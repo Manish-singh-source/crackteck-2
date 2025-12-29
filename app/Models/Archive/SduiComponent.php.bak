@@ -1,0 +1,208 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Permission\Models\Role;
+
+class SduiComponent extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'sdui_components';
+
+    protected $fillable = [
+        'page_id',
+        'type',
+        'props',
+        'order',
+        'is_active',
+        'created_by',
+        'updated_by',
+    ];
+
+    protected $casts = [
+        'props' => 'array',
+        'is_active' => 'boolean',
+        'order' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+    ];
+
+    /**
+     * Boot method to handle model events
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Create version on update
+        static::updated(function ($component) {
+            $component->createVersion();
+        });
+
+        // Create initial version on create
+        static::created(function ($component) {
+            $component->createVersion();
+        });
+    }
+
+    /**
+     * Get the page this component belongs to
+     */
+    public function page(): BelongsTo
+    {
+        return $this->belongsTo(SduiPage::class, 'page_id');
+    }
+
+    /**
+     * Get the user who created this component
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Get the user who last updated this component
+     */
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    /**
+     * Get roles assigned to this component
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'sdui_component_role', 'component_id', 'role_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get all versions of this component
+     */
+    public function versions(): HasMany
+    {
+        return $this->hasMany(SduiComponentVersion::class, 'component_id')->orderBy('version_number', 'desc');
+    }
+
+    /**
+     * Create a new version of this component
+     */
+    public function createVersion(): void
+    {
+        $latestVersion = $this->versions()->max('version_number') ?? 0;
+        
+        SduiComponentVersion::create([
+            'component_id' => $this->id,
+            'page_id' => $this->page_id,
+            'version_number' => $latestVersion + 1,
+            'type' => $this->type,
+            'props' => $this->props,
+            'order' => $this->order,
+            'is_active' => $this->is_active,
+            'version_data' => [
+                'component' => $this->toArray(),
+                'roles' => $this->roles->pluck('id')->toArray(),
+            ],
+            'created_by' => auth()->id(),
+        ]);
+    }
+
+    /**
+     * Revert to a specific version
+     */
+    public function revertToVersion(int $versionNumber): bool
+    {
+        $version = $this->versions()->where('version_number', $versionNumber)->first();
+        
+        if (!$version) {
+            return false;
+        }
+
+        $versionData = $version->version_data;
+
+        // Update component data
+        $this->update([
+            'type' => $version->type,
+            'props' => $version->props,
+            'order' => $version->order,
+            'is_active' => $version->is_active,
+            'updated_by' => auth()->id(),
+        ]);
+
+        // Sync roles
+        if (isset($versionData['roles'])) {
+            $this->roles()->sync($versionData['roles']);
+        }
+
+        return true;
+    }
+
+    /**
+     * Scope to get components by type
+     */
+    public function scopeByType($query, $type)
+    {
+        return $query->where('type', $type);
+    }
+
+    /**
+     * Scope to get active components
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope to get components for a specific role
+     */
+    public function scopeForRole($query, $roleId)
+    {
+        return $query->whereHas('roles', function ($q) use ($roleId) {
+            $q->where('role_id', $roleId);
+        });
+    }
+
+    /**
+     * Validate component props based on type
+     */
+    public function validateProps(): bool
+    {
+        $props = $this->props;
+        
+        // Basic validation rules for different component types
+        $validationRules = [
+            'header' => ['title'],
+            'text' => ['content'],
+            'button' => ['label'],
+            'form' => ['fields'],
+            'list' => ['items'],
+            'image' => ['url'],
+            'input' => ['type', 'name'],
+            'card' => ['content'],
+        ];
+
+        if (!isset($validationRules[$this->type])) {
+            return true; // Unknown type, skip validation
+        }
+
+        foreach ($validationRules[$this->type] as $requiredField) {
+            if (!isset($props[$requiredField])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+

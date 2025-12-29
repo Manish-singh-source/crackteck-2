@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class ServiceRequestProductRequestPart extends Model
+{
+    //
+    use SoftDeletes;
+    
+    protected $fillable = [
+        'service_request_id',
+        'service_request_product_id',
+        'assigned_engineer_id',
+        'requested_part_id',
+        'request_type',
+
+        'assigned_person_type',
+        'assigned_person_id',    
+
+        'status',
+
+        'otp',
+        'otp_expiry',
+        
+        'assigned_at',
+        'approved_at',
+        'rejected_at',
+        'customer_approved_at',
+        'customer_rejected_at',
+        'picked_at',
+        'in_transit_at',
+        'delivered_at',
+        'used_at',
+        'cancelled_at',
+    ];
+}

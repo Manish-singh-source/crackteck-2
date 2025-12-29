@@ -1,0 +1,165 @@
+<?php
+
+namespace Database\Seeders;
+
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class PlansTableSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        //
+        $now = Carbon::now();
+
+        DB::table('a_m_c_s')->insert([
+            // ===== Monthly Plans =====
+            [
+                'plan_name' => 'Basic Monthly',
+                'plan_code' => 'BM-001',
+                'plan_type' => 'Monthly',
+                'description' => 'Basic monthly subscription with limited services.',
+                'duration' => '3 months',
+                'total_visits' => 3,
+                'plan_cost' => 500,
+                'tax' => 18,
+                'total_cost' => 545,
+                'pay_terms' => 'Full Payment',
+                'support_type' => 'Onsite',
+                'replacement_policy' => 'No replacement',
+                'items' => '[\\"antivirus-installation\\",\\"os-installation\\"]',
+                'brochure' => 'basic_monthly.pdf',
+                'tandc' => 'T&C apply',
+                'status' => 'Active',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'plan_name' => 'Standard Monthly',
+                'plan_code' => 'SM-002',
+                'plan_type' => 'Monthly',
+                'description' => 'Standard monthly plan with extended services.',
+                'duration' => '6 months',
+                'total_visits' => 5,
+                'plan_cost' => 1000,
+                'tax' => 18,
+                'total_cost' => 1090,
+                'pay_terms' => 'Full Payment',
+                'support_type' => 'Onsite',
+                'replacement_policy' => 'Replacement within 7 days',
+                'items' => '[\\"antivirus-installation\\",\\"os-installation\\"]',
+                'brochure' => 'standard_monthly.pdf',
+                'tandc' => 'T&C apply',
+                'status' => 'Active',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'plan_name' => 'Premium Monthly',
+                'plan_code' => 'PM-003',
+                'plan_type' => 'Monthly',
+                'description' => 'Premium monthly plan with priority services.',
+                'duration' => '15 months',
+                'total_visits' => 10,
+                'plan_cost' => 2000,
+                'tax' => 18,
+                'total_cost' => 2180,
+                'pay_terms' => 'Full Payment',
+                'support_type' => 'Both',
+                'replacement_policy' => 'Replacement within 15 days',
+                'items' => '[\\"antivirus-installation\\",\\"os-installation\\"]',
+                'brochure' => 'premium_monthly.pdf',
+                'tandc' => 'T&C apply',
+                'status' => 'Active',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'plan_name' => 'Ultimate Monthly',
+                'plan_code' => 'UM-004',
+                'plan_type' => 'Monthly',
+                'description' => 'Ultimate plan with unlimited services and priority support.',
+                'duration' => 'Unlimited',
+                'total_visits' => 20,
+                'plan_cost' => 3500,
+                'tax' => 18,
+                'total_cost' => 3815,
+                'pay_terms' => 'Installments',
+                'support_type' => 'Both',
+                'replacement_policy' => 'Replacement within 30 days',
+                'items' => '[\\"antivirus-installation\\",\\"os-installation\\"]',
+                'brochure' => 'ultimate_monthly.pdf',
+                'tandc' => 'T&C apply',
+                'status' => 'Active',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+
+            // ===== Annual Plans =====
+            [
+                'plan_name' => 'Basic Annual',
+                'plan_code' => 'BA-001',
+                'plan_type' => 'Annually',
+                'description' => 'Basic annual subscription with limited services.',
+                'duration' => '1 Year',
+                'total_visits' => 15,
+                'plan_cost' => 5000,
+                'tax' => 18,
+                'total_cost' => 5450,
+                'pay_terms' => 'Full Payment',
+                'support_type' => 'Onsite',
+                'replacement_policy' => 'No replacement',
+                'items' => '[\\"antivirus-installation\\",\\"os-installation\\"]',
+                'brochure' => 'basic_annual.pdf',
+                'tandc' => 'T&C apply',
+                'status' => 'Active',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'plan_name' => 'Standard Annual',
+                'plan_code' => 'SA-002',
+                'plan_type' => 'Annually',
+                'description' => 'Standard annual plan with extended services.',
+                'duration' => '2 Years',
+                'total_visits' => 20,
+                'plan_cost' => 10000,
+                'tax' => 18,
+                'total_cost' => 10900,
+                'pay_terms' => 'Full Payment',
+                'support_type' => 'Onsite',
+                'replacement_policy' => 'Replacement within 7 days',
+                'items' => '[\\"antivirus-installation\\",\\"os-installation\\"]',
+                'brochure' => 'standard_annual.pdf',
+                'tandc' => 'T&C apply',
+                'status' => 'Active',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'plan_name' => 'Premium Annual',
+                'plan_code' => 'PA-003',
+                'plan_type' => 'Annually',
+                'description' => 'Premium annual plan with priority services.',
+                'duration' => '3 Years',
+                'total_visits' => 30,
+                'plan_cost' => 20000,
+                'tax' => 18,
+                'total_cost' => 21800,
+                'pay_terms' => 'Installments',
+                'support_type' => 'Both',
+                'replacement_policy' => 'Replacement within 15 days',
+                'items' => '[\\"antivirus-installation\\",\\"os-installation\\"]',
+                'brochure' => 'premium_annual.pdf',
+                'tandc' => 'T&C apply',
+                'status' => 'Active',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+        ]);
+    }
+}

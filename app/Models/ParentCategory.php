@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class ParentCategory extends Model
+{
+    //
+    protected $fillable = [
+        'slug',
+        'name',
+        'image',
+        'sort_order',
+        'status_ecommerce',
+        'status',
+    ];
+
+    public function subCategories()
+    {
+        return $this->hasMany(SubCategory::class, 'parent_category_id');
+    }
+}

@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class SduiComponentVersion extends Model
+{
+    use HasFactory;
+
+    protected $table = 'sdui_component_versions';
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'component_id',
+        'page_id',
+        'version_number',
+        'type',
+        'props',
+        'order',
+        'is_active',
+        'version_data',
+        'created_by',
+        'created_at',
+    ];
+
+    protected $casts = [
+        'props' => 'array',
+        'version_data' => 'array',
+        'is_active' => 'boolean',
+        'version_number' => 'integer',
+        'order' => 'integer',
+        'created_at' => 'datetime',
+    ];
+
+    /**
+     * Boot method to set created_at automatically
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (!$model->created_at) {
+                $model->created_at = now();
+            }
+        });
+    }
+
+    /**
+     * Get the component this version belongs to
+     */
+    public function component(): BelongsTo
+    {
+        return $this->belongsTo(SduiComponent::class, 'component_id');
+    }
+
+    /**
+     * Get the page this version belongs to
+     */
+    public function page(): BelongsTo
+    {
+        return $this->belongsTo(SduiPage::class, 'page_id');
+    }
+
+    /**
+     * Get the user who created this version
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+}
+

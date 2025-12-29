@@ -1,0 +1,334 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\SduiComponent;
+use App\Models\SduiPage;
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
+
+class SduiComponentController extends Controller
+{
+    /**
+     * Display a listing of components
+     */
+    public function index(Request $request)
+    {
+        $query = SduiComponent::with(['page', 'roles', 'creator', 'updater']);
+
+        // Filter by page
+        if ($request->has('page_id') && $request->page_id) {
+            $query->where('page_id', $request->page_id);
+        }
+
+        // Filter by type
+        if ($request->has('type') && $request->type) {
+            $query->byType($request->type);
+        }
+
+        // Include trashed if requested
+        if ($request->has('show_deleted') && $request->show_deleted) {
+            $query->withTrashed();
+        }
+
+        $components = $query->orderBy('page_id')->orderBy('order')->paginate(20);
+        $pages = SduiPage::all();
+        $roles = Role::all();
+
+        return view('admin.sdui.components.index', compact('components', 'pages', 'roles'));
+    }
+
+    /**
+     * Show the form for creating a new component
+     */
+    public function create(Request $request)
+    {
+        $pageId = $request->get('page_id');
+        $page = $pageId ? SduiPage::findOrFail($pageId) : null;
+        $pages = SduiPage::all();
+        $roles = Role::all();
+        $componentTypes = $this->getComponentTypes();
+
+        return view('admin.sdui.components.create', compact('page', 'pages', 'roles', 'componentTypes'));
+    }
+
+    /**
+     * Store a newly created component
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'page_id' => 'required|exists:sdui_pages,id',
+            'type' => 'required|string|max:100',
+            'props' => 'required|json',
+            'order' => 'nullable|integer',
+            'is_active' => 'boolean',
+            'roles' => 'nullable|array',
+            'roles.*' => 'exists:roles,id',
+        ]);
+
+        // Decode JSON props
+        $validated['props'] = json_decode($validated['props'], true);
+
+        // Auto-set order if not provided
+        if (!isset($validated['order'])) {
+            $maxOrder = SduiComponent::where('page_id', $validated['page_id'])->max('order') ?? 0;
+            $validated['order'] = $maxOrder + 1;
+        }
+
+        $validated['created_by'] = auth()->id();
+        $validated['updated_by'] = auth()->id();
+
+        $component = SduiComponent::create($validated);
+
+        // Attach roles
+        if (!empty($validated['roles'])) {
+            $component->roles()->sync($validated['roles']);
+        }
+
+        flash()->success('Component created successfully!');
+        
+        if ($request->has('redirect_to_page') && $request->redirect_to_page) {
+            return redirect()->route('admin.sdui.pages.edit', $component->page_id);
+        }
+        
+        return redirect()->route('admin.sdui.components.edit', $component->id);
+    }
+
+    /**
+     * Display the specified component
+     */
+    public function show($id)
+    {
+        $component = SduiComponent::with(['page', 'roles', 'versions.creator'])->findOrFail($id);
+        return view('admin.sdui.components.show', compact('component'));
+    }
+
+    /**
+     * Show the form for editing the specified component
+     */
+    public function edit($id)
+    {
+        $component = SduiComponent::with(['page', 'roles'])->findOrFail($id);
+        $pages = SduiPage::all();
+        $roles = Role::all();
+        $componentTypes = $this->getComponentTypes();
+
+        return view('admin.sdui.components.edit', compact('component', 'pages', 'roles', 'componentTypes'));
+    }
+
+    /**
+     * Update the specified component
+     */
+    public function update(Request $request, $id)
+    {
+        $component = SduiComponent::findOrFail($id);
+
+        $validated = $request->validate([
+            'page_id' => 'required|exists:sdui_pages,id',
+            'type' => 'required|string|max:100',
+            'props' => 'required|json',
+            'order' => 'required|integer',
+            'is_active' => 'boolean',
+            'roles' => 'nullable|array',
+            'roles.*' => 'exists:roles,id',
+        ]);
+
+        // Decode JSON props
+        $validated['props'] = json_decode($validated['props'], true);
+        $validated['updated_by'] = auth()->id();
+
+        $component->update($validated);
+
+        // Sync roles
+        if (isset($validated['roles'])) {
+            $component->roles()->sync($validated['roles']);
+        } else {
+            $component->roles()->sync([]);
+        }
+
+        flash()->success('Component updated successfully!');
+        return redirect()->route('admin.sdui.components.edit', $component->id);
+    }
+
+    /**
+     * Remove the specified component (soft delete)
+     */
+    public function destroy($id)
+    {
+        $component = SduiComponent::findOrFail($id);
+        $pageId = $component->page_id;
+        $component->delete();
+
+        flash()->success('Component deleted successfully!');
+        
+        if (request()->has('redirect_to_page') && request()->redirect_to_page) {
+            return redirect()->route('admin.sdui.pages.edit', $pageId);
+        }
+        
+        return redirect()->route('admin.sdui.components.index');
+    }
+
+    /**
+     * Restore a soft-deleted component
+     */
+    public function restore($id)
+    {
+        $component = SduiComponent::withTrashed()->findOrFail($id);
+        $component->restore();
+
+        flash()->success('Component restored successfully!');
+        return redirect()->route('admin.sdui.components.edit', $component->id);
+    }
+
+    /**
+     * Permanently delete a component
+     */
+    public function forceDelete($id)
+    {
+        $component = SduiComponent::withTrashed()->findOrFail($id);
+        $component->forceDelete();
+
+        flash()->success('Component permanently deleted!');
+        return redirect()->route('admin.sdui.components.index');
+    }
+
+    /**
+     * Revert component to a specific version
+     */
+    public function revert($id, $versionNumber)
+    {
+        $component = SduiComponent::findOrFail($id);
+        
+        if ($component->revertToVersion($versionNumber)) {
+            flash()->success("Component reverted to version {$versionNumber} successfully!");
+        } else {
+            flash()->error("Failed to revert to version {$versionNumber}.");
+        }
+
+        return redirect()->route('admin.sdui.components.edit', $component->id);
+    }
+
+    /**
+     * Reorder components
+     */
+    public function reorder(Request $request)
+    {
+        $validated = $request->validate([
+            'components' => 'required|array',
+            'components.*.id' => 'required|exists:sdui_components,id',
+            'components.*.order' => 'required|integer',
+        ]);
+
+        foreach ($validated['components'] as $componentData) {
+            SduiComponent::where('id', $componentData['id'])
+                ->update([
+                    'order' => $componentData['order'],
+                    'updated_by' => auth()->id(),
+                ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Components reordered successfully!',
+        ]);
+    }
+
+    /**
+     * Duplicate a component
+     */
+    public function duplicate($id)
+    {
+        $originalComponent = SduiComponent::with('roles')->findOrFail($id);
+        
+        // Create new component
+        $newComponent = $originalComponent->replicate();
+        $newComponent->order = SduiComponent::where('page_id', $originalComponent->page_id)->max('order') + 1;
+        $newComponent->created_by = auth()->id();
+        $newComponent->updated_by = auth()->id();
+        $newComponent->save();
+
+        // Duplicate roles
+        $newComponent->roles()->sync($originalComponent->roles->pluck('id'));
+
+        flash()->success('Component duplicated successfully!');
+        return redirect()->route('admin.sdui.components.edit', $newComponent->id);
+    }
+
+    /**
+     * Get component template/schema based on type
+     */
+    public function getTemplate($type)
+    {
+        $templates = [
+            'header' => [
+                'title' => 'Header Title',
+                'subtitle' => 'Optional subtitle',
+                'alignment' => 'center',
+                'style' => [
+                    'fontSize' => 24,
+                    'fontWeight' => 'bold',
+                    'color' => '#000000',
+                ],
+            ],
+            'text' => [
+                'content' => 'Text content here',
+                'alignment' => 'left',
+                'style' => [
+                    'fontSize' => 14,
+                    'color' => '#333333',
+                ],
+            ],
+            'button' => [
+                'label' => 'Button Label',
+                'action' => 'navigate',
+                'endpoint' => '/api/endpoint',
+                'style' => [
+                    'backgroundColor' => '#007bff',
+                    'textColor' => '#ffffff',
+                    'borderRadius' => 8,
+                ],
+            ],
+            'input' => [
+                'type' => 'text',
+                'name' => 'field_name',
+                'label' => 'Field Label',
+                'placeholder' => 'Enter value',
+                'required' => false,
+                'validation' => [],
+            ],
+            'image' => [
+                'url' => 'https://example.com/image.jpg',
+                'alt' => 'Image description',
+                'width' => '100%',
+                'height' => 'auto',
+            ],
+        ];
+
+        return response()->json([
+            'success' => true,
+            'template' => $templates[$type] ?? [],
+        ]);
+    }
+
+    /**
+     * Get available component types
+     */
+    private function getComponentTypes()
+    {
+        return [
+            'header' => 'Header',
+            'text' => 'Text',
+            'button' => 'Button',
+            'form' => 'Form',
+            'list' => 'List',
+            'image' => 'Image',
+            'input' => 'Input Field',
+            'card' => 'Card',
+            'divider' => 'Divider',
+            'spacer' => 'Spacer',
+        ];
+    }
+}
+

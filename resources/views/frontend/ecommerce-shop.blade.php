@@ -162,7 +162,7 @@
                                             <input type="checkbox" name="category" class="tf-check category-filter"
                                                 id="category-{{ $category->id }}" value="{{ $category->id }}">
                                             <label
-                                                for="category-{{ $category->id }}">{{ $category->parent_categories }}</label>
+                                                for="category-{{ $category->id }}">{{ $category->name }}</label>
                                         </fieldset>
                                     @empty
                                         <p class="text-muted">No categories available</p>
@@ -180,7 +180,7 @@
                                         <fieldset class="fieldset-item">
                                             <input type="checkbox" name="brand" class="tf-check brand-filter"
                                                 id="brand-{{ $brand->id }}" value="{{ $brand->id }}">
-                                            <label for="brand-{{ $brand->id }}">{{ $brand->brand_title }}</label>
+                                            <label for="brand-{{ $brand->id }}">{{ $brand->name }}</label>
                                         </fieldset>
                                     @empty
                                         <p class="text-muted">No brands available</p>
@@ -339,8 +339,7 @@
                                                     src="{{ asset($product->warehouseProduct->main_product_image) }}"
                                                     data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
                                                     alt="{{ $product->warehouseProduct->product_name }}">
-                                                @if (
-                                                    $product->warehouseProduct->additional_product_images &&
+                                                @if (is_array($product->warehouseProduct->additional_product_images) &&
                                                         count($product->warehouseProduct->additional_product_images) > 0)
                                                     <img class="img-hover lazyload"
                                                         src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
@@ -459,7 +458,7 @@
                                                     <li><i class="icon-star"></i></li>
                                                     <li><i class="icon-star"></i></li>
                                                 </ul>
-                                                <p class="caption text-main-2">({{ $product->total_sold }})</p>
+                                                <p class="caption text-main-2">({{ $product->total_sold ?? 0 }})</p>
                                             </div>
                                             {{-- <a href="#compare" data-bs-toggle="offcanvas" class="tf-btn-icon style-2">
                                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
@@ -516,11 +515,11 @@
                         </div>
                     </div>
                     <!-- Pagination -->
-                    @if ($products->hasPages())
+                    {{-- @if ($products->hasPages())
                         <div class="tf-pagination-wrap view-more-button">
                             {{ $products->links() }}
                         </div>
-                    @endif
+                    @endif --}}
                 </div>
             </div>
         </div>
@@ -1066,11 +1065,11 @@
                             </li>
                         </ul>
                         ${discountPercent > 0 ? `
-                                <div class="box-sale-wrap pst-default">
-                                    <p class="small-text">Sale</p>
-                                    <p class="title-sidebar-2">${discountPercent}%</p>
-                                </div>
-                            ` : ''}
+                                    <div class="box-sale-wrap pst-default">
+                                        <p class="small-text">Sale</p>
+                                        <p class="title-sidebar-2">${discountPercent}%</p>
+                                    </div>
+                                ` : ''}
                     </div>
                     <div class="card-product-info">
                         <div class="box-title">
@@ -1089,8 +1088,8 @@
                             </p>
 
                             ${shortDescription ? `<div class="product-description">
-                                                                <p class="caption">${shortDescription}</p>
-                                                            </div>` : ''}
+                                                                    <p class="caption">${shortDescription}</p>
+                                                                </div>` : ''}
                             <div class="box-infor-detail">
                                 <div class="star-review flex-wrap">
                                     <ul class="list-star">

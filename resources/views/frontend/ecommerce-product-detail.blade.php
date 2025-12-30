@@ -31,7 +31,7 @@
                             <a href="{{ route('shop') }}?category={{ $product->warehouseProduct->parentCategorie->id }}"
                                 class="body-small link" itemprop="item">
                                 <span
-                                    itemprop="name">{{ $product->warehouseProduct->parentCategorie->parent_categories }}</span>
+                                    itemprop="name">{{ $product->warehouseProduct->parentCategorie->name }}</span>
                             </a>
                             <meta itemprop="position" content="3" />
                         </li>
@@ -78,14 +78,15 @@
 
                                             @if (
                                                 $product->warehouseProduct->additional_product_images &&
-                                                    count($product->warehouseProduct->additional_product_images) > 0)
-                                                @foreach ($product->warehouseProduct->additional_product_images as $index => $image)
+                                                    count(json_decode($product->warehouseProduct->additional_product_images)) > 0)
+                                                @foreach (json_decode($product->warehouseProduct->additional_product_images) as $index => $image)
                                                     <div class="swiper-slide" data-color="additional-{{ $index }}">
                                                         <a href="{{ asset($image) }}" target="_blank" class="item"
                                                             data-pswp-width="600px" data-pswp-height="800px">
-                                                            <img class="tf-image-zoom lazyload"
+                                                            <img class="tf-image-zoom ls-is-cached lazyload"
+                                                                src="{{ asset($image) }}"
                                                                 data-zoom="{{ asset($image) }}"
-                                                                data-src="{{ asset($image) }}" src="{{ asset($image) }}"
+                                                                data-src="{{ asset($image) }}"
                                                                 alt="{{ $product->warehouseProduct->product_name }} - Image {{ $index + 1 }}">
                                                         </a>
                                                     </div>
@@ -124,8 +125,8 @@
 
                                             @if (
                                                 $product->warehouseProduct->additional_product_images &&
-                                                    count($product->warehouseProduct->additional_product_images) > 0)
-                                                @foreach ($product->warehouseProduct->additional_product_images as $index => $image)
+                                                    count(json_decode($product->warehouseProduct->additional_product_images)) > 0)
+                                                @foreach (json_decode($product->warehouseProduct->additional_product_images) as $index => $image)
                                                     <div class="swiper-slide stagger-item"
                                                         data-color="additional-{{ $index }}">
                                                         <div class="item">
@@ -163,9 +164,9 @@
                                         @if ($product->warehouseProduct && $product->warehouseProduct->parentCategorie)
                                             <div class="caption mb-2">
                                                 <span class="">
-                                                    {{ $product->warehouseProduct->parentCategorie->parent_categories }}
+                                                    {{ $product->warehouseProduct->parentCategorie->name }}
                                                     @if ($product->warehouseProduct->subCategorie)
-                                                        > {{ $product->warehouseProduct->subCategorie->sub_categorie }}
+                                                        > {{ $product->warehouseProduct->subCategorie->name }}
                                                     @endif
                                                 </span>
                                             </div>
@@ -231,15 +232,15 @@
                                     <div class="infor-center">
                                         <div class="product-info-price">
                                             @if ($product->warehouseProduct)
-                                                @if ($product->warehouseProduct->selling_price)
+                                                @if ($product->warehouseProduct->final_price)
                                                     <h4 class="text-primary">
-                                                        ₹{{ number_format($product->warehouseProduct->selling_price, 2) }}
+                                                        ₹{{ number_format($product->warehouseProduct->final_price, 2) }}
                                                     </h4>
                                                     @if (
-                                                        $product->warehouseProduct->cost_price &&
-                                                            $product->warehouseProduct->cost_price > $product->warehouseProduct->selling_price)
+                                                        $product->warehouseProduct->discount_price &&
+                                                            $product->warehouseProduct->discount_price > 0)
                                                         <span
-                                                            class="price-text text-main-2 old-price">₹{{ number_format($product->warehouseProduct->cost_price, 2) }}</span>
+                                                            class="price-text text-main-2 old-price">₹{{ number_format($product->warehouseProduct->final_price + $product->warehouseProduct->discount_price, 2) }}</span>
                                                     @endif
                                                 @endif
                                             @else

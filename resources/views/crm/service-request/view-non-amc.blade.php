@@ -259,11 +259,11 @@
                                             <th>Serial No</th>
                                             <th>Purchase Date</th>
                                             <th>Warranty</th>
-                                        </tr>    
+                                        </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($service->products as $index => $product)
-                                            <tr>    
+                                            <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $product->product_name }}</td>
                                                 <td>{{ $product->product_type }}</td>
@@ -281,7 +281,7 @@
                                         @endforelse
                                     </tbody>
                                 </table>
-                            </div>    
+                            </div>
                         </div>
                     </div>
 
@@ -404,72 +404,84 @@
                             </div>
 
                             <!-- Assigned Engineers Display -->
-                            @if($service->activeAssignment)
-                            <div class="card mt-3" id="assignedEngineersCard">
-                                <div class="card-header border-bottom-dashed bg-light">
-                                    <h5 class="card-title mb-0">Assigned Engineers</h5>
-                                </div>
-                                <div class="card-body">
-                                    @if($service->activeAssignment->assignment_type === 'Individual')
-                                        <!-- Individual Engineer Card -->
-                                        <div class="border rounded p-3 bg-success-subtle">
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-grow-1">
-                                                    <h6 class="mb-1 fw-bold">
-                                                        {{ $service->activeAssignment->engineer->first_name }} {{ $service->activeAssignment->engineer->last_name }}
-                                                    </h6>
-                                                    <p class="mb-1 text-muted small">
-                                                        <i class="mdi mdi-briefcase"></i> {{ $service->activeAssignment->engineer->designation }}
-                                                    </p>
-                                                    <p class="mb-1 text-muted small">
-                                                        <i class="mdi mdi-office-building"></i> {{ $service->activeAssignment->engineer->department }}
-                                                    </p>
-                                                    <p class="mb-0 text-muted small">
-                                                        <i class="mdi mdi-phone"></i> {{ $service->activeAssignment->engineer->phone }}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <span class="badge bg-success">Individual Assignment</span>
+                            @if ($service->activeAssignment)
+                                <div class="card mt-3" id="assignedEngineersCard">
+                                    <div class="card-header border-bottom-dashed bg-light">
+                                        <h5 class="card-title mb-0">Assigned Engineers</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        @if ($service->activeAssignment->assignment_type === 'Individual')
+                                            <!-- Individual Engineer Card -->
+                                            <div class="border rounded p-3 bg-success-subtle">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="mb-1 fw-bold">
+                                                            {{ $service->activeAssignment->engineer->first_name }}
+                                                            {{ $service->activeAssignment->engineer->last_name }}
+                                                        </h6>
+                                                        <p class="mb-1 text-muted small">
+                                                            <i class="mdi mdi-briefcase"></i>
+                                                            {{ $service->activeAssignment->engineer->designation }}
+                                                        </p>
+                                                        <p class="mb-1 text-muted small">
+                                                            <i class="mdi mdi-office-building"></i>
+                                                            {{ $service->activeAssignment->engineer->department }}
+                                                        </p>
+                                                        <p class="mb-0 text-muted small">
+                                                            <i class="mdi mdi-phone"></i>
+                                                            {{ $service->activeAssignment->engineer->phone }}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <span class="badge bg-success">Individual Assignment</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    @else
-                                        <!-- Group Assignment Card -->
-                                        <div class="border rounded p-3 bg-info-subtle">
-                                            <h6 class="mb-3 fw-bold">
-                                                <i class="mdi mdi-account-group"></i> Group: {{ $service->activeAssignment->group_name }}
-                                                <span class="badge bg-info ms-2">{{ $service->activeAssignment->groupEngineers->count() }} Engineers</span>
-                                            </h6>
+                                        @else
+                                            <!-- Group Assignment Card -->
+                                            <div class="border rounded p-3 bg-info-subtle">
+                                                <h6 class="mb-3 fw-bold">
+                                                    <i class="mdi mdi-account-group"></i> Group:
+                                                    {{ $service->activeAssignment->group_name }}
+                                                    <span
+                                                        class="badge bg-info ms-2">{{ $service->activeAssignment->groupEngineers->count() }}
+                                                        Engineers</span>
+                                                </h6>
 
-                                            <div class="row">
-                                                @foreach($service->activeAssignment->groupEngineers as $groupEngineer)
-                                                    <div class="col-md-6 mb-3">
-                                                        <div class="border rounded p-2 {{ $groupEngineer->pivot->is_supervisor ? 'bg-warning-subtle' : 'bg-white' }}">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="flex-grow-1">
-                                                                    <h6 class="mb-1 fw-semibold">
-                                                                        {{ $groupEngineer->first_name }} {{ $groupEngineer->last_name }}
-                                                                        @if($groupEngineer->pivot->is_supervisor)
-                                                                            <span class="supervisor-badge">SUPERVISOR</span>
-                                                                        @endif
-                                                                    </h6>
-                                                                    <p class="mb-0 text-muted small">
-                                                                        <i class="mdi mdi-briefcase"></i> {{ $groupEngineer->designation }} |
-                                                                        <i class="mdi mdi-phone"></i> {{ $groupEngineer->phone }}
-                                                                    </p>
+                                                <div class="row">
+                                                    @foreach ($service->activeAssignment->groupEngineers as $groupEngineer)
+                                                        <div class="col-md-6 mb-3">
+                                                            <div
+                                                                class="border rounded p-2 {{ $groupEngineer->pivot->is_supervisor ? 'bg-warning-subtle' : 'bg-white' }}">
+                                                                <div class="d-flex align-items-center">
+                                                                    <div class="flex-grow-1">
+                                                                        <h6 class="mb-1 fw-semibold">
+                                                                            {{ $groupEngineer->first_name }}
+                                                                            {{ $groupEngineer->last_name }}
+                                                                            @if ($groupEngineer->pivot->is_supervisor)
+                                                                                <span
+                                                                                    class="supervisor-badge">SUPERVISOR</span>
+                                                                            @endif
+                                                                        </h6>
+                                                                        <p class="mb-0 text-muted small">
+                                                                            <i class="mdi mdi-briefcase"></i>
+                                                                            {{ $groupEngineer->designation }} |
+                                                                            <i class="mdi mdi-phone"></i>
+                                                                            {{ $groupEngineer->phone }}
+                                                                        </p>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                @endforeach
+                                                    @endforeach
+                                                </div>
                                             </div>
-                                        </div>
-                                    @endif
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
                             @endif
 
-                            
+
 
                             <!-- Action Buttons -->
                             {{-- <div class="card mt-3">
@@ -509,97 +521,98 @@
         @endsection
 
         @section('scripts')
-<script>
-    $(document).ready(function() {
-        // Toggle between Individual and Group sections
-        $('input[name="assignment_type"]').change(function() {
-            if ($(this).val() === 'Individual') {
-                $('#individualSection').show();
-                $('#groupSection').hide();
-                // Clear group fields
-                $('#group_name').val('');
-                $('.engineer-checkbox').prop('checked', false);
-                $('input[name="supervisor_id"]').prop('checked', false);
-            } else {
-                $('#individualSection').hide();
-                $('#groupSection').show();
-                // Clear individual field
-                $('#engineer_id').val('');
-            }
-        });
+            <script>
+                $(document).ready(function() {
+                    // Toggle between Individual and Group sections
+                    $('input[name="assignment_type"]').change(function() {
+                        if ($(this).val() === 'Individual') {
+                            $('#individualSection').show();
+                            $('#groupSection').hide();
+                            // Clear group fields
+                            $('#group_name').val('');
+                            $('.engineer-checkbox').prop('checked', false);
+                            $('input[name="supervisor_id"]').prop('checked', false);
+                        } else {
+                            $('#individualSection').hide();
+                            $('#groupSection').show();
+                            // Clear individual field
+                            $('#engineer_id').val('');
+                        }
+                    });
 
-        // Sync checkbox with supervisor radio
-        $('.engineer-checkbox').change(function() {
-            const engineerId = $(this).val();
-            const supervisorRadio = $('input[name="supervisor_id"][value="' + engineerId + '"]');
+                    // Sync checkbox with supervisor radio
+                    $('.engineer-checkbox').change(function() {
+                        const engineerId = $(this).val();
+                        const supervisorRadio = $('input[name="supervisor_id"][value="' + engineerId + '"]');
 
-            if (!$(this).is(':checked')) {
-                // If unchecked, also uncheck supervisor radio
-                supervisorRadio.prop('checked', false);
-            }
-        });
+                        if (!$(this).is(':checked')) {
+                            // If unchecked, also uncheck supervisor radio
+                            supervisorRadio.prop('checked', false);
+                        }
+                    });
 
-        // Ensure supervisor is also checked as engineer
-        $('input[name="supervisor_id"]').change(function() {
-            const engineerId = $(this).val();
-            const engineerCheckbox = $('.engineer-checkbox[value="' + engineerId + '"]');
+                    // Ensure supervisor is also checked as engineer
+                    $('input[name="supervisor_id"]').change(function() {
+                        const engineerId = $(this).val();
+                        const engineerCheckbox = $('.engineer-checkbox[value="' + engineerId + '"]');
 
-            if (!engineerCheckbox.is(':checked')) {
-                engineerCheckbox.prop('checked', true);
-            }
-        });
+                        if (!engineerCheckbox.is(':checked')) {
+                            engineerCheckbox.prop('checked', true);
+                        }
+                    });
 
-        // Form submission
-        $('#assignEngineerForm').submit(function(e) {
-            e.preventDefault();
+                    // Form submission
+                    $('#assignEngineerForm').submit(function(e) {
+                        e.preventDefault();
 
-            const assignmentType = $('input[name="assignment_type"]:checked').val();
+                        const assignmentType = $('input[name="assignment_type"]:checked').val();
 
-            // Validation
-            if (assignmentType === 'Individual') {
-                if (!$('#engineer_id').val()) {
-                    alert('Please select an engineer');
-                    return;
-                }
-            } else if (assignmentType === 'Group') {
-                if (!$('#group_name').val()) {
-                    alert('Please enter group name');
-                    return;
-                }
+                        // Validation
+                        if (assignmentType === 'Individual') {
+                            if (!$('#engineer_id').val()) {
+                                alert('Please select an engineer');
+                                return;
+                            }
+                        } else if (assignmentType === 'Group') {
+                            if (!$('#group_name').val()) {
+                                alert('Please enter group name');
+                                return;
+                            }
 
-                const checkedEngineers = $('.engineer-checkbox:checked').length;
-                if (checkedEngineers === 0) {
-                    alert('Please select at least one engineer');
-                    return;
-                }
+                            const checkedEngineers = $('.engineer-checkbox:checked').length;
+                            if (checkedEngineers === 0) {
+                                alert('Please select at least one engineer');
+                                return;
+                            }
 
-                if (!$('input[name="supervisor_id"]:checked').val()) {
-                    alert('Please select a supervisor');
-                    return;
-                }
-            }
+                            if (!$('input[name="supervisor_id"]:checked').val()) {
+                                alert('Please select a supervisor');
+                                return;
+                            }
+                        }
 
-            // Submit via AJAX
-            const formData = $(this).serialize();
+                        // Submit via AJAX
+                        const formData = $(this).serialize();
 
-            $.ajax({
-                url: '{{ route("service-request.assign-non-amc-engineer") }}',
-                method: 'POST',
-                data: formData,
-                success: function(response) {
-                    if (response.success) {
-                        alert(response.message);
-                        location.reload();
-                    } else {
-                        alert('Error: ' + response.message);
-                    }
-                },
-                error: function(xhr) {
-                    const error = xhr.responseJSON?.message || 'Error assigning engineer. Please try again.';
-                    alert(error);
-                }
-            });
-        });
-    });
-</script>
-@endsection
+                        $.ajax({
+                            url: '{{ route('service-request.assign-non-amc-engineer') }}',
+                            method: 'POST',
+                            data: formData,
+                            success: function(response) {
+                                if (response.success) {
+                                    alert(response.message);
+                                    location.reload();
+                                } else {
+                                    alert('Error: ' + response.message);
+                                }
+                            },
+                            error: function(xhr) {
+                                const error = xhr.responseJSON?.message ||
+                                    'Error assigning engineer. Please try again.';
+                                alert(error);
+                            }
+                        });
+                    });
+                });
+            </script>
+        @endsection

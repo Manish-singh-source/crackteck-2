@@ -122,36 +122,59 @@
                                                 class="table table-striped table-borderless dt-responsive nowrap">
                                                 <thead>
                                                     <tr>
-                                                        <th>Duration</th>
-                                                        <th>Name</th>
                                                         <th>Code</th>
+                                                        <th>Title</th>
                                                         <th>Type</th>
-                                                        <th>Discount Value</th>
+                                                        <th>Discount</th>
                                                         <th>Status</th>
-                                                        <th>Action</th>
+                                                        <th>Usage</th>
+                                                        <th>Dates</th>
+                                                        <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     @forelse($coupons as $coupon)
                                                     <tr>
                                                         <td>
-                                                            {{ $coupon->start_date->format('M d, Y') }} -
-                                                            {{ $coupon->end_date->format('M d, Y') }}
+                                                            <code class="text-primary">{{ $coupon->code }}</code>
                                                         </td>
-                                                        <td>{{ $coupon->coupon_title }}</td>
+                                                        <td>{{ $coupon->title }}</td>
                                                         <td>
-                                                            <code>{{ $coupon->coupon_code }}</code>
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge {{ $coupon->discount_type === 'percentage' ? 'bg-info-subtle text-info' : 'bg-success-subtle text-success' }} fw-semibold">
-                                                                {{ $coupon->discount_type === 'percentage' ? 'Percentage' : 'Fixed Amount' }}
-                                                            </span>
+                                                            @if($coupon->type == 0)
+                                                                <span class="badge bg-info-subtle text-info fw-semibold">Percentage</span>
+                                                            @elseif($coupon->type == 1)
+                                                                <span class="badge bg-success-subtle text-success fw-semibold">Fixed</span>
+                                                            @else
+                                                                <span class="badge bg-warning-subtle text-warning fw-semibold">Buy X Get Y</span>
+                                                            @endif
                                                         </td>
                                                         <td>{{ $coupon->formatted_discount }}</td>
                                                         <td>
-                                                            <span class="badge {{ $coupon->status_badge_class }} fw-semibold">
-                                                                {{ $coupon->status_text }}
-                                                            </span>
+                                                            @if($coupon->is_active)
+                                                                @if($coupon->is_expired)
+                                                                    <span class="badge bg-danger fw-semibold">Expired</span>
+                                                                @elseif($coupon->is_valid)
+                                                                    <span class="badge bg-success fw-semibold">Active</span>
+                                                                @else
+                                                                    <span class="badge bg-warning fw-semibold">Scheduled</span>
+                                                                @endif
+                                                            @else
+                                                                <span class="badge bg-secondary fw-semibold">Inactive</span>
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            <small class="text-muted">
+                                                                {{ $coupon->used_count }} / {{ $coupon->usage_limit ?: '∞' }}
+                                                                @if($coupon->usage_limit > 0)
+                                                                    <br><span class="badge bg-light text-dark">{{ $coupon->usage_percentage }}%</span>
+                                                                @endif
+                                                            </small>
+                                                        </td>
+                                                        <td>
+                                                            <small>
+                                                                {{ $coupon->start_date->format('M d, Y') }}<br>
+                                                                {{ $coupon->end_date->format('M d, Y') }}
+                                                            </small>
                                                         </td>
                                                         <td>
                                                             <a aria-label="anchor" href="{{ route('coupon.edit', $coupon->id) }}"
@@ -159,18 +182,28 @@
                                                                 data-bs-toggle="tooltip" data-bs-original-title="Edit">
                                                                 <i class="mdi mdi-pencil-outline fs-14 text-warning"></i>
                                                             </a>
-                                                            <button type="button" aria-label="anchor"
+                                                            {{-- <button type="button" aria-label="anchor"
                                                                 class="btn btn-icon btn-sm bg-danger-subtle delete-coupon"
                                                                 data-coupon-id="{{ $coupon->id }}"
-                                                                data-coupon-name="{{ $coupon->coupon_title }}"
+                                                                data-coupon-name="{{ $coupon->title }}"
                                                                 data-bs-toggle="tooltip" data-bs-original-title="Delete">
                                                                 <i class="mdi mdi-delete fs-14 text-danger"></i>
-                                                            </button>
+                                                            </button> --}}
+                                                            <form action="{{ route('coupon.delete', $coupon->id) }}" method="POST" style="display: inline-block;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" aria-label="anchor"
+                                                                    class="btn btn-icon btn-sm bg-danger-subtle"
+                                                                    data-bs-toggle="tooltip" data-bs-original-title="Delete"
+                                                                    onclick="return confirm('Are you sure you want to delete the coupon &quot;{{ $coupon->title }}&quot;?');">
+                                                                    <i class="mdi mdi-delete fs-14 text-danger"></i>
+                                                                </button>
+                                                            </form> 
                                                         </td>
                                                     </tr>
                                                     @empty
                                                     <tr>
-                                                        <td colspan="7" class="text-center py-4">
+                                                        <td colspan="8" class="text-center py-4">
                                                             <div class="text-muted">
                                                                 <i class="mdi mdi-ticket-percent fs-24 mb-2"></i>
                                                                 <p class="mb-0">No coupons found</p>
@@ -187,7 +220,7 @@
 
                                         <!-- Pagination -->
                                         @if($coupons->hasPages())
-                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <div class="d-flex justify-content-between align-items-center mt-3 px-3">
                                             <div class="text-muted">
                                                 Showing {{ $coupons->firstItem() }} to {{ $coupons->lastItem() }} of {{ $coupons->total() }} results
                                             </div>

@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
 use App\Models\Coupon;
 use App\Models\EcommerceProduct;
-use App\Models\ParentCategorie;
-use Carbon\Carbon;
+use App\Models\ParentCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\{Auth, DB, Log, Validator};
 
 class CouponsController extends Controller
 {
@@ -18,20 +17,21 @@ class CouponsController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Coupon::with(['categories', 'products']);
+        $query = Coupon::query();
 
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('coupon_code', 'like', "%{$search}%")
-                    ->orWhere('coupon_title', 'like', "%{$search}%");
+                $q->where('code', 'like', "%{$search}%")
+                    ->orWhere('title', 'like', "%{$search}%");
             });
         }
 
         // Status filter
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $isActive = $request->status === 'active' ? 1 : 0;
+            $query->where('is_active', $isActive);
         }
 
         $coupons = $query->orderBy('created_at', 'desc')->paginate(15);
@@ -44,9 +44,7 @@ class CouponsController extends Controller
      */
     public function create()
     {
-        $categories = ParentCategorie::active()->pluck('parent_categories', 'id');
-
-        return view('e-commerce.coupons.create', compact('categories'));
+        return view('e-commerce.coupons.create');
     }
 
     /**
@@ -55,25 +53,29 @@ class CouponsController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'coupon_code' => 'nullable|string|max:50|unique:coupons,coupon_code',
-            'coupon_title' => 'required|string|max:255',
-            'coupon_description' => 'nullable|string',
-            'discount_type' => 'required|in:percentage,fixed_amount',
-            'discount_value' => 'required|numeric|min:0',
+            'code' => 'required|string|max:50|unique:coupons,code',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'type' => 'required|in:0,1,2', // 0=Percentage, 1=Fixed, 2=Buy X Get Y
+            'discount_value' => 'required|numeric|min:0.01',
+            'max_discount' => 'nullable|numeric|min:0',
             'min_purchase_amount' => 'nullable|numeric|min:0',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
-            'total_usage_limit' => 'nullable|integer|min:1',
-            'usage_limit_per_customer' => 'nullable|integer|min:1',
-            'status' => 'required|in:active,inactive',
-            'categories' => 'nullable|array',
-            'categories.*' => 'exists:parent_categories,id',
-            'products' => 'nullable|array',
-            'products.*' => 'exists:ecommerce_products,id',
+            'usage_limit' => 'nullable|integer|min:0',
+            'usage_per_customer' => 'nullable|integer|min:1',
+            'is_active' => 'required|in:0,1',
+            'stackable' => 'nullable|in:0,1',
+            'applicable_categories' => 'nullable|array',
+            'applicable_categories.*' => 'exists:parent_categories,id',
+            'applicable_brands' => 'nullable|array',
+            'applicable_brands.*' => 'exists:brands,id',
+            'excluded_products' => 'nullable|array',
+            'excluded_products.*' => 'exists:ecommerce_products,id',
         ]);
 
         // Additional validation for percentage discount
-        if ($request->discount_type === 'percentage') {
+        if ($request->type == 0) { // Percentage
             $validator->after(function ($validator) use ($request) {
                 if ($request->discount_value > 100) {
                     $validator->errors()->add('discount_value', 'Percentage discount cannot exceed 100%.');
@@ -82,45 +84,40 @@ class CouponsController extends Controller
         }
 
         if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-
             // Create coupon
             $coupon = Coupon::create([
-                'coupon_code' => $request->coupon_code ?: Coupon::generateCouponCode(),
-                'coupon_title' => $request->coupon_title,
-                'coupon_description' => $request->coupon_description,
-                'discount_type' => $request->discount_type,
+                'code' => strtoupper($request->code),
+                'title' => $request->title,
+                'description' => $request->description,
+                'type' => $request->type, // Already integer from form (0, 1, 2)
                 'discount_value' => $request->discount_value,
+                'max_discount' => $request->max_discount,
                 'min_purchase_amount' => $request->min_purchase_amount,
-                'start_date' => Carbon::parse($request->start_date),
-                'end_date' => Carbon::parse($request->end_date),
-                'total_usage_limit' => $request->total_usage_limit,
-                'usage_limit_per_customer' => $request->usage_limit_per_customer,
-                'status' => $request->status,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'usage_limit' => $request->usage_limit ?? 0,
+                'used_count' => 0,
+                'usage_per_customer' => $request->usage_per_customer ?? 1,
+                'is_active' => $request->is_active,
+                'stackable' => $request->stackable ?? 0,
+                'applicable_categories' => $request->applicable_categories,
+                'applicable_brands' => $request->applicable_brands,
+                'excluded_products' => $request->excluded_products,
             ]);
 
-            // Attach categories if provided
-            if ($request->filled('categories')) {
-                $coupon->categories()->attach($request->categories);
-            }
-
-            // Attach products if provided
-            if ($request->filled('products')) {
-                $coupon->products()->attach($request->products);
-            }
-
             DB::commit();
+            activity()->performedOn($coupon)->causedBy(Auth::user())->log('Coupon created');
 
             return redirect()->route('coupon.index')->with('success', 'Coupon created successfully.');
-
         } catch (\Exception $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error creating coupon: '.$e->getMessage())->withInput();
+            DB::rollBack();
+            Log::error('Coupon Store Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -129,10 +126,8 @@ class CouponsController extends Controller
      */
     public function edit($id)
     {
-        $coupon = Coupon::with(['categories', 'products'])->findOrFail($id);
-        $categories = ParentCategorie::active()->pluck('parent_categories', 'id');
-
-        return view('e-commerce.coupons.edit', compact('coupon', 'categories'));
+        $coupon = Coupon::findOrFail($id);
+        return view('e-commerce.coupons.edit', compact('coupon'));
     }
 
     /**
@@ -142,26 +137,37 @@ class CouponsController extends Controller
     {
         $coupon = Coupon::findOrFail($id);
 
+        // ✅ FIXED: Type mapping for form values (0,1,2)
+        $typeMapping = [
+            '0' => 0, // Percentage
+            '1' => 1, // Fixed  
+            '2' => 2, // Buy X Get Y
+        ];
+
         $validator = Validator::make($request->all(), [
-            'coupon_code' => 'required|string|max:50|unique:coupons,coupon_code,'.$id,
-            'coupon_title' => 'required|string|max:255',
-            'coupon_description' => 'nullable|string',
-            'discount_type' => 'required|in:percentage,fixed_amount',
-            'discount_value' => 'required|numeric|min:0',
+            'code' => 'required|string|max:50|unique:coupons,code,' . $id,
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'type' => 'required|in:0,1,2', // ✅ FIXED: Same as store (0,1,2)
+            'discount_value' => 'required|numeric|min:0.01',
+            'max_discount' => 'nullable|numeric|min:0',
             'min_purchase_amount' => 'nullable|numeric|min:0',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-            'total_usage_limit' => 'nullable|integer|min:1',
-            'usage_limit_per_customer' => 'nullable|integer|min:1',
-            'status' => 'required|in:active,inactive',
-            'categories' => 'nullable|array',
-            'categories.*' => 'exists:parent_categories,id',
-            'products' => 'nullable|array',
-            'products.*' => 'exists:ecommerce_products,id',
+            'usage_limit' => 'nullable|integer|min:0',
+            'usage_per_customer' => 'nullable|integer|min:1',
+            'is_active' => 'required|in:0,1',
+            'stackable' => 'nullable|in:0,1',
+            'applicable_categories' => 'nullable|array',
+            'applicable_categories.*' => 'exists:parent_categories,id',
+            'applicable_brands' => 'nullable|array',
+            'applicable_brands.*' => 'exists:brands,id',
+            'excluded_products' => 'nullable|array',
+            'excluded_products.*' => 'exists:ecommerce_products,id',
         ]);
 
-        // Additional validation for percentage discount
-        if ($request->discount_type === 'percentage') {
+        // ✅ FIXED: Percentage validation for integer type (0)
+        if ($request->type == 0) { // Percentage
             $validator->after(function ($validator) use ($request) {
                 if ($request->discount_value > 100) {
                     $validator->errors()->add('discount_value', 'Percentage discount cannot exceed 100%.');
@@ -170,49 +176,39 @@ class CouponsController extends Controller
         }
 
         if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-
             // Update coupon
             $coupon->update([
-                'coupon_code' => $request->coupon_code,
-                'coupon_title' => $request->coupon_title,
-                'coupon_description' => $request->coupon_description,
-                'discount_type' => $request->discount_type,
+                'code' => strtoupper($request->code),
+                'title' => $request->title,
+                'description' => $request->description,
+                'type' => (int) $request->type, // ✅ Ensure integer
                 'discount_value' => $request->discount_value,
+                'max_discount' => $request->max_discount,
                 'min_purchase_amount' => $request->min_purchase_amount,
-                'start_date' => Carbon::parse($request->start_date),
-                'end_date' => Carbon::parse($request->end_date),
-                'total_usage_limit' => $request->total_usage_limit,
-                'usage_limit_per_customer' => $request->usage_limit_per_customer,
-                'status' => $request->status,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'usage_limit' => $request->usage_limit ?? 0,
+                'usage_per_customer' => $request->usage_per_customer ?? 1,
+                'is_active' => $request->is_active,
+                'stackable' => $request->stackable ?? 0,
+                'applicable_categories' => $request->applicable_categories,
+                'applicable_brands' => $request->applicable_brands,
+                'excluded_products' => $request->excluded_products,
             ]);
 
-            // Sync categories
-            if ($request->filled('categories')) {
-                $coupon->categories()->sync($request->categories);
-            } else {
-                $coupon->categories()->detach();
-            }
-
-            // Sync products
-            if ($request->filled('products')) {
-                $coupon->products()->sync($request->products);
-            } else {
-                $coupon->products()->detach();
-            }
-
             DB::commit();
+            activity()->performedOn($coupon)->causedBy(Auth::user())->log('Coupon updated');
 
             return redirect()->route('coupon.index')->with('success', 'Coupon updated successfully.');
-
         } catch (\Exception $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Error updating coupon: '.$e->getMessage())->withInput();
+            DB::rollBack();
+            Log::error('Coupon Update Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -221,29 +217,73 @@ class CouponsController extends Controller
      */
     public function destroy($id)
     {
+        DB::beginTransaction();
         try {
             $coupon = Coupon::findOrFail($id);
 
             // Check if coupon has been used
-            if ($coupon->current_usage_count > 0) {
+            if ($coupon->used_count > 0) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Cannot delete coupon that has been used by customers.',
                 ], 400);
             }
 
+            activity()->performedOn($coupon)->causedBy(Auth::user())->log('Coupon deleted');
             $coupon->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Coupon deleted successfully.',
-            ]);
+            DB::commit();
 
+            return redirect()->route('coupons.index')
+                ->with('success', 'Coupon deleted successfully.');
         } catch (\Exception $e) {
-            return response()->json([
+            DB::rollBack();
+            Log::error('Coupon Delete Error: ' . $e->getMessage());
+            return redirect()->back()->with([
                 'success' => false,
-                'message' => 'Error deleting coupon: '.$e->getMessage(),
+                'message' => 'Error deleting coupon: ' . $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Search categories for AJAX requests
+     */
+    public function searchCategories(Request $request): JsonResponse
+    {
+        try {
+            $query = $request->get('q', '');
+
+            $categories = ParentCategory::where('name', 'LIKE', "%$query%")
+                ->where('status', "1")
+                ->select('id', 'name')
+                ->get();
+
+            return response()->json($categories);
+        } catch (\Exception $e) {
+            Log::error('Category Search Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Search failed'], 500);
+        }
+    }
+
+    /**
+     * Search brands for AJAX requests
+     */
+    public function searchBrands(Request $request): JsonResponse
+    {
+        try {
+            $query = $request->get('q', '');
+
+            $brands = Brand::where('name', 'LIKE', "%$query%")
+                ->where('status', "1")
+                ->select('id', 'name')
+                ->limit(20)
+                ->get();
+
+            return response()->json($brands);
+        } catch (\Exception $e) {
+            Log::error('Brand Search Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Search failed'], 500);
         }
     }
 
@@ -252,41 +292,29 @@ class CouponsController extends Controller
      */
     public function searchProducts(Request $request): JsonResponse
     {
-        $search = $request->get('search', '');
+        try {
+            $query = $request->get('q', '');
 
-        $products = EcommerceProduct::with(['warehouseProduct.brand', 'warehouseProduct.parentCategorie'])
-            ->whereHas('warehouseProduct', function ($query) use ($search) {
-                $query->where('product_name', 'like', "%{$search}%")
-                    ->orWhere('sku', 'like', "%{$search}%");
-            })
-            ->where('ecommerce_status', 'active')
-            ->limit(20)
-            ->get();
+            $products = EcommerceProduct::with(['warehouseProduct'])
+                ->whereHas('warehouseProduct', function ($q) use ($query) {
+                    $q->where('product_name', 'like', "%{$query}%")
+                        ->orWhere('sku', 'like', "%{$query}%");
+                })
+                ->where('status', "1") // 1 = Active
+                ->limit(20)
+                ->get()
+                ->map(function ($product) {
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->warehouseProduct->product_name ?? 'N/A',
+                        'sku' => $product->warehouseProduct->sku ?? 'N/A',
+                    ];
+                });
 
-        $results = response()->json([
-            'success' => true,
-            'products' => $products,
-        ]);
-        // $results = $products->map(function($product) {
-        //     return [
-        //         'id' => $product->id,
-        //         'text' => $product->warehouseProduct->product_name . ' (' . $product->sku . ')',
-        //         'sku' => $product->sku,
-        //         'brand' => $product->warehouseProduct->brand->brand_title ?? 'N/A',
-        //         'category' => $product->warehouseProduct->parentCategorie->parent_categories ?? 'N/A',
-        //         'price' => $product->warehouseProduct->selling_price ?? 0
-        //     ];
-        // });
-
-        if (! isset($results)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No products found matching your search',
-            ]);
+            return response()->json($products);
+        } catch (\Exception $e) {
+            Log::error('Product Search Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Search failed'], 500);
         }
-
-        return $results;
-
-        // response()->json($results);
     }
 }

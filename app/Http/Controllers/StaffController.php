@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Staff;
 use App\Models\User;
+use App\Models\AssignedEngineer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\{Auth, DB, Log, Validator};
 use Spatie\Permission\Models\Role;
 
 class StaffController extends Controller
@@ -43,7 +45,26 @@ class StaffController extends Controller
         $staff = Staff::with(['address', 'bankDetails', 'workSkills', 'aadharDetails', 'panDetails', 'vehicleDetails', 'policeVerification'])->findOrFail($id);
         $roles = Role::where('name', '!=', 'Customer')->get();
 
-        return view('/crm/access-control/staff/view', compact('staff', 'roles'));
+        // Fetch assigned tasks for this engineer
+        $assignedTasks = AssignedEngineer::with([
+            'serviceRequest.customer',
+            'serviceRequest.customerAddress',
+            'groupEngineers'
+        ])
+        ->where(function($query) use ($id) {
+            // Individual assignments
+            $query->where('engineer_id', $id)
+                  ->where('assignment_type', '0');
+        })
+        ->orWhereHas('groupEngineers', function($query) use ($id) {
+            // Group assignments where this engineer is a member
+            $query->where('engineer_id', $id);
+        })
+        ->where('status', '0') // Active assignments only
+        ->orderBy('assigned_at', 'desc')
+        ->get();
+
+        return view('/crm/access-control/staff/view', compact('staff', 'roles', 'assignedTasks'));
     }
 
     // Role Access (staff table)
@@ -531,5 +552,55 @@ class StaffController extends Controller
         $users->syncRoles($request->name);
 
         return redirect()->route('roles.index')->with('success', 'Role assigned successfully.');
+    }
+
+    public function approveTask(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'assignment_id' => 'required|exists:assigned_engineers,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $assignment = AssignedEngineer::findOrFail($request->assignment_id);
+
+            // Check if already approved
+            if ($assignment->is_approved_by_engineer) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Task has already been approved.',
+                ], 422);
+            }
+
+            // Update approval status
+            $assignment->update([
+                'is_approved_by_engineer' => true,
+                'engineer_approved_at' => now(),
+            ]);
+
+            DB::commit();
+            activity()->performedOn($assignment)->causedBy(Auth::user())->log('Engineer approved the assigned task');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Task approved successfully.',
+                'approved_at' => $assignment->engineer_approved_at->format('d M Y, h:i A'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Task approval error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error approving task: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

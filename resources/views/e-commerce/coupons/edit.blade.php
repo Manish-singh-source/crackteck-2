@@ -1,438 +1,571 @@
 @extends('e-commerce/layouts/master')
 
 @section('content')
-
 <div class="content">
-
-    <!-- Start Content-->
     <div class="container-fluid">
-
-        <div class="bradcrumb pt-3 ps-2 bg-light">
-            <div class="row ">
-                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Coupon</li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit Coupon</li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
-
-        <div class="py-1 d-flex align-items-sm-center flex-sm-row flex-column">
+        <!-- Breadcrumb -->
+        <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
-                <h4 class="fs-18 fw-semibold m-0"></h4>
+                <h4 class="fs-18 fw-semibold m-0">Edit Coupon</h4>
             </div>
+            
         </div>
 
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
 
-        <form action="{{ route('coupon.update', $coupon->id) }}" method="POST" id="couponEditForm">
+        <form action="{{ route('coupon.update', $coupon->id) }}" method="POST" id="couponForm">
             @csrf
             @method('PUT')
             <div class="row">
-                <div class="col-12">
-                    <div class="row">
-                        <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-header border-bottom-dashed">
-                                <div class="row g-4 align-items-center">
-                                    <div class="col-sm">
-                                        <h5 class="card-title mb-0">
-                                            Coupon Basic Details:
-                                        </h5>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-xl-6 col-lg-12 mb-2">
-                                        <div>
-                                            @include('components.form.input', [
-                                            'label' => 'Coupon Code',
-                                            'name' => 'coupon_code',
-                                            'type' => 'text',
-                                            'placeholder' => 'Enter Coupon Code',
-                                            'model' => $coupon
-                                            ])
-                                        </div>
-                                    </div>
-
-                                    <div class="col-xl-6 col-lg-6 mb-2">
-                                        <div>
-                                            @include('components.form.input', [
-                                            'label' => 'Coupon Title',
-                                            'name' => 'coupon_title',
-                                            'type' => 'text',
-                                            'placeholder' => 'Summer Sale 20% OFF',
-                                            'model' => $coupon
-                                            ])
-                                        </div>
-                                    </div>
-
-                                    <div class="col-xl-6 col-lg-6 mb-2">
-                                        <div>
-                                            <label for="coupon_description" class="form-label"> Coupon Description
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <textarea id="coupon_description" class="form-control @error('coupon_description') is-invalid @enderror" name="coupon_description" placeholder="Enter Coupon Description">{{ old('coupon_description', $coupon->coupon_description) }}</textarea>
-                                            @error('coupon_description')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
+                <!-- Main Form (8 columns) -->
+                <div class="col-lg-8">
+                    <!-- Basic Details Card -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Basic Details</h5>
                         </div>
-
-                        <div class="card pb-4">
-                            <div class="card-header border-bottom-dashed">
-                                <h5 class="card-title mb-0">
-                                    Discount Details:
-                                </h5>
-                            </div>
-
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-xl-6 col-lg-6 mb-2">
-                                        @include('components.form.select', [
-                                        'label' => 'Discount Type',
-                                        'name' => 'discount_type',
-                                        'options' => ["" => "--Select--", "percentage" => "Percentage", "fixed_amount" => "Fixed Amount"],
-                                        'model' => $coupon
-                                        ])
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 mb-2">
-                                        <div>
-                                            @include('components.form.input', [
-                                            'label' => 'Discount Value',
-                                            'name' => 'discount_value',
-                                            'type' => 'number',
-                                            'placeholder' => 'Enter Discount Value',
-                                            'model' => $coupon
-                                            ])
-                                        </div>
-                                    </div>
-
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-lg-6">
+                                    <label class="form-label">Coupon Code <span class="text-danger">*</span></label>
+                                    <input type="text" name="code" class="form-control @error('code') is-invalid @enderror"
+                                        value="{{ old('code', $coupon->code) }}" placeholder="SAVE20" required>
+                                    @error('code')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
-                            </div>
-
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header border-bottom-dashed">
-                                <h5 class="card-title mb-0">
-                                    Usage Conditions:
-                                </h5>
-                            </div>
-
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-xl-6 col-lg-6 mb-2">
-                                        @include('components.form.input', [
-                                        'label' => 'Minimum Purchase Amount',
-                                        'name' => 'min_purchase_amount',
-                                        'type' => 'number',
-                                        'placeholder' => 'Enter Minimum Purchase Amount',
-                                        'model' => $coupon
-                                        ])
-                                    </div>
-
-                                    <div class="col-xl-6 col-lg-6 mb-2">
-                                        <label for="categories" class="form-label">Applicable Categories (Optional)</label>
-                                        <select name="categories[]" id="categories" class="form-select" multiple>
-                                            @foreach($categories as $id => $name)
-                                                <option value="{{ $id }}" {{ in_array($id, old('categories', $coupon->categories->pluck('id')->toArray())) ? 'selected' : '' }}>
-                                                    {{ $name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <small class="text-muted">Hold Ctrl/Cmd to select multiple categories. Leave empty to apply to all categories.</small>
-                                        @error('categories')
-                                            <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-                                    <div class="col-xl-12 col-lg-12 mb-2">
-                                        <label for="product_search" class="form-label">
-                                            Product Search (Optional)
-                                        </label>
-                                        <div class="input-group mb-2">
-                                            <input type="text" id="product_search" class="form-control" placeholder="Search product name or SKU">
-                                            <button type="button" id="search_products" class="btn btn-outline-primary">
-                                                Search Products
-                                            </button>
-                                        </div>
-
-                                        <!-- Selected Products Display -->
-                                        <div id="selected_products" class="border rounded p-2 bg-light" style="min-height: 60px;">
-                                            <small class="text-muted">Selected products will appear here. Leave empty to apply to all products.</small>
-                                        </div>
-
-                                        <!-- Hidden inputs for selected products -->
-                                        <div id="product_inputs"></div>
-                                    </div>
-
+                                <div class="col-lg-6">
+                                    <label class="form-label">Title <span class="text-danger">*</span></label>
+                                    <input type="text" name="title" class="form-control @error('title') is-invalid @enderror"
+                                        value="{{ old('title', $coupon->title) }}" placeholder="Summer Sale 20% OFF" required>
+                                    @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-header border-bottom-dashed">
-                                <h5 class="card-title mb-0">
-                                    Validity Period:
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    @include('components.form.input', [
-                                    'label' => 'Start Date',
-                                    'name' => 'start_date',
-                                    'type' => 'date',
-                                    'placeholder' => 'Enter Start Date',
-                                    'model' => $coupon
-                                    ])
+                                <div class="col-12">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="description" class="form-control @error('description') is-invalid @enderror"
+                                        rows="3" placeholder="Enter coupon description">{{ old('description', $coupon->description) }}</textarea>
+                                    @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
-                                <div class="mt-3 mb-3">
-                                    @include('components.form.input', [
-                                    'label' => 'End Date',
-                                    'name' => 'end_date',
-                                    'type' => 'date',
-                                    'placeholder' => 'Enter End Date',
-                                    'model' => $coupon
-                                    ])
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header border-bottom-dashed">
-                                <h5 class="card-title mb-0">
-                                    Usage Limits
-                                </h5>
-                            </div>
-
-                            <div class="card-body">
-                                <div class=" mb-3">
-                                    @include('components.form.input', [
-                                    'label' => 'Total Usage Limit (Optional)',
-                                    'name' => 'total_usage_limit',
-                                    'type' => 'number',
-                                    'placeholder' => 'e.g., 100',
-                                    'model' => $coupon
-                                    ])
-                                    <small class="text-muted">Leave empty for unlimited usage</small>
-                                </div>
-                                <div class="mb-3">
-                                    @include('components.form.input', [
-                                    'label' => 'Usage Limit Per Customer (Optional)',
-                                    'name' => 'usage_limit_per_customer',
-                                    'type' => 'number',
-                                    'placeholder' => 'e.g., 1',
-                                    'model' => $coupon
-                                    ])
-                                    <small class="text-muted">Leave empty for unlimited per customer</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header border-bottom-dashed">
-                                <h5 class="card-title mb-0">
-                                    Status
-                                </h5>
-                            </div>
-
-                            <div class="card-body">
-                                @include('components.form.select', [
-                                'label' => 'Coupon Status',
-                                'name' => 'status',
-                                'options' => ["active" => "Active", "inactive" => "Inactive"],
-                                'model' => $coupon
-                                ])
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-lg-12">
-                        <div class="text-start mb-3">
-                            <button type="submit" class="btn btn-success w-sm waves ripple-light">
-                                Update Coupon
+                    <!-- Discount Details Card -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Discount Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-lg-6">
+                                    {{-- type: 0 - Percentage, 1 - Fixed, 2 - Buy X Get Y --}}
+                                    <label class="form-label">Discount Type <span class="text-danger">*</span></label>
+                                    <select name="type" class="form-select @error('type') is-invalid @enderror" required>
+                                        <option value="">Select Type</option>
+                                        <option value="0" {{ old('type', $coupon->type) == '0' ? 'selected' : '' }}>Percentage (%)</option>
+                                        <option value="1" {{ old('type', $coupon->type) == '1' ? 'selected' : '' }}>Fixed Amount</option>
+                                        <option value="2" {{ old('type', $coupon->type) == '2' ? 'selected' : '' }}>Buy X Get Y</option>
+                                    </select>
+                                    @error('type')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                <div class="col-lg-6">
+                                    <label class="form-label">Discount Value <span class="text-danger">*</span></label>
+                                    <input type="number" name="discount_value" class="form-control @error('discount_value') is-invalid @enderror"
+                                        value="{{ old('discount_value', $coupon->discount_value) }}" step="0.01" min="0.01" placeholder="10.00" required>
+                                    @error('discount_value')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                <div class="col-lg-6">
+                                    <label class="form-label">Max Discount</label>
+                                    <input type="number" name="max_discount" class="form-control @error('max_discount') is-invalid @enderror"
+                                        value="{{ old('max_discount', $coupon->max_discount) }}" step="0.01" min="0" placeholder="100.00">
+                                    @error('max_discount')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                <div class="col-lg-6">
+                                    <label class="form-label">Min Purchase Amount</label>
+                                    <input type="number" name="min_purchase_amount" class="form-control @error('min_purchase_amount') is-invalid @enderror"
+                                        value="{{ old('min_purchase_amount', $coupon->min_purchase_amount) }}" step="0.01" min="0" placeholder="500.00">
+                                    @error('min_purchase_amount')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Applicable Categories Card -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Applicable Categories</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3 mb-3">
+                                <div class="col-lg-9">
+                                    <input type="text" id="category_search" class="form-control" placeholder="Search categories...">
+                                </div>
+                                <div class="col-lg-3">
+                                    <button type="button" id="add_category_btn" class="btn btn-success w-100" disabled>
+                                        <i class="mdi mdi-plus me-1"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="category_search_results" class="mb-3" style="display: none;">
+                                <div class="list-group" id="category_list"></div>
+                            </div>
+                            <div id="selected_categories_container">
+                                <div id="selected_categories" class="d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Applicable Brands Card -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Applicable Brands</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3 mb-3">
+                                <div class="col-lg-9">
+                                    <input type="text" id="brand_search" class="form-control" placeholder="Search brands...">
+                                </div>
+                                <div class="col-lg-3">
+                                    <button type="button" id="add_brand_btn" class="btn btn-success w-100" disabled>
+                                        <i class="mdi mdi-plus me-1"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="brand_search_results" class="mb-3" style="display: none;">
+                                <div class="list-group" id="brand_list"></div>
+                            </div>
+                            <div id="selected_brands_container">
+                                <div id="selected_brands" class="d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Excluded Products Card -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Excluded Products</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3 mb-3">
+                                <div class="col-lg-9">
+                                    <input type="text" id="product_search" class="form-control" placeholder="Search products...">
+                                </div>
+                                <div class="col-lg-3">
+                                    <button type="button" id="add_product_btn" class="btn btn-success w-100" disabled>
+                                        <i class="mdi mdi-plus me-1"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="product_search_results" class="mb-3" style="display: none;">
+                                <div class="list-group" id="product_list"></div>
+                            </div>
+                            <div id="selected_products_container">
+                                <div id="selected_products" class="d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar (4 columns) -->
+                <div class="col-lg-4">
+                    <!-- Validity Period -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Validity Period</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Start Date <span class="text-danger">*</span></label>
+                                <input type="date" name="start_date" class="form-control @error('start_date') is-invalid @enderror"
+                                    value="{{ old('start_date', $coupon->start_date->format('Y-m-d')) }}" required>
+                                @error('start_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">End Date <span class="text-danger">*</span></label>
+                                <input type="date" name="end_date" class="form-control @error('end_date') is-invalid @enderror"
+                                    value="{{ old('end_date', $coupon->end_date->format('Y-m-d')) }}" required>
+                                @error('end_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Usage Limits -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Usage Limits</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Total Usage Limit</label>
+                                <input type="number" name="usage_limit" class="form-control @error('usage_limit') is-invalid @enderror"
+                                    value="{{ old('usage_limit', $coupon->usage_limit) }}" min="0" placeholder="0 = Unlimited">
+                                <small class="text-muted">0 = Unlimited</small>
+                                @error('usage_limit')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Usage Per Customer</label>
+                                <input type="number" name="usage_per_customer" class="form-control @error('usage_per_customer') is-invalid @enderror"
+                                    value="{{ old('usage_per_customer', $coupon->usage_per_customer) }}" min="1" placeholder="1">
+                                @error('usage_per_customer')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Settings -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Status <span class="text-danger">*</span></label>
+                                <select name="is_active" class="form-select @error('is_active') is-invalid @enderror" required>
+                                    <option value="1" {{ old('is_active', $coupon->is_active) == 1 ? 'selected' : '' }}>Active</option>
+                                    <option value="0" {{ old('is_active', $coupon->is_active) == 0 ? 'selected' : '' }}>Inactive</option>
+                                </select>
+                                @error('is_active')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Stackable</label>
+                                <select name="stackable" class="form-select @error('stackable') is-invalid @enderror">
+                                    <option value="0" {{ old('stackable', $coupon->stackable) == 0 ? 'selected' : '' }}>No</option>
+                                    <option value="1" {{ old('stackable', $coupon->stackable) == 1 ? 'selected' : '' }}>Yes</option>
+                                </select>
+                                @error('stackable')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="card">
+                        <div class="card-body">
+                            <button type="submit" class="btn btn-success w-100 mb-2">
+                                <i class="mdi mdi-content-save me-1"></i> Update Coupon
                             </button>
-                            <a href="{{ route('coupon.index') }}" class="btn btn-secondary w-sm waves ripple-light ms-2">
-                                Cancel
+                            <a href="{{ route('coupon.index') }}" class="btn btn-secondary w-100">
+                                <i class="mdi mdi-arrow-left me-1"></i> Cancel
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
         </form>
-    </div> <!-- container-fluid -->
-</div> <!-- content -->
-
+    </div>
+</div>
 @endsection
 
 @section('scripts')
 <script>
 $(document).ready(function() {
-    let selectedProducts = @json($coupon->products->toArray());
+    let selectedCategories = @json($coupon->applicable_categories ?? []);
+    let selectedCategoryData = null;
+    let selectedBrands = @json($coupon->applicable_brands ?? []);
+    let selectedBrandData = null;
+    let selectedProducts = @json($coupon->excluded_products ?? []);
+    let selectedProductData = null;
 
-    // Initialize Select2 for categories
-    $('#categories').select2({
-        placeholder: 'Select categories (optional)',
-        allowClear: true,
-        width: '100%',
-        theme: 'bootstrap-5'
-    });
+    // Pre-populate existing selections
+    initializeExistingSelections();
 
-    // Initialize selected products display
-    updateSelectedProductsDisplay();
-    updateProductInputs();
-
-    // Product search functionality
-    $('#search_products').on('click', function() {
-        const searchTerm = $('#product_search').val().trim();
-        if (searchTerm.length < 2) {
-            alert('Please enter at least 2 characters to search');
-            return;
+    function initializeExistingSelections() {
+        // Load existing categories
+        if (selectedCategories && selectedCategories.length > 0) {
+            selectedCategories.forEach(function(catId) {
+                $.ajax({
+                    url: '{{ route("coupon.search-categories") }}',
+                    method: 'GET',
+                    data: { id: catId },
+                    success: function(response) {
+                        if (response.length > 0) {
+                            addCategoryChip(response[0], false);
+                        }
+                    }
+                });
+            });
         }
 
+        // Load existing brands
+        if (selectedBrands && selectedBrands.length > 0) {
+            selectedBrands.forEach(function(brandId) {
+                $.ajax({
+                    url: '{{ route("coupon.search-brands") }}',
+                    method: 'GET',
+                    data: { id: brandId },
+                    success: function(response) {
+                        if (response.length > 0) {
+                            addBrandChip(response[0], false);
+                        }
+                    }
+                });
+            });
+        }
+
+        // Load existing products
+        if (selectedProducts && selectedProducts.length > 0) {
+            selectedProducts.forEach(function(prodId) {
+                $.ajax({
+                    url: '{{ route("coupon.search-products") }}',
+                    method: 'GET',
+                    data: { id: prodId },
+                    success: function(response) {
+                        if (response.length > 0) {
+                            addProductChip(response[0], false);
+                        }
+                    }
+                });
+            });
+        }
+    }
+
+    // Category search
+    $('#category_search').on('input', function() {
+        const query = $(this).val();
+        if (query.length >= 2) {
+            searchCategories(query);
+        } else {
+            $('#category_search_results').hide();
+            $('#add_category_btn').prop('disabled', true);
+        }
+    });
+
+    $('#add_category_btn').click(function() {
+        if (selectedCategoryData && !selectedCategories.includes(selectedCategoryData.id)) {
+            addCategoryChip(selectedCategoryData);
+            selectedCategories.push(selectedCategoryData.id);
+            $('#category_search').val('');
+            $('#category_search_results').hide();
+            $(this).prop('disabled', true);
+        }
+    });
+
+    function searchCategories(query) {
+        $.ajax({
+            url: '{{ route("coupon.search-categories") }}',
+            method: 'GET',
+            data: { q: query },
+            success: function(response) {
+                displayCategoryResults(response);
+            },
+            error: function() {
+                console.error('Error searching categories');
+            }
+        });
+    }
+
+    function displayCategoryResults(categories) {
+        const categoryList = $('#category_list');
+        categoryList.empty();
+
+        if (categories.length === 0) {
+            categoryList.append('<div class="list-group-item">No categories found</div>');
+        } else {
+            categories.forEach(function(category) {
+                const item = $('<a href="#" class="list-group-item list-group-item-action"></a>')
+                    .text(category.name)
+                    .data('category', category)
+                    .click(function(e) {
+                        e.preventDefault();
+                        selectedCategoryData = $(this).data('category');
+                        $('#add_category_btn').prop('disabled', false);
+                        $('.list-group-item').removeClass('active');
+                        $(this).addClass('active');
+                    });
+                categoryList.append(item);
+            });
+        }
+        $('#category_search_results').show();
+    }
+
+    function addCategoryChip(category, addToArray = true) {
+        if (addToArray && selectedCategories.includes(category.id)) return;
+
+        const chip = $(`
+            <div class="badge bg-primary" data-id="${category.id}">
+                ${category.name}
+                <i class="mdi mdi-close ms-1 cursor-pointer remove-category" data-id="${category.id}"></i>
+                <input type="hidden" name="applicable_categories[]" value="${category.id}">
+            </div>
+        `);
+        $('#selected_categories').append(chip);
+    }
+
+    $(document).on('click', '.remove-category', function() {
+        const id = $(this).data('id');
+        selectedCategories = selectedCategories.filter(catId => catId !== id);
+        $(this).closest('.badge').remove();
+    });
+
+    // Brand search
+    $('#brand_search').on('input', function() {
+        const query = $(this).val();
+        if (query.length >= 2) {
+            searchBrands(query);
+        } else {
+            $('#brand_search_results').hide();
+            $('#add_brand_btn').prop('disabled', true);
+        }
+    });
+
+    $('#add_brand_btn').click(function() {
+        if (selectedBrandData && !selectedBrands.includes(selectedBrandData.id)) {
+            addBrandChip(selectedBrandData);
+            selectedBrands.push(selectedBrandData.id);
+            $('#brand_search').val('');
+            $('#brand_search_results').hide();
+            $(this).prop('disabled', true);
+        }
+    });
+
+    function searchBrands(query) {
+        $.ajax({
+            url: '{{ route("coupon.search-brands") }}',
+            method: 'GET',
+            data: { q: query },
+            success: function(response) {
+                displayBrandResults(response);
+            },
+            error: function() {
+                console.error('Error searching brands');
+            }
+        });
+    }
+
+    function displayBrandResults(brands) {
+        const brandList = $('#brand_list');
+        brandList.empty();
+
+        if (brands.length === 0) {
+            brandList.append('<div class="list-group-item">No brands found</div>');
+        } else {
+            brands.forEach(function(brand) {
+                const item = $('<a href="#" class="list-group-item list-group-item-action"></a>')
+                    .text(brand.name)
+                    .data('brand', brand)
+                    .click(function(e) {
+                        e.preventDefault();
+                        selectedBrandData = $(this).data('brand');
+                        $('#add_brand_btn').prop('disabled', false);
+                        $('.list-group-item').removeClass('active');
+                        $(this).addClass('active');
+                    });
+                brandList.append(item);
+            });
+        }
+        $('#brand_search_results').show();
+    }
+
+    function addBrandChip(brand, addToArray = true) {
+        if (addToArray && selectedBrands.includes(brand.id)) return;
+
+        const chip = $(`
+            <div class="badge bg-success" data-id="${brand.id}">
+                ${brand.name}
+                <i class="mdi mdi-close ms-1 cursor-pointer remove-brand" data-id="${brand.id}"></i>
+                <input type="hidden" name="applicable_brands[]" value="${brand.id}">
+            </div>
+        `);
+        $('#selected_brands').append(chip);
+    }
+
+    $(document).on('click', '.remove-brand', function() {
+        const id = $(this).data('id');
+        selectedBrands = selectedBrands.filter(brandId => brandId !== id);
+        $(this).closest('.badge').remove();
+    });
+
+    // Product search
+    $('#product_search').on('input', function() {
+        const query = $(this).val();
+        if (query.length >= 2) {
+            searchProducts(query);
+        } else {
+            $('#product_search_results').hide();
+            $('#add_product_btn').prop('disabled', true);
+        }
+    });
+
+    $('#add_product_btn').click(function() {
+        if (selectedProductData && !selectedProducts.includes(selectedProductData.id)) {
+            addProductChip(selectedProductData);
+            selectedProducts.push(selectedProductData.id);
+            $('#product_search').val('');
+            $('#product_search_results').hide();
+            $(this).prop('disabled', true);
+        }
+    });
+
+    function searchProducts(query) {
         $.ajax({
             url: '{{ route("coupon.search-products") }}',
             method: 'GET',
-            data: { search: searchTerm },
+            data: { q: query },
             success: function(response) {
-                if (response.success && response.products.length > 0) {
-                    showProductSearchResults(response.products);
-                } else {
-                    alert('No products found matching your search');
-                }
+                displayProductResults(response);
             },
             error: function() {
-                alert('Error searching products. Please try again.');
+                console.error('Error searching products');
             }
         });
-    });
+    }
 
-    // Allow search on Enter key
-    $('#product_search').on('keypress', function(e) {
-        if (e.which === 13) {
-            e.preventDefault();
-            $('#search_products').click();
+    function displayProductResults(products) {
+        const productList = $('#product_list');
+        productList.empty();
+
+        if (products.length === 0) {
+            productList.append('<div class="list-group-item">No products found</div>');
+        } else {
+            products.forEach(function(product) {
+                const item = $('<a href="#" class="list-group-item list-group-item-action"></a>')
+                    .html(`${product.name} <small class="text-muted">(${product.sku})</small>`)
+                    .data('product', product)
+                    .click(function(e) {
+                        e.preventDefault();
+                        selectedProductData = $(this).data('product');
+                        $('#add_product_btn').prop('disabled', false);
+                        $('.list-group-item').removeClass('active');
+                        $(this).addClass('active');
+                    });
+                productList.append(item);
+            });
         }
+        $('#product_search_results').show();
+    }
+
+    function addProductChip(product, addToArray = true) {
+        if (addToArray && selectedProducts.includes(product.id)) return;
+
+        const chip = $(`
+            <div class="badge bg-danger" data-id="${product.id}">
+                ${product.name} (${product.sku})
+                <i class="mdi mdi-close ms-1 cursor-pointer remove-product" data-id="${product.id}"></i>
+                <input type="hidden" name="excluded_products[]" value="${product.id}">
+            </div>
+        `);
+        $('#selected_products').append(chip);
+    }
+
+    $(document).on('click', '.remove-product', function() {
+        const id = $(this).data('id');
+        selectedProducts = selectedProducts.filter(prodId => prodId !== id);
+        $(this).closest('.badge').remove();
     });
-
-    function showProductSearchResults(products) {
-        let html = '<div class="search-results border rounded p-2 mt-2 bg-white">';
-        html += '<h6>Search Results:</h6>';
-
-        products.forEach(function(product) {
-            const isSelected = selectedProducts.find(p => p.id === product.id);
-            if (!isSelected) {
-                html += `
-                    <div class="product-result d-flex justify-content-between align-items-center p-2 border-bottom">
-                        <div>
-                            <strong>${product.warehouse_product.product_name}</strong><br>
-                            <small class="text-muted">SKU: ${product.sku} | Category: ${product.warehouse_product.parent_categorie ? product.warehouse_product.parent_categorie.parent_categories : 'N/A'}</small>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-primary add-product" data-product='${JSON.stringify(product)}'>
-                            Add
-                        </button>
-                    </div>
-                `;
-            }
-        });
-
-        html += '</div>';
-
-        // Remove existing search results
-        $('.search-results').remove();
-
-        // Add new search results
-        $('#product_search').parent().after(html);
-
-        // Bind add product events
-        $('.add-product').on('click', function() {
-            const product = JSON.parse($(this).attr('data-product'));
-            addProductToSelection(product);
-            $(this).closest('.product-result').remove();
-        });
-    }
-
-    function addProductToSelection(product) {
-        selectedProducts.push(product);
-        updateSelectedProductsDisplay();
-        updateProductInputs();
-    }
-
-    function removeProductFromSelection(productId) {
-        selectedProducts = selectedProducts.filter(p => p.id !== productId);
-        updateSelectedProductsDisplay();
-        updateProductInputs();
-    }
-
-    function updateSelectedProductsDisplay() {
-        const container = $('#selected_products');
-
-        if (selectedProducts.length === 0) {
-            container.html('<small class="text-muted">Selected products will appear here. Leave empty to apply to all products.</small>');
-            return;
-        }
-
-        let html = '<div class="selected-products-list">';
-        html += '<h6>Selected Products:</h6>';
-        html += '<div class="table-responsive">';
-        html += '<table class="table table-sm">';
-        html += '<thead><tr><th>Product Name</th><th>SKU</th><th>Category</th><th>Action</th></tr></thead>';
-        html += '<tbody>';
-
-        selectedProducts.forEach(function(product) {
-            html += `
-                <tr>
-                    <td>${product.warehouse_product.product_name}</td>
-                    <td>${product.sku}</td>
-                    <td>${product.warehouse_product.parent_categorie ? product.warehouse_product.parent_categorie.parent_categories : 'N/A'}</td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-danger remove-product" data-product-id="${product.id}">
-                            Remove
-                        </button>
-                    </td>
-                </tr>
-            `;
-        });
-
-        html += '</tbody></table></div></div>';
-        container.html(html);
-
-        // Bind remove events
-        $('.remove-product').on('click', function() {
-            const productId = parseInt($(this).data('product-id'));
-            removeProductFromSelection(productId);
-        });
-    }
-
-    function updateProductInputs() {
-        const container = $('#product_inputs');
-        container.empty();
-
-        selectedProducts.forEach(function(product) {
-            container.append(`<input type="hidden" name="products[]" value="${product.id}">`);
-        });
-    }
 
     // Form validation
-    $('#couponEditForm').on('submit', function(e) {
-        const discountType = $('select[name="discount_type"]').val();
+    $('#couponForm').on('submit', function(e) {
+        const type = $('select[name="type"]').val();
         const discountValue = parseFloat($('input[name="discount_value"]').val());
+        const startDate = new Date($('input[name="start_date"]').val());
+        const endDate = new Date($('input[name="end_date"]').val());
 
-        if (discountType === 'percentage' && discountValue > 100) {
+        if (type === 'percentage' && discountValue > 100) {
             e.preventDefault();
             alert('Percentage discount cannot exceed 100%');
             return false;
@@ -443,7 +576,23 @@ $(document).ready(function() {
             alert('Discount value must be greater than 0');
             return false;
         }
+
+        if (startDate >= endDate) {
+            e.preventDefault();
+            alert('End date must be after start date');
+            return false;
+        }
     });
 });
 </script>
+
+<style>
+.cursor-pointer {
+    cursor: pointer;
+}
+.badge {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+}
+</style>
 @endsection

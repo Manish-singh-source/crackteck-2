@@ -3,7 +3,7 @@
 @section('main-content')
     <div class="container-fluid" style="z-index: 10;display: flex;opacity: 0.9;position: absolute;">
         <div class="container">
-            <div class="category-scroll-container " class="box-btn-slide-2 sw-nav-effect wow fadeInUp" data-wow-delay="0s">
+            <div class="category-scroll-container box-btn-slide-2 sw-nav-effect wow fadeInUp" data-wow-delay="0s">
                 <div class="swiper tf-sw-products slider-category" data-preview="10" data-tablet="7" data-mobile-sm="4"
                     data-mobile="3" data-pagination="2" data-pagination-sm="4" data-pagination-md="7"
                     data-pagination-lg="10">
@@ -11,11 +11,11 @@
                         @if (isset($categories) && $categories->count() > 0)
                             @foreach ($categories as $category)
                                 <div class="category-item swiper-slide">
-                                    <a href="{{ $category->url }}" class="hover-img" style="text-decoration: none;">
-                                        <img src="{{ $category->category_image ? asset($category->category_image) : asset('frontend-assets/images/new-products/default-category.png') }}"
-                                            alt="{{ $category->parent_categories }}"
+                                    <a href="{{ route('shop') }}?category={{ $category->id }}" class="hover-img" style="text-decoration: none;">
+                                        <img src="{{ $category->image ? asset($category->image) : asset('frontend-assets/images/new-products/default-category.png') }}"
+                                            alt="{{ $category->name }}"
                                             style="width: 100%; height: auto; object-fit: cover;">
-                                        <span style="color: #ffffff;">{{ $category->parent_categories }}</span>
+                                        <span style="color: #ffffff;">{{ $category->name }}</span>
                                     </a>
                                 </div>
                             @endforeach
@@ -43,21 +43,19 @@
                 @foreach ($banners as $index => $banner)
                     <!-- Slide {{ $index + 1 }} -->
                     <div class="carousel-item {{ $index === 0 ? 'active' : '' }}"
-                        style="background-image: url('{{ $banner->banner_image_url }}');">
+                        style="background-image: url('{{ $banner->image_url }}');">
                         <div class="container">
                             <div class="carousel-caption">
-                                @if ($banner->banner_sub_heading)
-                                    <h5>{{ $banner->banner_sub_heading }}</h5>
+                                @if ($banner->title)
+                                    <h1>{!! nl2br(e($banner->title)) !!}</h1>
                                 @endif
-                                @if ($banner->banner_heading)
-                                    <h1>{!! nl2br(e($banner->banner_heading)) !!}</h1>
+                                @if ($banner->description)
+                                    <p>{{ $banner->description }}</p>
                                 @endif
-                                @if ($banner->banner_description)
-                                    <p>{{ $banner->banner_description }}</p>
-                                @endif
-                                @if ($banner->button_text && $banner->banner_url)
-                                    <a href="{{ $banner->banner_url }}"
-                                        class="btn btn-outline-light">{{ $banner->button_text }}</a>
+                                @if ($banner->link_url)
+                                    <a href="{{ $banner->link_url }}"
+                                        target="{{ $banner->link_target == '1' ? '_blank' : '_self' }}"
+                                        class="btn btn-outline-light">EXPLORE NOW</a>
                                 @endif
                             </div>
                         </div>
@@ -171,7 +169,7 @@
     <!-- /Iconbox -->
 
     <!-- Deal Today -->
-    @foreach ($activeDeals as $deal)
+    {{-- @foreach ($activeDeals as $deal)
         @if ($activeDeals->count() > 0)
             <section class="tf-sp-2 pt-3">
                 <div class="container">
@@ -327,7 +325,7 @@
                 </div>
             </section>
         @endif
-    @endforeach
+    @endforeach --}}
     <!-- /Deal Today -->
 
     <!-- Deal Today -->

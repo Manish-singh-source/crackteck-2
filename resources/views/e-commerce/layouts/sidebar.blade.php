@@ -90,26 +90,15 @@
                         <span class="ps-1"> Contacts </span>
                     </a>
                 </li>
-
+                
                 <li class="menu-title">Website Setup</li>
                 <li>
-                    <a href="#sidebarBaseui1" data-bs-toggle="collapse">
+                    <a class='tp-link' href="{{ route('website.banner.index') }}">
                         <i class="fas fa-flag"></i>
                         <span class="ps-1"> Banner </span>
-                        <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="sidebarBaseui1">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a class='tp-link' href="{{ route('website.banner.index') }}">Website Banner</a>
-                            </li>
-                            <li>
-                                <a class='tp-link' href="{{ route('promotional.banner.index') }}">Promotional Banner</a>
-                            </li>
-
-                        </ul>
-                    </div>
                 </li>
+
                 <li>
                     <a class='tp-link' href="{{ route('product-deals.index') }}">
                     <i class="fas fa-bolt"></i>

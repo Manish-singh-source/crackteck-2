@@ -64,4 +64,19 @@ class ServiceRequest extends Model
     {
         return $this->belongsTo(CoveredItem::class, 'item_code_id');
     }
+
+    public function assignedEngineers()
+    {
+        return $this->hasMany(AssignedEngineer::class);
+    }
+
+    public function activeAssignment()
+    {
+        return $this->hasOne(AssignedEngineer::class)->where('status', '0')->latest();
+    }
+
+    public function inactiveAssignments()
+    {
+        return $this->hasMany(AssignedEngineer::class)->where('status', '1')->orderBy('created_at', 'desc');
+    }
 }

@@ -1894,6 +1894,7 @@ etc.
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email');
+            $table->string('phone');
             $table->string('subject');
             $table->text('description');
             $table->timestamps();

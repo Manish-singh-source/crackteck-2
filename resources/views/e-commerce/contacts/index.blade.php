@@ -77,7 +77,7 @@
                                                                 </td>
                                                                 <td>{{ $contact->email }}</td>
                                                                 <td>{{ $contact->phone }}</td>
-                                                                <td>{{ $contact->message }}</td>
+                                                                <td>{{ $contact->description }}</td>
                                                                 <td>
                                                                     <a aria-label="anchor"
                                                                         href="{{ route('contact.view', $contact->id) }}"

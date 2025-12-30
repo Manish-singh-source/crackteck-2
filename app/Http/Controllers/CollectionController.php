@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Collection;
-use App\Models\ParentCategorie;
+use App\Models\ParentCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
@@ -38,6 +38,7 @@ class CollectionController extends Controller
             'description' => 'nullable|string',
             'image' => 'required|image|mimes:jpeg,jpg,png|max:2048',
             'status' => 'required|boolean',
+            'is_active' => 'required|boolean',
             'categories' => 'required|array|min:1',
             'categories.*' => 'exists:parent_categories,id',
         ]);
@@ -68,6 +69,7 @@ class CollectionController extends Controller
             'description' => $request->description,
             'image' => $imagePath,
             'status' => $request->status,
+            'is_active' => $request->is_active,
         ]);
 
         // Attach categories
@@ -98,6 +100,7 @@ class CollectionController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             'status' => 'required|boolean',
+            'is_active' => 'required|boolean',
             'categories' => 'required|array|min:1',
             'categories.*' => 'exists:parent_categories,id',
         ]);
@@ -133,6 +136,7 @@ class CollectionController extends Controller
             'description' => $request->description,
             'image' => $imagePath,
             'status' => $request->status,
+            'is_active' => $request->is_active,
         ]);
 
         // Sync categories
@@ -166,18 +170,10 @@ class CollectionController extends Controller
     {
         $query = $request->get('q', '');
 
-        $categories = ParentCategorie::where('parent_categories', 'LIKE', "%{$query}%")
-            ->where('status', 1)
-            ->withCount('products')
+        $categories = ParentCategory::where('name', 'LIKE', "%$query%")
+            ->select('id', 'name')
             ->limit(10)
-            ->get()
-            ->map(function ($category) {
-                return [
-                    'id' => $category->id,
-                    'name' => $category->parent_categories,
-                    'products_count' => $category->products_count,
-                ];
-            });
+            ->get();
 
         return response()->json($categories);
     }

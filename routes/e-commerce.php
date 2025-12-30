@@ -205,18 +205,20 @@ Route::controller(CouponsController::class)->group(function () {
     // Coupons Page
     Route::get('/e-commerce/coupons', 'index')->name('coupon.index');
     // Create Coupons Page
-    Route::get('/e-commerce/create-coupons', 'create')->name('coupon.create');
+    Route::get('/e-commerce/coupons/create', 'create')->name('coupon.create');
     // Store Coupon
-    Route::post('/e-commerce/create-coupons', 'store')->name('coupon.store');
+    Route::post('/e-commerce/coupons', 'store')->name('coupon.store');
     // Edit Coupons Page
-    Route::get('/e-commerce/edit-coupons/{id}', 'edit')->name('coupon.edit');
+    Route::get('/e-commerce/coupons/{id}/edit', 'edit')->name('coupon.edit');
     // Update Coupon
-    Route::put('/e-commerce/edit-coupons/{id}', 'update')->name('coupon.update');
+    Route::put('/e-commerce/coupons/{id}', 'update')->name('coupon.update');
     // Delete Coupon
-    Route::delete('/e-commerce/delete-coupon/{id}', 'destroy')->name('coupon.delete');
+    Route::delete('/e-commerce/coupons/{id}', 'destroy')->name('coupon.delete');
 
-    // AJAX Routes for product search
-    Route::get('/e-commerce/search-products-for-coupon', 'searchProducts')->name('coupon.search-products');
+    // AJAX Routes for search
+    Route::get('/e-commerce/coupons/search-categories', 'searchCategories')->name('coupon.search-categories');
+    Route::get('/e-commerce/coupons/search-brands', 'searchBrands')->name('coupon.search-brands');
+    Route::get('/e-commerce/coupons/search-products', 'searchProducts')->name('coupon.search-products');
 });
 
 // ------------------------------------------------------------ E-Commerce Subscribers Page -------------------------------------------------------------
@@ -244,33 +246,17 @@ Route::delete('/e-commerce/delete-contact/{id}', [ContactController::class, 'del
 // ---------------------------------------- E-Commerce Website Banner Page and Promotional Banner Page ------------------------------------------------
 
 Route::controller(BannerController::class)->group(function () {
-    // Website Banner Page
+    // Website Banner Routes
     Route::get('/e-commerce/website-banner', 'websiteBanner')->name('website.banner.index');
-    // Add Website Banner Page
     Route::get('/e-commerce/add-banner', 'addWebsiteBanner')->name('website.banner.create');
-    // Store Website Banner Page
     Route::post('/e-commerce/store-banner', 'storeWebsiteBanner')->name('website.banner.store');
-    // Edit Website Banner Page
+    Route::get('/e-commerce/show-banner/{id}', 'showWebsiteBanner')->name('website.banner.show');
     Route::get('/e-commerce/edit-banner/{id}', 'editWebsiteBanner')->name('website.banner.edit');
-    // Update website Banner Page
     Route::put('/e-commerce/update-banner/{id}', 'updateWebsiteBanner')->name('website.banner.update');
-    // Delete Website Banner Page
     Route::delete('/e-commerce/delete-banner/{id}', 'deleteWebsiteBanner')->name('website.banner.delete');
-    // Update Banner Sort Order (AJAX)
-    Route::post('/e-commerce/update-banner-sort-order', 'updateSortOrder')->name('website.banner.update-sort-order');
 
-    // Promotional Banner Page
+    // Promotional Banner Routes (uses same table with type=1)
     Route::get('/e-commerce/promotional-banner', 'promotionalBanner')->name('promotional.banner.index');
-    // Add Promotional Banner Page
-    Route::get('/e-commerce/add-promotional-banner', 'addPromotionalBanner')->name('promotional.banner.create');
-    // Store Promotional Banner Page
-    Route::post('/e-commerce/store-promotional-banner', 'storePromotionalBanner')->name('promotional.banner.store');
-    // Edit Promotional Banner Page
-    Route::get('/e-commerce/edit-promotional-banner/{id}', 'editPromotionalBanner')->name('promotional.banner.edit');
-    // Update Promotional Banner Page
-    Route::put('/e-commerce/update-promotional-banner/{id}', 'updatePromotionalBanner')->name('promotional.banner.update');
-    // Delete Promotional Banner Page
-    Route::delete('/e-commerce/delete-promotional-banner{id}', 'deletePromotionalBanner')->name('promotional.banner.delete');
 });
 
 // ------------------------------------------------------------ E-Commerce Product Deals Page -------------------------------------------------------------

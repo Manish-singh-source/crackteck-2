@@ -2,19 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PromotionalBanner;
 use App\Models\WebsiteBanner;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\{Auth, DB, File, Log, Validator};
+use Illuminate\Validation\Rule;
 
 class BannerController extends Controller
 {
-    //
+    /**
+     * Display website banners (type = 0)
+     */
     public function websiteBanner()
     {
-        $website = WebsiteBanner::ordered()->get();
+        // mujhe sub kuch chahiye
+        // sirf type 0 ka nahi 
+        $website = WebsiteBanner::where('is_active', '1')
+            ->orderBy('display_order', 'asc')
+            ->paginate(15);
 
         return view('/e-commerce/banner/website-banner/index', compact('website'));
     }
@@ -24,232 +28,233 @@ class BannerController extends Controller
         return view('/e-commerce/banner/website-banner/create');
     }
 
+    /**
+     * Store website banner
+     */
     public function storeWebsiteBanner(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
-            'banner_title' => 'required|min:3',
-            'banner_heading' => 'nullable|string|max:255',
-            'banner_sub_heading' => 'nullable|string|max:255',
-            'banner_url' => 'required|min:3',
-            'banner_description' => 'required|min:15',
-            'button_text' => 'nullable|string|max:100',
-            'website_banner' => 'required',
-            'status' => 'required',
+            'title'           => 'required|string|min:3|max:255',
+            'image'           => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'type'            => 'required|in:0,1',
+            'channel'         => 'required|in:0,1',
+            'description'     => 'nullable|string|min:3',
+            'promotion_type'  => 'nullable|in:0,1,2,3',
+            'discount_value'  => 'nullable|numeric|min:0',
+            'discount_type'   => 'nullable|in:0,1',
+            'promo_code'      => 'nullable|string|max:100',
+            'link_url'        => 'nullable|url|max:255',
+            'link_target'     => 'nullable|in:0,1',
+            'position'        => 'required|in:0,1,2,3,4,5',
+            'display_order'   => [
+                'required',
+                'integer',
+                'min:0',
+                Rule::unique('website_banners', 'display_order')
+                    ->where('type', $request->type)
+                    ->whereNull('deleted_at')
+            ],
+            'start_at'        => 'required|date',
+            'end_at'          => 'required|date|after:start_at',
+            'is_active'       => 'required|in:0,1',
+            'metadata'        => 'nullable|json',
+        ], [
+            'display_order.unique' => 'This display order is already taken for this banner type. Please choose a different order.',
         ]);
 
         if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Get the next sort order
-        $maxSortOrder = WebsiteBanner::max('sort_order') ?? 0;
+        DB::beginTransaction();
+        try {
+            // Image upload
+            $path = null;
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads/e-commerce/banner/website_banner'), $filename);
+                $path = 'uploads/e-commerce/banner/website_banner/' . $filename;
+            }
 
-        $websiteBanner = new WebsiteBanner;
-        $websiteBanner->banner_title = $request->banner_title;
-        $websiteBanner->banner_heading = $request->banner_heading;
-        $websiteBanner->banner_sub_heading = $request->banner_sub_heading;
-        $websiteBanner->banner_url = $request->banner_url;
-        $websiteBanner->banner_description = $request->banner_description;
-        $websiteBanner->button_text = $request->button_text;
-        $websiteBanner->sort_order = $maxSortOrder + 1;
+            $banner = WebsiteBanner::create([
+                'title'          => $request->title,
+                'slug'           => \Illuminate\Support\Str::slug($request->title),
+                'description'    => $request->description,
+                'image_url'      => $path,
+                'type'           => $request->type,
+                'channel'        => $request->channel,
+                'promotion_type' => $request->promotion_type !== '' ? $request->promotion_type : null,
+                'discount_value' => $request->discount_value,
+                'discount_type'  => $request->discount_type !== '' ? $request->discount_type : null,
+                'promo_code'     => $request->promo_code,
+                'link_url'       => $request->link_url,
+                'link_target'    => $request->link_target ?? 1,
+                'position'       => $request->position,
+                'display_order'  => $request->display_order ?? 0,
+                'start_at'       => $request->start_at,
+                'end_at'         => $request->end_at,
+                'is_active'      => $request->is_active,
+                'click_count'    => 0,
+                'view_count'     => 0,
+                'metadata'       => $request->metadata ? json_decode($request->metadata, true) : null,
+            ]);
 
-        if ($request->hasFile('website_banner')) {
-            $file = $request->file('website_banner');
-            $filename = time().'.'.$file->getClientOriginalExtension();
-
-            $file->move(public_path('uploads/e-commerce/banner/website_banner'), $filename);
-            $websiteBanner->website_banner = 'uploads/e-commerce/banner/website_banner/'.$filename;
+            DB::commit();
+            activity()->performedOn($banner)->causedBy(Auth::user())->log('Banner created');
+            return redirect()->route('website.banner.index')->with('success', 'Banner added successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Banner Store Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage())->withInput();
         }
-
-        $websiteBanner->status = $request->status;
-
-        $websiteBanner->save();
-
-        if (! $websiteBanner) {
-            return back()->with('error', 'Something went wrong.');
-        }
-
-        return redirect()->route('website.banner.index')->with('success', 'Banner added successfully.');
     }
 
+    /**
+     * Show banner details
+     */
+    public function showWebsiteBanner($id)
+    {
+        $website = WebsiteBanner::findOrFail($id);
+        return view('/e-commerce/banner/website-banner/show', compact('website'));
+    }
+
+    /**
+     * Edit website banner
+     */
     public function editWebsiteBanner($id)
     {
-        $website = WebsiteBanner::find($id);
-
+        $website = WebsiteBanner::findOrFail($id);
         return view('/e-commerce/banner/website-banner/edit', compact('website'));
     }
 
+    /**
+     * Update website banner
+     */
     public function updateWebsiteBanner(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'banner_title' => 'required|min:3',
-            'banner_heading' => 'nullable|string|max:255',
-            'banner_sub_heading' => 'nullable|string|max:255',
-            'banner_url' => 'required|min:3',
-            'banner_description' => 'required|min:15',
-            'button_text' => 'nullable|string|max:100',
-            'status' => 'required',
+            'title'           => 'required|string|min:3|max:255',
+            'image'           => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'type'            => 'required|in:0,1',
+            'channel'         => 'required|in:0,1',
+            'description'     => 'nullable|string|min:3',
+            'promotion_type'  => 'nullable|in:0,1,2,3',
+            'discount_value'  => 'nullable|numeric|min:0',
+            'discount_type'   => 'nullable|in:0,1',
+            'promo_code'      => 'nullable|string|max:100',
+            'link_url'        => 'nullable|url|max:255',
+            'link_target'     => 'nullable|in:0,1',
+            'position'        => 'required|in:0,1,2,3,4,5',
+            'display_order'   => [
+                'required',
+                'integer',
+                'min:0',
+                Rule::unique('website_banners', 'display_order')
+                    ->where('type', $request->type)
+                    ->ignore($id)
+                    ->whereNull('deleted_at')
+            ],
+            'start_at'        => 'required|date',
+            'end_at'          => 'required|date|after:start_at',
+            'is_active'       => 'required|in:0,1',
+            'metadata'        => 'nullable|json',
+        ], [
+            'display_order.unique' => 'This display order is already taken for this banner type. Please choose a different order.',
         ]);
 
         if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $websiteBanner = WebsiteBanner::findOrFail($id);
-        $websiteBanner->banner_title = $request->banner_title;
-        $websiteBanner->banner_heading = $request->banner_heading;
-        $websiteBanner->banner_sub_heading = $request->banner_sub_heading;
-        $websiteBanner->banner_url = $request->banner_url;
-        $websiteBanner->banner_description = $request->banner_description;
-        $websiteBanner->button_text = $request->button_text;
+        DB::beginTransaction();
+        try {
+            $banner = WebsiteBanner::findOrFail($id);
 
-        if ($request->hasFile('website_banner')) {
-
-            // Only if updating profile
-            if ($websiteBanner->website_banner != '') {
-                if (File::exists(public_path($websiteBanner->website_banner))) {
-                    File::delete(public_path($websiteBanner->website_banner));
+            // Handle image upload
+            $path = $banner->image_url;
+            if ($request->hasFile('image')) {
+                // Delete old image
+                if ($banner->image_url && File::exists(public_path($banner->image_url))) {
+                    File::delete(public_path($banner->image_url));
                 }
+
+                $file = $request->file('image');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads/e-commerce/banner/website_banner'), $filename);
+                $path = 'uploads/e-commerce/banner/website_banner/' . $filename;
             }
-            // updating profile end
 
-            $file = $request->file('website_banner');
-            $filename = time().'.'.$file->getClientOriginalExtension();
+            $banner->update([
+                'title'          => $request->title,
+                'slug'           => \Illuminate\Support\Str::slug($request->title),
+                'description'    => $request->description,
+                'image_url'      => $path,
+                'type'           => $request->type,
+                'channel'        => $request->channel,
+                'promotion_type' => $request->promotion_type !== '' ? $request->promotion_type : null,
+                'discount_value' => $request->discount_value,
+                'discount_type'  => $request->discount_type !== '' ? $request->discount_type : null,
+                'promo_code'     => $request->promo_code,
+                'link_url'       => $request->link_url,
+                'link_target'    => $request->link_target ?? 1,
+                'position'       => $request->position,
+                'display_order'  => $request->display_order ?? 0,
+                'start_at'       => $request->start_at,
+                'end_at'         => $request->end_at,
+                'is_active'      => $request->is_active,
+                'metadata'       => $request->metadata ? json_decode($request->metadata, true) : null,
+            ]);
 
-            $file->move(public_path('uploads/e-commerce/banner/website_banner'), $filename);
-            $websiteBanner->website_banner = 'uploads/e-commerce/banner/website_banner/'.$filename;
+            DB::commit();
+            activity()->performedOn($banner)->causedBy(Auth::user())->log('Banner updated');
+            return redirect()->route('website.banner.index')->with('success', 'Banner updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Banner Update Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage())->withInput();
         }
-
-        $websiteBanner->status = $request->status;
-        $websiteBanner->save();
-
-        return redirect()->route('website.banner.index')->with('success', 'Banner updated successfully.');
     }
 
+    /**
+     * Delete website banner
+     */
     public function deleteWebsiteBanner($id)
     {
-        $website = WebsiteBanner::findOrFail($id);
-        $website->delete();
+        DB::beginTransaction();
+        try {
+            $banner = WebsiteBanner::findOrFail($id);
 
-        return redirect()->route('website.banner.index')->with('success', 'Website Banner deleted successfully.');
+            // Delete image file
+            if ($banner->image_url && File::exists(public_path($banner->image_url))) {
+                File::delete(public_path($banner->image_url));
+            }
+
+            $banner->delete();
+
+            DB::commit();
+            activity()->performedOn($banner)->causedBy(Auth::user())->log('Banner deleted');
+            return redirect()->route('website.banner.index')->with('success', 'Banner deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Banner Delete Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+        }
     }
 
+    /**
+     * Display promotional banners (type = 1)
+     */
     public function promotionalBanner()
     {
-        $promotionalBanner = PromotionalBanner::all();
+        $promotionalBanner = WebsiteBanner::where('type', '1')
+            ->orderBy('display_order', 'asc')
+            ->paginate(15);
 
         return view('/e-commerce/banner/promotional-banner/index', compact('promotionalBanner'));
     }
 
-    public function addPromotionalBanner()
-    {
-        return view('/e-commerce/banner/promotional-banner/create');
-    }
 
-    public function storePromotionalBanner(Request $request)
-    {
-
-        $validator = Validator::make($request->all(), [
-            'banner_title' => 'required|min:3',
-            'banner_url' => 'required|min:3',
-            'banner_description' => 'required|min:15',
-            'promotional_banner' => 'required',
-            'start_datetime' => 'required',
-            'end_datetime' => 'required',
-            'status' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
-        }
-
-        $promotionalBanner = new PromotionalBanner;
-        $promotionalBanner->banner_title = $request->banner_title;
-        $promotionalBanner->banner_url = $request->banner_url;
-        $promotionalBanner->banner_description = $request->banner_description;
-
-        if ($request->hasFile('promotional_banner')) {
-            $file = $request->file('promotional_banner');
-            $filename = time().'.'.$file->getClientOriginalExtension();
-
-            $file->move(public_path('uploads/e-commerce/banner/promotional_banner'), $filename);
-            $promotionalBanner->promotional_banner = 'uploads/e-commerce/banner/promotional_banner/'.$filename;
-        }
-
-        $promotionalBanner->start_datetime = $request->start_datetime;
-        $promotionalBanner->end_datetime = $request->end_datetime;
-        $promotionalBanner->status = $request->status;
-
-        $promotionalBanner->save();
-
-        if (! $promotionalBanner) {
-            return back()->with('error', 'Something went wrong.');
-        }
-
-        return redirect()->route('promotional.banner.index')->with('success', 'Customer added successfully.');
-    }
-
-    public function editPromotionalBanner($id)
-    {
-        $promotionalBanner = PromotionalBanner::find($id);
-
-        return view('/e-commerce/banner/promotional-banner/edit', compact('promotionalBanner'));
-    }
-
-    public function updatePromotionalBanner(Request $request, $id)
-    {
-        $validator = Validator::make($request->all(), [
-            'banner_title' => 'required|min:3',
-            'banner_url' => 'required|min:3',
-            'banner_description' => 'required|min:15',
-            'start_datetime' => 'required',
-            'end_datetime' => 'required',
-            'status' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
-        }
-
-        $promotionalBanner = PromotionalBanner::findOrFail($id);
-        $promotionalBanner->banner_title = $request->banner_title;
-        $promotionalBanner->banner_url = $request->banner_url;
-        $promotionalBanner->banner_description = $request->banner_description;
-
-        if ($request->hasFile('promotional_banner')) {
-
-            // Only if updating profile
-            if ($promotionalBanner->promotional_banner != '') {
-                if (File::exists(public_path($promotionalBanner->promotional_banner))) {
-                    File::delete(public_path($promotionalBanner->promotional_banner));
-                }
-            }
-            // updating profile end
-
-            $file = $request->file('promotional_banner');
-            $filename = time().'.'.$file->getClientOriginalExtension();
-
-            $file->move(public_path('uploads/e-commerce/banner/promotional_banner'), $filename);
-            $promotionalBanner->promotional_banner = 'uploads/e-commerce/banner/promotional_banner/'.$filename;
-        }
-
-        $promotionalBanner->start_datetime = $request->start_datetime;
-        $promotionalBanner->end_datetime = $request->end_datetime;
-        $promotionalBanner->status = $request->status;
-
-        $promotionalBanner->save();
-
-        return redirect()->route('promotional.banner.index')->with('success', 'Banner updated successfully.');
-    }
-
-    public function deletePromotionalBanner($id)
-    {
-        $promotionalBanner = PromotionalBanner::findOrFail($id);
-        $promotionalBanner->delete();
-
-        return redirect()->route('promotional.banner.index')->with('success', 'Promotional Banner deleted successfully.');
-    }
 
     /**
      * Update banner sort order via AJAX for drag & drop functionality
@@ -269,7 +274,7 @@ class BannerController extends Controller
 
             return response()->json(['success' => true, 'message' => 'Banner order updated successfully']);
         } catch (\Exception $e) {
-            Log::error('Banner sort order update failed: '.$e->getMessage());
+            Log::error('Banner sort order update failed: ' . $e->getMessage());
 
             return response()->json(['success' => false, 'message' => 'Failed to update banner order']);
         }

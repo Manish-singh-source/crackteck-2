@@ -8,6 +8,7 @@ use App\Models\AmcEngineerAssignment;
 use App\Models\AmcGroupEngineer;
 use App\Models\AmcProduct;
 use App\Models\AmcService;
+use App\Models\AssignedEngineer;
 use App\Models\Brand;
 use App\Models\CoveredItem;
 use App\Models\Customer;
@@ -22,6 +23,7 @@ use App\Models\ParentCategorie;
 use App\Models\ParentCategory;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
+use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -40,7 +42,7 @@ class ServiceRequestController extends Controller
 
         $nextNumber = $lastService ? (intval(substr($lastService->request_id, -4)) + 1) : 1;
 
-        return 'SRV-'.$year.'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        return 'SRV-' . $year . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     //
@@ -59,6 +61,26 @@ class ServiceRequestController extends Controller
     public function view()
     {
         return view('/crm/service-request/view-service');
+    }
+
+    public function viewServiceRequest($id)
+    {
+        $serviceRequest = ServiceRequest::with([
+            'customer',
+            'customerAddress',
+            'customerCompany',
+            'products',
+        ])->findOrFail($id);
+
+        // Get active assignment
+        $activeAssignment = AssignedEngineer::with(['engineer', 'groupEngineers'])
+            ->where('service_request_id', $id)
+            ->where('status', '0')
+            ->first();
+
+        $engineers = Staff::where('staff_role', '1')->get();
+
+        return view('/crm/service-request/view-quick-service-request', compact('serviceRequest', 'activeAssignment', 'engineers'));
     }
 
     public function edit()
@@ -116,17 +138,17 @@ class ServiceRequestController extends Controller
             // Handle profile image upload
             if ($request->hasFile('profile_image')) {
                 $file = $request->file('profile_image');
-                $filename = time().'_profile.'.$file->getClientOriginalExtension();
+                $filename = time() . '_profile.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/amc/profiles'), $filename);
-                $amcService->profile_image = 'uploads/crm/amc/profiles/'.$filename;
+                $amcService->profile_image = 'uploads/crm/amc/profiles/' . $filename;
             }
 
             // Handle customer image upload
             if ($request->hasFile('customer_image')) {
                 $file = $request->file('customer_image');
-                $filename = time().'_customer.'.$file->getClientOriginalExtension();
+                $filename = time() . '_customer.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/amc/customers'), $filename);
-                $amcService->customer_image = 'uploads/crm/amc/customers/'.$filename;
+                $amcService->customer_image = 'uploads/crm/amc/customers/' . $filename;
             }
 
             // AMC Details
@@ -199,9 +221,9 @@ class ServiceRequestController extends Controller
                     // Handle product image upload
                     if (isset($productData['product_image']) && $productData['product_image'] instanceof \Illuminate\Http\UploadedFile) {
                         $file = $productData['product_image'];
-                        $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+                        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                         $file->move(public_path('uploads/crm/amc/products'), $filename);
-                        $product->product_image = 'uploads/crm/amc/products/'.$filename;
+                        $product->product_image = 'uploads/crm/amc/products/' . $filename;
                     }
 
                     $product->save();
@@ -214,7 +236,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Something went wrong: '.$e->getMessage())->withInput();
+            return back()->with('error', 'Something went wrong: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -287,9 +309,9 @@ class ServiceRequestController extends Controller
                 }
 
                 $file = $request->file('profile_image');
-                $filename = time().'_profile.'.$file->getClientOriginalExtension();
+                $filename = time() . '_profile.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/amc/profiles'), $filename);
-                $amcService->profile_image = 'uploads/crm/amc/profiles/'.$filename;
+                $amcService->profile_image = 'uploads/crm/amc/profiles/' . $filename;
             }
 
             // Handle customer image upload
@@ -300,9 +322,9 @@ class ServiceRequestController extends Controller
                 }
 
                 $file = $request->file('customer_image');
-                $filename = time().'_customer.'.$file->getClientOriginalExtension();
+                $filename = time() . '_customer.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/amc/customers'), $filename);
-                $amcService->customer_image = 'uploads/crm/amc/customers/'.$filename;
+                $amcService->customer_image = 'uploads/crm/amc/customers/' . $filename;
             }
 
             // AMC Details
@@ -431,7 +453,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Something went wrong: '.$e->getMessage())->withInput();
+            return back()->with('error', 'Something went wrong: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -461,7 +483,7 @@ class ServiceRequestController extends Controller
 
             return redirect()->route('service-request.index')->with('success', 'AMC Request deleted successfully.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Something went wrong: '.$e->getMessage());
+            return back()->with('error', 'Something went wrong: ' . $e->getMessage());
         }
     }
 
@@ -534,7 +556,7 @@ class ServiceRequestController extends Controller
                 ]);
 
                 $engineer = Engineer::find($request->engineer_id);
-                $message = 'Engineer '.$engineer->first_name.' '.$engineer->last_name.' assigned successfully';
+                $message = 'Engineer ' . $engineer->first_name . ' ' . $engineer->last_name . ' assigned successfully';
             } else {
                 // Group assignment
                 $assignment = AmcEngineerAssignment::create([
@@ -555,7 +577,7 @@ class ServiceRequestController extends Controller
                     ]);
                 }
 
-                $message = 'Group "'.$request->group_name.'" assigned successfully with '.count($request->engineer_ids).' engineers';
+                $message = 'Group "' . $request->group_name . '" assigned successfully with ' . count($request->engineer_ids) . ' engineers';
             }
 
             DB::commit();
@@ -573,7 +595,7 @@ class ServiceRequestController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error assigning engineer: '.$e->getMessage(),
+                'message' => 'Error assigning engineer: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -644,17 +666,17 @@ class ServiceRequestController extends Controller
             // Handle profile image upload
             if ($request->hasFile('profile_image')) {
                 $file = $request->file('profile_image');
-                $filename = time().'_profile_'.uniqid().'.'.$file->getClientOriginalExtension();
+                $filename = time() . '_profile_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/non-amc/profiles'), $filename);
-                $nonAmcService->profile_image = 'uploads/crm/non-amc/profiles/'.$filename;
+                $nonAmcService->profile_image = 'uploads/crm/non-amc/profiles/' . $filename;
             }
 
             // Handle customer image upload
             if ($request->hasFile('customer_image')) {
                 $file = $request->file('customer_image');
-                $filename = time().'_customer_'.uniqid().'.'.$file->getClientOriginalExtension();
+                $filename = time() . '_customer_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/non-amc/customers'), $filename);
-                $nonAmcService->customer_image = 'uploads/crm/non-amc/customers/'.$filename;
+                $nonAmcService->customer_image = 'uploads/crm/non-amc/customers/' . $filename;
             }
 
             $nonAmcService->service_type = $request->service_type ?? 'Offline';
@@ -683,9 +705,9 @@ class ServiceRequestController extends Controller
                     // Handle product image upload
                     if (isset($productData['product_image']) && $productData['product_image'] instanceof \Illuminate\Http\UploadedFile) {
                         $file = $productData['product_image'];
-                        $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+                        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                         $file->move(public_path('uploads/crm/non-amc/products'), $filename);
-                        $product->product_image = 'uploads/crm/non-amc/products/'.$filename;
+                        $product->product_image = 'uploads/crm/non-amc/products/' . $filename;
                     }
 
                     $product->save();
@@ -698,7 +720,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Something went wrong: '.$e->getMessage())->withInput();
+            return back()->with('error', 'Something went wrong: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -715,74 +737,74 @@ class ServiceRequestController extends Controller
     /**
      * Assign engineer to NON AMC service (single engineer only)
      */
-    public function assignNonAmcEngineer(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'non_amc_service_id' => 'required|exists:non_amc_services,id',
-            'engineer_id' => 'required|exists:engineers,id',
-        ]);
+    // public function assignNonAmcEngineer(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'non_amc_service_id' => 'required|exists:non_amc_services,id',
+    //         'engineer_id' => 'required|exists:engineers,id',
+    //     ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()->first(),
-            ], 422);
-        }
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => $validator->errors()->first(),
+    //         ], 422);
+    //     }
 
-        DB::beginTransaction();
-        try {
-            $nonAmcService = NonAmcService::findOrFail($request->non_amc_service_id);
+    //     DB::beginTransaction();
+    //     try {
+    //         $nonAmcService = NonAmcService::findOrFail($request->non_amc_service_id);
 
-            // Check if status is pending
-            if (! $nonAmcService->canAssignEngineer()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Engineer cannot be assigned while status is Pending. Please change the status first.',
-                ], 422);
-            }
+    //         // Check if status is pending
+    //         if (! $nonAmcService->canAssignEngineer()) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Engineer cannot be assigned while status is Pending. Please change the status first.',
+    //             ], 422);
+    //         }
 
-            // Deactivate previous assignments
-            NonAmcEngineerAssignment::where('non_amc_service_id', $request->non_amc_service_id)
-                ->where('status', 'Active')
-                ->update(['status' => 'Inactive']);
+    //         // Deactivate previous assignments
+    //         NonAmcEngineerAssignment::where('non_amc_service_id', $request->non_amc_service_id)
+    //             ->where('status', 'Active')
+    //             ->update(['status' => 'Inactive']);
 
-            // Create new assignment (Individual only, no group support for NON AMC)
-            $assignment = NonAmcEngineerAssignment::create([
-                'non_amc_service_id' => $request->non_amc_service_id,
-                'assignment_type' => 'Individual',
-                'engineer_id' => $request->engineer_id,
-                'status' => 'Active',
-                'assigned_at' => now(),
-            ]);
+    //         // Create new assignment (Individual only, no group support for NON AMC)
+    //         $assignment = NonAmcEngineerAssignment::create([
+    //             'non_amc_service_id' => $request->non_amc_service_id,
+    //             'assignment_type' => 'Individual',
+    //             'engineer_id' => $request->engineer_id,
+    //             'status' => 'Active',
+    //             'assigned_at' => now(),
+    //         ]);
 
-            // Update the service with assigned engineer
-            $nonAmcService->assigned_engineer_id = $request->engineer_id;
-            $nonAmcService->save();
+    //         // Update the service with assigned engineer
+    //         $nonAmcService->assigned_engineer_id = $request->engineer_id;
+    //         $nonAmcService->save();
 
-            DB::commit();
+    //         DB::commit();
 
-            // Load relationships for response
-            $assignment->load('engineer');
+    //         // Load relationships for response
+    //         $assignment->load('engineer');
 
-            activity()->performedOn($assignment)->causedBy(Auth::user())->log('Engineer assigned to NON AMC service');
+    //         activity()->performedOn($assignment)->causedBy(Auth::user())->log('Engineer assigned to NON AMC service');
 
-            $engineer = Engineer::find($request->engineer_id);
+    //         $engineer = Engineer::find($request->engineer_id);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Engineer '.$engineer->first_name.' '.$engineer->last_name.' assigned successfully',
-                'assignment' => $assignment,
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error($e->getMessage());
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Engineer '.$engineer->first_name.' '.$engineer->last_name.' assigned successfully',
+    //             'assignment' => $assignment,
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error($e->getMessage());
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Error assigning engineer: '.$e->getMessage(),
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Error assigning engineer: '.$e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
     public function edit_non_amc($id)
     {
@@ -839,9 +861,9 @@ class ServiceRequestController extends Controller
                 }
 
                 $file = $request->file('profile_image');
-                $filename = time().'_profile_'.uniqid().'.'.$file->getClientOriginalExtension();
+                $filename = time() . '_profile_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/non-amc/profiles'), $filename);
-                $nonAmcService->profile_image = 'uploads/crm/non-amc/profiles/'.$filename;
+                $nonAmcService->profile_image = 'uploads/crm/non-amc/profiles/' . $filename;
             }
 
             // Handle customer image upload
@@ -852,9 +874,9 @@ class ServiceRequestController extends Controller
                 }
 
                 $file = $request->file('customer_image');
-                $filename = time().'_customer_'.uniqid().'.'.$file->getClientOriginalExtension();
+                $filename = time() . '_customer_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/non-amc/customers'), $filename);
-                $nonAmcService->customer_image = 'uploads/crm/non-amc/customers/'.$filename;
+                $nonAmcService->customer_image = 'uploads/crm/non-amc/customers/' . $filename;
             }
 
             $nonAmcService->service_type = $request->service_type ?? 'Offline';
@@ -923,9 +945,9 @@ class ServiceRequestController extends Controller
                     // Handle product image upload
                     if (isset($productData['product_image']) && $productData['product_image'] instanceof \Illuminate\Http\UploadedFile) {
                         $file = $productData['product_image'];
-                        $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+                        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                         $file->move(public_path('uploads/crm/non-amc/products'), $filename);
-                        $product->product_image = 'uploads/crm/non-amc/products/'.$filename;
+                        $product->product_image = 'uploads/crm/non-amc/products/' . $filename;
                     }
 
                     $product->save();
@@ -948,7 +970,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Something went wrong: '.$e->getMessage())->withInput();
+            return back()->with('error', 'Something went wrong: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -978,7 +1000,7 @@ class ServiceRequestController extends Controller
 
             return redirect()->route('service-request.index')->with('success', 'Non-AMC Service Request deleted successfully.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting service request: '.$e->getMessage());
+            return back()->with('error', 'Error deleting service request: ' . $e->getMessage());
         }
     }
 
@@ -1048,7 +1070,7 @@ class ServiceRequestController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Engineer '.$engineer->first_name.' '.$engineer->last_name.' updated successfully',
+                'message' => 'Engineer ' . $engineer->first_name . ' ' . $engineer->last_name . ' updated successfully',
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -1056,7 +1078,7 @@ class ServiceRequestController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error: '.$e->getMessage(),
+                'message' => 'Error: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -1081,7 +1103,7 @@ class ServiceRequestController extends Controller
     {
         // $customerCode = 'CUST' . str_pad((Customer::max('id') ?? 0) + 1, 4, '0', STR_PAD_LEFT);
         // mujhe is format me chahiye
-        $customerCode = 'CUST'.str_pad((Customer::max('id') ?? 0) + 1, 4, '0', STR_PAD_LEFT);
+        $customerCode = 'CUST' . str_pad((Customer::max('id') ?? 0) + 1, 4, '0', STR_PAD_LEFT);
 
         return $customerCode;
     }
@@ -1180,7 +1202,7 @@ class ServiceRequestController extends Controller
             DB::rollBack();
             dd($e->getMessage());
 
-            return redirect()->back()->with('error', 'Error creating service request: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Error creating service request: ' . $e->getMessage());
         }
     }
 
@@ -1190,19 +1212,23 @@ class ServiceRequestController extends Controller
     public function viewQuickServiceRequest($id)
     {
         $request = ServiceRequest::with([
-
             'customer',
             'customerAddress',
             'customerCompany',
             'customerPan',
             'products',
             'parentCategorie',
-
-            // 'activeAssignment'
+            'activeAssignment.engineer',
+            'activeAssignment.groupEngineers',
+            'activeAssignment.transferredTo',
+            'inactiveAssignments.engineer',
+            'inactiveAssignments.groupEngineers',
+            'inactiveAssignments.transferredTo',
         ])->findOrFail($id);
 
-        // dd($request);
-        return view('crm/service-request/view-quick-service-request', compact('request'));
+        $engineers = Staff::where('staff_role', '1')->where('status', '1')->get();
+
+        return view('crm/service-request/view-quick-service-request', compact('request', 'engineers'));
     }
 
     /**
@@ -1250,7 +1276,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             return redirect()
                 ->route('service-request.index')
-                ->with('error', 'Quick Service Request not found: '.$e->getMessage());
+                ->with('error', 'Quick Service Request not found: ' . $e->getMessage());
         }
     }
 
@@ -1349,9 +1375,9 @@ class ServiceRequestController extends Controller
                 // Handle product image upload
                 if (isset($prod['product_image']) && $prod['product_image'] instanceof \Illuminate\Http\UploadedFile) {
                     $file = $prod['product_image'];
-                    $imageName = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+                    $imageName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                     $file->move(public_path('uploads/service-request-products'), $imageName);
-                    $imagePath = 'uploads/service-request-products/'.$imageName;
+                    $imagePath = 'uploads/service-request-products/' . $imageName;
                 }
 
                 ServiceRequestProduct::create([
@@ -1374,7 +1400,7 @@ class ServiceRequestController extends Controller
             activity()
                 ->performedOn($serviceRequest)
                 ->causedBy(Auth::user())
-                ->log('Updated Quick Service Request #'.$serviceRequest->id);
+                ->log('Updated Quick Service Request #' . $serviceRequest->id);
 
             return redirect()
                 ->route('service-request.view-quick-service-request', $serviceRequest->id)
@@ -1384,7 +1410,7 @@ class ServiceRequestController extends Controller
 
             return redirect()
                 ->back()
-                ->with('error', 'Error updating Quick Service Request: '.$e->getMessage())
+                ->with('error', 'Error updating Quick Service Request: ' . $e->getMessage())
                 ->withInput();
         }
     }
@@ -1411,13 +1437,151 @@ class ServiceRequestController extends Controller
             activity()
                 ->performedOn($quickServiceRequest)
                 ->causedBy(Auth::user())
-                ->log('Deleted Quick Service Request #'.$quickServiceRequest->id);
+                ->log('Deleted Quick Service Request #' . $quickServiceRequest->id);
 
             return redirect()->route('service-request.index')->with('success', 'Quick Service Request deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return redirect()->back()->with('error', 'Error deleting Quick Service Request: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Error deleting Quick Service Request: ' . $e->getMessage());
+        }
+    }
+
+    public function assignQuickServiceEngineer(Request $request)
+    {
+        if ($request->assignment_type == '1') {
+            $request->replace($request->except('engineer_id'));
+        }
+
+        $validator = Validator::make($request->all(), [
+            'service_request_id' => 'required|exists:service_requests,id',
+            'assignment_type'    => 'required|in:0,1',
+            'engineer_id'        => 'required_if:assignment_type,0|exists:staff,id',
+            'group_name'         => 'required_if:assignment_type,1',
+            'engineer_ids'       => 'required_if:assignment_type,1|array',
+            'engineer_ids.*'     => 'exists:staff,id',
+            'supervisor_id'      => 'required_if:assignment_type,1|exists:staff,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error: ' . $validator->errors()->first(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+
+
+        try {
+            $serviceRequest = ServiceRequest::find($request->service_request_id);
+
+            // Check if status is Approved (status = 1)
+            if ($serviceRequest->status != 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Engineer can only be assigned to Approved requests.',
+                ], 422);
+            }
+
+            // Get previous active assignment
+            $previousAssignment = AssignedEngineer::where('service_request_id', $request->service_request_id)
+                ->where('status', '0')
+                ->first();
+
+            // Update service request status to Assigned (status = 2)
+            $serviceRequest->status = 2;
+            $serviceRequest->save();
+
+            // Mark previous assignment as inactive
+            if ($previousAssignment) {
+                $previousAssignment->update([
+                    'status' => '1',
+                    'transferred_at' => now(),
+                ]);
+            }
+
+            if ($request->assignment_type == '0') {
+                // Individual assignment
+                $assignment = AssignedEngineer::create([
+                    'service_request_id' => $request->service_request_id,
+                    'engineer_id'        => $request->engineer_id,
+                    'assignment_type'    => '0',
+                    'assigned_at'        => now(),
+                    'status'             => '0       ',
+                ]);
+
+                // Update transferred_to in previous assignment
+                if ($previousAssignment) {
+                    $previousAssignment->update(['transferred_to' => $request->engineer_id]);
+                }
+
+                $engineer = Staff::where('staff_role', '1')->find($request->engineer_id);
+                $message  = 'Engineer ' . $engineer->first_name . ' ' . $engineer->last_name . ' assigned successfully';
+            } else {
+                // Group assignment
+                $assignment = AssignedEngineer::create([
+                    'service_request_id' => $request->service_request_id,
+                    'engineer_id'        => $request->supervisor_id,
+                    'assignment_type'    => '1',
+                    'group_name'         => $request->group_name,
+                    'assigned_at'        => now(),
+                    'status'             => '0',
+                ]);
+
+                // Add group members to pivot table
+                foreach ($request->engineer_ids as $engineerId) {
+                    $assignment->groupEngineers()->attach($engineerId, [
+                        'is_supervisor' => ($engineerId == $request->supervisor_id),
+                    ]);
+                }
+
+                $message = 'Group "' . $request->group_name .
+                    '" assigned successfully with ' . count($request->engineer_ids) . ' engineers';
+            }
+
+            // Update service request status to Assigned (status = 2)
+            $oldStatus = $serviceRequest->status;
+            $serviceRequest->status = 2;
+            $serviceRequest->save();
+
+            // Log the status change
+            Log::info('Service Request Status Updated', [
+                'service_request_id' => $serviceRequest->id,
+                'old_status' => $oldStatus,
+                'new_status' => $serviceRequest->status,
+                'assigned_engineer_id' => $assignment->id
+            ]);
+
+            // Activity log
+            activity()
+                ->performedOn($serviceRequest)
+                ->causedBy(Auth::user())
+                ->withProperties([
+                    'old_status' => $oldStatus,
+                    'new_status' => 2,
+                    'assignment_id' => $assignment->id
+                ])
+                ->log('Engineer assigned to service request - Status changed to Assigned');
+
+            DB::commit();
+
+            return response()->json([
+                'success'    => true,
+                'message'    => $message,
+                'status_updated' => true,
+                'old_status' => $oldStatus,
+                'new_status' => $serviceRequest->status
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error assigning engineer: ' . $e->getMessage(),
+            ], 500);
         }
     }
 }

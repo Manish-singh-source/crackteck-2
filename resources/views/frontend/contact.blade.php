@@ -188,7 +188,7 @@
                     <div class="col-12">
                         @include('components.form.input', [
                         'label' => 'Message',
-                        'name' => 'message',
+                        'name' => 'description',
                         'type' => 'textarea',
                         'placeholder' => 'Enter Message',
                         ])
@@ -244,7 +244,266 @@
             </div>
         </div>
     </div>
-</div>
-<!-- /Contact -->
+</div><!-- /Contact -->
 
+@endsection
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-5">
+                <div class="success-icon mb-4">
+                    <i class="fas fa-check-circle" style="font-size: 80px; color: #28a745;"></i>
+                </div>
+                <h3 class="mb-3">Thank You!</h3>
+                <p class="text-muted mb-0" id="successMessage">{{ session('success') }}</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pb-4">
+                <button type="button" class="btn btn-primary px-5" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-5">
+                <div class="error-icon mb-4">
+                    <i class="fas fa-exclamation-circle" style="font-size: 80px; color: #dc3545;"></i>
+                </div>
+                <h3 class="mb-3">Oops!</h3>
+                <div id="errorMessage" class="text-muted"></div>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pb-4">
+                <button type="button" class="btn btn-danger px-5" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section('script')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Page loaded');
+        console.log('Session success: {{ session("success") }}');
+        console.log('Has success: @if(session("success")) YES @else NO @endif');
+
+        // Server-side session based modals (fallback for non-JS or full-page submit)
+        @if(session('success'))
+            console.log('Success condition met!');
+            var successModalEl = document.getElementById('successModal');
+            if (successModalEl) {
+                var successModal = new bootstrap.Modal(successModalEl);
+                successModal.show();
+
+                // Disable form button until modal is closed
+                var submitBtn = document.querySelector('.contact-form button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                }
+
+                // Re-enable button when modal is closed
+                successModalEl.addEventListener('hidden.bs.modal', function () {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                    }
+                    // Clear form fields
+                    var form = document.querySelector('.contact-form');
+                    if (form) {
+                        form.reset();
+                    }
+                });
+            } else {
+                console.error('Success modal element not found!');
+            }
+        @else
+            console.log('No success session found');
+        @endif
+
+        // Server-side error / validation handling (full page)
+        @if(session('error'))
+            var errorMessageEl = document.getElementById('errorMessage');
+            if (errorMessageEl) {
+                errorMessageEl.innerHTML = '<p>{{ session("error") }}</p>';
+            }
+            var errorModalEl = document.getElementById('errorModal');
+            if (errorModalEl) {
+                var errorModal = new bootstrap.Modal(errorModalEl);
+                errorModal.show();
+
+                // Disable form button until modal is closed
+                var submitBtn = document.querySelector('.contact-form button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                }
+
+                // Re-enable button when modal is closed
+                errorModalEl.addEventListener('hidden.bs.modal', function () {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                    }
+                });
+            }
+        @endif
+
+        @if($errors->any())
+            var errorHtml = '<ul style="text-align: left; display: inline-block;">';
+            @foreach($errors->all() as $error)
+                errorHtml += '<li>{{ $error }}</li>';
+            @endforeach
+            errorHtml += '</ul>';
+
+            var errorMessageEl = document.getElementById('errorMessage');
+            if (errorMessageEl) {
+                errorMessageEl.innerHTML = errorHtml;
+            }
+
+            var errorModalEl = document.getElementById('errorModal');
+            if (errorModalEl) {
+                var errorModal = new bootstrap.Modal(errorModalEl);
+                errorModal.show();
+
+                // Disable form button until modal is closed
+                var submitBtn = document.querySelector('.contact-form button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                }
+
+                // Re-enable button when modal is closed
+                errorModalEl.addEventListener('hidden.bs.modal', function () {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                    }
+                });
+            }
+        @endif
+
+        // AJAX form submit handler - shows popup without full page reload ✅
+        var contactForm = document.querySelector('.contact-form');
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                var submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+                }
+
+                var formData = new FormData(this);
+                var action = this.getAttribute('action') || window.location.href;
+
+                fetch(action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: formData
+                })
+                .then(async function(response) {
+                    if (response.ok) {
+                        var data = await response.json().catch(function(){ return {}; });
+
+                        var successMessageEl = document.getElementById('successMessage');
+                        if (successMessageEl) {
+                            successMessageEl.textContent = data.message || '{{ session("success") ?? "Thank you for contacting us! We will get back to you within 24 hours." }}';
+                        }
+
+                        var successModalEl = document.getElementById('successModal');
+                        if (successModalEl) {
+                            var successModal = new bootstrap.Modal(successModalEl);
+                            successModal.show();
+
+                            successModalEl.addEventListener('hidden.bs.modal', function () {
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerHTML = 'SEND MESSAGE <i class="fas fa-arrow-right"></i>';
+                                }
+                                contactForm.reset();
+                            }, { once: true });
+                        } else {
+                            alert(data.message || 'Message sent successfully');
+                        }
+
+                    } else {
+                        // Handle validation errors (422) and other errors
+                        var body = await response.json().catch(function(){ return null; });
+                        var errorHtml = '';
+                        if (body && body.errors) {
+                            errorHtml = '<ul style="text-align: left; display: inline-block;">';
+                            for (var key in body.errors) {
+                                body.errors[key].forEach(function(msg){
+                                    errorHtml += '<li>' + msg + '</li>';
+                                });
+                            }
+                            errorHtml += '</ul>';
+                        } else if (body && body.message) {
+                            errorHtml = '<p>' + body.message + '</p>';
+                        } else {
+                            errorHtml = '<p>Something went wrong. Please try again.</p>';
+                        }
+
+                        var errorMessageEl = document.getElementById('errorMessage');
+                        if (errorMessageEl) {
+                            errorMessageEl.innerHTML = errorHtml;
+                        }
+
+                        var errorModalEl = document.getElementById('errorModal');
+                        if (errorModalEl) {
+                            var errorModal = new bootstrap.Modal(errorModalEl);
+                            errorModal.show();
+
+                            errorModalEl.addEventListener('hidden.bs.modal', function () {
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerHTML = 'SEND MESSAGE <i class="fas fa-arrow-right"></i>';
+                                }
+                            }, { once: true });
+                        } else {
+                            alert(body && body.message ? body.message : 'Error submitting form');
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = 'SEND MESSAGE <i class="fas fa-arrow-right"></i>';
+                            }
+                        }
+                    }
+                })
+                .catch(function(err){
+                    console.error('Contact form AJAX error:', err);
+                    var errorMessageEl = document.getElementById('errorMessage');
+                    if (errorMessageEl) {
+                        errorMessageEl.innerHTML = '<p>Network error. Please try again.</p>';
+                    }
+                    var errorModalEl = document.getElementById('errorModal');
+                    if (errorModalEl) {
+                        var errorModal = new bootstrap.Modal(errorModalEl);
+                        errorModal.show();
+
+                        errorModalEl.addEventListener('hidden.bs.modal', function () {
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = 'SEND MESSAGE <i class="fas fa-arrow-right"></i>';
+                            }
+                        }, { once: true });
+                    } else {
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = 'SEND MESSAGE <i class="fas fa-arrow-right"></i>';
+                        }
+                    }
+                });
+            });
+        }
+    });
+</script>
 @endsection

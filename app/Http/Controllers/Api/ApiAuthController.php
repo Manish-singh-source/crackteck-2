@@ -200,31 +200,62 @@ class ApiAuthController extends Controller
         //     $panCard->move(public_path('uploads/pan_card'), $panCardName);
         // }
 
-        $model = $this->getModelByRoleId($request->role_id);
-        if (! $model) {
-            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
-        }
 
         $validated = Validator::make($request->all(), [
-            'primary_skills' => 'nullable|string',
+            // Staff details
             'first_name' => 'required|string|min:2',
             'last_name' => 'required|string|min:2',
             'phone' => 'required|digits:10',
             'email' => 'required|email',
             'dob' => 'required|date',
             'gender' => 'required|in:male,female',
-
-            'address' => 'required|string',
+            'marital_status' => 'nullable|string',
+            'employment_type' => 'nullable|string',
+            'joining_date' => 'nullable|date',
+            'assigned_area' => 'nullable|string',
+            
+            // Address details
+            'address1' => 'nullable|string',
             'address2' => 'nullable|string',
-            'city' => 'required|string',
-            'state' => 'required|string',
-            'country' => 'required|string',
-            'pincode' => 'required|string',
+            'city' => 'nullable|string',
+            'state' => 'nullable|string',
+            'country' => 'nullable|string',
+            'pincode' => 'nullable|string',
 
-            'designation' => 'required|string',
-            'department' => 'required|string',
-            'aadhar_pic' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'pan_card' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // Work details
+            'primary_skills' => 'nullable|string',
+            'certifications' => 'nullable|string',
+            'experience' => 'nullable|string',
+            'languages_known' => 'nullable|string',
+
+            // Police verification details
+            'police_verifications' => 'nullable|in:verified,not_verified',
+            'police_verification_status' => 'nullable|in:verified,not_verified',
+            'police_certificate' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            
+            // Aadhar verification details
+            'aadhar_number' => 'nullable|string',
+            'aadhar_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'aadhar_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+            // PAN verification details
+            'pan_number' => 'nullable|string',
+            'pan_card_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'pan_card_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+            // Bank account details
+            'bank_acc_holder_name' => 'nullable|string',
+            'bank_acc_number' => 'nullable|string',
+            'bank_name' => 'nullable|string',
+            'ifsc_code' => 'nullable|string',
+            'passbook_pic' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+            // Vehicle details
+            'vehicle_type' => 'nullable|string',
+            'vehicle_number' => 'nullable|string',
+            'driving_license_no' => 'nullable|string',
+            'driving_license_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'driving_license_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ($validated->fails()) {
@@ -232,6 +263,35 @@ class ApiAuthController extends Controller
         }
 
         // Handle file uploads
+        if($request->hasFile('aadhar_front_path')) {
+            $file = $request->file('aadhar_front_path');
+            $filename = time().'_aadhar_front.'.$file->getClientOriginalExtension();
+            $file->move(public_path('uploads/aadhar_card'), $filename);
+            $request->merge(['aadhar_front_path' => 'uploads/aadhar_card/'.$filename]);
+        }
+
+        if($request->hasFile('aadhar_back_path')) {
+            $file = $request->file('aadhar_back_path');
+            $filename = time().'_aadhar_back.'.$file->getClientOriginalExtension();
+            $file->move(public_path('uploads/aadhar_card'), $filename);
+            $request->merge(['aadhar_back_path' => 'uploads/aadhar_card/'.$filename]);
+        }
+
+        if($request->hasFile('pan_card_front_path')) {
+            $file = $request->file('pan_card_front_path');
+            $filename = time().'_pan_front.'.$file->getClientOriginalExtension();
+            $file->move(public_path('uploads/pan_card'), $filename);
+            $request->merge(['pan_card_front_path' => 'uploads/pan_card/'.$filename]);
+        }
+
+        if($request->hasFile('pan_card_back_path')) {
+            $file = $request->file('pan_card_back_path');
+            $filename = time().'_pan_back.'.$file->getClientOriginalExtension();
+            $file->move(public_path('uploads/pan_card'), $filename);
+            $request->merge(['pan_card_back_path' => 'uploads/pan_card/'.$filename]);
+        }
+        
+
         $aadharPicPath = null;
         if ($request->hasFile('aadhar_pic')) {
             $file = $request->file('aadhar_pic');
@@ -248,50 +308,21 @@ class ApiAuthController extends Controller
             $panCardName = 'uploads/pan_card/'.$filename;
         }
 
-        // $user = new $model();
-        $user = new Engineer;
 
-        $user->primary_skills = $request->primary_skills ?? 'Network Engineer';
-        $user->first_name = $request->first_name;
-        $user->last_name = $request->last_name;
-        $user->phone = $request->phone;
-        $user->email = $request->email;
-        $user->dob = $request->dob;
-        $user->gender = $request->gender;
+        $staff = Staff::create([
+            'staff_role' => $staffRole,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'current_address' => $request->current_address,
+            'pan_no' => $request->pan_no,
+            'aadhar_no' => $request->aadhar_no,
+            'pan_card' => $panCardName,
+            'aadhar_card' => $aadharPicPath,
+        ]);
 
-        $user->address = $request->address;
-        $user->address2 = $request->address2;
-        $user->city = $request->city;
-        $user->state = $request->state;
-        $user->country = $request->country;
-        $user->pincode = $request->pincode;
-
-        $user->designation = $request->designation;
-        $user->department = $request->department;
-        $user->join_date = date('Y-m-d');
-        $user->aadhar_pic = $aadharPicPath;
-        $user->pan_card = $panCardName;
-
-        $user->save();
-
-        if (! $user) {
-            return response()->json(['success' => false, 'message' => 'Failed to create user.'], 500);
-        }
-
-        // $staff = Staff::create([
-        //     'staff_role' => $staffRole,
-        //     'first_name' => $request->first_name,
-        //     'last_name' => $request->last_name,
-        //     'phone' => $request->phone,
-        //     'email' => $request->email,
-        //     'current_address' => $request->current_address,
-        //     'pan_no' => $request->pan_no,
-        //     'aadhar_no' => $request->aadhar_no,
-        //     'pan_card' => $panCardName,
-        //     'aadhar_card' => $aadharCardName,
-        // ]);
-
-        if (! $user) {
+        if (! $staff) {
             return response()->json(['success' => false, 'message' => 'Failed to create staff.'], 500);
         }
 
@@ -315,14 +346,9 @@ class ApiAuthController extends Controller
                 return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
             }
 
-            $model = $this->getModelByRoleId($request->role_id);
-            if (! $model) {
-                return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
-            }
-
-            $user = $model::where('phone', $request->phone_number)->first();
+            $user = Staff::where('phone', $request->phone_number)->where('staff_role', $request->role_id)->first();
             if (! $user) {
-                return response()->json(['success' => false, 'message' => 'User not found with the provided phone number.'], 404);
+                return response()->json(['success' => false, 'message' => 'User not found with the provided phone number and role.'], 404);
             }
 
             $otp = rand(1000, 9999);
@@ -336,13 +362,13 @@ class ApiAuthController extends Controller
             // Send OTP via Fast2SMS DLT
             // Template ID from .env (191040) - DLT approved template
             // Template message: "Your OTP is {#var#}. Valid for 5 minutes. - CRCTK"
-            $templateId = env('FAST2SMS_TEMPLATE_ID'); // 191040
+            // $templateId = env('FAST2SMS_TEMPLATE_ID'); // 191040
 
-            $success = $this->sendDltSms(
-                $user->phone,           // Phone number
-                $templateId,            // Template ID (191040)
-                $otp                    // OTP value to replace {#var#}
-            );
+            // $success = $this->sendDltSms(
+            //     $user->phone,           // Phone number
+            //     $templateId,            // Template ID (191040)
+            //     $otp                    // OTP value to replace {#var#}
+            // );
 
             if ($user) {
                 return response()->json([
@@ -382,24 +408,17 @@ class ApiAuthController extends Controller
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
-        $model = $this->getModelByRoleId($request->role_id);
-        if (! $model) {
-            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
-        }
-
-        $user = $model::where('phone', $request->phone_number)->first();
+        $user = Staff::where('phone', $request->phone_number)->where('staff_role', $request->role_id)->first();
         if (! $user || $user->otp != $request->otp || now()->gt($user->otp_expiry)) {
             return response()->json(['error' => 'Invalid or expired OTP'], 401);
         }
-
+        
         $user->otp = null; // reset OTP after verification
         $user->otp_expiry = null;
         $user->save();
 
         // Choose guard based on role
-        $guards = ['1' => 'engineer', '2' => 'delivery_man', '3' => 'sales_person', '4' => 'customers'];
-        $guard = $guards[$request->role_id] ?? 'api';
-        $token = auth($guard)->login($user); // if guard mapping in config/auth.php
+        $token = auth('staffs')->login($user); // if guard mapping in config/auth.php
 
         return response()->json(['token' => $token, 'user' => $user]);
     }
@@ -407,6 +426,7 @@ class ApiAuthController extends Controller
     public function logout(Request $request)
     {
         $validated = Validator::make($request->all(), ([
+            'user_id' => 'required',
             'role_id' => 'required|in:1,2,3,4',
         ]));
 
@@ -414,8 +434,7 @@ class ApiAuthController extends Controller
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
-        $guards = ['1' => 'engineer', '2' => 'delivery_man', '3' => 'sales_person', '4' => 'customers'];
-        $guard = $guards[$request->role_id] ?? 'api';
+        $guard = $guards['staffs'] ?? 'api';
 
         try {
             auth($guard)->logout();
@@ -429,6 +448,7 @@ class ApiAuthController extends Controller
     public function refreshToken(Request $request)
     {
         $validated = Validator::make($request->all(), [
+            'user_id' => 'required',
             'role_id' => 'required|in:1,2,3,4',
         ]);
 
@@ -438,8 +458,7 @@ class ApiAuthController extends Controller
 
         $validated = $validated->validated();
 
-        $guards = ['1' => 'engineer', '2' => 'delivery_man', '3' => 'sales_person', '4' => 'customers'];
-        $guard = $guards[$validated['role_id']] ?? 'api';
+        $guard = $guards['staffs'] ?? 'api';
 
         try {
             $newToken = auth($guard)->refresh();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\LeadResource;
 use App\Models\Lead;
+use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -21,7 +22,7 @@ class LeadController extends Controller
     {
         // Create validator
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:sales_people,id',
+            'user_id' => 'required',
         ]);
 
         // Check for validation errors
@@ -33,11 +34,20 @@ class LeadController extends Controller
             ], 422);
         }
 
+        $roleCheck = Staff::where('id', $request->user_id)->first();
+
+        if($roleCheck->staff_role != '3'){
+            return response()->json([
+                'success' => false,
+                'message' => 'User is not a sales person.',
+            ], 403);
+        }
+
         // Get validated data as array
         $validatedData = $validator->validated();
 
         // Query leads
-        $leads = Lead::where('user_id', $validatedData['user_id'])->paginate();
+        $leads = Lead::where('staff_id', $validatedData['user_id'])->paginate();
 
         // Return paginated leads as resource collection
         return LeadResource::collection($leads);

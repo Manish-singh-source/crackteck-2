@@ -51,15 +51,40 @@ etc.
 ## Warehouse 
 
 ### Modules: 
+1. permissions 
+    - toggle status not working 
+2. roles 
+    - toggle status not working 
+3. staff 
+    - data need to check if properly effected or not 
+4. customers 
+    - file uploaded preview in edit page not working 
+    - data need to check if properly effected or not 
+    - created by value not stored 
+    
+5. warehouses 
+    - softdelete need to be added 
+    
+6. warehouse rack 
+    - softdelete need to be added 
 
-(CRM)
+
+    (CRM)
+0. Permissions: 
+    - List of permissions available in the system 
+    - Add Permission 
+    - Update Permission 
+    - Delete Permission 
+    - toggle status 
+
 1. Roles: List of roles available in the system 
     - List of roles available in the system 
     - Add Role 
-    - View Role 
     - Update Role 
     - Delete Role 
-    
+    - toggle status 
+
+
 2. Staff: List of staff available in the system (admin, sales person, field executive, delivery man, engineer) 
     - List of staff available in the system 
     - Add Staff 
@@ -2209,8 +2234,154 @@ etc.
 
 
 
+1. Staff seeder: 
 
 
 
-Authentication 
-aminities 
+
+Common APIs:
+
+Authentication: 
+
+/signup
+/send-otp
+/verify-otp
+/refresh-token
+/logout
+
+/dashboard
+
+/notifications
+
+/profile
+/profile/{role_id}
+
+
+/attendance
+/attendance/login
+/attendance/logout
+
+
+
+
+
+
+Sales Person App APIs:
+
+API Endpoint
+
+Dashboard:
+/sales-overview
+/task
+
+
+/leads
+/lead/{lead_id}
+/lead
+/lead/{lead_id}
+/lead/{lead_id}
+
+/follow-up
+/follow-up/{follow_up_id}
+/follow-up
+/follow-up/{follow_up_id}
+/follow-up/{follow_up_id}
+
+/meets
+/meet/{meet_id}
+/meet
+/meet/{meet_id}
+/meet/{meet_id}
+
+/quotation
+/quotation
+/quotation/{quotation_id}
+/quotation/{quotation_id}
+/quotation/{quotation_id}
+
+/product
+/product/{product_id}
+
+
+
+
+
+
+Delivery Man App APIs:
+
+
+/vehical-registration
+/vehical-details
+/vehical-details
+
+/dashboard
+/orders
+/orders
+/orders
+/orders
+/orders
+
+/order/{order_id}
+
+/accept-order/{order_id}
+/order/profile/{order_id}
+/order/{order_id}/otp
+/order/{order_id}/verify-otp
+
+/delivery/{order_id}
+
+/driving-license
+/driving-license
+
+/aadhar-card
+/aadhar-card
+
+/pan-card
+/pan-card
+
+/track-work-details
+
+
+
+
+
+
+
+Customer App APIs:
+
+/products
+/product/{product_id}
+/buy-product/{product_id}
+
+/quick-service
+/quick-service{id}
+
+/installation-request
+
+/repair-request
+
+/amc-plans
+/create-amc-request
+
+/orders
+/order/{order_id}
+
+/work-progress
+/work-progress/{id}
+
+/repairs
+/repairs/{id}
+
+/quotations
+/quotation/{q_id}
+
+/all-requests
+/amc-request-details/{id}
+/non-amc-request-details/{id}
+/quick-service-request-details/{id}
+
+/feedback
+
+/feedbacks
+/feedbacks/{feedback_id}
+

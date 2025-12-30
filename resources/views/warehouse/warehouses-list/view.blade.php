@@ -271,7 +271,7 @@
                                     class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                     <span class="fw-semibold text-break">Upload Licence Document:</span>
                                     <span>
-                                        <span><a class="btn btn-primary btn-sm" href="#">View</a></span>
+                                        <span><a class="btn btn-primary btn-sm" href="{{ asset($warehouse->licence_doc) }}">View</a></span>
                                     </span>
                                 </li>
                             </ul>

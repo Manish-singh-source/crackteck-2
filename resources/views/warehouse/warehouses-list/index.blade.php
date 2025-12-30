@@ -45,12 +45,37 @@
                                                                 <th>Address</th>
                                                                 <th>Contact Person</th>
                                                                 <th>Contact Detail</th>
+                                                                <th>Default</th>
                                                                 <th>Verified</th>
                                                                 <th>Status</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            @php
+                                                                $status = ['0' => 'Inactive', '1' => 'Active'];
+                                                                $badge = [
+                                                                    '0' => 'bg-danger-subtle text-danger',
+                                                                    '1' => 'bg-success-subtle text-success',
+                                                                ];
+
+                                                                $default = ['0' => 'No', '1' => 'Yes'];
+                                                                $defaultBadge = [
+                                                                    '0' => 'bg-danger-subtle text-danger',
+                                                                    '1' => 'bg-success-subtle text-success',
+                                                                ];
+
+                                                                $verificationStatus = [
+                                                                    '0' => 'Pending',
+                                                                    '1' => 'Verified',
+                                                                    '2' => 'Rejected',
+                                                                ];
+                                                                $verificationBadge = [
+                                                                    '0' => 'bg-danger-subtle text-danger',
+                                                                    '1' => 'bg-success-subtle text-success',
+                                                                    '2' => 'bg-warning-subtle text-warning',
+                                                                ];
+                                                            @endphp
                                                             @foreach ($warehouses as $warehouse)
                                                                 <tr>
                                                                     <td>
@@ -64,11 +89,15 @@
                                                                     <td>{{ $warehouse->phone_number }}</td>
                                                                     <td>
                                                                         <span
-                                                                            class="badge {{ $warehouse->verification_status == 0 ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success' }} fw-semibold">{{ $warehouse->verification_status == 1 ? 'Verified' : 'Unverified' }}</span>
+                                                                            class="badge {{ $defaultBadge[$warehouse->default_warehouse] }} fw-semibold">{{ $default[$warehouse->default_warehouse] }}</span>
                                                                     </td>
                                                                     <td>
                                                                         <span
-                                                                            class="badge {{ $warehouse->status == 0 ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success' }} fw-semibold">{{ $warehouse->status == 1 ? 'Active' : 'Inactive' }}</span>
+                                                                            class="badge {{ $verificationBadge[$warehouse->verification_status] }} fw-semibold">{{ $verificationStatus[$warehouse->verification_status] }}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span
+                                                                            class="badge {{ $badge[$warehouse->status] }} fw-semibold">{{ $status[$warehouse->status] }}</span>
                                                                     </td>
                                                                     <td>
                                                                         <a aria-label="anchor"
@@ -114,6 +143,6 @@
                         </div>
                     </div>
                 </div>
-            </div> 
-        </div> 
+            </div>
+        </div>
     @endsection

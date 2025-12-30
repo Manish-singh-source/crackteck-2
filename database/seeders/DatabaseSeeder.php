@@ -29,31 +29,11 @@ class DatabaseSeeder extends Seeder
         Role::create(['name' => 'Admin']);
         Role::create(['name' => 'Warehouse Manager']);
 
-        // $this->call([
-        //     ProductVariantAttributesSeeder::class,
-        //     ProductVariantAttributeValuesSeeder::class,
-        //     BrandsSeeder::class,
-        //     ParentCategoriesSeeder::class,
-        //     WebsiteBannersSeeder::class,
-        //     WarehousesSeeder::class,
-        //     WarehouseRacksSeeder::class,
-        //     SubCategoriesSeeder::class,
-        //     ProductsSeeder::class,
-        //     EcommerceProductsSeeder::class,
-        //     // ContactSeeder::class,
-        //     EngineerSeeder::class,
-        //     PlansTableSeeder::class,
-        //     CustomerSeeder::class,
-        //     DeliveryMenSeeder::class,
-        //     SalesPeopleSeeder::class,
-        //     LeadTableSeeder::class,
-        //     FollowUpTableSeeder::class,
-        //     MeetTableSeeder::class,
-        //     QuotationTableSeeder::class,
-        //     QuotationProductTableSeeder::class,
-        //     QuickServicesSeeder::class,
-        //     CustomerAddressDetailsSeeder::class,
-        // ]);
+        $this->call([
+            StaffSeeder::class,
+            LeadTableSeeder::class,
+            
+        ]);
 
     }
 }

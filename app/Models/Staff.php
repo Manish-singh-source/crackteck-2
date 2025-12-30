@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Models\Role;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Staff extends Model
+class Staff extends Authenticatable implements JWTSubject
 {
     protected $fillable = [
         'staff_code',
@@ -21,6 +23,22 @@ class Staff extends Model
         'assigned_area',
         'status',
     ];
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
+    // Get Role 
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'staff_role');
+    }
 
     public function address()
     {

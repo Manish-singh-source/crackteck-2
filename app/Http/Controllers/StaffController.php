@@ -12,9 +12,10 @@ class StaffController extends Controller
     //
     public function index()
     {
-        $staffs = Staff::all();
+        $staffs = Staff::with('role')->get();
+        $roles = Role::where('name', '!=', 'Customer')->get();
 
-        return view('/crm/access-control/staff/index', compact('staffs'));
+        return view('/crm/access-control/staff/index', compact('staffs', 'roles'));
     }
 
     public function create($role = null)
@@ -22,7 +23,6 @@ class StaffController extends Controller
         $roles = Role::where('name', '!=', 'Customer')->get();
         $role = Role::find($role);
 
-        // dd($role);
         if (! $role) {
             return view('/crm/access-control/staff/create', compact('roles'));
         }

@@ -418,10 +418,10 @@
                                                     'name' => 'status',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '1' => 'Inactive',
-                                                        '2' => 'Active',
-                                                        '3' => 'Blocked',
-                                                        '4' => 'Suspended',
+                                                        '0' => 'Inactive',
+                                                        '1' => 'Active',
+                                                        '2' => 'Blocked',
+                                                        '3' => 'Suspended',
                                                     ],
                                                 ])
                                             </div>
@@ -456,14 +456,14 @@
             let branchIndex = 1; // Start from 1 since we already have branch 0
 
             // Add new branch
-            $('#add-branch-btn').click(function() {
+            $(document).on('click', '#add-branch-btn', function() {
                 const branchHtml = `
                     <div class="branch-item border rounded p-3 mb-3" data-branch-index="${branchIndex}">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h6 class="mb-0 text-primary">Branch #${branchIndex + 1}</h6>
                             <div class="d-flex align-items-center gap-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="primary_branch" value="${branchIndex}" id="primary_${branchIndex}">
+                                    <input class="form-check-input" type="radio" name="is_primary" value="${branchIndex}" id="primary_${branchIndex}">
                                     <label class="form-check-label" for="primary_${branchIndex}">
                                         Primary Branch
                                     </label>
@@ -479,8 +479,8 @@
                                 <input type="text" name="branches[${branchIndex}][branch_name]" id="branches_${branchIndex}_branch_name" class="form-control" placeholder="Enter Name of Branch">
                             </div>
                             <div class="col-6">
-                                <label for="branches_${branchIndex}_address" class="form-label">Address Line 1 <span class="text-danger">*</span></label>
-                                <input type="text" name="branches[${branchIndex}][address]" id="branches_${branchIndex}_address" class="form-control" placeholder="Enter Address Line 1">
+                                <label for="branches_${branchIndex}_address1" class="form-label">Address Line 1 <span class="text-danger">*</span></label>
+                                <input type="text" name="branches[${branchIndex}][address1]" id="branches_${branchIndex}_address1" class="form-control" placeholder="Enter Address Line 1">
                             </div>
                             <div class="col-6">
                                 <label for="branches_${branchIndex}_address2" class="form-label">Address Line 2</label>

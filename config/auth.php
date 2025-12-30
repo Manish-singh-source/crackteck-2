@@ -44,22 +44,14 @@ return [
             'driver' => 'jwt',
             'provider' => 'users',
         ],
-        'engineer' => [
-            'driver' => 'jwt',
-            'provider' => 'engineers',
-        ],
-        'delivery_man' => [
-            'driver' => 'jwt',
-            'provider' => 'delivery_men',
-        ],
-        'sales_person' => [
-            'driver' => 'jwt',
-            'provider' => 'sales_people',
-        ],
         'customers' => [
             'driver' => 'jwt',
             'provider' => 'customers',
         ],
+        'staffs' => [
+            'driver' => 'jwt',
+            'provider' => 'staffs',
+        ],  
     ],
 
     /*
@@ -84,24 +76,13 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
-
-        'engineers' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_ENGINEER_MODEL', App\Models\Engineer::class),
-        ],
-
-        'delivery_men' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_DELIVERY_MAN_MODEL', App\Models\DeliveryMan::class),
-        ],
-
-        'sales_people' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_SALES_PERSON_MODEL', App\Models\SalesPerson::class),
-        ],
         'customers' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_CUSTOMER_MODEL', App\Models\Customer::class),
+        ],
+        'staffs' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_STAFF_MODEL', App\Models\Staff::class),
         ],
 
         // 'users' => [

@@ -47,14 +47,14 @@
                                         ])
                                     </div>
                                     <div class="col-lg-6">
-                                        <label for="category_image" class="form-label">Category Image</label>
-                                        <input type="file" class="form-control" id="category_image" name="category_image"
+                                        <label for="image" class="form-label">Category Image</label>
+                                        <input type="file" class="form-control" id="image" name="image"
                                             accept="image/*">
                                         <small class="text-muted">Upload category image (JPEG, PNG, JPG, GIF - Max:
                                             2MB)</small>
-                                        @if ($parentCategorie->category_image)
+                                        @if ($parentCategorie->image)
                                             <div class="mt-2">
-                                                <img src="{{ asset($parentCategorie->category_image) }}" alt="Current Image"
+                                                <img src="{{ asset($parentCategorie->image) }}" alt="Current Image"
                                                     style="width: 100px; height: 100px; object-fit: cover;" class="rounded">
                                                 <small class="d-block text-muted">Current Image</small>
                                             </div>

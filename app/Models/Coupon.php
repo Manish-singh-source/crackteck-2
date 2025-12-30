@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Coupon extends Model
 {
-    //
     use SoftDeletes;
 
     protected $fillable = [
@@ -21,6 +20,7 @@ class Coupon extends Model
         'start_date',
         'end_date',
         'usage_limit',
+        'used_count',
         'usage_per_customer',
         'is_active',
         'applicable_categories',
@@ -33,5 +33,67 @@ class Coupon extends Model
         'applicable_categories' => 'array',
         'applicable_brands' => 'array',
         'excluded_products' => 'array',
+        'is_active' => 'boolean',
+        'stackable' => 'boolean',
+        'start_date' => 'date',
+        'end_date' => 'date',
     ];
+
+    /**
+     * Scope for active coupons
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', 1);
+    }
+
+    /**
+     * Scope for inactive coupons
+     */
+    public function scopeInactive($query)
+    {
+        return $query->where('is_active', 0);
+    }
+
+    /**
+     * Get formatted discount value
+     * Type: 0 - Percentage, 1 - Fixed, 2 - Buy X Get Y
+     */
+    public function getFormattedDiscountAttribute()
+    {
+        if ($this->type == 0) { // Percentage
+            return $this->discount_value . '%';
+        } elseif ($this->type == 1) { // Fixed
+            return '₹' . number_format($this->discount_value, 2);
+        } else { // Buy X Get Y
+            return 'Buy X Get Y';
+        }
+    }
+
+    /**
+     * Get usage percentage
+     */
+    public function getUsagePercentageAttribute()
+    {
+        if (!$this->usage_limit || $this->usage_limit == 0) {
+            return 0;
+        }
+        return round(($this->used_count / $this->usage_limit) * 100, 2);
+    }
+
+    /**
+     * Check if coupon is expired
+     */
+    public function getIsExpiredAttribute()
+    {
+        return now()->gt($this->end_date);
+    }
+
+    /**
+     * Check if coupon is valid (active and not expired)
+     */
+    public function getIsValidAttribute()
+    {
+        return $this->is_active && !$this->is_expired && now()->gte($this->start_date);
+    }
 }

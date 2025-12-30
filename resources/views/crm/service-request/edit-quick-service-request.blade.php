@@ -567,14 +567,19 @@
                                                         'name' => 'status',
                                                         'options' => [
                                                             '0' => 'Pending',
-                                                            '1' => 'Approved',
-                                                            '2' => 'Assigned',
-                                                            '3' => 'Rejected',
-                                                            '4' => 'In Transfer',
-                                                            '5' => 'Transferred',
-                                                            '6' => 'In Progress',
-                                                            '7' => 'Completed',
+                                                            '1' => 'Admin Approved',
+                                                            '2' => 'Assigned Engineer',
+                                                            '3' => 'Engineer Approved',
+                                                            '4' => 'Engineer Not Approved',
+                                                            '5' => 'In Transfer',
+                                                            '6' => 'Transferred',
+                                                            '7' => 'In Progress',
+                                                            '8' => 'Picking',
+                                                            '9' => 'Picked',
+                                                            '10' => 'Completed',
+                                                            '11' => 'On Hold',
                                                         ],
+                                                        'value' => old('status', $request->status),
                                                     ])
                                                 </div>
                                             </div>

@@ -57,7 +57,7 @@
                                     class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                     <span class="fw-semibold text-break">Message :
                                     </span>
-                                    <span>{{ $contact->message }}</span>
+                                    <span>{{ $contact->description }}</span>
                                 </li>
 
                             </ul>

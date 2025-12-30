@@ -6,7 +6,7 @@ use App\Models\AMC;
 use App\Models\Brand;
 use App\Models\Collection;
 use App\Models\Contact;
-use App\Models\ParentCategorie;
+use App\Models\ParentCategory;
 use App\Models\Product;
 use App\Models\ProductDeal;
 use App\Models\WebsiteBanner;
@@ -21,37 +21,39 @@ class FrontendController extends Controller
      */
     public function index()
     {
-        // Get active banners ordered by sort_order
-        $banners = WebsiteBanner::active()->ordered()->get();
+        // Get only type 0 (website) active banners for the homepage carousel, ordered by display_order
+        $banners = WebsiteBanner::where('is_active', '1')
+            ->where('type', '0')
+            ->orderBy('display_order', 'asc')
+            ->get();
 
         // Get active parent categories for e-commerce display, ordered by sort_order
-        $categories = ParentCategorie::active()
-            ->ecommerceActive()
-            ->ordered()
+        $categories = ParentCategory::where('status', '1')
+            ->orderBy('sort_order', 'asc')
             ->get();
 
         // Get active collections with their categories
-        $collections = Collection::active()
+        $collections = Collection::where('is_active', '1')
             ->with('categories')
             ->orderBy('created_at', 'desc')
             ->limit(8) // Limit to 8 collections for homepage display
             ->get();
 
         // Get active deals that are currently running
-        $activeDeals = ProductDeal::with([
-            'dealItems.ecommerceProduct.warehouseProduct.brand',
-            'dealItems.ecommerceProduct.warehouseProduct',
-        ])
-            ->where('status', 'active')
-            ->where('offer_start_date', '<=', Carbon::now())
-            ->where('offer_end_date', '>=', Carbon::now())
-            ->orderBy('offer_start_date', 'desc')
-            ->get();
+        // $activeDeals = ProductDeal::with([
+        //     'dealItems.ecommerceProduct.warehouseProduct.brand',
+        //     'dealItems.ecommerceProduct.warehouseProduct',
+        // ])
+        //     ->where('status', 'active')
+        //     ->where('offer_start_date', '<=', Carbon::now())
+        //     ->where('offer_end_date', '>=', Carbon::now())
+        //     ->orderBy('offer_start_date', 'desc')
+        //     ->get();
 
         $products = Product::with(['brand', 'parentCategorie', 'subCategorie'])->get();
         // dd($products);
 
-        return view('frontend.index', compact('banners', 'categories', 'collections', 'activeDeals', 'products'));
+        return view('frontend.index', compact('banners', 'categories', 'products', 'collections'));
     }
 
     /**
@@ -437,25 +439,62 @@ class FrontendController extends Controller
             'last_name' => 'required|min:3',
             'email' => 'required|email',
             'phone' => 'required|digits:10',
-            'message' => 'required',
+            'description' => 'required',
         ]);
 
         if ($validator->fails()) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
             return back()->withErrors($validator)->withInput();
         }
 
-        $contact = new Contact;
-        $contact->first_name = $request->first_name;
-        $contact->last_name = $request->last_name;
-        $contact->email = $request->email;
-        $contact->phone = $request->phone;
-        $contact->message = $request->message;
-        $contact->save();
+        try {
+            $contact = new Contact;
+            $contact->first_name = $request->first_name;
+            $contact->last_name = $request->last_name;
+            $contact->email = $request->email;
+            // The data come static data 
+            $contact->subject = 'Inquiry From E-Commerce Website';
+            $contact->phone = $request->phone;
+            $contact->description = $request->description;
+            $contact->save();
 
-        if (! $contact) {
+            if (! $contact) {
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Something went wrong.',
+                    ], 500);
+                }
+
+                return back()->with('error', 'Something went wrong.');
+            }
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Thank you for contacting us! We will get back to you within 24 hours.',
+                ]);
+            }
+
+            return back()->with('success', 'Thank you for contacting us! We will get back to you within 24 hours.');
+
+        } catch (\Exception $e) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Something went wrong. Please try again.',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+
             return back()->with('error', 'Something went wrong.');
         }
-
-        return redirect()->route('contact')->with('success', 'Contact added successfully.');
     }
 }

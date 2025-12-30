@@ -133,6 +133,8 @@ Route::controller(StaffController::class)->group(function () {
     Route::delete('/crm/delete-staff/{id}', 'delete')->name('staff.delete');
     // Assign Role To Staff
     Route::put('/crm/assign-role-to-staff/{id}', 'assignRole')->name('assign.role');
+    // Approve Task
+    Route::post('/crm/approve-task', 'approveTask')->name('staff.approve.task');
 });
 
 // Staff List
@@ -556,7 +558,8 @@ Route::controller(ServiceRequestController::class)->group(function () {
     // Create Service Request Page
     Route::get('/crm/create-service-request', 'create')->name('service-request.create-servies');
     // View Service Request Page
-    Route::get('/crm/view-service-request', 'view')->name('service-request.view-service');
+    Route::get('/crm/view-service-request/{id}', 'viewServiceRequest')->name('service-request.view');
+    Route::get('/crm/view-service-request-old', 'view')->name('service-request.view-service');
     // Edit Service Request Page
     Route::get('/crm/edit-service-request', 'edit')->name('service-request.edit-service');
 
@@ -567,6 +570,8 @@ Route::controller(ServiceRequestController::class)->group(function () {
     Route::get('/crm/service-request/edit-quick-service-request/{id}', 'editQuickServiceRequest')->name('service-request.edit-quick-service-request');
     Route::put('/crm/service-request/update-quick-service-request/{id}', 'updateQuickServiceRequest')->name('service-request.update-quick-service-request');
     Route::delete('/crm/service-request/destroy-quick-service-request/{id}', 'destroyQuickServiceRequest')->name('service-request.destroy-quick-service-request');
+    Route::post('/crm/service-request/assign-quick-service-engineer', 'assignQuickServiceEngineer')->name('service-request.assign-quick-service-engineer');
+    Route::post('/crm/service-request/assign-non-amc-engineer', 'assignNonAmcEngineer')->name('service-request.assign-non-amc-engineer');
 
     // AMC Request CRUD Routes
     // Create AMC Request Page

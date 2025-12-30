@@ -666,21 +666,107 @@
                                                                 <div class="col-12">
                                                                     <div class="card shadow-none">
                                                                         <div class="card-body">
-                                                                            <table id="responsive-datatable"
+                                                                            @if(session('success'))
+                                                                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                                                                    {{ session('success') }}
+                                                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                                                </div>
+                                                                            @endif
+                                                                            @if(session('error'))
+                                                                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                                                    {{ session('error') }}
+                                                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                                                </div>
+                                                                            @endif
+
+                                                                            <table id="task-table"
                                                                                 class="table table-striped table-borderless dt-responsive nowrap">
-                                                                                <thead>
+                                                                                <thead class="table-light">
                                                                                     <tr>
-                                                                                        <th>Service ID</th>
+                                                                                        <th>Service Request ID</th>
                                                                                         <th>Customer Name</th>
+                                                                                        <th>Service Type</th>
                                                                                         <th>Assigned Date</th>
-                                                                                        <th>Visit Date</th>
                                                                                         <th>Assignment Type</th>
-                                                                                        <th>Issue Type</th>
-                                                                                        <th>Status</th>
-                                                                                        <th>Action</th>
+                                                                                        <th>Approval Status</th>
+                                                                                        <th style="width:120px;">Action</th>
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
+                                                                                    @forelse($assignedTasks as $task)
+                                                                                        @php
+                                                                                            $serviceTypeMap = [
+                                                                                                '0' => 'AMC',
+                                                                                                '1' => 'Quick Service',
+                                                                                                '2' => 'Installation',
+                                                                                                '3' => 'Repair'
+                                                                                            ];
+                                                                                            $serviceType = $serviceTypeMap[$task->serviceRequest->service_type ?? ''] ?? 'N/A';
+
+                                                                                            // Check if task is overdue (48 hours)
+                                                                                            $isOverdue = $task->is_overdue;
+                                                                                        @endphp
+                                                                                        <tr class="{{ $isOverdue ? 'table-warning' : '' }}">
+                                                                                            <td>
+                                                                                                <a href="{{ route('service-request.view', $task->service_request_id) }}">
+                                                                                                    {{ $task->serviceRequest->request_id ?? 'N/A' }}
+                                                                                                </a>
+                                                                                                @if($isOverdue)
+                                                                                                    <br><small class="text-danger"><i class="bx bx-time-five"></i> Over 48 hours</small>
+                                                                                                @endif
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                {{ $task->serviceRequest->customer->first_name ?? '' }}
+                                                                                                {{ $task->serviceRequest->customer->last_name ?? '' }}
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                <span class="badge bg-info-subtle text-info">{{ $serviceType }}</span>
+                                                                                            </td>
+                                                                                            <td>{{ $task->assigned_at ? $task->assigned_at->format('d M Y, h:i A') : 'N/A' }}</td>
+                                                                                            <td>
+                                                                                                @if($task->assignment_type == '0')
+                                                                                                    <span class="badge bg-primary-subtle text-primary">Individual</span>
+                                                                                                @else
+                                                                                                    <span class="badge bg-secondary-subtle text-secondary">Group - {{ $task->group_name }}</span>
+                                                                                                @endif
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                @if($task->is_approved_by_engineer)
+                                                                                                    <span class="badge bg-success-subtle text-success">
+                                                                                                        <i class="bx bx-check-circle"></i> Approved
+                                                                                                    </span>
+                                                                                                    <br><small class="text-muted">{{ $task->engineer_approved_at->format('d M Y, h:i A') }}</small>
+                                                                                                @else
+                                                                                                    <span class="badge bg-warning-subtle text-warning">
+                                                                                                        <i class="bx bx-time"></i> Pending Approval
+                                                                                                    </span>
+                                                                                                @endif
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                <a href="{{ route('service-request.view', $task->service_request_id) }}"
+                                                                                                   class="btn btn-sm btn-info"
+                                                                                                   data-bs-toggle="tooltip"
+                                                                                                   title="View Details">
+                                                                                                    <i class="bx bx-show"></i>
+                                                                                                </a>
+                                                                                                @if(!$task->is_approved_by_engineer)
+                                                                                                    <button type="button"
+                                                                                                            class="btn btn-sm btn-success approve-task-btn"
+                                                                                                            data-assignment-id="{{ $task->id }}"
+                                                                                                            data-bs-toggle="tooltip"
+                                                                                                            title="Approve Task">
+                                                                                                        <i class="bx bx-check"></i> Approve
+                                                                                                    </button>
+                                                                                                @endif
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    @empty
+                                                                                        <tr>
+                                                                                            <td colspan="7" class="text-center text-muted py-4">
+                                                                                                No tasks assigned yet
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    @endforelse
                                                                                     {{-- @forelse($visitAssignments as $assignment)
                                                                                         <tr>
                                                                                             <td>
@@ -1200,4 +1286,107 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        $(document).ready(function() {
+            // CSRF token setup for AJAX
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            // Handle approve task button click
+            $('.approve-task-btn').on('click', function() {
+                const button = $(this);
+                const assignmentId = button.data('assignment-id');
+                const row = button.closest('tr');
+
+                // Confirm approval
+                if (!confirm('Are you sure you want to approve this task?')) {
+                    return;
+                }
+
+                // Disable button and show loading
+                button.prop('disabled', true);
+                button.html('<i class="bx bx-loader bx-spin"></i> Approving...');
+
+                // Send AJAX request
+                $.ajax({
+                    url: '{{ route("staff.approve.task") }}',
+                    type: 'POST',
+                    data: {
+                        assignment_id: assignmentId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Show success message
+                            const alertHtml = `
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    ${response.message}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            `;
+                            $('.card-body').prepend(alertHtml);
+
+                            // Update the approval status column
+                            const statusCell = row.find('td:eq(5)');
+                            statusCell.html(`
+                                <span class="badge bg-success-subtle text-success">
+                                    <i class="bx bx-check-circle"></i> Approved
+                                </span>
+                                <br><small class="text-muted">${response.approved_at}</small>
+                            `);
+
+                            // Remove the approve button
+                            button.remove();
+
+                            // Remove warning highlight if present
+                            row.removeClass('table-warning');
+
+                            // Auto-dismiss alert after 5 seconds
+                            setTimeout(function() {
+                                $('.alert-success').fadeOut('slow', function() {
+                                    $(this).remove();
+                                });
+                            }, 5000);
+                        } else {
+                            alert('Error: ' + response.message);
+                            button.prop('disabled', false);
+                            button.html('<i class="bx bx-check"></i> Approve');
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMessage = 'An error occurred while approving the task.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+
+                        const alertHtml = `
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                ${errorMessage}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        `;
+                        $('.card-body').prepend(alertHtml);
+
+                        button.prop('disabled', false);
+                        button.html('<i class="bx bx-check"></i> Approve');
+
+                        // Auto-dismiss alert after 5 seconds
+                        setTimeout(function() {
+                            $('.alert-danger').fadeOut('slow', function() {
+                                $(this).remove();
+                            });
+                        }, 5000);
+                    }
+                });
+            });
+
+            // Initialize tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+    @endpush
 @endsection

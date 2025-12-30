@@ -25,4 +25,9 @@ class ParentCategory extends Model
     {
         return $this->hasMany(Product::class, 'parent_category_id');
     }
+    
+    public function ecommerceProducts()
+    {
+        return $this->hasMany(EcommerceProduct::class, 'parent_category_id');
+    }
 }

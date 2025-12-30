@@ -263,6 +263,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Cost Price',
                                                         'name' => 'cost_price',
+                                                        'id' => 'cost_price',
                                                         'type' => 'number',
                                                         'placeholder' => 'Enter Cost Price',
                                                         'model' => $product,
@@ -275,6 +276,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Selling Price',
                                                         'name' => 'selling_price',
+                                                        'id' => 'selling_price',
                                                         'type' => 'number',
                                                         'placeholder' => 'Enter Selling Price',
                                                         'model' => $product,
@@ -287,6 +289,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Discount Price',
                                                         'name' => 'discount_price',
+                                                        'id' => 'discount_price',
                                                         'type' => 'number',
                                                         'placeholder' => 'Enter Discount Price',
                                                         'model' => $product,
@@ -299,6 +302,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Tax (%)',
                                                         'name' => 'tax',
+                                                        'id' => 'tax',
                                                         'type' => 'number',
                                                         'placeholder' => 'Enter Tax',
                                                         'model' => $product,
@@ -311,6 +315,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Final Price',
                                                         'name' => 'final_price',
+                                                        'id' => 'final_price',
                                                         'type' => 'number',
                                                         'placeholder' => 'Enter Final Price',
                                                         'model' => $product,
@@ -508,9 +513,6 @@
 
         </div>
     </div>
-
-
-
     <!-- Include Quill CSS -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
@@ -574,11 +576,6 @@
                 }
             });
 
-            // Set initial content from database
-            shortDescriptionQuill.root.innerHTML = $('#short_description').val() || '';
-            fullDescriptionQuill.root.innerHTML = $('#full_description').val() || '';
-            technicalSpecificationQuill.root.innerHTML = $('#technical_specification').val() || '';
-
             // Update hidden inputs when form is submitted
             $('form').on('submit', function() {
                 $('#short_description').val(shortDescriptionQuill.root.innerHTML);
@@ -590,7 +587,8 @@
             $('select[name="warehouse_id"]').on('change', function() {
                 var id = $(this).val();
                 $.get('/warehouse-dependent?type=rack&id=' + id, function(data) {
-                    var select = $('select[name="warehouse_rack_id"]');
+                    console.log(data);
+                    var select = $('select[name="warehouse_rack_name"]');
                     select.empty().append('<option value="">--Select Rack--</option>');
                     $.each(data, function(key, value) {
                         select.append('<option value="' + key + '">' + value + '</option>');
@@ -598,13 +596,60 @@
                 });
             });
 
-            // AJAX SKU Validation for Edit
+            // Rack -> Zone
+            $('select[name="warehouse_rack_name"]').on('change', function() {
+                var id = $(this).val();
+                $.get('/warehouse-dependent?type=zone&id=' + id, function(data) {
+                    var select = $('select[name="zone_area_id"]');
+                    select.empty().append('<option value="">--Select Zone--</option>');
+                    $.each(data, function(key, value) {
+                        select.append('<option value="' + key + '">' + value + '</option>');
+                    });
+                });
+            });
+
+            // Zone -> Rack No
+            $('select[name="zone_area_id"]').on('change', function() {
+                var id = $(this).val();
+                $.get('/warehouse-dependent?type=rack_no&id=' + id, function(data) {
+                    var select = $('select[name="rack_no_id"]');
+                    select.empty().append('<option value="">--Select Rack No--</option>');
+                    $.each(data, function(key, value) {
+                        select.append('<option value="' + key + '">' + value + '</option>');
+                    });
+                });
+            });
+
+            // Rack No -> Level
+            $('select[name="rack_no_id"]').on('change', function() {
+                var id = $(this).val();
+                $.get('/warehouse-dependent?type=level&id=' + id, function(data) {
+                    var select = $('select[name="level_no_id"]');
+                    select.empty().append('<option value="">--Select Level--</option>');
+                    $.each(data, function(key, value) {
+                        select.append('<option value="' + key + '">' + value + '</option>');
+                    });
+                });
+            });
+
+            // Level -> Position
+            $('select[name="level_no_id"]').on('change', function() {
+                var id = $(this).val();
+                $.get('/warehouse-dependent?type=position&id=' + id, function(data) {
+                    var select = $('select[name="position_no_id"]');
+                    select.empty().append('<option value="">--Select Position--</option>');
+                    $.each(data, function(key, value) {
+                        select.append('<option value="' + key + '">' + value + '</option>');
+                    });
+                });
+            });
+
+            // AJAX SKU Validation
             let skuTimeout = null;
             $('#sku').on('input', function() {
                 const sku = $(this).val().trim();
                 const $input = $(this);
                 const $feedback = $('#sku-ajax-feedback');
-                const productId = '{{ $product->id }}'; // Current product ID
 
                 // Clear previous timeout
                 if (skuTimeout) {
@@ -621,8 +666,7 @@
                             url: '{{ route('product-list.check-sku') }}',
                             method: 'GET',
                             data: {
-                                sku: sku,
-                                product_id: productId // Exclude current product from check
+                                sku: sku
                             },
                             success: function(response) {
                                 if (response.valid) {
@@ -650,9 +694,94 @@
                 }
             });
 
+            // ========================================
+            // Task 2: Category-Dependent Subcategory Filtering
+            // ========================================
+            $('#parent_category').on('change', function() {
+                var parentId = $(this).val();
+                var subcategorySelect = $('#sub_category');
+
+                // keep selected parent; only touch subcategory
+                subcategorySelect.empty();
+
+                if (!parentId) {
+                    subcategorySelect.append('<option value="">--Select Category First--</option>');
+                    return;
+                }
+
+                subcategorySelect.append('<option value="">Loading...</option>');
+
+                $.ajax({
+                    url: '/category-dependent',
+                    method: 'GET',
+                    data: {
+                        parent_id: parentId
+                    },
+                    success: function(data) {
+                        subcategorySelect.empty()
+                            .append('<option value="">--Select Subcategory--</option>');
+                        $.each(data, function(key, value) {
+                            subcategorySelect.append('<option value="' + key + '">' +
+                                value + '</option>');
+                        });
+                    },
+                    error: function() {
+                        subcategorySelect.empty()
+                            .append('<option value="">Error loading subcategories</option>');
+                        console.error('Error fetching subcategories');
+                    }
+                });
+            });
+
+
+            // ========================================
+            // Task 3: Real-time Pricing Calculation
+            // ========================================
+            function calculateFinalPrice() {
+                var sellingPrice = parseFloat($('input[name="selling_price"]').val()) || 0;
+                var discountPrice = parseFloat($('input[name="discount_price"]').val()) || 0;
+                var taxPercentage = parseFloat($('input[name="tax"]').val()) || 0;
+
+                // Validation: discount price cannot be greater than selling price
+                if (discountPrice > sellingPrice && sellingPrice > 0) {
+                    alert('Discount price cannot be greater than selling price');
+                    $('input[name="discount_price"]').val('');
+                    discountPrice = 0;
+                }
+
+                // Validation: tax percentage cannot exceed 100%
+                if (taxPercentage > 100) {
+                    alert('Tax percentage cannot exceed 100%');
+                    $('input[name="tax"]').val('');
+                    taxPercentage = 0;
+                }
+
+                // Calculate base price
+                // If discount price is entered: base_price = selling_price - discount_price
+                // Otherwise: base_price = selling_price
+                var basePrice = discountPrice > 0 ? (sellingPrice - discountPrice) : sellingPrice;
+
+                // Apply tax: final_price = base_price + (base_price * tax_percentage / 100)
+                var finalPrice = basePrice + (basePrice * taxPercentage / 100);
+
+                // Update final price field (rounded to 2 decimal places)
+                $('input[name="final_price"]').val(finalPrice.toFixed(2));
+            }
+
+            // Attach event listeners to pricing fields
+            $('input[name="selling_price"], input[name="discount_price"], input[name="tax"]').on('keyup change',
+                function() {
+                    calculateFinalPrice();
+                });
+
+            // Calculate on page load if values exist
+            calculateFinalPrice();
+
         });
     </script>
+@endsection
 
+@section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.js-variation-select').forEach(function(el) {

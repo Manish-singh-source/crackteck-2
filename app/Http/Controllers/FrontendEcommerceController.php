@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\EcommerceProduct;
 use App\Models\ParentCategorie;
+use App\Models\ParentCategory;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -16,36 +17,38 @@ class FrontendEcommerceController extends Controller
      */
     public function shop()
     {
-        // Get active e-commerce products with their warehouse product relationships
+        // ✅ Active ecommerce products
         $products = EcommerceProduct::with([
             'warehouseProduct.brand',
             'warehouseProduct.parentCategorie',
             'warehouseProduct.subCategorie',
-            'warehouseProduct',
-        ])
-            ->active() // Only active products
-            ->paginate(12); // Paginate for better performance
+            ])
+            ->where('status', "1")
+            ->get();
 
-        // Get active categories for filter
-        $categories = ParentCategorie::where('status', '1')
-            ->where('category_status_ecommerce', true)
+        // ✅ Active categories
+        $categories = ParentCategory::where('status_ecommerce', "1")
             ->whereHas('products', function ($query) {
                 $query->whereHas('ecommerceProduct', function ($q) {
-                    $q->where('ecommerce_status', 'active');
+                    $q->where('status_ecommerce', "1")
+                        ->whereNull('deleted_at');
                 });
             })
             ->orderBy('sort_order', 'asc')
-            ->get(['id', 'parent_categories', 'category_image']);
+            ->get(['id', 'name', 'image']);
 
-        // Get active brands for filter
-        $brands = Brand::where('status', '1')
+        // ✅ Active brands
+        $brands = Brand::where('status', "1")
             ->whereHas('products', function ($query) {
                 $query->whereHas('ecommerceProduct', function ($q) {
-                    $q->where('ecommerce_status', 'active');
+                    $q->where('status_ecommerce', "1")
+                        ->whereNull('deleted_at');
                 });
             })
-            ->orderBy('brand_title', 'asc')
-            ->get(['id', 'brand_title', 'logo']);
+            ->orderBy('name', 'asc')
+            ->get(['id', 'name', 'image']);
+
+        // dd($brands);    
 
         return view('frontend.ecommerce-shop', compact('products', 'categories', 'brands'));
     }
@@ -57,12 +60,15 @@ class FrontendEcommerceController extends Controller
     {
         // Get the specific e-commerce product with all relationships
         $product = EcommerceProduct::with([
+            'warehouseProduct',
             'warehouseProduct.brand',
             'warehouseProduct.parentCategorie',
             'warehouseProduct.subCategorie',
         ])
-            ->active()
+            ->where('status', "1")
             ->findOrFail($id);
+
+            // dd($product);
 
         // Track recently viewed products
         $this->trackRecentlyViewed($id);
@@ -148,7 +154,7 @@ class FrontendEcommerceController extends Controller
             'warehouseProduct.subCategorie',
         ])
             ->where('id', '!=', $product->id)
-            ->active();
+            ->where('status', "1");
 
         // First try to get products from same sub-category
         if ($product->warehouseProduct && $product->warehouseProduct->sub_category_id) {
@@ -224,7 +230,7 @@ class FrontendEcommerceController extends Controller
     {
         try {
             // Get active parent categories that have e-commerce products
-            $categories = ParentCategorie::where('status', '1')
+            $categories = ParentCategory::where('status', '1')
                 ->where('category_status_ecommerce', true)
                 ->whereHas('products', function ($query) {
                     $query->whereHas('ecommerceProduct', function ($q) {
@@ -232,7 +238,7 @@ class FrontendEcommerceController extends Controller
                     });
                 })
                 ->orderBy('sort_order', 'asc')
-                ->get(['id', 'parent_categories', 'category_image']);
+                ->get(['id', 'name', 'image']);
 
             return response()->json([
                 'success' => true,

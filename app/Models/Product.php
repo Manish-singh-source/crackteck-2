@@ -101,4 +101,5 @@ class Product extends Model
     {
         return $this->hasOne(EcommerceProduct::class, 'product_id');
     }
+    
 }

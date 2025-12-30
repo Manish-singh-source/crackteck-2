@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Engineer;
+use App\Models\Staff;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +19,7 @@ class LeadFactory extends Factory
     public function definition(): array
     {
         //
-        $usersCount = Engineer::count();
+        $usersCount = Staff::count();
 
         return [
             //

@@ -30,7 +30,6 @@
                                                     <thead>
                                                         <tr>
                                                             <th>Name</th>
-                                                            <th>Status</th>
                                                             <th>Created By</th>
                                                             <th>Action</th>
                                                         </tr>
@@ -39,15 +38,6 @@
                                                         @foreach ($permission as $permission)
                                                             <tr>
                                                                 <td>{{ $permission->name }}</td>
-                                                                <td>
-                                                                    <div class="form-check form-switch mb-2">
-                                                                        <input class="form-check-input" type="checkbox"
-                                                                            role="switch" id="flexSwitchCheckChecked"
-                                                                            checked>
-                                                                        <label class="form-check-label"
-                                                                            for="flexSwitchCheckChecked"></label>
-                                                                    </div>
-                                                                </td>
                                                                 <td>Super Admin</td>
                                                                 <td>
                                                                     <a aria-label="anchor" href="{{ route('permission.edit', $permission->id) }}"

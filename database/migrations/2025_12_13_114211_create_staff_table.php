@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->string('staff_code')->unique();
 
-            $table->enum('staff_role', [0, 1, 2, 3, 4])->default(0)->comment('0 - Admin, 1 - Engineer, 2 - Delivery Man, 3 - Sales Person, 4 - Customer');
+            $table->string('staff_role')->comment('0 - Admin, 1 - Engineer, 2 - Delivery Man, 3 - Sales Person, 4 - Customer');
             // Personal Information
             $table->string('first_name', 50);
             $table->string('last_name', 50);

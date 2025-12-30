@@ -36,6 +36,7 @@ class CustomerController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $validated = $request->validate([
             // Personal
             'first_name' => 'required|string|max:255',
@@ -67,7 +68,7 @@ class CustomerController extends Controller
             'branches.*.state' => 'required|string|max:255',
             'branches.*.country' => 'required|string|max:255',
             'branches.*.pincode' => 'required|string|max:20',
-            'is_primary' => 'nullable|integer',
+            'is_primary' => 'required|integer',
 
             // Company
             'company_name' => 'nullable|string|max:255',
@@ -161,7 +162,7 @@ class CustomerController extends Controller
                     'state' => $branch['state'],
                     'country' => $branch['country'],
                     'pincode' => $branch['pincode'],
-                    'is_primary' => ($index == $primaryBranch) ? 1 : 0,
+                    'is_primary' => ($index == $primaryBranch) ? $primaryBranch : "0",
                 ]);
             }
 

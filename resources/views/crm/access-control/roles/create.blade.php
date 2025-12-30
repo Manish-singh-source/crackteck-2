@@ -39,31 +39,38 @@
                                     <div class="row g-3">
                                         <div class="col-12">
                                             <div class="border rounded p-3">
-                                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                                    <h6 class="mb-0">
-                                                        Admin
-                                                    </h6>
-                                                </div>
+                                                @if ($permissions->isEmpty())
+                                                    <div class="alert alert-info">
+                                                        No permissions available.
+                                                    </div>
+                                                @else
+                                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                                        <h6 class="mb-0">
+                                                            Admin
+                                                        </h6>
+                                                    </div>
 
-                                                <div class="row g-3">
-                                                    @foreach ($permissions as $permission)
-                                                        <div class="col-md-2">
-                                                            <div
-                                                                class="d-flex align-items-center justify-content-between gap-3 form-control p-2">
-                                                                <label class="mb-0">
-                                                                    {{ $permission->name }}
-                                                                </label>
-                                                                <div class="form-check form-switch">
-                                                                    <input type="checkbox" value="{{ $permission->name }}"
-                                                                        name="permission[]" class="form-check-input"
-                                                                        id="view_admin">
-                                                                    <label class="form-check-label"
-                                                                        for="view_admin"></label>
+                                                    <div class="row g-3">
+                                                        @foreach ($permissions as $permission)
+                                                            <div class="col-md-2">
+                                                                <div
+                                                                    class="d-flex align-items-center justify-content-between gap-3 form-control p-2">
+                                                                    <label class="mb-0">
+                                                                        {{ $permission->name }}
+                                                                    </label>
+                                                                    <div class="form-check form-switch">
+                                                                        <input type="checkbox"
+                                                                            value="{{ $permission->name }}"
+                                                                            name="permission[]" class="form-check-input"
+                                                                            id="view_admin">
+                                                                        <label class="form-check-label"
+                                                                            for="view_admin"></label>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>

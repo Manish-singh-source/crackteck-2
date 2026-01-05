@@ -121,6 +121,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/task', 'index');
         });
 
+        // pending to check 
         Route::controller(OrderController::class)->group(function () {
             Route::get('/product', 'listProducts'); // Sales Person and Customer
             Route::get('/product/{id}', 'product'); // Sales Person and Customer
@@ -134,6 +135,7 @@ Route::prefix('v1')->group(function () {
 
         });
 
+        // 
         Route::controller(LeadController::class)->group(function () {
             Route::get('/leads', 'index');
             Route::post('/lead', 'store');

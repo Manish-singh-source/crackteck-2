@@ -66,6 +66,10 @@ return new class extends Migration
             $table->boolean('requires_signature')->default(false);
             $table->boolean('is_gift')->default(false);
 
+            // Assigned Person
+            $table->string('assigned_person_type')->nullable()->comment('0 - Delivery Person, 1 - Engineer');
+            $table->foreignId('assigned_person_id')->nullable()->constrained('staff')->onDelete('cascade');
+
             // Created & Updated By
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('cascade');
             $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('cascade');

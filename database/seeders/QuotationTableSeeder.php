@@ -13,13 +13,22 @@ class QuotationTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $leads = Lead::all();
-        //
+        // Ensure we have leads to attach followups to
+        if (Lead::count() === 0) {
+            Lead::factory()->count(10)->create();
+        }
 
-        Quotation::factory()->count(10)->make()->each(function ($quotation) use ($leads) {
+        $leads = Lead::all();
+
+        Quotation::factory()->count(20)->make()->each(function ($quotation) use ($leads) {
             $lead = $leads->random();
-            $quotation->user_id = $lead->user_id;
             $quotation->lead_id = $lead->id;
+
+            // If lead has an assigned staff, use it for the quotation
+            if (isset($lead->staff_id)) {
+                $quotation->staff_id = $lead->staff_id;
+            }
+
             $quotation->save();
         });
     }

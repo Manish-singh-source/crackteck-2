@@ -32,7 +32,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             StaffSeeder::class,
             LeadTableSeeder::class,
-            
+            FollowUpTableSeeder::class,
+            MeetTableSeeder::class,
+            QuotationTableSeeder::class,
+            QuotationProductTableSeeder::class,
         ]);
 
     }

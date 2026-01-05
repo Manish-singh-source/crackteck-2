@@ -10,6 +10,7 @@ use App\Models\Engineer;
 use App\Models\FollowUp;
 use App\Models\Lead;
 use App\Models\Meet;
+use App\Models\Order;
 use App\Models\SalesPerson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,17 +18,6 @@ use Illuminate\Support\Facades\Validator;
 class DashboardController extends Controller
 {
     //
-
-    protected function getModelByRoleId($roleId)
-    {
-        return [
-            1 => Engineer::class,
-            2 => DeliveryMan::class,
-            3 => SalesPerson::class,
-            4 => Customer::class,
-        ][$roleId] ?? null;
-    }
-
     protected function getRoleId($roleId)
     {
         return [
@@ -38,7 +28,9 @@ class DashboardController extends Controller
         ][$roleId] ?? null;
     }
 
-    // sales dashboard
+    // Dashboard data based on role 
+    // role_id: 1 => engineer, 2 => delivery man completed 
+    // 3 => sales person, 4 => customers pending 
     public function index(Request $request)
     {
 
@@ -53,40 +45,40 @@ class DashboardController extends Controller
         $validated = $validated->validated();
         $staffRole = $this->getRoleId($validated['role_id']);
         if (! $staffRole) {
-            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+            return response()->json(['success' => false, 'message' => 'Invalid Role ID provided.'], 400);
         }
         $data = [];
         if ($staffRole == 'sales_person') {
-            $meets = Meet::where('user_id', $validated['user_id'])->where('date', today())->get();
-            $followup = FollowUp::where('user_id', $validated['user_id'])->where('followup_date', today())->get();
+            $meets = Meet::where('staff_id', $validated['user_id'])->where('date', today())->get();
+            $followup = FollowUp::where('staff_id', $validated['user_id'])->where('followup_date', today())->get();
             $data = [
                 'meets' => $meets,
                 'followup' => $followup,
             ];
         } elseif ($staffRole == 'delivery_man') {
-            $total_orders = EcommerceOrder::where('delivery_man_id', $validated['user_id'])->count();
-            $delivered_orders = EcommerceOrder::where('delivery_man_id', $validated['user_id'])->where('status', 'delivered')->count();
-            $pending_orders = EcommerceOrder::where('delivery_man_id', $validated['user_id'])->where('status', 'pending')->count();
-            $processing_orders = EcommerceOrder::where('delivery_man_id', $validated['user_id'])->where('status', 'processing')->count();
-            $shipped_orders = EcommerceOrder::where('delivery_man_id', $validated['user_id'])->where('status', 'shipped')->count();
-            $cancelled_orders = EcommerceOrder::where('delivery_man_id', $validated['user_id'])->where('status', 'cancelled')->count();
-
-            $new_orders = EcommerceOrder::where('delivery_man_id', $validated['user_id'])->where('status', 'confirmed')->orderBy('updated_at', 'desc')->get();
+            $total_orders = Order::where('assigned_person_id', $validated['user_id'])->count();
+            $pending_orders = Order::where('assigned_person_id', $validated['user_id'])->where('order_status', '0')->orderBy('updated_at', 'desc')->count();
+            $new_orders = Order::where('assigned_person_id', $validated['user_id'])->where('order_status', '1')->orderBy('updated_at', 'desc')->get();
+            $processing_orders = Order::where('assigned_person_id', $validated['user_id'])->where('order_status', '2')->orderBy('updated_at', 'desc')->count();
+            $shipped_orders = Order::where('assigned_person_id', $validated['user_id'])->where('order_status', '3')->orderBy('updated_at', 'desc')->count();
+            $delivered_orders = Order::where('assigned_person_id', $validated['user_id'])->where('order_status', '4')->orderBy('updated_at', 'desc')->count();
+            $cancelled_orders = Order::where('assigned_person_id', $validated['user_id'])->where('order_status', '5')->orderBy('updated_at', 'desc')->count();
 
             $data = [
                 'total_orders' => $total_orders,
-                'delivered_orders' => $delivered_orders,
                 'pending_orders' => $pending_orders,
+                'new_orders' => $new_orders,
                 'processing_orders' => $processing_orders,
                 'shipped_orders' => $shipped_orders,
+                'delivered_orders' => $delivered_orders,
                 'cancelled_orders' => $cancelled_orders,
-                'new_orders' => $new_orders,
             ];
         }
 
         return response()->json($data, 200);
     }
 
+    // Sales Overview for Sales Person
     public function salesOverview(Request $request)
     {
         $validated = Validator::make($request->all(), ([
@@ -99,11 +91,12 @@ class DashboardController extends Controller
         }
         $validated = $validated->validated();
 
-        $lostLeads = Lead::where('user_id', $validated['user_id'])->where('status', 'Lost')->count();
-        $newLeads = Lead::where('user_id', $validated['user_id'])->where('status', 'New')->count();
-        $contactedLeads = Lead::where('user_id', $validated['user_id'])->where('status', 'Contacted')->count();
-        $qualifiedLeads = Lead::where('user_id', $validated['user_id'])->where('status', 'Qualified')->count();
-        $quotedLeads = Lead::where('user_id', $validated['user_id'])->where('status', 'Quoted')->count();
+        $newLeads = Lead::where('staff_id', $validated['user_id'])->where('status', '0')->count();
+        $contactedLeads = Lead::where('staff_id', $validated['user_id'])->where('status', '1')->count();
+        $qualifiedLeads = Lead::where('staff_id', $validated['user_id'])->where('status', '2')->count();
+        // replaced quoted with won
+        $quotedLeads = Lead::where('staff_id', $validated['user_id'])->where('status', '4')->count();
+        $lostLeads = Lead::where('staff_id', $validated['user_id'])->where('status', '5')->count();
 
         return response()->json(['lost_leads' => $lostLeads, 'new_leads' => $newLeads, 'contacted_leads' => $contactedLeads, 'qualified_leads' => $qualifiedLeads, 'quoted_leads' => $quotedLeads], 200);
     }

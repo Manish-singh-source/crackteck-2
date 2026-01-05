@@ -26,7 +26,7 @@ class QuotationController extends Controller
 
         $validated = $validated->validated();
 
-        $quotations = Quotation::with('products')->where('user_id', $validated['user_id'])->get();
+        $quotations = Quotation::with('leadDetails','products')->where('staff_id', $validated['user_id'])->get();
 
         if ($quotations->isEmpty()) {
             return response()->json(['message' => 'No quotations found'], 404);
@@ -42,9 +42,16 @@ class QuotationController extends Controller
             // validation rules if any
             'user_id' => 'required',
             'lead_id' => 'required',
-            'quote_id' => 'required',
             'quote_date' => 'required',
             'expiry_date' => 'required',
+            'products' => 'array',
+            'products.*.product_name' => 'required|string',
+            'products.*.hsn_code' => 'nullable|string',
+            'products.*.sku' => 'nullable|string',
+            'products.*.price' => 'required',
+            'products.*.quantity' => 'required|integer',
+            'products.*.tax' => 'required',
+            'products.*.total' => 'required',
         ]));
 
         if ($validated->fails()) {
@@ -53,22 +60,36 @@ class QuotationController extends Controller
 
         $validated = $validated->validated();
 
+        $validated['staff_id'] = $validated['user_id'];
+        unset($validated['user_id']);
+
+        $validated['quote_id'] = 'Q-' . strtoupper(uniqid());
+        $validated['quote_number'] = 'Q-' . strtoupper(uniqid());
+        $validated['subtotal'] = 0;
+        $validated['tax_amount'] = 0;
+        $validated['discount_amount'] = 0;
+        $validated['total_amount'] = 0;
+        
         $Quotation = Quotation::create($validated);
 
         if ($request->has('products')) {
+            $subtotal = 0;
+            
             foreach ($request->products as $productData) {
                 $quotationProduct = new QuotationProduct;
                 $quotationProduct->quotation_id = $Quotation->id;
                 $quotationProduct->product_name = $productData['product_name'];
                 $quotationProduct->hsn_code = $productData['hsn_code'];
                 $quotationProduct->sku = $productData['sku'];
-                $quotationProduct->price = $productData['price'];
+                $quotationProduct->unit_price = $productData['price'];
                 $quotationProduct->quantity = $productData['quantity'];
-                $quotationProduct->tax = $productData['tax'];
-                $quotationProduct->total = $productData['total'];
+                $quotationProduct->tax_rate = $productData['tax'];
+                $quotationProduct->line_total = $productData['total'];
                 $quotationProduct->save();
+                $subtotal += $productData['total'];
             }
         }
+        $Quotation->subtotal = $subtotal;
 
         if (! $Quotation) {
             return response()->json(['message' => 'Quotation not created'], 500);
@@ -93,7 +114,7 @@ class QuotationController extends Controller
 
         $validated = $validated->validated();
 
-        $Quotation = Quotation::with('products')->where('user_id', $validated['user_id'])->where('id', $lead_id)->first();
+        $Quotation = Quotation::with('leadDetails', 'products')->where('staff_id', $validated['user_id'])->first();
 
         if (! $Quotation) {
             return response()->json(['message' => 'Quotation not found'], 404);
@@ -116,7 +137,7 @@ class QuotationController extends Controller
 
         $validated = $validated->validated();
 
-        $Quotation = Quotation::where('user_id', $validated['user_id'])->where('id', $Quotation_id)->first();
+        $Quotation = Quotation::where('staff_id', $validated['user_id'])->where('id', $Quotation_id)->first();
 
         if (! $Quotation) {
             return response()->json(['message' => 'Quotation not found'], 404);
@@ -164,7 +185,7 @@ class QuotationController extends Controller
 
         $validated = $validated->validated();
 
-        $Quotation = Quotation::where('user_id', $validated['user_id'])->where('id', $lead_id)->delete();
+        $Quotation = Quotation::where('staff_id', $validated['user_id'])->where('id', $lead_id)->delete();
 
         if (! $Quotation) {
             return response()->json(['message' => 'Quotation not found'], 404);

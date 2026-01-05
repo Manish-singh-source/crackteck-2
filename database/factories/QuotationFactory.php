@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Lead;
+use App\Models\Staff;
+use App\Models\Quotation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -10,6 +12,14 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class QuotationFactory extends Factory
 {
+    
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Quotation::class;
+
     /**
      * Define the model's default state.
      *
@@ -17,14 +27,45 @@ class QuotationFactory extends Factory
      */
     public function definition(): array
     {
-        $leadsCount = Lead::count();
 
         return [
-            //
-            'lead_id' => rand(1, $leadsCount),
-            'quote_id' => 'Q-'.str_pad(rand(1, 1000), 5, '0', STR_PAD_LEFT),
-            'quote_date' => fake()->date(),
-            'expiry_date' => fake()->date(),
+            'lead_id' => function () {
+                // Pick an existing lead or create one if none exist
+                return Lead::inRandomOrder()->value('id') ?? Lead::factory()->create()->id;
+            },
+            'staff_id' => function (array $attributes) {
+                // Prefer the staff assigned to the selected lead, otherwise pick or create a staff
+                $lead = Lead::find($attributes['lead_id']);
+                if ($lead && $lead->staff_id) {
+                    return $lead->staff_id;
+                }
+
+                return Staff::inRandomOrder()->value('id') ?? Staff::create([
+                    'staff_code' => 'SEED' . time() . rand(100, 999),
+                    'staff_role' => '3',
+                    'first_name' => 'Seed',
+                    'last_name' => 'User',
+                    'email' => 'seed' . time() . '@example.test',
+                    'phone' => '0000000000'
+                ])->id;
+            },
+            'quote_id' => 'QUO' . strtoupper(uniqid()),
+            'quote_number' => 'QUO' . strtoupper(uniqid()),
+            'quote_date' => $this->faker->date(),
+            'expiry_date' => $this->faker->date(),
+            'total_items' => $this->faker->numberBetween(1, 100),
+            'currency' => $this->faker->currencyCode(),
+            'subtotal' => $this->faker->randomFloat(2, 100, 1000),
+            'discount_amount' => $this->faker->randomFloat(2, 0, 100),
+            'tax_amount' => $this->faker->randomFloat(2, 0, 100),
+            'total_amount' => $this->faker->randomFloat(2, 100, 1000),
+            'status' => $this->faker->randomElement(['0', '1', '2', '3', '4', '5']),
+            'terms_conditions' => $this->faker->paragraph(),
+            'notes' => $this->faker->paragraph(),
+            'sent_at' => $this->faker->optional()->date(),
+            'accepted_at' => $this->faker->optional()->date(),
+            'quote_document_path' => $this->faker->optional()->imageUrl(),
+
         ];
     }
 }

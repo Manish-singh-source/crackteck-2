@@ -13,15 +13,22 @@ class FollowUpTableSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        // Ensure we have leads to attach followups to
+        if (Lead::count() === 0) {
+            Lead::factory()->count(10)->create();
+        }
+
         $leads = Lead::all();
 
-        // foreach ($leads as $lead) {
-        //     FollowUp::factory()->count(1)->for($lead)->create();
-        // }
         FollowUp::factory()->count(20)->make()->each(function ($followup) use ($leads) {
             $lead = $leads->random();
             $followup->lead_id = $lead->id;
+
+            // If lead has an assigned staff, use it for the followup
+            if (isset($lead->staff_id)) {
+                $followup->staff_id = $lead->staff_id;
+            }
+
             $followup->save();
         });
     }

@@ -13,12 +13,16 @@ class QuotationProductTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $quotations = Quotation::all();
-        //
-        QuotationProduct::factory()->count(10)->make()->each(function ($quotationProduct) use ($quotations) {
-            $quotation = $quotations->random();
-            $quotationProduct->quotation_id = $quotation->id;
-            $quotationProduct->save();
+        // Ensure we have quotations
+        if (Quotation::count() === 0) {
+            Quotation::factory()->count(10)->create();
+        }
+
+        // Create 1-5 line items per quotation
+        Quotation::all()->each(function ($quotation) {
+            QuotationProduct::factory()->count(rand(1, 5))->create([
+                'quotation_id' => $quotation->id,
+            ]);
         });
     }
 }

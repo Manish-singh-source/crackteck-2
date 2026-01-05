@@ -99,6 +99,12 @@ class LeadController extends Controller
             unset($request['name']);
         }
 
+        $request->merge(['staff_id' => $request->user_id]);
+        unset($request['user_id']);
+
+        $leadNumber = 'LD-' . date('YmdHis') . '-' . $request->staff_id;;
+        $request->merge(['lead_number' => $leadNumber]);
+
         $lead = Lead::create($request->all());
 
         if (! $lead) {
@@ -111,7 +117,6 @@ class LeadController extends Controller
     public function show(Request $request, $lead_id)
     {
         $validated = Validator::make($request->all(), ([
-            // validation rules if any
             'user_id' => 'required',
         ]));
 
@@ -121,8 +126,7 @@ class LeadController extends Controller
 
         $validated = $validated->validated();
 
-        $lead = Lead::where('user_id', $validated['user_id'])->find($lead_id);
-
+        $lead = Lead::where('staff_id', $validated['user_id'])->where('id', $lead_id)->first();
         if (! $lead) {
             return response()->json(['message' => 'Lead not found'], 404);
         }
@@ -151,7 +155,7 @@ class LeadController extends Controller
             unset($request['full_name']);
         }
 
-        $lead = Lead::where('user_id', $validated['user_id'])->find($lead_id);
+        $lead = Lead::where('staff_id', $validated['user_id'])->find($lead_id);
 
         if (! $lead) {
             return response()->json(['message' => 'Lead not found'], 404);
@@ -173,7 +177,7 @@ class LeadController extends Controller
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
-        $lead = Lead::where('user_id', $request->user_id)->where('id', $lead_id)->delete();
+        $lead = Lead::where('staff_id', $request->user_id)->where('id', $lead_id)->delete();
 
         if (! $lead) {
             return response()->json(['message' => 'Lead not found'], 404);

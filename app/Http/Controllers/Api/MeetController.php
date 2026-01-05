@@ -21,7 +21,7 @@ class MeetController extends Controller
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
-        $meets = Meet::with('leadDetails')->where('user_id', $request->user_id)->paginate();
+        $meets = Meet::with('leadDetails')->where('staff_id', $request->user_id)->paginate();
 
         if ($meets->isEmpty()) {
             return response()->json(['message' => 'No meets found'], 404);
@@ -50,8 +50,23 @@ class MeetController extends Controller
         if ($validated->fails()) {
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
+        $validated = $validated->validated();
 
-        $meet = Meet::create($request->all());
+        $validated['staff_id'] = $validated['user_id'];
+        unset($validated['user_id']);
+
+        $validated['start_time'] = $validated['time'] ?? null;
+        unset($validated['time']);
+
+        $validated['meet_agenda'] = $validated['meetAgenda'] ?? null;
+        unset($validated['meetAgenda']);
+
+        $validated['follow_up_action'] = $validated['followUp'] ?? null;
+        unset($validated['followUp']);
+
+
+
+        $meet = Meet::create($validated);
 
         if (! $meet) {
             return response()->json(['message' => 'Meet not created'], 500);
@@ -71,7 +86,7 @@ class MeetController extends Controller
         }
         $validated = $validated->validated();
 
-        $meets = Meet::where('user_id', $validated['user_id'])->where('id', $meet_id)->first();
+        $meets = Meet::where('staff_id', $validated['user_id'])->where('id', $meet_id)->first();
 
         if (! $meets) {
             return response()->json(['message' => 'Meet not found'], 404);
@@ -118,7 +133,7 @@ class MeetController extends Controller
 
         $validated = $validated->validated();
 
-        Meet::where('user_id', $validated['user_id'])->where('id', $meet_id)->delete();
+        Meet::where('staff_id', $validated['user_id'])->where('id', $meet_id)->delete();
 
         return response()->json(['message' => 'Meet deleted successfully'], 200);
     }

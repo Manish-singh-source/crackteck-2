@@ -2,8 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\Engineer;
 use App\Models\Lead;
+use App\Models\Staff;
+use App\Models\FollowUp;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -12,33 +13,45 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class FollowUpFactory extends Factory
 {
     /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = FollowUp::class;
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
-        $leadsCount = Lead::count();
-        $usersCount = Engineer::count();
-
         return [
-            //
-            'lead_id' => rand(1, $leadsCount),
-            'user_id' => rand(1, $usersCount),
-            // 'lead_id' => Lead::inRandomOrder()->first()->id,
-            // 'client_name' => function (array $attributes) {
-            //     return Lead::find($attributes['lead_id'])->first_name . ' ' . Lead::find($attributes['lead_id'])->last_name;
-            // },
-            // 'contact' => function (array $attributes) {
-            //     return Lead::find($attributes['lead_id'])->phone;
-            // },
-            // 'email' => function (array $attributes) {
-            //     return Lead::find($attributes['lead_id'])->email;
-            // },
-            'followup_date' => fake()->date(),
-            'followup_time' => fake()->time(),
-            'status' => fake()->randomElement(['Pending', 'Done', 'Rescheduled', 'Cancelled']),
-            'remarks' => fake()->jobTitle(),
+            'lead_id' => function () {
+                // Pick an existing lead or create one if none exist
+                return Lead::inRandomOrder()->value('id') ?? Lead::factory()->create()->id;
+            },
+            'staff_id' => function (array $attributes) {
+                // Prefer the staff assigned to the selected lead, otherwise pick or create a staff
+                $lead = Lead::find($attributes['lead_id']);
+                if ($lead && $lead->staff_id) {
+                    return $lead->staff_id;
+                }
+
+                return Staff::inRandomOrder()->value('id') ?? Staff::create([
+                    'staff_code' => 'SEED' . time() . rand(100, 999),
+                    'staff_role' => '3',
+                    'first_name' => 'Seed',
+                    'last_name' => 'User',
+                    'email' => 'seed' . time() . '@example.test',
+                    'phone' => '0000000000'
+                ])->id;
+            },
+            'followup_date' => $this->faker->date(),
+            'followup_time' => $this->faker->time(),
+            // enum uses numeric codes as strings: '0' - Pending, '1' - Completed, '2' - Rescheduled, '3' - Cancelled
+            'status' => $this->faker->randomElement(['0', '1', '2', '3']),
+            'remarks' => $this->faker->sentence(),
         ];
     }
 }

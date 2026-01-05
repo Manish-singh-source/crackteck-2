@@ -8,21 +8,13 @@ use App\Models\CustomerAddressDetails;
 use App\Models\DeliveryMan;
 use App\Models\Engineer;
 use App\Models\SalesPerson;
+use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
 {
     //
-    protected function getModelByRoleId($roleId)
-    {
-        return [
-            1 => Engineer::class,
-            2 => DeliveryMan::class,
-            3 => SalesPerson::class,
-            4 => Customer::class,
-        ][$roleId] ?? null;
-    }
 
     protected function getRoleId($roleId)
     {
@@ -49,8 +41,7 @@ class ProfileController extends Controller
         if ($validated['role_id'] == 4) {
             $user = Customer::with('branches')->where('id', $validated['user_id'])->first();
         } else {
-            $model = $this->getModelByRoleId($validated['role_id']);
-            $user = $model::where('id', $validated['user_id'])->first();
+            $user = Staff::where('id', $validated['user_id'])->first();
         }
         if (! $user) {
             return response()->json(['success' => false, 'message' => 'User not found.'], 404);
@@ -118,12 +109,8 @@ class ProfileController extends Controller
             return response()->json(['success' => true, 'message' => 'User updated successfully.'], 200);
         }
 
-        $model = $this->getModelByRoleId($request->role_id);
-        if (! $model) {
-            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
-        }
 
-        $user = $model::where('id', $validated['user_id'])->first();
+        $user = Staff::where('id', $validated['user_id'])->first();
         if (! $user) {
             return response()->json(['success' => false, 'message' => 'User not found.'], 404);
         }
@@ -134,16 +121,11 @@ class ProfileController extends Controller
         $user->email = $request->email;
         $user->dob = $request->dob;
         $user->gender = $request->gender;
-        $user->current_address = $request->current_address;
-        $user->city = $request->city;
-        $user->state = $request->state;
-        $user->country = $request->country;
-        $user->pincode = $request->pincode;
         $user->employment_type = $request->employment_type;
         $user->joining_date = $request->joining_date;
-        $user->police_verification = $request->police_verification;
-        $user->police_verification_status = $request->police_verification_status;
-        $user->police_certificate = $request->police_certificate;
+        $user->marital_status = $request->marital_status;
+        $user->assigned_area = $request->assigned_area;
+        $user->status = $request->status;
         $user->save();
 
         if (! $user) {

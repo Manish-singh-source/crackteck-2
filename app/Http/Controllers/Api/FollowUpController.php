@@ -23,7 +23,7 @@ class FollowUpController extends Controller
 
         $validated = $validated->validated();
 
-        $followup = FollowUp::where('user_id', $validated['user_id'])->paginate();
+        $followup = FollowUp::with('leadDetails')->where('staff_id', $validated['user_id'])->get();
         if ($followup->isEmpty()) {
             return response()->json(['message' => 'No followup found'], 404);
         }
@@ -49,6 +49,9 @@ class FollowUpController extends Controller
 
         $validated = $validated->validated();
 
+        $validated['staff_id'] = $validated['user_id'];
+        unset($validated['user_id']);
+
         // return response()->json(['message' => 'Follow Up created successfully', 'followup' => $validated], 200);
         $followup = FollowUp::create($validated);
         if (! $followup) {
@@ -70,9 +73,13 @@ class FollowUpController extends Controller
         }
         $validated = $validated->validated();
 
-        $followup = FollowUp::with('leadDetails')->where('user_id', $validated['user_id'])->where('id', $lead_id)->first();
+        $followup = FollowUp::with('leadDetails')->where('staff_id', $validated['user_id'])->where('id', $lead_id)->first();
 
-        return response()->json(['followup' => $followup], 200);
+        if (! $followup) {
+            return response()->json(['message' => 'Follow Up not found'], 404);
+        }
+
+        return new FollowUpResource($followup);
     }
 
     public function update(Request $request, $followup_id)
@@ -88,7 +95,7 @@ class FollowUpController extends Controller
 
         $validated = $validated->validated();
 
-        $followup = FollowUp::where('user_id', $validated['user_id'])->find($followup_id);
+        $followup = FollowUp::where('staff_id', $validated['user_id'])->find($followup_id);
 
         if (! $followup) {
             return response()->json(['message' => 'Follow Up not found'], 404);
@@ -112,7 +119,7 @@ class FollowUpController extends Controller
 
         $validated = $validated->validated();
 
-        $followup = FollowUp::where('user_id', $validated['user_id'])->where('id', $lead_id)->delete();
+        $followup = FollowUp::where('staff_id', $validated['user_id'])->where('id', $lead_id)->delete();
 
         if (! $followup) {
             return response()->json(['message' => 'Follow Up not found'], 404);

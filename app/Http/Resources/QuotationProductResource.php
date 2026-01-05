@@ -20,10 +20,10 @@ class QuotationProductResource extends JsonResource
             'product_name' => $this->product_name,
             'hsn_code' => $this->hsn_code,
             'sku' => $this->sku,
-            'price' => $this->price,
+            'price' => $this->unit_price,
             'quantity' => $this->quantity,
-            'tax' => $this->tax,
-            'total' => $this->total,
+            'tax' => $this->tax_rate,
+            'total' => $this->line_total,
         ];
     }
 }

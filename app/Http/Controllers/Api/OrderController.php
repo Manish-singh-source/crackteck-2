@@ -2,31 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Customer;
-use App\Models\DeliveryMan;
-use App\Models\EcommerceOrder;
-use App\Models\EcommerceOrderItem;
-use App\Models\EcommerceProduct;
-use App\Models\Engineer;
+use App\Models\Order;
 use App\Models\Product;
+use App\Models\Customer;
+use App\Models\Engineer;
+use App\Models\OrderItem;
+use App\Models\DeliveryMan;
 use App\Models\SalesPerson;
 use App\Models\StockRequest;
-use App\Models\StockRequestItem;
 use Illuminate\Http\Request;
+use App\Models\EcommerceOrder;
+use App\Models\EcommerceProduct;
+use App\Models\StockRequestItem;
+use App\Models\EcommerceOrderItem;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
-    protected function getModelByRoleId($roleId)
-    {
-        return [
-            1 => Engineer::class,
-            2 => DeliveryMan::class,
-            3 => SalesPerson::class,
-            4 => Customer::class,
-        ][$roleId] ?? null;
-    }
 
     protected function getRoleId($roleId)
     {
@@ -52,20 +45,18 @@ class OrderController extends Controller
         $staffRole = $this->getRoleId($request->role_id);
 
         if (! $staffRole) {
-            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+            return response()->json(['success' => false, 'message' => 'Invalid Role Id Provided.'], 400);
         }
 
         if ($staffRole == 'customers' || $staffRole == 'sales_person') {
 
+            $products = EcommerceProduct::query();
             if ($request->filled('search')) {
-                $products = EcommerceProduct::whereHas('warehouseProduct', function ($query) use ($request) {
+                $products = $products->whereHas('warehouseProduct', function ($query) use ($request) {
                     $query->where('product_name', 'like', "%{$request->search}%");
-                })
-                    ->with('warehouseProduct')
-                    ->get();
-            } else {
-                $products = EcommerceProduct::with('warehouseProduct')->get();
+                });
             }
+            $products = $products->with('warehouseProduct')->get();
 
             return response()->json(['products' => $products], 200);
         }
@@ -136,10 +127,10 @@ class OrderController extends Controller
             $price = $product->selling_price;
             $total = $quantity * $price;
 
-            $order = EcommerceOrder::create([
+            $order = Order::create([
                 'user_id' => 1,
                 'customer_id' => $request->customer_id,
-                'order_number' => 'ORD-'.date('YmdHis').'-'.$request->customer_id,
+                'order_number' => 'ORD-' . date('YmdHis') . '-' . $request->customer_id,
                 'order_source' => 'buy_now',
                 'email' => $customer->email,
 
@@ -174,7 +165,7 @@ class OrderController extends Controller
                 'status' => 'pending',
             ]);
 
-            EcommerceOrderItem::create([
+            OrderItem::create([
                 'ecommerce_order_id' => $order->id,
                 'ecommerce_product_id' => $product->id,
                 'product_name' => $product->product_name,
@@ -221,7 +212,7 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $orders = EcommerceOrder::with('orderItems')->where('customer_id', $request->customer_id)->get();
+            $orders = Order::with('orderItems')->where('customer_id', $request->customer_id)->get();
 
             return response()->json(['orders' => $orders], 200);
         }
@@ -350,7 +341,7 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $order = EcommerceOrder::with('orderItems')->where('id', $order_id)->first();
+            $order = Order::with('orderItems')->where('id', $order_id)->first();
 
             if (! $order) {
                 return response()->json(['message' => 'Order not found'], 404);

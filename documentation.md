@@ -1774,6 +1774,10 @@ etc.
             $table->boolean('is_priority')->default(false);
             $table->boolean('requires_signature')->default(false);
             $table->boolean('is_gift')->default(false);
+
+            // Assigned Person
+            $table->string('assigned_person_type')->nullable();
+            $table->foreignId('assigned_person_id')->nullable()->constrained('staffs')->onDelete('setNull');
             
             // Created & Updated By
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('setNull');

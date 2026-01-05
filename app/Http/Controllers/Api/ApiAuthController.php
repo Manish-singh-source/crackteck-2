@@ -85,7 +85,7 @@ class ApiAuthController extends Controller
 
             return false;
         } catch (\Exception $e) {
-            Log::error('Fast2SMS Exception: '.$e->getMessage());
+            Log::error('Fast2SMS Exception: ' . $e->getMessage());
 
             return false;
         }
@@ -213,7 +213,7 @@ class ApiAuthController extends Controller
             'employment_type' => 'nullable|string',
             'joining_date' => 'nullable|date',
             'assigned_area' => 'nullable|string',
-            
+
             // Address details
             'address1' => 'nullable|string',
             'address2' => 'nullable|string',
@@ -232,7 +232,7 @@ class ApiAuthController extends Controller
             'police_verifications' => 'nullable|in:verified,not_verified',
             'police_verification_status' => 'nullable|in:verified,not_verified',
             'police_certificate' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            
+
             // Aadhar verification details
             'aadhar_number' => 'nullable|string',
             'aadhar_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -263,49 +263,49 @@ class ApiAuthController extends Controller
         }
 
         // Handle file uploads
-        if($request->hasFile('aadhar_front_path')) {
+        if ($request->hasFile('aadhar_front_path')) {
             $file = $request->file('aadhar_front_path');
-            $filename = time().'_aadhar_front.'.$file->getClientOriginalExtension();
+            $filename = time() . '_aadhar_front.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/aadhar_card'), $filename);
-            $request->merge(['aadhar_front_path' => 'uploads/aadhar_card/'.$filename]);
+            $request->merge(['aadhar_front_path' => 'uploads/aadhar_card/' . $filename]);
         }
 
-        if($request->hasFile('aadhar_back_path')) {
+        if ($request->hasFile('aadhar_back_path')) {
             $file = $request->file('aadhar_back_path');
-            $filename = time().'_aadhar_back.'.$file->getClientOriginalExtension();
+            $filename = time() . '_aadhar_back.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/aadhar_card'), $filename);
-            $request->merge(['aadhar_back_path' => 'uploads/aadhar_card/'.$filename]);
+            $request->merge(['aadhar_back_path' => 'uploads/aadhar_card/' . $filename]);
         }
 
-        if($request->hasFile('pan_card_front_path')) {
+        if ($request->hasFile('pan_card_front_path')) {
             $file = $request->file('pan_card_front_path');
-            $filename = time().'_pan_front.'.$file->getClientOriginalExtension();
+            $filename = time() . '_pan_front.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/pan_card'), $filename);
-            $request->merge(['pan_card_front_path' => 'uploads/pan_card/'.$filename]);
+            $request->merge(['pan_card_front_path' => 'uploads/pan_card/' . $filename]);
         }
 
-        if($request->hasFile('pan_card_back_path')) {
+        if ($request->hasFile('pan_card_back_path')) {
             $file = $request->file('pan_card_back_path');
-            $filename = time().'_pan_back.'.$file->getClientOriginalExtension();
+            $filename = time() . '_pan_back.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/pan_card'), $filename);
-            $request->merge(['pan_card_back_path' => 'uploads/pan_card/'.$filename]);
+            $request->merge(['pan_card_back_path' => 'uploads/pan_card/' . $filename]);
         }
-        
+
 
         $aadharPicPath = null;
         if ($request->hasFile('aadhar_pic')) {
             $file = $request->file('aadhar_pic');
-            $filename = time().'_aadhar.'.$file->getClientOriginalExtension();
+            $filename = time() . '_aadhar.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/aadhar_card'), $filename);
-            $aadharPicPath = 'uploads/aadhar_card/'.$filename;
+            $aadharPicPath = 'uploads/aadhar_card/' . $filename;
         }
 
         $panCardName = null;
         if ($request->hasFile('pan_card')) {
             $file = $request->file('pan_card');
-            $filename = time().'_pan.'.$file->getClientOriginalExtension();
+            $filename = time() . '_pan.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/pan_card'), $filename);
-            $panCardName = 'uploads/pan_card/'.$filename;
+            $panCardName = 'uploads/pan_card/' . $filename;
         }
 
 
@@ -378,7 +378,7 @@ class ApiAuthController extends Controller
                     'otp' => $otp, // For testing only
                 ], 200);
             } else {
-                Log::error('OTP sending failed for phone: '.$user->phone);
+                Log::error('OTP sending failed for phone: ' . $user->phone);
 
                 return response()->json([
                     'success' => false,
@@ -390,7 +390,7 @@ class ApiAuthController extends Controller
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            Log::error('Login error: '.$e->getMessage());
+            Log::error('Login error: ' . $e->getMessage());
 
             return response()->json(['success' => false, 'message' => 'An error occurred during login', 'error' => $e->getMessage()], 500);
         }
@@ -412,7 +412,7 @@ class ApiAuthController extends Controller
         if (! $user || $user->otp != $request->otp || now()->gt($user->otp_expiry)) {
             return response()->json(['error' => 'Invalid or expired OTP'], 401);
         }
-        
+
         $user->otp = null; // reset OTP after verification
         $user->otp_expiry = null;
         $user->save();
@@ -434,14 +434,28 @@ class ApiAuthController extends Controller
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
-        $guard = $guards['staffs'] ?? 'api';
+        // $guard = $guards['staffs'] ?? 'api';
 
         try {
-            auth($guard)->logout();
+            $guard = match ($request->role_id) {
+                1 => 'staffs',
+                2 => 'staffs',
+                3 => 'staffs',
+                4 => 'customers',
+                default => 'api',
+            };
 
-            return response()->json(['message' => 'Successfully logged out']);
+            auth($guard)->logout(); 
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Successfully logged out'
+            ]);
         } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-            return response()->json(['error' => 'Failed to logout'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to logout'
+            ], 500);
         }
     }
 

@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Quotation extends Model
 {
+    use HasFactory;
+
     //
     protected $fillable = [
         'lead_id',
@@ -27,4 +30,14 @@ class Quotation extends Model
         'accepted_at',
         'quote_document_path',
     ];
+    
+    public function leadDetails()
+    {
+        return $this->belongsTo(Lead::class, 'lead_id', 'id');
+    }
+
+    public function products()
+    {
+        return $this->hasMany(QuotationProduct::class, 'quotation_id', 'id');
+    }
 }

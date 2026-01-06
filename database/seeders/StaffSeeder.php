@@ -53,6 +53,7 @@ class StaffSeeder extends Seeder
             }
         }
 
-        Staff::insert($staff);
+        // Use upsert to make seeding idempotent and avoid duplicate key errors
+        Staff::upsert($staff, ['staff_code']);
     }
 }

@@ -15,11 +15,31 @@ class ProductVariantAttributesSeeder extends Seeder
         //
 
         DB::table('product_variant_attributes')->insert([
-            ['attribute_name' => 'Color', 'status' => 1],
-            ['attribute_name' => 'Size', 'status' => 1],
-            ['attribute_name' => 'Storage', 'status' => 1],
-            ['attribute_name' => 'RAM', 'status' => 1],
-            ['attribute_name' => 'Warranty', 'status' => 1],
+            [
+                'atribute_code' => 'COLOR',
+                'name' => 'Color', 
+                'status' => 1
+            ],
+            [
+                'atribute_code' => 'COLOR',
+                'name' => 'Size', 
+                'status' => 1
+            ],
+            [
+                'atribute_code' => 'COLOR',
+                'name' => 'Storage', 
+                'status' => 1
+            ],
+            [
+                'atribute_code' => 'COLOR',
+                'name' => 'RAM', 
+                'status' => 1
+            ],
+            [
+                'atribute_code' => 'COLOR',
+                'name' => 'Warranty', 
+                'status' => 1
+            ],
         ]);
     }
 }

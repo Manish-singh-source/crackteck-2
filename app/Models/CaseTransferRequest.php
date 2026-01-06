@@ -11,6 +11,7 @@ class CaseTransferRequest extends Model
 
     //
     protected $fillable = [
+        'transfer_id', 
         'service_request_id',
         'requesting_engineer_id',
         'new_engineer_id',

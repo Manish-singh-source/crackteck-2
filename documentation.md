@@ -2390,3 +2390,110 @@ Customer App APIs:
 /feedbacks
 /feedbacks/{feedback_id}
 
+
+
+
+
+
+
+
+
+users 
+
+staffs                - done
+staff addresses                 - done
+aadhar details                 - done
+pan card details                 - done
+bank details                 - done
+vehical details                 - done
+police verification details                 - done
+work skills details                 - done
+
+customers               - done
+customer address details                - done
+customers company details                 - done
+customer aadhar details                 - done
+customer pan card details                 - done
+
+warehouses                  - done
+warehouses racks                  - done
+
+parent categories                - done
+sub categories                 - done
+
+brands                - done
+product varient attributes                 - done
+product varient attribute values                  - done
+
+vendors                   - done
+vendors purchase orders                   - done
+
+pincodes                    - done
+
+products                     - done
+product serials                      - done
+ecommerce products                      - done
+
+covered items                       - done
+amc plans                        - done
+service requests                         - done
+service request products                         - done
+
+case transfer requests                          - done
+pickup requests                          - done
+remote jobs                           - done
+
+
+field issues                            - done
+stock in hands                            - done
+stock in hand products                            - done
+
+leads 
+follow ups 
+meets 
+quotations 
+quotation products  
+
+scrap items 
+
+orders 
+order items 
+order payments 
+
+coupons                - done
+coupon usages 
+
+subscribers 
+
+contacts                - done
+
+website banners 
+
+testimonials  
+
+collections 
+collection categories 
+
+tickets 
+ticket comments 
+
+invoices 
+invoice items 
+
+assigned engineers 
+engineer diagnosis details 
+
+service request product pickups 
+service request product request parts 
+
+requested part deliveries 
+
+service request quotations 
+
+service request payments 
+assigned engineer group 
+
+
+
+
+

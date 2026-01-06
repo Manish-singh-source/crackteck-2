@@ -14,12 +14,13 @@ class WarehousesSeeder extends Seeder
     {
         //
 
-        DB::table('warehouses')->insert([
+        $warehouses = [
             [
-                'warehouse_name' => 'Malad Warehouse',
-                'warehouse_type' => 'Storage Hub',
-                'warehouse_addr1' => 'Office No. 501, 5th Floor, Ghanshyam Enclave',
-                'warehouse_addr2' => '501A',
+                'warehouse_code' => 'WH001',
+                'name' => 'Malad Warehouse',
+                'type' => 'Storage Hub',
+                'address1' => 'Office No. 501, 5th Floor, Ghanshyam Enclave',
+                'address2' => '501A',
                 'city' => 'Mumbai',
                 'state' => 'Maharashtra',
                 'country' => 'India',
@@ -36,14 +37,16 @@ class WarehousesSeeder extends Seeder
                 'gst_no' => '24AAQFT9187K1Z8',
                 'licence_no' => '5656556',
                 'licence_doc' => 'uploads/warehouse/licence_docs/1759145446.pdf',
-                'default_warehouse' => 1,
-                'status' => 1,
+                'verification_status' => '1',
+                'default_warehouse' => '1',
+                'status' => '1',
             ],
             [
-                'warehouse_name' => 'Andheri Warehouse',
-                'warehouse_type' => 'Distribution Center',
-                'warehouse_addr1' => 'Shop No. 12, Orion Building',
-                'warehouse_addr2' => '12B',
+                'warehouse_code' => 'WH002',
+                'name' => 'Andheri Warehouse',
+                'type' => 'Distribution Center',
+                'address1' => 'Shop No. 12, Orion Building',
+                'address2' => '12B',
                 'city' => 'Mumbai',
                 'state' => 'Maharashtra',
                 'country' => 'India',
@@ -60,14 +63,16 @@ class WarehousesSeeder extends Seeder
                 'gst_no' => '27AAQFT9187K1Z7',
                 'licence_no' => '9876543',
                 'licence_doc' => 'uploads/warehouse/licence_docs/1759145447.pdf',
-                'default_warehouse' => 0,
-                'status' => 1,
+                'verification_status' => '1',
+                'default_warehouse' => '0',
+                'status' => '1',
             ],
             [
-                'warehouse_name' => 'Bangalore Warehouse',
-                'warehouse_type' => 'Storage Hub',
-                'warehouse_addr1' => 'Plot No. 34, 3rd Cross, Whitefield',
-                'warehouse_addr2' => '34C',
+                'warehouse_code' => 'WH003',
+                'name' => 'Bangalore Warehouse',
+                'type' => 'Storage Hub',
+                'address1' => 'Plot No. 34, 3rd Cross, Whitefield',
+                'address2' => '34C',
                 'city' => 'Bangalore',
                 'state' => 'Karnataka',
                 'country' => 'India',
@@ -84,14 +89,16 @@ class WarehousesSeeder extends Seeder
                 'gst_no' => '29AAQFT9187K1Z9',
                 'licence_no' => '1122334',
                 'licence_doc' => 'uploads/warehouse/licence_docs/1759145448.pdf',
-                'default_warehouse' => 0,
-                'status' => 1,
+                'verification_status' => '1',
+                'default_warehouse' => '0',
+                'status' => '1',
             ],
             [
-                'warehouse_name' => 'Delhi Warehouse',
-                'warehouse_type' => 'Distribution Center',
-                'warehouse_addr1' => 'Unit No. 21, DLF Industrial Area',
-                'warehouse_addr2' => '21A',
+                'warehouse_code' => 'WH004',
+                'name' => 'Delhi Warehouse',
+                'type' => 'Distribution Center',
+                'address1' => 'Unit No. 21, DLF Industrial Area',
+                'address2' => '21A',
                 'city' => 'Delhi',
                 'state' => 'Delhi',
                 'country' => 'India',
@@ -108,14 +115,16 @@ class WarehousesSeeder extends Seeder
                 'gst_no' => '07AAQFT9187K1D1',
                 'licence_no' => '3344556',
                 'licence_doc' => 'uploads/warehouse/licence_docs/1759145449.pdf',
-                'default_warehouse' => 0,
-                'status' => 1,
+                'verification_status' => '1',
+                'default_warehouse' => '0',
+                'status' => '1',
             ],
             [
-                'warehouse_name' => 'Chennai Warehouse',
-                'warehouse_type' => 'Storage Hub',
-                'warehouse_addr1' => 'No. 10, GST Road, Guindy',
-                'warehouse_addr2' => '10B',
+                'warehouse_code' => 'WH005',
+                'name' => 'Chennai Warehouse',
+                'type' => 'Storage Hub',
+                'address1' => 'No. 10, GST Road, Guindy',
+                'address2' => '10B',
                 'city' => 'Chennai',
                 'state' => 'Tamil Nadu',
                 'country' => 'India',
@@ -132,9 +141,16 @@ class WarehousesSeeder extends Seeder
                 'gst_no' => '33AAQFT9187K1C2',
                 'licence_no' => '7788990',
                 'licence_doc' => 'uploads/warehouse/licence_docs/1759145450.pdf',
-                'default_warehouse' => 0,
-                'status' => 1,
+                'verification_status' => '1',
+                'default_warehouse' => '0',
+                'status' => '1',
             ],
-        ]);
+        ];
+
+        foreach ($warehouses as $w) {
+            DB::table('warehouses')->updateOrInsert([
+                'warehouse_code' => $w['warehouse_code']
+            ], $w);
+        }
     }
 }

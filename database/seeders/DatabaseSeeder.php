@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Contact;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -22,21 +23,56 @@ class DatabaseSeeder extends Seeder
         //     'password' => '123456'
         // ]);
 
-        Role::create(['name' => 'Engineer']);
-        Role::create(['name' => 'Delivery Man']);
-        Role::create(['name' => 'Sales Person']);
-        Role::create(['name' => 'Customer']);
-        Role::create(['name' => 'Admin']);
-        Role::create(['name' => 'Warehouse Manager']);
+        // Create roles idempotently
+        Role::firstOrCreate(['name' => 'Engineer']);
+        Role::firstOrCreate(['name' => 'Delivery Man']);
+        Role::firstOrCreate(['name' => 'Sales Person']);
+        Role::firstOrCreate(['name' => 'Customer']);
+        Role::firstOrCreate(['name' => 'Admin']);
+        Role::firstOrCreate(['name' => 'Warehouse Manager']);
 
         $this->call([
             StaffSeeder::class,
+            StaffAddressSeeder::class,
+            StaffAadharDetailSeeder::class,
+            StaffPanCardDetailSeeder::class,
+            StaffBankDetailSeeder::class,
+            StaffVehicleDetailSeeder::class,
+            StaffPoliceVerificationSeeder::class,
+            StaffWorkSkillSeeder::class,
+
             LeadTableSeeder::class,
             FollowUpTableSeeder::class,
             MeetTableSeeder::class,
             QuotationTableSeeder::class,
             QuotationProductTableSeeder::class,
+            BrandsSeeder::class,
+            ContactSeeder::class,
+            CouponSeeder::class,
+            CustomerSeeder::class,
+            CustomerAddressDetailsSeeder::class,
+            CustomerAadharDetailSeeder::class,
+            CustomerPanCardDetailSeeder::class,
+            CustomerCompanyDetailSeeder::class,
+            VendorSeeder::class,
+            VendorPurchaseOrderSeeder::class,
+            WarehousesSeeder::class,
+            ParentCategoriesSeeder::class,
+            SubCategoriesSeeder::class,
+            ProductsSeeder::class,
+            EcommerceProductsSeeder::class,
+            ProductSerialSeeder::class,
+            CoveredItemSeeder::class,
+            AmcPlanSeeder::class,
+            ServiceRequestSeeder::class,
+            ServiceRequestProductSeeder::class,
+            RemoteJobSeeder::class,
+            CaseTransferRequestSeeder::class,
+            PickupRequestSeeder::class,
+            StockInHandSeeder::class,
+            StockInHandProductSeeder::class,
+            FieldIssueSeeder::class,
+            PincodeSeeder::class,
         ]);
-
     }
 }

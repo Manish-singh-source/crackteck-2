@@ -11,14 +11,15 @@ class ServiceRequestProduct extends Model
         'service_requests_id',
         'name',
         'type',
-        'brand',
         'model_no',
+        'sku',
         'hsn',
         'purchase_date',
+        'brand',
         'images',
+        'description',
         'item_code_id',
         'service_charge',
-        'description',
         'status',
     ];
 

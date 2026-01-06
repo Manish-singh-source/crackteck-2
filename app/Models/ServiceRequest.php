@@ -14,9 +14,9 @@ class ServiceRequest extends Model
         'customer_id',
         'request_date',
         'request_status',
-        'request_source',
-        'created_by',
-        'assign_engineer_status',
+        'request_source',   
+        'created_by',   
+        'is_engineer_assigned',
         'status',
     ];
 

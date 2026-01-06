@@ -9,8 +9,8 @@ class PickupRequest extends Model
 {
     use SoftDeletes;
 
-    //
     protected $fillable = [
+        'pickup_request_id',
         'service_request_id',
         'engineer_id',
         'customer_id',
@@ -28,6 +28,8 @@ class PickupRequest extends Model
 
         'before_photos',
         'after_photos',
+        'otp',
+        'otp_verified_at',
     ];
 
     // Json Data

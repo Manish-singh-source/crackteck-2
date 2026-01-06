@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class RemoteJob extends Model
 {
-    //
+    
     protected $fillable = [
+        'job_id',
         'service_request_id',
         'field_executive_id',
         'assigned_engineer_id',

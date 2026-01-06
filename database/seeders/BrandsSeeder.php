@@ -13,17 +13,17 @@ class BrandsSeeder extends Seeder
     public function run(): void
     {
         //
-        DB::table('brands')->insert([
-            ['brand_title' => 'Apple', 'logo' => 'apple.png', 'status' => 1],
-            ['brand_title' => 'Samsung', 'logo' => 'samsung.png', 'status' => 1],
-            ['brand_title' => 'OnePlus', 'logo' => 'oneplus.png', 'status' => 1],
-            ['brand_title' => 'Sony', 'logo' => 'sony.png', 'status' => 1],
-            ['brand_title' => 'Dell', 'logo' => 'dell.png', 'status' => 1],
-            ['brand_title' => 'HP', 'logo' => 'hp.png', 'status' => 1],
-            ['brand_title' => 'Lenovo', 'logo' => 'lenovo.png', 'status' => 1],
-            ['brand_title' => 'Bose', 'logo' => 'bose.png', 'status' => 1],
-            ['brand_title' => 'Xiaomi', 'logo' => 'xiaomi.png', 'status' => 1],
-            ['brand_title' => 'Asus', 'logo' => 'asus.png', 'status' => 1],
+        DB::table('brands')->insertOrIgnore([
+            ['name' => 'Apple', 'slug' => 'apple', 'image' => 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg', 'status_ecommerce' => "1", 'status' => "1", 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Samsung', 'slug' => 'samsung', 'image' => 'https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg', 'status_ecommerce' => "1", 'status' => "1", 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'OnePlus', 'slug' => 'oneplus', 'image' => 'https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg', 'status_ecommerce' => "1", 'status' => "1", 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Sony', 'slug' => 'sony', 'image' => 'https://upload.wikimedia.org/wikipedia/commons/2/20/Sony_logo.svg', 'status_ecommerce' => "1", 'status' => "1", 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Dell', 'slug' => 'dell', 'image' => 'https://upload.wikimedia.org/wikipedia/commons/4/48/Dell_Logo.svg', 'status_ecommerce' => "1", 'status' => "1", 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'HP', 'slug' => 'hp', 'image' => 'https://upload.wikimedia.org/wikipedia/commons/4/48/Dell_Logo.svg', 'status_ecommerce' => "1", 'status' => "1", 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Lenovo', 'slug' => 'lenovo', 'image' => 'https://upload.wikimedia.org/wikipedia/commons/3/3a/HP_logo_2012.svg', 'status_ecommerce' => "1", 'status' => "1", 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Bose', 'slug' => 'bose', 'image' => 'https://upload.wikimedia.org/wikipedia/commons/3/3a/HP_logo_2012.svg', 'status_ecommerce' => "1", 'status' => "1", 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Xiaomi', 'slug' => 'xiaomi', 'image' => 'https://upload.wikimedia.org/wikipedia/commons/3/3a/HP_logo_2012.svg', 'status_ecommerce' => "1", 'status' => "1", 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Asus', 'slug' => 'asus', 'image' => 'https://upload.wikimedia.org/wikipedia/commons/3/3a/HP_logo_2012.svg', 'status_ecommerce' => "1", 'status' => "1", 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

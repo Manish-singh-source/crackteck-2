@@ -17,7 +17,11 @@ class LeadTableSeeder extends Seeder
         //
         $staffs = Staff::where('staff_role', '3')->get();
 
-        // Create 20 leads manually
+        // Make idempotent: clear existing leads then create 20 new leads
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        Lead::truncate();
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
         for ($i = 1; $i <= 20; $i++) {
             Lead::create([
                 'staff_id' => $staffs->random()->id,

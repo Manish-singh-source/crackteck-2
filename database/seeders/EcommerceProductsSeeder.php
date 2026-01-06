@@ -104,10 +104,29 @@ class EcommerceProductsSeeder extends Seeder
 
         // Use upsert to avoid duplicate SKU errors when running seeds repeatedly
         DB::table('ecommerce_products')->upsert($rows, ['sku'], [
-            'product_id','meta_title','meta_description','meta_keywords','meta_product_url_slug',
-            'with_installation','company_warranty','short_description','full_description','technical_specification',
-            'min_order_qty','max_order_qty','product_weight','product_dimensions','shipping_charges','shipping_class',
-            'is_featured','is_best_seller','is_suggested','is_todays_deal','product_tags','status','updated_at'
+            'product_id',
+            'meta_title',
+            'meta_description',
+            'meta_keywords',
+            'meta_product_url_slug',
+            'with_installation',
+            'company_warranty',
+            'short_description',
+            'full_description',
+            'technical_specification',
+            'min_order_qty',
+            'max_order_qty',
+            'product_weight',
+            'product_dimensions',
+            'shipping_charges',
+            'shipping_class',
+            'is_featured',
+            'is_best_seller',
+            'is_suggested',
+            'is_todays_deal',
+            'product_tags',
+            'status',
+            'updated_at'
         ]);
     }
 }

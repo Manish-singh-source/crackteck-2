@@ -38,4 +38,9 @@ class AmcPlan extends Model
     protected $casts = [
         'covered_items' => 'array',
     ];
+
+    // public function coveredItems()
+    // {
+    //     return $this->hasMany(CoveredItem::class, 'amc_plan_id');
+    // }
 }

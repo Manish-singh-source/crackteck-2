@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\AmcService;
+use App\Models\AmcPlan;
 use App\Models\Customer;
-use App\Models\DeliveryMan;
 use App\Models\Engineer;
+use App\Models\AmcService;
+use App\Models\CoveredItem;
+use App\Models\DeliveryMan;
 use App\Models\SalesPerson;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -55,7 +57,33 @@ class AmcServicesController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $amcPlans = \App\Models\AMC::where('status', 'Active')->get();
+            $amcPlans = AmcPlan::where('status', '1')->get();
+            $amcPlans = $amcPlans->map(function ($row) {
+                return [
+                    'id' => $row->id,
+                    'plan_name' => $row->plan_name,
+                    'plan_code' => $row->plan_code,
+                    'description' => $row->description,
+                    'duration' => $row->duration,
+                    'total_visits' => $row->total_visits,
+                    'plan_cost' => $row->plan_cost,
+                    'tax' => $row->tax,
+                    'total_cost' => $row->total_cost,
+                    'pay_terms' => $row->pay_terms,
+                    'support_type' => $row->support_type,
+                    'covered_items' => $row->covered_items->map(function ($item) {
+                        $serviceType = CoveredItem::find($item->id);
+                        return [
+                            'id' => $serviceType->id,
+                            'item_name' => $serviceType->item_name,
+                            'item_description' => $serviceType->item_description,
+                        ];
+                    }),
+                    'brochure' => $row->brochure,
+                    'tandc' => $row->tandc,
+                    'replacement_policy' => $row->replacement_policy,
+                ];
+            });
 
             return response()->json(['amc_plans' => $amcPlans], 200);
         }

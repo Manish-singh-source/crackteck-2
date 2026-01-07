@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class CustomerPanCardDetail extends Model
 {
     //
+
+    protected $table = 'customer_pan_card_details';
+
     protected $fillable = [
         'customer_id',
         'pan_number',

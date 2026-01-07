@@ -28,6 +28,10 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->enum('status', [0, 1, 2, 3])->default(1)->comment('0 - InActive, 1 - Active, 2 - Blocked, 3 - Suspended');
 
+            // Authentication / Verification
+            $table->string('otp')->nullable();
+            $table->timestamp('otp_expiry')->nullable();
+
             $table->unsignedBigInteger('created_by')->nullable();
             $table->softDeletes();
             $table->timestamps();

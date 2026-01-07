@@ -12,6 +12,7 @@ use App\Models\Lead;
 use App\Models\Meet;
 use App\Models\Order;
 use App\Models\SalesPerson;
+use App\Models\WebsiteBanner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -99,5 +100,11 @@ class DashboardController extends Controller
         $lostLeads = Lead::where('staff_id', $validated['user_id'])->where('status', '5')->count();
 
         return response()->json(['lost_leads' => $lostLeads, 'new_leads' => $newLeads, 'contacted_leads' => $contactedLeads, 'qualified_leads' => $qualifiedLeads, 'quoted_leads' => $quotedLeads], 200);
+    }
+
+    public function banners(Request $request)
+    {
+        $banners = WebsiteBanner::where('is_active', "1")->where('channel', '1')->get();
+        return response()->json(['banners' => $banners], 200);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AmcService;
+use App\Models\CoveredItem;
 use App\Models\Customer;
 use App\Models\DeliveryMan;
 use App\Models\Engineer;
@@ -35,6 +36,72 @@ class AllServicesController extends Controller
             3 => 'sales_person',
             4 => 'customers',
         ][$roleId] ?? null;
+    }
+
+    public function servicesList(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        $services = [
+            [
+                'id' => '1',
+                'name' => 'AMC Services',
+            ],
+            [
+                'id' => '2',
+                'name' => 'Quick Services',
+            ],
+            [
+                'id' => '3',
+                'name' => 'Installation Services',
+            ],
+            [
+                'id' => '4',
+                'name' => 'Repair Services',
+            ]
+        ];
+
+        return response()->json(['services' => $services], 200);
+    }
+
+    public function quickServicesList(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'customers') {
+            $quickServices = CoveredItem::where('service_type', '2')
+                ->where('status', '1')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return response()->json(['quick_services' => $quickServices], 200);
+        }
     }
 
     public function allRequests(Request $request)
@@ -77,10 +144,10 @@ class AllServicesController extends Controller
                 return [
                     'id' => $row->id,
                     'type' => 'amc',
-                    'title' => $row->amc_number ?? ('AMC #'.$row->id),
+                    'title' => $row->amc_number ?? ('AMC #' . $row->id),
                     'status' => $row->status,
                     'created_at' => $row->created_at,
-                    'detail_url' => url('/api/v1/amc-request-details/'.$row->id),
+                    'detail_url' => url('/api/v1/amc-request-details/' . $row->id),
                 ];
             });
 
@@ -92,10 +159,10 @@ class AllServicesController extends Controller
                 return [
                     'id' => $row->id,
                     'type' => $row->service_sub_type ?? 'non_amc', // non_amc / installation / repairing
-                    'title' => $row->service_number ?? ('NON-AMC #'.$row->id),
+                    'title' => $row->service_number ?? ('NON-AMC #' . $row->id),
                     'status' => $row->status,
                     'created_at' => $row->created_at,
-                    'detail_url' => url('/api/v1/non-amc-request-details/'.$row->id),
+                    'detail_url' => url('/api/v1/non-amc-request-details/' . $row->id),
                 ];
             });
 
@@ -107,10 +174,10 @@ class AllServicesController extends Controller
                 return [
                     'id' => $row->id,
                     'type' => 'quick_service',
-                    'title' => $row->ticket_number ?? ('Quick Service #'.$row->id),
+                    'title' => $row->ticket_number ?? ('Quick Service #' . $row->id),
                     'status' => $row->status,
                     'created_at' => $row->created_at,
-                    'detail_url' => url('/api/v1/quick-service-request-details/'.$row->id),
+                    'detail_url' => url('/api/v1/quick-service-request-details/' . $row->id),
                 ];
             });
 

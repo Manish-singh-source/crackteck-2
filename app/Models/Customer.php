@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Customer extends Model
+class Customer extends Authenticatable implements JWTSubject
 {
     //
     protected $fillable = [
@@ -21,6 +23,16 @@ class Customer extends Model
         'status',
         'created_by',
     ];
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 
 
     public function setGenderAttribute($value)
@@ -49,6 +61,54 @@ class Customer extends Model
         $this->attributes['customer_type'] = is_numeric($value)
             ? $value
             : ($map[strtolower($value)] ?? null);
+    }
+
+    public function getGenderAttribute($value)
+    {
+        $map = [
+            0 => 'male',
+            1 => 'female',
+            2 => 'other',
+        ];
+
+        return $map[$value];
+    }
+
+    public function getCustomerTypeAttribute($value)
+    {
+        $map = [
+            0 => 'e-commerce',
+            1 => 'amc',
+            2 => 'non-amc',
+            3 => 'both',
+            4 => 'offline',
+        ];
+
+        return $map[$value];
+    }
+
+    public function getSourceTypeAttribute($value)
+    {
+        $map = [
+            0 => 'website',
+            1 => 'whatsapp',
+            2 => 'phone',
+            3 => 'walk-in',
+        ];
+
+        return $map[$value];
+    }
+
+    public function getStatusAttribute($value)
+    {
+        $map = [
+            0 => 'inactive',
+            1 => 'active',
+            2 => 'blocked',
+            3 => 'suspended',
+        ];
+        
+        return $map[$value];
     }
 
     public function branches()

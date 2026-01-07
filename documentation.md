@@ -2494,6 +2494,5 @@ service request payments                         - done
 assigned engineer group - model not created 
 
 
-38,070
-37,128
+website banners 
 

@@ -115,20 +115,27 @@ Route::prefix('v1')->group(function () {
         Route::controller(DashboardController::class)->group(function () {
             Route::get('/dashboard', 'index');
             Route::get('/sales-overview', 'salesOverview');
+
+            // Customer APIs
+            Route::get('/banners', 'banners');
         });
 
         Route::controller(TaskController::class)->group(function () {
             Route::get('/task', 'index');
         });
 
-        // pending to check 
+        // Sales and Customer Product and Order APIs
         Route::controller(OrderController::class)->group(function () {
             Route::get('/product', 'listProducts'); // Sales Person and Customer
+            Route::get('/product/categories', 'listProductCategories'); // Sales Person and Customer
             Route::get('/product/{id}', 'product'); // Sales Person and Customer
+
             Route::post('/buy-product/{id}', 'buyProduct'); // Sales Person and Customer
+            
             Route::get('/order', 'listOrders'); // Sales Person and Customer
             Route::get('/order/{id}', 'order'); // Sales Person and Customer
 
+            // Engineer APIs
             Route::get('/all-product', 'allListProducts'); // Engineer
             Route::get('/all-product/{id}', 'allProduct'); // Engineer
             Route::post('/request-product', 'requestProduct'); // Engineer
@@ -246,6 +253,15 @@ Route::prefix('v1')->group(function () {
         
         // All Requests APIs AMC and Non-AMC
         Route::controller(AllServicesController::class)->group(function () {
+            // Quick Services List 
+            Route::get('/services', 'servicesList');
+            Route::get('/quick-services', 'quickServicesList');
+            // submit service request 
+
+
+
+
+
             // Customer all requests list and details
             Route::get('/all-requests', 'allRequests');
             // AMC

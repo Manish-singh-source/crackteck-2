@@ -12,6 +12,7 @@ use App\Models\SalesPerson;
 use App\Models\StockRequest;
 use Illuminate\Http\Request;
 use App\Models\EcommerceOrder;
+use App\Models\ParentCategory;
 use App\Models\EcommerceProduct;
 use App\Models\StockRequestItem;
 use App\Models\EcommerceOrderItem;
@@ -61,6 +62,32 @@ class OrderController extends Controller
             return response()->json(['products' => $products], 200);
         }
     }
+
+    public function listProductCategories(Request $request)
+    {
+        $roleValidated = Validator::make($request->all(), ([
+            'role_id' => 'required|in:3,4',
+        ]));
+
+        if ($roleValidated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
+        }
+
+        $staffRole = $this->getRoleId($request->role_id);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'customers' || $staffRole == 'sales_person') {
+            $categories = ParentCategory::where('status', '1')
+                ->where('status_ecommerce', '1')
+                ->get();
+
+            return response()->json(['categories' => $categories], 200);
+        }
+    }
+
 
     public function product(Request $request, $product_id)
     {

@@ -105,8 +105,13 @@ class ApiAuthController extends Controller
                 'email' => 'required|email|unique:customers,email',
                 'dob' => 'nullable',
                 'gender' => 'required',
-                'pan_no' => 'nullable',
-
+                'pan_no' => 'nullable|string|max:10',
+                'pan_card_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
+                'pan_card_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
+                'aadhar_number' => 'nullable|digits:12',
+                'aadhar_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
+                'aadhar_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
+                
                 'branch_name' => 'nullable',
                 'company_name' => 'nullable',
                 'company_addr' => 'nullable',
@@ -141,10 +146,10 @@ class ApiAuthController extends Controller
             }
 
             // Customer Address Details
-            if ($request->address) {
+            if ($request->address1) {
                 $customer->branches()->create([
                     'branch_name' => $request->branch_name,
-                    'address1' => $request->address,
+                    'address1' => $request->address1,
                     'address2' => $request->address2,
                     'city' => $request->city,
                     'state' => $request->state,
@@ -155,7 +160,7 @@ class ApiAuthController extends Controller
             }
 
             // PAN Card Details
-            if ($request->pan_no) {
+            if ($request->filled('pan_no')) {
                 $panFront = null;
                 if ($request->hasFile('pan_card_front_path')) {
                     $file = $request->file('pan_card_front_path');
@@ -174,13 +179,17 @@ class ApiAuthController extends Controller
 
                 $customer->panCardDetails()->create([
                     'pan_number' => $request->pan_no,
-                    'pan_card_front_path' => $panFront,
-                    'pan_card_back_path' => $panBack,
+                    'pan_card_front_path' => $panFront ?? null,
+                    'pan_card_back_path' => $panBack ?? null,
                 ]);
+
+                if (! $customer) {
+                    return response()->json(['success' => false, 'message' => 'Failed to create PAN card details.'], 500);
+                }
             }
 
             // Aadhar Card Details
-            if ($request->aadhar_number) {
+            if ($request->filled('aadhar_number')) {
                 $aadharFront = null;
                 if ($request->hasFile('aadhar_front_path')) {
                     $file = $request->file('aadhar_front_path');
@@ -199,9 +208,13 @@ class ApiAuthController extends Controller
 
                 $customer->aadharDetails()->create([
                     'aadhar_number' => $request->aadhar_number,
-                    'aadhar_front_path' => $aadharFront,
-                    'aadhar_back_path' => $aadharBack,
-                ]);
+                    'aadhar_front_path' => $aadharFront ?? null,
+                    'aadhar_back_path' => $aadharBack ?? null,
+                ]); 
+
+                if (! $customer) {
+                    return response()->json(['success' => false, 'message' => 'Failed to create Aadhar card details.'], 500);
+                }
             }
 
             return response()->json(['success' => true, 'message' => 'Customer created successfully.']);
@@ -357,7 +370,17 @@ class ApiAuthController extends Controller
                 return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
             }
 
-            $user = Staff::where('phone', $request->phone_number)->where('staff_role', $request->role_id)->first();
+            $staffRole = $this->getRoleId($request->role_id);
+
+            if (! $staffRole) {
+                return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+            }
+
+            if($staffRole == 'customers') {
+                $user = Customer::where('phone', $request->phone_number)->first();
+            } else {
+                $user = Staff::where('phone', $request->phone_number)->where('staff_role', $request->role_id)->first();
+            }
             if (! $user) {
                 return response()->json(['success' => false, 'message' => 'User not found with the provided phone number and role.'], 404);
             }
@@ -419,7 +442,17 @@ class ApiAuthController extends Controller
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
-        $user = Staff::where('phone', $request->phone_number)->where('staff_role', $request->role_id)->first();
+        $staffRole = $this->getRoleId($request->role_id);
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if($staffRole == 'customers') {
+            $user = Customer::where('phone', $request->phone_number)->first();
+        } else {
+            $user = Staff::where('phone', $request->phone_number)->where('staff_role', $request->role_id)->first();
+        }
+
         if (! $user || $user->otp != $request->otp || now()->gt($user->otp_expiry)) {
             return response()->json(['error' => 'Invalid or expired OTP'], 401);
         }
@@ -429,7 +462,12 @@ class ApiAuthController extends Controller
         $user->save();
 
         // Choose guard based on role
-        $token = auth('staffs')->login($user); // if guard mapping in config/auth.php
+        if ($staffRole == 'customers') {
+            $guard = 'customers';
+        } else {
+            $guard = 'staffs';
+        }
+        $token = auth($guard)->login($user); // if guard mapping in config/auth.php
 
         return response()->json(['token' => $token, 'user' => $user]);
     }

@@ -197,22 +197,6 @@ Route::prefix('v1')->group(function () {
             Route::post('/repair-request', 'repairStore');
         });
 
-        // All Requests APIs AMC and Non-AMC
-        Route::controller(AllServicesController::class)->group(function () {
-            // Customer all requests list and details
-            Route::get('/all-requests', 'allRequests');
-            // AMC
-            Route::get('/amc-request-details/{id}', 'amcRequestDetails');
-            // Non-AMC
-            Route::get('/non-amc-request-details/{id}', 'nonAmcRequestDetails');
-            // Quick Service
-            Route::get('/quick-service-request-details/{id}', 'quickServiceRequestDetails');
-
-            // Give Feedback APIs
-            Route::post('/give-feedback', 'giveFeedback');
-            Route::get('/get-all-feedback', 'getAllFeedback');
-            Route::get('/get-feedback', 'getFeedback');
-        });
 
         // Delivery Man APIs
         Route::controller(DeliveryOrderController::class)->group(function () {
@@ -257,6 +241,25 @@ Route::prefix('v1')->group(function () {
         //     Route::get('/stock-in-hand/{id}', 'show');
         //     Route::post('/stock-in-hand', 'store');
         // });
+
+
+        
+        // All Requests APIs AMC and Non-AMC
+        Route::controller(AllServicesController::class)->group(function () {
+            // Customer all requests list and details
+            Route::get('/all-requests', 'allRequests');
+            // AMC
+            Route::get('/amc-request-details/{id}', 'amcRequestDetails');
+            // Non-AMC
+            Route::get('/non-amc-request-details/{id}', 'nonAmcRequestDetails');
+            // Quick Service
+            Route::get('/quick-service-request-details/{id}', 'quickServiceRequestDetails');
+
+            // Give Feedback APIs
+            Route::post('/give-feedback', 'giveFeedback');
+            Route::get('/get-all-feedback', 'getAllFeedback');
+            Route::get('/get-feedback', 'getFeedback');
+        });
 
     });
 });

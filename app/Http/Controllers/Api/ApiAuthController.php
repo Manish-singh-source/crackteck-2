@@ -26,16 +26,6 @@ class ApiAuthController extends Controller
         $this->fast2sms = $fast2sms;
     }
 
-    protected function getModelByRoleId($roleId)
-    {
-        return [
-            1 => Engineer::class,
-            2 => DeliveryMan::class,
-            3 => SalesPerson::class,
-            4 => Customer::class,
-        ][$roleId] ?? null;
-    }
-
     protected function getRoleId($roleId)
     {
         return [
@@ -121,14 +111,13 @@ class ApiAuthController extends Controller
                 'company_name' => 'nullable',
                 'company_addr' => 'nullable',
                 'gst_no' => 'nullable',
-                'customer_type' => 'required',
 
-                'address' => 'required',
+                'address1' => 'nullable',
                 'address2' => 'nullable',
-                'city' => 'required',
-                'state' => 'required',
-                'country' => 'required',
-                'pincode' => 'required',
+                'city' => 'nullable',
+                'state' => 'nullable',
+                'country' => 'nullable',
+                'pincode' => 'nullable',
             ]));
 
             if ($customerValidated->fails()) {
@@ -136,30 +125,84 @@ class ApiAuthController extends Controller
             }
 
             $customer = Customer::create([
+                'customer_code' => $this->generateCustomerCode(),
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
                 'phone' => $request->phone,
                 'email' => $request->email,
                 'dob' => $request->dob,
                 'gender' => $request->gender,
-                'pan_no' => $request->pan_no,
-
-                'branch_name' => $request->branch_name,
-                'company_name' => $request->company_name,
-                'company_addr' => $request->company_addr,
-                'gst_no' => $request->gst_no,
-                'customer_type' => $request->customer_type,
+                'customer_type' => '0',
+                'source_type' => '1',
             ]);
 
-            $customer->branches()->create([
-                'branch_name' => $request->branch_name,
-                'address' => $request->address,
-                'address2' => $request->address2,
-                'city' => $request->city,
-                'state' => $request->state,
-                'country' => $request->country,
-                'pincode' => $request->pincode,
-            ]);
+            if (! $customer) {
+                return response()->json(['success' => false, 'message' => 'Failed to create customer.'], 500);
+            }
+
+            // Customer Address Details
+            if ($request->address) {
+                $customer->branches()->create([
+                    'branch_name' => $request->branch_name,
+                    'address1' => $request->address,
+                    'address2' => $request->address2,
+                    'city' => $request->city,
+                    'state' => $request->state,
+                    'country' => $request->country,
+                    'pincode' => $request->pincode,
+                    'is_primary' => 1,
+                ]);
+            }
+
+            // PAN Card Details
+            if ($request->pan_no) {
+                $panFront = null;
+                if ($request->hasFile('pan_card_front_path')) {
+                    $file = $request->file('pan_card_front_path');
+                    $filename = time() . '_pan_front.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('uploads/pan_card'), $filename);
+                    $panFront = 'uploads/pan_card/' . $filename;
+                }
+
+                $panBack = null;
+                if ($request->hasFile('pan_card_back_path')) {
+                    $file = $request->file('pan_card_back_path');
+                    $filename = time() . '_pan_back.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('uploads/pan_card'), $filename);
+                    $panBack = 'uploads/pan_card/' . $filename;
+                }
+
+                $customer->panCardDetails()->create([
+                    'pan_number' => $request->pan_no,
+                    'pan_card_front_path' => $panFront,
+                    'pan_card_back_path' => $panBack,
+                ]);
+            }
+
+            // Aadhar Card Details
+            if ($request->aadhar_number) {
+                $aadharFront = null;
+                if ($request->hasFile('aadhar_front_path')) {
+                    $file = $request->file('aadhar_front_path');
+                    $filename = time() . '_aadhar_front.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('uploads/aadhar_card'), $filename);
+                    $aadharFront = 'uploads/aadhar_card/' . $filename;
+                }
+
+                $aadharBack = null;
+                if ($request->hasFile('aadhar_back_path')) {
+                    $file = $request->file('aadhar_back_path');
+                    $filename = time() . '_aadhar_back.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('uploads/aadhar_card'), $filename);
+                    $aadharBack = 'uploads/aadhar_card/' . $filename;
+                }
+
+                $customer->aadharDetails()->create([
+                    'aadhar_number' => $request->aadhar_number,
+                    'aadhar_front_path' => $aadharFront,
+                    'aadhar_back_path' => $aadharBack,
+                ]);
+            }
 
             return response()->json(['success' => true, 'message' => 'Customer created successfully.']);
         }
@@ -168,38 +211,6 @@ class ApiAuthController extends Controller
         $names = explode(' ', $request->name);
         $request->merge(['first_name' => $names[0]]);
         $request->merge(['last_name' => $names[1]]);
-
-        // if ($request->filled('pan_card')) {
-        //     $request->validate([
-        //         'pan_card' => 'mimes:jpeg,png,jpg,gif,svg|max:2048',
-        //     ]);
-        // }
-
-        // if ($request->filled('aadhar_card')) {
-        //     $request->validate([
-        //         'aadhar_card' => 'mimes:jpeg,png,jpg,gif,svg|max:2048',
-        //     ]);
-        // }
-
-        // if ($request->hasFile('aadhar_card')) {
-
-        //     $aadharCard = $request->file('aadhar_card');
-        //     $ext = $aadharCard->getClientOriginalExtension();
-        //     $aadharCardName = time() . '.' . $ext;
-
-        //     // Store original image
-        //     $aadharCard->move(public_path('uploads/aadhar_card'), $aadharCardName);
-        // }
-
-        // if ($request->hasFile('pan_card')) {
-        //     $panCard = $request->file('pan_card');
-        //     $ext = $panCard->getClientOriginalExtension();
-        //     $panCardName = time() . '.' . $ext;
-
-        //     // Store original image
-        //     $panCard->move(public_path('uploads/pan_card'), $panCardName);
-        // }
-
 
         $validated = Validator::make($request->all(), [
             // Staff details
@@ -445,7 +456,7 @@ class ApiAuthController extends Controller
                 default => 'api',
             };
 
-            auth($guard)->logout(); 
+            auth($guard)->logout();
 
             return response()->json([
                 'success' => true,
@@ -486,4 +497,12 @@ class ApiAuthController extends Controller
             return response()->json(['error' => 'Failed to refresh token'], 401);
         }
     }
+
+    public function generateCustomerCode()
+    {
+        $lastCustomer = Customer::orderBy('id', 'desc')->first();
+        $lastId = $lastCustomer ? intval(substr($lastCustomer->customer_code, 3)) : 0;
+        $newId = $lastId + 1;
+        return 'CST' . str_pad($newId, 6, '0', STR_PAD_LEFT);
+    }   
 }

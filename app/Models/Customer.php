@@ -22,6 +22,35 @@ class Customer extends Model
         'created_by',
     ];
 
+
+    public function setGenderAttribute($value)
+    {
+        $map = [
+            'male' => 1,
+            'female' => 2,
+            'other' => 3,
+        ];
+
+        $this->attributes['gender'] = is_numeric($value)
+            ? $value
+            : ($map[strtolower($value)] ?? null);
+    }
+
+    public function setCustomerTypeAttribute($value)
+    {
+        $map = [
+            'e-commerce' => 0,
+            'amc' => 1,
+            'non-amc' => 2,
+            'both' => 3,
+            'offline' => 4,
+        ];
+
+        $this->attributes['customer_type'] = is_numeric($value)
+            ? $value
+            : ($map[strtolower($value)] ?? null);
+    }
+
     public function branches()
     {
         return $this->hasMany(CustomerAddressDetail::class);

@@ -17,11 +17,11 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        // User::factory()->create([
-        //     'name' => 'Support',
-        //     'email' => 'support@technofra.com',
-        //     'password' => '123456'
-        // ]);
+        User::factory()->create([
+            'name' => 'Support',
+            'email' => 'support@technofra.com',
+            'password' => '123456'
+        ]);
 
         // Create roles idempotently
         Role::firstOrCreate(['name' => 'Engineer']);
@@ -73,6 +73,26 @@ class DatabaseSeeder extends Seeder
             StockInHandProductSeeder::class,
             FieldIssueSeeder::class,
             PincodeSeeder::class,
+            
+            OrderSeeder::class,
+            OrderItemSeeder::class,
+            OrderPaymentSeeder::class,
+            SubscriberSeeder::class,
+            CouponUsageSeeder::class,
+            TestimonialSeeder::class,
+            CollectionSeeder::class,
+            TicketSeeder::class,
+            TicketCommentSeeder::class,
+            InvoiceSeeder::class,
+            InvoiceItemSeeder::class,
+            AssignedEngineerSeeder::class,
+            EngineerDiagnosisDetailSeeder::class,
+            ServiceRequestProductPickupSeeder::class,
+            ServiceRequestProductRequestPartSeeder::class,
+            ServiceRequestPaymentSeeder::class,
+            ServiceRequestQuotationSeeder::class,
+            RequestedPartDeliverySeeder::class,
+            AssignedEngineerGroupSeeder::class,
         ]);
     }
 }

@@ -22,11 +22,11 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $guarded = [];
-    // protected $fillable = [
-    //     'name',
-    //     'email',
-    //     'password',
-    // ];
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -53,82 +53,82 @@ class User extends Authenticatable
 
     /**
      * Get the wishlist items for the user.
-     */
-    public function wishlists()
-    {
-        return $this->hasMany(Wishlist::class);
-    }
+    //  */
+    // public function wishlists()
+    // {
+    //     return $this->hasMany(Wishlist::class);
+    // }
 
-    /**
-     * Get the stock requests made by this user.
-     */
-    public function stockRequests()
-    {
-        return $this->hasMany(StockRequest::class, 'requested_by');
-    }
+    // /**
+    //  * Get the stock requests made by this user.
+    //  */
+    // public function stockRequests()
+    // {
+    //     return $this->hasMany(StockRequest::class, 'requested_by');
+    // }
 
-    /**
-     * Get the e-commerce products in the user's wishlist.
-     */
-    public function wishlistProducts()
-    {
-        return $this->belongsToMany(EcommerceProduct::class, 'wishlists', 'user_id', 'ecommerce_product_id')
-            ->withTimestamps();
-    }
+    // /**
+    //  * Get the e-commerce products in the user's wishlist.
+    //  */
+    // public function wishlistProducts()
+    // {
+    //     return $this->belongsToMany(EcommerceProduct::class, 'wishlists', 'user_id', 'ecommerce_product_id')
+    //         ->withTimestamps();
+    // }
 
-    /**
-     * Get the cart items for the user.
-     */
-    public function carts()
-    {
-        return $this->hasMany(Cart::class);
-    }
+    // /**
+    //  * Get the cart items for the user.
+    //  */
+    // public function carts()
+    // {
+    //     return $this->hasMany(Cart::class);
+    // }
 
-    /**
-     * Get the e-commerce products in the user's cart.
-     */
-    public function cartProducts()
-    {
-        return $this->belongsToMany(EcommerceProduct::class, 'carts', 'user_id', 'ecommerce_product_id')
-            ->withPivot('quantity')
-            ->withTimestamps();
-    }
+    // /**
+    //  * Get the e-commerce products in the user's cart.
+    //  */
+    // public function cartProducts()
+    // {
+    //     return $this->belongsToMany(EcommerceProduct::class, 'carts', 'user_id', 'ecommerce_product_id')
+    //         ->withPivot('quantity')
+    //         ->withTimestamps();
+    // }
 
-    /**
-     * Get the user's addresses.
-     */
-    public function addresses()
-    {
-        return $this->hasMany(UserAddress::class);
-    }
+    // /**
+    //  * Get the user's addresses.
+    //  */
+    // public function addresses()
+    // {
+    //     return $this->hasMany(UserAddress::class);
+    // }
 
-    /**
-     * Get the user's e-commerce orders.
-     */
-    public function ecommerceOrders()
-    {
-        return $this->hasMany(EcommerceOrder::class);
-    }
+    // /**
+    //  * Get the user's e-commerce orders.
+    //  */
+    // public function ecommerceOrders()
+    // {
+    //     return $this->hasMany(EcommerceOrder::class);
+    // }
 
-    /**
-     * Get the user's default shipping address.
-     */
-    public function defaultShippingAddress()
-    {
-        return $this->hasOne(UserAddress::class)
-            ->where('address_type', 'shipping')
-            ->where('is_default', true);
-    }
+    // /**
+    //  * Get the user's default shipping address.
+    //  */
+    // public function defaultShippingAddress()
+    // {
+    //     return $this->hasOne(UserAddress::class)
+    //         ->where('address_type', 'shipping')
+    //         ->where('is_default', true);
+    // }
 
-    /**
-     * Get the user's default billing address.
-     */
-    public function defaultBillingAddress()
-    {
-        return $this->hasOne(UserAddress::class)
-            ->where('address_type', 'billing')
-            ->where('is_default', true);
-    }
+    // /**
+    //  * Get the user's default billing address.
+    //  */
+    // public function defaultBillingAddress()
+    // {
+    //     return $this->hasOne(UserAddress::class)
+    //         ->where('address_type', 'billing')
+    //         ->where('is_default', true);
+    // }
 
     /**
      * Configure activity logging options.

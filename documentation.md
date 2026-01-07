@@ -2448,52 +2448,52 @@ field issues                            - done
 stock in hands                            - done
 stock in hand products                            - done
 
-leads 
-follow ups 
-meets 
-quotations 
-quotation products  
+leads                             - done
+follow ups                             - done
+meets                             - done
+quotations                              - done
+quotation products                               - done
 
-scrap items 
+scrap items                                - done
 
-orders 
-order items 
-order payments 
+orders                                - done
+order items                                - done
+order payments                                - done
 
 coupons                - done
-coupon usages 
+coupon usages                 - done
 
-subscribers 
+subscribers                 - done
 
 contacts                - done
 
-website banners 
+website banners                 - done
 
-testimonials  
+testimonials                  - done
 
-collections 
-collection categories 
+collections                   - done
+collection categories                   - done
 
-tickets 
-ticket comments 
+tickets                    - done
+ticket comments                    - done
 
-invoices 
-invoice items 
+invoices                     - done
+invoice items                     - done
 
-assigned engineers 
-engineer diagnosis details 
+assigned engineers                      - done
+engineer diagnosis details                      - done
 
-service request product pickups 
-service request product request parts 
+service request product pickups                       - done
+service request product request parts                       - done
 
-requested part deliveries 
+requested part deliveries                        - done
 
-service request quotations 
+service request quotations                        - done
 
-service request payments 
-assigned engineer group 
+service request payments                         - done
+assigned engineer group - model not created 
 
 
-
+38,070
 
 

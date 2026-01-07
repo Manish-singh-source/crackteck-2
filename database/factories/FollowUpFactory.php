@@ -49,6 +49,7 @@ class FollowUpFactory extends Factory
             },
             'followup_date' => $this->faker->date(),
             'followup_time' => $this->faker->time(),
+            'followup_type' => $this->faker->randomElement(['0', '1', '2', '3']),  // enum uses numeric codes as strings: '0' - Call, '1' - Email, '2' - Meeting, '3' - SMS
             // enum uses numeric codes as strings: '0' - Pending, '1' - Completed, '2' - Rescheduled, '3' - Cancelled
             'status' => $this->faker->randomElement(['0', '1', '2', '3']),
             'remarks' => $this->faker->sentence(),

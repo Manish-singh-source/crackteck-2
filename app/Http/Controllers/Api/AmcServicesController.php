@@ -58,34 +58,49 @@ class AmcServicesController extends Controller
 
         if ($staffRole == 'customers') {
             $amcPlans = AmcPlan::where('status', '1')->get();
-            $amcPlans = $amcPlans->map(function ($row) {
-                return [
-                    'id' => $row->id,
-                    'plan_name' => $row->plan_name,
-                    'plan_code' => $row->plan_code,
-                    'description' => $row->description,
-                    'duration' => $row->duration,
-                    'total_visits' => $row->total_visits,
-                    'plan_cost' => $row->plan_cost,
-                    'tax' => $row->tax,
-                    'total_cost' => $row->total_cost,
-                    'pay_terms' => $row->pay_terms,
-                    'support_type' => $row->support_type,
-                    'covered_items' => $row->covered_items->map(function ($item) {
-                        $serviceType = CoveredItem::find($item->id);
-                        return [
-                            'id' => $serviceType->id,
-                            'item_name' => $serviceType->item_name,
-                            'item_description' => $serviceType->item_description,
-                        ];
-                    }),
-                    'brochure' => $row->brochure,
-                    'tandc' => $row->tandc,
-                    'replacement_policy' => $row->replacement_policy,
+            $amcPlansCoveredItems = [];
+            foreach ($amcPlans as $plan) {
+                $amcPlansCoveredItems[] = [
+                    'plan' => $plan,
+                    'covered_items' => $plan->coveredItems(),
                 ];
-            });
+            }
 
-            return response()->json(['amc_plans' => $amcPlans], 200);
+            return response()->json(['amc_plans' => $amcPlansCoveredItems], 200);
+        }
+    }
+
+    public function amcPlanDetails(Request $request, $id)
+    {
+        $validated = Validator::make($request->all(), [
+            // validation rules if any
+            'role_id' => 'required|in:4',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'customers') {
+            $amcPlan = AmcPlan::find($id);
+            if (! $amcPlan) {
+                return response()->json(['success' => false, 'message' => 'AMC Plan not found.'], 404);
+            }
+
+            $data = [
+                'amc_plan' => $amcPlan,
+                'covered_items' => $amcPlan->coveredItems(),
+            ];
+
+            return response()->json(['data' => $data], 200);
         }
     }
 

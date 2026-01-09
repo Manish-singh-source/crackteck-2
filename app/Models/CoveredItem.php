@@ -32,15 +32,29 @@ class CoveredItem extends Model
         // installation is INST
         // repair is REP
         $map = [
-            '0' => 'AMC',
-            '1' => 'QS',
-            '2' => 'INST',
-            '3' => 'REP',
+            '0' => 'amc',
+            '1' => 'quick_service',
+            '2' => 'installation',
+            '3' => 'repair',
         ];
 
         $key = (string) $typeCode;
 
-        return $map[$key] ?? 'Unknown';
+        return $map[$key] ?? 'unknown';
+    }
+
+    public function getServiceTypeAttribute($value)
+    {
+        $map = [
+            '0' => 'amc',
+            '1' => 'quick_service',
+            '2' => 'installation',
+            '3' => 'repair',
+        ];
+
+        $key = (string) $value;
+
+        return $map[$key] ?? 'unknown'; 
     }
 
     public static function generateItemCode($typeCode): string

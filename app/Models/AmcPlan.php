@@ -39,8 +39,8 @@ class AmcPlan extends Model
         'covered_items' => 'array',
     ];
 
-    // public function coveredItems()
-    // {
-    //     return $this->hasMany(CoveredItem::class, 'amc_plan_id');
-    // }
+    public function coveredItems()
+    {
+        return CoveredItem::whereIn('id', $this->covered_items)->get();
+    }
 }

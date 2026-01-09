@@ -218,6 +218,7 @@ Route::prefix('v1')->group(function () {
         // AMC Request APIs
         Route::controller(AmcServicesController::class)->group(function () {
             Route::get('/amc-plans', 'getAmcPlans');
+            Route::get('/amc-plan-details/{id}', 'amcPlanDetails');
             Route::post('/create-amc-request', 'store');
         });
 
@@ -274,27 +275,21 @@ Route::prefix('v1')->group(function () {
         // });
 
 
-        
+        // ================================== Customer APIs ========================================
         // All Requests APIs AMC and Non-AMC
         Route::controller(AllServicesController::class)->group(function () {
             // Quick Services List 
             Route::get('/services', 'servicesList');
             Route::get('/quick-services', 'quickServicesList');
+            Route::get('/services-list', 'servicesListByType');
+            Route::get('/service-details/{id}', 'getServiceDetails');
             // submit service request 
+            Route::post('/submit-quick-service-request', 'submitQuickServiceRequest');
 
+            // service request quotation details
+            Route::get('/service-request-quotations', 'serviceRequestQuotations');
 
-
-
-
-            // Customer all requests list and details
-            Route::get('/all-requests', 'allRequests');
-            // AMC
-            Route::get('/amc-request-details/{id}', 'amcRequestDetails');
-            // Non-AMC
-            Route::get('/non-amc-request-details/{id}', 'nonAmcRequestDetails');
-            // Quick Service
-            Route::get('/quick-service-request-details/{id}', 'quickServiceRequestDetails');
-
+            
             // Give Feedback APIs
             Route::post('/give-feedback', 'giveFeedback');
             Route::get('/get-all-feedback', 'getAllFeedback');
@@ -303,3 +298,20 @@ Route::prefix('v1')->group(function () {
 
     });
 });
+
+
+// customer id 
+// service type 
+// covered item type 
+
+// product* 
+
+// name 
+// type 
+// model_no 
+// sku
+// hsn
+// purchase_date 
+// brand 
+// images 
+// description 

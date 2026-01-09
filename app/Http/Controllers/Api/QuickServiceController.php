@@ -62,6 +62,36 @@ class QuickServiceController extends Controller
         }
     }
 
+    public function show(Request $request, $id)
+    {
+        $validated = Validator::make($request->all(), [
+            // validation rules if any
+            'role_id' => 'required|in:4',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'customers') {
+            $quickService = QuickService::where('id', $id)->first();
+
+            if (!$quickService) {
+                return response()->json(['success' => false, 'message' => 'Quick service not found.'], 404);
+            }
+
+            return response()->json(['quick_service' => $quickService], 200);
+        }
+    }
+
     public function store(Request $request, $id)
     {
         // Validate role_id

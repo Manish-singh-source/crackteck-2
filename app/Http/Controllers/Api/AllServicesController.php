@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Models\Customer;
+use App\Models\Engineer;
 use App\Models\AmcService;
 use App\Models\CoveredItem;
-use App\Models\Customer;
 use App\Models\DeliveryMan;
-use App\Models\Engineer;
-use App\Models\GiveFeedback;
-use App\Models\NonAmcService;
-use App\Models\QuickServiceRequest;
 use App\Models\SalesPerson;
+use App\Models\GiveFeedback;
 use Illuminate\Http\Request;
+use App\Models\NonAmcService;
+use App\Models\ServiceRequest;
+use Illuminate\Support\Facades\DB;
+use App\Models\QuickServiceRequest;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\File;
+use App\Models\ServiceRequestProduct;
+use App\Models\ServiceRequestQuotation;
 use Illuminate\Support\Facades\Validator;
 
 class AllServicesController extends Controller
@@ -95,7 +100,7 @@ class AllServicesController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $quickServices = CoveredItem::where('service_type', '2')
+            $quickServices = CoveredItem::where('service_type', '1')
                 ->where('status', '1')
                 ->orderBy('created_at', 'desc')
                 ->get();
@@ -104,97 +109,82 @@ class AllServicesController extends Controller
         }
     }
 
-    public function allRequests(Request $request)
+    public function servicesListByType(Request $request)
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed.',
-                'errors' => $validated->errors(),
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
         $validated = $validated->validated();
         $staffRole = $this->getRoleId($validated['role_id']);
 
         if (! $staffRole) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid role_id provided.',
-            ], 400);
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        if ($staffRole !== 'customers') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized role.',
-            ], 403);
+        $service_type = $request->service_type;
+
+        if ($staffRole == 'customers') {
+
+            $mapping = [
+                'amc' => '0',
+                'quick_service' => '1',
+                'installation' => '2',
+                'repairing' => '3',
+            ];
+            // if (!$mapping[$service_type]) {
+            //     return response()->json(['success' => false, 'message' => 'Invalid service type provided.'], 400);
+            // }
+
+            $services = CoveredItem::where('service_type', $mapping[$service_type])
+                ->where('status', '1')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return response()->json(['services' => $services], 200);
         }
-
-        // AMC summary
-        $amcServices = AmcService::where('customer_id', $validated['customer_id'])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($row) {
-                return [
-                    'id' => $row->id,
-                    'type' => 'amc',
-                    'title' => $row->amc_number ?? ('AMC #' . $row->id),
-                    'status' => $row->status,
-                    'created_at' => $row->created_at,
-                    'detail_url' => url('/api/v1/amc-request-details/' . $row->id),
-                ];
-            });
-
-        // Non-AMC summary (Non-AMC + Installation + Repairing agar same table + subtype hai)
-        $nonAmcServices = NonAmcService::where('customer_id', $validated['customer_id'])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($row) {
-                return [
-                    'id' => $row->id,
-                    'type' => $row->service_sub_type ?? 'non_amc', // non_amc / installation / repairing
-                    'title' => $row->service_number ?? ('NON-AMC #' . $row->id),
-                    'status' => $row->status,
-                    'created_at' => $row->created_at,
-                    'detail_url' => url('/api/v1/non-amc-request-details/' . $row->id),
-                ];
-            });
-
-        // Quick Service summary
-        $quickServiceRequests = QuickServiceRequest::where('customer_id', $validated['customer_id'])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($row) {
-                return [
-                    'id' => $row->id,
-                    'type' => 'quick_service',
-                    'title' => $row->ticket_number ?? ('Quick Service #' . $row->id),
-                    'status' => $row->status,
-                    'created_at' => $row->created_at,
-                    'detail_url' => url('/api/v1/quick-service-request-details/' . $row->id),
-                ];
-            });
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'amc_services' => $amcServices,
-                'non_amc_services' => $nonAmcServices,
-                'quick_service_requests' => $quickServiceRequests,
-            ],
-        ], 200);
     }
 
-    public function amcRequestDetails(Request $request, $id)
+    public function getServiceDetails(Request $request, $id)
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'customers') {
+            $quickService = CoveredItem::where('status', '1')
+                ->where('id', $id)
+                ->first();
+
+            if (! $quickService) {
+                return response()->json(['success' => false, 'message' => 'Quick service not found.'], 404);
+            }
+
+            return response()->json(['quick_service' => $quickService], 200);
+        }
+    }
+
+    public function submitQuickServiceRequest(Request $request)
+    {
+        // return response()->json(['request_data' => $request->all()], 200);
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'service_type' => 'required|in:quick_service,installation,repairing,amc',
             'customer_id' => 'required|integer|exists:customers,id',
         ]);
 
@@ -205,30 +195,94 @@ class AllServicesController extends Controller
         $validated = $validated->validated();
         $staffRole = $this->getRoleId($validated['role_id']);
 
-        if (! $staffRole || $staffRole !== 'customers') {
+        if (! $staffRole) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        $amcService = AmcService::with(['amcPlan', 'branches', 'products', 'creator'])
-            ->where('id', $id)
-            ->where('customer_id', $validated['customer_id']) // security
-            ->first();
+        if ($staffRole == 'customers') {
 
-        if (! $amcService) {
-            return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
+            $mapping = [
+                'amc' => '0',
+                'quick_service' => '1',
+                'installation' => '2',
+                'repairing' => '3',
+            ];
+
+            $serviceRequest = uniqid();
+
+            $servicesRequest = ServiceRequest::create([
+                'request_id' => $serviceRequest,
+                'service_type' => $mapping[$request->service_type],
+                'customer_id' => $request->customer_id,
+                'created_by' => $request->customer_id,
+                'request_date' => now(),
+                'amc_plan_id' => $request->filled('amc_plan_id')
+                    ? $request->amc_plan_id
+                    : null,
+                // 'request_status' => 'pending',
+                // 'request_source' => 'mobile_app',
+                // 'is_engineer_assigned' => '0',
+                // 'status' => '1',
+            ]);
+
+            if ($servicesRequest) {
+                foreach ($request->products as $product) {
+
+                    if ($request->service_type != 'amc') {
+                        $services = CoveredItem::where('status', '1')
+                            ->where('id', $product['service_type_id'] ?? null)
+                            ->first();
+
+                        if (! $services) {
+                            continue;
+                        }
+                    }
+
+                    $serviceProduct = $servicesRequest->products()->create([
+                        'service_requests_id' => $servicesRequest->id,
+                        'item_code_id' => $services->id ?? null,
+                        'name' => $product['name'] ?? null,
+                        'type' => $product['type'] ?? null,
+                        'model_no' => $product['model_no'] ?? null,
+                        'sku' => $product['sku'] ?? null,
+                        'hsn' => $product['hsn'] ?? null,
+                        'purchase_date' => $product['purchase_date'] ?? null,
+                        'brand' => $product['brand'] ?? null,
+                        'description' => $product['description'] ?? null,
+                        'service_charge' => $services->service_charge ?? null,
+                    ]);
+
+                    $images = $serviceProduct->images ?? [];
+                    if (!empty($product['images']) && is_array($product['images'])) {
+                        foreach ($product['images'] as $file) {
+
+                            if (!$file || !($file instanceof \Illuminate\Http\UploadedFile)) {
+                                continue;
+                            }
+
+                            $filename = time() . '_' . $serviceProduct->id . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+                            $file->move(
+                                public_path('uploads/crm/quick-service/products'),
+                                $filename
+                            );
+
+                            $images[] = 'uploads/crm/quick-service/products/' . $filename;
+                        }
+                    }
+
+                    $serviceProduct->images = $images;
+                    $serviceProduct->save();
+                }
+            }
+            return response()->json(['quick_service_request' => $servicesRequest], 200);
         }
-
-        return response()->json([
-            'success' => true,
-            'request' => $amcService,
-        ], 200);
     }
 
-    public function nonAmcRequestDetails(Request $request, $id)
+    public function serviceRequestQuotations(Request $request)
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
@@ -238,56 +292,15 @@ class AllServicesController extends Controller
         $validated = $validated->validated();
         $staffRole = $this->getRoleId($validated['role_id']);
 
-        if (! $staffRole || $staffRole !== 'customers') {
+        if (! $staffRole) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        $nonAmcService = NonAmcService::with(['serviceType', 'branches', 'products', 'creator'])
-            ->where('id', $id)
-            ->where('customer_id', $validated['customer_id']) // security
-            ->first();
+        // Pending to implement quotation list logic
+        $serviceRequestQuotations = ServiceRequestQuotation::with('serviceRequest', 'serviceRequestPart')->orderBy('created_at', 'desc')->get();
+        // $serviceRequestQuotations = ServiceRequest::with('quotations')->orderBy('created_at', 'desc')->get();
 
-        if (! $nonAmcService) {
-            return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'request' => $nonAmcService,
-        ], 200);
-    }
-
-    public function quickServiceRequestDetails(Request $request, $id)
-    {
-        $validated = Validator::make($request->all(), [
-            'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
-        ]);
-
-        if ($validated->fails()) {
-            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
-        }
-
-        $validated = $validated->validated();
-        $staffRole = $this->getRoleId($validated['role_id']);
-
-        if (! $staffRole || $staffRole !== 'customers') {
-            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
-        }
-
-        $quickServiceRequest = QuickServiceRequest::with(['quickService', 'branches', 'products', 'creator'])
-            ->where('id', $id)
-            ->where('customer_id', $validated['customer_id']) // security
-            ->first();
-
-        if (! $quickServiceRequest) {
-            return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'request' => $quickServiceRequest,
-        ], 200);
+        return response()->json(['quotations' => $serviceRequestQuotations], 200);
     }
 
     // Give Feedback APIs only for that services who status is completed

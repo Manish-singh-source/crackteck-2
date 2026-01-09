@@ -23,4 +23,14 @@ class ServiceRequestQuotation extends Model
         'quotation_status',
         'quotation_date',
     ];
+
+    public function serviceRequest()
+    {
+        return $this->belongsTo(ServiceRequest::class, 'request_id');
+    }
+
+    public function serviceRequestPart()
+    {
+        return $this->belongsTo(ServiceRequestProductRequestPart::class, 'request_part_id');
+    }
 }

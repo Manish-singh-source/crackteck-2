@@ -18,6 +18,7 @@ class ServiceRequest extends Model
         'created_by',   
         'is_engineer_assigned',
         'status',
+        'amc_plan_id',
     ];
 
     public function customer()
@@ -78,5 +79,10 @@ class ServiceRequest extends Model
     public function inactiveAssignments()
     {
         return $this->hasMany(AssignedEngineer::class)->where('status', '1')->orderBy('created_at', 'desc');
+    }
+
+    public function quotations()
+    {
+        return $this->hasMany(ServiceRequestQuotation::class, 'request_id');
     }
 }

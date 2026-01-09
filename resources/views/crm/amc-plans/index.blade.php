@@ -164,21 +164,21 @@
                                                                     <td>
                                                                         <ul>
                                                                             @php
-                                                                                $items = json_decode(
-                                                                                    $amc->covered_items,
-                                                                                    true,
-                                                                                );
-                                                                                if (!is_array($items)) {
+                                                                                // $items = json_decode(
+                                                                                //     $amc->covered_items,
+                                                                                //     true,
+                                                                                // );
+                                                                                if (!is_array($amc->covered_items)) {
                                                                                     $items = json_decode(
-                                                                                        $items,
+                                                                                        $amc->covered_items,
                                                                                         true,
                                                                                     );
                                                                                 }
 
                                                                             @endphp
 
-                                                                            @if (is_array($items))
-                                                                                @foreach ($items as $item)
+                                                                            @if (is_array($amc->covered_items))
+                                                                                @foreach ($amc->covered_items as $item)
                                                                                     @php
                                                                                         $item = DB::table('covered_items')->find($item);
                                                                                     @endphp 

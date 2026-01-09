@@ -22,9 +22,9 @@ class TicketSeeder extends Seeder
         // Ensure there are some customers
         if (Customer::count() < 3) {
             DB::table('customers')->insert([
-                ['first_name' => 'Ticket', 'last_name' => 'User1', 'phone' => '9000000010', 'email' => 'ticket.user1@example.com', 'status' => 1, 'created_at' => $now, 'updated_at' => $now],
-                ['first_name' => 'Ticket', 'last_name' => 'User2', 'phone' => '9000000011', 'email' => 'ticket.user2@example.com', 'status' => 1, 'created_at' => $now, 'updated_at' => $now],
-                ['first_name' => 'Ticket', 'last_name' => 'User3', 'phone' => '9000000012', 'email' => 'ticket.user3@example.com', 'status' => 1, 'created_at' => $now, 'updated_at' => $now],
+                ['first_name' => 'Ticket', 'last_name' => 'User1', 'phone' => '9000000010', 'email' => 'ticket.user1@example.com', 'status' => "1", 'created_at' => $now, 'updated_at' => $now],
+                ['first_name' => 'Ticket', 'last_name' => 'User2', 'phone' => '9000000011', 'email' => 'ticket.user2@example.com', 'status' => "1", 'created_at' => $now, 'updated_at' => $now],
+                ['first_name' => 'Ticket', 'last_name' => 'User3', 'phone' => '9000000012', 'email' => 'ticket.user3@example.com', 'status' => "1", 'created_at' => $now, 'updated_at' => $now],
             ]);
         }
 

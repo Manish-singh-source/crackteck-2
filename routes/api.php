@@ -20,6 +20,8 @@ use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\FrontendController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\Mime\Address;
 
 // use App\Http\Controllers\AMCRequestController;
 // use App\Http\Controllers\AMCRequestController;
@@ -176,8 +178,30 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::controller(ProfileController::class)->group(function () {
+            // For Profile APIs 
             Route::get('/profile', 'index');
             Route::put('/profile', 'update');
+
+            // For Address APIs
+            Route::get('/addresses', 'getAddresses');
+            Route::post('/address', 'addAddress');
+            Route::put('/address/{id}', 'updateAddress');
+
+            // For Aadhar Card APIs
+            Route::get('/aadhar-card', 'getAadharCard');
+            Route::post('/aadhar-card', 'addAadharCard');
+            Route::put('/aadhar-card/{id}', 'updateAadharCard');
+
+            // For Pan Card APIs
+            Route::get('/customer-pan-card', 'getPanCard');
+            Route::post('/customer-pan-card', 'addPanCard');
+            Route::put('/customer-pan-card/{id}', 'updatePanCard');
+
+            // For Company Details APIs
+            Route::get('/company-details', 'getCompanyDetails');
+            Route::post('/company-details', 'addCompanyDetails');
+            Route::put('/company-details/{id}', 'updateCompanyDetails');
+
         });
 
         Route::controller(AttendanceController::class)->group(function () {

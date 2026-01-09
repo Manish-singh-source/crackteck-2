@@ -17,7 +17,6 @@ class FrontendEcommerceController extends Controller
      */
     public function shop()
     {
-        // ✅ Active ecommerce products
         $products = EcommerceProduct::with([
             'warehouseProduct.brand',
             'warehouseProduct.parentCategorie',
@@ -26,7 +25,6 @@ class FrontendEcommerceController extends Controller
             ->where('status', "1")
             ->get();
 
-        // ✅ Active categories
         $categories = ParentCategory::where('status_ecommerce', "1")
             ->whereHas('products', function ($query) {
                 $query->whereHas('ecommerceProduct', function ($q) {
@@ -37,7 +35,6 @@ class FrontendEcommerceController extends Controller
             ->orderBy('sort_order', 'asc')
             ->get(['id', 'name', 'image']);
 
-        // ✅ Active brands
         $brands = Brand::where('status', "1")
             ->whereHas('products', function ($query) {
                 $query->whereHas('ecommerceProduct', function ($q) {

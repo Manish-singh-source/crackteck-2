@@ -40,7 +40,7 @@ class EcommerceProductsSeeder extends Seeder
                 'is_suggested' => 0,
                 'is_todays_deal' => 0,
                 'product_tags' => null,
-                'status' => 1, // Active
+                'status' => "1", // Active
                 'created_at' => Carbon::parse('2025-10-01 10:29:49'),
                 'updated_at' => Carbon::parse('2025-10-01 10:29:49'),
             ],
@@ -68,7 +68,7 @@ class EcommerceProductsSeeder extends Seeder
                 'is_suggested' => 0,
                 'is_todays_deal' => 0,
                 'product_tags' => null,
-                'status' => 1, // Active
+                'status' => "1", // Active
                 'created_at' => Carbon::parse('2025-10-01 10:30:06'),
                 'updated_at' => Carbon::parse('2025-10-01 10:30:06'),
             ],
@@ -96,7 +96,7 @@ class EcommerceProductsSeeder extends Seeder
                 'is_suggested' => 0,
                 'is_todays_deal' => 0,
                 'product_tags' => null,
-                'status' => 1, // Active
+                'status' => "1", // Active
                 'created_at' => Carbon::parse('2025-10-01 10:30:21'),
                 'updated_at' => Carbon::parse('2025-10-01 10:30:21'),
             ],

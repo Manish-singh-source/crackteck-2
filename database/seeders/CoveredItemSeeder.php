@@ -64,7 +64,7 @@ class CoveredItemSeeder extends Seeder
                 'service_type' => $it['service_type'],
                 'service_name' => $it['service_name'],
                 'service_charge' => $it['service_charge'],
-                'status' => 1,
+                'status' => "1",
                 'diagnosis_list' => json_encode($it['diagnosis_list']),
                 'created_at' => $now,
                 'updated_at' => $now,

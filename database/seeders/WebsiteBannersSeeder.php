@@ -22,7 +22,7 @@ class WebsiteBannersSeeder extends Seeder
                 'banner_description' => 'Discover the newest smartphones from Apple, Samsung, OnePlus and more with exciting offers.',
                 'button_text' => 'Shop Now',
                 'website_banner' => 'uploads/frontend/banner/main-banner-1.jpg',
-                'status' => 1,
+                'status' => "1",
                 'sort_order' => 1,
             ],
             [
@@ -33,7 +33,7 @@ class WebsiteBannersSeeder extends Seeder
                 'banner_description' => 'Upgrade your work and gaming setup with premium laptops at unbeatable prices.',
                 'button_text' => 'Explore Laptops',
                 'website_banner' => 'uploads/frontend/banner/main-banner-2.jpg',
-                'status' => 1,
+                'status' => "1",
                 'sort_order' => 2,
             ],
             [
@@ -44,7 +44,7 @@ class WebsiteBannersSeeder extends Seeder
                 'banner_description' => 'Stay connected and stylish with our collection of smartwatches and tech accessories.',
                 'button_text' => 'Discover Now',
                 'website_banner' => 'uploads/frontend/banner/main-banner-3.jpg',
-                'status' => 1,
+                'status' => "1",
                 'sort_order' => 3,
             ],
         ]);

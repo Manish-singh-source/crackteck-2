@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Customer;
 use App\Models\Engineer;
+use App\Models\Feedback;
 use App\Models\AmcService;
 use App\Models\CoveredItem;
 use App\Models\DeliveryMan;
@@ -303,6 +304,40 @@ class AllServicesController extends Controller
         return response()->json(['quotations' => $serviceRequestQuotations], 200);
     }
 
+    public function serviceRequestQuotationDetails(Request $request, $id)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'user_id' => 'required|integer|exists:customers,id',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        // Pending to implement quotation details logic
+        // Current (works fine)
+        $serviceRequestQuotation = ServiceRequestQuotation::with('serviceRequest', 'serviceRequestPart')
+            ->whereHas('serviceRequest', function ($query) use ($validated) {
+                $query->where('customer_id', $validated['user_id']);
+            })
+            ->where('id', $id)
+            ->first();
+
+        if (! $serviceRequestQuotation) {
+            return response()->json(['success' => false, 'message' => 'Quotation not found.'], 404);
+        }
+
+        return response()->json(['quotation_details' => $serviceRequestQuotation], 200);
+    }
+
     // Give Feedback APIs only for that services who status is completed
     public function giveFeedback(Request $request)
     {
@@ -310,7 +345,7 @@ class AllServicesController extends Controller
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
             'customer_id' => 'required|integer|exists:customers,id',
-            'service_type' => 'required|in:amc,non_amc,quick_service',
+            'service_type' => 'required|in:amc,repairing,installation,quick_service',
             'service_id' => 'required|integer',
             'rating' => 'required|numeric|min:1|max:5',
             'comments' => 'nullable|string',
@@ -333,24 +368,14 @@ class AllServicesController extends Controller
         $comments = $validated['comments'] ?? null;
 
         $service = null;
-        switch ($serviceType) {
-            case 'amc':
-                $service = AmcService::where('id', $serviceId)->where('customer_id', $validated['customer_id'])->first();
-                break;
-            case 'non_amc':
-                $service = NonAmcService::where('id', $serviceId)->where('customer_id', $validated['customer_id'])->first();
-                break;
-            case 'quick_service':
-                $service = QuickServiceRequest::where('id', $serviceId)->where('customer_id', $validated['customer_id'])->first();
-                break;
-        }
+        $service = ServiceRequest::where('id', $serviceId)->where('customer_id', $validated['customer_id'])->first();
 
         if (! $service) {
             return response()->json(['success' => false, 'message' => 'Service not found.'], 404);
         }
 
         // If  feedback already exists for same service
-        $existingFeedback = GiveFeedback::where('customer_id', $validated['customer_id'])
+        $existingFeedback = Feedback::where('customer_id', $validated['customer_id'])
             ->where('service_type', $validated['service_type'])
             ->where('service_id', $validated['service_id'])
             ->first();
@@ -365,11 +390,12 @@ class AllServicesController extends Controller
         }
 
         // for non amc and quick service status is completed
-        if ($serviceType !== 'amc' && $service->status !== 'Completed') {
+        if ($serviceType !== 'amc' && $service->status !== '10') {
             return response()->json(['success' => false, 'message' => 'Service is not completed.'], 400);
         }
+        // return response()->json(['request_data' => $service->status], 200);
 
-        $feedback = GiveFeedback::create([
+        $feedback = Feedback::create([
             'customer_id' => $validated['customer_id'],
             'service_type' => $validated['service_type'],
             'service_id' => $validated['service_id'],
@@ -402,18 +428,16 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        $feedbacks = GiveFeedback::where('customer_id', $validated['customer_id'])->get();
+        $feedbacks = Feedback::with('serviceRequest')->where('customer_id', $validated['customer_id'])->get();
 
         return response()->json(['success' => true, 'data' => $feedbacks], 200);
     }
 
-    public function getFeedback(Request $request)
+    public function getFeedback(Request $request, $feedback_id)
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
             'customer_id' => 'required|integer|exists:customers,id',
-            'service_type' => 'required|in:amc,non_amc,quick_service',
-            'service_id' => 'required|integer',
         ]);
 
         if ($validated->fails()) {
@@ -427,9 +451,9 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        $feedback = GiveFeedback::where('customer_id', $validated['customer_id'])
-            ->where('service_type', $validated['service_type'])
-            ->where('service_id', $validated['service_id'])
+        $feedback = Feedback::with('serviceRequest')
+            ->where('id', $feedback_id)
+            ->where('customer_id', $validated['customer_id'])
             ->first();
 
         if (! $feedback) {

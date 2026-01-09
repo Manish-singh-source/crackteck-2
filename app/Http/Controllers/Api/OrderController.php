@@ -57,6 +57,11 @@ class OrderController extends Controller
                     $query->where('product_name', 'like', "%{$request->search}%");
                 });
             }
+            if ($request->filled('category_id')) {
+                $products = $products->whereHas('warehouseProduct', function ($query) use ($request) {
+                    $query->where('parent_category_id', $request->category_id);
+                });
+            }
             $products = $products->with('warehouseProduct')->get();
 
             return response()->json(['products' => $products], 200);

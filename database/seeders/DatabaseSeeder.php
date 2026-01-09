@@ -90,10 +90,11 @@ class DatabaseSeeder extends Seeder
             // ServiceRequestProductPickupSeeder::class,
             // ServiceRequestProductRequestPartSeeder::class,
             // ServiceRequestPaymentSeeder::class,
-            ServiceRequestQuotationSeeder::class,
+            // ServiceRequestQuotationSeeder::class,
             // RequestedPartDeliverySeeder::class,
             // AssignedEngineerGroupSeeder::class,
             // WebsiteBannerSeeder::class,
+            FeedbackSeeder::class,
         ]);
     }
 }

@@ -2494,21 +2494,17 @@ service request payments                         - done
 assigned engineer group - model not created 
 
 
-website banners 
+website banners                          - done
+
+feedbacks                          - done
 
 
 
 
 
 
-1. category filter & searching on products 
 2. payment after service request completion
+
 3. my orders - profile 
 4. my services 
 5. work progress tracker (selected service details)
-6. quotations 
-7. selected quotation details 
-
-8. feedback form
-9. feedback list
-10. individual feedback details

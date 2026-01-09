@@ -106,7 +106,7 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers' || $staffRole == 'sales_person') {
-            $product = EcommerceProduct::find($product_id);
+            $product = EcommerceProduct::with('warehouseProduct')->find($product_id);
 
             if (! $product) {
                 return response()->json(['message' => 'Product not found'], 404);
@@ -138,76 +138,73 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $product = EcommerceProduct::find($product_id);
+            $product = EcommerceProduct::with('warehouseProduct')->find($product_id);
 
             if (! $product) {
                 return response()->json(['message' => 'Product not found'], 404);
             }
 
             // Store Order in Order Table
-            $customer = Customer::with('address')->where('id', $request->customer_id)->first();
+            $customer = Customer::with('addressDetails')->where('id', $request->customer_id)->first();
             if (! $customer) {
                 return response()->json(['message' => 'Customer not found'], 404);
             }
 
             $quantity = $request->quantity;
-            $price = $product->selling_price;
+            $price = $product->warehouseProduct->final_price;
             $total = $quantity * $price;
 
             $order = Order::create([
-                'user_id' => 1,
                 'customer_id' => $request->customer_id,
                 'order_number' => 'ORD-' . date('YmdHis') . '-' . $request->customer_id,
-                'order_source' => 'buy_now',
-                'email' => $customer->email,
-
-                'shipping_first_name' => $customer->first_name,
-                'shipping_last_name' => $customer->last_name,
-                'shipping_country' => $customer->address->country,
-                'shipping_state' => $customer->address->state,
-                'shipping_city' => $customer->address->city,
-                'shipping_zipcode' => $customer->address->pincode,
-                'shipping_address_line_1' => $customer->address->address,
-                'shipping_address_line_2' => $customer->address->address2,
-                'shipping_phone' => $customer->phone,
-                'billing_same_as_shipping' => true,
-                'billing_first_name' => $customer->first_name,
-                'billing_last_name' => $customer->last_name,
-                'billing_country' => $customer->country,
-                'billing_state' => $customer->address->state,
-                'billing_city' => $customer->address->city,
-                'billing_zipcode' => $customer->address->pincode,
-                'billing_address_line_1' => $customer->address->address,
-                'billing_address_line_2' => $customer->address->address2,
-                'billing_phone' => $customer->phone,
-                'payment_method' => 'cod',
-                'card_name' => null,
-                'card_last_four' => null,
-                'card_expiry' => null,
-                'subtotal' => $total,
-                'shipping_charges' => 0,
+                'total_items' => $quantity,
+                'subtotal' => $product->warehouseProduct->final_price,
                 'discount_amount' => 0,
                 'coupon_code' => null,
+                'tax_amount' => $product->warehouseProduct->final_price * $product->warehouseProduct->tax / 100,
+                'shipping_charges' => $product->shipping_charges ?? 0,
+                'packaging_charges' => $product->packaging_charges ?? 0,
                 'total_amount' => $total,
-                'status' => 'pending',
+                'billing_address_id' => null,
+                'shipping_address_id' => null,
+                'billing_same_as_shipping' => true,
+                'order_status' => "0",
+                'payment_status' => "0",
+                'delivery_status' => "0",
+                'expected_delivery_date' => null,
+                'customer_notes' => null,
+                'admin_notes' => null,
+                'source_platform' => '0',
+                'tracking_number' => null,
+                'tracking_url' => null,
+                'is_returnable' => false,
+                'return_days' => 0,
+                'return_status' => null,
+                'refund_amount' => 0,
+                'refund_status' => null,
+                'is_priority' => false,
+                'requires_signature' => false,
+                'is_gift' => false,
+                'created_by' => $request->customer_id,
+                'updated_by' => $request->customer_id,
             ]);
+            
 
             OrderItem::create([
-                'ecommerce_order_id' => $order->id,
-                'ecommerce_product_id' => $product->id,
-                'product_name' => $product->product_name,
-                'product_sku' => $product->sku,
-                'product_image' => $product->main_product_image,
-                'unit_price' => $product->selling_price,
+                'order_id' => $order->id,
+                'product_id' => $product->id,   
+                'product_serial_id' => null,
+                'product_name' => $product->warehouseProduct->product_name,
+                'product_sku' => $product->warehouseProduct->sku,
+                'hsn_code' => $product->warehouseProduct->hsn_code,
                 'quantity' => $quantity,
-                'total_price' => $total,
-                'hsn_sac_code' => $product->hsn_code,
-                'tax_percentage' => $product->tax ?? 18,
-                'taxable_value' => $total,  // Total price before tax
-                'igst_amount' => 0,  // IGST amount
-                'final_amount' => $total,  // Total price after tax
-                'shipping_charges' => 0,  // Individual item shipping charges
-                'free_shipping' => true,
+                'unit_price' => $price,
+                'discount_per_unit' => 0,
+                'tax_per_unit' => 0,
+                'line_total' => $total,
+                'variant_details' => null,
+                'custom_options' => null,
+                'item_status' => '0',
             ]);
 
             return response()->json([

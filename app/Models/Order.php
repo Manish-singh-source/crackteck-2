@@ -56,4 +56,29 @@ class Order extends Model
         'created_by',
         'updated_by',
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function billingAddress()
+    {
+        return $this->belongsTo(CustomerAddressDetail::class, 'billing_address_id');
+    }
+
+    public function shippingAddress()
+    {
+        return $this->belongsTo(CustomerAddressDetail::class, 'shipping_address_id');
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function orderPayments()
+    {
+        return $this->hasMany(OrderPayment::class);
+    }
 }

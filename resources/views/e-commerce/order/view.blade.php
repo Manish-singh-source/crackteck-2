@@ -58,7 +58,15 @@
                                         </li>
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Order Source:</span>
-                                            <span>{{ ucfirst($order->order_source ?? 'Website') }}</span>
+                                            @php
+                                                $sourcePlatform = match ($order->source_platform) {
+                                                    "0" => 'Website',
+                                                    "1" => 'Mobile App',
+                                                    "2" => 'Third-Party Marketplace',
+                                                    default => 'Website',
+                                                };
+                                            @endphp
+                                            <span>{{ $sourcePlatform }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Total Items:</span>
@@ -70,27 +78,55 @@
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Status:</span>
-                                            <span
-                                                class="badge bg-{{ $order->status === 'pending' ? 'warning' : ($order->status === 'confirmed' ? 'info' : ($order->status === 'processing' ? 'primary' : ($order->status === 'shipped' ? 'primary' : ($order->status === 'delivered' ? 'success' : ($order->status === 'cancelled' ? 'danger' : ($order->status === 'returned' ? 'warning' : 'secondary')))))) }}">
-                                                {{ ucfirst($order->status) }}
+                                            @php
+                                                // Determine badge color based on status
+                                                $badgeColor = match ($order->order_status) {
+                                                    "0" => 'warning',
+                                                    "1" => 'info',
+                                                    "2" => 'primary', // processing
+                                                    "3" => 'primary', // shipped
+                                                    "4" => 'success',
+                                                    "5" => 'danger',
+                                                    "6" => 'warning', // returned
+                                                    default => 'secondary',
+                                                };
+                                            @endphp
+                                            <span class="badge bg-{{ $badgeColor }}">
+                                                @if ($order->order_status === "0")
+                                                    Pending
+                                                @elseif ($order->order_status === "1")
+                                                    Confirmed
+                                                @elseif ($order->order_status === "2")
+                                                    Processing
+                                                @elseif ($order->order_status === "3")
+                                                    Shipped
+                                                @elseif ($order->order_status === "4")
+                                                    Delivered
+                                                @elseif ($order->order_status === "5")
+                                                    Cancelled
+                                                @elseif ($order->order_status === "6")
+                                                    Returned
+                                                @else
+                                                    Unknown
+                                                @endif
                                             </span>
                                         </li>
                                         @if ($order->confirmed_at)
                                             <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                                 <span class="fw-semibold">Confirmed At:</span>
-                                                <span>{{ $order->confirmed_at->format('d M Y h:i A') }}</span>
+                                                <span>{{ $order->confirmed_at }}</span>
                                             </li>
                                         @endif
                                         @if ($order->shipped_at)
                                             <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                                 <span class="fw-semibold">Shipped At:</span>
-                                                <span>{{ $order->shipped_at->format('d M Y h:i A') }}</span>
+                                                <span>{{ $order->shipped_at }}</span>
                                             </li>
                                         @endif
                                         @if ($order->delivered_at)
                                             <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                                 <span class="fw-semibold">Delivered At:</span>
-                                                <span>{{ $order->delivered_at->format('d M Y h:i A') }}</span>
+                                                <span>{{ $order->delivered_at }}</span>
                                             </li>
                                         @endif
                                     </ul>
@@ -112,17 +148,17 @@
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Customer Name:</span>
-                                            <span>{{ $order->user ? $order->user->name : $order->shipping_first_name . ' ' . $order->shipping_last_name }}</span>
+                                            <span>{{ $order->customer ? $order->customer->first_name . ' ' . $order->customer->last_name : $order->shipping_first_name . ' ' . $order->shipping_last_name }}</span>
                                         </li>
 
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Email:</span>
-                                            <span>{{ $order->user ? $order->user->email : $order->email }}</span>
+                                            <span>{{ $order->customer ? $order->customer->email : $order->email }}</span>
                                         </li>
 
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Phone:</span>
-                                            <span>{{ $order->shipping_phone ?? 'N/A' }}</span>
+                                            <span>{{ $order->customer->phone ?? 'N/A' }}</span>
                                         </li>
                                     </ul>
                                 </div>

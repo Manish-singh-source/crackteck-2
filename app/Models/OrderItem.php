@@ -31,4 +31,24 @@ class OrderItem extends Model
         'variant_details' => 'array',
         'custom_options' => 'array',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function ecommerceProduct()
+    {
+        return $this->belongsTo(EcommerceProduct::class);
+    }
+    
+    public function productSerial()
+    {
+        return $this->belongsTo(ProductSerial::class);
+    }
 }

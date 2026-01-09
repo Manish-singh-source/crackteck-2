@@ -28,4 +28,21 @@ class OrderPayment extends Model
     protected $casts = [
         'response_data' => 'array',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function getPaymentMethodAttribute($value)
+    {
+        $methods = [
+            0 => 'Online',
+            1 => 'COD',
+            2 => 'Cheque',
+            3 => 'Bank Transfer',
+        ];
+
+        return $methods[$value] ?? 'N/A';
+    }
 }

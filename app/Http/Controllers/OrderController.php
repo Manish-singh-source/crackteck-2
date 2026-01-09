@@ -7,7 +7,10 @@ use App\Models\EcommerceOrder;
 use App\Models\EcommerceOrderItem;
 use App\Models\EcommerceProduct;
 use App\Models\InventoryUpdateLog;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Staff;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -22,7 +25,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $query = EcommerceOrder::with(['user', 'orderItems.ecommerceProduct.warehouseProduct']);
+        $query = Order::with(['customer', 'orderItems.ecommerceProduct.warehouseProduct']);
 
         // Search functionality
         if ($request->has('search') && ! empty($request->search)) {
@@ -34,16 +37,17 @@ class OrderController extends Controller
                     ->orWhere('shipping_last_name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('shipping_phone', 'like', "%{$search}%")
-                    ->orWhereHas('user', function ($userQuery) use ($search) {
-                        $userQuery->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('customer', function ($userQuery) use ($search) {
+                        $userQuery->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
                             ->orWhere('email', 'like', "%{$search}%");
                     });
             });
         }
 
         // Status filter
-        if ($request->has('status') && ! empty($request->status)) {
-            $query->where('status', $request->status);
+        if ($request->has('order_status') && ! empty($request->order_status)) {
+            $query->where('order_status', $request->order_status);
         }
 
         // Date range filter
@@ -59,13 +63,13 @@ class OrderController extends Controller
 
         // Get status counts for filter tabs
         $statusCounts = [
-            'all' => EcommerceOrder::count(),
-            'pending' => EcommerceOrder::where('status', 'pending')->count(),
-            'confirmed' => EcommerceOrder::where('status', 'confirmed')->count(),
-            'processing' => EcommerceOrder::where('status', 'processing')->count(),
-            'shipped' => EcommerceOrder::where('status', 'shipped')->count(),
-            'delivered' => EcommerceOrder::where('status', 'delivered')->count(),
-            'cancelled' => EcommerceOrder::where('status', 'cancelled')->count(),
+            'all' => Order::count(),
+            'pending' => Order::where('order_status', 'pending')->count(),
+            'confirmed' => Order::where('order_status', 'confirmed')->count(),
+            'processing' => Order::where('order_status', 'processing')->count(),
+            'shipped' => Order::where('order_status', 'shipped')->count(),
+            'delivered' => Order::where('order_status', 'delivered')->count(),
+            'cancelled' => Order::where('order_status', 'cancelled')->count(),
         ];
 
         return view('e-commerce.order.index', compact('orders', 'statusCounts'));
@@ -125,13 +129,13 @@ class OrderController extends Controller
             $totalAmount = $subtotal + $taxAmount + $shippingCharges - $discountAmount;
 
             // Generate order number
-            $orderNumber = 'ORD-'.date('Ymd').'-'.str_pad(EcommerceOrder::count() + 1, 4, '0', STR_PAD_LEFT);
+            $orderNumber = 'ORD-'.date('Ymd').'-'.str_pad(Order::count() + 1, 4, '0', STR_PAD_LEFT);
 
             // Create the order
-            $order = EcommerceOrder::create([
-                'user_id' => $request->user_id,
+            $order = Order::create([
+                'customer_id' => $request->customer_id,
                 'order_number' => $orderNumber,
-                'order_source' => 'admin',
+                'source_platform' => '0',
                 'email' => $request->email,
                 'shipping_first_name' => $request->shipping_first_name,
                 'shipping_last_name' => $request->shipping_last_name,
@@ -151,22 +155,22 @@ class OrderController extends Controller
                 'billing_state' => $request->shipping_state,
                 'billing_zipcode' => $request->shipping_zipcode,
                 'billing_country' => $request->shipping_country,
-                'payment_method' => $request->payment_method,
+                'payment_status' => $request->payment_status,
                 'card_name' => $request->card_name,
                 'card_last_four' => $request->card_last_four,
                 'subtotal' => $subtotal,
                 'shipping_charges' => $shippingCharges,
                 'discount_amount' => $discountAmount,
                 'total_amount' => $totalAmount,
-                'status' => $request->status,
-                'confirmed_at' => $request->status === 'confirmed' ? now() : null,
+                'order_status' => $request->order_status,
+                'confirmed_at' => $request->order_status === '1' ? now() : null,
             ]);
 
             // Create order items
             foreach ($request->items as $itemData) {
-                EcommerceOrderItem::create([
-                    'ecommerce_order_id' => $order->id,
-                    'ecommerce_product_id' => $itemData['product_id'],
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $itemData['product_id'],
                     'product_name' => $itemData['product_name'],
                     'product_sku' => $itemData['product_sku'],
                     'hsn_sac_code' => $itemData['hsn_sac_code'],
@@ -204,7 +208,7 @@ class OrderController extends Controller
      */
     public function edit($id)
     {
-        $order = EcommerceOrder::with(['user', 'orderItems.ecommerceProduct.warehouseProduct'])
+        $order = Order::with(['customer', 'orderItems.product.ecommerceProduct'])
             ->findOrFail($id);
 
         return view('e-commerce.order.edit', compact('order'));
@@ -215,10 +219,10 @@ class OrderController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $order = EcommerceOrder::findOrFail($id);
+        $order = Order::findOrFail($id);
 
         $request->validate([
-            'status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled',
+            'status' => 'required|in:0,1,2,3,4,5',
             'shipping_first_name' => 'required|string|max:255',
             'shipping_last_name' => 'required|string|max:255',
             'shipping_phone' => 'required|string|max:20',
@@ -247,11 +251,11 @@ class OrderController extends Controller
 
             // Update status timestamps
             if ($request->status !== $order->status) {
-                if ($request->status === 'confirmed' && $order->status !== 'confirmed') {
+                if ($request->status === '1' && $order->status !== '1') {
                     $data['confirmed_at'] = now();
-                } elseif ($request->status === 'shipped' && $order->status !== 'shipped') {
+                } elseif ($request->status === '3' && $order->status !== '3') {
                     $data['shipped_at'] = now();
-                } elseif ($request->status === 'delivered' && $order->status !== 'delivered') {
+                } elseif ($request->status === '4' && $order->status !== '4') {
                     $data['delivered_at'] = now();
                 }
             }
@@ -279,7 +283,7 @@ class OrderController extends Controller
     public function destroy($id)
     {
         try {
-            $order = EcommerceOrder::findOrFail($id);
+            $order = Order::findOrFail($id);
 
             // Check if order can be deleted (business logic)
             if (in_array($order->status, ['shipped', 'delivered'])) {
@@ -337,7 +341,7 @@ class OrderController extends Controller
 
             foreach ($orderIds as $orderId) {
                 try {
-                    $order = EcommerceOrder::find($orderId);
+                    $order = Order::find($orderId);
 
                     if ($order) {
                         // Check if order can be deleted
@@ -464,9 +468,9 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $order = EcommerceOrder::with(['user', 'orderItems.ecommerceProduct.warehouseProduct'])
+        $order = Order::with(['customer', 'orderItems.product.ecommerceProduct'])
             ->findOrFail($id);
-        $deliveryMen = DeliveryMan::where('status', 'Active')->get();
+        $deliveryMen = Staff::where('staff_role', '2')->where('status', 'Active')->get();
         // Calculate totals
         $totals = $this->calculateOrderTotals($order);
 
@@ -500,7 +504,7 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled',
+            'order_status' => 'required|in:0,1,2,3,4,5',
         ]);
 
         if ($validator->fails()) {
@@ -511,18 +515,18 @@ class OrderController extends Controller
         }
 
         try {
-            $order = EcommerceOrder::findOrFail($id);
-            $oldStatus = $order->status;
-            $newStatus = $request->status;
+            $order = Order::findOrFail($id);
+            $oldStatus = $order->order_status;
+            $newStatus = $request->order_status;
 
             // Update status with timestamps
-            $order->status = $newStatus;
+            $order->order_status = $newStatus;
 
-            if ($newStatus === 'confirmed' && $oldStatus !== 'confirmed') {
+            if ($newStatus === '1' && $oldStatus !== '1') {
                 $order->confirmed_at = now();
-            } elseif ($newStatus === 'shipped' && $oldStatus !== 'shipped') {
+            } elseif ($newStatus === '3' && $oldStatus !== '3') {
                 $order->shipped_at = now();
-            } elseif ($newStatus === 'delivered' && $oldStatus !== 'delivered') {
+            } elseif ($newStatus === '4' && $oldStatus !== '4') {
                 $order->delivered_at = now();
             }
 
@@ -559,7 +563,7 @@ class OrderController extends Controller
         }
 
         try {
-            $order = EcommerceOrder::findOrFail($id);
+            $order = Order::findOrFail($id);
             $order->delivery_man_id = $request->delivery_man_id;
             $order->save();
 
@@ -584,7 +588,7 @@ class OrderController extends Controller
     {
         try {
             // Fetch order with all related data
-            $order = EcommerceOrder::with(['user', 'orderItems.ecommerceProduct.warehouseProduct'])
+            $order = Order::with(['user', 'orderItems.product.warehouseProduct'])
                 ->findOrFail($id);
 
             // Calculate totals

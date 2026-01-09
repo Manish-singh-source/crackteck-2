@@ -264,30 +264,15 @@ Route::prefix('v1')->group(function () {
 
             // service request quotation details
             Route::get('/service-request-quotations', 'serviceRequestQuotations');
+            Route::get('/service-request-quotation-details/{id}', 'serviceRequestQuotationDetails');
 
-            
+
             // Give Feedback APIs
             Route::post('/give-feedback', 'giveFeedback');
             Route::get('/get-all-feedback', 'getAllFeedback');
-            Route::get('/get-feedback', 'getFeedback');
+            Route::get('/get-feedback/{feedback_id}', 'getFeedback');
         });
 
     });
 });
 
-
-// customer id 
-// service type 
-// covered item type 
-
-// product* 
-
-// name 
-// type 
-// model_no 
-// sku
-// hsn
-// purchase_date 
-// brand 
-// images 
-// description 

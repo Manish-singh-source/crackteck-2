@@ -23,7 +23,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/hp.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/hp.png',
                 'status_ecommerce' => 1,
-                'status' => 1,
+                'status' => "1",
             ],
             [
                 'id' => 2,
@@ -33,7 +33,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/dell.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/dell.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
             [
                 'id' => 3,
@@ -43,7 +43,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/asus.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/asus.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
             // Monitor
             [
@@ -54,7 +54,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/samsung.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/samsung.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
             [
                 'id' => 5,
@@ -64,7 +64,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/lg.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/lg.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
             // Laptop
             [
@@ -75,7 +75,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/hp_laptop.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/hp_laptop.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
             [
                 'id' => 7,
@@ -85,7 +85,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/dell_laptop.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/dell_laptop.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
 
             // CCTV
@@ -97,7 +97,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/hikvision.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/hikvision.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
             [
                 'id' => 9,
@@ -107,7 +107,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/dahua.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/dahua.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
 
             // Biometric
@@ -119,7 +119,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/zkteco.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/zkteco.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
 
             // Router
@@ -131,7 +131,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/tplink.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/tplink.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
             [
                 'id' => 12,
@@ -141,7 +141,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/netgear.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/netgear.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
 
             // SSD
@@ -153,7 +153,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/ssd_samsung.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/ssd_samsung.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
             [
                 'id' => 14,
@@ -163,7 +163,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/ssd_wd.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/ssd_wd.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
 
             // Scanner
@@ -175,7 +175,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/canon_scanner.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/canon_scanner.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
 
             // Server
@@ -187,7 +187,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/dell_server.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/dell_server.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
 
             // Keyboard
@@ -199,7 +199,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/logitech_keyboard.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/logitech_keyboard.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
 
             // Mouse
@@ -211,7 +211,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/logitech_mouse.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/logitech_mouse.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
             // Webcam
             [
@@ -222,7 +222,7 @@ class SubCategoriesSeeder extends Seeder
                 'image' => 'uploads/crm/categorie/feature_image/microsoft_webcam.png',
                 'icon_image' => 'uploads/crm/categorie/icon_image/microsoft_webcam.png',
                 'status_ecommerce' => 1,
-                'status' => 1
+                'status' => "1"
             ],
         ]);
     }

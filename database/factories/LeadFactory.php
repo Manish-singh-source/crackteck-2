@@ -19,14 +19,13 @@ class LeadFactory extends Factory
     public function definition(): array
     {
         //
-        $usersCount = Staff::count();
 
         return [
             //
             'staff_id' => function () {
                 return Staff::inRandomOrder()->value('id') ?? Staff::create([
                     'staff_code' => 'SEED' . time() . rand(100, 999),
-                    'staff_role' => '3',
+                    'staff_role' => 'sales_person',
                     'first_name' => 'Seed',
                     'last_name' => 'User',
                     'email' => 'seed' . time() . '@example.test',
@@ -43,11 +42,11 @@ class LeadFactory extends Factory
             'company_name' => fake()->company(),
             'designation' => fake()->jobTitle(),
             'industry_type' => fake()->randomElement(['pharma', 'school', 'manufacturing']),
-            'source' => fake()->randomElement(['referral', 'website', 'call', 'walk-in', 'event']),
+            'source' => fake()->randomElement(['referral', 'website', 'call', 'walk_in', 'event']),
             'requirement_type' => fake()->randomElement(['servers', 'cctv', 'biometric', 'networking']),
             'budget_range' => fake()->randomElement(['10K-50K', '50K-100K', '100K-500K', '500K-1000K']),
-            'urgency' => fake()->randomElement(['Low', 'Medium', 'High']),
-            'status' => fake()->randomElement(['New', 'Contacted', 'Qualified', 'Quoted', 'Lost']),
+            'urgency' => fake()->randomElement(['low', 'medium', 'high']),
+            'status' => fake()->randomElement(['new', 'contacted', 'qualified', 'lost']),
         ];
     }
 }

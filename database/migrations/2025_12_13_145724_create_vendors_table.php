@@ -28,8 +28,7 @@ return new class extends Migration
             $table->string('pincode');
             $table->string('pan_no')->unique()->nullable();
             $table->string('gst_no')->unique()->nullable();
-            $table->enum('status', [0, 1])->default(1)->comment('0 - Inactive, 1 - Active');
-
+            $table->enum('status', ['inactive', 'active'])->default('active');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->softDeletes();
             $table->timestamps();

@@ -18,8 +18,8 @@ return new class extends Migration
                 $table->foreignId('field_executive_id')->constrained('staff')->onDelete('cascade');
                 $table->string('issue_type');
                 $table->text('issue_description');
-                $table->enum('priority', [0, 1, 2, 3])->default(1)->comment('0 - Low, 1 - Medium, 2 - High, 3 - Critical'); // low, medium, high, critical
-                $table->enum('status', [0, 1, 2, 3])->default(0)->comment('0 - Pending, 1 - In Progress, 2 - Resolved, 3 - Closed'); // pending, in_progress, resolved, closed
+                $table->enum('priority', ['low', 'medium', 'high', 'critical'])->default('medium')->comment('0 - Low, 1 - Medium, 2 - High, 3 - Critical'); // low, medium, high, critical
+                $table->enum('status', ['pending', 'in_progress', 'resolved', 'closed'])->default('pending')->comment('0 - Pending, 1 - In Progress, 2 - Resolved, 3 - Closed'); // pending, in_progress, resolved, closed
                 $table->foreignId('assigned_remote_engineer_id')->nullable()->constrained('staff')->onDelete('cascade');
                 $table->timestamp('resolved_at')->nullable();
                 $table->text('resolution_notes')->nullable();

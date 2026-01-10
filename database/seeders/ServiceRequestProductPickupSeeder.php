@@ -40,7 +40,8 @@ class ServiceRequestProductPickupSeeder extends Seeder
             }
 
             $statusName = $statuses[array_rand($statuses)];
-            $statusMap = [
+
+            $status =[
                 'pending' => 0,
                 'assigned' => 1,
                 'approved' => 2,
@@ -50,8 +51,6 @@ class ServiceRequestProductPickupSeeder extends Seeder
                 'returned' => 6,
                 'completed' => 7,
             ];
-
-            $status = $statusMap[$statusName] ?? 0;
 
             $assignedPersonType = 0; // 0 - Delivery Man, 1 - Engineer
             $assignedPersonId = $staffs->isNotEmpty() ? $staffs->random()->id : null;

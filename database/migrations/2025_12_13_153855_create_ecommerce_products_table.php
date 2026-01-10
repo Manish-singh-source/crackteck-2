@@ -31,7 +31,7 @@ return new class extends Migration
             $table->integer('max_order_qty')->nullable();
 
             $table->decimal('shipping_charges', 10, 2)->nullable();
-            $table->enum('shipping_class', [0, 1, 2, 3])->default(1)->comment('0 - Light, 1 - Medium, 2 - Heavy, 3 - Fragile');
+            $table->enum('shipping_class', ['light', 'medium', 'heavy', 'fragile'])->default('light');
 
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_best_seller')->default(false);
@@ -40,7 +40,7 @@ return new class extends Migration
 
             $table->json('product_tags')->nullable();
 
-            $table->enum('status', [0, 1, 2])->default(1)->comment('0 - Inactive, 1 - Active, 2 - Draft');
+            $table->enum('status', ['inactive', 'active', 'draft'])->default('active');
 
             $table->string('meta_title')->nullable();
             $table->string('meta_description')->nullable();

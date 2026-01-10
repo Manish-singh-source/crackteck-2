@@ -88,6 +88,39 @@ class Staff extends Authenticatable implements JWTSubject
             ? $value
             : ($map[strtolower($value)] ?? null);
     }
+
+    public function getGenderAttribute($value)
+    {
+        $map = [
+            1 => 'male',
+            2 => 'female',
+            3 => 'other',
+        ];
+
+        return $map[$value];
+    }
+
+    public function getMaritalStatusAttribute($value)
+    {
+        $map = [
+            1 => 'unmarried',
+            2 => 'married',
+            3 => 'divorced',
+        ];
+
+        return $map[$value];
+    }
+
+    public function getEmploymentTypeAttribute($value)
+    {
+        $map = [
+            1 => 'full_time',
+            2 => 'part_time',
+            3 => 'contractual',
+        ];
+
+        return $map[$value];
+    }   
     
 
     // Get Role 

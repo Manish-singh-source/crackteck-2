@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('brand')->nullable();
             $table->json('images')->nullable();
             $table->string('description')->nullable();
-            $table->enum('status', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])->default(0)->comment('0 - Pending, 1 - Approved, 2 - Rejected, 3 - Processing, 4 - In Progress, 5 - On Hold, 6 - Diagnosis Completed, 7 - Processed, 8 - Picking, 9 - Picked, 10 - Completed');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'processing', 'in_progress', 'on_hold', 'diagnosis_completed', 'processed', 'picking', 'picked', 'completed'])->default('pending');
 
             $table->timestamps();
         });

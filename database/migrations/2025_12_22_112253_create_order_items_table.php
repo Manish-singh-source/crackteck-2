@@ -26,7 +26,7 @@ return new class extends Migration
             $table->decimal('line_total', 15, 2);
             $table->json('variant_details')->nullable();
             $table->json('custom_options')->nullable();
-            $table->enum('item_status', [0, 1, 2, 3, 4])->default(0)->comment('0 - Pending, 1 - Shipped, 2 - Delivered, 3 - Cancelled, 4 - Returned'); // pending, shipped, delivered, cancelled, returned
+            $table->enum('item_status', ['pending', 'shipped', 'delivered', 'cancelled', 'returned'])->default('pending')->comment('0 - Pending, 1 - Shipped, 2 - Delivered, 3 - Cancelled, 4 - Returned'); // pending, shipped, delivered, cancelled, returned
             $table->softDeletes();
             $table->timestamps();
 

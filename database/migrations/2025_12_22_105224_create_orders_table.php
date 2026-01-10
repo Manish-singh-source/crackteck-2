@@ -32,9 +32,9 @@ return new class extends Migration
             $table->boolean('billing_same_as_shipping')->default(true);
 
             // Status
-            $table->enum('order_status', [0, 1, 2, 3, 4, 5, 6])->default(0)->comment('0 - Pending, 1 - Confirmed, 2 - Processing, 3 - Shipped, 4 - Delivered, 5 - Cancelled, 6 - Returned'); // pending, confirmed, processing, shipped, delivered, cancelled, returned
-            $table->enum('payment_status', [0, 1, 2, 3, 4])->default(0)->comment('0 - Pending, 1 - Partial, 2 - Completed, 3 - Failed, 4 - Refunded'); // pending, partial, completed, failed, refunded
-            $table->enum('delivery_status', [0, 1, 2, 3, 4])->default(0)->comment('0 - Pending, 1 - In Transit, 2 - Delivered, 3 - Failed, 4 - Returned'); // pending, in_transit, delivered, failed, returned
+            $table->enum('order_status', ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'])->default('pending')->comment('0 - Pending, 1 - Confirmed, 2 - Processing, 3 - Shipped, 4 - Delivered, 5 - Cancelled, 6 - Returned'); // pending, confirmed, processing, shipped, delivered, cancelled, returned
+            $table->enum('payment_status', ['pending', 'partial', 'completed', 'failed', 'refunded'])->default('pending')->comment('0 - Pending, 1 - Partial, 2 - Completed, 3 - Failed, 4 - Refunded'); // pending, partial, completed, failed, refunded
+            $table->enum('delivery_status', ['pending', 'in_transit', 'delivered', 'failed', 'returned'])->default('pending')->comment('0 - Pending, 1 - In Transit, 2 - Delivered, 3 - Failed, 4 - Returned'); // pending, in_transit, delivered, failed, returned
 
             // Dates
             $table->timestamp('confirmed_at')->nullable();
@@ -50,16 +50,16 @@ return new class extends Migration
             // Additional Info
             $table->text('customer_notes')->nullable();
             $table->text('admin_notes')->nullable();
-            $table->enum('source_platform', [0, 1, 2])->default(0)->comment('0 - Website, 1 - Mobile App, 2 - Admin Panel'); // website, mobile_app, admin_panel
+            $table->enum('source_platform', ['website', 'mobile_app', 'admin_panel'])->default('website')->comment('0 - Website, 1 - Mobile App, 2 - Admin Panel'); // website, mobile_app, admin_panel
             $table->string('tracking_number')->nullable();
             $table->string('tracking_url')->nullable();
 
             // Return Info
             $table->boolean('is_returnable')->default(true);
             $table->integer('return_days')->default(30);
-            $table->enum('return_status', [0, 1, 2])->comment('0 - Pending, 1 - Approved, 2 - Rejected')->nullable();
+            $table->enum('return_status', ['pending', 'approved', 'rejected'])->comment('0 - Pending, 1 - Approved, 2 - Rejected')->nullable();
             $table->decimal('refund_amount', 15, 2)->nullable();
-            $table->enum('refund_status', [0, 1, 2])->comment('0 - Pending, 1 - Processed, 2 - Cancelled')->nullable(); // pending, processed, cancelled
+            $table->enum('refund_status', ['pending', 'processed', 'cancelled'])->comment('0 - Pending, 1 - Processed, 2 - Cancelled')->nullable(); // pending, processed, cancelled
 
             // Metrics
             $table->boolean('is_priority')->default(false);

@@ -27,7 +27,7 @@ return new class extends Migration
             $table->decimal('po_amount', 10, 2);
             $table->decimal('po_amount_paid', 10, 2)->nullable();
             $table->decimal('po_amount_pending', 10, 2)->nullable();
-            $table->enum('po_status', [0, 1, 2, 3])->default(1)->comment('0 - Pending, 1 - Approved, 2 - Rejected, 3 - Cancelled');
+            $table->enum('po_status', ['pending', 'approved', 'rejected', 'cancelled'])->default('approved');
 
             $table->softDeletes();
             $table->timestamps();

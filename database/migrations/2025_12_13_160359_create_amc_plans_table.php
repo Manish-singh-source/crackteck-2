@@ -24,16 +24,16 @@ return new class extends Migration
             $table->decimal('plan_cost', 10, 2);
             $table->decimal('tax', 10, 2)->nullable();
             $table->decimal('total_cost', 10, 2);
-            $table->enum('pay_terms', [0, 1])->default(0)->comment('0 - Full Payment, 1 - Installments');
+            $table->enum('pay_terms', ['full_payment', 'installments'])->default('full_payment');
 
-            $table->enum('support_type', [0, 1, 2])->default(0)->comment('0 - Onsite, 1 - Remote, 2 - Both');
+            $table->enum('support_type', ['onsite', 'remote', 'both'])->default('onsite');
             $table->json('covered_items')->nullable();
 
             $table->string('brochure')->nullable();
             $table->string('tandc')->nullable();
             $table->string('replacement_policy')->nullable();
 
-            $table->enum('status', [0, 1])->default(1)->comment('0 - Inactive, 1 - Active');
+            $table->enum('status', ['inactive', 'active'])->default('active');
 
             $table->softDeletes();
             $table->timestamps();

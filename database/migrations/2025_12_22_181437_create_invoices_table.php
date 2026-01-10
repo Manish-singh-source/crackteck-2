@@ -25,7 +25,7 @@ return new class extends Migration
             $table->decimal('tax_amount', 15, 2)->default(0);
             $table->decimal('total_amount', 15, 2);
             $table->decimal('paid_amount', 15, 2)->default(0);
-            $table->enum('status', [0, 1, 2, 3, 4, 5])->default(0)->comment('0 - Draft, 1 - Sent, 2 - Viewed, 3 - Partially Paid, 4 - Paid, 5 - Cancelled'); // draft, sent, viewed, partially_paid, paid, overdue, cancelled
+            $table->enum('status', ['pending', 'draft', 'sent', 'viewed', 'partially_paid', 'paid', 'cancelled'])->default('pending')->comment('0 - Draft, 1 - Sent, 2 - Viewed, 3 - Partially Paid, 4 - Paid, 5 - Cancelled'); // draft, sent, viewed, partially_paid, paid, overdue, cancelled
             $table->text('notes')->nullable();
             $table->string('invoice_document_path')->nullable();
             $table->timestamp('sent_at')->nullable();

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->enum('type', [0, 1, 2])->default(0)->comment('0 - Percentage, 1 - Fixed, 2 - Buy X Get Y'); // percentage, fixed, buy_x_get_y
+            $table->enum('type', ['percentage', 'fixed', 'buy_x_get_y'])->default('percentage')->comment('0 - Percentage, 1 - Fixed, 2 - Buy X Get Y'); // percentage, fixed, buy_x_get_y
             $table->decimal('discount_value', 10, 2);
             $table->decimal('max_discount', 15, 2)->nullable();
             $table->decimal('min_purchase_amount', 15, 2)->nullable();

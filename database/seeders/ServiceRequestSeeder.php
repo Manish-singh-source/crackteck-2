@@ -21,10 +21,10 @@ class ServiceRequestSeeder extends Seeder
                 'request_id' => 'SR-' . Carbon::now()->subDays(5)->format('Ymd') . '-001',
                 'customer_id' => 1,
                 'request_date' => Carbon::now()->subDays(5)->toDateString(),
-                'request_status' => "0", // Pending
-                'request_source' => "0", // Customer
+                'request_status' => "pending", // Pending
+                'request_source' => "customer", // Customer
                 'created_by' => null,
-                'is_engineer_assigned' => "0",
+                'is_engineer_assigned' => "not_assigned",
                 'created_at' => $now->subDays(5),
                 'updated_at' => $now->subDays(5),
             ],
@@ -32,10 +32,10 @@ class ServiceRequestSeeder extends Seeder
                 'request_id' => 'SR-' . Carbon::now()->subDays(3)->format('Ymd') . '-001',
                 'customer_id' => 2,
                 'request_date' => Carbon::now()->subDays(3)->toDateString(),
-                'request_status' => "3", // Processing
-                'request_source' => "0",
+                'request_status' => "processing", // Processing
+                'request_source' => "customer",
                 'created_by' => 1,
-                'is_engineer_assigned' => "1",
+                'is_engineer_assigned' => "assigned",
                 'created_at' => $now->subDays(3),
                 'updated_at' => $now->subDays(3),
             ],
@@ -43,10 +43,10 @@ class ServiceRequestSeeder extends Seeder
                 'request_id' => 'SR-' . Carbon::now()->subDays(2)->format('Ymd') . '-001',
                 'customer_id' => 3,
                 'request_date' => Carbon::now()->subDays(2)->toDateString(),
-                'request_status' => "1", // Approved
-                'request_source' => "1", // System
+                'request_status' => "approved", // Approved
+                'request_source' => "system", // System
                 'created_by' => 2,
-                'is_engineer_assigned' => "0",
+                'is_engineer_assigned' => "not_assigned",
                 'created_at' => $now->subDays(2),
                 'updated_at' => $now->subDays(2),
             ],

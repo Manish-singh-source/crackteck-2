@@ -39,19 +39,18 @@ class MeetFactory extends Factory
                 if ($lead && $lead->staff_id) {
                     return $lead->staff_id;
                 }
-
+                // 'admin', 'engineer', 'delivery_man', 'sales_person', 'customer'
                 return Staff::inRandomOrder()->value('id') ?? Staff::create([
                     'staff_code' => 'SEED' . time() . rand(100, 999),
-                    'staff_role' => '3',
+                    'staff_role' => 'sales_person',
                     'first_name' => 'Seed',
                     'last_name' => 'User',
                     'email' => 'seed' . time() . '@example.test',
-                    'phone' => '0000000000'
+                    'phone' => '8888888888'
                 ])->id;
             },
             'meet_title' => $this->faker->sentence(),
-            // meeting_type uses numeric codes as strings: '0' - In Person, '1' - Virtual, '2' - Phone
-            'meeting_type' => $this->faker->randomElement(['0', '1', '2']),
+            'meeting_type' => $this->faker->randomElement(['in_person', 'virtual', 'phone']),
             'date' => $this->faker->date(),
             'start_time' => $this->faker->time(),
             'end_time' => $this->faker->optional()->time(),
@@ -62,8 +61,7 @@ class MeetFactory extends Factory
             'meet_agenda' => $this->faker->sentence(),
             'meeting_notes' => $this->faker->sentence(),
             'follow_up_action' => $this->faker->sentence(),
-            // status enum: '0' - Scheduled, '1' - Confirmed, '2' - Completed, '3' - Cancelled, '4' - Rescheduled
-            'status' => $this->faker->randomElement(['0', '1', '2', '3', '4']),
+            'status' => $this->faker->randomElement(['scheduled', 'confirmed', 'completed', 'cancelled', 'rescheduled']),
         ];
     }
 }

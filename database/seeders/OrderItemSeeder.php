@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -56,7 +55,7 @@ class OrderItemSeeder extends Seeder
                     'line_total' => $lineTotal,
                     'variant_details' => json_encode([]),
                     'custom_options' => json_encode([]),
-                    'item_status' => '0',
+                    'item_status' => 'active',
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];

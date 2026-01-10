@@ -19,21 +19,21 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('image_url');
 
-            $table->enum('type', [0, 1])->default(0)->comment('0 - Website, 1 - Promotional');
+            $table->enum('type', ['website', 'promotional'])->default('website')->comment('0 - Website, 1 - Promotional');
 
-            $table->enum('channel', [0, 1])->default(0)->comment('0 - Website, 1 - Mobile');
+            $table->enum('channel', ['website', 'mobile'])->default('website')->comment('0 - Website, 1 - Mobile');
 
-            $table->enum('promotion_type', [0, 1, 2, 3])->comment('0 - Discount, 1 - Coupon, 2 - Flash Sale, 3 - Event')->nullable();
+            $table->enum('promotion_type', ['discount', 'coupon', 'flash_sale', 'event'])->comment('0 - Discount, 1 - Coupon, 2 - Flash Sale, 3 - Event')->nullable();
 
             $table->decimal('discount_value', 8, 2)->nullable();
-            $table->enum('discount_type', [0, 1])->comment('0 - Percentage, 1 - Fixed')->nullable();
+            $table->enum('discount_type', ['percentage', 'fixed'])->comment('0 - Percentage, 1 - Fixed')->nullable();
 
             $table->string('promo_code')->nullable();
 
             $table->string('link_url')->nullable();
-            $table->enum('link_target', [0, 1])->default(1)->comment('0 - Self, 1 - Blank');
+            $table->enum('link_target', ['self', 'blank'])->default('self')->comment('0 - Self, 1 - Blank');
 
-            $table->enum('position', [0, 1, 2, 3, 4, 5])->default(0)->comment('0 - Homepage, 1 - Category, 2 - Product, 3 - Slider, 4 - Checkout, 5 - Cart');
+            $table->enum('position', ['homepage', 'category', 'product', 'slider', 'checkout', 'cart'])->default('homepage')->comment('0 - Homepage, 1 - Category, 2 - Product, 3 - Slider, 4 - Checkout, 5 - Cart');
 
             $table->integer('display_order')->default(0);
 

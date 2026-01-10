@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -37,7 +36,7 @@ class StockInHandProductSeeder extends Seeder
                 'requested_quantity' => 1,
                 'delivered_quantity' => 1,
                 'unit_price' => $battery->selling_price ?? 0,
-                'status' => "4",
+                'status' => "completed",
                 'notes' => 'Battery replaced during pickup cycle.',
                 'picked_at' => $now->copy()->subDays(3),
                 'returned_at' => null,
@@ -56,7 +55,7 @@ class StockInHandProductSeeder extends Seeder
                 'requested_quantity' => 2,
                 'delivered_quantity' => 0,
                 'unit_price' => $dell->selling_price ?? 0,
-                'status' => "0",
+                'status' => "pending",
                 'notes' => 'Spare parts requested for diagnostic.',
                 'picked_at' => null,
                 'returned_at' => null,

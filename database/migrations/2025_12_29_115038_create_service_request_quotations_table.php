@@ -22,7 +22,7 @@ return new class extends Migration
             $table->decimal('total_amount', 15, 2);
             $table->decimal('discount', 15, 2)->default(0);
             $table->string('quotation_file')->nullable();
-            $table->enum('quotation_status', [0, 1, 2])->default(0)->comment('0 - Pending, 1 - Approved, 2 - Rejected');
+            $table->enum('quotation_status', ['pending', 'approved', 'rejected'])->default('pending')->comment('0 - Pending, 1 - Approved, 2 - Rejected');
             $table->date('quotation_date');
             $table->softDeletes();
             $table->timestamps();

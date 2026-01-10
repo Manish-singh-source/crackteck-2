@@ -20,8 +20,7 @@ return new class extends Migration
                 ->onUpdate('cascade');
 
             $table->string('value');
-            $table->enum('status', [0, 1])->default(1)->comment('0 - Inactive, 1 - Active');
-
+            $table->enum('status', ['inactive', 'active'])->default('active');
             $table->softDeletes();
             $table->timestamps();
 

@@ -40,9 +40,9 @@ return new class extends Migration
             $table->string('licence_no', 50)->nullable()->unique();
             $table->string('licence_doc')->nullable();
 
-            $table->enum('verification_status', [0, 1, 2])->default(0)->comment('0 - Pending, 1 - Verified, 2 - Rejected');
-            $table->enum('default_warehouse', [0, 1])->default(0)->comment('0 - No, 1 - Yes');
-            $table->enum('status', [0, 1])->default(1)->comment('0 - Inactive, 1 - Active');
+            $table->enum('verification_status', ['pending', 'verified', 'rejected'])->default('pending');
+            $table->enum('default_warehouse', ['no', 'yes'])->default('no');
+            $table->enum('status', ['active', 'inactive'])->default('active');
 
             $table->softDeletes();
             $table->timestamps();

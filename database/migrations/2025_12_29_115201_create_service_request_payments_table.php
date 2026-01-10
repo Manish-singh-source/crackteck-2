@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('transaction_id');
             $table->decimal('total_amount', 15, 2);
             $table->string('payment_gateway')->nullable();
-            $table->enum('payment_method', [0, 1, 2, 3])->comment('0 - Online, 1 - COD, 2 - Cheque, 3 - Bank Transfer'); 
-            $table->enum('payment_status', [0, 1, 2, 3, 4, 5])->default(0)->comment('0 - Pending, 1 - Processing, 2 - Completed, 3 - Failed, 4 - Refunded, 5 - Partial Paid'); 
+            $table->enum('payment_method', ['online', 'cod', 'cheque', 'bank_transfer'])->default('online')->comment('0 - Online, 1 - COD, 2 - Cheque, 3 - Bank Transfer'); 
+            $table->enum('payment_status', ['pending', 'processing', 'completed', 'failed', 'refunded', 'partial_paid'])->default('pending')->comment('0 - Pending, 1 - Processing, 2 - Completed, 3 - Failed, 4 - Refunded, 5 - Partial Paid'); 
             $table->timestamp('payment_date')->nullable();
             $table->softDeletes();
             $table->timestamps();

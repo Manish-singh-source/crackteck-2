@@ -24,12 +24,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create roles idempotently
-        // Role::firstOrCreate(['name' => 'Engineer']);
-        // Role::firstOrCreate(['name' => 'Delivery Man']);
-        // Role::firstOrCreate(['name' => 'Sales Person']);
-        // Role::firstOrCreate(['name' => 'Customer']);
-        // Role::firstOrCreate(['name' => 'Admin']);
-        // Role::firstOrCreate(['name' => 'Warehouse Manager']);
+        Role::firstOrCreate(['name' => 'Engineer']);
+        Role::firstOrCreate(['name' => 'Delivery Man']);
+        Role::firstOrCreate(['name' => 'Sales Person']);
+        Role::firstOrCreate(['name' => 'Customer']);
+        Role::firstOrCreate(['name' => 'Admin']);
+        Role::firstOrCreate(['name' => 'Warehouse Manager']);
 
         $this->call([
             StaffSeeder::class,
@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
             StaffPoliceVerificationSeeder::class,
             StaffWorkSkillSeeder::class,
 
-            LeadTableSeeder::class,
+            // LeadTableSeeder::class,
             FollowUpTableSeeder::class,
             MeetTableSeeder::class,
             QuotationTableSeeder::class,

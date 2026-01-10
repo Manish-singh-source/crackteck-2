@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -26,7 +25,7 @@ class StockInHandSeeder extends Seeder
                 'assigned_delivery_man_id' => 6,
                 'assigned_at' => $now->copy()->subDays(3),
                 'delivered_at' => $now->copy()->subDays(2),
-                'status' => "4",
+                'status' => "completed",
                 'request_notes' => 'Replace battery for Dell Inspiron (customer agreed to replacement).',
                 'delivery_photos' => json_encode(['uploads/delivery/si1_photo1.jpg']),
                 'cancellation_reason' => null,
@@ -46,7 +45,7 @@ class StockInHandSeeder extends Seeder
                 'assigned_delivery_man_id' => null,
                 'assigned_at' => null,
                 'delivered_at' => null,
-                'status' => "0",
+                'status' => "pending",
                 'request_notes' => 'Spare part required for diagnostic follow-up.',
                 'delivery_photos' => null,
                 'cancellation_reason' => null,
@@ -66,7 +65,7 @@ class StockInHandSeeder extends Seeder
                 'assigned_delivery_man_id' => null,
                 'assigned_at' => null,
                 'delivered_at' => null,
-                'status' => "6",
+                'status' => "cancelled",
                 'request_notes' => 'Customer cancelled after request placed.',
                 'delivery_photos' => null,
                 'cancellation_reason' => 'Customer no longer available',

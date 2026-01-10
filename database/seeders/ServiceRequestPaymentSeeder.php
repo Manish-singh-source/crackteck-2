@@ -38,7 +38,7 @@ class ServiceRequestPaymentSeeder extends Seeder
                 'transaction_id' => 'SRP-' . strtoupper(uniqid()),
                 'total_amount' => $total,
                 'payment_gateway' => 'manual',
-                'payment_method' => 'cash',
+                'payment_method' => 'online',
                 'payment_date' => $now->subDays(rand(0, 30))->toDateString(),
                 'payment_status' => $status,
                 'created_at' => $now,

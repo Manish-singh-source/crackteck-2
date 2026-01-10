@@ -33,7 +33,7 @@ return new class extends Migration
 
             $table->json('variations')->nullable();
 
-            $table->enum('status', [0, 1, 2, 3])->default(1)->comment('0 - Inactive, 1 - Active, 2 - Sold, 3 - Scrap');
+            $table->enum('status', ['inactive', 'active', 'sold', 'scrap'])->default('active');
 
             $table->softDeletes();
             $table->timestamps();

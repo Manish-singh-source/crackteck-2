@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -32,11 +31,11 @@ class OrderPaymentSeeder extends Seeder
                 'order_id' => $order->id,
                 'payment_id' => 'PMT-' . strtoupper(uniqid()),
                 'transaction_id' => 'TXN-' . strtoupper(uniqid()),
-                'payment_method' => 'cash',
-                'payment_gateway' => 'manual',
+                'payment_method' => 'online',
+                'payment_gateway' => 'phonepe',
                 'amount' => $order->total_amount,
                 'currency' => 'INR',
-                'status' => 'completed',
+                'status' => 'pending',
                 'response_data' => json_encode([]),
                 'processed_at' => $now,
                 'failure_reason' => null,
@@ -47,7 +46,7 @@ class OrderPaymentSeeder extends Seeder
 
             $orderUpdates[] = [
                 'id' => $order->id,
-                'payment_status' => 'paid',
+                'payment_status' => 'pending',
                 'updated_at' => $now,
             ];
         }

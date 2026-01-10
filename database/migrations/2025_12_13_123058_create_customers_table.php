@@ -21,12 +21,12 @@ return new class extends Migration
             $table->string('phone', 10)->unique();
             $table->string('email')->unique();
             $table->date('dob')->nullable(); // Use proper date type
-            $table->enum('gender', [0, 1, 2])->nullable()->comment('0 - Male, 1 - Female, 2 - Other');
+            $table->enum('gender', ['male', 'female', 'other'])->nullable();
 
-            $table->enum('customer_type', [0, 1, 2, 3, 4])->default(0)->comment('0 - E-commerce, 1 - AMC, 2 - Non-AMC, 3 - Both, 4 - Offline');
-            $table->enum('source_type', [0, 1, 2, 3, 4, 5])->default(0)->comment('0 - E-commerce, 1 - App, 2 - Call, 3 - Walk-in, 4 - Other, 5 - Admin Panel')->nullable();
+            $table->enum('customer_type', ['ecommerce', 'amc', 'non_amc', 'both', 'offline'])->default('ecommerce');
+            $table->enum('source_type', ['ecommerce', 'app', 'call', 'walk_in', 'other', 'admin_panel'])->default('ecommerce')->nullable();
             $table->string('password')->nullable();
-            $table->enum('status', [0, 1, 2, 3])->default(1)->comment('0 - InActive, 1 - Active, 2 - Blocked, 3 - Suspended');
+            $table->enum('status', ['inactive', 'active', 'blocked', 'suspended'])->default('active');
 
             // Authentication / Verification
             $table->string('otp')->nullable();

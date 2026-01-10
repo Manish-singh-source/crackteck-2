@@ -18,10 +18,10 @@ return new class extends Migration
             // $table->foreignId('item_code_id')->constrained('covered_items')->cascadeOnDelete();
             $table->foreignId('customer_id')->constrained('customers')->cascadeOnDelete();
             $table->date('request_date');
-            $table->enum('request_status', [0, 1, 2, 3, 4, 5, 6, 7])->default(0)->comment('0 - Pending, 1 - Approved, 2 - Rejected, 3 - Processing, 4 - Processed, 5 - Picking, 6 - Picked, 7 - Completed')->index();
-            $table->enum('request_source', [0, 1])->default(0)->comment('0 - Customer, 1 - System');
+            $table->enum('request_status', ['pending', 'approved', 'rejected', 'processing', 'processed', 'picking', 'picked', 'completed'])->default('pending')->index();
+            $table->enum('request_source', ['customer', 'system'])->default('customer');
             $table->unsignedBigInteger('created_by')->nullable();
-            $table->enum('is_engineer_assigned', [0, 1])->default(0)->comment('0 - Not Assigned, 1 - Assigned');
+            $table->enum('is_engineer_assigned', ['not_assigned', 'assigned'])->default('not_assigned');
 
             $table->softDeletes();
             $table->timestamps();

@@ -29,7 +29,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('staff_id');
-            $table->index('primary_skills');
         });
     }
 

@@ -41,17 +41,6 @@ class ServiceRequestProductPickupSeeder extends Seeder
 
             $statusName = $statuses[array_rand($statuses)];
 
-            $status =[
-                'pending' => 0,
-                'assigned' => 1,
-                'approved' => 2,
-                'picked' => 3,
-                'received' => 4,
-                'cancelled' => 5,
-                'returned' => 6,
-                'completed' => 7,
-            ];
-
             $assignedPersonType = 0; // 0 - Delivery Man, 1 - Engineer
             $assignedPersonId = $staffs->isNotEmpty() ? $staffs->random()->id : null;
 
@@ -88,7 +77,7 @@ class ServiceRequestProductPickupSeeder extends Seeder
                 'reason' => 'Pickup created by seeder',
                 'assigned_person_type' => (string) $assignedPersonType,
                 'assigned_person_id' => $assignedPersonId,
-                'status' => $status,
+                'status' => $statusName,
                 'otp' => (string) rand(100000, 999999),
                 'otp_expiry' => Carbon::now()->addHours(2)->toDateTimeString(),
                 'assigned_at' => $assignedAt->toDateTimeString(),

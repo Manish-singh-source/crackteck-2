@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('ticket_id')->constrained('tickets')->onDelete('cascade');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->text('comment');
-            $table->json('attachments')->nullable();
+            $table->text('attachments')->nullable();
             $table->boolean('is_internal')->default(false);
 
             $table->softDeletes();

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('amount', 15, 2);
             $table->string('currency')->default('INR');
             $table->enum('status', ['pending', 'processing', 'completed', 'failed', 'refunded'])->default('pending')->comment('0 - Pending, 1 - Processing, 2 - Completed, 3 - Failed, 4 - Refunded'); // pending, processing, completed, failed, refunded
-            $table->json('response_data')->nullable();
+            $table->text('response_data')->nullable();
             $table->timestamp('processed_at')->nullable();
             $table->text('failure_reason')->nullable();
             $table->text('notes')->nullable();

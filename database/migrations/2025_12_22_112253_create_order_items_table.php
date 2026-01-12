@@ -24,8 +24,8 @@ return new class extends Migration
             $table->decimal('discount_per_unit', 15, 2)->default(0);
             $table->decimal('tax_per_unit', 15, 2)->default(0);
             $table->decimal('line_total', 15, 2);
-            $table->json('variant_details')->nullable();
-            $table->json('custom_options')->nullable();
+            $table->text('variant_details')->nullable();
+            $table->text('custom_options')->nullable();
             $table->enum('item_status', ['pending', 'shipped', 'delivered', 'cancelled', 'returned'])->default('pending')->comment('0 - Pending, 1 - Shipped, 2 - Delivered, 3 - Cancelled, 4 - Returned'); // pending, shipped, delivered, cancelled, returned
             $table->softDeletes();
             $table->timestamps();

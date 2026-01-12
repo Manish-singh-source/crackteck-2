@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('sku')->nullable();
             $table->string('hsn')->nullable();
             $table->string('brand')->nullable();
-            $table->json('images')->nullable();
+            $table->text('images')->nullable();
             $table->string('description')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'processing', 'in_progress', 'on_hold', 'diagnosis_completed', 'processed', 'picking', 'picked', 'completed'])->default('pending');
 

@@ -20,7 +20,7 @@ return new class extends Migration
                 $table->foreignId('assigned_engineer_id')->nullable()->constrained('staff')->onDelete('cascade');
                 $table->enum('job_type', ['remote_diagnosis', 'troubleshooting', 'guidance'])->default('remote_diagnosis')->comment('0 - Remote Diagnosis, 1 - Troubleshooting, 2 - Guidance'); // remote_diagnosis, troubleshooting, guidance
                 $table->text('job_description');
-                $table->json('remote_access_details')->nullable();
+                $table->text('remote_access_details')->nullable();
                 $table->enum('status', ['pending', 'assigned', 'in_progress', 'completed', 'escalated'])->default('pending')->comment('0 - Pending, 1 - Assigned, 2 - In Progress, 3 - Completed, 4 - Escalated');
                 $table->timestamp('started_at')->nullable();
                 $table->timestamp('completed_at')->nullable();

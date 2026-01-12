@@ -50,7 +50,7 @@ class Lead extends Model
             'website' => '0',
             'referral' => '1',
             'call' => '2',
-            'walk-in' => '3',
+            'walk_in' => '3',
             'event' => '4',
         ];
 

@@ -29,9 +29,9 @@ return new class extends Migration
             $table->decimal('final_price', 10, 2);
 
             $table->string('main_product_image')->nullable();
-            $table->json('additional_product_images')->nullable();
+            $table->text('additional_product_images')->nullable();
 
-            $table->json('variations')->nullable();
+            $table->text('variations')->nullable();
 
             $table->enum('status', ['inactive', 'active', 'sold', 'scrap'])->default('active');
 

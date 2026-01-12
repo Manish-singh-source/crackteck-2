@@ -44,7 +44,7 @@ return new class extends Migration
             $table->integer('click_count')->default(0);
             $table->integer('view_count')->default(0);
 
-            $table->json('metadata')->nullable();
+            $table->text('metadata')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

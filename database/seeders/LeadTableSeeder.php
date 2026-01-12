@@ -15,6 +15,17 @@ class LeadTableSeeder extends Seeder
     {
         $staffs = Staff::where('staff_role', 'sales_person')->get();
 
+        if ($staffs->isEmpty()) {
+            $staffs = collect([Staff::create([
+                'staff_code' => 'SEED' . time() . rand(100, 999),
+                'staff_role' => 'sales_person',
+                'first_name' => 'Seed',
+                'last_name' => 'Sales',
+                'email' => 'seedsales' . time() . '@example.test',
+                'phone' => '0000000000'
+            ])]);
+        }
+
         // Make idempotent: clear existing leads then create 20 new leads
         \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         Lead::truncate();

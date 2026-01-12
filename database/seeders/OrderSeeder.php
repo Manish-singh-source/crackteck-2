@@ -20,13 +20,18 @@ class OrderSeeder extends Seeder
 
         // Ensure some customers exist (create a few directly if no factories available)
         if (Customer::count() < 3) {
-            DB::table('customers')->insert([
+            DB::table('customers')->insertOrIgnore([
                 [
                     'customer_code' => 'CUS001',
                     'first_name' => 'John',
                     'last_name' => 'Doe',
                     'phone' => '9000000001',
                     'email' => 'john.doe@example.com',
+                    'dob' => '1990-01-01',
+                    'gender' => 'male',
+                    'customer_type' => 'ecommerce',
+                    'source_type' => 'website',
+                    'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
                     'status' => "active",
                     'created_at' => $now,
                     'updated_at' => $now,
@@ -37,6 +42,11 @@ class OrderSeeder extends Seeder
                     'last_name' => 'Smith',
                     'phone' => '9000000002',
                     'email' => 'jane.smith@example.com',
+                    'dob' => '1992-05-15',
+                    'gender' => 'female',
+                    'customer_type' => 'ecommerce',
+                    'source_type' => 'website',
+                    'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
                     'status' => "active",
                     'created_at' => $now,
                     'updated_at' => $now,
@@ -47,6 +57,11 @@ class OrderSeeder extends Seeder
                     'last_name' => 'Corp',
                     'phone' => '9000000003',
                     'email' => 'acme@example.com',
+                    'dob' => '1985-10-20',
+                    'gender' => 'other',
+                    'customer_type' => 'ecommerce',
+                    'source_type' => 'website',
+                    'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
                     'status' => "active",
                     'created_at' => $now,
                     'updated_at' => $now,
@@ -74,9 +89,6 @@ class OrderSeeder extends Seeder
                 'order_status' => 'pending',
                 'payment_status' => 'pending',
                 'delivery_status' => 'pending',
-                'otp' => null,
-                'otp_expiry' => null,
-                'otp_verified_at' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
                 'is_returnable' => true,
@@ -102,7 +114,7 @@ class OrderSeeder extends Seeder
                 'source_platform' => 'website',
                 'otp_verified_at' => null,
                 'otp' => null,
-                'otp_expiry' => null,   
+                'otp_expiry' => null,
             ];
         }
 

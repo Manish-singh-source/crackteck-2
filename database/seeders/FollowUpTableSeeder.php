@@ -20,16 +20,16 @@ class FollowUpTableSeeder extends Seeder
 
         $leads = Lead::all();
 
-        FollowUp::factory()->count(20)->make()->each(function ($followup) use ($leads) {
+        FollowUp::factory()->count(20)->make()->each(function ($followUp) use ($leads) {
             $lead = $leads->random();
-            $followup->lead_id = $lead->id;
+            $followUp->lead_id = $lead->id;
 
-            // If lead has an assigned staff, use it for the followup
+            // If lead has an assigned staff, use it for the follow up
             if (isset($lead->staff_id)) {
-                $followup->staff_id = $lead->staff_id;
+                $followUp->staff_id = $lead->staff_id;
             }
 
-            $followup->save();
+            $followUp->save();
         });
     }
 }

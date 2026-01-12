@@ -55,7 +55,7 @@ class OrderItemSeeder extends Seeder
                     'line_total' => $lineTotal,
                     'variant_details' => json_encode([]),
                     'custom_options' => json_encode([]),
-                    'item_status' => 'active',
+                    'item_status' => 'pending',
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];

@@ -23,7 +23,7 @@ return new class extends Migration
                 $table->foreignId('assigned_remote_engineer_id')->nullable()->constrained('staff')->onDelete('cascade');
                 $table->timestamp('resolved_at')->nullable();
                 $table->text('resolution_notes')->nullable();
-                $table->json('attachments')->nullable();
+                $table->text('attachments')->nullable();
                 $table->timestamps();
             });
         }

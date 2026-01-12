@@ -22,7 +22,7 @@ return new class extends Migration
 
             $table->enum('status', ['inactive', 'active'])->default('active');
 
-            $table->json('diagnosis_list')->nullable();
+            $table->text('diagnosis_list')->nullable();
 
             $table->softDeletes();
             $table->timestamps();

@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
             StaffPoliceVerificationSeeder::class,
             StaffWorkSkillSeeder::class,
 
-            // LeadTableSeeder::class,
+            LeadTableSeeder::class,
             FollowUpTableSeeder::class,
             MeetTableSeeder::class,
             QuotationTableSeeder::class,

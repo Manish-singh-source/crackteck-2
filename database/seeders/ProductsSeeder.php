@@ -342,14 +342,29 @@ class ProductsSeeder extends Seeder
 
         $toInsert = [];
         $parentCount = count($parentIds) ?: 1;
+        $subsByParent = $subCategories->groupBy('parent_category_id');
 
         foreach ($productsData as $index => $prod) {
+            if (isset($prod['parent_category_id'], $prod['sub_category_id'])) {
+                $toInsert[] = $prod;
+                continue;
+            }
+
             $parentId = $parentIds[$index % $parentCount];
-            $subId = DB::table('sub_categories')->where('parent_category_id', $parentId)->value('id');
+            $possibleSubs = $subsByParent->get($parentId);
+
+            if ($possibleSubs && $possibleSubs->isNotEmpty()) {
+                $subId = $possibleSubs->random()->id;
+            } elseif ($subCategories->isNotEmpty()) {
+                $randomSub = $subCategories->random();
+                $parentId = $randomSub->parent_category_id;
+                $subId = $randomSub->id;
+            } else {
+                continue; // Skip if no subcategories available
+            }
 
             $prod['parent_category_id'] = $parentId;
             $prod['sub_category_id'] = $subId;
-
             $toInsert[] = $prod;
         }
 

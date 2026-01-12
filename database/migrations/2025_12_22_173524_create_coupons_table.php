@@ -26,9 +26,9 @@ return new class extends Migration
             $table->integer('used_count')->default(0);
             $table->integer('usage_per_customer')->default(1);
             $table->boolean('is_active')->default(true);
-            $table->json('applicable_categories')->nullable();
-            $table->json('applicable_brands')->nullable();
-            $table->json('excluded_products')->nullable();
+            $table->text('applicable_categories')->nullable();
+            $table->text('applicable_brands')->nullable();
+            $table->text('excluded_products')->nullable();
             $table->boolean('stackable')->default(false);
             $table->softDeletes();
             $table->timestamps();

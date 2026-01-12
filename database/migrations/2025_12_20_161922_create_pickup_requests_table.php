@@ -29,8 +29,8 @@ return new class extends Migration
             $table->enum('status', ['pending', 'assigned', 'picked', 'received', 'in_process', 'processed', 'in_transit', 'delivered', 'completed', 'cancelled'])->default('pending');
             $table->text('cancellation_reason')->nullable();
 
-            $table->json('before_photos')->nullable();
-            $table->json('after_photos')->nullable();
+            $table->text('before_photos')->nullable();
+            $table->text('after_photos')->nullable();
 
             $table->string('otp')->nullable();
             $table->timestamp('otp_verified_at')->nullable();

@@ -21,7 +21,7 @@ return new class extends Migration
 
             $table->string('sku')->unique();
 
-            $table->json('with_installation')->nullable();
+            $table->text('with_installation')->nullable();
 
             $table->string('short_description')->nullable();
             $table->text('full_description')->nullable();
@@ -38,7 +38,7 @@ return new class extends Migration
             $table->boolean('is_suggested')->default(false);
             $table->boolean('is_todays_deal')->default(false);
 
-            $table->json('product_tags')->nullable();
+            $table->text('product_tags')->nullable();
 
             $table->enum('status', ['inactive', 'active', 'draft'])->default('active');
 

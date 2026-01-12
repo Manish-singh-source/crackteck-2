@@ -64,10 +64,10 @@ return new class extends Migration
             $table->enum('stock_status', ['in_stock', 'out_of_stock', 'low_stock', 'scrap'])->default('in_stock');
 
             $table->string('main_product_image')->nullable();
-            $table->json('additional_product_images')->nullable();
+            $table->text('additional_product_images')->nullable();
             $table->string('datasheet_manual')->nullable();
 
-            $table->json('variation_options')->nullable();
+            $table->text('variation_options')->nullable();
 
             $table->enum('status', ['inactive', 'active'])->default('active');
 

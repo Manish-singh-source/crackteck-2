@@ -28,7 +28,10 @@ class CouponSeeder extends Seeder
                 'usage_limit' => 100,
                 'used_count' => 0,
                 'usage_per_customer' => 1,
-                'status' => "active",
+                'is_active' => true,
+                'applicable_categories' => 'all',
+                'applicable_brands' => 'all',
+                'excluded_products' => null,
                 'stackable' => false,
             ],
             [
@@ -42,7 +45,11 @@ class CouponSeeder extends Seeder
                 'end_date' => Carbon::now()->addMonths(6),
                 'usage_limit' => 50,
                 'usage_per_customer' => 2,
-                'status' => "active",
+                "is_active" => true,
+                'applicable_categories' => 'all',
+                'applicable_brands' => 'all',
+                'excluded_products' => null,
+                'stackable' => false,
             ],
             [
                 'code' => 'BIGDEAL20',
@@ -55,7 +62,11 @@ class CouponSeeder extends Seeder
                 'end_date' => Carbon::now()->addMonth(),
                 'usage_limit' => null, // Unlimited
                 'usage_per_customer' => 1,
-                'status' => "active",
+                "is_active" => true,
+                'applicable_categories' => 'all',
+                'applicable_brands' => 'all',
+                'excluded_products' => null,
+                'stackable' => false,
             ],
             [
                 'code' => 'EXPIRED50',
@@ -68,7 +79,11 @@ class CouponSeeder extends Seeder
                 'end_date' => Carbon::now()->subMonth(),
                 'usage_limit' => 10,
                 'usage_per_customer' => 1,
-                'status' => "active",
+                "is_active" => true,
+                'applicable_categories' => 'all',
+                'applicable_brands' => 'all',
+                'excluded_products' => null,
+                'stackable' => false,
             ],
             [
                 'code' => 'INACTIVE25',
@@ -81,7 +96,11 @@ class CouponSeeder extends Seeder
                 'end_date' => Carbon::now()->addMonths(2),
                 'usage_limit' => null,
                 'usage_per_customer' => 1,
-                'status' => "inactive",
+                "is_active" => false,
+                'applicable_categories' => 'all',
+                'applicable_brands' => 'all',
+                'excluded_products' => null,
+                'stackable' => false,
             ],
         ];
 

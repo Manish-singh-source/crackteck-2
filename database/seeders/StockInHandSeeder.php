@@ -25,7 +25,7 @@ class StockInHandSeeder extends Seeder
                 'assigned_delivery_man_id' => 6,
                 'assigned_at' => $now->copy()->subDays(3),
                 'delivered_at' => $now->copy()->subDays(2),
-                'status' => "completed",
+                'status' => "pending",
                 'request_notes' => 'Replace battery for Dell Inspiron (customer agreed to replacement).',
                 'delivery_photos' => json_encode(['uploads/delivery/si1_photo1.jpg']),
                 'cancellation_reason' => null,

@@ -19,11 +19,11 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
-            $table->json('primary_skills')->nullable();
-            $table->json('certifications')->nullable();
+            $table->text('primary_skills')->nullable();
+            $table->text('certifications')->nullable();
             $table->string('experience')->nullable();
-            $table->json('languages_known')->nullable();
-            // $table->json('employment_history')->nullable();
+            $table->text('languages_known')->nullable();
+            // $table->text('employment_history')->nullable();
 
             $table->softDeletes();
             $table->timestamps();

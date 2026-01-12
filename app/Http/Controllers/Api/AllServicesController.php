@@ -101,8 +101,8 @@ class AllServicesController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $quickServices = CoveredItem::where('service_type', '1')
-                ->where('status', '1')
+            $quickServices = CoveredItem::where('service_type', 'quick_service')
+                ->where('status', 'active')
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -131,18 +131,8 @@ class AllServicesController extends Controller
 
         if ($staffRole == 'customers') {
 
-            $mapping = [
-                'amc' => '0',
-                'quick_service' => '1',
-                'installation' => '2',
-                'repairing' => '3',
-            ];
-            // if (!$mapping[$service_type]) {
-            //     return response()->json(['success' => false, 'message' => 'Invalid service type provided.'], 400);
-            // }
-
-            $services = CoveredItem::where('service_type', $mapping[$service_type])
-                ->where('status', '1')
+            $services = CoveredItem::where('service_type', $service_type)
+                ->where('status', 'active')
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -168,7 +158,7 @@ class AllServicesController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $quickService = CoveredItem::where('status', '1')
+            $quickService = CoveredItem::where('status', 'active')
                 ->where('id', $id)
                 ->first();
 
@@ -201,19 +191,11 @@ class AllServicesController extends Controller
         }
 
         if ($staffRole == 'customers') {
-
-            $mapping = [
-                'amc' => '0',
-                'quick_service' => '1',
-                'installation' => '2',
-                'repairing' => '3',
-            ];
-
             $serviceRequest = uniqid();
 
             $servicesRequest = ServiceRequest::create([
                 'request_id' => $serviceRequest,
-                'service_type' => $mapping[$request->service_type],
+                'service_type' => $request->service_type,
                 'customer_id' => $request->customer_id,
                 'created_by' => $request->customer_id,
                 'request_date' => now(),
@@ -230,7 +212,7 @@ class AllServicesController extends Controller
                 foreach ($request->products as $product) {
 
                     if ($request->service_type != 'amc') {
-                        $services = CoveredItem::where('status', '1')
+                        $services = CoveredItem::where('status', 'active')
                             ->where('id', $product['service_type_id'] ?? null)
                             ->first();
 

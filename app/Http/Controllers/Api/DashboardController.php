@@ -104,7 +104,7 @@ class DashboardController extends Controller
 
     public function banners(Request $request)
     {
-        $banners = WebsiteBanner::where('is_active', "1")->where('channel', '1')->get();
+        $banners = WebsiteBanner::where('is_active', "1")->where('channel', 'mobile')->get();
         return response()->json(['banners' => $banners], 200);
     }
 }

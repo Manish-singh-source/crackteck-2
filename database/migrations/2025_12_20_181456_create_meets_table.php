@@ -22,7 +22,7 @@ return new class extends Migration
             $table->time('end_time')->nullable();
             $table->string('location')->nullable();
             $table->string('meeting_link')->nullable(); // For virtual meetings
-            $table->json('attendees')->nullable();
+            $table->text('attendees')->nullable();
             $table->string('attachment')->nullable();
             $table->text('meet_agenda')->nullable();
             $table->text('meeting_notes')->nullable();

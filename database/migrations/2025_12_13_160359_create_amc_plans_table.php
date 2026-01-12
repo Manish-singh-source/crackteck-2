@@ -27,7 +27,7 @@ return new class extends Migration
             $table->enum('pay_terms', ['full_payment', 'installments'])->default('full_payment');
 
             $table->enum('support_type', ['onsite', 'remote', 'both'])->default('onsite');
-            $table->json('covered_items')->nullable();
+            $table->text('covered_items')->nullable();
 
             $table->string('brochure')->nullable();
             $table->string('tandc')->nullable();

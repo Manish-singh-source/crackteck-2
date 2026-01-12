@@ -57,12 +57,12 @@ class OrderController extends Controller
                     $query->where('product_name', 'like', "%{$request->search}%");
                 });
             }
-            if ($request->filled('category_id')) {
-                $products = $products->whereHas('warehouseProduct', function ($query) use ($request) {
-                    $query->where('parent_category_id', $request->category_id);
+            if ($request->filled('category_name')) {
+                $products = $products->whereHas('warehouseProduct.parentCategorie', function ($query) use ($request) {
+                    $query->where('slug', $request->category_name);
                 });
             }
-            $products = $products->with('warehouseProduct')->get();
+            $products = $products->with('warehouseProduct.parentCategorie')->get();
 
             return response()->json(['products' => $products], 200);
         }
@@ -85,8 +85,8 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers' || $staffRole == 'sales_person') {
-            $categories = ParentCategory::where('status', '1')
-                ->where('status_ecommerce', '1')
+            $categories = ParentCategory::where('status', 'active')
+                ->where('status_ecommerce', 'active')
                 ->get();
 
             return response()->json(['categories' => $categories], 200);
@@ -111,7 +111,7 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers' || $staffRole == 'sales_person') {
-            $product = EcommerceProduct::with('warehouseProduct')->find($product_id);
+            $product = EcommerceProduct::with('warehouseProduct.parentCategorie')->find($product_id);
 
             if (! $product) {
                 return response()->json(['message' => 'Product not found'], 404);

@@ -15,14 +15,12 @@ class ServiceRequestQuotationSeeder extends Seeder
      */
     public function run(): void
     {
-        echo "Seeding Service Request Quotations...\n";
         $now = Carbon::now();
 
         $partsRequests = ServiceRequestProductRequestPart::whereIn('status', ['approved', 'picked'])->inRandomOrder()->limit(10)->get();
         if ($partsRequests->isEmpty()) {
             return;
         }
-        echo "Found " . $partsRequests->count() . " parts requests to create quotations for.\n";
         $products = Product::pluck('id')->toArray();
 
         $quotations = [];
@@ -53,7 +51,6 @@ class ServiceRequestQuotationSeeder extends Seeder
             ];
         }
 
-        echo json_encode($quotations);
 
         if (!empty($quotations)) {
             DB::table('service_request_quotations')->insert($quotations);

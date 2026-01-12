@@ -58,9 +58,17 @@ class CoveredItemSeeder extends Seeder
 
         $inserts = [];
 
-        foreach ($items as $it) {
+        foreach ($items as $index => $it) {
+            $prefix = match ($it['service_type']) {
+                'amc' => 'AMC',
+                'quick_service' => 'QS',
+                'installation' => 'INS',
+                'repair' => 'REP',
+                default => 'ITM',
+            };
+
             $inserts[] = [
-                'item_code' => CoveredItem::generateItemCode($it['service_type']),
+                'item_code' => $prefix . '-' . str_pad($index + 1, 6, '0', STR_PAD_LEFT),
                 'service_type' => $it['service_type'],
                 'service_name' => $it['service_name'],
                 'service_charge' => $it['service_charge'],

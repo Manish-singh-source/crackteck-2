@@ -33,7 +33,7 @@ class FrontendController extends Controller
             ->get();
 
         // Get active collections with their categories
-        $collections = Collection::where('is_active', '1')
+        $collections = Collection::where('status', 'active')
             ->with('categories')
             ->orderBy('created_at', 'desc')
             ->limit(8) // Limit to 8 collections for homepage display

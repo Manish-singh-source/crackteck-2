@@ -161,8 +161,7 @@
                                         <fieldset class="fieldset-item">
                                             <input type="checkbox" name="category" class="tf-check category-filter"
                                                 id="category-{{ $category->id }}" value="{{ $category->id }}">
-                                            <label
-                                                for="category-{{ $category->id }}">{{ $category->name }}</label>
+                                            <label for="category-{{ $category->id }}">{{ $category->name }}</label>
                                         </fieldset>
                                     @empty
                                         <p class="text-muted">No categories available</p>
@@ -1065,11 +1064,11 @@
                             </li>
                         </ul>
                         ${discountPercent > 0 ? `
-                                    <div class="box-sale-wrap pst-default">
-                                        <p class="small-text">Sale</p>
-                                        <p class="title-sidebar-2">${discountPercent}%</p>
-                                    </div>
-                                ` : ''}
+                                        <div class="box-sale-wrap pst-default">
+                                            <p class="small-text">Sale</p>
+                                            <p class="title-sidebar-2">${discountPercent}%</p>
+                                        </div>
+                                    ` : ''}
                     </div>
                     <div class="card-product-info">
                         <div class="box-title">
@@ -1088,8 +1087,8 @@
                             </p>
 
                             ${shortDescription ? `<div class="product-description">
-                                                                    <p class="caption">${shortDescription}</p>
-                                                                </div>` : ''}
+                                                                        <p class="caption">${shortDescription}</p>
+                                                                    </div>` : ''}
                             <div class="box-infor-detail">
                                 <div class="star-review flex-wrap">
                                     <ul class="list-star">
@@ -1099,7 +1098,7 @@
                                         <li><i class="icon-star"></i></li>
                                         <li><i class="icon-star"></i></li>
                                     </ul>
-                                    <p class="caption text-main-2">({{ $product->total_sold }})</p>
+                                    <p class="caption text-main-2">(${product.total_sold || 0})</p>
                                 </div>
                             </div>
 

@@ -334,6 +334,7 @@ class ApiAuthController extends Controller
 
 
         $staff = Staff::create([
+            'staff_code' => 'STF' . time() . rand(100, 999),
             'staff_role' => $staffRole,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -379,7 +380,7 @@ class ApiAuthController extends Controller
             if($staffRole == 'customers') {
                 $user = Customer::where('phone', $request->phone_number)->first();
             } else {
-                $user = Staff::where('phone', $request->phone_number)->where('staff_role', $request->role_id)->first();
+                $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
             }
             if (! $user) {
                 return response()->json(['success' => false, 'message' => 'User not found with the provided phone number and role.'], 404);
@@ -450,7 +451,7 @@ class ApiAuthController extends Controller
         if($staffRole == 'customers') {
             $user = Customer::where('phone', $request->phone_number)->first();
         } else {
-            $user = Staff::where('phone', $request->phone_number)->where('staff_role', $request->role_id)->first();
+            $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
         }
 
         if (! $user || $user->otp != $request->otp || now()->gt($user->otp_expiry)) {

@@ -445,6 +445,7 @@ class FrontendEcommerceController extends Controller
                     'is_todays_deal' => $product->is_todays_deal,
                     'url' => route('product.detail', $product->id),
                     'short_description' => $product->warehouseProduct->short_description ?? '',
+                    'total_sold' => $product->total_sold ?? 0,
                 ];
             });
 

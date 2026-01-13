@@ -302,8 +302,41 @@ Route::prefix('v1')->group(function () {
 
         // Feild Engineer APIs 
         Route::controller(FieldEngineerController::class)->group(function () {
+            // List of services 
             Route::get('/service-requests', 'serviceRequests');
+            // Service details and List of products in this service
             Route::get('/service-request/{id}', 'serviceRequestDetails');
+            // Product details of selected service and it's product
+            Route::get('/service-request/{id}/{product_id}', 'serviceRequestProductDetails');
+            // Accept Request 
+            Route::post('/service-request/{id}/accept', 'acceptServiceRequest');
+
+
+            // Case Transfer API 
+            Route::post('/service-request/{id}/case-transfer', 'caseTransfer');
+            // Reschedule Service Request API
+            Route::post('/service-request/{id}/reschedule', 'rescheduleServiceRequest');
+
+            // List of diagnosis 
+            Route::get('/service-request/{id}/{product_id}/diagnosis-list', 'diagnosisList');
+            // Submit Diagnosis 
+            Route::post('/service-request/{id}/{product_id}/submit-diagnosis', 'submitDiagnosis');
+
+
+            // Stock In Hand Products APIs 
+            Route::get('/stock-in-hand', 'stockInHand');
+            
+            // Products List 
+            // same as customer and sales person 
+
+            // Request Part 
+            Route::post('/service-request/{id}/{product_id}/request-part', 'requestPart'); 
+
+            // Attendance APIs 
+            Route::get('/attendance', 'attendance');
+            Route::post('/check-in', 'checkIn');
+            Route::post('/check-out', 'checkOut');
+            
         });
     });
 });

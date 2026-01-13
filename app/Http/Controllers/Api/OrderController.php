@@ -36,7 +36,7 @@ class OrderController extends Controller
     public function listProducts(Request $request)
     {
         $roleValidated = Validator::make($request->all(), ([
-            'role_id' => 'required|in:3,4',
+            'role_id' => 'required|in:1,3,4',   
         ]));
 
         if ($roleValidated->fails()) {
@@ -49,7 +49,7 @@ class OrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid Role Id Provided.'], 400);
         }
 
-        if ($staffRole == 'customers' || $staffRole == 'sales_person') {
+        if ($staffRole == 'customers' || $staffRole == 'sales_person' || $staffRole == 'engineer') {
 
             $products = EcommerceProduct::query();
             if ($request->filled('search')) {
@@ -97,7 +97,7 @@ class OrderController extends Controller
     public function product(Request $request, $product_id)
     {
         $roleValidated = Validator::make($request->all(), ([
-            'role_id' => 'required|in:3,4',
+            'role_id' => 'required|in:1,3,4',
         ]));
 
         if ($roleValidated->fails()) {
@@ -110,7 +110,7 @@ class OrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        if ($staffRole == 'customers' || $staffRole == 'sales_person') {
+        if ($staffRole == 'customers' || $staffRole == 'sales_person' || $staffRole == 'engineer') {
             $product = EcommerceProduct::with('warehouseProduct.parentCategorie')->find($product_id);
 
             if (! $product) {

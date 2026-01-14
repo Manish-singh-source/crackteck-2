@@ -287,6 +287,13 @@ Route::prefix('v1')->group(function () {
             // submit service request 
             Route::post('/submit-quick-service-request', 'submitQuickServiceRequest');
 
+            // Get all service requests
+            Route::get('/all-service-requests', 'allServiceRequests');
+            // service request details
+            Route::get('/service-request-details/{id}', 'serviceRequestDetails');
+            // service request product diagnostics 
+            Route::get('/service-request-product-diagnostics/{id}/{product_id}', 'serviceRequestProductDiagnostics');
+
             // service request quotation details
             Route::get('/service-request-quotations', 'serviceRequestQuotations');
             Route::get('/service-request-quotation-details/{id}', 'serviceRequestQuotationDetails');

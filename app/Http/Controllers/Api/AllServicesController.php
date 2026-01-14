@@ -280,6 +280,141 @@ class AllServicesController extends Controller
         }
     }
 
+    public function allServiceRequests(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'customer_id' => 'required|integer|exists:customers,id',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'customers') {
+            $serviceRequests = ServiceRequest::where('customer_id', $validated['customer_id'])->orderBy('created_at', 'desc')->get();
+
+            return response()->json(['service_requests' => $serviceRequests], 200);
+        }
+    }
+
+    public function serviceRequestDetails(Request $request, $id)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'customer_id' => 'required|integer|exists:customers,id',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'customers') {
+            $serviceRequest = ServiceRequest::with('products', 'customer')->where('id', $id)->where('customer_id', $validated['customer_id'])->first();
+
+            if (! $serviceRequest) {
+                return response()->json(['success' => false, 'message' => 'Service request not found.'], 404);
+            }
+
+            return response()->json(['service_request' => $serviceRequest], 200);
+        }
+    }
+
+    // first i want to check service_type is 0 then this is amc service 
+    // and if service_type is 1,2,3 then this is other service 
+    // if service_type is 0 then check amc_plan_id 
+    // if amc_plan_id is not null then check amc_plans table in that fetch covered_items then go to covered_items table fetch diagnosis_list according to that amc_plan_id covered_items
+    // else check service_requests_products table in that fetch item_code_id it will fetch covered_items table in that table fetch diagnosis_list
+
+    public function serviceRequestProductDiagnostics(Request $request, $id, $product_id)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'customer_id' => 'required|integer|exists:customers,id',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'customers') {
+            $serviceRequest = ServiceRequest::where('id', $id)
+                ->where('customer_id', $validated['customer_id'])
+                ->first();
+
+            if (! $serviceRequest) {
+                return response()->json(['success' => false, 'message' => 'Service request not found.'], 404);
+            }
+
+            $productDiagnostics = [];
+
+            $serviceRequestProduct = ServiceRequestProduct::where('id', $product_id)
+                ->where('service_requests_id', $id)
+                ->first();
+            
+            $coveredItem = CoveredItem::find($serviceRequestProduct->item_code_id);
+            if ($coveredItem && !empty($coveredItem->diagnosis_list)) {
+                $productDiagnostics[] = [
+                    'product_id' => $serviceRequestProduct->id,
+                    'product_name' => $serviceRequestProduct->name,
+                    'diagnostics' => $coveredItem->diagnosis_list,
+                ];
+            }
+
+            return response()->json(['product_diagnostics' => $productDiagnostics], 200);
+        }
+    }
+
+    // public function serviceRequestProductDiagnostics(Request $request, $id)
+    // {
+    //     $validated = Validator::make($request->all(), [
+    //         'role_id' => 'required|in:4',
+    //         'customer_id' => 'required|integer|exists:customers,id',
+    //     ]);
+
+    //     if ($validated->fails()) {
+    //         return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+    //     }
+
+    //     $validated = $validated->validated();
+    //     $staffRole = $this->getRoleId($validated['role_id']);
+
+    //     if (! $staffRole) {
+    //         return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+    //     }
+
+    //     if ($staffRole == 'customers') {
+    //         $productDiagnostics = ServiceRequestProduct::where('service_requests_id', $id)
+    //             ->whereHas('serviceRequest', function ($query) use ($validated) {
+    //                 $query->where('customer_id', $validated['customer_id']);
+    //             })
+    //             ->get();
+
+    //         return response()->json(['product_diagnostics' => $productDiagnostics], 200);
+    //     }
+    // }
+
     public function serviceRequestQuotations(Request $request)
     {
         $validated = Validator::make($request->all(), [

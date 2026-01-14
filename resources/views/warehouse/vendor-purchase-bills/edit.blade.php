@@ -126,17 +126,6 @@
                                     ])
                                 </div>
 
-                                {{-- po_amount_pending --}}
-                                <div class="col-4">
-                                    @include('components.form.input', [
-                                        'label'       => 'PO Amount Pending',
-                                        'name'        => 'po_amount_pending',
-                                        'type'        => 'number',
-                                        'placeholder' => 'Enter PO Amount Pending',
-                                        'model'       => $vendorPurchaseBill,
-                                    ])
-                                </div>
-
                                 {{-- po_status --}}
                                 <div class="col-4">
                                     @include('components.form.select', [
@@ -144,10 +133,10 @@
                                         'name'    => 'po_status',
                                         'options' => [
                                             ''  => '--Select PO Status--',
-                                            '0' => 'Pending',
-                                            '1' => 'Approved',
-                                            '2' => 'Rejected',
-                                            '3' => 'Cancelled',
+                                            'pending' => 'Pending',
+                                            'approved' => 'Approved',
+                                            'rejected' => 'Rejected',
+                                            'cancelled' => 'Cancelled',
                                         ],
                                         'model'   => $vendorPurchaseBill,
                                     ])

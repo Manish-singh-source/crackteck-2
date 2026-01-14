@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->enum('type', [0, 1, 2])->default(0)->comment('0 - Percentage, 1 - Fixed, 2 - Buy X Get Y'); // percentage, fixed, buy_x_get_y
+            $table->enum('type', ['percentage', 'fixed', 'buy_x_get_y'])->default('percentage')->comment('0 - Percentage, 1 - Fixed, 2 - Buy X Get Y'); // percentage, fixed, buy_x_get_y
             $table->decimal('discount_value', 10, 2);
             $table->decimal('max_discount', 15, 2)->nullable();
             $table->decimal('min_purchase_amount', 15, 2)->nullable();
@@ -26,9 +26,9 @@ return new class extends Migration
             $table->integer('used_count')->default(0);
             $table->integer('usage_per_customer')->default(1);
             $table->boolean('is_active')->default(true);
-            $table->json('applicable_categories')->nullable();
-            $table->json('applicable_brands')->nullable();
-            $table->json('excluded_products')->nullable();
+            $table->text('applicable_categories')->nullable();
+            $table->text('applicable_brands')->nullable();
+            $table->text('excluded_products')->nullable();
             $table->boolean('stackable')->default(false);
             $table->softDeletes();
             $table->timestamps();

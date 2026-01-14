@@ -1216,7 +1216,7 @@ class ServiceRequestController extends Controller
             'customerAddress',
             'customerCompany',
             'customerPan',
-            'products',
+            'products.itemCode',
             'parentCategorie',
             'activeAssignment.engineer',
             'activeAssignment.groupEngineers',
@@ -1225,9 +1225,7 @@ class ServiceRequestController extends Controller
             'inactiveAssignments.groupEngineers',
             'inactiveAssignments.transferredTo',
         ])->findOrFail($id);
-
-        $engineers = Staff::where('staff_role', '1')->where('status', '1')->get();
-
+        $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
         return view('crm/service-request/view-quick-service-request', compact('request', 'engineers'));
     }
 
@@ -1247,7 +1245,7 @@ class ServiceRequestController extends Controller
             ])->findOrFail($id);
 
             // same data as create
-            $quickService = CoveredItem::where('service_type', '1')->get(); // Collection
+            $quickService = CoveredItem::where('service_type', 'quick_service')->get(); // Collection
             $quickServiceOptions = $quickService
                 ->pluck('service_name', 'id', 'service_charge')
                 ->prepend('--Select Quick Service--', 0);
@@ -1255,11 +1253,11 @@ class ServiceRequestController extends Controller
             $quickServicePrices = $quickService->pluck('service_charge', 'id');
             // dd($quickServicePrices, $quickServiceOptions);
 
-            $categories = ParentCategory::where('status', '1')
-                ->where('status_ecommerce', '1')
+            $categories = ParentCategory::where('status', 'active')
+                ->where('status_ecommerce', 'active')
                 ->pluck('name', 'id');
 
-            $brands = Brand::where('status', '1')
+            $brands = Brand::where('status', 'active')
                 ->pluck('name', 'id');
 
             $customers = Customer::all();
@@ -1299,13 +1297,12 @@ class ServiceRequestController extends Controller
                 ->findOrFail($id);
 
             /*
-         * 1. UPDATE / CREATE CUSTOMER (by email) + ADDRESS + COMPANY + PAN
-         */
+            * 1. UPDATE / CREATE CUSTOMER (by email) + ADDRESS + COMPANY + PAN
+            */
             $customer = Customer::with(['addressDetails', 'companyDetails', 'panCardDetails'])
                 ->where('email', $request->email)->first();
 
             if ($customer) {
-
                 $customer->update([
                     'first_name' => $request->first_name,
                     'last_name' => $request->last_name,
@@ -1351,21 +1348,21 @@ class ServiceRequestController extends Controller
             }
 
             /*
-         * 2. UPDATE SERVICE REQUEST HEADER
-         */
+            * 2. UPDATE SERVICE REQUEST HEADER
+            */
             $serviceRequest->update([
                 'customer_id' => $customer->id,
-                'service_type' => 1, // Quick Service
-                'request_source' => $serviceRequest->request_source ?? '1',
+                'service_type' => 'quick_service', // Quick Service
+                'request_source' => 'system',   
                 'request_date' => $serviceRequest->request_date ?? now(),
                 'created_by' => $serviceRequest->created_by ?? Auth::id(),
                 'status' => $request->status ?? $serviceRequest->status,
             ]);
 
             /*
-         * 3. UPDATE PRODUCTS (simple strategy: delete old + recreate from form)
-         *    This ensures quick_service_id + price (service_charge) are in sync.
-         */
+            * 3. UPDATE PRODUCTS (simple strategy: delete old + recreate from form)
+            *    This ensures quick_service_id + price (service_charge) are in sync.
+            */
             // Handle existing product images deletion only if needed; here we keep them.
             $serviceRequest->products()->delete();
 
@@ -1449,18 +1446,18 @@ class ServiceRequestController extends Controller
 
     public function assignQuickServiceEngineer(Request $request)
     {
-        if ($request->assignment_type == '1') {
+        if ($request->assignment_type == 'individual') {
             $request->replace($request->except('engineer_id'));
         }
 
         $validator = Validator::make($request->all(), [
             'service_request_id' => 'required|exists:service_requests,id',
-            'assignment_type'    => 'required|in:0,1',
-            'engineer_id'        => 'required_if:assignment_type,0|exists:staff,id',
-            'group_name'         => 'required_if:assignment_type,1',
-            'engineer_ids'       => 'required_if:assignment_type,1|array',
+            'assignment_type'    => 'required|in:individual,group',
+            'engineer_id'        => 'required_if:assignment_type,individual|exists:staff,id',
+            'group_name'         => 'required_if:assignment_type,group',
+            'engineer_ids'       => 'required_if:assignment_type,group|array',
             'engineer_ids.*'     => 'exists:staff,id',
-            'supervisor_id'      => 'required_if:assignment_type,1|exists:staff,id',
+            'supervisor_id'      => 'required_if:assignment_type,group|exists:staff,id',
         ]);
 
         if ($validator->fails()) {
@@ -1477,8 +1474,8 @@ class ServiceRequestController extends Controller
         try {
             $serviceRequest = ServiceRequest::find($request->service_request_id);
 
-            // Check if status is Approved (status = 1)
-            if ($serviceRequest->status != 1) {
+            // Check if status is Approved (status = admin_approved)
+            if ($serviceRequest->status != 'admin_approved') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Engineer can only be assigned to Approved requests.',
@@ -1487,29 +1484,29 @@ class ServiceRequestController extends Controller
 
             // Get previous active assignment
             $previousAssignment = AssignedEngineer::where('service_request_id', $request->service_request_id)
-                ->where('status', '0')
+                ->where('status', 'active')
                 ->first();
 
             // Update service request status to Assigned (status = 2)
-            $serviceRequest->status = 2;
+            $serviceRequest->status = 'assigned_engineer';
             $serviceRequest->save();
 
             // Mark previous assignment as inactive
             if ($previousAssignment) {
                 $previousAssignment->update([
-                    'status' => '1',
+                    'status' => 'inactive',
                     'transferred_at' => now(),
                 ]);
             }
 
-            if ($request->assignment_type == '0') {
+            if ($request->assignment_type == 'individual') {
                 // Individual assignment
                 $assignment = AssignedEngineer::create([
                     'service_request_id' => $request->service_request_id,
                     'engineer_id'        => $request->engineer_id,
-                    'assignment_type'    => '0',
+                    'assignment_type'    => 'individual',
                     'assigned_at'        => now(),
-                    'status'             => '0       ',
+                    'status'             => 'active',
                 ]);
 
                 // Update transferred_to in previous assignment
@@ -1517,17 +1514,17 @@ class ServiceRequestController extends Controller
                     $previousAssignment->update(['transferred_to' => $request->engineer_id]);
                 }
 
-                $engineer = Staff::where('staff_role', '1')->find($request->engineer_id);
+                $engineer = Staff::where('staff_role', 'engineer')->find($request->engineer_id);
                 $message  = 'Engineer ' . $engineer->first_name . ' ' . $engineer->last_name . ' assigned successfully';
             } else {
                 // Group assignment
                 $assignment = AssignedEngineer::create([
                     'service_request_id' => $request->service_request_id,
                     'engineer_id'        => $request->supervisor_id,
-                    'assignment_type'    => '1',
+                    'assignment_type'    => 'group',
                     'group_name'         => $request->group_name,
                     'assigned_at'        => now(),
-                    'status'             => '0',
+                    'status'             => 'active',
                 ]);
 
                 // Add group members to pivot table
@@ -1543,7 +1540,7 @@ class ServiceRequestController extends Controller
 
             // Update service request status to Assigned (status = 2)
             $oldStatus = $serviceRequest->status;
-            $serviceRequest->status = 2;
+            $serviceRequest->status = 'assigned_engineer';
             $serviceRequest->save();
 
             // Log the status change
@@ -1560,7 +1557,7 @@ class ServiceRequestController extends Controller
                 ->causedBy(Auth::user())
                 ->withProperties([
                     'old_status' => $oldStatus,
-                    'new_status' => 2,
+                    'new_status' => 'assigned_engineer',
                     'assignment_id' => $assignment->id
                 ])
                 ->log('Engineer assigned to service request - Status changed to Assigned');

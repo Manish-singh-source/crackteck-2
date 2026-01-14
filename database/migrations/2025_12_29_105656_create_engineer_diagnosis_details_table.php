@@ -17,20 +17,20 @@ return new class extends Migration
             $table->foreignId('service_request_product_id')->constrained('service_request_products')->cascadeOnDelete();
             $table->foreignId('assigned_engineer_id')->constrained('assigned_engineers')->cascadeOnDelete();
 
-            $table->foreignId('covered_item_id')->constrained('covered_items')->cascadeOnDelete(); 
+            $table->foreignId('covered_item_id')->constrained('covered_items')->cascadeOnDelete();
 
-            $table->json('diagnosis_list')->nullable();
+            $table->text('diagnosis_list')->nullable();
 
-            $table->json('diagnosis_photos')->nullable();
+            $table->text('diagnosis_photos')->nullable();
 
-            $table->json('diagnosis_videos')->nullable();
+            $table->text('diagnosis_videos')->nullable();
 
-            $table->json('diagnosis_notes')->nullable();
+            $table->text('diagnosis_notes')->nullable();
 
             $table->string('diagnosis_report')->nullable();
 
-            $table->json('after_photos')->nullable();
-            $table->json('before_photos')->nullable();
+            $table->text('after_photos')->nullable();
+            $table->text('before_photos')->nullable();
 
             $table->timestamp('completed_at')->nullable();
 

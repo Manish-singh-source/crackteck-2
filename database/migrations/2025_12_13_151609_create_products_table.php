@@ -61,15 +61,15 @@ return new class extends Migration
             $table->decimal('final_price', 10, 2)->nullable();
 
             $table->integer('stock_quantity');
-            $table->enum('stock_status', [0, 1, 2, 3])->default(0)->comment('0 - In Stock, 1 - Out of Stock, 2 - Low Stock, 3 - Scrap');
+            $table->enum('stock_status', ['in_stock', 'out_of_stock', 'low_stock', 'scrap'])->default('in_stock');
 
             $table->string('main_product_image')->nullable();
-            $table->json('additional_product_images')->nullable();
+            $table->text('additional_product_images')->nullable();
             $table->string('datasheet_manual')->nullable();
 
-            $table->json('variation_options')->nullable();
+            $table->text('variation_options')->nullable();
 
-            $table->enum('status', [0, 1])->default(1)->comment('0 - Inactive, 1 - Active');
+            $table->enum('status', ['inactive', 'active'])->default('active');
 
             $table->softDeletes();
             $table->timestamps();

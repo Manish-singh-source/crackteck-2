@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('state');
             $table->string('country')->default('India');
             $table->string('pincode');
-            $table->enum('is_primary', [0, 1])->default(0)->comment('0 - No, 1 - Yes');
+            $table->enum('is_primary', ['no', 'yes'])->default('no');
 
             $table->softDeletes();
             $table->timestamps();

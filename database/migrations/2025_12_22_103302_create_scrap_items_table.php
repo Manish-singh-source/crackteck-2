@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('quantity_scrapped');
             $table->string('reason_for_scrap');
             $table->text('scrap_notes')->nullable();
-            $table->json('photos')->nullable();
+            $table->text('photos')->nullable();
             $table->foreignId('scrapped_by')->nullable()->constrained('users')->onDelete('cascade');
             $table->timestamp('scrapped_at');
 

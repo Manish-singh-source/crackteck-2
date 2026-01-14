@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -50,7 +49,7 @@ class ProductSerialSeeder extends Seeder
                 'main_product_image' => $product->main_product_image,
                 'additional_product_images' => json_encode([$product->main_product_image]),
                 'variations' => json_encode(['color' => 'Black']),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
@@ -68,7 +67,7 @@ class ProductSerialSeeder extends Seeder
                 'main_product_image' => $product->main_product_image,
                 'additional_product_images' => json_encode([$product->main_product_image]),
                 'variations' => json_encode(['color' => 'White']),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => $now,
                 'updated_at' => $now,
             ];

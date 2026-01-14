@@ -13,8 +13,6 @@ class EcommerceProductsSeeder extends Seeder
      */
     public function run(): void
     {
-        //
-
         $rows = [
             [
 
@@ -34,13 +32,13 @@ class EcommerceProductsSeeder extends Seeder
                 'product_weight' => null,
                 'product_dimensions' => null,
                 'shipping_charges' => null,
-                'shipping_class' => '0', // 0 = Light
+                'shipping_class' => 'light', // 0 = Light
                 'is_featured' => 0,
                 'is_best_seller' => 0,
                 'is_suggested' => 0,
                 'is_todays_deal' => 0,
                 'product_tags' => null,
-                'status' => "1", // Active
+                'status' => "active", // Active
                 'created_at' => Carbon::parse('2025-10-01 10:29:49'),
                 'updated_at' => Carbon::parse('2025-10-01 10:29:49'),
             ],
@@ -62,13 +60,13 @@ class EcommerceProductsSeeder extends Seeder
                 'product_weight' => null,
                 'product_dimensions' => null,
                 'shipping_charges' => null,
-                'shipping_class' => '0', // 0 = Light
+                'shipping_class' => 'light', // 0 = Light
                 'is_featured' => 0,
                 'is_best_seller' => 0,
                 'is_suggested' => 0,
                 'is_todays_deal' => 0,
                 'product_tags' => null,
-                'status' => "1", // Active
+                'status' => "active", // Active
                 'created_at' => Carbon::parse('2025-10-01 10:30:06'),
                 'updated_at' => Carbon::parse('2025-10-01 10:30:06'),
             ],
@@ -90,13 +88,13 @@ class EcommerceProductsSeeder extends Seeder
                 'product_weight' => null,
                 'product_dimensions' => null,
                 'shipping_charges' => null,
-                'shipping_class' => '0', // 0 = Light
+                'shipping_class' => 'light', // 0 = Light
                 'is_featured' => 0,
                 'is_best_seller' => 0,
                 'is_suggested' => 0,
                 'is_todays_deal' => 0,
                 'product_tags' => null,
-                'status' => "1", // Active
+                'status' => "active", // Active
                 'created_at' => Carbon::parse('2025-10-01 10:30:21'),
                 'updated_at' => Carbon::parse('2025-10-01 10:30:21'),
             ],

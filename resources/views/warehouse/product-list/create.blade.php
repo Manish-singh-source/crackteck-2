@@ -47,13 +47,11 @@
 
                                             <div class="col-xl-6 col-lg-6">
                                                 <div>
-                                                    @include('components.form.select', [
-                                                        'label' => 'Vendor PO Number',
-                                                        'name' => 'vendor_purchase_order_id',
-                                                        'options' =>
-                                                            ['' => '--Select Vendor PO Number--'] +
-                                                            $vendorPurchaseOrders->toArray(),
-                                                    ])
+                                                    <label class="form-label">Vendor PO Number</label>
+                                                    <select name="vendor_purchase_order_id" id="vendor_purchase_order_id"
+                                                        class="form-select">
+                                                        <option value="">--Select--</option>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -82,14 +80,10 @@
 
                                             <div class="col-lg-6">
                                                 {{-- Sub Category --}}
-                                                @include('components.form.select', [
-                                                    'label' => 'Sub Category',
-                                                    'name' => 'sub_category_id', // keep as requested
-                                                    'id' => 'sub_category',
-                                                    'options' =>
-                                                        ['' => '--Select Sub Category--'] +
-                                                        $subCategories->toArray(),
-                                                ])
+                                                <label class="form-label">Sub Category</label>
+                                                <select name="sub_category_id" id="sub_category" class="form-select">
+                                                    <option value="">--Select Sub Category--</option>
+                                                </select>
                                             </div>
 
                                             <div class="col-lg-6">
@@ -104,62 +98,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                {{-- <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="card-title mb-0">Rack Details</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row g-3 pb-3">
-                                            
-
-                                            <div class="col-lg-6">
-                                                @include('components.form.select', [
-                                                    'label' => 'Warehouse Rack',
-                                                    'name' => 'warehouse_rack_name',
-                                                    'options' => ['' => 'First select Warehouse'],
-                                                    'model' => isset($product) ? $product : null,
-                                                ])
-                                            </div>
-
-                                            <div class="col-lg-6">
-                                                @include('components.form.select', [
-                                                    'label' => 'Zone Area',
-                                                    'name' => 'zone_area_id',
-                                                    'options' => ['' => 'First select Rack'],
-                                                    'model' => isset($product) ? $product : null,
-                                                ])
-                                            </div>
-
-                                            <div class="col-lg-6">
-                                                @include('components.form.select', [
-                                                    'label' => 'Rack No',
-                                                    'name' => 'rack_no_id',
-                                                    'options' => ['' => 'First select Zone Area'],
-                                                    'model' => isset($product) ? $product : null,
-                                                ])
-                                            </div>
-
-                                            <div class="col-lg-6">
-                                                @include('components.form.select', [
-                                                    'label' => 'Level No',
-                                                    'name' => 'level_no_id',
-                                                    'options' => ['' => 'First select Rack No'],
-                                                    'model' => isset($product) ? $product : null,
-                                                ])
-                                            </div>
-
-                                            <div class="col-lg-6">
-                                                @include('components.form.select', [
-                                                    'label' => 'Position No',
-                                                    'name' => 'position_no_id',
-                                                    'options' => ['' => 'First select Level No'],
-                                                    'model' => isset($product) ? $product : null,
-                                                ])
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> --}}
 
                                 <div class="card">
                                     <div class="card-header border-bottom-dashed">
@@ -362,10 +300,10 @@
                                                         'name' => 'stock_status',
                                                         'options' => [
                                                             '' => '--Select--',
-                                                            '0' => 'In Stock',
-                                                            '1' => 'Out of Stock',
-                                                            '2' => 'Low Stock',
-                                                            '3' => 'Scrap',
+                                                            'in_stock' => 'In Stock',
+                                                            'out_of_stock' => 'Out of Stock',
+                                                            'low_stock' => 'Low Stock',
+                                                            'scrap' => 'Scrap',
                                                         ],
                                                     ])
                                                 </div>
@@ -389,6 +327,7 @@
                                                 'name' => 'main_product_image',
                                                 'type' => 'file',
                                                 'placeholder' => 'Upload Main Product Image',
+                                                'accept' => 'image/*',
                                             ])
                                             <div id="emailHelp" class="text-danger">Image Size Should Be
                                                 800x650
@@ -409,6 +348,7 @@
                                                 'name' => 'datasheet_manual',
                                                 'type' => 'file',
                                                 'placeholder' => 'Upload Product Datasheet or Manual',
+                                                'accept' => 'application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.presentation',
                                             ])
                                             <div class="text-danger">PDF files only</div>
                                         </div>
@@ -420,7 +360,6 @@
                                     <div
                                         class="card-header border-bottom-dashed d-flex justify-content-between align-items-center">
                                         <h5 class="card-title mb-0">Product Variations</h5>
-
                                     </div>
 
                                     <div class="card-body">
@@ -436,7 +375,7 @@
                                                     name="variations[{{ $attribute->name }}][]"
                                                     class="form-select js-variation-select" multiple>
                                                     @if (isset($variationAttributeValues[$attribute->name]))
-                                                        @foreach ($variationAttributeValues[$attribute->name] as  $value)
+                                                        @foreach ($variationAttributeValues[$attribute->name] as $value)
                                                             <option value="{{ $value }}">{{ $value }}
                                                             </option>
                                                         @endforeach
@@ -446,9 +385,7 @@
                                                 </select>
                                             </div>
                                         @endforeach
-
                                     </div>
-
                                 </div>
 
 
@@ -463,11 +400,11 @@
                                             @include('components.form.select', [
                                                 'label' => 'Product Status',
                                                 'name' => 'status',
-                                                'value' => '1',
+                                                'value' => 'active',
                                                 'options' => [
                                                     '' => '--Select--',
-                                                    '0' => 'Inactive',
-                                                    '1' => 'Active',
+                                                    'inactive' => 'Inactive',
+                                                    'active' => 'Active',
                                                 ],
                                             ])
                                         </div>
@@ -677,41 +614,7 @@
             // ========================================
             // Task 2: Category-Dependent Subcategory Filtering
             // ========================================
-            $('#parent_category').on('change', function() {
-                var parentId = $(this).val();
-                var subcategorySelect = $('#sub_category');
 
-                // keep selected parent; only touch subcategory
-                subcategorySelect.empty();
-
-                if (!parentId) {
-                    subcategorySelect.append('<option value="">--Select Category First--</option>');
-                    return;
-                }
-
-                subcategorySelect.append('<option value="">Loading...</option>');
-
-                $.ajax({
-                    url: '/category-dependent',
-                    method: 'GET',
-                    data: {
-                        parent_id: parentId
-                    },
-                    success: function(data) {
-                        subcategorySelect.empty()
-                            .append('<option value="">--Select Subcategory--</option>');
-                        $.each(data, function(key, value) {
-                            subcategorySelect.append('<option value="' + key + '">' +
-                                value + '</option>');
-                        });
-                    },
-                    error: function() {
-                        subcategorySelect.empty()
-                            .append('<option value="">Error loading subcategories</option>');
-                        console.error('Error fetching subcategories');
-                    }
-                });
-            });
 
 
             // ========================================
@@ -763,16 +666,62 @@
 
 @section('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.js-variation-select').forEach(function(el) {
-                new Choices(el, {
-                    removeItemButton: true, // chip ke andar × button
-                    shouldSort: false,
-                    placeholder: true,
-                    placeholderValue: 'Select values',
-                    searchPlaceholderValue: 'Filter...',
-                    allowHTML: true
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     document.querySelectorAll('.js-variation-select').forEach(function(el) {
+        //         new Choices(el, {
+        //             removeItemButton: true, // chip ke andar × button
+        //             shouldSort: false,
+        //             placeholder: true,
+        //             placeholderValue: 'Select values',
+        //             searchPlaceholderValue: 'Filter...',
+        //             allowHTML: true
+        //         });
+        //     });
+        // });
+
+
+        // Vendor -> Vendor PO Number
+        $(document).ready(function() {
+            $('#vendor_id').on('change', function() {
+                var vendorId = $(this).val();
+                $.ajax({
+                    url: '{{ route('product-list.get-vendor-purchase-orders-by-vendor') }}',
+                    method: 'GET',
+                    data: {
+                        vendor_id: vendorId
+                    },
+                    success: function(data) {
+                        $('#vendor_purchase_order_id').empty();
+                        $('#vendor_purchase_order_id').append(
+                            '<option value="">--Select--</option>');
+                        $.each(data, function(key, value) {
+                            $('#vendor_purchase_order_id').append('<option value="' +
+                                key + '">' + value + '</option>');
+                        });
+                    }
                 });
+            });
+
+            console.log("Parent Category -> Sub Category");
+            // Parent Category -> Sub Category
+            $('#parent_category').on('change', function() {
+                var parentId = $(this).val();
+                console.log(parentId);
+                // $.ajax({
+                //     url: '{{ route('product-list.get-sub-categories') }}',
+                //     method: 'GET',
+                //     data: {
+                //         parent_id: parentId
+                //     },
+                //     success: function(data) {
+                //         console.log(data);
+                //         $('#sub_category').empty();
+                //         $('#sub_category').append('<option value="">--Select Subcategory--</option>');
+                //         $.each(data, function(key, value) {
+                //             $('#sub_category').append('<option value="' + key + '">' + value + '</option>');
+                //         });
+                //     }
+                // });
             });
         });
     </script>

@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Staff;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class StaffSeeder extends Seeder
 {
@@ -37,7 +36,7 @@ class StaffSeeder extends Seeder
             for ($j = 1; $j <= 4; $j++) { // 4 records per role → 24 total
                 $staff[] = [
                     'staff_code' => 'STF' . str_pad($i, 3, '0', STR_PAD_LEFT),
-                    'staff_role' => $roleId,
+                    'staff_role' => 'customer',
                     'first_name' => $roleName . $j,
                     'last_name' => 'User',
                     'phone' => '98' . rand(10000000, 99999999),

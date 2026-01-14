@@ -27,7 +27,7 @@ return new class extends Migration
             $table->decimal('tax_amount', 15, 2)->default(0);
             $table->decimal('total_amount', 15, 2);
 
-            $table->enum('status', [0, 1, 2, 3, 4, 5])->default(0)->comment('0 - Draft, 1 - Sent, 2 - Accepted, 3 - Rejected, 4 - Expired, 5 - Converted');
+            $table->enum('status', ['draft', 'sent', 'accepted', 'rejected', 'expired', 'converted'])->default('draft')->comment('0 - Draft, 1 - Sent, 2 - Accepted, 3 - Rejected, 4 - Expired, 5 - Converted');
             $table->text('terms_conditions')->nullable();
             $table->text('notes')->nullable();
             $table->timestamp('sent_at')->nullable();

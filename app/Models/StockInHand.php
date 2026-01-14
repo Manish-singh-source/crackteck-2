@@ -25,4 +25,9 @@ class StockInHand extends Model
         'requested_date',
         'approved_at',
     ];
+
+    public function products()
+    {
+        return $this->hasMany(StockInHandProduct::class);
+    }
 }

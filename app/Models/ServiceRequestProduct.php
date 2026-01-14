@@ -26,4 +26,15 @@ class ServiceRequestProduct extends Model
     protected $casts = [
         'images' => 'array',
     ];
+
+    public function serviceRequest()
+    {
+        return $this->belongsTo(ServiceRequest::class, 'service_requests_id');
+    }
+
+    public function itemCode()
+    {
+        return $this->belongsTo(CoveredItem::class, 'item_code_id');
+    }
+
 }

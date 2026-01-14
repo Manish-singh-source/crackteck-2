@@ -35,6 +35,7 @@ class VendorController extends Controller
             'pincode' => 'required|digits:6',
             'pan_no' => 'nullable|unique:vendors,pan_no',
             'gst_no' => 'nullable|unique:vendors,gst_no',
+            'status' => 'required|in:inactive,active',
         ]);
 
         if ($validator->fails()) {
@@ -88,6 +89,7 @@ class VendorController extends Controller
             'pincode' => 'required|digits:6',
             'pan_no' => 'nullable|unique:vendors,pan_no,'.$id,
             'gst_no' => 'nullable|unique:vendors,gst_no,'.$id,
+            'status' => 'required|in:inactive,active',
         ]);
 
         if ($validator->fails()) {
@@ -108,7 +110,6 @@ class VendorController extends Controller
         $vendor->pan_no = $request->pan_no;
         $vendor->gst_no = $request->gst_no;
         $vendor->status = $request->status;
-
         $vendor->save();
 
         if (! $vendor) {

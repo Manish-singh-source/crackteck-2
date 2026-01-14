@@ -541,10 +541,10 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                @php $variations = json_decode($product->warehouseProduct->variation_options, true); 
+                                {{-- @php $variations = json_decode($product->warehouseProduct->variation_options, true); 
                                     // print_r($variations);
-                                @endphp
-                                @foreach ($variations as $key=> $attribute)
+                                @endphp --}}
+                                @foreach ($product->warehouseProduct->variation_options as $key=> $attribute)
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label class="fw-semibold">{{ $key }}:</label>

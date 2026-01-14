@@ -184,7 +184,7 @@ class EcommerceProductController extends Controller
             'warehouseProduct.warehouse',
             'warehouseProduct.warehouseRack',
             'warehouseProduct.productSerials' => function ($query) {
-                $query->where('status', '1');
+                $query->where('status', 'active');
             },
         ])->findOrFail($id);
 

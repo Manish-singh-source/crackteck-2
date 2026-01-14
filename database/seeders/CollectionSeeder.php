@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -24,21 +23,21 @@ class CollectionSeeder extends Seeder
                     'slug' => 'electronics', 
                     'name' => 'Electronics',
                     'sort_order' => 1,
-                    'status' => "1", 
+                    'status' => "active", 
                     'created_at' => $now, 
                     'updated_at' => $now],
                 [
                     'slug' => 'home-appliances', 
                     'name' => 'Home Appliances',
                     'sort_order' => 2,
-                    'status' => "1", 
+                    'status' => "active", 
                     'created_at' => $now, 
                     'updated_at' => $now],
                 [
                     'slug' => 'kitchen', 
                     'name' => 'Kitchen',
                     'sort_order' => 3,
-                    'status' => "1", 
+                    'status' => "active", 
                     'created_at' => $now, 
                     'updated_at' => $now],
             ]);
@@ -53,7 +52,7 @@ class CollectionSeeder extends Seeder
                 'description' => 'Best summer discounts', 
                 'image_url' => null, 
                 'sort_order' => 1, 
-                'is_active' => 1, 
+                'status' => "active", 
                 'products_count' => 0, 
                 'created_at' => $now, 
                 'updated_at' => $now
@@ -64,7 +63,7 @@ class CollectionSeeder extends Seeder
                 'description' => 'Top rated products', 
                 'image_url' => null, 
                 'sort_order' => 2, 
-                'is_active' => 1, 
+                'status' => "active", 
                 'products_count' => 0, 
                 'created_at' => $now, 
                 'updated_at' => $now
@@ -75,7 +74,7 @@ class CollectionSeeder extends Seeder
                 'description' => 'Latest products', 
                 'image_url' => null, 
                 'sort_order' => 3, 
-                'is_active' => 1, 
+                'status' => "active", 
                 'products_count' => 0, 
                 'created_at' => $now, 
                 'updated_at' => $now

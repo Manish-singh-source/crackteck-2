@@ -21,9 +21,9 @@ return new class extends Migration
             $table->foreignId('assigned_delivery_man_id')->nullable()->constrained('staff')->onDelete('cascade');
             $table->timestamp('assigned_at')->nullable();
             $table->timestamp('delivered_at')->nullable();
-            $table->enum('status', [0, 1, 2, 3, 4, 5, 6])->default(0)->comment('0 - Pending, 1 - Approved, 2 - Rejected, 3 - Picked, 4 - Used, 5 - Returned, 6 - Cancelled'); // pending, approved, rejected, picked, used, returned, cancelled
+            $table->enum('status', ['pending', 'approved', 'rejected', 'picked', 'used', 'returned', 'cancelled'])->default('pending')->comment('0 - Pending, 1 - Approved, 2 - Rejected, 3 - Picked, 4 - Used, 5 - Returned, 6 - Cancelled'); // pending, approved, rejected, picked, used, returned, cancelled
             $table->text('request_notes')->nullable();
-            $table->json('delivery_photos')->nullable();
+            $table->text('delivery_photos')->nullable();
             $table->text('cancellation_reason')->nullable();
 
             $table->integer('requested_quantity');

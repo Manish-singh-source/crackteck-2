@@ -29,11 +29,11 @@ return new class extends Migration
             $table->decimal('final_price', 10, 2);
 
             $table->string('main_product_image')->nullable();
-            $table->json('additional_product_images')->nullable();
+            $table->text('additional_product_images')->nullable();
 
-            $table->json('variations')->nullable();
+            $table->text('variations')->nullable();
 
-            $table->enum('status', [0, 1, 2, 3])->default(1)->comment('0 - Inactive, 1 - Active, 2 - Sold, 3 - Scrap');
+            $table->enum('status', ['inactive', 'active', 'sold', 'scrap'])->default('active');
 
             $table->softDeletes();
             $table->timestamps();

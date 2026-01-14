@@ -57,7 +57,7 @@ class AmcServicesController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $amcPlans = AmcPlan::where('status', '1')->get();
+            $amcPlans = AmcPlan::where('status', 'active')->get();
             $amcPlansCoveredItems = [];
             foreach ($amcPlans as $plan) {
                 $amcPlansCoveredItems[] = [

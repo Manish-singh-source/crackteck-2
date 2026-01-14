@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -22,8 +21,8 @@ class FieldIssueSeeder extends Seeder
                 'field_executive_id' => 5,
                 'issue_type' => 'Pickup Delay',
                 'issue_description' => 'Pickup delayed due to traffic and customer reschedule.',
-                'priority' => 1,
-                'status' => "0",
+                'priority' => "medium",
+                'status' => "pending",
                 'assigned_remote_engineer_id' => null,
                 'resolved_at' => null,
                 'resolution_notes' => null,
@@ -36,8 +35,8 @@ class FieldIssueSeeder extends Seeder
                 'field_executive_id' => 6,
                 'issue_type' => 'Safety Concern',
                 'issue_description' => 'Field executive reported an unsafe installation environment.',
-                'priority' => 3,
-                'status' => "1",
+                'priority' => "critical",
+                'status' => "in_progress",
                 'assigned_remote_engineer_id' => 2,
                 'resolved_at' => null,
                 'resolution_notes' => null,
@@ -50,8 +49,8 @@ class FieldIssueSeeder extends Seeder
                 'field_executive_id' => 7,
                 'issue_type' => 'Tool Damage',
                 'issue_description' => 'Reported damage to handheld diagnostic tool; replaced from stock.',
-                'priority' => 2,
-                'status' => "2",
+                'priority' => "high",
+                'status' => "resolved",
                 'assigned_remote_engineer_id' => 3,
                 'resolved_at' => \Carbon\Carbon::now()->subDay(),
                 'resolution_notes' => 'Issued replacement tool and logged inventory change.',

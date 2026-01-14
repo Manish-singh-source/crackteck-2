@@ -23,13 +23,9 @@ class RequestedPartDeliverySeeder extends Seeder
             return;
         }
 
-        $serials = ProductSerial::inRandomOrder()->limit(200)->get();
-
         $deliveries = [];
 
         foreach ($partsRequests as $pr) {
-            $serial = $serials->isNotEmpty() ? $serials->random() : null;
-
             $quantity = rand(1, 3);
             $unitPrice = rand(100, 2000);
             $totalPrice = $quantity * $unitPrice;
@@ -40,10 +36,9 @@ class RequestedPartDeliverySeeder extends Seeder
             }
 
             $deliveries[] = [
-                'service_request_id' => $pr->service_request_id,
-                'service_request_product_id' => $pr->service_request_product_id,
-                'service_request_product_request_part_id' => $pr->id,
-                'product_serial_id' => $serial ? $serial->id : null,
+                'request_id' => $pr->request_id,
+                'product_id' => $pr->product_id,
+                'request_part_id' => $pr->id,
                 'quantity' => $quantity,
                 'unit_price' => $unitPrice,
                 'total_price' => $totalPrice,

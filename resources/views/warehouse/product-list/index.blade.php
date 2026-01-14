@@ -120,8 +120,8 @@
                                                                         <div>{{ $product->stock_quantity ?? 0 }}</div>
                                                                         @if ($product->stock_status)
                                                                             <span
-                                                                                class="badge {{ $product->stock_status == 'In Stock' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
-                                                                                {{ $product->stock_status }}
+                                                                                class="badge {{ $product->stock_status == 'in_stock' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
+                                                                                {{ ucwords(str_replace('_', ' ', $product->stock_status)) }}
                                                                             </span>
                                                                         @endif
                                                                     </td>
@@ -130,8 +130,8 @@
                                                                             {{ $product->created_at->format('d M Y') }}
                                                                         </div>
                                                                         <span
-                                                                            class="badge {{ $product->status == 1 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
-                                                                            {{ $product->status == 1 ? 'Active' : 'Inactive' }}
+                                                                            class="badge {{ $product->status == 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
+                                                                            {{ $product->status == 'active' ? 'Active' : 'Inactive' }}
                                                                         </span>
                                                                     </td>
                                                                     <td>

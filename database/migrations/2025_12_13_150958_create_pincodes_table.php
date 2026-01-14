@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
 
             $table->string('pincode')->unique();
-            $table->enum('delivery', [0, 1])->default(1)->comment('0 - Inactive, 1 - Active');
-            $table->enum('installation', [0, 1])->default(1)->comment('0 - Inactive, 1 - Active');
-            $table->enum('repair', [0, 1])->default(1)->comment('0 - Inactive, 1 - Active');
-            $table->enum('quick_service', [0, 1])->default(1)->comment('0 - Inactive, 1 - Active');
-            $table->enum('amc', [0, 1])->default(1)->comment('0 - Inactive, 1 - Active');
+            $table->enum('delivery', ['inactive', 'active'])->default('active');
+            $table->enum('installation', ['inactive', 'active'])->default('active');
+            $table->enum('repair', ['inactive', 'active'])->default('active');
+            $table->enum('quick_service', ['inactive', 'active'])->default('active');
+            $table->enum('amc', ['inactive', 'active'])->default('active');
 
             $table->softDeletes();
             $table->timestamps();

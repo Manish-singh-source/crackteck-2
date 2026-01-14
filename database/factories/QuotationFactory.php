@@ -42,7 +42,7 @@ class QuotationFactory extends Factory
 
                 return Staff::inRandomOrder()->value('id') ?? Staff::create([
                     'staff_code' => 'SEED' . time() . rand(100, 999),
-                    'staff_role' => '3',
+                    'staff_role' => 'sales_person',
                     'first_name' => 'Seed',
                     'last_name' => 'User',
                     'email' => 'seed' . time() . '@example.test',
@@ -59,7 +59,7 @@ class QuotationFactory extends Factory
             'discount_amount' => $this->faker->randomFloat(2, 0, 100),
             'tax_amount' => $this->faker->randomFloat(2, 0, 100),
             'total_amount' => $this->faker->randomFloat(2, 100, 1000),
-            'status' => $this->faker->randomElement(['0', '1', '2', '3', '4', '5']),
+            'status' => $this->faker->randomElement(['draft', 'sent', 'accepted', 'rejected', 'expired', 'converted']),
             'terms_conditions' => $this->faker->paragraph(),
             'notes' => $this->faker->paragraph(),
             'sent_at' => $this->faker->optional()->date(),

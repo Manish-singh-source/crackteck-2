@@ -257,10 +257,10 @@
                                                 'name'    => 'supported_operations',
                                                 'options' => [
                                                     ''  => '--Select Supported Operations--',
-                                                    '0' => 'Inbound',
-                                                    '1' => 'Outbound',
-                                                    '2' => 'Returns',
-                                                    '3' => 'QC',
+                                                    'inbound' => 'Inbound',
+                                                    'outbound' => 'Outbound',
+                                                    'returns' => 'Returns',
+                                                    'qc' => 'QC',
                                                 ],
                                                 'model'   => $warehouse,
                                             ])
@@ -274,9 +274,9 @@
                                                 'name'    => 'zone_conf',
                                                 'options' => [
                                                     ''  => '--Select Zone Configuration--',
-                                                    '0' => 'Receiving Zone',
-                                                    '1' => 'Pick Zone',
-                                                    '2' => 'Cold Storage',
+                                                    'receiving_zone' => 'Receiving Zone',
+                                                    'pick_zone' => 'Pick Zone',
+                                                    'cold_storage' => 'Cold Storage',
                                                 ],
                                                 'model'   => $warehouse,
                                             ])
@@ -346,8 +346,8 @@
                                                 'label'   => 'Default Warehouse',
                                                 'name'    => 'default_warehouse',
                                                 'options' => [
-                                                    '0' => 'No',
-                                                    '1' => 'Yes',
+                                                    'no' => 'No',
+                                                    'yes' => 'Yes',
                                                 ],
                                                 'model'   => $warehouse,
                                             ])
@@ -360,9 +360,9 @@
                                                 'label'   => 'Verification Status',
                                                 'name'    => 'verification_status',
                                                 'options' => [
-                                                    '0' => 'Pending',
-                                                    '1' => 'Verified',
-                                                    '2' => 'Rejected',
+                                                    'pending' => 'Pending',
+                                                    'verified' => 'Verified',
+                                                    'rejected' => 'Rejected',
                                                 ],
                                                 'model'   => $warehouse,
                                             ])
@@ -375,8 +375,8 @@
                                                 'label'   => 'Status',
                                                 'name'    => 'status',
                                                 'options' => [
-                                                    '0' => 'Inactive',
-                                                    '1' => 'Active',
+                                                    'inactive' => 'Inactive',
+                                                    'active' => 'Active',
                                                 ],
                                                 'model'   => $warehouse,
                                             ])

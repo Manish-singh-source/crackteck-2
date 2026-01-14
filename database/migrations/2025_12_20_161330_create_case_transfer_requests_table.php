@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('new_engineer_id')->nullable()->constrained('staff')->nullOnDelete();
             $table->text('engineer_reason');
             $table->text('admin_reason')->nullable();
-            $table->enum('status', [0, 1, 2])->default(0)->comment('0 - Pending, 1 - Approved, 2 - Rejected');
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamp('approved_at')->nullable();
             $table->timestamp('rejected_at')->nullable();
             $table->timestamps();

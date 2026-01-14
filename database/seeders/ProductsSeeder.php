@@ -42,14 +42,14 @@ class ProductsSeeder extends Seeder
                 'selling_price' => 42000.00,
                 'final_price' => 49060.00,
                 'stock_quantity' => 5,
-                'stock_status' => '0',
+                'stock_status' => 'in_stock',
 
                 'main_product_image' => 'uploads/warehouse/products/2-4-1.png',
                 'additional_product_images' => json_encode(['uploads/warehouse/products/2-4-2.png']),
                 'datasheet_manual' => 'uploads/products/documents/datasheet1.pdf',
                 'variation_options' => json_encode(['1' => ['1', '5'], '2' => ['7', '8']]),
 
-                'status' => "1",
+                'status' => "active",
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
@@ -72,14 +72,14 @@ class ProductsSeeder extends Seeder
                 'selling_price' => 68500.00,
                 'final_price' => 79830.00,
                 'stock_quantity' => 10,
-                'stock_status' => '0',
+                'stock_status' => 'in_stock',
                 'warehouse_id' => 1,
 
                 'main_product_image' => 'uploads/warehouse/products/2-4-1.png',
                 'additional_product_images' => json_encode(['uploads/warehouse/products/2-4-2.png']),
                 'datasheet_manual' => 'uploads/products/documents/datasheet2.pdf',
                 'variation_options' => json_encode(['1' => ['1', '2'], '2' => ['3', '4']]),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
@@ -103,14 +103,14 @@ class ProductsSeeder extends Seeder
                 'selling_price' => 57000.00,
                 'final_price' => 66510.00,
                 'stock_quantity' => 8,
-                'stock_status' => '0',
+                'stock_status' => 'in_stock',
                 'warehouse_id' => 3,
 
                 'main_product_image' => 'uploads/warehouse/products/2-4-1.png',
                 'additional_product_images' => json_encode(['uploads/warehouse/products/2-4-2.png']),
                 'datasheet_manual' => 'uploads/products/documents/datasheet3.pdf',
                 'variation_options' => json_encode(['1' => ['1', '3'], '2' => ['5', '6']]),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
@@ -133,14 +133,14 @@ class ProductsSeeder extends Seeder
                 'selling_price' => 48200.00,
                 'final_price' => 56276.00,
                 'stock_quantity' => 6,
-                'stock_status' => '0',
+                'stock_status' => 'in_stock',
                 'warehouse_id' => 4,
 
                 'main_product_image' => 'uploads/warehouse/products/2-4-1.png',
                 'additional_product_images' => json_encode(['uploads/warehouse/products/2-4-2.png']),
                 'datasheet_manual' => 'uploads/products/documents/datasheet4.pdf',
                 'variation_options' => json_encode(['1' => ['2', '4'], '2' => ['6', '8']]),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
@@ -163,14 +163,14 @@ class ProductsSeeder extends Seeder
                 'selling_price' => 78000.00,
                 'final_price' => 90840.00,
                 'stock_quantity' => 4,
-                'stock_status' => '0',
+                'stock_status' => 'in_stock',
                 'warehouse_id' => 5,
 
                 'main_product_image' => 'uploads/warehouse/products/2-4-1.png',
                 'additional_product_images' => json_encode(['uploads/warehouse/products/2-4-2.png']),
                 'datasheet_manual' => 'uploads/products/documents/datasheet5.pdf',
                 'variation_options' => json_encode(['1' => ['3', '5'], '2' => ['7', '9']]),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
@@ -198,14 +198,14 @@ class ProductsSeeder extends Seeder
                 'selling_price' => 6400.00,
                 'final_price' => 7552.00,
                 'stock_quantity' => 15,
-                'stock_status' => '0',
+                'stock_status' => 'in_stock',
                 'warehouse_id' => 2,
 
                 'main_product_image' => 'uploads/warehouse/products/Spare Part.png',
                 'additional_product_images' => json_encode(['uploads/warehouse/products/Spare Part.png']),
                 'datasheet_manual' => 'uploads/products/documents/datasheet6.pdf',
                 'variation_options' => json_encode(['1' => ['2', '3'], '2' => ['4', '5']]),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
@@ -230,14 +230,14 @@ class ProductsSeeder extends Seeder
                 'selling_price' => 2600.00,
                 'final_price' => 3068.00,
                 'stock_quantity' => 25,
-                'stock_status' => '0',
+                'stock_status' => 'in_stock',
                 'warehouse_id' => 1,
 
                 'main_product_image' => 'uploads/warehouse/products/Spare Part.png',
                 'additional_product_images' => json_encode(['uploads/warehouse/products/Spare Part.png']),
                 'datasheet_manual' => 'uploads/products/documents/datasheet7.pdf',
                 'variation_options' => json_encode(['1' => ['1', '3'], '2' => ['5', '7']]),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
@@ -262,14 +262,14 @@ class ProductsSeeder extends Seeder
                 'selling_price' => 2100.00,
                 'final_price' => 2479.00,
                 'stock_quantity' => 30,
-                'stock_status' => '0',
+                'stock_status' => 'in_stock',
                 'warehouse_id' => 3,
 
                 'main_product_image' => 'uploads/warehouse/products/Spare Part.png',
                 'additional_product_images' => json_encode(['uploads/warehouse/products/Spare Part.png']),
                 'datasheet_manual' => 'uploads/products/documents/datasheet8.pdf',
                 'variation_options' => json_encode(['1' => ['2', '5'], '2' => ['6', '8']]),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
@@ -294,14 +294,14 @@ class ProductsSeeder extends Seeder
                 'selling_price' => 1400.00,
                 'final_price' => 1652.00,
                 'stock_quantity' => 40,
-                'stock_status' => '0',
+                'stock_status' => 'in_stock',
                 'warehouse_id' => 4,
 
                 'main_product_image' => 'uploads/warehouse/products/Spare Part.png',
                 'additional_product_images' => json_encode(['uploads/warehouse/products/Spare Part.png']),
                 'datasheet_manual' => 'uploads/products/documents/datasheet9.pdf',
                 'variation_options' => json_encode(['1' => ['1', '2'], '2' => ['3', '4']]),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
@@ -326,14 +326,14 @@ class ProductsSeeder extends Seeder
                 'selling_price' => 4900.00,
                 'final_price' => 5782.00,
                 'stock_quantity' => 20,
-                'stock_status' => '0',
+                'stock_status' => 'in_stock',
                 'warehouse_id' => 5,
 
                 'main_product_image' => 'uploads/warehouse/products/Spare Part.png',
                 'additional_product_images' => json_encode(['uploads/warehouse/products/Spare Part.png']),
                 'datasheet_manual' => 'uploads/products/documents/datasheet10.pdf',
                 'variation_options' => json_encode(['1' => ['4', '6'], '2' => ['7', '9']]),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
@@ -342,14 +342,29 @@ class ProductsSeeder extends Seeder
 
         $toInsert = [];
         $parentCount = count($parentIds) ?: 1;
+        $subsByParent = $subCategories->groupBy('parent_category_id');
 
         foreach ($productsData as $index => $prod) {
+            if (isset($prod['parent_category_id'], $prod['sub_category_id'])) {
+                $toInsert[] = $prod;
+                continue;
+            }
+
             $parentId = $parentIds[$index % $parentCount];
-            $subId = DB::table('sub_categories')->where('parent_category_id', $parentId)->value('id');
+            $possibleSubs = $subsByParent->get($parentId);
+
+            if ($possibleSubs && $possibleSubs->isNotEmpty()) {
+                $subId = $possibleSubs->random()->id;
+            } elseif ($subCategories->isNotEmpty()) {
+                $randomSub = $subCategories->random();
+                $parentId = $randomSub->parent_category_id;
+                $subId = $randomSub->id;
+            } else {
+                continue; // Skip if no subcategories available
+            }
 
             $prod['parent_category_id'] = $parentId;
             $prod['sub_category_id'] = $subId;
-
             $toInsert[] = $prod;
         }
 

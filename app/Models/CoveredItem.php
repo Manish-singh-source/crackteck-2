@@ -23,39 +23,6 @@ class CoveredItem extends Model
         'diagnosis_list' => 'array',
     ];
 
-    // Map numeric type to name
-    public static function getServiceTypeName($typeCode): string
-    {
-        // for
-        // amc is AMC
-        // quick service is QS
-        // installation is INST
-        // repair is REP
-        $map = [
-            '0' => 'amc',
-            '1' => 'quick_service',
-            '2' => 'installation',
-            '3' => 'repair',
-        ];
-
-        $key = (string) $typeCode;
-
-        return $map[$key] ?? 'unknown';
-    }
-
-    public function getServiceTypeAttribute($value)
-    {
-        $map = [
-            '0' => 'amc',
-            '1' => 'quick_service',
-            '2' => 'installation',
-            '3' => 'repair',
-        ];
-
-        $key = (string) $value;
-
-        return $map[$key] ?? 'unknown'; 
-    }
 
     public static function generateItemCode($typeCode): string
     {

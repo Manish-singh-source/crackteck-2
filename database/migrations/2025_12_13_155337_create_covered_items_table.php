@@ -16,13 +16,13 @@ return new class extends Migration
 
             $table->string('item_code')->unique();
 
-            $table->enum('service_type', [0, 1, 2, 3])->default(0)->comment('0 - AMC, 1 - Quick Service, 2 - Installation, 3 - Repair');
+            $table->enum('service_type', ['amc', 'quick_service', 'installation', 'repair'])->default('quick_service');
             $table->string('service_name');
             $table->decimal('service_charge', 10, 2)->nullable();
 
-            $table->enum('status', [0, 1])->default(1)->comment('0 - Inactive, 1 - Active');
+            $table->enum('status', ['inactive', 'active'])->default('active');
 
-            $table->json('diagnosis_list')->nullable();
+            $table->text('diagnosis_list')->nullable();
 
             $table->softDeletes();
             $table->timestamps();

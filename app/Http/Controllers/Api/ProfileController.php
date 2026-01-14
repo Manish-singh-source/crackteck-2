@@ -166,15 +166,15 @@ class ProfileController extends Controller
 
             if ($request->filled('is_primary')) {
                 if ($request->is_primary && ! $primaryAddress) {
-                    $request->is_primary = "1";
+                    $request->is_primary = "yes";
                 } else {
-                    $request->is_primary = "0";
+                    $request->is_primary = "no";
                 }
             } else {
                 if (! $primaryAddress) {
-                    $request->is_primary = "1";
+                    $request->is_primary = "yes";
                 } else {
-                    $request->is_primary = "0";
+                    $request->is_primary = "no";
                 }
             }
 
@@ -188,7 +188,6 @@ class ProfileController extends Controller
                 'state' => $request->state,
                 'country' => $request->country,
                 'pincode' => $request->pincode,
-
                 'is_primary' => $request->is_primary,
             ]);
         } else {
@@ -215,15 +214,9 @@ class ProfileController extends Controller
         }
         $validated = $validated->validated();
 
-        // but there is some condition 
-        // i want to check if there is any primary address or not for that customer
-        // if there is no primary address then make this address primary
-        // otherwise update as per request
-        // one customer can set only one primary address send error that one address is already primary
-
         if ($validated['role_id'] == 4) {
             $address = CustomerAddressDetail::where('customer_id', $validated['user_id'])->find($id);
-            $address->branch_name = $request->branch_name;
+            $address->branch_name = $request->branch_name ?? '';
             $address->address1 = $request->address1;
             $address->address2 = $request->address2;
             $address->city = $request->city;
@@ -236,7 +229,7 @@ class ProfileController extends Controller
                 if ($primaryAddress) {
                     return response()->json(['success' => false, 'message' => 'One address is already primary.'], 400);
                 }
-                $address->is_primary = "1";
+                $address->is_primary = "yes";
             }
             $address->save();
         } else {

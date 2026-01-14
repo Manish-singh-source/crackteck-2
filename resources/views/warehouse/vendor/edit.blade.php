@@ -156,10 +156,10 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Status',
                                                     'name' => 'status',
-                                                    'value' => '1',
+                                                    'value' => 'active',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'inactive' => 'Inactive',
+                                                        'active' => 'Active',
                                                     ],
                                                     'model' => $vendor,
                                                 ])

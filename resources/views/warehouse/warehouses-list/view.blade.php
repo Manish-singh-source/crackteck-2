@@ -182,26 +182,7 @@
                                     class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                     <span class="fw-semibold text-break">Supported Operations:</span>
                                     <span>
-                                        @switch($warehouse->supported_operations)
-                                            @case(0)
-                                                Inbound
-                                            @break
-
-                                            @case(1)
-                                                Outbound
-                                            @break
-
-                                            @case(2)
-                                                Returns
-                                            @break
-
-                                            @case(3)
-                                                QC
-                                            @break
-
-                                            @default
-                                                Unknown
-                                        @endswitch
+                                        {{ ucwords($warehouse->supported_operations) }}
                                     </span>
 
                                 </li>
@@ -210,22 +191,8 @@
                                     class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                     <span class="fw-semibold text-break">Zone Configuration:</span>
                                     <span>
-                                        @switch($warehouse->zone_conf)
-                                            @case(0)
-                                                Receiving Zone
-                                            @break
-
-                                            @case(1)
-                                                Pick Zone
-                                            @break
-
-                                            @case(2)
-                                                Cold Storage
-                                            @break
-
-                                            @default
-                                                Unknown
-                                        @endswitch
+                                        {{-- Receiving_zone --}}
+                                        {{ ucwords(str_replace('_', ' ', $warehouse->zone_conf)) }}
                                     </span>
                                 </li>
                             </ul>
@@ -296,10 +263,10 @@
                                 <div>
                                     <select required name="default_warehouse" class="form-select w-100">
                                         <option value="" selected disabled>---- Select ----</option>
-                                        <option value="1"
-                                            {{ $warehouse->default_warehouse == '1' ? 'selected' : '' }}>Yes</option>
-                                        <option value="0"
-                                            {{ $warehouse->default_warehouse == '0' ? 'selected' : '' }}>No</option>
+                                        <option value="yes"
+                                            {{ $warehouse->default_warehouse == 'yes' ? 'selected' : '' }}>Yes</option>
+                                        <option value="no"
+                                            {{ $warehouse->default_warehouse == 'no' ? 'selected' : '' }}>No</option>
                                     </select>
                                 </div>
                             </div>
@@ -318,16 +285,16 @@
                                 <div>
                                     <select required name="verification_status" class="form-select w-100">
                                         <option value="" selected disabled>---- Select ----</option>
-                                        <option value="0"
-                                            {{ $warehouse->verification_status == 0 ? 'selected' : '' }}>
+                                        <option value="pending"
+                                            {{ $warehouse->verification_status == 'pending' ? 'selected' : '' }}>
                                             Pending
                                         </option>
-                                        <option value="1"
-                                            {{ $warehouse->verification_status == 1 ? 'selected' : '' }}>
+                                        <option value="verified"
+                                            {{ $warehouse->verification_status == 'verified' ? 'selected' : '' }}>
                                             Verified
                                         </option>
-                                        <option value="2"
-                                            {{ $warehouse->verification_status == 2 ? 'selected' : '' }}>
+                                        <option value="rejected"
+                                            {{ $warehouse->verification_status == 'rejected' ? 'selected' : '' }}>
                                             Rejected
                                         </option>
                                     </select>
@@ -348,9 +315,9 @@
                                 <div>
                                     <select required name="status" class="form-select w-100">
                                         <option value="" selected disabled>---- Select ----</option>
-                                        <option value="1" {{ $warehouse->status == 1 ? 'selected' : '' }}>Active
+                                        <option value="active" {{ $warehouse->status == 'active' ? 'selected' : '' }}>Active
                                         </option>
-                                        <option value="0" {{ $warehouse->status == 0 ? 'selected' : '' }}>Inactive
+                                        <option value="inactive" {{ $warehouse->status == 'inactive' ? 'selected' : '' }}>Inactive
                                         </option>
                                     </select>
                                 </div>

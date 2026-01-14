@@ -13,9 +13,18 @@ class LeadTableSeeder extends Seeder
      */
     public function run(): void
     {
-        //
-        //
-        $staffs = Staff::where('staff_role', '3')->get();
+        $staffs = Staff::where('staff_role', 'sales_person')->get();
+
+        if ($staffs->isEmpty()) {
+            $staffs = collect([Staff::create([
+                'staff_code' => 'SEED' . time() . rand(100, 999),
+                'staff_role' => 'sales_person',
+                'first_name' => 'Seed',
+                'last_name' => 'Sales',
+                'email' => 'seedsales' . time() . '@example.test',
+                'phone' => '0000000000'
+            ])]);
+        }
 
         // Make idempotent: clear existing leads then create 20 new leads
         \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
@@ -31,15 +40,15 @@ class LeadTableSeeder extends Seeder
                 'phone' => '98765432' . str_pad($i, 2, '0', STR_PAD_LEFT),
                 'email' => 'lead' . $i . '@example.com',
                 'dob' => null,
-                'gender' => null,
+                'gender' => 'male',
                 'company_name' => null,
                 'designation' => null,
                 'industry_type' => null,
-                'source' => '0',
+                'source' => 'walk_in',
                 'requirement_type' => null,
                 'budget_range' => null,
-                'urgency' => '0',
-                'status' => '0',
+                'urgency' => 'low',
+                'status' => 'new',
                 'estimated_value' => null,
                 'notes' => null,
             ]);

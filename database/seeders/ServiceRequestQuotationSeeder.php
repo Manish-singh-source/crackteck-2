@@ -15,14 +15,12 @@ class ServiceRequestQuotationSeeder extends Seeder
      */
     public function run(): void
     {
-        echo "Seeding Service Request Quotations...\n";
         $now = Carbon::now();
 
-        $partsRequests = ServiceRequestProductRequestPart::whereIn('status', ['1', '2'])->inRandomOrder()->limit(10)->get();
+        $partsRequests = ServiceRequestProductRequestPart::whereIn('status', ['approved', 'picked'])->inRandomOrder()->limit(10)->get();
         if ($partsRequests->isEmpty()) {
             return;
         }
-        echo "Found " . $partsRequests->count() . " parts requests to create quotations for.\n";
         $products = Product::pluck('id')->toArray();
 
         $quotations = [];
@@ -34,7 +32,7 @@ class ServiceRequestQuotationSeeder extends Seeder
 
             $total = $productPrice + $serviceCharge + $deliveryCharge;
 
-            $status = [0, 1, 2][array_rand([0, 1, 2])];
+            $status = ['pending', 'approved', 'rejected'][array_rand(['pending', 'approved', 'rejected'])];
 
             $quotations[] = [
                 'request_id' => $pr->request_id,
@@ -46,14 +44,13 @@ class ServiceRequestQuotationSeeder extends Seeder
                 'total_amount' => $total,
                 'discount' => rand(0, 200),
                 'quotation_file' => null,
-                'quotation_status' => "1",
+                'quotation_status' => $status,
                 'quotation_date' => $now->subDays(rand(0, 30))->toDateString(),
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
         }
 
-        echo json_encode($quotations);
 
         if (!empty($quotations)) {
             DB::table('service_request_quotations')->insert($quotations);

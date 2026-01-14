@@ -32,16 +32,6 @@
                                 @csrf
                                 @method('POST')
                                 <div class="row g-3 pb-3">
-                                    {{-- - vendor_id (foreign key)
-                                    - po_number (unique)
-                                    - invoice_number (unique)
-                                    - invoice_pdf
-                                    - purchase_date
-                                    - po_amount_due_date
-                                    - po_amount
-                                    - po_amount_paid
-                                    - po_amount_pending
-                                    - po_status (pending, approved, rejected, cancelled) --}}
 
                                     <div class="col-4">
                                         @include('components.form.select', [
@@ -67,7 +57,7 @@
                                             'type' => 'text',   
                                             'placeholder' => 'Enter Invoice Number',
                                         ])
-                                    </div>  
+                                    </div>
 
                                     <div class="col-4">
                                         @include('components.form.input', [
@@ -114,6 +104,7 @@
                                         ])
                                     </div>  
 
+                                    {{-- 
                                     <div class="col-4">     
                                         @include('components.form.input', [
                                             'label' => 'PO Amount Pending',    
@@ -121,7 +112,8 @@
                                             'type' => 'number', 
                                             'placeholder' => 'Enter PO Amount Pending',
                                         ])
-                                    </div>  
+                                    </div>
+                                    --}}
 
                                     <div class="col-4">     
                                         @include('components.form.select', [
@@ -129,10 +121,10 @@
                                             'name' => 'po_status',          
                                             'options' => [
                                                 '' => '--Select PO Status--',
-                                                '0' => 'Pending',
-                                                '1' => 'Approved',
-                                                '2' => 'Rejected',
-                                                '3' => 'Cancelled',
+                                                'pending' => 'Pending',
+                                                'approved' => 'Approved',
+                                                'rejected' => 'Rejected',
+                                                'cancelled' => 'Cancelled',
                                             ],
                                         ])
                                     </div>

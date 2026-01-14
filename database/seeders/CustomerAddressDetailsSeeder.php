@@ -34,7 +34,7 @@ class CustomerAddressDetailsSeeder extends Seeder
                     'state' => $addr['state'],
                     'country' => $addr['country'],
                     'pincode' => $addr['pincode'],
-                    'is_primary' => 1,
+                    'is_primary' => "yes",
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);

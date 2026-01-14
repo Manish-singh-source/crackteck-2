@@ -73,12 +73,12 @@ class ServiceRequest extends Model
 
     public function activeAssignment()
     {
-        return $this->hasOne(AssignedEngineer::class)->where('status', '0')->latest();
+        return $this->hasOne(AssignedEngineer::class)->where('status', 'active')->latest();
     }
 
     public function inactiveAssignments()
     {
-        return $this->hasMany(AssignedEngineer::class)->where('status', '1')->orderBy('created_at', 'desc');
+        return $this->hasMany(AssignedEngineer::class)->where('status', 'inactive')->orderBy('created_at', 'desc');
     }
 
     public function quotations()

@@ -26,11 +26,11 @@ return new class extends Migration
             $table->timestamp('delivery_assigned_at')->nullable();
             $table->timestamp('delivery_completed_at')->nullable();
 
-            $table->enum('status', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])->default(0)->comment('0 - Pending, 1 - Assigned, 2 - Picked , 3 - Received, 4 - In Process, 5 - Processed, 6 - In Transit, 7 - Delivered, 8 - Completed, 9 - Cancelled');
+            $table->enum('status', ['pending', 'assigned', 'picked', 'received', 'in_process', 'processed', 'in_transit', 'delivered', 'completed', 'cancelled'])->default('pending');
             $table->text('cancellation_reason')->nullable();
 
-            $table->json('before_photos')->nullable();
-            $table->json('after_photos')->nullable();
+            $table->text('before_photos')->nullable();
+            $table->text('after_photos')->nullable();
 
             $table->string('otp')->nullable();
             $table->timestamp('otp_verified_at')->nullable();

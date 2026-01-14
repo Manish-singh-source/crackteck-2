@@ -17,12 +17,12 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained('service_request_products')->cascadeOnDelete();
             $table->foreignId('engineer_id')->constrained('assigned_engineers')->cascadeOnDelete();
             $table->foreignId('part_id')->constrained('products')->cascadeOnDelete();
-            $table->enum('request_type', [0, 1])->comment('0 - Stock In Hand, 1 - Part Request');
+            $table->enum('request_type', ['stock_in_hand', 'part_request'])->comment('0 - Stock In Hand, 1 - Part Request');
 
-            $table->enum('assigned_person_type', [0, 1])->comment('0 - Delivery Man, 1 - Engineer')->nullable();
+            $table->enum('assigned_person_type', ['delivery_man', 'engineer'])->comment('0 - Delivery Man, 1 - Engineer')->nullable();
             $table->foreignId('assigned_person_id')->nullable()->constrained('staff')->cascadeOnDelete();
 
-            $table->enum('status', [0, 1, 2, 3, 4, 5, 6, 7])->default(0)->comment('0 - Pending, 1 - Approved, 2 - Rejected, 3 - Customer Approved, 4 - Customer Rejected, 5 - Picked, 6 - In Transit, 7 - Delivered, 8 - Used');
+            $table->enum('status', ['requested', 'approved', 'rejected', 'customer_approved', 'customer_rejected', 'picked', 'in_transit', 'delivered', 'used', 'cancelled'])->default('requested')->comment('0 - Pending, 1 - Approved, 2 - Rejected, 3 - Customer Approved, 4 - Customer Rejected, 5 - Picked, 6 - In Transit, 7 - Delivered, 8 - Used');
 
             $table->string('otp')->nullable();
             $table->timestamp('otp_expiry')->nullable();

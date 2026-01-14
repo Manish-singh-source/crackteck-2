@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -45,7 +44,7 @@ class InvoiceSeeder extends Seeder
                 $paidAmount = round($total * (rand(10, 80) / 100), 2);
             }
 
-            $status = $paidAmount >= $total ? '4' : ($paidAmount > 0 ? '3' : '0');
+            $status = $paidAmount >= $total ? 'paid' : ($paidAmount > 0 ? 'partially_paid' : 'draft');
 
             $invoices[] = [
                 'order_id' => $order->id,

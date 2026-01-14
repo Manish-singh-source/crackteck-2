@@ -36,4 +36,24 @@ class ServiceRequestProductRequestPart extends Model
         'used_at',
         'cancelled_at',
     ];
+
+    public function serviceRequest()
+    {
+        return $this->belongsTo(ServiceRequest::class, 'request_id');
+    }
+
+    public function serviceRequestProduct()
+    {
+        return $this->belongsTo(ServiceRequestProduct::class, 'product_id');
+    }
+
+    public function assignedEngineer()
+    {
+        return $this->belongsTo(User::class, 'engineer_id');
+    }
+
+    public function requestedPart()
+    {
+        return $this->belongsTo(Product::class, 'part_id');
+    }
 }

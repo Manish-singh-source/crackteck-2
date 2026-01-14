@@ -19,7 +19,7 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
-            $table->enum('vehicle_type', [0, 1, 2, 3])->nullable()->comment('0 - Two-wheeler, 1 - Three-wheeler, 2 - Four-wheeler, 3 - Other');
+            $table->enum('vehicle_type', ['two_wheeler', 'three_wheeler', 'four_wheeler', 'other'])->default('other');
             $table->string('vehicle_number')->nullable()->unique();
             $table->string('driving_license_no')->nullable()->unique();
             $table->string('driving_license_front_path')->nullable();

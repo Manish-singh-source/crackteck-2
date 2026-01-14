@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('ticket_id')->unique();
             $table->string('title');
             $table->longText('description');
-            $table->enum('category', [0, 1, 2, 3, 4])->default(0)->comment('0 - Product, 1 - Service, 2 - Billing, 3 - Technical, 4 - Other');
+            $table->enum('category', ['product', 'service', 'billing', 'technical', 'other'])->default('other')->comment('0 - Product, 1 - Service, 2 - Billing, 3 - Technical, 4 - Other');
             $table->string('subcategory')->nullable();
-            $table->enum('priority', [0, 1, 2, 3])->default(0)->comment('0 - Low, 1 - Medium, 2 - High, 3 - Critical');
-            $table->enum('status', [0, 1, 2, 3, 4, 5])->default(0)->comment('0 - Open, 1 - In Progress, 2 - Pending, 3 - Resolved, 4 - Closed, 5 - Reopened');
+            $table->enum('priority', ['low', 'medium', 'high', 'critical'])->default('medium')->comment('0 - Low, 1 - Medium, 2 - High, 3 - Critical');
+            $table->enum('status', ['open', 'in_progress', 'pending', 'resolved', 'closed', 'reopened'])->default('open')->comment('0 - Open, 1 - In Progress, 2 - Pending, 3 - Resolved, 4 - Closed, 5 - Reopened');
             $table->foreignId('assigned_to')->nullable()->constrained('staff')->onDelete('cascade');
             $table->integer('response_time_minutes')->nullable(); // SLA
             $table->integer('resolution_time_minutes')->nullable(); // SLA

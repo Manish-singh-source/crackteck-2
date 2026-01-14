@@ -26,7 +26,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->intended('crm/index');
+            return redirect()->intended('demo/crm/index');
         }
 
         return back()->withErrors([

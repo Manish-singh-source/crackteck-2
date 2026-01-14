@@ -1,27 +1,28 @@
 <?php
 
-use App\Http\Controllers\Api\AllServicesController;
-use App\Http\Controllers\Api\AmcServicesController;
-use App\Http\Controllers\Api\ApiAuthController;
-use App\Http\Controllers\Api\AttendanceController;
-use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\DeliveryOrderController;
-use App\Http\Controllers\Api\FollowUpController;
+use Illuminate\Http\Request;
+use Symfony\Component\Mime\Address;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LeadController;
 use App\Http\Controllers\Api\MeetController;
-use App\Http\Controllers\Api\NonAmcServicesController;
-use App\Http\Controllers\Api\OrderController;
-use App\Http\Controllers\Api\ProfileController;
-use App\Http\Controllers\Api\QuickServiceController;
-use App\Http\Controllers\Api\QuotationController;
 use App\Http\Controllers\Api\SDUIController;
-use App\Http\Controllers\Api\StockinHandController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\FrontendController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\ApiAuthController;
+use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\FollowUpController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\QuotationController;
+use App\Http\Controllers\FieldEngineerController;
+use App\Http\Controllers\Api\AttendanceController;
 use Symfony\Component\HttpKernel\Profiler\Profile;
-use Symfony\Component\Mime\Address;
+use App\Http\Controllers\Api\AllServicesController;
+use App\Http\Controllers\Api\AmcServicesController;
+use App\Http\Controllers\Api\StockinHandController;
+use App\Http\Controllers\Api\QuickServiceController;
+use App\Http\Controllers\Api\DeliveryOrderController;
+use App\Http\Controllers\Api\NonAmcServicesController;
 
 // use App\Http\Controllers\AMCRequestController;
 // use App\Http\Controllers\AMCRequestController;
@@ -304,6 +305,46 @@ Route::prefix('v1')->group(function () {
             Route::get('/get-feedback/{feedback_id}', 'getFeedback');
         });
 
+
+
+        // Feild Engineer APIs 
+        Route::controller(FieldEngineerController::class)->group(function () {
+            // List of services 
+            Route::get('/service-requests', 'serviceRequests');
+            // Service details and List of products in this service
+            Route::get('/service-request/{id}', 'serviceRequestDetails');
+            // Product details of selected service and it's product
+            Route::get('/service-request/{id}/{product_id}', 'serviceRequestProductDetails');
+            // Accept Request 
+            Route::post('/service-request/{id}/accept', 'acceptServiceRequest');
+
+
+            // Case Transfer API 
+            Route::post('/service-request/{id}/case-transfer', 'caseTransfer');
+            // Reschedule Service Request API
+            Route::post('/service-request/{id}/reschedule', 'rescheduleServiceRequest');
+
+            // List of diagnosis 
+            Route::get('/service-request/{id}/{product_id}/diagnosis-list', 'diagnosisList');
+            // Submit Diagnosis 
+            Route::post('/service-request/{id}/{product_id}/submit-diagnosis', 'submitDiagnosis');
+
+
+            // Stock In Hand Products APIs 
+            Route::get('/stock-in-hand', 'stockInHand');
+            
+            // Products List 
+            // same as customer and sales person 
+
+            // Request Part 
+            Route::post('/service-request/{id}/{product_id}/request-part', 'requestPart'); 
+
+            // Attendance APIs 
+            Route::get('/attendance', 'attendance');
+            Route::post('/check-in', 'checkIn');
+            Route::post('/check-out', 'checkOut');
+            
+        });
     });
 });
 

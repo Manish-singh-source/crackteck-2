@@ -21,7 +21,7 @@
                     <div class="card-header border-bottom-dashed">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">Purchase Bill Details</h5>
-                            <div class="fw-bold text-dark">Bill No: {{ $vendorPurchaseBill->purchase_bill_no }}</div>
+                            <div class="fw-bold text-dark">Bill No: {{ $vendorPurchaseBill->po_number }}</div>
                         </div>
                     </div>
 

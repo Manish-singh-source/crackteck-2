@@ -23,8 +23,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('image')->nullable();
             $table->string('icon_image')->nullable();
-            $table->enum('status_ecommerce', [0, 1])->default(1)->comment('0 - No, 1 - Yes');
-            $table->enum('status', [0, 1])->default(1)->comment('0 - Inactive, 1 - Active');
+            $table->enum('status_ecommerce', ['no', 'yes'])->default('no');
+            $table->enum('status', ['inactive', 'active'])->default('active');
 
             $table->softDeletes();
             $table->timestamps();

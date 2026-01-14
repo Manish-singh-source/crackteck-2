@@ -37,22 +37,23 @@ class FollowUpFactory extends Factory
                 if ($lead && $lead->staff_id) {
                     return $lead->staff_id;
                 }
-
+                // 'admin', 'engineer', 'delivery_man', 'sales_person', 'customer'
                 return Staff::inRandomOrder()->value('id') ?? Staff::create([
                     'staff_code' => 'SEED' . time() . rand(100, 999),
-                    'staff_role' => '3',
+                    'staff_role' => 'sales_person',
                     'first_name' => 'Seed',
                     'last_name' => 'User',
                     'email' => 'seed' . time() . '@example.test',
-                    'phone' => '0000000000'
+                    'phone' => '8888888888'
                 ])->id;
             },
             'followup_date' => $this->faker->date(),
             'followup_time' => $this->faker->time(),
-            'followup_type' => $this->faker->randomElement(['0', '1', '2', '3']),  // enum uses numeric codes as strings: '0' - Call, '1' - Email, '2' - Meeting, '3' - SMS
-            // enum uses numeric codes as strings: '0' - Pending, '1' - Completed, '2' - Rescheduled, '3' - Cancelled
-            'status' => $this->faker->randomElement(['0', '1', '2', '3']),
+            'followup_type' => $this->faker->randomElement(['call', 'email', 'meeting', 'sms']),
+            'status' => $this->faker->randomElement(['pending', 'completed', 'rescheduled', 'cancelled']),
             'remarks' => $this->faker->sentence(),
+            'next_action' => $this->faker->sentence(),
+            'next_followup_date' => $this->faker->date(),
         ];
     }
 }

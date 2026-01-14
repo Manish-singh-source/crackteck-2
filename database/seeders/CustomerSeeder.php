@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class CustomerSeeder extends Seeder
 {
@@ -13,7 +12,6 @@ class CustomerSeeder extends Seeder
      */
     public function run(): void
     {
-        //
         $customers = [
             [
                 'customer_code' => 'CUS001',
@@ -22,11 +20,11 @@ class CustomerSeeder extends Seeder
                 'phone' => '7709131547',
                 'email' => 'saurabh.damale@gmail.com',
                 'dob' => '1990-05-12',
-                'gender' => '0',
-                'customer_type' => '0',
-                'source_type' => '1',
+                'gender' => 'male',
+                'customer_type' => 'ecommerce',
+                'source_type' => 'ecommerce',
                 'password' => bcrypt('password123'),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
@@ -38,11 +36,11 @@ class CustomerSeeder extends Seeder
                 'phone' => '9892320172',
                 'email' => 'mayursatam@gmail.com',
                 'dob' => '1985-08-25',
-                'gender' => '1',
-                'customer_type' => '1',
-                'source_type' => '2',
+                'gender' => 'female',
+                'customer_type' => 'amc',
+                'source_type' => 'app',
                 'password' => bcrypt('password123'),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
@@ -54,11 +52,11 @@ class CustomerSeeder extends Seeder
                 'phone' => '8928339535',
                 'email' => 'roshanyadav@gmail.com',
                 'dob' => '1995-11-10',
-                'gender' => '0',
-                'customer_type' => '0',
-                'source_type' => '3',
+                'gender' => 'male',
+                'customer_type' => 'ecommerce',
+                'source_type' => 'call',
                 'password' => bcrypt('password123'),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
@@ -69,11 +67,11 @@ class CustomerSeeder extends Seeder
                 'phone' => '9988776655',
                 'email' => 'manishsingh@gmail.com',
                 'dob' => '1992-03-18',
-                'gender' => '1',
-                'customer_type' => '1',
-                'source_type' => '1',
+                'gender' => 'male',
+                'customer_type' => 'ecommerce',
+                'source_type' => 'walk_in',
                 'password' => bcrypt('password123'),
-                'status' => "1",
+                'status' => "active",
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],

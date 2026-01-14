@@ -18,27 +18,27 @@ class ProductVariantAttributesSeeder extends Seeder
             [
                 'atribute_code' => 'COLOR',
                 'name' => 'Color', 
-                'status' => "1",
+                'status' => "active",
             ],
             [
                 'atribute_code' => 'COLOR',
                 'name' => 'Size', 
-                'status' => "1",
+                'status' => "active",
             ],
             [
                 'atribute_code' => 'COLOR',
                 'name' => 'Storage', 
-                'status' => "1",
+                'status' => "active",
             ],
             [
                 'atribute_code' => 'COLOR',
                 'name' => 'RAM', 
-                'status' => "1",
+                'status' => "active",
             ],
             [
                 'atribute_code' => 'COLOR',
                 'name' => 'Warranty', 
-                'status' => "1",
+                'status' => "active",
             ],
         ]);
     }

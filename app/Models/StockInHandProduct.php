@@ -19,4 +19,14 @@ class StockInHandProduct extends Model
         'picked_at',
         'returned_at',
     ];
+
+    public function stockInHand()
+    {
+        return $this->belongsTo(StockInHand::class, 'stock_in_hand_id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
 }

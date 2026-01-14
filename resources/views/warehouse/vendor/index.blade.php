@@ -74,8 +74,8 @@
                                                                 <td>{{ $vendor->gst_no }}</td>
                                                                 {{-- <td>{{ $vendor->no_of_po ? $vendor->no_of_po : 'N/A' }}</td> --}}
                                                                 <td>
-                                                                    <span class="badge bg-{{ $vendor->status == 1 ? 'success' : 'danger' }}-subtle text-{{ $vendor->status == 1 ? 'success' : 'danger' }} fw-semibold">     
-                                                                        {{ $vendor->status == 1 ? 'Active' : 'Inactive' }}
+                                                                    <span class="badge bg-{{ $vendor->status == 'active' ? 'success' : 'danger' }}-subtle text-{{ $vendor->status == 'active' ? 'success' : 'danger' }} fw-semibold">     
+                                                                        {{ $vendor->status == 'active' ? 'Active' : 'Inactive' }}
                                                                     </span>
                                                                 </td>
                                                                 <td>    

@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade'); // Sales Person
             $table->date('followup_date');
             $table->time('followup_time')->nullable();
-            $table->enum('followup_type', [0, 1, 2, 3])->default(0)->comment('0 - Call, 1 - Email, 2 - Meeting, 3 - SMS');
-            $table->enum('status', [0, 1, 2, 3])->default(0)->comment('0 - Pending, 1 - Completed, 2 - Rescheduled, 3 - Cancelled');
+            $table->enum('followup_type', ['call', 'email', 'meeting', 'sms'])->default('call')->comment('0 - Call, 1 - Email, 2 - Meeting, 3 - SMS');
+            $table->enum('status', ['pending', 'completed', 'rescheduled', 'cancelled'])->default('pending')->comment('0 - Pending, 1 - Completed, 2 - Rescheduled, 3 - Cancelled');
             $table->text('remarks')->nullable();
             $table->text('next_action')->nullable();
             $table->timestamp('next_followup_date')->nullable();

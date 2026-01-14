@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -39,14 +38,14 @@ class AssignedEngineerSeeder extends Seeder
             $assignments[] = [
                 'service_request_id' => $req->id,
                 'engineer_id' => $engineer->id,
-                'assignment_type' => '0',
+                'assignment_type' => 'individual',
                 'assigned_at' => $assignedAt->toDateTimeString(),
                 'transferred_to' => null,
                 'transferred_at' => null,
                 'group_name' => null,
                 'is_supervisor' => 0,
                 'notes' => 'Auto-assigned by seeder',
-                'status' => '0',
+                'status' => 'active',
                 'is_approved_by_engineer' => rand(0, 1) === 1,
                 'engineer_approved_at' => rand(0, 1) === 1 ? $assignedAt->addHours(rand(1, 48))->toDateTimeString() : null,
                 'created_at' => $now,

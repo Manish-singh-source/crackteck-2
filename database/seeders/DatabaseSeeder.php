@@ -24,12 +24,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create roles idempotently
-        // Role::firstOrCreate(['name' => 'Engineer']);
-        // Role::firstOrCreate(['name' => 'Delivery Man']);
-        // Role::firstOrCreate(['name' => 'Sales Person']);
-        // Role::firstOrCreate(['name' => 'Customer']);
-        // Role::firstOrCreate(['name' => 'Admin']);
-        // Role::firstOrCreate(['name' => 'Warehouse Manager']);
+        Role::firstOrCreate(['name' => 'Engineer']);
+        Role::firstOrCreate(['name' => 'Delivery Man']);
+        Role::firstOrCreate(['name' => 'Sales Person']);
+        Role::firstOrCreate(['name' => 'Customer']);
+        Role::firstOrCreate(['name' => 'Admin']);
+        Role::firstOrCreate(['name' => 'Warehouse Manager']);
 
         $this->call([
             StaffSeeder::class,
@@ -74,26 +74,26 @@ class DatabaseSeeder extends Seeder
             FieldIssueSeeder::class,
             PincodeSeeder::class,
             
-            // OrderSeeder::class,
-            // OrderItemSeeder::class,
-            // OrderPaymentSeeder::class,
-            // SubscriberSeeder::class,
-            // CouponUsageSeeder::class,
-            // TestimonialSeeder::class,
-            // CollectionSeeder::class,
-            // TicketSeeder::class,
-            // TicketCommentSeeder::class,
-            // InvoiceSeeder::class,
-            // InvoiceItemSeeder::class,
-            // AssignedEngineerSeeder::class,
-            // EngineerDiagnosisDetailSeeder::class,
-            // ServiceRequestProductPickupSeeder::class,
-            // ServiceRequestProductRequestPartSeeder::class,
-            // ServiceRequestPaymentSeeder::class,
-            // ServiceRequestQuotationSeeder::class,
-            // RequestedPartDeliverySeeder::class,
-            // AssignedEngineerGroupSeeder::class,
-            // WebsiteBannerSeeder::class,
+            OrderSeeder::class,
+            OrderItemSeeder::class,
+            OrderPaymentSeeder::class,
+            SubscriberSeeder::class,
+            CouponUsageSeeder::class,
+            TestimonialSeeder::class,
+            CollectionSeeder::class,
+            TicketSeeder::class,
+            TicketCommentSeeder::class,
+            InvoiceSeeder::class,
+            InvoiceItemSeeder::class,
+            AssignedEngineerSeeder::class,
+            EngineerDiagnosisDetailSeeder::class,
+            ServiceRequestProductPickupSeeder::class,
+            ServiceRequestProductRequestPartSeeder::class,
+            ServiceRequestPaymentSeeder::class,
+            ServiceRequestQuotationSeeder::class,
+            RequestedPartDeliverySeeder::class,
+            AssignedEngineerGroupSeeder::class,
+            WebsiteBannerSeeder::class,
             FeedbackSeeder::class,
         ]);
     }

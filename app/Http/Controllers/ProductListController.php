@@ -55,6 +55,18 @@ class ProductListController extends Controller
         return view('/warehouse/product-list/create', compact('brands', 'vendors', 'vendorPurchaseOrders', 'parentCategories', 'subCategories', 'warehouses', 'warehouseRacks', 'zoneAreas', 'rackNo', 'levelNo', 'positionNo', 'variationAttributes', 'variationAttributeValues'));
     }
 
+    public function getVendorPurchaseOrdersByVendor(Request $request): JsonResponse
+    {
+        $vendorId = $request->input('vendor_id');
+        if (empty($vendorId)) {
+            return response()->json([]);
+        }
+
+        $vendorPurchaseOrders = VendorPurchaseOrder::where('vendor_id', $vendorId)->pluck('po_number', 'id');
+
+        return response()->json($vendorPurchaseOrders);
+    }
+
     public function store(Request $request)
     {
         // dd($request->all());
@@ -88,7 +100,7 @@ class ProductListController extends Controller
 
             // Inventory Details
             'stock_quantity' => 'nullable|integer|min:0',
-            'stock_status' => 'nullable|in:0,1,2,3',
+            'stock_status' => 'nullable|in:in_stock,out_of_stock,low_stock,scrap',
 
             // Images & Media
             'main_product_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -101,7 +113,7 @@ class ProductListController extends Controller
             'variations.*.*' => 'nullable',
 
             // Product Status
-            'status' => 'nullable|in:0,1',
+            'status' => 'nullable|in:active,inactive',
         ]);
 
         // dd($validator->errors());
@@ -176,7 +188,6 @@ class ProductListController extends Controller
         ])->findOrFail($id);
 
         // Prepare variations for display
-
         return view('/warehouse/product-list/view', compact('product'));
     }
 
@@ -659,5 +670,20 @@ class ProductListController extends Controller
             ->pluck('name', 'id');
 
         return response()->json($subcategories);
+    }
+
+    public function getSubCategories(Request $request): JsonResponse
+    {
+        $subcategories = SubCategory::where('parent_category_id', $request->parent_id)
+            ->orderBy('name')
+            ->pluck('name', 'id');
+        if ($subcategories) {
+            return response()->json([
+                'success' => true,
+                'subcategories' => $subcategories,
+            ]);
+        }
+
+        
     }
 }

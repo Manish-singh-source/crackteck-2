@@ -16,7 +16,6 @@ class VendorPurchaseBillController extends Controller
     public function index()
     {
         $vendorPurchaseBills = VendorPurchaseOrder::orderBy('created_at', 'desc')->get();
-
         return view('/warehouse/vendor-purchase-bills/index', compact('vendorPurchaseBills'));
     }
 
@@ -26,7 +25,6 @@ class VendorPurchaseBillController extends Controller
     public function create()
     {
         $vendors = Vendor::all();
-
         return view('/warehouse/vendor-purchase-bills/create', compact('vendors'));
     }
 
@@ -41,8 +39,7 @@ class VendorPurchaseBillController extends Controller
             'po_amount_due_date' => 'required|date',
             'po_amount' => 'required|numeric|min:0',
             'po_amount_paid' => 'nullable|numeric|min:0',
-            'po_amount_pending' => 'nullable|numeric|min:0',
-            'po_status' => 'required|in:0,1,2,3',
+            'po_status' => 'required|in:pending,approved,rejected,cancelled',
         ]);
 
         if ($validator->fails()) {
@@ -58,8 +55,13 @@ class VendorPurchaseBillController extends Controller
             $file->move(public_path('uploads/vendor-purchase-bills'), $filename);
             $validatedData['invoice_pdf'] = 'uploads/vendor-purchase-bills/'.$filename;
         }
+        $validatedData['po_amount_pending'] = $validatedData['po_amount'] - $validatedData['po_amount_paid'];
 
-        VendorPurchaseOrder::create($validatedData);
+        $vendorPurchaseBill = VendorPurchaseOrder::create($validatedData);
+
+        if (! $vendorPurchaseBill) {
+            return back()->with('error', 'Failed to create vendor purchase bill. Please try again.');
+        }
 
         return redirect()->route('vendor.index')->with('success', 'Vendor Purchase Bill created successfully.');
     }
@@ -110,7 +112,7 @@ class VendorPurchaseBillController extends Controller
             'po_amount' => 'required|numeric|min:0',
             'po_amount_paid' => 'nullable|numeric|min:0',
             'po_amount_pending' => 'nullable|numeric|min:0',
-            'po_status' => 'required|in:0,1,2,3',
+            'po_status' => 'required|in:pending,approved,rejected,cancelled',
         ]);
 
         if ($validator->fails()) {
@@ -127,6 +129,8 @@ class VendorPurchaseBillController extends Controller
             $validatedData['invoice_pdf'] = 'uploads/vendor-purchase-bills/'.$filename;
         }
 
+        $validatedData['po_amount_pending'] = $validatedData['po_amount'] - $validatedData['po_amount_paid'];
+
         VendorPurchaseOrder::where('id', $id)->update($validatedData);
 
         return redirect()->route('vendor.index')->with('success', 'Vendor Purchase Bill updated successfully.');
@@ -137,14 +141,24 @@ class VendorPurchaseBillController extends Controller
      */
     public function destroy($id)
     {
-        $vendorPurchaseBill = VendorPurchaseOrder::findOrFail($id);
-
+        $vendorPurchaseBill = VendorPurchaseOrder::withCount('products')->find($id);
+        if (! $vendorPurchaseBill) {
+            return redirect()->route('vendor.index')->with('error', 'Record not found.');
+        }
         // Delete attachment file if exists
-        if ($vendorPurchaseBill->attachment && file_exists(public_path($vendorPurchaseBill->attachment))) {
-            unlink(public_path($vendorPurchaseBill->attachment));
+        if ($vendorPurchaseBill->invoice_pdf && file_exists(public_path($vendorPurchaseBill->invoice_pdf))) {
+            unlink(public_path($vendorPurchaseBill->invoice_pdf));
+        }
+
+        if ($vendorPurchaseBill->products_count > 0) {
+            return redirect()->route('vendor.index')->with('error', 'Cannot delete vendor purchase bill with products.');
         }
 
         $vendorPurchaseBill->delete();
+
+        if (! $vendorPurchaseBill) {
+            return redirect()->route('vendor.index')->with('error', 'Failed to delete vendor purchase bill. Please try again.');
+        }
 
         return redirect()->route('vendor.index')->with('success', 'Vendor Purchase Bill deleted successfully.');
     }

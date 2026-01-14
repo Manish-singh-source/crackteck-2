@@ -50,6 +50,10 @@ Route::prefix('demo')->group(function () {
         Route::post('/warehouse/save-serial', 'saveSerial')->name('product-list.save-serial');
         // AJAX SKU Validation
         Route::get('/warehouse/check-sku-unique', 'checkSkuUnique')->name('product-list.check-sku');
+
+        Route::get('/warehouse/get-vendor-purchase-orders-by-vendor', 'getVendorPurchaseOrdersByVendor')->name('product-list.get-vendor-purchase-orders-by-vendor');
+        Route::get('/warehouse/get-sub-categories', 'getSubCategories')->name('product-list.get-sub-categories');
+
     });
 
     Route::get('/warehouse-dependent', [WarehouseRackController::class, 'getDependentData']);

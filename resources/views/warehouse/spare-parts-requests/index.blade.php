@@ -171,31 +171,51 @@
                                                                 <th>Requested Date</th>
                                                                 <th>No of Items</th>
                                                                 <th>Total Quantity</th>
-                                                                <th>Reason</th>
-                                                                <th>Urgency</th>
+                                                                <th>Request Type</th>
                                                                 <th>Approval Status</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            @php  
+                                                                $badgeClasses = [
+                                                                    'pending' => 'bg-warning-subtle text-warning',
+                                                                    'rejected' => 'bg-danger-subtle text-danger',
+                                                                    'approved' => 'bg-success-subtle text-success',
+                                                                    'delivered' => 'bg-success-subtle text-success',
+                                                                    'customer_approved' => 'bg-success-subtle text-success',
+                                                                    'customer_rejected' => 'bg-danger-subtle text-danger',
+                                                                    'engineer_approved' => 'bg-success-subtle text-success',
+                                                                    'engineer_rejected' => 'bg-danger-subtle text-danger', 
+                                                                    'picked' => 'bg-success-subtle text-success',
+                                                                ];
+                                                                
+                                                                $status = [
+                                                                    'pending' => 'Pending',
+                                                                    'rejected' => 'Rejected',
+                                                                    'approved' => 'Approved',
+                                                                    'delivered' => 'Delivered',
+                                                                    'customer_approved' => 'Approved',
+                                                                    'customer_rejected' => 'Rejected',
+                                                                    'engineer_approved' => 'Approved',
+                                                                    'engineer_rejected' => 'Rejected', 
+                                                                    'picked' => 'Picked',
+                                                                ];
+                                                            @endphp
                                                             @forelse($stockRequests as $index => $request)
                                                                 <tr>
                                                                     <td>{{ $index + 1 }}</td>
-                                                                    <td>{{ $request->requestedBy->first_name ?? 'N/A' }} {{ $request->requestedBy->last_name ?? 'N/A' }}</td>
-                                                                    <td>{{ $request->request_date->format('Y-m-d') }}</td>
-                                                                    <td>{{ $request->item_count }}</td>
-                                                                    <td>{{ $request->total_quantity }}</td>
-                                                                    <td>{{ Str::limit($request->reason, 50) }}</td>
+                                                                    <td>{{ $request->assignedEngineer->name ?? 'N/A' }}</td>
+                                                                    <td>{{ $request->created_at->format('Y-m-d') }}</td>
+                                                                    <td>{{ $request->requested_part_count }}</td>
+                                                                    <td>{{ $request?->total_quantity ?? '0' }}</td>
                                                                     <td>
-                                                                        <span
-                                                                            class="badge {{ $request->urgency_badge_class }}">
-                                                                            {{ $request->urgency_level }}
-                                                                        </span>
+                                                                        {{ ucwords(str_replace('_', ' ', $request->request_type)) }}
                                                                     </td>
                                                                     <td>
                                                                         <span
-                                                                            class="badge {{ $request->approval_badge_class }}">
-                                                                            {{ $request->approval_status }}
+                                                                            class="badge {{ $badgeClasses[strtolower($request->status)] }}">
+                                                                            {{ $status[strtolower($request->status)] }}
                                                                         </span>
                                                                     </td>
                                                                     <td>

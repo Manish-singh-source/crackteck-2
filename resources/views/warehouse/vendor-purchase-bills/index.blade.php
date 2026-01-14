@@ -54,14 +54,6 @@
                                                         class="table table-striped table-borderless dt-responsive nowrap">
                                                         <thead>
                                                             <tr>
-                                                                {{-- vendor_id',
-                                                                'po_number',
-                                                                'invoice_number',
-                                                                'purchase_date',,
-                                                                'po_amount',
-                                                                'po_amount_paid',
-                                                                'po_amount_pending',
-                                                                'po_status', --}}
                                                                 <th>Vendor Name</th>
                                                                 <th>PO Number</th>
                                                                 <th>Invoice Number</th>
@@ -86,7 +78,7 @@
                                                                     <td>{{ $bill->po_amount }}</td>
                                                                     <td>{{ $bill->po_amount_paid }}</td>
                                                                     <td>{{ $bill->po_amount_pending }}</td>
-                                                                    <td>{{ $bill->po_status == 0 ? 'Pending' : ($bill->po_status == 1 ? 'Approved' : ($bill->po_status == 2 ? 'Rejected' : 'Cancelled')) }}
+                                                                    <td>{{ $bill->po_status == 'pending' ? 'Pending' : ($bill->po_status == 'approved' ? 'Approved' : ($bill->po_status == 'rejected' ? 'Rejected' : 'Cancelled')) }}
                                                                     </td>
                                                                     <td>
                                                                         <a aria-label="anchor"
@@ -94,16 +86,14 @@
                                                                             class="btn btn-icon btn-sm bg-primary-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="View">
-                                                                            <i
-                                                                                class="mdi mdi-eye-outline fs-14 text-primary"></i>
+                                                                            <i class="mdi mdi-eye-outline fs-14 text-primary"></i>
                                                                         </a>
                                                                         <a aria-label="anchor"
                                                                             href="{{ route('vendor.edit', $bill->id) }}"
                                                                             class="btn btn-icon btn-sm bg-warning-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="Edit">
-                                                                            <i
-                                                                                class="mdi mdi-pencil fs-14 text-warning"></i>
+                                                                            <i class="mdi mdi-pencil fs-14 text-warning"></i>
                                                                         </a>
                                                                         <form
                                                                             action="{{ route('vendor.destroy', $bill->id) }}"
@@ -115,8 +105,7 @@
                                                                                 class="btn btn-icon btn-sm bg-danger-subtle"
                                                                                 data-bs-toggle="tooltip"
                                                                                 data-bs-original-title="Delete">
-                                                                                <i
-                                                                                    class="mdi mdi-delete fs-14 text-danger"></i>
+                                                                                <i class="mdi mdi-delete fs-14 text-danger"></i>
                                                                             </button>
                                                                         </form>
                                                                     </td>

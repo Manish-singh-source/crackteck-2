@@ -74,7 +74,7 @@
 <script src="{{ asset('assets/js/pages/apexcharts-heatmap.init.js') }}"></script>
 
 <!-- for basic area chart -->
-<script src="{{ asset('apexcharts.com/samples/assets/stock-prices.js') }}"></script>
+{{-- <script src="{{ asset('apexcharts.com/samples/assets/stock-prices.js') }}"></script> --}}
 
 <!-- Apexcharts Init Js -->
 <script src="{{ asset('assets/js/pages/apexcharts-line.init.js') }}"></script>

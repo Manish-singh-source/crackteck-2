@@ -53,27 +53,26 @@
                                                         </thead>
                                                         <tbody>
                                                             @php
-                                                                $status = ['0' => 'Inactive', '1' => 'Active'];
+                                                                $status = ['inactive' => 'Inactive', 'active' => 'Active'];
                                                                 $badge = [
-                                                                    '0' => 'bg-danger-subtle text-danger',
-                                                                    '1' => 'bg-success-subtle text-success',
+                                                                    'inactive' => 'bg-danger-subtle text-danger',
+                                                                    'active' => 'bg-success-subtle text-success',
                                                                 ];
-
-                                                                $default = ['0' => 'No', '1' => 'Yes'];
+                                                                $default = ['no' => 'No', 'yes' => 'Yes'];
                                                                 $defaultBadge = [
-                                                                    '0' => 'bg-danger-subtle text-danger',
-                                                                    '1' => 'bg-success-subtle text-success',
+                                                                    'no' => 'bg-danger-subtle text-danger',
+                                                                    'yes' => 'bg-success-subtle text-success',
                                                                 ];
 
                                                                 $verificationStatus = [
-                                                                    '0' => 'Pending',
-                                                                    '1' => 'Verified',
-                                                                    '2' => 'Rejected',
+                                                                    'pending' => 'Pending',
+                                                                    'verified' => 'Verified',
+                                                                    'rejected' => 'Rejected',
                                                                 ];
                                                                 $verificationBadge = [
-                                                                    '0' => 'bg-danger-subtle text-danger',
-                                                                    '1' => 'bg-success-subtle text-success',
-                                                                    '2' => 'bg-warning-subtle text-warning',
+                                                                    'pending' => 'bg-danger-subtle text-danger',
+                                                                    'verified' => 'bg-success-subtle text-success',
+                                                                    'rejected' => 'bg-warning-subtle text-warning',
                                                                 ];
                                                             @endphp
                                                             @foreach ($warehouses as $warehouse)

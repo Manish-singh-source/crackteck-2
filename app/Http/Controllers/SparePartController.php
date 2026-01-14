@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateStockRequestRequest;
 use App\Models\DeliveryMan;
+use App\Models\ServiceRequestProductRequestPart;
 use App\Models\SparePartRequest;
 use App\Models\StockRequest;
 use App\Models\StockRequestItem;
@@ -22,7 +23,8 @@ class SparePartController extends Controller
     public function index()
     {
         // stock requests ke table ka data display hoga with product details from stock_request_items table
-        $stockRequests = StockRequest::with(['requestedBy', 'stockRequestItems.product'])
+        $stockRequests = ServiceRequestProductRequestPart::with(['serviceRequest', 'serviceRequestProduct', 'assignedEngineer', 'requestedPart'])
+            ->withCount('requestedPart')
             ->orderBy('created_at', 'desc')
             ->get();
 

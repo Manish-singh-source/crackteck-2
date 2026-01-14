@@ -484,8 +484,8 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                @php $variations = json_decode($product->variation_options, true); 
-                                    // print_r($variations);
+                                @php 
+                                    $variations = json_decode($product->variation_options, true); 
                                 @endphp
                                 @foreach ($variations as $key=> $attribute)
                                     <div class="col-md-6">

@@ -25,4 +25,9 @@ class VendorPurchaseOrder extends Model
     {
         return $this->belongsTo(Vendor::class);
     }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'vendor_purchase_order_id');
+    }
 }

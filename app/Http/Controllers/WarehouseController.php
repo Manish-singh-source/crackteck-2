@@ -44,9 +44,9 @@ class WarehouseController extends Controller
             'gst_no' => 'nullable|unique:warehouses,gst_no',
             'licence_no' => 'nullable|unique:warehouses,licence_no',
             'licence_doc' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
-            'verification_status' => 'required|in:0,1,2',
-            'default_warehouse' => 'required|in:0,1',
-            'status' => 'required|in:0,1',
+            'verification_status' => 'required|in:pending,verified,rejected',
+            'default_warehouse' => 'required|in:no,yes',
+            'status' => 'required|in:inactive,active',
         ]);
 
         if ($validator->fails()) {
@@ -54,7 +54,7 @@ class WarehouseController extends Controller
         }
 
         // Check for default warehouse
-        if ($request->default_warehouse == "1" && Warehouse::where('default_warehouse', "1")->exists()) {
+        if ($request->default_warehouse == "yes" && Warehouse::where('default_warehouse', "yes")->exists()) {
             return back()->with('error', 'One warehouse has already default value kindly check.')->withInput();
         }
 
@@ -149,9 +149,9 @@ class WarehouseController extends Controller
             'gst_no' => 'nullable|unique:warehouses,gst_no,' . $id,
             'licence_no' => 'nullable|unique:warehouses,licence_no,' . $id,
             'licence_doc' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
-            'verification_status' => 'required|in:0,1,2',
-            'default_warehouse' => 'required|in:0,1',
-            'status' => 'required|in:0,1',
+            'verification_status' => 'required|in:pending,verified,rejected',
+            'default_warehouse' => 'required|in:no,yes',
+            'status' => 'required|in:inactive,active',
         ]);
 
         if ($validator->fails()) {

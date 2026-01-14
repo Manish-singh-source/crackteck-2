@@ -27,7 +27,9 @@
         @if (isset($model) && isset($model->$name)) value="{{ old($name, $model->$name) }}"
         @else
             value="{{ old($name) }}" @endif
-        {{-- Aria for screen readers on error --}} @if ($errors->has($name)) aria-describedby="{{ $name }}-feedback" @endif>
+        {{-- Aria for screen readers on error --}} @if ($errors->has($name)) aria-describedby="{{ $name }}-feedback" @endif
+        @if (!empty($accept)) accept="{{ $accept }}" @endif
+    >
 
     {{-- Error message --}}
     @error($name)

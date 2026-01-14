@@ -115,9 +115,9 @@ class WarehousesSeeder extends Seeder
                 'gst_no' => '07AAQFT9187K1D1',
                 'licence_no' => '3344556',
                 'licence_doc' => 'uploads/warehouse/licence_docs/1759145449.pdf',
-                'verification_status' => '1',
-                'default_warehouse' => '0',
-                'status' => '1',
+                'verification_status' => 'verified',
+                'default_warehouse' => 'no',
+                'status' => 'active',
             ],
             [
                 'warehouse_code' => 'WH005',
@@ -141,9 +141,9 @@ class WarehousesSeeder extends Seeder
                 'gst_no' => '33AAQFT9187K1C2',
                 'licence_no' => '7788990',
                 'licence_doc' => 'uploads/warehouse/licence_docs/1759145450.pdf',
-                'verification_status' => '1',
-                'default_warehouse' => '0',
-                'status' => '1',
+                'verification_status' => 'pending',
+                'default_warehouse' => 'no',
+                'status' => 'inactive',
             ],
         ];
 

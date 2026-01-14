@@ -219,7 +219,8 @@
                                                                         </span>
                                                                     </td>
                                                                     <td>
-                                                                        <a href="{{ route('stock-request.show', $request) }}"
+                                                                        {{-- <a href="#" --}}
+                                                                        <a href="{{ route('spare-parts.view', $request) }}"
                                                                             class="btn btn-sm btn-primary"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="View/Edit">

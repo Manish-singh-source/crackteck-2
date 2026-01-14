@@ -152,39 +152,31 @@ Route::prefix('demo/warehouse')->group(function () {
         // Spare Parts Requests
         Route::get('/spare-parts', 'index')->name('spare-parts.index');
         // View/Edit Stock Request Page
-        Route::get('/spare-parts/{stockRequest}', 'warehouse_show')->name('stock-request.show');
+        Route::get('/spare-parts/{stockRequest}', 'view')->name('spare-parts.view');
+        // Route::get('/spare-parts/{stockRequest}', 'warehouse_show')->name('stock-request.show');
 
-        // Update Stock Request
-        Route::put('/stock-requests/{stockRequest}', 'warehouse_update')->name('stock-request.update');
-        // Remove Product from Stock Request
-        Route::delete('/stock-requests/remove-product/{id}', 'removeProduct')->name('stock-request.remove-product');
+        // // Update Stock Request
+        // Route::put('/stock-requests/{stockRequest}', 'warehouse_update')->name('stock-request.update');
+        // // Remove Product from Stock Request
+        // Route::delete('/stock-requests/remove-product/{id}', 'removeProduct')->name('stock-request.remove-product');
 
-        // Assign Delivery Man
-        Route::post('/assign-delivery-man/{id}', 'assignDeliveryMan')->name('spare-parts.assign-delivery-man');
+        // // Assign Delivery Man
+        // Route::post('/assign-delivery-man/{id}', 'assignDeliveryMan')->name('spare-parts.assign-delivery-man');
     });
 
     // ------------------------------------------------------------ Stock Requests Page -------------------------------------------------------------
 
     Route::controller(StockReportController::class)->group(function () {
-        // Stock Requests Index Page
-        Route::get('/stock-requests', 'warehouse_index')->name('stock-request.index');
-        // Create Stock Request Page
-        Route::get('/create-stock-request', 'warehouse_create')->name('stock-request.create');
-        // Store Stock Request
-        Route::post('/create-stock-request', 'warehouse_store')->name('stock-request.store');
-
-        // Delete Stock Request
-        Route::delete('/stock-requests/{stockRequest}', 'delete')->name('stock-request.destroy');
-
-        // AJAX Routes for Product Search
-        Route::get('/search-products', 'searchProducts')->name('stock-request.search-products');
-        Route::get('/get-product/{product}', 'getProduct')->name('stock-request.get-product');
+        // Stock Reports 
+        Route::get('/stock-reports', 'index')->name('stock-reports.index');
     });
 
     // ------------------------------------------------------------ Low Stock Page -------------------------------------------------------------
 
     Route::controller(LowStockController::class)->group(function () {
         // Low Stock Page
-        Route::get('/low-stock-alert', 'warehouse_index')->name('low-stock.index');
+        Route::get('/low-stock-alert', 'index')->name('low-stock.index');
+        // export low stock products
+        Route::get('/export-low-stock', 'exportLowStock')->name('low-stock.export');
     });
 });

@@ -9,6 +9,7 @@ class Warehouse extends Model
 {
     //
     protected $fillable = [
+        'warehouse_code',
         'name',
         'type',
         'address1',
@@ -29,10 +30,11 @@ class Warehouse extends Model
         'gst_no',
         'licence_no',
         'licence_doc',
-        'verification_status',
         'default_warehouse',
+        'verification_status',
         'status',
     ];
+
 
     public function racks(): HasMany
     {

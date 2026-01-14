@@ -308,6 +308,7 @@
                                                 'label' => 'Upload Licence Document',
                                                 'name' => 'licence_doc',
                                                 'type' => 'file',
+                                                'accept' => '.pdf,.doc,.jpg,.jpeg,.png',
                                             ])
                                         </div>
                                     </div>

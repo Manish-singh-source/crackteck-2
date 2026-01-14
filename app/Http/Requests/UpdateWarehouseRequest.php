@@ -3,16 +3,17 @@
 namespace App\Http\Requests;
 
 use App\Models\Warehouse;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreWarehouseRequest extends FormRequest
+class UpdateWarehouseRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -22,8 +23,9 @@ class StoreWarehouseRequest extends FormRequest
      */
     public function rules(): array
     {
+        $warehouseId = $this->route('id'); // from route parameter
+
         return [
-            'warehouse_code' => 'nullable|unique:warehouses,warehouse_code',
             'name' => 'required|min:3',
             'type' => 'required',
             'address1' => 'required|min:3',
@@ -37,17 +39,28 @@ class StoreWarehouseRequest extends FormRequest
             'phone_number' => 'required|digits:10',
             'alternate_phone_number' => 'nullable|digits:10',
 
-            'email' => 'required|email|unique:warehouses,email',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('warehouses', 'email')->ignore($warehouseId),
+            ],
 
             'working_hours' => 'nullable',
             'working_days' => 'nullable',
-
             'max_store_capacity' => 'nullable|numeric',
             'supported_operations' => 'nullable',
             'zone_conf' => 'nullable',
 
-            'gst_no' => 'nullable|unique:warehouses,gst_no',
-            'licence_no' => 'nullable|unique:warehouses,licence_no',
+            'gst_no' => [
+                'nullable',
+                Rule::unique('warehouses', 'gst_no')->ignore($warehouseId),
+            ],
+
+            'licence_no' => [
+                'nullable',
+                Rule::unique('warehouses', 'licence_no')->ignore($warehouseId),
+            ],
+
             'licence_doc' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
 
             'verification_status' => 'required|in:pending,verified,rejected',
@@ -56,15 +69,14 @@ class StoreWarehouseRequest extends FormRequest
         ];
     }
 
-    /**
-     * Custom validation after default rules
-     */
     protected function withValidator($validator)
     {
         $validator->after(function ($validator) {
             if (
                 $this->default_warehouse === 'yes' &&
-                Warehouse::where('default_warehouse', 'yes')->exists()
+                Warehouse::where('default_warehouse', 'yes')
+                ->where('id', '!=', $this->route('id'))
+                ->exists()
             ) {
                 $validator->errors()->add(
                     'default_warehouse',

@@ -198,7 +198,7 @@
                                                                     'customer_approved' => 'Approved',
                                                                     'customer_rejected' => 'Rejected',
                                                                     'engineer_approved' => 'Approved',
-                                                                    'engineer_rejected' => 'Rejected', 
+                                                                    'engineer_rejected' => 'Rejected',
                                                                     'picked' => 'Picked',
                                                                 ];
                                                             @endphp

@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UpdateStockRequestRequest;
-use App\Models\DeliveryMan;
-use App\Models\ServiceRequestProductRequestPart;
-use App\Models\SparePartRequest;
-use App\Models\StockRequest;
-use App\Models\StockRequestItem;
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
+use App\Models\Staff;
+use Illuminate\View\View;
+use App\Models\DeliveryMan;
+use App\Models\StockRequest;
 use Illuminate\Http\Request;
+use App\Models\SparePartRequest;
+use App\Models\StockRequestItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\UpdateStockRequestRequest;
+use App\Models\ServiceRequestProductRequestPart;
 
 class SparePartController extends Controller
 {
@@ -22,7 +23,7 @@ class SparePartController extends Controller
      */
     public function index()
     {
-        // stock requests ke table ka data display hoga with product details from stock_request_items table
+        
         $stockRequests = ServiceRequestProductRequestPart::with(['serviceRequest', 'serviceRequestProduct', 'assignedEngineer', 'requestedPart'])
             ->withCount('requestedPart')
             ->orderBy('created_at', 'desc')
@@ -37,17 +38,12 @@ class SparePartController extends Controller
      */
     public function view($id)
     {
-        $sparePartRequest = SparePartRequest::with([
-            'product',
-            'engineer',
-            'deliveryMan',
-            'customerServiceRequest',
-        ])->findOrFail($id);
+        $stockRequests = ServiceRequestProductRequestPart::with(['serviceRequest', 'serviceRequestProduct', 'fromEngineer', 'assignedEngineer', 'requestedPart.parentCategorie', 'requestedPart.brand', 'requestedPart.subCategorie'])
+            ->findOrFail($id);
+        dd($stockRequests);
+        $deliveryMen = Staff::where('staff_role', 'delivery_man')->get();
 
-        $deliveryMen = DeliveryMan::where('status', 'Active')->get();
-        dd($sparePartRequest);
-
-        return view('/warehouse/spare-parts-requests/view', compact('sparePartRequest', 'deliveryMen'));
+        return view('/warehouse/spare-parts-requests/view', compact('stockRequests', 'deliveryMen'));
     }
 
     /**

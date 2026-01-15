@@ -82,9 +82,9 @@
                 <li class="menu-title mt-2">Manage Stock Alerts</li>
                 
                 <li>
-                    <a class='tp-link' href="{{ route('stock-request.index') }}">
+                    <a class='tp-link' href="{{ route('stock-reports.index') }}">
                         <i class="fas fa-chart-bar"></i>
-                        <span class="ps-1"> Stock Reports </span>
+                        <span class="ps-1"> Stock Requests </span>
                     </a>
                 </li>
                 <li>

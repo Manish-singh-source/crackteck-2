@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProductRequest;
 use App\Models\Brand;
 use App\Models\ParentCategory;
 use App\Models\Product;
@@ -21,16 +22,24 @@ use Illuminate\Support\Facades\Validator;
 
 class ProductListController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with(['brand', 'parentCategorie', 'subCategorie', 'warehouse', 'warehouseRack'])->get();
+        $products = Product::query();
+
+        if (request()->has('status') && request('status') !== 'all') {
+            $products->where('status', request('status'));
+        }
+
+        $products = $products->with(['brand', 'parentCategorie', 'subCategorie', 'warehouse', 'warehouseRack'])->get();
 
         return view('/warehouse/product-list/index', compact('products'));
     }
 
     public function create()
     {
-        $vendors = Vendor::pluck('vendor_code', 'id');
+        $vendors = Vendor::selectRaw(
+            "id, CONCAT(vendor_code, ' - ', first_name, ' ', last_name) AS name"
+        )->pluck('name', 'id');
         $vendorPurchaseOrders = VendorPurchaseOrder::pluck('po_number', 'id');
         $brands = Brand::pluck('name', 'id');
         $parentCategories = ParentCategory::pluck('name', 'id');
@@ -67,110 +76,60 @@ class ProductListController extends Controller
         return response()->json($vendorPurchaseOrders);
     }
 
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        // dd($request->all());
-        $validator = Validator::make($request->all(), [
-            'vendor_id' => 'nullable|exists:vendors,id',
-            'vendor_purchase_order_id' => 'nullable|exists:vendor_purchase_orders,id',
-            'brand_id' => 'nullable|exists:brands,id',
-            'parent_category_id' => 'nullable|exists:parent_categories,id',
-            'sub_category_id' => 'nullable|exists:sub_categories,id',
-
-            'warehouse_id' => 'nullable|exists:warehouses,id',
-
-            'product_name' => 'required|string|max:255',
-            'hsn_code' => 'nullable|string|max:100',
-            'sku' => 'required|string|unique:products,sku|max:100',
-            'model_no' => 'nullable|string|max:100',
-
-            // Product Details
-            'short_description' => 'nullable|string',
-            'full_description' => 'nullable|string',
-            'technical_specification' => 'nullable|string',
-            'brand_warranty' => 'nullable|string|max:255',
-            'company_warranty' => 'nullable|string|max:255',
-
-            // Pricing
-            'cost_price' => 'nullable|numeric|min:0',
-            'selling_price' => 'nullable|numeric|min:0',
-            'discount_price' => 'nullable|numeric|min:0',
-            'tax' => 'nullable|numeric|min:0|max:100',
-            'final_price' => 'nullable|numeric|min:0',
-
-            // Inventory Details
-            'stock_quantity' => 'nullable|integer|min:0',
-            'stock_status' => 'nullable|in:in_stock,out_of_stock,low_stock,scrap',
-
-            // Images & Media
-            'main_product_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'additional_product_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'datasheet_manual' => 'nullable|mimes:pdf|max:10240',
-
-            // Product Variations
-            'variations' => 'nullable|array',
-            'variations.*' => 'nullable',
-            'variations.*.*' => 'nullable',
-
-            // Product Status
-            'status' => 'nullable|in:active,inactive',
-        ]);
-
-        // dd($validator->errors());
-        if ($validator->fails()) {
-            dd($validator->errors());
-
-            return back()->with($validator)->withInput();
-        }
-
         DB::beginTransaction();
+
         try {
-            $validated = $validator->validated();
-            $validated['variation_options'] = json_encode($validated['variations']);
+            $data = $request->validated();
 
-            // Handle file uploads
+            // Store variations safely
+            $data['variation_options'] = $data['variations'] ?? null;
+            unset($data['variations']);
+
+            // Calculate final price (DO NOT trust client)
+            $data['final_price'] =
+                ($data['selling_price'] ?? 0)
+                - ($data['discount_price'] ?? 0)
+                + (($data['selling_price'] ?? 0) * ($data['tax'] ?? 0) / 100);
+
+            // Main image
             if ($request->hasFile('main_product_image')) {
-                $file = $request->file('main_product_image');
-                $filename = time().'_'.$file->getClientOriginalName();
-                $file->move(public_path('uploads/products/images'), $filename);
-                $validated['main_product_image'] = 'uploads/products/images/'.$filename;
+                $data['main_product_image'] = $request->file('main_product_image')
+                    ->store('products/images', 'public');
             }
 
+            // Additional images
             if ($request->hasFile('additional_product_images')) {
-                $additionalImages = [];
-                foreach ($request->file('additional_product_images') as $index => $file) {
-                    $filename = time().'_additional_'.$index.'.'.$file->getClientOriginalExtension();
-                    $file->move(public_path('uploads/products/images'), $filename);
-                    $additionalImages[] = 'uploads/products/images/'.$filename;
+                $images = [];
+                foreach ($request->file('additional_product_images') as $file) {
+                    $images[] = $file->store('products/images', 'public');
                 }
-                $validated['additional_product_images'] = json_encode($additionalImages);
+                $data['additional_product_images'] = $images;
             }
 
+            // Datasheet
             if ($request->hasFile('datasheet_manual')) {
-                $file = $request->file('datasheet_manual');
-                $filename = time().'_datasheet.'.$file->getClientOriginalExtension();
-                $file->move(public_path('uploads/products/datasheets'), $filename);
-                $validated['datasheet_manual'] = 'uploads/products/datasheets/'.$filename;
+                $data['datasheet_manual'] = $request->file('datasheet_manual')
+                    ->store('products/datasheets', 'public');
             }
 
-            $product = Product::create($validated);
+            $product = Product::create($data);
 
-            // Create product serials if they don't exist based on stock quantity
+            // Ensure serials
             $this->ensureProductSerials($product);
 
-            if (! $product) {
-                DB::rollback();
-
-                return back()->with('error', 'Something went wrong.')->withInput();
-            }
             DB::commit();
 
-            return redirect()->route('products.index')->with('success', 'Product created successfully!');
+            return redirect()
+                ->route('products.index')
+                ->with('success', 'Product created successfully!');
         } catch (\Exception $e) {
-            DB::rollback();
-            dd($e->getMessage());
+            DB::rollBack();
 
-            return back()->with('error', 'Error creating product: '.$e->getMessage())->withInput();
+            return back()
+                ->with('error', 'Error creating product.')
+                ->withInput();
         }
     }
 
@@ -271,7 +230,7 @@ class ProductListController extends Controller
 
             'product_name' => 'required|string|max:255',
             'hsn_code' => 'nullable|string|max:100',
-            'sku' => 'required|string|unique:products,sku,'.$id.'|max:100',
+            'sku' => 'required|string|unique:products,sku,' . $id . '|max:100',
             'model_no' => 'nullable|string|max:100',
             'serial_no' => 'nullable|string|max:100',
 
@@ -320,17 +279,17 @@ class ProductListController extends Controller
                 }
 
                 $file = $request->file('main_product_image');
-                $filename = time().'_'.$file->getClientOriginalName();
+                $filename = time() . '_' . $file->getClientOriginalName();
                 $file->move(public_path('uploads/products/images'), $filename);
-                $validated['main_product_image'] = 'uploads/products/images/'.$filename;
+                $validated['main_product_image'] = 'uploads/products/images/' . $filename;
             }
 
             if ($request->hasFile('additional_product_images')) {
                 $additionalImages = [];
                 foreach ($request->file('additional_product_images') as $index => $file) {
-                    $filename = time().'_additional_'.$index.'.'.$file->getClientOriginalExtension();
+                    $filename = time() . '_additional_' . $index . '.' . $file->getClientOriginalExtension();
                     $file->move(public_path('uploads/products/images'), $filename);
-                    $additionalImages[] = 'uploads/products/images/'.$filename;
+                    $additionalImages[] = 'uploads/products/images/' . $filename;
                 }
                 $validated['additional_product_images'] = json_encode($additionalImages);
             }
@@ -342,9 +301,9 @@ class ProductListController extends Controller
                 }
 
                 $file = $request->file('datasheet_manual');
-                $filename = time().'_datasheet.'.$file->getClientOriginalExtension();
+                $filename = time() . '_datasheet.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/products/datasheets'), $filename);
-                $validated['datasheet_manual'] = 'uploads/products/datasheets/'.$filename;
+                $validated['datasheet_manual'] = 'uploads/products/datasheets/' . $filename;
             }
 
             $product->update($validated);
@@ -355,7 +314,7 @@ class ProductListController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Error updating product: '.$e->getMessage())->withInput();
+            return back()->with('error', 'Error updating product: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -385,7 +344,7 @@ class ProductListController extends Controller
 
             return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete product: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete product: ' . $e->getMessage());
         }
     }
 
@@ -470,9 +429,9 @@ class ProductListController extends Controller
             DB::commit();
 
             if ($scrappedCount > 0) {
-                $message = $scrappedCount.' item(s) scrapped successfully';
+                $message = $scrappedCount . ' item(s) scrapped successfully';
                 if (! empty($errors)) {
-                    $message .= '. Some items had errors: '.implode(', ', $errors);
+                    $message .= '. Some items had errors: ' . implode(', ', $errors);
                 }
 
                 return response()->json([
@@ -483,7 +442,7 @@ class ProductListController extends Controller
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No items were scrapped. Errors: '.implode(', ', $errors),
+                    'message' => 'No items were scrapped. Errors: ' . implode(', ', $errors),
                 ], 400);
             }
         } catch (\Exception $e) {
@@ -491,7 +450,7 @@ class ProductListController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while scrapping items: '.$e->getMessage(),
+                'message' => 'An error occurred while scrapping items: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -527,7 +486,7 @@ class ProductListController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while restoring the product: '.$e->getMessage(),
+                'message' => 'An error occurred while restoring the product: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -683,7 +642,5 @@ class ProductListController extends Controller
                 'subcategories' => $subcategories,
             ]);
         }
-
-        
     }
 }

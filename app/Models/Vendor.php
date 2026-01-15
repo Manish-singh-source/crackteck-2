@@ -8,6 +8,7 @@ class Vendor extends Model
 {
     //
     protected $fillable = [
+        'vendor_code',
         'first_name',
         'last_name',
         'phone',
@@ -23,4 +24,9 @@ class Vendor extends Model
         'status',
         'created_by',
     ];
+
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'vendor_id');
+    }
 }

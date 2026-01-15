@@ -75,8 +75,8 @@
                                             'label' => 'General Status',
                                             'name' => 'status',
                                             'options' => [
-                                                '1' => 'Active',
-                                                '0' => 'Inactive',
+                                                'active' => 'Active',
+                                                'inactive' => 'Inactive',
                                             ],
                                             'model' => $parentCategorie,
                                             'required' => true,
@@ -87,8 +87,8 @@
                                             'label' => 'Show on E-commerce Website',
                                             'name' => 'status_ecommerce',
                                             'options' => [
-                                                '1' => 'Active',
-                                                '0' => 'Inactive',
+                                                'yes' => 'Yes',
+                                                'no' => 'No',
                                             ],
                                             'model' => $parentCategorie,
                                             'required' => true,
@@ -182,10 +182,10 @@
                                                             @include('components.form.select', [
                                                                 'label' => 'General Status',
                                                                 'name' => 'status',
-                                                                'value' => '1',
+                                                                'value' => 'active',
                                                                 'options' => [
-                                                                    '0' => 'Inactive',
-                                                                    '1' => 'Active',
+                                                                    'inactive' => 'Inactive',
+                                                                    'active' => 'Active',
                                                                 ],
                                                                 'required' => true,
                                                             ])
@@ -195,10 +195,10 @@
                                                             @include('components.form.select', [
                                                                 'label' => 'Show on E-commerce Website',
                                                                 'name' => 'status_ecommerce',
-                                                                'value' => '1',
+                                                                'value' => 'yes',
                                                                 'options' => [
-                                                                    '0' => 'Inactive',
-                                                                    '1' => 'Active',
+                                                                    'no' => 'No',
+                                                                    'yes' => 'Yes',
                                                                 ],
                                                                 'required' => true,
                                                             ])
@@ -258,8 +258,7 @@
                                                     <td>
                                                         <button type="button" class="btn btn-warning btn-sm me-1"
                                                             onclick="editChildCategory({{ $subCategory->id }})"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target=".attribute-value-edit">
+                                                            data-bs-toggle="modal" data-bs-target=".attribute-value-edit">
                                                             <i class="mdi mdi-pencil-outline"></i>
                                                         </button>
                                                         <form style="display: inline-block"
@@ -324,6 +323,7 @@
                                                                     'name' => 'name',
                                                                     'type' => 'text',
                                                                     'placeholder' => 'Enter Sub Categorie',
+                                                                    'model' => $subCategory->name,
                                                                 ])
                                                             </div>
 
@@ -351,11 +351,12 @@
                                                                 @include('components.form.select', [
                                                                     'label' => 'General Status',
                                                                     'name' => 'status',
-                                                                    'value' => '1',
+                                                                    'value' => '',
                                                                     'options' => [
                                                                         '0' => 'Inactive',
                                                                         '1' => 'Active',
                                                                     ],
+                                                                    'model' => $subCategory,
                                                                     'required' => true,
                                                                 ])
                                                             </div>
@@ -369,6 +370,7 @@
                                                                         '0' => 'Inactive',
                                                                         '1' => 'Active',
                                                                     ],
+                                                                    'model' => $subCategory,
                                                                     'required' => true,
                                                                 ])
                                                             </div>
@@ -426,10 +428,20 @@
                             </div>
 
                             {{-- Sub Category Name --}}
+                            {{-- <div class="mb-3 col-6">
+                                <label for="name" class="form-label">Sub Categorie</label>
+                                <input type="text" name="name" id="name" class="form-control"
+                                placeholder="Enter Sub Categorie">
+                            </div> --}}
                             <div class="mb-3 col-6">
-                                <label for="edit_sub_categorie" class="form-label">Sub Categorie</label>
-                                <input type="text" name="name" id="edit_sub_categorie" class="form-control"
-                                    placeholder="Enter Sub Categorie">
+                                @include('components.form.input', [
+                                    'label' => 'Sub Categorie',
+                                    'name' => 'name',
+                                    'type' => 'text',
+                                    // 'placeholder' => 'Enter Sub Categorie',
+                                    'model' => $subCategory->name,
+                                    'required' => true,
+                                ])
                             </div>
 
                             {{-- Feature Image --}}
@@ -450,8 +462,8 @@
                             <div class="mb-3 col-6">
                                 <label for="edit_status" class="form-label">General Status</label>
                                 <select name="status" id="edit_status" class="form-select">
-                                    <option value="0">Inactive</option>
-                                    <option value="1">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                    <option value="active">Active</option>
                                 </select>
                             </div>
 
@@ -460,8 +472,8 @@
                                 <label for="edit_status_ecommerce" class="form-label">Show on E-commerce
                                     Website</label>
                                 <select name="status_ecommerce" id="edit_status_ecommerce" class="form-select">
-                                    <option value="0">Inactive</option>
-                                    <option value="1">Active</option>
+                                    <option value="no">No</option>
+                                    <option value="yes">Yes</option>
                                 </select>
                             </div>
 
@@ -479,57 +491,57 @@
     </div>
 
 @section('scripts')
-        <script>
-            function editChildCategory(childId) {
-                // Fetch child category data via AJAX
-                $.ajax({    
-                    url: `/e-commerce/get-child-category-data/${childId}`,
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.success) {
-                            const data = response.data;
+    <script>
+        function editChildCategory(childId) {
+            // Fetch child category data via AJAX
+            $.ajax({
+                url: `/e-commerce/get-child-category-data/${childId}`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        const data = response.data;
 
-                            // Set the form action URL
-                            document.getElementById('editChildCategoryForm').action =
-                                `/e-commerce/update-child-categorie/${childId}`;
+                        // Set the form action URL
+                        document.getElementById('editChildCategoryForm').action =
+                            `/e-commerce/update-child-categorie/${childId}`;
 
-                            // Populate form fields
-                            document.getElementById('edit_sub_categorie').value = data.name;    
-                            document.getElementById('edit_status').value = data.status;
-                            document.getElementById('edit_status_ecommerce').value = data.status_ecommerce;
+                        // Populate form fields
+                        document.getElementById('edit_sub_categorie').value = data.name;
+                        document.getElementById('edit_status').value = data.status;
+                        document.getElementById('edit_status_ecommerce').value = data.status_ecommerce;
 
-                            // Clear and set image previews
-                            const featurePreview = document.getElementById('current_feature_image');
-                            const iconPreview = document.getElementById('current_icon_image');
+                        // Clear and set image previews
+                        const featurePreview = document.getElementById('current_feature_image');
+                        const iconPreview = document.getElementById('current_icon_image');
 
-                            featurePreview.innerHTML = '';
-                            iconPreview.innerHTML = '';
+                        featurePreview.innerHTML = '';
+                        iconPreview.innerHTML = '';
 
-                            if (data.image) {
-                                featurePreview.innerHTML = `
+                        if (data.image) {
+                            featurePreview.innerHTML = `
                                 <img src="${data.image}" alt="Current Feature Image"
                                      style="width: 80px; height: 80px; object-fit: cover;" class="rounded">
                                 <small class="d-block text-muted">Current Feature Image</small>
                             `;
-                            }
+                        }
 
-                            if (data.icon_image) {
-                                iconPreview.innerHTML = `
+                        if (data.icon_image) {
+                            iconPreview.innerHTML = `
                                 <img src="${data.icon_image}" alt="Current Icon Image"
                                      style="width: 80px; height: 80px; object-fit: cover;" class="rounded">
                                 <small class="d-block text-muted">Current Icon Image</small>
                             `;
-                            }
-
-                            // Show the modal
-                            new bootstrap.Modal(document.querySelector('.attribute-value-edit')).show();
                         }
-                    },
-                    error: function(xhr) {
-                        console.error('Error fetching child category data:', xhr.responseText);
+
+                        // Show the modal
+                        new bootstrap.Modal(document.querySelector('.attribute-value-edit')).show();
                     }
-                });
-            }
-        </script>
-    @endsection
+                },
+                error: function(xhr) {
+                    console.error('Error fetching child category data:', xhr.responseText);
+                }
+            });
+        }
+    </script>
+@endsection
 @endsection

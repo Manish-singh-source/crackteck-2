@@ -18,20 +18,36 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body pt-0">
+
                             <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link active p-2" id="all_customer_tab" data-bs-toggle="tab"
-                                        href="#all_customer" role="tab">
-                                        <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
-                                        <span class="d-none d-sm-block">All Products</span>
+                                    <a class="nav-link {{ request()->get('status') === 'all' || request()->get('status') === null ? 'active' : '' }} p-2"
+                                        href="{{ route('products.index') }}">
+                                        <span class="d-block d-sm-none"><i
+                                                class="mdi mdi-format-list-bulleted fs-16 me-1"></i></span>
+                                        <span class="d-none d-sm-block"><i
+                                                class="mdi mdi-format-list-bulleted fs-16 me-1"></i>All</span>
                                     </a>
                                 </li>
-
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link {{ request()->get('status') === 'active' ? 'active' : '' }} p-2"
+                                        href="{{ route('products.index', ['status' => 'active']) }}">
+                                        <span class="d-block d-sm-none"><i class="mdi mdi-check-circle-outline fs-16 me-1 text-success"></i></span>
+                                        <span class="d-none d-sm-block"><i class="mdi mdi-check-circle-outline fs-16 me-1 text-success"></i>Active</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link {{ request()->get('status') === 'inactive' ? 'active' : '' }} p-2"
+                                        href="{{ route('products.index', ['status' => 'inactive']) }}">
+                                        <span class="d-block d-sm-none"><i class="mdi mdi-close-circle-outline fs-16 me-1 text-danger"></i></span>
+                                        <span class="d-none d-sm-block"><i class="mdi mdi-close-circle-outline fs-16 me-1 text-danger"></i>Inactive</span>
+                                    </a>
+                                </li>
                             </ul>
 
                             <div class="tab-content text-muted">
 
-                                <div class="tab-pane active show pt-4" id="all_customer" role="tabpanel">
+                                <div class="tab-pane active show" id="all_products" role="tabpanel">
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="card shadow-none">

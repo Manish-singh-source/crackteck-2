@@ -39,8 +39,8 @@
                                                         'label' => 'Vendor',
                                                         'name' => 'vendor_id',
                                                         // I want Vendor Code as well as Vendor Name to be displayed in the dropdown
-                                                        'options' =>
-                                                            ['' => '--Select Vendor--'] + $vendors->toArray(),
+                                                        // 'options' => $vendors->all(['vendor_code', 'id', 'first_name', 'last_name']),
+                                                        'options' => $vendors->prepend('-- Select Vendor --', 0),
                                                     ])
                                                 </div>
                                             </div>

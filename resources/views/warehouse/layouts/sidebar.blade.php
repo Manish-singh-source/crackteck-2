@@ -61,7 +61,7 @@
                     </a>
                 </li>
                 <li>
-                    <a class='tp-link' href="{{ route('product-list.scrap-items') }}">
+                    <a class='tp-link' href="{{ route('scrap-items.index') }}">
                         <i class="fas fa-trash"></i>
                         <span class="ps-1"> Scrap items </span>
                     </a>

@@ -40,29 +40,29 @@
                                     </a>
                                 </li>
                                 <!-- <li class="nav-item">
-                                    <a class="nav-link p-2" id="active_customer_tab" data-bs-toggle="tab" href="#active_customer"
-                                        role="tab">
-                                        <span class="d-block d-sm-none"><i
-                                                class="mdi mdi-sitemap-outline"></i></span>
-                                        <span class="d-none d-sm-block">Laptops</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link p-2" id="active_customer_tab" data-bs-toggle="tab" href="#active_customer"
-                                        role="tab">
-                                        <span class="d-block d-sm-none"><i
-                                                class="mdi mdi-sitemap-outline"></i></span>
-                                        <span class="d-none d-sm-block">Computers</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link p-2" id="active_customer_tab" data-bs-toggle="tab" href="#active_customer"
-                                        role="tab">
-                                        <span class="d-block d-sm-none"><i
-                                                class="mdi mdi-sitemap-outline"></i></span>
-                                        <span class="d-none d-sm-block">Accessories</span>
-                                    </a>
-                                </li> -->
+                                        <a class="nav-link p-2" id="active_customer_tab" data-bs-toggle="tab" href="#active_customer"
+                                            role="tab">
+                                            <span class="d-block d-sm-none"><i
+                                                    class="mdi mdi-sitemap-outline"></i></span>
+                                            <span class="d-none d-sm-block">Laptops</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link p-2" id="active_customer_tab" data-bs-toggle="tab" href="#active_customer"
+                                            role="tab">
+                                            <span class="d-block d-sm-none"><i
+                                                    class="mdi mdi-sitemap-outline"></i></span>
+                                            <span class="d-none d-sm-block">Computers</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link p-2" id="active_customer_tab" data-bs-toggle="tab" href="#active_customer"
+                                            role="tab">
+                                            <span class="d-block d-sm-none"><i
+                                                    class="mdi mdi-sitemap-outline"></i></span>
+                                            <span class="d-none d-sm-block">Accessories</span>
+                                        </a>
+                                    </li> -->
                             </ul>
 
                             <div class="tab-content text-muted">
@@ -183,14 +183,18 @@
     @endsection
 
     @section('scripts')
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
+            integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script>
             $(document).ready(function() {
                 // Handle scrap product form submission
                 $('#scrapProductForm').on('submit', function(e) {
+                    e.preventDefault();
                     const form = $(this);
                     const submitBtn = $('#scrapSubmitBtn');
                     const spinner = submitBtn.find('.spinner-border');
-
+                    console.log(form.serialize());
                     // Clear previous errors
                     $('.is-invalid').removeClass('is-invalid');
                     $('.invalid-feedback').text('');
@@ -200,14 +204,13 @@
                     spinner.removeClass('d-none');
 
                     $.ajax({
-                        url: '{{ route('product-list.scrap-product') }}',
+                        url: '{{ route('scrap-items.add-to-scrap') }}',
                         method: 'POST',
                         data: form.serialize(),
                         success: function(response) {
                             // Hide loading state first
                             submitBtn.prop('disabled', false);
                             spinner.addClass('d-none');
-                            console.log(response);
 
                             if (response.success) {
                                 // Show success message
@@ -226,6 +229,7 @@
                             }
                         },
                         error: function(xhr) {
+                            console.log(xhr.responseJSON);
                             // Hide loading state first
                             submitBtn.prop('disabled', false);
                             spinner.addClass('d-none');

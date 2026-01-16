@@ -179,36 +179,46 @@
                                                         <tbody>
                                                             @php  
                                                                 $badgeClasses = [
-                                                                    'pending' => 'bg-warning-subtle text-warning',
-                                                                    'rejected' => 'bg-danger-subtle text-danger',
+                                                                    'requested' => 'bg-warning-subtle text-warning',
                                                                     'approved' => 'bg-success-subtle text-success',
-                                                                    'delivered' => 'bg-success-subtle text-success',
+                                                                    'rejected' => 'bg-danger-subtle text-danger',
                                                                     'customer_approved' => 'bg-success-subtle text-success',
                                                                     'customer_rejected' => 'bg-danger-subtle text-danger',
+                                                                    'picked' => 'bg-success-subtle text-success',
+                                                                    'in_transit' => 'bg-warning-subtle text-warning',
+                                                                    'delivered' => 'bg-success-subtle text-success',
+                                                                    'used' => 'bg-success-subtle text-success',
+                                                                    'cancelled' => 'bg-danger-subtle text-danger',
+                                                                    'pending' => 'bg-warning-subtle text-warning',
+                                                                    'delivered' => 'bg-success-subtle text-success',
                                                                     'engineer_approved' => 'bg-success-subtle text-success',
                                                                     'engineer_rejected' => 'bg-danger-subtle text-danger', 
-                                                                    'picked' => 'bg-success-subtle text-success',
                                                                 ];
                                                                 
                                                                 $status = [
-                                                                    'pending' => 'Pending',
-                                                                    'rejected' => 'Rejected',
+                                                                    'requested' => 'Requested',
                                                                     'approved' => 'Approved',
-                                                                    'delivered' => 'Delivered',
-                                                                    'customer_approved' => 'Approved',
-                                                                    'customer_rejected' => 'Rejected',
-                                                                    'engineer_approved' => 'Approved',
-                                                                    'engineer_rejected' => 'Rejected',
+                                                                    'rejected' => 'Rejected',
+                                                                    'customer_approved' => 'Customer Approved',
+                                                                    'customer_rejected' => 'Customer Rejected',
                                                                     'picked' => 'Picked',
+                                                                    'in_transit' => 'In Transit',
+                                                                    'delivered' => 'Delivered',
+                                                                    'used' => 'Used',
+                                                                    'cancelled' => 'Cancelled',
+                                                                    'pending' => 'Pending',
+                                                                    'delivered' => 'Delivered',
+                                                                    'engineer_approved' => 'Engineer Approved',
+                                                                    'engineer_rejected' => 'Engineer Rejected',
                                                                 ];
                                                             @endphp
                                                             @forelse($stockRequests as $index => $request)
                                                                 <tr>
                                                                     <td>{{ $index + 1 }}</td>
-                                                                    <td>{{ $request->assignedEngineer->name ?? 'N/A' }}</td>
+                                                                    <td>{{ $request->fromEngineer->first_name ?? 'N/A' }} {{ $request->fromEngineer->last_name ?? 'N/A' }}</td>
                                                                     <td>{{ $request->created_at->format('Y-m-d') }}</td>
                                                                     <td>{{ $request->requested_part_count }}</td>
-                                                                    <td>{{ $request?->total_quantity ?? '0' }}</td>
+                                                                    <td>{{ $request?->requested_quantity ?? '0' }}</td>
                                                                     <td>
                                                                         {{ ucwords(str_replace('_', ' ', $request->request_type)) }}
                                                                     </td>

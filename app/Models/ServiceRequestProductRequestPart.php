@@ -58,8 +58,13 @@ class ServiceRequestProductRequestPart extends Model
         return $this->belongsTo(Staff::class, 'assigned_person_id');
     }
 
+    // public function requestedPart()
+    // {
+    //     return $this->belongsTo(Product::class, 'part_id');
+    // }
+
     public function requestedPart()
     {
-        return $this->belongsTo(Product::class, 'part_id');
+    return $this->belongsTo(ProductSerial::class, 'part_id');
     }
 }

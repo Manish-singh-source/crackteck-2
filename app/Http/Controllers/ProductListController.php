@@ -389,14 +389,6 @@ class ProductListController extends Controller
         }
     }
 
-    public function scrapItems()
-    {
-        $scrapItems = ScrapItem::with(['product', 'productSerial'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return view('/warehouse/product-list/scrap-items', compact('scrapItems'));
-    }
 
     public function scrapProduct(Request $request)
     {

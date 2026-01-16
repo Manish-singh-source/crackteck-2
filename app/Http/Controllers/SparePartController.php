@@ -23,8 +23,8 @@ class SparePartController extends Controller
      */
     public function index()
     {
-        
-        $stockRequests = ServiceRequestProductRequestPart::with(['serviceRequest', 'serviceRequestProduct', 'assignedEngineer', 'requestedPart'])
+
+        $stockRequests = ServiceRequestProductRequestPart::with(['serviceRequest', 'serviceRequestProduct', 'fromEngineer', 'assignedEngineer', 'requestedPart'])
             ->withCount('requestedPart')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -38,12 +38,54 @@ class SparePartController extends Controller
      */
     public function view($id)
     {
-        $stockRequests = ServiceRequestProductRequestPart::with(['serviceRequest', 'serviceRequestProduct', 'fromEngineer', 'assignedEngineer', 'requestedPart.parentCategorie', 'requestedPart.brand', 'requestedPart.subCategorie'])
-            ->findOrFail($id);
-        dd($stockRequests);
+        $stockRequests = ServiceRequestProductRequestPart::with([
+            'serviceRequest.customer',
+            'serviceRequest.customer.primaryAddress',
+            'serviceRequestProduct',
+            'fromEngineer',
+            'assignedEngineer',
+            'requestedPart.product.parentCategorie',
+            'requestedPart.product.brand',
+            'requestedPart.product.subCategorie'
+        ])
+        ->findOrFail($id);
+        // dd($stockRequests);
         $deliveryMen = Staff::where('staff_role', 'delivery_man')->get();
+        $engineers = Staff::where('staff_role', 'engineer')->get();
+        return view('/warehouse/spare-parts-requests/view', compact('stockRequests', 'deliveryMen', 'engineers'));
+    }
 
-        return view('/warehouse/spare-parts-requests/view', compact('stockRequests', 'deliveryMen'));
+    public function assignPerson(Request $request, $id)
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+            'assigned_person_type' => 'required|in:engineer,delivery_man',
+            'delivery_man_id' => 'nullable|exists:staff,id',
+            'engineer_id' => 'nullable|exists:staff,id',
+        ]);
+
+        // dd($request->all());
+        if ($request->assigned_person_type == 'engineer') {
+            $data = [
+                'quantity' => $request->quantity,
+                'assigned_person_type' => $request->assigned_person_type,
+                'assigned_person_id' => $request->engineer_id,
+                'status' => 'approved',
+            ];
+        } else {
+            $data = [
+                'quantity' => $request->quantity,
+                'assigned_person_type' => $request->assigned_person_type,
+                'assigned_person_id' => $request->delivery_man_id,
+                'status' => 'approved',
+            ];
+        }
+        
+        $sparePartRequest = ServiceRequestProductRequestPart::findOrFail($id);
+        $sparePartRequest->update($data);
+
+        return redirect()->route('spare-parts.index', $id)
+            ->with('success', 'Person assigned successfully.');
     }
 
     /**
@@ -120,10 +162,9 @@ class SparePartController extends Controller
 
             return redirect()->route('spare-parts.index')
                 ->with('success', 'Stock request updated successfully.');
-
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error updating stock request: '.$e->getMessage());
+            Log::error('Error updating stock request: ' . $e->getMessage());
 
             return back()->withInput()
                 ->with('error', 'Failed to update stock request. Please try again.');
@@ -176,7 +217,6 @@ class SparePartController extends Controller
                 'success' => true,
                 'message' => 'Product removed from stock request.',
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -187,6 +227,5 @@ class SparePartController extends Controller
                 'error_code' => 500,
             ]);
         }
-
     }
 }

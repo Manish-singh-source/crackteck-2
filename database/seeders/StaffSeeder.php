@@ -25,6 +25,15 @@ class StaffSeeder extends Seeder
             6 => 'Warehouse Manager',
         ];
 
+        $staffRoles = [
+            1 => 'engineer',
+            2 => 'delivery_man',
+            3 => 'sales_person',
+            4 => 'customer',
+            5 => 'admin',
+            6 => 'warehouse_manager',
+        ];
+
         $areas = ['Mumbai', 'Delhi', 'Bangalore', 'Pune', 'Chennai', 'Hyderabad'];
         $genders = ['0', '1', '2'];
         $marital = ['0', '1', '2'];
@@ -36,7 +45,7 @@ class StaffSeeder extends Seeder
             for ($j = 1; $j <= 4; $j++) { // 4 records per role → 24 total
                 $staff[] = [
                     'staff_code' => 'STF' . str_pad($i, 3, '0', STR_PAD_LEFT),
-                    'staff_role' => 'customer',
+                    'staff_role' => $staffRoles[$roleId],
                     'first_name' => $roleName . $j,
                     'last_name' => 'User',
                     'phone' => '98' . rand(10000000, 99999999),

@@ -59,28 +59,16 @@ class Customer extends Authenticatable implements JWTSubject
         return $this->hasOne(CustomerCompanyDetail::class);
     }
 
-    // aadharDetail
-    public function aadharDetail()
-    {
-        return $this->hasOne(CustomerAadharDetail::class);
-    }
-
-    // panCardDetail
-    public function panCardDetail()
-    {
-        return $this->hasOne(CustomerPanCardDetail::class);
-    }
-
     // addressDetails
     public function addressDetails()
     {
         return $this->hasMany(CustomerAddressDetail::class);
     }
 
-    // companyDetail
-    public function companyDetail()
+    // primary address only 
+    public function primaryAddress()
     {
-        return $this->hasOne(CustomerCompanyDetail::class);
+        return $this->hasOne(CustomerAddressDetail::class)->where('is_primary', 'yes');
     }
 
     public function orders()

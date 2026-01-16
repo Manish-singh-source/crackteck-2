@@ -1,15 +1,16 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\VendorController;
 use App\Http\Controllers\LowStockController;
-use App\Http\Controllers\ProductListController;
 use App\Http\Controllers\SparePartController;
+use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\ProductListController;
 use App\Http\Controllers\StockReportController;
 use App\Http\Controllers\TrackProductController;
-use App\Http\Controllers\VendorController;
-use App\Http\Controllers\VendorPurchaseBillController;
-use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WarehouseRackController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\VendorPurchaseBillController;
+use App\Http\Controllers\Warehouse\ScrapItemController;
 
 // *******************************************************************************************************************************************************
 // *******************************************************************************************************************************************************
@@ -137,6 +138,16 @@ Route::prefix('demo/warehouse')->group(function () {
     Route::get('/warehouse-dependent', [WarehouseRackController::class, 'getDependentData']);
     Route::get('/category-dependent', [ProductListController::class, 'getSubcategoriesByParent']);
 
+    // ------------------------------------------------------------ Scrap Items List -------------------------------------------------------------
+    Route::controller(ScrapItemController::class)->group(function () {
+        // Scrap Items List Page
+        Route::get('/scrap-items', 'index')->name('scrap-items.index');
+        // Add to Scrap
+        Route::post('/add-to-scrap', 'addToScrap')->name('scrap-items.add-to-scrap');
+        // Remove from Scrap
+        Route::post('/remove-from-scrap', 'removeFromScrap')->name('scrap-items.remove-from-scrap');
+    });
+
     // ------------------------------------------------------------ Track Product List -------------------------------------------------------------
 
     Route::controller(TrackProductController::class)->group(function () {
@@ -153,7 +164,10 @@ Route::prefix('demo/warehouse')->group(function () {
         Route::get('/spare-parts', 'index')->name('spare-parts.index');
         // View/Edit Stock Request Page
         Route::get('/spare-parts/{stockRequest}', 'view')->name('spare-parts.view');
-        // Route::get('/spare-parts/{stockRequest}', 'warehouse_show')->name('stock-request.show');
+        // Assign Delivery Man/Engineer
+        Route::put('/assign-person/{id}', 'assignPerson')->name('spare-parts.assign-person');
+
+        //warehouse_show')->name('stock-request.show');
 
         // // Update Stock Request
         // Route::put('/stock-requests/{stockRequest}', 'warehouse_update')->name('stock-request.update');

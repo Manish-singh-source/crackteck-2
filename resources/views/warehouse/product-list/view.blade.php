@@ -680,7 +680,7 @@
                     <h5 class="modal-title" id="scrapSerialModalLabel">Scrap Serial Number</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="scrapSerialForm">
+                <form id="Scrap Serial Number">
                     @csrf
                     <div class="modal-body" style="background-color: #fff; padding: 20px;">
                         <div class="alert alert-warning">
@@ -985,80 +985,118 @@
             });
 
             // Handle scrap serial form submission
-            document.getElementById('scrapSerialForm').addEventListener('submit', function(e) {
-                e.preventDefault();
+            (document).ready(function() {
+                // Handle scrap product form submission
+                $('#scrapProductForm').on('submit', function(e) {
+                    e.preventDefault();
+                    const form = $(this);
+                    const submitBtn = $('#scrapSubmitBtn');
+                    const spinner = submitBtn.find('.spinner-border');
+                    console.log(form.serialize());
+                    // Clear previous errors
+                    $('.is-invalid').removeClass('is-invalid');
+                    $('.invalid-feedback').text('');
 
-                const form = this;
-                const submitBtn = document.getElementById('scrapSerialSubmitBtn');
-                const spinner = submitBtn.querySelector('.spinner-border');
-                const serialNumber = document.getElementById('scrapSerialNumber').value;
+                    // Show loading state
+                    submitBtn.prop('disabled', true);
+                    spinner.removeClass('d-none');
 
-                // Clear previous errors
-                document.getElementById('reason_error').textContent = '';
-                document.getElementById('scrapReason').classList.remove('is-invalid');
-
-                // Show loading state
-                submitBtn.disabled = true;
-                spinner.classList.remove('d-none');
-
-                // Prepare form data
-                const formData = new FormData(form);
-
-                fetch('{{ route('product-list.scrap-product') }}', {
+                    $.ajax({
+                        url: '{{ route('scrap-items.add-to-scrap') }}',
                         method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Hide loading state
-                        submitBtn.disabled = false;
-                        spinner.classList.add('d-none');
-                        console.log(data);
+                        data: form.serialize(),
+                        success: function(response) {
+                            // Hide loading state first
+                            submitBtn.prop('disabled', false);
+                            spinner.addClass('d-none');
 
-                        if (data.success) {
-                            // Show success message
-                            showAlert('success', data.message);
+                            if (response.success) {
+                                // Show success message
+                                toastr.success(response.message);
 
-                            // Close modal
-                            const modal = bootstrap.Modal.getInstance(document.getElementById(
-                                'scrapSerialModal'));
-                            modal.hide();
+                                // Reset form and close modal
+                                form[0].reset();
+                                $('#addScrapModal').modal('hide');
 
-                            // Remove the scrapped serial row from the table
-                            const serialRow = document.querySelector(`tr[id*="${serialNumber}"]`);
-                            if (serialRow) {
-                                serialRow.style.transition = 'opacity 0.3s';
-                                serialRow.style.opacity = '0';
-                                setTimeout(() => {
-                                    serialRow.remove();
-
-                                    // Check if no more serial numbers are left
-                                    const remainingRows = document.querySelectorAll(
-                                        '#serial-row-');
-                                    if (remainingRows.length === 0) {
-                                        // Reload page if no serial numbers left
-                                        setTimeout(() => {
-                                            location.reload();
-                                        }, 1000);
-                                    }
-                                }, 300);
+                                // Reload page to show updated data
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1000);
+                            } else {
+                                toastr.error(response.message);
                             }
-                        } else {
-                            showAlert('error', data.message);
-                        }
-                    })
-                    .catch(error => {
-                        // Hide loading state
-                        submitBtn.disabled = false;
-                        spinner.classList.add('d-none');
+                        },
+                        error: function(xhr) {
+                            console.log(xhr.responseJSON);
+                            // Hide loading state first
+                            submitBtn.prop('disabled', false);
+                            spinner.addClass('d-none');
 
-                        console.error('Error:', error);
-                        showAlert('error', 'An error occurred while scrapping the serial number');
+                            if (xhr.status === 422) {
+                                // Validation errors
+                                const errors = xhr.responseJSON.errors;
+                                Object.keys(errors).forEach(function(key) {
+                                    $('#' + key).addClass('is-invalid');
+                                    $('#' + key + '_error').text(errors[key][0]);
+                                });
+                            } else {
+                                toastr.error('An error occurred while processing your request.');
+                            }
+                        }
                     });
+                });
+
+                // Handle restore product
+                $('.restore-btn').on('click', function() {
+                    const scrapId = $(this).data('scrap-id');
+                    const button = $(this);
+
+                    if (confirm('Are you sure you want to restore this product?')) {
+                        button.prop('disabled', true);
+
+                        $.ajax({
+                            url: '{{ route('product-list.restore-product', ':id') }}'.replace(':id',
+                                scrapId),
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    // toastr.success(response.message);
+                                    location.reload();
+                                    // Remove the row from table
+                                    button.closest('tr').fadeOut(function() {
+                                        $(this).remove();
+
+                                        // Check if table is empty and reload if needed
+                                        if ($('tbody tr:visible').length === 0) {
+                                            setTimeout(function() {
+                                                location.reload();
+                                            }, 1000);
+                                        }
+                                    });
+                                } else {
+                                    toastr.error(response.message);
+                                    button.prop('disabled', false);
+                                }
+                            },
+                            error: function() {
+                                toastr.error('An error occurred while restoring the product.');
+                                button.prop('disabled', false);
+                            }
+                        });
+                    }
+                });
             });
+            
         });
     </script>
 @endsection
+
+    @section('scripts')
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
+            integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        
+    @endsection

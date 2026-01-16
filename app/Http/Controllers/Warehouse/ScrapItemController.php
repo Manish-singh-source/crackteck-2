@@ -21,6 +21,7 @@ class ScrapItemController extends Controller
         $scrapItems = ScrapItem::with(['product', 'productSerial'])
             ->orderBy('created_at', 'desc')
             ->get();
+            // dd($scrapItems);
 
         return view('/warehouse/scrap-items/index',  compact('scrapItems'));
     }

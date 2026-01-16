@@ -9,64 +9,30 @@
                 <div class="flex-grow-1">
                     <h4 class="fs-18 fw-semibold m-0">Scrap Product list</h4>
                 </div>
+                <div class="card-body border-end-0 border-start-0">
+                    <form action="#" method="get">
+                        <div class="d-flex justify-content-end">
+                            <div class="row">
+                                <div class="col">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#addScrapModal">
+                                        Add Scrap Product
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <div class="row">
                 <div class="col-12">
                     <div class="card">
 
-                        <div class="card-body border border-dashed border-end-0 border-start-0">
-                            <form action="#" method="get">
-                                <div class="d-flex justify-content-end">
-                                    <div class="row">
-                                        <div class="col">
-                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#addScrapModal">
-                                                Add Scrap Product
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-
                         <div class="card-body pt-0">
-                            <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link active p-2" id="all_customer_tab" data-bs-toggle="tab"
-                                        href="#all_customer" role="tab">
-                                        <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
-                                        <span class="d-none d-sm-block">All Products</span>
-                                    </a>
-                                </li>
-                                <!-- <li class="nav-item">
-                                        <a class="nav-link p-2" id="active_customer_tab" data-bs-toggle="tab" href="#active_customer"
-                                            role="tab">
-                                            <span class="d-block d-sm-none"><i
-                                                    class="mdi mdi-sitemap-outline"></i></span>
-                                            <span class="d-none d-sm-block">Laptops</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link p-2" id="active_customer_tab" data-bs-toggle="tab" href="#active_customer"
-                                            role="tab">
-                                            <span class="d-block d-sm-none"><i
-                                                    class="mdi mdi-sitemap-outline"></i></span>
-                                            <span class="d-none d-sm-block">Computers</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link p-2" id="active_customer_tab" data-bs-toggle="tab" href="#active_customer"
-                                            role="tab">
-                                            <span class="d-block d-sm-none"><i
-                                                    class="mdi mdi-sitemap-outline"></i></span>
-                                            <span class="d-none d-sm-block">Accessories</span>
-                                        </a>
-                                    </li> -->
-                            </ul>
 
                             <div class="tab-content text-muted">
-                                <div class="tab-pane active show pt-4" id="all_customer" role="tabpanel">
+                                <div class="tab-pane active show" id="all_customer" role="tabpanel">
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="card shadow-none">
@@ -76,6 +42,7 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>Name</th>
+                                                                <th>SKU & HSN</th>
                                                                 <th>Type</th>
                                                                 <th>Reason</th>
                                                                 <th>Module Number</th>
@@ -88,22 +55,57 @@
                                                             @forelse($scrapItems as $scrapItem)
                                                                 <tr>
                                                                     <td>
-                                                                        <div>
-                                                                            {{ $scrapItem->product_name }}
+                                                                        <div class="d-flex align-items-center">
+                                                                            <div class="me-3">
+                                                                                @if ($scrapItem->product->main_product_image)
+                                                                                    <img src="{{ asset($scrapItem->product->main_product_image) }}"
+                                                                                        alt="{{ $scrapItem->product->product_name }}"
+                                                                                        width="80" height="80"
+                                                                                        class="img-fluid rounded">
+                                                                                @else
+                                                                                    <img src="https://placehold.co/80x80"
+                                                                                        alt="No Image" width="80"
+                                                                                        height="80"
+                                                                                        class="img-fluid rounded">
+                                                                                @endif
+                                                                            </div>
+                                                                            <div>
+                                                                                <div class="fw-semibold">
+                                                                                    {{ $scrapItem->product->product_name ?? 'N/A' }}
+                                                                                </div>
+                                                                                <div class="text-muted small">
+                                                                                    Brand:
+                                                                                    {{ $scrapItem->product->brand->brand_title ?? 'N/A' }}
+                                                                                </div>
+                                                                                <div class="text-muted small">
+                                                                                    Model:
+                                                                                    {{ $scrapItem->product->model_no ?? 'N/A' }}
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
                                                                     </td>
                                                                     <td>
+                                                                        <div class="small text-muted fw-semibold mb-1">SKU:
+                                                                            {{ $scrapItem->product->sku ?? 'N/A' }}</div>
+
+                                                                        @if ($scrapItem->product->hsn_code)
+                                                                            <div class="small text-muted">HSN:
+                                                                                {{ $scrapItem->product->hsn_code }}</div>
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>
                                                                         <div>
-                                                                            {{ $scrapItem->product->parentCategorie->parent_categories ?? 'N/A' }}
+                                                                            {{ $scrapItem->product->parentCategorie->name ?? 'N/A' }}
                                                                         </div>
                                                                         <div
                                                                             class="badge bg-primary-subtle text-primary fw-semibold">
-                                                                            {{ $scrapItem->product->brand->brand_title ?? 'N/A' }}
+                                                                            {{ $scrapItem->product->brand->name ?? 'N/A' }}
                                                                         </div>
                                                                     </td>
-                                                                    <td>{{ $scrapItem->reason }}</td>
+                                                                    <td>{{ $scrapItem->reason_for_scrap }}</td>
                                                                     <td>{{ $scrapItem->product->model_no ?? 'N/A' }}</td>
-                                                                    <td>{{ $scrapItem->serial_number }}</td>
+                                                                    <td>{{ $scrapItem->productSerial->auto_generated_serial }}
+                                                                    </td>
                                                                     <td>
                                                                         <button type="button"
                                                                             class="btn btn-icon btn-sm bg-success-subtle restore-btn"
@@ -117,7 +119,7 @@
                                                                 </tr>
                                                             @empty
                                                                 <tr>
-                                                                    <td colspan="6" class="text-center py-4">
+                                                                    <td colspan="7" class="text-center py-4">
                                                                         <div class="text-muted">
                                                                             <i
                                                                                 class="mdi mdi-information-outline fs-24 mb-2"></i>
@@ -126,6 +128,7 @@
                                                                     </td>
                                                                 </tr>
                                                             @endforelse
+
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -141,7 +144,8 @@
         </div> <!-- content -->
 
         <!-- Add Scrap Product Modal -->
-        <div class="modal fade" id="addScrapModal" tabindex="-1" aria-labelledby="addScrapModalLabel" aria-hidden="true">
+        <div class="modal fade" id="addScrapModal" tabindex="-1" aria-labelledby="addScrapModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">

@@ -9,13 +9,20 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StoreWarehouseRequest;
 use App\Http\Requests\UpdateWarehouseRequest;
+use Termwind\Components\Raw;
 
 class WarehouseController extends Controller
 {
     //
-    public function index()
+    public function index(Request $request)
     {
-        $warehouses = Warehouse::all();
+        $warehouses = Warehouse::query();
+
+        if (request()->has('status') && request('status') !== 'all') {
+            $warehouses->where('status', request('status'));
+        }
+
+        $warehouses = $warehouses->get();
 
         return view('/warehouse/warehouses-list/index', compact('warehouses'));
     }
@@ -82,7 +89,7 @@ class WarehouseController extends Controller
         try {
             DB::beginTransaction();
 
-            $warehouse = Warehouse::findOrFail($id);
+            $warehouse = Warehouse::find($id);
             $data = $request->validated();
 
             // Handle licence document replacement
@@ -122,7 +129,18 @@ class WarehouseController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        $warehouse = Warehouse::findOrFail($id);
+        $warehouse = Warehouse::find($id);
+
+        if (
+            $request->default_warehouse === 'yes' &&
+            Warehouse::where('default_warehouse', 'yes')
+            ->where('id', '!=', $id)
+            ->exists()
+        ) {
+            return redirect()
+                ->back()
+                ->with('error', 'Another warehouse is already set as default.');
+        }
 
         $warehouse->default_warehouse = $request->default_warehouse;
         $warehouse->status = $request->status;
@@ -135,7 +153,13 @@ class WarehouseController extends Controller
 
     public function delete($id)
     {
-        $warehouse = Warehouse::findOrFail($id);
+        $warehouse = Warehouse::withCount('products')->find($id);
+        if (!$warehouse) {
+            return redirect()->route('warehouses-list.index')->with('error', 'Warehouse not found.');
+        }
+        if ($warehouse->products_count > 0) {
+            return redirect()->route('warehouses-list.index')->with('error', 'Cannot delete warehouse with associated products.');
+        }
         $warehouse->delete();
 
         return redirect()->route('warehouses-list.index')->with('success', 'Warehouse deleted successfully.');

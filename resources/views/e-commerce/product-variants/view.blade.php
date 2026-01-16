@@ -126,8 +126,8 @@
                                             'label' => 'Status',
                                             'name' => 'status',
                                             'options' => [
-                                                '1' => 'Active',
-                                                '0' => 'Inactive',
+                                                'active' => 'Active',
+                                                'inactive' => 'Inactive',
                                             ],
                                             'model' => $attributeName,
                                             'required' => true,
@@ -219,14 +219,25 @@
 <script>
     $(document).ready(function() {
         $('.btn-edit-attr-value').click(function() {
-            
+
             var id = $(this).data('id');
             var value = $(this).data('value');
 
             $('#edit_attribute_value').val(value);
-            $('#editAttributeValueForm').attr('action', '/e-commerce/update-product-attribute-value/' + id);
+            $('#editAttributeValueForm').attr('action', '' + id);
         });
     });
+
+    // $(document).ready(function() {
+    //     $('.btn-edit-attr-value').click(function() {
+            
+    //         var id = $(this).data('id');
+    //         var value = $(this).data('value');
+
+    //         $('#edit_attribute_value').val(value);
+    //         $('#editAttributeValueForm').attr('action', '/e-commerce/update-product-attribute-value/' + id);
+    //     });
+    // });
 
 </script>
 @endsection

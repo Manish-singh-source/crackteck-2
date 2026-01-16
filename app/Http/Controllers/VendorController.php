@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreVendorRequest;
+use App\Http\Requests\UpdateVendorRequest;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -9,9 +11,15 @@ use Illuminate\Support\Facades\Validator;
 class VendorController extends Controller
 {
     //
-    public function index()
+    public function index(Request $request)
     {
-        $vendors = Vendor::all();
+        $vendors = Vendor::query();
+
+        if (request()->has('status') && request('status') !== 'all') {
+            $vendors->where('status', request('status'));
+        }
+
+        $vendors = $vendors->get();
 
         return view('warehouse/vendor/index', compact('vendors'));
     }
@@ -21,51 +29,22 @@ class VendorController extends Controller
         return view('warehouse/vendor/create');
     }
 
-    public function store(Request $request)
+    public function store(StoreVendorRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'first_name' => 'required|min:3',
-            'last_name' => 'required|min:3',
-            'phone' => 'required|digits:10',
-            'email' => 'required|email|unique:vendors,email',
-            'address1' => 'required|min:3',
-            'city' => 'required',
-            'state' => 'required',
-            'country' => 'required',
-            'pincode' => 'required|digits:6',
-            'pan_no' => 'nullable|unique:vendors,pan_no',
-            'gst_no' => 'nullable|unique:vendors,gst_no',
-            'status' => 'required|in:inactive,active',
-        ]);
+        $data = $request->validated();
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
-        }
+        // Generate vendor code: VD-25-0001
+        $data['vendor_code'] = 'VD-' . date('y') . '-' . str_pad(Vendor::count() + 1, 4, '0', STR_PAD_LEFT);
 
-        $vendor = new Vendor;
-        // VD-25-0001
-        $vendor->vendor_code = 'VD-'.date('y').'-'.str_pad(Vendor::count() + 1, 4, '0', STR_PAD_LEFT);
-        $vendor->first_name = $request->first_name;
-        $vendor->last_name = $request->last_name;
-        $vendor->phone = $request->phone;
-        $vendor->email = $request->email;
-        $vendor->address1 = $request->address1;
-        $vendor->address2 = $request->address2;
-        $vendor->city = $request->city;
-        $vendor->state = $request->state;
-        $vendor->country = $request->country;
-        $vendor->pincode = $request->pincode;
-        $vendor->pan_no = $request->pan_no;
-        $vendor->gst_no = $request->gst_no;
-        $vendor->status = $request->status;
+        $vendor = Vendor::create($data);
 
-        $vendor->save();
-
-        if (! $vendor) {
+        if (!$vendor) {
             return back()->with('error', 'Something went wrong.');
         }
 
-        return redirect()->route('vendor_list.index')->with('success', 'Vendor added successfully.');
+        return redirect()
+            ->route('vendor_list.index')
+            ->with('success', 'Vendor added successfully.');
     }
 
     public function edit($id)
@@ -75,53 +54,29 @@ class VendorController extends Controller
         return view('warehouse/vendor/edit', compact('vendor'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateVendorRequest $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'first_name' => 'required|min:3',
-            'last_name' => 'required|min:3',
-            'phone' => 'required|digits:10',
-            'email' => 'required|email|unique:vendors,email,'.$id,
-            'address1' => 'required|min:3',
-            'city' => 'required',
-            'state' => 'required',
-            'country' => 'required',
-            'pincode' => 'required|digits:6',
-            'pan_no' => 'nullable|unique:vendors,pan_no,'.$id,
-            'gst_no' => 'nullable|unique:vendors,gst_no,'.$id,
-            'status' => 'required|in:inactive,active',
-        ]);
-
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
-        }
-
         $vendor = Vendor::findOrFail($id);
-        $vendor->first_name = $request->first_name;
-        $vendor->last_name = $request->last_name;
-        $vendor->phone = $request->phone;
-        $vendor->email = $request->email;
-        $vendor->address1 = $request->address1;
-        $vendor->address2 = $request->address2;
-        $vendor->city = $request->city;
-        $vendor->state = $request->state;
-        $vendor->country = $request->country;
-        $vendor->pincode = $request->pincode;
-        $vendor->pan_no = $request->pan_no;
-        $vendor->gst_no = $request->gst_no;
-        $vendor->status = $request->status;
-        $vendor->save();
 
-        if (! $vendor) {
-            return back()->with('error', 'Something went wrong.');
-        }
+        // Get validated data
+        $data = $request->validated();
 
-        return redirect()->route('vendor_list.index')->with('success', 'Vendor updated successfully.');
+        $vendor->update($data);
+
+        return redirect()
+            ->route('vendor_list.index')
+            ->with('success', 'Vendor updated successfully.');
     }
 
     public function destroy($id)
     {
-        $vendor = Vendor::findOrFail($id);
+        $vendor = Vendor::withCount('products')->find($id);
+        if (! $vendor) {
+            return back()->with('error', 'Vendor not found.');
+        }
+        if ($vendor->products_count > 0) {
+            return back()->with('error', 'Cannot delete vendor with associated products.');
+        }
         $vendor->delete();
 
         return redirect()->route('vendor_list.index')->with('success', 'Vendor deleted successfully.');

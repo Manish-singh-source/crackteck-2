@@ -33,19 +33,80 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body pt-0">
+
                             <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
+
+                                {{-- All --}}
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link active p-2" id="all_customer_tab" data-bs-toggle="tab"
-                                        href="#all_customer" role="tab">
-                                        <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
-                                        <span class="d-none d-sm-block">All Invoices</span>
+                                    <a class="nav-link {{ request('po_status') === null || request('po_status') === 'all' ? 'active' : '' }} p-2"
+                                        href="{{ route('vendor.index') }}">
+                                        <span class="d-block d-sm-none">
+                                            <i class="mdi mdi-store fs-16 me-1"></i>
+                                        </span>
+                                        <span class="d-none d-sm-block">
+                                            <i class="mdi mdi-store fs-16 me-1"></i> All
+                                        </span>
                                     </a>
                                 </li>
+
+                                {{-- Pending --}}
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link {{ request('po_status') === 'pending' ? 'active' : '' }} p-2"
+                                        href="{{ route('vendor.index', ['po_status' => 'pending']) }}">
+                                        <span class="d-block d-sm-none">
+                                            <i class="mdi mdi-clock-outline fs-16 me-1 text-warning"></i>
+                                        </span>
+                                        <span class="d-none d-sm-block">
+                                            <i class="mdi mdi-clock-outline fs-16 me-1 text-warning"></i> Pending
+                                        </span>
+                                    </a>
+                                </li>
+
+                                {{-- Approved --}}
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link {{ request('po_status') === 'approved' ? 'active' : '' }} p-2"
+                                        href="{{ route('vendor.index', ['po_status' => 'approved']) }}">
+                                        <span class="d-block d-sm-none">
+                                            <i class="mdi mdi-check-circle-outline fs-16 me-1 text-success"></i>
+                                        </span>
+                                        <span class="d-none d-sm-block">
+                                            <i class="mdi mdi-check-circle-outline fs-16 me-1 text-success"></i> Approved
+                                        </span>
+                                    </a>
+                                </li>
+
+                                {{-- Rejected --}}
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link {{ request('po_status') === 'rejected' ? 'active' : '' }} p-2"
+                                        href="{{ route('vendor.index', ['po_status' => 'rejected']) }}">
+                                        <span class="d-block d-sm-none">
+                                            <i class="mdi mdi-close-circle-outline fs-16 me-1 text-danger"></i>
+                                        </span>
+                                        <span class="d-none d-sm-block">
+                                            <i class="mdi mdi-close-circle-outline fs-16 me-1 text-danger"></i> Rejected
+                                        </span>
+                                    </a>
+                                </li>
+
+                                {{-- Cancelled --}}
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link {{ request('po_status') === 'cancelled' ? 'active' : '' }} p-2"
+                                        href="{{ route('vendor.index', ['po_status' => 'cancelled']) }}">
+                                        <span class="d-block d-sm-none">
+                                            <i class="mdi mdi-cancel fs-16 me-1 text-secondary"></i>
+                                        </span>
+                                        <span class="d-none d-sm-block">
+                                            <i class="mdi mdi-cancel fs-16 me-1 text-secondary"></i> Cancelled
+                                        </span>
+                                    </a>
+                                </li>
+
                             </ul>
+
 
                             <div class="tab-content text-muted">
 
-                                <div class="tab-pane active show pt-4" id="all_customer" role="tabpanel">
+                                <div class="tab-pane active show" id="all_customer" role="tabpanel">
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="card shadow-none">
@@ -67,6 +128,20 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            @php
+                                                                $status = [
+                                                                    'pending' => 'Pending',
+                                                                    'approved' => 'Approved',
+                                                                    'rejected' => 'Rejected',
+                                                                    'cancelled' => 'Cancelled',
+                                                                ];
+                                                                $badge = [
+                                                                    'pending' => 'warning',
+                                                                    'approved' => 'success',
+                                                                    'rejected' => 'danger',
+                                                                    'cancelled' => 'secondary',
+                                                                ];
+                                                            @endphp
                                                             @forelse($vendorPurchaseBills as $bill)
                                                                 <tr class="align-middle">
                                                                     {{-- First Name Last Name  --}}
@@ -78,7 +153,10 @@
                                                                     <td>{{ $bill->po_amount }}</td>
                                                                     <td>{{ $bill->po_amount_paid }}</td>
                                                                     <td>{{ $bill->po_amount_pending }}</td>
-                                                                    <td>{{ $bill->po_status == 'pending' ? 'Pending' : ($bill->po_status == 'approved' ? 'Approved' : ($bill->po_status == 'rejected' ? 'Rejected' : 'Cancelled')) }}
+                                                                    <td>
+                                                                        <span
+                                                                            class="badge bg-{{ $badge[$bill->po_status] ?? 'secondary' }}-subtle text-{{ $badge[$bill->po_status] ?? 'secondary' }} fw-semibold">{{ $status[$bill->po_status] ?? 'Unknown' }}
+                                                                        </span>
                                                                     </td>
                                                                     <td>
                                                                         <a aria-label="anchor"
@@ -86,14 +164,16 @@
                                                                             class="btn btn-icon btn-sm bg-primary-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="View">
-                                                                            <i class="mdi mdi-eye-outline fs-14 text-primary"></i>
+                                                                            <i
+                                                                                class="mdi mdi-eye-outline fs-14 text-primary"></i>
                                                                         </a>
                                                                         <a aria-label="anchor"
                                                                             href="{{ route('vendor.edit', $bill->id) }}"
                                                                             class="btn btn-icon btn-sm bg-warning-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="Edit">
-                                                                            <i class="mdi mdi-pencil fs-14 text-warning"></i>
+                                                                            <i
+                                                                                class="mdi mdi-pencil fs-14 text-warning"></i>
                                                                         </a>
                                                                         <form
                                                                             action="{{ route('vendor.destroy', $bill->id) }}"
@@ -105,14 +185,15 @@
                                                                                 class="btn btn-icon btn-sm bg-danger-subtle"
                                                                                 data-bs-toggle="tooltip"
                                                                                 data-bs-original-title="Delete">
-                                                                                <i class="mdi mdi-delete fs-14 text-danger"></i>
+                                                                                <i
+                                                                                    class="mdi mdi-delete fs-14 text-danger"></i>
                                                                             </button>
                                                                         </form>
                                                                     </td>
                                                                 </tr>
                                                             @empty
                                                                 <tr>
-                                                                    <td colspan="8" class="text-center">No vendor
+                                                                    <td colspan="9" class="text-center">No vendor
                                                                         purchase bills found.</td>
                                                                 </tr>
                                                             @endforelse

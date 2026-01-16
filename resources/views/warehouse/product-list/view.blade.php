@@ -242,13 +242,13 @@
                                         @php
                                             $stockStatus = $product->stock_status;
                                             $badgeClass = '';
-                                            if ($stockStatus == '0') {
+                                            if ($stockStatus == 'in_stock') {
                                                 $stockStatus = 'In Stock';
                                                 $badgeClass = 'bg-success';
-                                            } elseif ($stockStatus == '1') {
+                                            } elseif ($stockStatus == 'out_of_stock') {
                                                 $stockStatus = 'Out of Stock';
                                                 $badgeClass = 'bg-secondary';
-                                            } elseif ($stockStatus == '2') {
+                                            } elseif ($stockStatus == 'low_stock') {
                                                 $stockStatus = 'Low Stock';
                                                 $badgeClass = 'bg-warning';
                                             } else {
@@ -484,10 +484,10 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                @php 
+                                {{-- @php 
                                     $variations = json_decode($product->variation_options, true); 
-                                @endphp
-                                @foreach ($variations as $key=> $attribute)
+                                @endphp --}}
+                                @foreach ($product->variation_options as $key=> $attribute)
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label class="fw-semibold">{{ $key }}:</label>
@@ -516,8 +516,8 @@
                                         <label class="fw-semibold">Status:</label>
                                         <p class="text-muted">
                                             <span
-                                                class="badge {{ $product->status == 1 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
-                                                {{ $product->status == 1 ? 'Active' : 'Inactive' }}
+                                                class="badge {{ $product->status == 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
+                                                {{ $product->status == 'active' ? 'Active' : 'Inactive' }}
                                             </span>
                                         </p>
                                     </div>

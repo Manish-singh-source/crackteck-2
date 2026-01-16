@@ -39,10 +39,10 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Status',
                                                     'name' => 'status',
-                                                    'value' => '1',
+                                                    'value' => 'active',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'inactive' => 'Inactive',
+                                                        'active' => 'Active',
                                                     ],
                                                 ])
                                             </div>
@@ -86,10 +86,10 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Status',
                                                     'name' => 'status',
+                                                    'value' => 'active',
                                                     'options' => [
-                                                        '0' => '--Select--',
-                                                        'Active' => 'Active',
-                                                        'Inactive' => 'Inactive',
+                                                        'active' => 'Active',
+                                                        'inactive' => 'Inactive',
                                                     ],
                                                 ])
                                             </div>
@@ -277,8 +277,8 @@
                                                                 <td>{{ $attribute->name }}</td>
                                                                 <td>
                                                                     <span
-                                                                        class="badge {{ $attribute->status == '1' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
-                                                                        {{ $attribute->status == '1' ? 'Active' : 'Inactive' }}
+                                                                        class="badge {{ $attribute->status == 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
+                                                                        {{ $attribute->status == 'active' ? 'Active' : 'Inactive' }}
                                                                     </span>
                                                                 </td>
                                                                 <td>

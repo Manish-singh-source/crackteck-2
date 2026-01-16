@@ -73,6 +73,7 @@ class CategorieController extends Controller
             'name' => 'required',
             'image' => 'required',
             'status' => 'required',
+            'status_ecommerce' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -84,6 +85,7 @@ class CategorieController extends Controller
         $parentCategorie->slug = strtolower(str_replace(' ', '-', $request->name));
         $parentCategorie->sort_order = $request->sort_order;
         $parentCategorie->status = $request->status;
+        $parentCategorie->status_ecommerce = $request->status_ecommerce;
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -110,8 +112,8 @@ class CategorieController extends Controller
             'name' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'icon_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|boolean',
-            'status_ecommerce' => 'required|boolean',
+            'status' => 'required|in:inactive,active',
+            'status_ecommerce' => 'required|in:no,yes',
         ]);
 
         if ($validator->fails()) {
@@ -122,8 +124,8 @@ class CategorieController extends Controller
         $subCategorie->parent_category_id = $request->parent_category_id;
         $subCategorie->name = $request->name;
         $subCategorie->slug = strtolower(str_replace(' ', '-', $request->name));
-        $subCategorie->status = $request->status ?? 1;
-        $subCategorie->status_ecommerce = $request->status_ecommerce ?? 1;
+        $subCategorie->status = $request->status ?? 'inactive';
+        $subCategorie->status_ecommerce = $request->status_ecommerce ?? 'no';
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -162,9 +164,9 @@ class CategorieController extends Controller
 
     public function parentCategorie($id)
     {
-        $parentCategorie = ParentCategory::findOrFail($id);
+        $parentCategorie = ParentCategory::with('subCategories')->findOrFail($id);
         $subCategories = SubCategory::where('parent_category_id', $id)->get();
-
+        // dd($parentCategorie);
         return view('/e-commerce/categories/view', compact('parentCategorie', 'subCategories'));
     }
 
@@ -207,8 +209,8 @@ class CategorieController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|boolean',
-            'status_ecommerce' => 'required|boolean',
+            'status' => 'required|in:inactive,active',
+            'status_ecommerce' => 'required|in:inactive,active',
         ]);
 
         if ($validator->fails()) {
@@ -356,7 +358,7 @@ class CategorieController extends Controller
     public function getChildCategoryData($id)
     {
         try {
-            $subCategorie = SubCategory::findOrFail($id);
+            $subCategorie = SubCategory::find($id);
 
             return response()->json([
                 'success' => true,

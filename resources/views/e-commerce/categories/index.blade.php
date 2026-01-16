@@ -64,10 +64,10 @@
                                                     @include('components.form.select', [
                                                         'label' => 'General Status',
                                                         'name' => 'status',
-                                                        'value' => '1',
+                                                        'value' => 'active',
                                                         'options' => [
-                                                            '0' => 'Inactive',
-                                                            '1' => 'Active',
+                                                            'inactive' => 'Inactive',
+                                                            'active' => 'Active',
                                                         ],
                                                         'required' => true,
                                                     ])
@@ -77,10 +77,10 @@
                                                     @include('components.form.select', [
                                                         'label' => 'Show on E-commerce Website',
                                                         'name' => 'status_ecommerce',
-                                                        'value' => '1',
+                                                        'value' => 'active',
                                                         'options' => [
-                                                            '0' => 'Inactive',
-                                                            '1' => 'Active',
+                                                            'inactive' => 'Inactive',
+                                                            'active' => 'Active',
                                                         ],
                                                         'required' => true,
                                                     ])
@@ -164,10 +164,10 @@
                                                 @include('components.form.select', [
                                                     'label' => 'General Status',
                                                     'name' => 'status', 
-                                                    'value' => '1',
+                                                    'value' => 'active',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'inactive' => 'Inactive',
+                                                        'active' => 'Active',
                                                     ],
                                                     'required' => true,
                                                 ])
@@ -177,10 +177,10 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Show on E-commerce Website',
                                                     'name' => 'status_ecommerce',
-                                                    'value' => '1',
+                                                    'value' => 'yes',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'no' => 'No',
+                                                        'yes' => 'Yes',
                                                     ],
                                                     'required' => true,
                                                 ])
@@ -365,14 +365,14 @@
                                                                 </td>
                                                                 <td>
                                                                     <span
-                                                                        class="badge fw-semibold {{ $category->status_ecommerce  ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
-                                                                        {{ $category->status_ecommerce  ? 'Active' : 'Inactive' }}
+                                                                        class="badge fw-semibold {{ $category->status_ecommerce === 'active'  ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
+                                                                        {{ $category->status_ecommerce == 'active'  ? 'Active' : 'Inactive' }}
                                                                     </span>
                                                                 </td>
                                                                 <td>
                                                                     <span
-                                                                        class="badge fw-semibold {{ $category->status === '1' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
-                                                                        {{ $category->status == '1' ? 'Active' : 'Inactive' }}
+                                                                        class="badge fw-semibold {{ $category->status === 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
+                                                                        {{ $category->status == 'active' ? 'Active' : 'Inactive' }}
                                                                     </span>
                                                                 </td>
                                                                 <td>

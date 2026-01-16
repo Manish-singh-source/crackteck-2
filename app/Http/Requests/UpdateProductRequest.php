@@ -22,72 +22,40 @@ class UpdateProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        $productId = $this->route('id');
-
         return [
-            // Vendor & Purchase Info
-            'vendor_name' => 'nullable|string|max:255',
-            'po_number' => 'nullable|string|max:100',
-            'invoice_number' => 'nullable|string|max:100',
-            'invoice_pdf' => 'nullable|mimes:pdf|max:10240',
-            'invoice_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'purchase_date' => 'nullable|date',
-            'bill_due_date' => 'nullable|date',
-            'bill_amount' => 'nullable|numeric|min:0',
-
-            // Basic Product Information
-            'product_name' => 'required|string|max:255',
-            'hsn_code' => 'nullable|string|max:100',
-            'sku' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('products', 'sku')->ignore($productId),
-            ],
+            'vendor_id' => 'nullable|exists:vendors,id',
+            'vendor_purchase_order_id' => 'nullable|exists:vendor_purchase_orders,id',
             'brand_id' => 'nullable|exists:brands,id',
-            'model_no' => 'nullable|string|max:100',
-            'serial_no' => 'nullable|string|max:100',
             'parent_category_id' => 'nullable|exists:parent_categories,id',
             'sub_category_id' => 'nullable|exists:sub_categories,id',
+            'warehouse_id' => 'nullable|exists:warehouses,id',
 
-            // Product Details
+            'product_name' => 'required|string|max:255',
+            'hsn_code' => 'nullable|string|max:100',
+            'sku' => 'required|string|max:100|unique:products,sku,' . $this->route('id'),
+            'model_no' => 'nullable|string|max:100',
+
             'short_description' => 'nullable|string',
             'full_description' => 'nullable|string',
             'technical_specification' => 'nullable|string',
             'brand_warranty' => 'nullable|string|max:255',
+            'company_warranty' => 'nullable|string|max:255',
 
-            // Pricing
             'cost_price' => 'nullable|numeric|min:0',
             'selling_price' => 'nullable|numeric|min:0',
             'discount_price' => 'nullable|numeric|min:0',
             'tax' => 'nullable|numeric|min:0|max:100',
 
-            // Inventory Details
             'stock_quantity' => 'nullable|integer|min:0',
-            'stock_status' => 'nullable|in:In Stock,Out of Stock',
+            'stock_status' => 'nullable|in:in_stock,out_of_stock,low_stock,scrap',
 
-            // Rack Details
-            'warehouse_id' => 'nullable|exists:warehouses,id',
-            'warehouse_rack_id' => 'nullable|exists:warehouse_racks,id',
-            'rack_zone_area' => 'nullable|string|max:100',
-            'rack_no' => 'nullable|string|max:100',
-            'level_no' => 'nullable|string|max:50',
-            'position_no' => 'nullable|string|max:50',
-            'expiry_date' => 'nullable|date',
-            'rack_status' => 'nullable|in:Available,Blocked,Reserved',
-
-            // Images & Media
             'main_product_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'additional_product_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'datasheet_manual' => 'nullable|mimes:pdf|max:10240',
 
-            // Product Variations
-            'color_options' => 'nullable|string|max:255',
-            'size_options' => 'nullable|string|max:255',
-            'length_options' => 'nullable|string|max:255',
+            'variations' => 'nullable|array',
 
-            // Product Status
-            'status' => 'nullable|in:Active,Inactive',
+            'status' => 'nullable|in:active,inactive',
         ];
     }
 

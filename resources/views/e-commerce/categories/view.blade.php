@@ -76,10 +76,10 @@
                                                 @include('components.form.select', [
                                                     'label' => 'General Status',
                                                     'name' => 'status',
-                                                    'value' => '1',
+                                                    'value' => 'active',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'inactive' => 'Inactive',
+                                                        'active' => 'Active',
                                                     ],
                                                     'required' => true,
                                                 ])
@@ -89,10 +89,10 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Show on E-commerce Website',
                                                     'name' => 'status_ecommerce',
-                                                    'value' => '1',
+                                                    'value' => 'yes',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'no' => 'No',
+                                                        'yes' => 'Yes',
                                                     ],
                                                     'required' => true,
                                                 ])
@@ -143,9 +143,13 @@
 
                                             {{-- Sub Category Name --}}
                                             <div class="mb-3 col-6">
-                                                <label for="edit_sub_categorie" class="form-label">Sub Categorie</label>
-                                                <input type="text" name="name" id="edit_sub_categorie"
-                                                    class="form-control" placeholder="Enter Sub Categorie">
+                                                @include('components.form.input', [
+                                                    'label' => 'Sub Categorie',
+                                                    'name' => 'name',
+                                                    'type' => 'text',
+                                                    // 'model' => $subCategories->name,
+                                                    'required' => true,
+                                                ])
                                             </div>
 
                                             {{-- Feature Image --}}
@@ -167,8 +171,8 @@
                                             <div class="mb-3 col-6">
                                                 <label for="edit_status" class="form-label">General Status</label>
                                                 <select name="status" id="edit_status" class="form-select">
-                                                    <option value="0">Inactive</option>
-                                                    <option value="1">Active</option>
+                                                    <option value="inactive">Inactive</option>
+                                                    <option value="active">Active</option>
                                                 </select>
                                             </div>
 
@@ -178,8 +182,8 @@
                                                     Website</label>
                                                 <select name="status_ecommerce" id="edit_status_ecommerce"
                                                     class="form-select">
-                                                    <option value="0">Inactive</option>
-                                                    <option value="1">Active</option>
+                                                    <option value="no">No</option>
+                                                    <option value="yes">Yes</option>
                                                 </select>
                                             </div>
 
@@ -249,14 +253,14 @@
                                                                 <td>{{ $subCategory->name }}</td>
                                                                 <td>
                                                                     <span
-                                                                        class="badge fw-semibold {{ $subCategory->status === '1' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
-                                                                        {{ $subCategory->status == '1' ? 'Active' : 'Inactive' }}
+                                                                        class="badge fw-semibold {{ $subCategory->status === 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
+                                                                        {{ $subCategory->status == 'active' ? 'Active' : 'Inactive' }}
                                                                     </span>
                                                                 </td>
                                                                 <td>
                                                                     <span
-                                                                        class="badge fw-semibold {{ $subCategory->status_ecommerce === '1' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
-                                                                        {{ $subCategory->status_ecommerce == '1' ? 'Active' : 'Inactive' }}
+                                                                        class="badge fw-semibold {{ $subCategory->status_ecommerce === 'yes' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
+                                                                        {{ $subCategory->status_ecommerce == 'yes' ? 'Yes' : 'No' }}
                                                                     </span>
                                                                 </td>
                                                                 <td>
@@ -307,13 +311,13 @@
                     success: function(response) {
                         if (response.success) {
                             const data = response.data;
-
+                            console.log(data);
                             // Set the form action URL
                             document.getElementById('editChildCategoryForm').action =
                                 `/e-commerce/update-child-categorie/${childId}`;
 
                             // Populate form fields
-                            document.getElementById('edit_sub_categorie').value = data.name;    
+                            document.getElementById('name').value = data.name;    
                             document.getElementById('edit_status').value = data.status;
                             document.getElementById('edit_status_ecommerce').value = data.status_ecommerce;
 

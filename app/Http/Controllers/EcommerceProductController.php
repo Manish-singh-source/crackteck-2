@@ -432,7 +432,7 @@ class EcommerceProductController extends Controller
                 $q->where('product_name', 'LIKE', "%{$query}%")
                     ->orWhere('sku', 'LIKE', "%{$query}%");
             })
-            ->where('status', '1')
+            ->where('status', 'active')
             ->limit(10)
             ->get();
 

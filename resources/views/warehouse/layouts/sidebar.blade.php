@@ -31,12 +31,12 @@
                         <span class="ps-1">Warehouses</span>
                     </a>
                 </li>
-                <li>
+                {{-- <li>
                     <a class='tp-link' href="{{ route('rack.index') }}">
                         <i class="fas fa-th"></i>
                         <span class="ps-1">Warehouse Rack</span>
                     </a>
-                </li>
+                </li> --}}
 
                 <li class="menu-title mt-2">Manage Vendor</li>
                 <li>

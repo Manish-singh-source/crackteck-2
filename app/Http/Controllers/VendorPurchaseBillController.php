@@ -2,20 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreVendorPurchaseOrderRequest;
+use App\Http\Requests\UpdateVendorPurchaseOrderRequest;
 use App\Models\Vendor;
-use App\Models\VendorPurchaseBill;
 use App\Models\VendorPurchaseOrder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Support\Facades\Storage;
 
 class VendorPurchaseBillController extends Controller
 {
     /**
      * Display a listing of the vendor purchase bills.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $vendorPurchaseBills = VendorPurchaseOrder::orderBy('created_at', 'desc')->get();
+        $vendorPurchaseBills = VendorPurchaseOrder::query();
+
+        if (request()->has('po_status') && request('po_status') !== 'all') {
+            $vendorPurchaseBills->where('po_status', request('po_status'));
+        }
+
+        $vendorPurchaseBills = $vendorPurchaseBills->get();
+
         return view('/warehouse/vendor-purchase-bills/index', compact('vendorPurchaseBills'));
     }
 
@@ -28,42 +38,42 @@ class VendorPurchaseBillController extends Controller
         return view('/warehouse/vendor-purchase-bills/create', compact('vendors'));
     }
 
-    public function store(Request $request)
+    public function store(StoreVendorPurchaseOrderRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'vendor_id' => 'required|exists:vendors,id',
-            'po_number' => 'required|string|max:100',
-            'invoice_number' => 'required|string|max:100',
-            'invoice_pdf' => 'nullable|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
-            'purchase_date' => 'required|date',
-            'po_amount_due_date' => 'required|date',
-            'po_amount' => 'required|numeric|min:0',
-            'po_amount_paid' => 'nullable|numeric|min:0',
-            'po_status' => 'required|in:pending,approved,rejected,cancelled',
-        ]);
+        try {
+            DB::beginTransaction();
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+            $data = $request->validated();
+
+            // Handle invoice upload
+            if ($request->hasFile('invoice_pdf')) {
+                $file = $request->file('invoice_pdf');
+                $filename = time() . '_' . $file->getClientOriginalName();
+
+                $data['invoice_pdf'] = $file->storeAs(
+                    'uploads/vendor-purchase-bills',
+                    $filename,
+                    'public'
+                );
+            }
+
+            // Calculate pending amount
+            $data['po_amount_pending'] = $data['po_amount'] - $data['po_amount_paid'];
+
+            VendorPurchaseOrder::create($data);
+
+            DB::commit();
+
+            return redirect()
+                ->route('vendor.index')
+                ->with('success', 'Vendor Purchase Bill created successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return back()
+                ->with('error', 'Failed to create vendor purchase bill.')
+                ->withInput();
         }
-
-        $validatedData = $validator->validated();
-
-        // Handle file upload
-        if ($request->hasFile('invoice_pdf')) {
-            $file = $request->file('invoice_pdf');
-            $filename = time().'_'.$file->getClientOriginalName();
-            $file->move(public_path('uploads/vendor-purchase-bills'), $filename);
-            $validatedData['invoice_pdf'] = 'uploads/vendor-purchase-bills/'.$filename;
-        }
-        $validatedData['po_amount_pending'] = $validatedData['po_amount'] - $validatedData['po_amount_paid'];
-
-        $vendorPurchaseBill = VendorPurchaseOrder::create($validatedData);
-
-        if (! $vendorPurchaseBill) {
-            return back()->with('error', 'Failed to create vendor purchase bill. Please try again.');
-        }
-
-        return redirect()->route('vendor.index')->with('success', 'Vendor Purchase Bill created successfully.');
     }
 
     /**
@@ -100,41 +110,51 @@ class VendorPurchaseBillController extends Controller
     /**
      * Update the specified vendor purchase bill in storage.
      */
-    public function update(Request $request, $id)
-    {
-        $validator = Validator::make($request->all(), [
-            'vendor_id' => 'required|exists:vendors,id',
-            'po_number' => 'required|string|max:100',
-            'invoice_number' => 'required|string|max:100',
-            'invoice_pdf' => 'nullable|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
-            'purchase_date' => 'required|date',
-            'po_amount_due_date' => 'required|date',
-            'po_amount' => 'required|numeric|min:0',
-            'po_amount_paid' => 'nullable|numeric|min:0',
-            'po_amount_pending' => 'nullable|numeric|min:0',
-            'po_status' => 'required|in:pending,approved,rejected,cancelled',
-        ]);
+    public function update(UpdateVendorPurchaseOrderRequest $request, $id)
+{
+    try {
+        DB::beginTransaction();
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
-        }
+        $purchaseOrder = VendorPurchaseOrder::findOrFail($id);
+        $data = $request->validated();
 
-        $validatedData = $validator->validated();
-
-        // Handle file upload
+        // Replace invoice file if uploaded
         if ($request->hasFile('invoice_pdf')) {
+
+            if ($purchaseOrder->invoice_pdf &&
+                Storage::disk('public')->exists($purchaseOrder->invoice_pdf)) {
+                Storage::disk('public')->delete($purchaseOrder->invoice_pdf);
+            }
+
             $file = $request->file('invoice_pdf');
-            $filename = time().'_'.$file->getClientOriginalName();
-            $file->move(public_path('uploads/vendor-purchase-bills'), $filename);
-            $validatedData['invoice_pdf'] = 'uploads/vendor-purchase-bills/'.$filename;
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            $data['invoice_pdf'] = $file->storeAs(
+                'uploads/vendor-purchase-bills',
+                $filename,
+                'public'
+            );
         }
 
-        $validatedData['po_amount_pending'] = $validatedData['po_amount'] - $validatedData['po_amount_paid'];
+        // Recalculate pending amount
+        $data['po_amount_pending'] = $data['po_amount'] - $data['po_amount_paid'];
 
-        VendorPurchaseOrder::where('id', $id)->update($validatedData);
+        $purchaseOrder->update($data);
 
-        return redirect()->route('vendor.index')->with('success', 'Vendor Purchase Bill updated successfully.');
+        DB::commit();
+
+        return redirect()
+            ->route('vendor.index')
+            ->with('success', 'Vendor Purchase Bill updated successfully.');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        return back()
+            ->with('error', 'Failed to update vendor purchase bill.')
+            ->withInput();
     }
+}
 
     /**
      * Remove the specified vendor purchase bill from storage.

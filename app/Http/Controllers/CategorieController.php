@@ -209,8 +209,8 @@ class CategorieController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|boolean',
-            'status_ecommerce' => 'required|boolean',
+            'status' => 'required|in:inactive,active',
+            'status_ecommerce' => 'required|in:inactive,active',
         ]);
 
         if ($validator->fails()) {

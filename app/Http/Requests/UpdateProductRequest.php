@@ -32,7 +32,7 @@ class UpdateProductRequest extends FormRequest
 
             'product_name' => 'required|string|max:255',
             'hsn_code' => 'nullable|string|max:100',
-            'sku' => 'required|string|max:100|unique:products,sku',
+            'sku' => 'required|string|max:100|unique:products,sku,' . $this->route('id'),
             'model_no' => 'nullable|string|max:100',
 
             'short_description' => 'nullable|string',

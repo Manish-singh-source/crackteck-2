@@ -365,7 +365,7 @@
                                                                 </td>
                                                                 <td>
                                                                     <span
-                                                                        class="badge fw-semibold {{ $category->status_ecommerce  ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
+                                                                        class="badge fw-semibold {{ $category->status_ecommerce === 'active'  ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
                                                                         {{ $category->status_ecommerce == 'active'  ? 'Active' : 'Inactive' }}
                                                                     </span>
                                                                 </td>

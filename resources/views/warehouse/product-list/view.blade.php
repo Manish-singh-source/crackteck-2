@@ -516,8 +516,8 @@
                                         <label class="fw-semibold">Status:</label>
                                         <p class="text-muted">
                                             <span
-                                                class="badge {{ $product->status == 1 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
-                                                {{ $product->status == 1 ? 'Active' : 'Inactive' }}
+                                                class="badge {{ $product->status == 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
+                                                {{ $product->status == 'active' ? 'Active' : 'Inactive' }}
                                             </span>
                                         </p>
                                     </div>

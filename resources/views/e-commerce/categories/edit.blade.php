@@ -75,8 +75,8 @@
                                             'label' => 'General Status',
                                             'name' => 'status',
                                             'options' => [
-                                                'active' => 'Active',
                                                 'inactive' => 'Inactive',
+                                                'active' => 'Active',
                                             ],
                                             'model' => $parentCategorie,
                                             'required' => true,
@@ -87,8 +87,8 @@
                                             'label' => 'Show on E-commerce Website',
                                             'name' => 'status_ecommerce',
                                             'options' => [
-                                                'yes' => 'Yes',
-                                                'no' => 'No',
+                                                'inactive' => 'Inactive',
+                                                'active' => 'Active',
                                             ],
                                             'model' => $parentCategorie,
                                             'required' => true,

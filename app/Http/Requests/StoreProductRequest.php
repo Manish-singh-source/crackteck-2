@@ -22,61 +22,39 @@ class StoreProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Vendor & Purchase Info
-            'vendor_name' => 'nullable|string|max:255',
-            'po_number' => 'nullable|string|max:100',
-            'invoice_number' => 'nullable|string|max:100',
-            'invoice_pdf' => 'nullable|mimes:pdf|max:10240',
-            'purchase_date' => 'nullable|date',
-            'bill_due_date' => 'nullable|date',
-            'bill_amount' => 'nullable|numeric|min:0',
-
-            // Basic Product Information
-            'product_name' => 'required|string|max:255',
-            'hsn_code' => 'nullable|string|max:100',
-            'sku' => 'required|string|unique:products,sku|max:100',
+            'vendor_id' => 'nullable|exists:vendors,id',
+            'vendor_purchase_order_id' => 'nullable|exists:vendor_purchase_orders,id',
             'brand_id' => 'nullable|exists:brands,id',
-            'model_no' => 'nullable|string|max:100',
-            'serial_no' => 'nullable|string|max:100',
             'parent_category_id' => 'nullable|exists:parent_categories,id',
             'sub_category_id' => 'nullable|exists:sub_categories,id',
+            'warehouse_id' => 'nullable|exists:warehouses,id',
 
-            // Product Details
+            'product_name' => 'required|string|max:255',
+            'hsn_code' => 'nullable|string|max:100',
+            'sku' => 'required|string|max:100|unique:products,sku',
+            'model_no' => 'nullable|string|max:100',
+
             'short_description' => 'nullable|string',
             'full_description' => 'nullable|string',
             'technical_specification' => 'nullable|string',
             'brand_warranty' => 'nullable|string|max:255',
+            'company_warranty' => 'nullable|string|max:255',
 
-            // Pricing
             'cost_price' => 'nullable|numeric|min:0',
             'selling_price' => 'nullable|numeric|min:0',
             'discount_price' => 'nullable|numeric|min:0',
             'tax' => 'nullable|numeric|min:0|max:100',
 
-            // Inventory Details
             'stock_quantity' => 'nullable|integer|min:0',
-            'stock_status' => 'nullable|in:In Stock,Out of Stock',
+            'stock_status' => 'nullable|in:in_stock,out_of_stock,low_stock,scrap',
 
-            // Rack Details
-            'warehouse_id' => 'nullable|exists:warehouses,id',
-            'warehouse_rack_name' => 'nullable|exists:warehouse_racks,id',
-            'rack_zone_area' => 'nullable|string|max:100',
-            'rack_no' => 'nullable|string|max:100',
-            'level_no' => 'nullable|string|max:50',
-            'position_no' => 'nullable|string|max:50',
-
-            // Images & Media
             'main_product_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'additional_product_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'datasheet_manual' => 'nullable|mimes:pdf|max:10240',
 
-            // Product Variations
             'variations' => 'nullable|array',
-            'variations.*' => 'nullable|exists:product_variant_attributes,id',
-            'variations.*.*' => 'nullable|exists:product_variant_attribute_values,id',
 
-            // Product Status
-            'status' => 'nullable|in:Active,Inactive',
+            'status' => 'nullable|in:active,inactive',
         ];
     }
 

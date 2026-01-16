@@ -71,7 +71,7 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Parent Category',
                                                     'name' => 'parent_category_id', // keep as requested
-                                                    'id' => 'parent_category',
+                                                    'id' => 'parent_category_id',
                                                     'options' =>
                                                         ['' => '--Select Parent Category--'] +
                                                         $parentCategories->toArray(),
@@ -81,7 +81,7 @@
                                             <div class="col-lg-6">
                                                 {{-- Sub Category --}}
                                                 <label class="form-label">Sub Category</label>
-                                                <select name="sub_category_id" id="sub_category" class="form-select">
+                                                <select name="sub_category_id" id="sub_category_id" class="form-select">
                                                     <option value="">--Select Sub Category--</option>
                                                 </select>
                                             </div>
@@ -348,7 +348,8 @@
                                                 'name' => 'datasheet_manual',
                                                 'type' => 'file',
                                                 'placeholder' => 'Upload Product Datasheet or Manual',
-                                                'accept' => 'application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                                                'accept' =>
+                                                    'application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.presentation',
                                             ])
                                             <div class="text-danger">PDF files only</div>
                                         </div>
@@ -356,35 +357,49 @@
 
                                 </div>
 
+                                {{-- Product Variations --}}
                                 <div class="card">
-                                    <div
-                                        class="card-header border-bottom-dashed d-flex justify-content-between align-items-center">
+                                    <div class="card-header border-bottom-dashed d-flex justify-content-between align-items-center">
                                         <h5 class="card-title mb-0">Product Variations</h5>
+                                        <span class="badge bg-primary">Multiple Select Enabled</span>
                                     </div>
 
                                     <div class="card-body">
-                                        @foreach ($variationAttributes as $attribute)
-                                            <div class="mb-3">
-                                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                                    <label for="variation_{{ $attribute->name }}" class="form-label mb-0">
-                                                        {{ $attribute->name }}
-                                                    </label>
+                                        <div class="row g-3">
+                                            @foreach ($variationAttributes as $attribute)
+                                                <div class="col-md-12">
+                                                    <div class="variation-group">
+                                                        <label for="variation_{{ $attribute->id }}" class="form-label fw-semibold">
+                                                            {{ $attribute->name }}
+                                                            <span class="text-muted fw-normal">(Select Multiple)</span>
+                                                        </label>
+                                                        <select id="variation_{{ $attribute->id }}"
+                                                                name="variations[{{ $attribute->name }}][]"
+                                                                class="form-select variation-select"
+                                                                multiple
+                                                                data-attribute="{{ $attribute->name }}">
+                                                            @foreach ($attribute->values as $value)
+                                                                @php
+                                                                    $selectedValues = $selectedVariations[$attribute->name] ?? [];
+                                                                    $isSelected = in_array($value->value, $selectedValues);
+                                                                @endphp
+                                                                <option value="{{ $value->value }}"
+                                                                        @if($isSelected) selected @endif>
+                                                                    {{ $value->value }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
                                                 </div>
+                                            @endforeach
+                                        </div>
 
-                                                <select id="variation_{{ $attribute->name }}"
-                                                    name="variations[{{ $attribute->name }}][]"
-                                                    class="form-select js-variation-select" multiple>
-                                                    @if (isset($variationAttributeValues[$attribute->name]))
-                                                        @foreach ($variationAttributeValues[$attribute->name] as $value)
-                                                            <option value="{{ $value }}">{{ $value }}
-                                                            </option>
-                                                        @endforeach
-                                                    @else
-                                                        <option value="">No values available</option>
-                                                    @endif
-                                                </select>
+                                        @if($variationAttributes->isEmpty())
+                                            <div class="alert alert-info mb-0">
+                                                <i class="bx bx-info-circle me-2"></i>
+                                                No product variations available. Please add variations from the E-commerce section.
                                             </div>
-                                        @endforeach
+                                        @endif
                                     </div>
                                 </div>
 
@@ -702,26 +717,194 @@
                 });
             });
 
-            console.log("Parent Category -> Sub Category");
             // Parent Category -> Sub Category
-            $('#parent_category').on('change', function() {
+            $('#parent_category_id').on('change', function() {
                 var parentId = $(this).val();
-                console.log(parentId);
-                // $.ajax({
-                //     url: '{{ route('product-list.get-sub-categories') }}',
-                //     method: 'GET',
-                //     data: {
-                //         parent_id: parentId
-                //     },
-                //     success: function(data) {
-                //         console.log(data);
-                //         $('#sub_category').empty();
-                //         $('#sub_category').append('<option value="">--Select Subcategory--</option>');
-                //         $.each(data, function(key, value) {
-                //             $('#sub_category').append('<option value="' + key + '">' + value + '</option>');
-                //         });
-                //     }
-                // });
+                $.ajax({
+                    url: '{{ route('product-list.get-sub-categories') }}',
+                    method: 'GET',
+                    data: {
+                        parent_id: parentId
+                    },
+                    success: function(data) {
+                        $('#sub_category_id').empty();
+                        $('#sub_category_id').append(
+                            '<option value="">--Select Sub category--</option>');
+
+                        $.each(data, function(key, value) {
+                            $('#sub_category_id').append('<option value="' + key +
+                                '">' + value + '</option>');
+                        });
+
+                    }
+                });
+            });
+        });
+    </script>
+    <style>
+        /* Beautiful styling for variation dropdowns */
+        .variation-group {
+            position: relative;
+        }
+
+        .variation-group .form-label {
+            margin-bottom: 0.5rem;
+            color: #495057;
+            font-size: 0.9375rem;
+        }
+
+        /* Choices.js Custom Styling */
+        .variation-select + .choices {
+            margin-bottom: 0;
+        }
+
+        .variation-select + .choices .choices__inner {
+            min-height: 50px;
+            padding: 6px 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            background-color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .variation-select + .choices .choices__inner:hover {
+            border-color: #0d6efd;
+        }
+
+        .variation-select + .choices.is-focused .choices__inner,
+        .variation-select + .choices.is-open .choices__inner {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        }
+
+        /* Selected Items (Chips/Tags) */
+        .variation-select + .choices .choices__list--multiple .choices__item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: #fff;
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .variation-select + .choices .choices__list--multiple .choices__item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Remove Button (×) */
+        .variation-select + .choices .choices__list--multiple .choices__item .choices__button {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+            padding: 2px 6px;
+            margin-left: 8px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            line-height: 1;
+            opacity: 0.9;
+            transition: all 0.2s ease;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .variation-select + .choices .choices__list--multiple .choices__item .choices__button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+
+        /* Dropdown List */
+        .variation-select + .choices .choices__list--dropdown {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            margin-top: 4px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .variation-select + .choices .choices__list--dropdown .choices__item--selectable {
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .variation-select + .choices .choices__list--dropdown .choices__item--selectable:hover,
+        .variation-select + .choices .choices__list--dropdown .choices__item--selectable.is-highlighted {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        /* Placeholder */
+        .variation-select + .choices .choices__placeholder {
+            opacity: 0.6;
+            color: #6c757d;
+        }
+
+        /* Input field inside dropdown */
+        .variation-select + .choices .choices__input {
+            background-color: transparent;
+            margin-bottom: 0;
+            padding: 4px 0;
+        }
+
+        /* Empty state */
+        .variation-select + .choices .choices__list--dropdown .choices__item--choice.has-no-results {
+            color: #6c757d;
+            font-style: italic;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Choices.js for all variation select dropdowns
+            const variationSelects = document.querySelectorAll('.variation-select');
+
+            variationSelects.forEach(function(selectElement) {
+                const attributeName = selectElement.getAttribute('data-attribute');
+
+                const choices = new Choices(selectElement, {
+                    removeItemButton: true,
+                    shouldSort: false,
+                    placeholder: true,
+                    placeholderValue: `Select ${attributeName}...`,
+                    searchPlaceholderValue: `Search ${attributeName}...`,
+                    allowHTML: true,
+                    noResultsText: 'No options found',
+                    itemSelectText: 'Click to select',
+                    maxItemCount: -1,
+                    searchEnabled: true,
+                    searchChoices: true,
+                    searchFields: ['label', 'value'],
+                    removeItemButtonAlignLeft: false,
+                    classNames: {
+                        containerOuter: 'choices',
+                        containerInner: 'choices__inner',
+                        input: 'choices__input',
+                        inputCloned: 'choices__input--cloned',
+                        list: 'choices__list',
+                        listItems: 'choices__list--multiple',
+                        listSingle: 'choices__list--single',
+                        listDropdown: 'choices__list--dropdown',
+                        item: 'choices__item',
+                        itemSelectable: 'choices__item--selectable',
+                        itemDisabled: 'choices__item--disabled',
+                        itemChoice: 'choices__item--choice',
+                        placeholder: 'choices__placeholder',
+                        group: 'choices__group',
+                        groupHeading: 'choices__heading',
+                        button: 'choices__button',
+                    },
+                });
             });
         });
     </script>

@@ -17,7 +17,9 @@ use App\Models\Warehouse;
 use App\Models\WarehouseRack;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
@@ -370,14 +372,20 @@ class ProductListController extends Controller
                     'serial_number' => $serialId,
                     'product_name' => $product->product_name,
                     'product_sku' => $product->sku,
-                    'reason' => $request->reason,
+                    'reason_for_scrap' => $request->reason,
                     'quantity_scrapped' => 1,
                     'scrapped_at' => now(),
-                    'scrapped_by' => auth()->user()->name ?? 'System',
+                    'scrapped_by' => Auth::user()->id ?? null,
                 ]);
 
-                // Update product serial status
-                $productSerial->update(['status' => 'damaged']);
+                // Update product serial status to 'scrap'
+                $productSerial->update(['status' => 'scrap']);
+
+                // Log activity
+                activity()
+                    ->performedOn($productSerial)
+                    ->causedBy(Auth::user())
+                    ->log('Product serial scrapped: ' . $serialId);
 
                 // Decrease product quantity
                 if ($product->stock_quantity > 0) {
@@ -539,6 +547,126 @@ class ProductListController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while saving the serial number',
+            ], 500);
+        }
+    }
+
+    /**
+     * Get serial data for editing
+     */
+    public function getSerialData($id)
+    {
+        try {
+            $productSerial = ProductSerial::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $productSerial,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching serial data: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load serial data',
+            ], 500);
+        }
+    }
+
+    /**
+     * Update product serial number
+     */
+    public function updateSerial(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'serial_id' => 'required|exists:product_serials,id',
+            'manual_serial' => 'nullable|string|max:255',
+            'cost_price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0',
+            'discount_price' => 'nullable|numeric|min:0',
+            'tax' => 'nullable|numeric|min:0',
+            'final_price' => 'required|numeric|min:0',
+            'main_product_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'additional_product_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'variations' => 'nullable|string',
+            'status' => 'required|in:inactive,active,sold,scrap',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $productSerial = ProductSerial::findOrFail($request->serial_id);
+
+            // Update basic fields
+            $productSerial->manual_serial = $request->manual_serial;
+            $productSerial->cost_price = $request->cost_price;
+            $productSerial->selling_price = $request->selling_price;
+            $productSerial->discount_price = $request->discount_price;
+            $productSerial->tax = $request->tax;
+            $productSerial->final_price = $request->final_price;
+            $productSerial->status = $request->status;
+
+            // Handle variations (JSON)
+            if ($request->variations) {
+                $variations = json_decode($request->variations, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $productSerial->variations = $variations;
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid JSON format for variations',
+                    ], 422);
+                }
+            } else {
+                $productSerial->variations = null;
+            }
+
+            // Handle main product image upload
+            if ($request->hasFile('main_product_image')) {
+                $mainImage = $request->file('main_product_image');
+                $mainImageName = time() . '_main_' . $mainImage->getClientOriginalName();
+                $mainImage->move(public_path('uploads/product_serials'), $mainImageName);
+                $productSerial->main_product_image = 'uploads/product_serials/' . $mainImageName;
+            }
+
+            // Handle additional product images upload
+            if ($request->hasFile('additional_product_images')) {
+                $additionalImages = [];
+                foreach ($request->file('additional_product_images') as $image) {
+                    $imageName = time() . '_' . uniqid() . '_' . $image->getClientOriginalName();
+                    $image->move(public_path('uploads/product_serials'), $imageName);
+                    $additionalImages[] = 'uploads/product_serials/' . $imageName;
+                }
+                $productSerial->additional_product_images = $additionalImages;
+            }
+
+            $productSerial->save();
+
+            // Log activity
+            activity()
+                ->performedOn($productSerial)
+                ->causedBy(Auth::user())
+                ->log('Updated product serial number');
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Serial number updated successfully',
+                'data' => $productSerial,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating serial: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating the serial number: ' . $e->getMessage(),
             ], 500);
         }
     }

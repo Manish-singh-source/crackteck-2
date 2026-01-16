@@ -126,6 +126,10 @@ Route::prefix('demo/warehouse')->group(function () {
         Route::post('/restore-product/{scrapItemId}', 'restoreProduct')->name('product-list.restore-product');
         // Save Serial Number
         Route::post('/save-serial', 'saveSerial')->name('product-list.save-serial');
+        // Get Serial Data
+        Route::get('/get-serial-data/{id}', 'getSerialData')->name('product-list.get-serial-data');
+        // Update Serial Number
+        Route::post('/update-serial', 'updateSerial')->name('product-list.update-serial');
         // AJAX SKU Validation
         Route::get('/check-sku-unique', 'checkSkuUnique')->name('product-list.check-sku');
 

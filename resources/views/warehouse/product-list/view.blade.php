@@ -176,6 +176,131 @@
                         </div>
                     </div>
 
+                    <!-- Product Serial Numbers -->
+                    <div class="card">
+                        <div class="card-header border-bottom-dashed">
+                            <h5 class="card-title mb-0">Product Serial Numbers</h5>
+                            <p class="text-muted mb-0">Each product item with unique serial number</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>SR No</th>
+                                            <th>Product Name</th>
+                                            <th>Auto Generated Serial</th>
+                                            <th>Manual Serial Number</th>
+                                            <th>Barcode</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($product->productSerials as $index => $serial)
+                                            <tr id="serial-row-{{ $serial->id }}">
+                                                <td>
+                                                    <span>{{ $index + 1 }}</span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        @if ($product->main_product_image)
+                                                            <img src="{{ asset($product->main_product_image) }}"
+                                                                alt="{{ $product->product_name }}" width="100"
+                                                                height="40" class="img-fluid rounded me-2">
+                                                        @else
+                                                            <div class="bg-light rounded d-flex align-items-center justify-content-center me-2"
+                                                                style="width: 40px; height: 40px;">
+                                                                <i class="mdi mdi-package-variant text-muted"></i>
+                                                            </div>
+                                                        @endif
+                                                        <div>
+                                                            <div class="fw-semibold">{{ $product->product_name }}</div>
+                                                            <div class="text-muted small">SKU: {{ $product->sku }}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>{{ $serial->auto_generated_serial }}</td>
+                                                <td>{{ $serial->manual_serial ?? 'N/A' }}</td>
+                                                <td>
+                                                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($serial->auto_generated_serial, 'C128') }}"
+                                                        alt="Barcode" width="200">
+                                                </td>
+                                                <td>
+                                                    {{-- Edit button --}}
+                                                    <button type="button" class="btn btn-sm btn-warning edit-serial-btn"
+                                                        data-serial-id="{{ $serial->id }}">
+                                                        <i class="mdi mdi-pencil"></i>
+                                                    </button>
+                                                    {{-- Scrap button --}}
+                                                    <button type="button" class="btn btn-sm btn-danger scrap-serial-btn"
+                                                        data-serial-id="{{ $serial->id }}"
+                                                        data-serial-number="{{ $serial->auto_generated_serial }}">
+                                                        <i class="mdi mdi-recycle"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="6" class="text-center">No serial numbers found.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rack Details -->
+                    {{-- <div class="card">
+                        <div class="card-header border-bottom-dashed">
+                            <h5 class="card-title mb-0">Rack Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="fw-semibold">Warehouse:</label>
+                                        <p class="text-muted">{{ $product->warehouse->warehouse_name ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="fw-semibold">Warehouse Rack:</label>
+                                        <p class="text-muted">{{ $product->warehouseRack->rack_name ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="fw-semibold">Rack Zone Area:</label>
+                                        <p class="text-muted">{{ $product->rack_zone_area ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="fw-semibold">Rack No:</label>
+                                        <p class="text-muted">{{ $product->rack_no ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="fw-semibold">Level No:</label>
+                                        <p class="text-muted">{{ $product->level_no ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="fw-semibold">Position No:</label>
+                                        <p class="text-muted">{{ $product->position_no ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> --}}
+
+                </div>
+
+                <div class="col-lg-4">
+
                     <!-- Pricing Information -->
                     <div class="card">
                         <div class="card-header border-bottom-dashed">
@@ -216,7 +341,8 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="fw-semibold">Final Price:</label>
-                                        <p class="text-muted">{{ $product->final_price ? $product->final_price : 'N/A' }}</p>
+                                        <p class="text-muted">{{ $product->final_price ? $product->final_price : 'N/A' }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -290,129 +416,6 @@
                         </div>
                     </div>
 
-                    <!-- Product Serial Numbers -->
-                    <div class="card">
-                        <div class="card-header border-bottom-dashed">
-                            <h5 class="card-title mb-0">Product Serial Numbers</h5>
-                            <p class="text-muted mb-0">Each product item with unique serial number</p>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Product Name</th>
-                                            <th>Auto Generated Serial</th>
-                                            <th>Manual Serial Number</th>
-                                            <th>Barcode</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($product->productSerials as $index => $serial)
-                                            <tr id="serial-row-{{ $serial->id }}">
-                                                <td>
-                                                    <span class="badge bg-primary">{{ $index + 1 }}</span>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        @if ($product->main_product_image)
-                                                            <img src="{{ asset($product->main_product_image) }}"
-                                                                alt="{{ $product->product_name }}" width="40"
-                                                                height="40" class="img-fluid rounded me-2">
-                                                        @else
-                                                            <div class="bg-light rounded d-flex align-items-center justify-content-center me-2"
-                                                                style="width: 40px; height: 40px;">
-                                                                <i class="mdi mdi-package-variant text-muted"></i>
-                                                            </div>
-                                                        @endif
-                                                        <div>
-                                                            <div class="fw-semibold">{{ $product->product_name }}</div>
-                                                            <div class="text-muted small">SKU: {{ $product->sku }}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>{{ $serial->auto_generated_serial }}</td>
-                                                <td>{{ $serial->manual_serial ?? 'N/A' }}</td>
-                                                <td>
-                                                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($serial->auto_generated_serial, 'C128') }}"
-                                                        alt="Barcode" width="100">
-                                                </td>
-                                                <td>
-                                                    {{-- Edit button and Recycle button --}}
-                                                    <button type="button" class="btn btn-sm btn-warning edit-serial-btn"
-                                                        data-serial-id="{{ $serial->id }}">
-                                                        <i class="mdi mdi-pencil"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-danger scrap-serial-btn"
-                                                        data-serial-id="{{ $serial->id }}"
-                                                        data-serial-number="{{ $serial->auto_generated_serial }}">
-                                                        <i class="mdi mdi-recycle"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="6" class="text-center">No serial numbers found.</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Rack Details -->
-                    {{-- <div class="card">
-                        <div class="card-header border-bottom-dashed">
-                            <h5 class="card-title mb-0">Rack Details</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="fw-semibold">Warehouse:</label>
-                                        <p class="text-muted">{{ $product->warehouse->warehouse_name ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="fw-semibold">Warehouse Rack:</label>
-                                        <p class="text-muted">{{ $product->warehouseRack->rack_name ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="fw-semibold">Rack Zone Area:</label>
-                                        <p class="text-muted">{{ $product->rack_zone_area ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="fw-semibold">Rack No:</label>
-                                        <p class="text-muted">{{ $product->rack_no ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="fw-semibold">Level No:</label>
-                                        <p class="text-muted">{{ $product->level_no ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="fw-semibold">Position No:</label>
-                                        <p class="text-muted">{{ $product->position_no ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div> --}}
-
-                </div>
-
-                <div class="col-lg-4">
                     <!-- Product Images -->
                     <div class="card">
                         <div class="card-header border-bottom-dashed">
@@ -487,7 +490,7 @@
                                 {{-- @php 
                                     $variations = json_decode($product->variation_options, true); 
                                 @endphp --}}
-                                @foreach ($product->variation_options as $key=> $attribute)
+                                @foreach ($product->variation_options as $key => $attribute)
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label class="fw-semibold">{{ $key }}:</label>
@@ -496,11 +499,11 @@
                                                     {{ $value }},
                                                 @endforeach
                                             </p>
-                                        </div>  
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
-                        </div>  
+                        </div>
 
                     </div>
 
@@ -545,6 +548,129 @@
         </div>
     </div> <!-- content -->
 
+    <!-- Edit Serial Modal -->
+    <div class="modal fade" id="editSerialModal" tabindex="-1" aria-labelledby="editSerialModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSerialModalLabel">Edit Serial Number</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editSerialForm">
+                    @csrf
+                    <input type="hidden" id="editSerialId" name="serial_id">
+                    <div class="modal-body" style="background-color: #fff; padding: 20px;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Auto Generated Serial</label>
+                                    <input type="text" class="form-control" id="editAutoSerial" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Manual Serial</label>
+                                    <input type="text" class="form-control" id="editManualSerial"
+                                        name="manual_serial">
+                                    <div class="invalid-feedback" id="manual_serial_error"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Cost Price <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" class="form-control" id="editCostPrice"
+                                        name="cost_price" required>
+                                    <div class="invalid-feedback" id="cost_price_error"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Selling Price <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" class="form-control" id="editSellingPrice"
+                                        name="selling_price" required>
+                                    <div class="invalid-feedback" id="selling_price_error"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Discount Price</label>
+                                    <input type="number" step="0.01" class="form-control" id="editDiscountPrice"
+                                        name="discount_price">
+                                    <div class="invalid-feedback" id="discount_price_error"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Tax (%)</label>
+                                    <input type="number" step="0.01" class="form-control" id="editTax"
+                                        name="tax">
+                                    <div class="invalid-feedback" id="tax_error"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Final Price <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" class="form-control" id="editFinalPrice"
+                                        name="final_price" required>
+                                    <div class="invalid-feedback" id="final_price_error"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Status <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="editStatus" name="status" required>
+                                        <option value="inactive">Inactive</option>
+                                        <option value="active">Active</option>
+                                        <option value="sold">Sold</option>
+                                        <option value="scrap">Scrap</option>
+                                    </select>
+                                    <div class="invalid-feedback" id="status_error"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Main Product Image</label>
+                                    <input type="file" class="form-control" id="editMainImage"
+                                        name="main_product_image" accept="image/*">
+                                    <div class="mt-2" id="currentMainImage"></div>
+                                    <div class="invalid-feedback" id="main_product_image_error"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Additional Product Images</label>
+                                    <input type="file" class="form-control" id="editAdditionalImages"
+                                        name="additional_product_images[]" accept="image/*" multiple>
+                                    <div class="mt-2" id="currentAdditionalImages"></div>
+                                    <div class="invalid-feedback" id="additional_product_images_error"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Variations</label>
+                                    <textarea class="form-control" id="editVariations" name="variations" rows="3"
+                                        placeholder='{"color": "Red", "size": "Large"}'></textarea>
+                                    <small class="text-muted">Enter variations in JSON format</small>
+                                    <div class="invalid-feedback" id="variations_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="editSerialSubmitBtn">
+                            <span class="spinner-border spinner-border-sm d-none" role="status"
+                                aria-hidden="true"></span>
+                            <i class="mdi mdi-content-save me-1"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Scrap Serial Modal -->
     <div class="modal fade" id="scrapSerialModal" tabindex="-1" aria-labelledby="scrapSerialModalLabel"
         aria-hidden="true">
@@ -556,7 +682,7 @@
                 </div>
                 <form id="scrapSerialForm">
                     @csrf
-                    <div class="modal-body">
+                    <div class="modal-body" style="background-color: #fff; padding: 20px;">
                         <div class="alert alert-warning">
                             <i class="mdi mdi-alert-circle-outline me-2"></i>
                             <strong>Warning:</strong> This action will permanently scrap the selected serial number.
@@ -670,6 +796,76 @@
             }, 5000);
         }
 
+        // Edit serial function
+        function editSerial(serialId) {
+            // Clear previous errors
+            document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+            document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+            // Fetch serial data
+            const url = "{{ route('product-list.get-serial-data', ':id') }}".replace(':id', serialId);
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const serial = data.data;
+
+                        // Populate form fields
+                        document.getElementById('editSerialId').value = serial.id;
+                        document.getElementById('editAutoSerial').value = serial.auto_generated_serial || '';
+                        document.getElementById('editManualSerial').value = serial.manual_serial || '';
+                        document.getElementById('editCostPrice').value = serial.cost_price || '';
+                        document.getElementById('editSellingPrice').value = serial.selling_price || '';
+                        document.getElementById('editDiscountPrice').value = serial.discount_price || '';
+                        document.getElementById('editTax').value = serial.tax || '';
+                        document.getElementById('editFinalPrice').value = serial.final_price || '';
+                        document.getElementById('editStatus').value = serial.status || 'active';
+
+                        // Handle variations (JSON)
+                        if (serial.variations) {
+                            document.getElementById('editVariations').value = typeof serial.variations === 'string' ?
+                                serial.variations :
+                                JSON.stringify(serial.variations, null, 2);
+                        } else {
+                            document.getElementById('editVariations').value = '';
+                        }
+
+                        // Display current main image
+                        const mainImageDiv = document.getElementById('currentMainImage');
+                        if (serial.main_product_image) {
+                            mainImageDiv.innerHTML =
+                                `<img src="{{ asset('') }}${serial.main_product_image}" alt="Main Image" class="img-thumbnail" style="max-height: 100px;">`;
+                        } else {
+                            mainImageDiv.innerHTML = '<small class="text-muted">No image uploaded</small>';
+                        }
+
+                        // Display current additional images
+                        const additionalImagesDiv = document.getElementById('currentAdditionalImages');
+                        if (serial.additional_product_images && serial.additional_product_images.length > 0) {
+                            let imagesHtml = '<div class="d-flex flex-wrap gap-2">';
+                            serial.additional_product_images.forEach(img => {
+                                imagesHtml +=
+                                    `<img src="{{ asset('') }}${img}" alt="Additional Image" class="img-thumbnail" style="max-height: 80px;">`;
+                            });
+                            imagesHtml += '</div>';
+                            additionalImagesDiv.innerHTML = imagesHtml;
+                        } else {
+                            additionalImagesDiv.innerHTML = '<small class="text-muted">No additional images</small>';
+                        }
+
+                        // Show modal
+                        const modal = new bootstrap.Modal(document.getElementById('editSerialModal'));
+                        modal.show();
+                    } else {
+                        showAlert('error', data.message || 'Failed to load serial data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('error', 'An error occurred while loading serial data');
+                });
+        }
+
         // Scrap serial function
         function scrapSerial(serialNumber, serialId) {
             // Set modal data
@@ -697,6 +893,95 @@
                         saveSerial(serialId);
                     }
                 });
+            });
+
+            // Handle edit button clicks
+            document.querySelectorAll('.edit-serial-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const serialId = this.getAttribute('data-serial-id');
+                    editSerial(serialId);
+                });
+            });
+
+            // Handle scrap button clicks
+            document.querySelectorAll('.scrap-serial-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const serialId = this.getAttribute('data-serial-id');
+                    const serialNumber = this.getAttribute('data-serial-number');
+                    scrapSerial(serialNumber, serialId);
+                });
+            });
+
+            // Handle edit serial form submission
+            document.getElementById('editSerialForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const form = this;
+                const submitBtn = document.getElementById('editSerialSubmitBtn');
+                const spinner = submitBtn.querySelector('.spinner-border');
+
+                // Clear previous errors
+                document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+                document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+                // Show loading state
+                submitBtn.disabled = true;
+                spinner.classList.remove('d-none');
+
+                // Prepare form data
+                const formData = new FormData(form);
+
+                fetch('{{ route('product-list.update-serial') }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Hide loading state
+                        submitBtn.disabled = false;
+                        spinner.classList.add('d-none');
+
+                        if (data.success) {
+                            // Show success message
+                            showAlert('success', data.message);
+
+                            // Close modal
+                            const modal = bootstrap.Modal.getInstance(document.getElementById(
+                                'editSerialModal'));
+                            modal.hide();
+
+                            // Reload page to show updated data
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            // Show validation errors
+                            if (data.errors) {
+                                Object.keys(data.errors).forEach(key => {
+                                    const errorElement = document.getElementById(
+                                        `${key}_error`);
+                                    const inputElement = document.querySelector(
+                                        `[name="${key}"]`);
+                                    if (errorElement && inputElement) {
+                                        errorElement.textContent = data.errors[key][0];
+                                        inputElement.classList.add('is-invalid');
+                                    }
+                                });
+                            }
+                            showAlert('error', data.message || 'Validation failed');
+                        }
+                    })
+                    .catch(error => {
+                        // Hide loading state
+                        submitBtn.disabled = false;
+                        spinner.classList.add('d-none');
+
+                        console.error('Error:', error);
+                        showAlert('error', 'An error occurred while updating the serial number');
+                    });
             });
 
             // Handle scrap serial form submission
@@ -731,6 +1016,7 @@
                         // Hide loading state
                         submitBtn.disabled = false;
                         spinner.classList.add('d-none');
+                        console.log(data);
 
                         if (data.success) {
                             // Show success message

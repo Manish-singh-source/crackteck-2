@@ -13,6 +13,9 @@ class ScrapItem extends Model
     protected $fillable = [
         'product_id',
         'product_serial_id',
+        'serial_number',
+        'product_name',
+        'product_sku',
         'quantity_scrapped',
         'reason_for_scrap',
         'scrap_notes',

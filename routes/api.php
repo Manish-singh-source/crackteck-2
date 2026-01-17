@@ -273,3 +273,42 @@ Route::prefix('v1')->group(function () {
     });
 });
 
+/**
+ * 
+ * signup
+ * send-otp
+ * verify-otp 
+ * logout
+ * refresh-token 
+ * banners 
+ * 
+ * 
+ * service-requests                     - service request list
+ * service-request/{id}                 - service request detail
+ * service-request/{id}/{product_id}    - service request product detail
+ * service-request/{id}/accept          - accept service request
+ * service-request/{id}/case-transfer    - case transfer 
+ * service-request/{id}/reschedule      - reschedule service request
+ * service-request/{id}/{product_id}/diagnosis-list - list of diagnosis 
+ * service-request/{id}/{product_id}/submit-diagnosis - submit diagnosis
+ * 
+ * 
+ * stock-in-hand                         - stock in hand products
+ * stock-in-hand/{id}                    - stock in hand product detail 
+ * 
+ * 
+ * products                              - products list
+ * products/{id}                         - product detail
+ * request-part                          - request part (stock in hand/spare part), multiple
+ * 
+ * 
+ * 
+ * 
+ * attendance 
+ * check-in 
+ * check-out
+ * 
+ * 
+ * 
+ * 
+ */

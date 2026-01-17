@@ -24,15 +24,6 @@ use Illuminate\Support\Facades\Validator;
 class AllServicesController extends Controller
 {
     //
-    protected function getModelByRoleId($roleId)
-    {
-        return [
-            1 => Engineer::class,
-            2 => DeliveryMan::class,
-            3 => SalesPerson::class,
-            4 => Customer::class,
-        ][$roleId] ?? null;
-    }
 
     protected function getRoleId($roleId)
     {
@@ -58,7 +49,7 @@ class AllServicesController extends Controller
         $staffRole = $this->getRoleId($validated['role_id']);
 
         if (! $staffRole) {
-            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+            return response()->json(['success' => false, 'message' => 'Invalid Role Id provided.'], 400);
         }
 
         $services = [
@@ -175,8 +166,21 @@ class AllServicesController extends Controller
         // return response()->json(['request_data' => $request->all()], 200);
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'service_type' => 'required|in:quick_service,installation,repairing,amc',
             'customer_id' => 'required|integer|exists:customers,id',
+            'service_type' => 'required|in:quick_service,installation,repairing,amc',
+            'products' => 'required|array|min:1',
+            'products.*.service_type_id' => 'required|integer|exists:covered_items,id',
+            'products.*.name' => 'required|string',
+            'products.*.type' => 'required|string',
+            'products.*.model_no' => 'nullable|string',
+            'products.*.sku' => 'nullable|string',
+            'products.*.hsn' => 'nullable|string',
+            'products.*.purchase_date' => 'nullable|date',
+            'products.*.brand' => 'required|string',
+            'products.*.description' => 'nullable|string',
+            'products.*.images' => 'nullable|array|min:1',
+            'products.*.images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'amc_plan_id' => 'nullable|integer|exists:amc_plans,id',
         ]);
 
         if ($validated->fails()) {
@@ -189,76 +193,83 @@ class AllServicesController extends Controller
         if (! $staffRole) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
+        try {
+            DB::beginTransaction();
+            if ($staffRole == 'customers') {
+                $serviceRequest = uniqid();
 
-        if ($staffRole == 'customers') {
-            $serviceRequest = uniqid();
+                $servicesRequest = ServiceRequest::create([
+                    'request_id' => $serviceRequest,
+                    'service_type' => $request->service_type,
+                    'customer_id' => $request->customer_id,
+                    'created_by' => $request->customer_id,
+                    'request_date' => now(),
+                    'amc_plan_id' => $request->filled('amc_plan_id')
+                        ? $request->amc_plan_id
+                        : null,
+                    // 'request_status' => 'pending',
+                    // 'request_source' => 'mobile_app',
+                    // 'is_engineer_assigned' => '0',
+                    // 'status' => '1',
+                ]);
 
-            $servicesRequest = ServiceRequest::create([
-                'request_id' => $serviceRequest,
-                'service_type' => $request->service_type,
-                'customer_id' => $request->customer_id,
-                'created_by' => $request->customer_id,
-                'request_date' => now(),
-                'amc_plan_id' => $request->filled('amc_plan_id')
-                    ? $request->amc_plan_id
-                    : null,
-                // 'request_status' => 'pending',
-                // 'request_source' => 'mobile_app',
-                // 'is_engineer_assigned' => '0',
-                // 'status' => '1',
-            ]);
+                if ($servicesRequest) {
+                    foreach ($request->products as $product) {
 
-            if ($servicesRequest) {
-                foreach ($request->products as $product) {
+                        if ($request->service_type != 'amc') {
+                            $services = CoveredItem::where('status', 'active')
+                                ->where('id', $product['service_type_id'] ?? null)
+                                ->first();
 
-                    if ($request->service_type != 'amc') {
-                        $services = CoveredItem::where('status', 'active')
-                            ->where('id', $product['service_type_id'] ?? null)
-                            ->first();
-
-                        if (! $services) {
-                            continue;
-                        }
-                    }
-
-                    $serviceProduct = $servicesRequest->products()->create([
-                        'service_requests_id' => $servicesRequest->id,
-                        'item_code_id' => $services->id ?? null,
-                        'name' => $product['name'] ?? null,
-                        'type' => $product['type'] ?? null,
-                        'model_no' => $product['model_no'] ?? null,
-                        'sku' => $product['sku'] ?? null,
-                        'hsn' => $product['hsn'] ?? null,
-                        'purchase_date' => $product['purchase_date'] ?? null,
-                        'brand' => $product['brand'] ?? null,
-                        'description' => $product['description'] ?? null,
-                        'service_charge' => $services->service_charge ?? null,
-                    ]);
-
-                    $images = $serviceProduct->images ?? [];
-                    if (!empty($product['images']) && is_array($product['images'])) {
-                        foreach ($product['images'] as $file) {
-
-                            if (!$file || !($file instanceof \Illuminate\Http\UploadedFile)) {
+                            if (! $services) {
                                 continue;
                             }
-
-                            $filename = time() . '_' . $serviceProduct->id . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-
-                            $file->move(
-                                public_path('uploads/crm/quick-service/products'),
-                                $filename
-                            );
-
-                            $images[] = 'uploads/crm/quick-service/products/' . $filename;
                         }
-                    }
 
-                    $serviceProduct->images = $images;
-                    $serviceProduct->save();
+                        $serviceProduct = $servicesRequest->products()->create([
+                            'service_requests_id' => $servicesRequest->id,
+                            'item_code_id' => $services->id ?? null,
+                            'name' => $product['name'] ?? null,
+                            'type' => $product['type'] ?? null,
+                            'model_no' => $product['model_no'] ?? null,
+                            'sku' => $product['sku'] ?? null,
+                            'hsn' => $product['hsn'] ?? null,
+                            'purchase_date' => $product['purchase_date'] ?? null,
+                            'brand' => $product['brand'] ?? null,
+                            'description' => $product['description'] ?? null,
+                            'service_charge' => $services->service_charge ?? null,
+                        ]);
+
+                        $images = $serviceProduct->images ?? [];
+                        if (!empty($product['images']) && is_array($product['images'])) {
+                            foreach ($product['images'] as $file) {
+
+                                if (!$file || !($file instanceof \Illuminate\Http\UploadedFile)) {
+                                    continue;
+                                }
+
+                                $filename = time() . '_' . $serviceProduct->id . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+                                $file->move(
+                                    public_path('uploads/crm/quick-service/products'),
+                                    $filename
+                                );
+
+                                $images[] = 'uploads/crm/quick-service/products/' . $filename;
+                            }
+                        }
+
+                        $serviceProduct->images = $images;
+                        $serviceProduct->save();
+                    }
                 }
+
+                DB::commit();
+                return response()->json(['quick_service_request' => $servicesRequest->load('products')], 200);
             }
-            return response()->json(['quick_service_request' => $servicesRequest], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Transaction failed.', 'errors' => $e->getMessage()], 500);
         }
     }
 
@@ -354,7 +365,7 @@ class AllServicesController extends Controller
             $serviceRequestProduct = ServiceRequestProduct::where('id', $product_id)
                 ->where('service_requests_id', $id)
                 ->first();
-            
+
             $coveredItem = CoveredItem::find($serviceRequestProduct->item_code_id);
             if ($coveredItem && !empty($coveredItem->diagnosis_list)) {
                 $productDiagnostics[] = [

@@ -779,10 +779,10 @@
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
             alertDiv.innerHTML = `
-        <i class="mdi mdi-${type === 'success' ? 'check-circle' : 'alert-circle'}-outline me-2"></i>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
+                <i class="mdi mdi-${type === 'success' ? 'check-circle' : 'alert-circle'}-outline me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
 
             // Insert at the top of the content
             const content = document.querySelector('.content .container-fluid');
@@ -1037,10 +1037,13 @@
                                 const errors = xhr.responseJSON.errors;
                                 Object.keys(errors).forEach(function(key) {
                                     $('#' + key).addClass('is-invalid');
-                                    $('#' + key + '_error').text(errors[key][0]);
+                                    $('#' + key + '_error').text(errors[key][
+                                    0]);
                                 });
                             } else {
-                                toastr.error('An error occurred while processing your request.');
+                                toastr.error(
+                                    'An error occurred while processing your request.'
+                                    );
                             }
                         }
                     });
@@ -1055,8 +1058,9 @@
                         button.prop('disabled', true);
 
                         $.ajax({
-                            url: '{{ route('product-list.restore-product', ':id') }}'.replace(':id',
-                                scrapId),
+                            url: '{{ route('product-list.restore-product', ':id') }}'
+                                .replace(':id',
+                                    scrapId),
                             method: 'POST',
                             data: {
                                 _token: '{{ csrf_token() }}'
@@ -1070,7 +1074,8 @@
                                         $(this).remove();
 
                                         // Check if table is empty and reload if needed
-                                        if ($('tbody tr:visible').length === 0) {
+                                        if ($('tbody tr:visible').length ===
+                                            0) {
                                             setTimeout(function() {
                                                 location.reload();
                                             }, 1000);
@@ -1082,21 +1087,22 @@
                                 }
                             },
                             error: function() {
-                                toastr.error('An error occurred while restoring the product.');
+                                toastr.error(
+                                    'An error occurred while restoring the product.'
+                                    );
                                 button.prop('disabled', false);
                             }
                         });
                     }
                 });
             });
-            
+
         });
     </script>
 @endsection
 
-    @section('scripts')
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
-            integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        
-    @endsection
+@section('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
+        integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+@endsection

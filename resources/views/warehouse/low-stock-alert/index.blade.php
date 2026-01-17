@@ -16,17 +16,8 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body pt-0">
-                        <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link active p-2" id="low_stock_tab" data-bs-toggle="tab"
-                                    href="#low_stock" role="tab">
-                                    <span class="d-block d-sm-none"><i class="mdi mdi-alert"></i></span>
-                                    <span class="d-none d-sm-block">Low Stock Products ({{ $lowStockProducts->count() }})</span>
-                                </a>
-                            </li>
-                        </ul>
                         <div class="tab-content text-muted">
-                            <div class="tab-pane active show pt-4" id="low_stock" role="tabpanel">
+                            <div class="tab-pane active show" id="low_stock" role="tabpanel">
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="card shadow-none">

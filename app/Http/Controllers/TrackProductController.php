@@ -9,7 +9,16 @@ class TrackProductController extends Controller
 {
     public function index()
     {
-        return view('/warehouse/track-product/index');
+        $products = Product::with([
+            'brand',
+            'parentCategorie',
+            'subCategorie',
+            'productSerials',
+            'warehouse',
+            'warehouseRack',
+        ])
+        ->get();
+        return view('/warehouse/track-product/index', compact('products'));
     }
 
     public function search(Request $request)
@@ -26,14 +35,16 @@ class TrackProductController extends Controller
                 'parentCategorie',
                 'subCategorie',
                 'productSerials',
+                'warehouse',
+                'warehouseRack',
             ])
             // ->where('sku', 'LIKE', '%' . $searchTerm . '%')
             // ->orWhere('product_name', 'LIKE', '%' . $searchTerm . '%')
             ->whereHas('productSerials', function ($query) use ($searchTerm) {
                 $query->where('auto_generated_serial', 'LIKE', '%' . $searchTerm . '%')
-                    ->orWhere('manual_serial', 'LIKE', '%' . $searchTerm . '%');
-            })
-            ->get();
+                ->orWhere('manual_serial', 'LIKE', '%' . $searchTerm . '%');
+                })
+                ->get();
             if ($products) {
                 return response()->json([
                     'success' => true,

@@ -23,9 +23,14 @@ class SparePartController extends Controller
      */
     public function index()
     {
-
-        $stockRequests = ServiceRequestProductRequestPart::with(['serviceRequest', 'serviceRequestProduct', 'fromEngineer', 'assignedEngineer', 'requestedPart'])
-            ->withCount('requestedPart')
+        $status = request()->get('status') ?? 'all';
+        
+        $stockRequests = ServiceRequestProductRequestPart::query();
+        if ($status != 'all') {
+            $stockRequests->where('status', $status);
+        }
+       $stockRequests = $stockRequests->withCount('requestedPart')
+        ->with(['serviceRequest', 'serviceRequestProduct', 'fromEngineer', 'assignedEngineer', 'requestedPart'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -48,7 +53,7 @@ class SparePartController extends Controller
             'requestedPart.product.brand',
             'requestedPart.product.subCategorie'
         ])
-        ->findOrFail($id);
+            ->findOrFail($id);
         // dd($stockRequests);
         $deliveryMen = Staff::where('staff_role', 'delivery_man')->get();
         $engineers = Staff::where('staff_role', 'engineer')->get();
@@ -80,7 +85,7 @@ class SparePartController extends Controller
                 'status' => 'approved',
             ];
         }
-        
+
         $sparePartRequest = ServiceRequestProductRequestPart::findOrFail($id);
         $sparePartRequest->update($data);
 

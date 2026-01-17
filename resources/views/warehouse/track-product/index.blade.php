@@ -153,53 +153,218 @@
             });
 
             // Function to display search results
+            // function displayResults(results) {
+            //     console.log(results);
+            //     const resultsContainer = $('#resultsContainer');
+            //     resultsContainer.empty();
+
+            //     results.forEach(function(result) {
+            //         const serialNumbers = result.product_serials.map(serial => serial.manual_serial ||
+            //             serial
+            //             .auto_generated_serial).join(', ') || 'N/A';
+            //         const availabilityBadge = result.stock_status === 'in_stock' ?
+            //             '<span class="badge bg-success">In Stock</span>' :
+            //             '<span class="badge bg-danger">Out of Stock</span>';
+
+            //         const row = `
+        //             <div class="row align-items-center">
+        //                 <div class="col-md-2 text-center">
+        //                     ${result.main_product_image ? `<img src="${result.main_product_image}" alt="${result.product_name}" class="img-fluid rounded" style="max-width: 80px; max-height: 80px;">` : `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; margin: 0 auto;"><i class="mdi mdi-package-variant text-muted fs-24"></i></div>`}
+        //                 </div>
+        //                 <div class="col-md-10">
+        //                     <div class="table-responsive">
+        //                         <table class="table table-borderless">
+        //                             <tbody>
+        //                                 <tr>
+        //                                     <td class="fw-semibold" style="width: 150px;">Product Name:</td>
+        //                                     <td>${result.product_name}</td>
+        //                                 </tr>
+        //                                 <tr>
+        //                                     <td class="fw-semibold" style="width: 150px;">SKU:</td>
+        //                                     <td>${result.sku}</td>
+        //                                 </tr>
+        //                                 <tr>
+        //                                     <td class="fw-semibold" style="width: 150px;">Serial Number:</td>
+        //                                     <td>${serialNumbers}</td>
+        //                                 </tr>
+        //                                 <tr>
+        //                                     <td class="fw-semibold" style="width: 150px;">Availability:</td>
+        //                                     <td>${availabilityBadge}</td>
+        //                                 </tr>
+        //                             </tbody>
+        //                         </table>
+        //                     </div>
+        //                 </div>
+        //             </div>
+        //         `;
+            //         resultsContainer.append(row);
+            //     });
+            // }
+
+
             function displayResults(results) {
-                console.log(results);
                 const resultsContainer = $('#resultsContainer');
                 resultsContainer.empty();
+                console.log(results);
 
                 results.forEach(function(result) {
-                    const serialNumbers = result.product_serials.map(serial => serial.manual_serial ||
-                        serial
-                        .auto_generated_serial).join(', ') || 'N/A';
-                    const availabilityBadge = result.stock_status === 'in_stock' ?
-                        '<span class="badge bg-success">In Stock</span>' :
-                        '<span class="badge bg-danger">Out of Stock</span>';
+                    // Serial rows
+                    let serialRows = `
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">
+                                No serial numbers found.
+                            </td>
+                        </tr>
+                    `;
 
-                    const row = `
-                        <div class="row align-items-center">
-                            <div class="col-md-2 text-center">
-                                ${result.main_product_image ? `<img src="${result.main_product_image}" alt="${result.product_name}" class="img-fluid rounded" style="max-width: 80px; max-height: 80px;">` : `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; margin: 0 auto;"><i class="mdi mdi-package-variant text-muted fs-24"></i></div>`}
-                            </div>
-                            <div class="col-md-10">
-                                <div class="table-responsive">
-                                    <table class="table table-borderless">
-                                        <tbody>
-                                            <tr>
-                                                <td class="fw-semibold" style="width: 150px;">Product Name:</td>
-                                                <td>${result.product_name}</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="fw-semibold" style="width: 150px;">SKU:</td>
-                                                <td>${result.sku}</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="fw-semibold" style="width: 150px;">Serial Number:</td>
-                                                <td>${serialNumbers}</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="fw-semibold" style="width: 150px;">Availability:</td>
-                                                <td>${availabilityBadge}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                    if (result.product_serials && result.product_serials.length > 0) {
+                        serialRows = result.product_serials.map(function(serial, index) {
+                            const serialNum = serial.manual_serial || serial
+                                .auto_generated_serial || 'N/A';
+                            const warehouse = result.warehouse.name || 'N/A';
+                            console.log(warehouse);
+                            const status = (serial.status || 'unknown').replace('_', ' ');
+                            const statusClass =
+                                serial.status === 'active' ?
+                                'bg-success-subtle text-success' :
+                                serial.status === 'used' ?
+                                'bg-warning-subtle text-warning' :
+                                serial.status === 'scrapped' ?
+                                'bg-danger-subtle text-danger' :
+                                'bg-secondary-subtle text-secondary';
+
+                            return `
+                    <tr>
+                        <td class="text-muted">${index + 1}</td>
+                        <td class="fw-medium">${serialNum}</td>
+                        <td>${warehouse}</td>
+                        <td>
+                            <span class="badge ${statusClass} text-capitalize">
+                                ${status}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+                        }).join('');
+                    }
+
+                    // Availability
+                    const availabilityBadge =
+                        result.stock_status === 'in_stock' ?
+                        '<span class="badge bg-success-subtle text-success"><i class="fas fa-check me-1"></i>In Stock</span>' :
+                        '<span class="badge bg-danger-subtle text-danger"><i class="fas fa-times me-1"></i>Out of Stock</span>';
+
+                    // Product image
+                    const imageHtml = result.main_product_image ?
+                        `<img src="/${result.main_product_image}" alt="${result.product_name}"
+                     class="img-fluid rounded-3 shadow-sm w-100"
+                     style="max-height: 260px; object-fit: contain; background: #f9fafb;">` :
+                        `<div class="bg-light rounded-3 d-flex align-items-center justify-content-center shadow-sm w-100"
+                     style="height: 260px;">
+                    <i class="mdi mdi-package-variant-outline text-muted" style="font-size: 3rem;"></i>
+               </div>`;
+
+                    const block = `
+            <div class="product-track-card mb-4">
+                <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                    <div class="row g-0">
+                        <!-- Left: Big image -->
+                        <div class="col-md-2 border-end">
+                            <div class="p-3 h-100 d-flex align-items-center justify-content-center">
+                                ${imageHtml}
                             </div>
                         </div>
-                    `;
-                    resultsContainer.append(row);
+
+                        <!-- Right: Details + serial table -->
+                        <div class="col-md-10">
+                            <div class="card-body">
+                                <!-- Top details -->
+                                <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+                                    <div>
+                                        <h5 class="card-title mb-1 fw-semibold">
+                                            ${result.product_name}
+                                        </h5>
+                                        <p class="mb-1 text-muted small">
+                                            SKU: <span class="fw-medium">${result.sku}</span>
+                                        </p>
+                                        ${
+                                            result.category_name
+                                                ? `<p class="mb-0 text-muted small">
+                                                                Category: <span class="fw-medium">${result.category_name}</span>
+                                                           </p>`
+                                                : ''
+                                        }
+                                    </div>
+                                    <div class="text-end">
+                                        ${availabilityBadge}
+                                        ${
+                                            result.total_quantity !== undefined
+                                                ? `<p class="mb-0 mt-2 text-muted small">
+                                                                Total Qty: <span class="fw-medium">${result.total_quantity}</span>
+                                                           </p>`
+                                                : ''
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Serial table -->
+                                <div class="mt-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0 fw-semibold">Serial Numbers</h6>
+                                        <span class="badge bg-soft-primary text-primary">
+                                            ${result.product_serials ? result.product_serials.length : 0} serials
+                                        </span>
+                                    </div>
+
+                                    <div class="table-responsive border rounded-3">
+                                        <table class="table table-sm mb-0 align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="width: 60px;">#</th>
+                                                    <th>Serial Number</th>
+                                                    <th>Warehouse</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${serialRows}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Optional action buttons -->
+                                ${
+                                    result.view_url || result.edit_url
+                                        ? `<div class="mt-3 d-flex justify-content-end gap-2">
+                                                        ${
+                                                            result.view_url
+                                                                ? `<a href="${result.view_url}" class="btn btn-sm btn-outline-primary">
+                                                                <i class="mdi mdi-eye-outline me-1"></i>View Details
+                                                           </a>`
+                                                                : ''
+                                                        }
+                                                        ${
+                                                            result.edit_url
+                                                                ? `<a href="${result.edit_url}" class="btn btn-sm btn-outline-secondary">
+                                                                <i class="mdi mdi-pencil-outline me-1"></i>Edit
+                                                           </a>`
+                                                                : ''
+                                                        }
+                                                   </div>`
+                                        : ''
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+                    resultsContainer.append(block);
                 });
             }
+
         });
     </script>
 @endsection

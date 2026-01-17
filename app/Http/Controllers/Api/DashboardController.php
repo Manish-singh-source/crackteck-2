@@ -104,6 +104,14 @@ class DashboardController extends Controller
 
     public function banners(Request $request)
     {
+        $validated = Validator::make($request->all(), ([
+            // validation rules if any
+            'role_id' => 'required|in:4',
+        ]));
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
         $banners = WebsiteBanner::where('is_active', "1")->where('channel', 'mobile')->get();
         return response()->json(['banners' => $banners], 200);
     }

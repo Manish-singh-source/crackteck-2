@@ -71,6 +71,10 @@ class AllServicesController extends Controller
             ]
         ];
 
+        if ($services->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'No services found.'], 404);
+        }
+
         return response()->json(['services' => $services], 200);
     }
 
@@ -91,20 +95,23 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        if ($staffRole == 'customers') {
-            $quickServices = CoveredItem::where('service_type', 'quick_service')
-                ->where('status', 'active')
-                ->orderBy('created_at', 'desc')
-                ->get();
+        $quickServices = CoveredItem::where('service_type', 'quick_service')
+            ->where('status', 'active')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-            return response()->json(['quick_services' => $quickServices], 200);
+        if ($quickServices->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'No quick services found.'], 404);
         }
+
+        return response()->json(['quick_services' => $quickServices], 200);
     }
 
     public function servicesListByType(Request $request)
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
+            'service_type' => 'required|in:amc,quick_service,installation,repairing',
         ]);
 
         if ($validated->fails()) {
@@ -118,17 +125,16 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        $service_type = $request->service_type;
+        $services = CoveredItem::where('service_type', $request->service_type)
+            ->where('status', 'active')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        if ($staffRole == 'customers') {
-
-            $services = CoveredItem::where('service_type', $service_type)
-                ->where('status', 'active')
-                ->orderBy('created_at', 'desc')
-                ->get();
-
-            return response()->json(['services' => $services], 200);
+        if ($services->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'No services found.'], 404);
         }
+
+        return response()->json(['services' => $services], 200);
     }
 
     public function getServiceDetails(Request $request, $id)
@@ -163,25 +169,45 @@ class AllServicesController extends Controller
 
     public function submitQuickServiceRequest(Request $request)
     {
-        // return response()->json(['request_data' => $request->all()], 200);
-        $validated = Validator::make($request->all(), [
-            'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
-            'service_type' => 'required|in:quick_service,installation,repairing,amc',
-            'products' => 'required|array|min:1',
-            'products.*.service_type_id' => 'required|integer|exists:covered_items,id',
-            'products.*.name' => 'required|string',
-            'products.*.type' => 'required|string',
-            'products.*.model_no' => 'nullable|string',
-            'products.*.sku' => 'nullable|string',
-            'products.*.hsn' => 'nullable|string',
-            'products.*.purchase_date' => 'nullable|date',
-            'products.*.brand' => 'required|string',
-            'products.*.description' => 'nullable|string',
-            'products.*.images' => 'nullable|array|min:1',
-            'products.*.images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'amc_plan_id' => 'nullable|integer|exists:amc_plans,id',
-        ]);
+        if ($request->service_type == 'amc') {
+            $rules = [
+                'role_id' => 'required|in:4',
+                'customer_id' => 'required|integer|exists:customers,id',
+                'service_type' => 'required|in:amc',
+                'products' => 'required|array|min:1',
+                'products.*.name' => 'required|string',
+                'products.*.type' => 'required|string',
+                'products.*.model_no' => 'nullable|string',
+                'products.*.sku' => 'nullable|string',
+                'products.*.hsn' => 'nullable|string',
+                'products.*.purchase_date' => 'nullable|date',
+                'products.*.brand' => 'required|string',
+                'products.*.description' => 'nullable|string',
+                'products.*.images' => 'nullable|array|min:1',
+                'products.*.images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'amc_plan_id' => 'required|integer|exists:amc_plans,id',
+            ];
+        } else {
+            $rules = [
+                'role_id' => 'required|in:4',
+                'customer_id' => 'required|integer|exists:customers,id',
+                'service_type' => 'required|in:quick_service,installation,repairing',
+                'products' => 'required|array|min:1',
+                'products.*.service_type_id' => 'required|integer|exists:covered_items,id',
+                'products.*.name' => 'required|string',
+                'products.*.type' => 'required|string',
+                'products.*.model_no' => 'nullable|string',
+                'products.*.sku' => 'nullable|string',
+                'products.*.hsn' => 'nullable|string',
+                'products.*.purchase_date' => 'nullable|date',
+                'products.*.brand' => 'required|string',
+                'products.*.description' => 'nullable|string',
+                'products.*.images' => 'nullable|array|min:1',
+                'products.*.images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ];
+        }
+
+        $validated = Validator::make($request->all(), $rules);
 
         if ($validated->fails()) {
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
@@ -193,6 +219,7 @@ class AllServicesController extends Controller
         if (! $staffRole) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
+        
         try {
             DB::beginTransaction();
             if ($staffRole == 'customers') {

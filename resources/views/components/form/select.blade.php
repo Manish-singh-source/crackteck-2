@@ -9,6 +9,7 @@
     'model' => $user ?? null,
     'autofocus' => true,
     'class' => 'custom-class',
+    'disabled' => true,
 ])
 --}}
 
@@ -30,6 +31,7 @@
             <option value="{{ $key }}"
                 {{ (string)$key === (string)$selectedValue ? 'selected' : '' }}
                 @if($errors->has($name)) class="text-neg" @endif
+                @if($disabled ?? false) disabled @endif
             >
                 {{ $option }}
             </option>

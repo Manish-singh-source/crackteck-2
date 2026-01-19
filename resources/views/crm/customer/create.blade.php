@@ -105,9 +105,9 @@
                                                     'name' => 'gender',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Male',
-                                                        '1' => 'Female',
-                                                        '2' => 'Other',
+                                                        'male' => 'Male',
+                                                        'female' => 'Female',
+                                                        'other' => 'Other',
                                                     ],
                                                 ])
                                             </div>
@@ -118,10 +118,10 @@
                                                     'name' => 'customer_type',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'E-commerce',
-                                                        '1' => 'AMC',
-                                                        '2' => 'Both',
-                                                        '3' => 'Offline',
+                                                        'ecommerce' => 'E-commerce',
+                                                        'amc' => 'AMC',
+                                                        'both' => 'Both',
+                                                        'offline' => 'Offline',
                                                     ],
                                                 ])
                                             </div>
@@ -132,11 +132,12 @@
                                                     'name' => 'source_type',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'E-commerce',
-                                                        '1' => 'App',
-                                                        '2' => 'Call',
-                                                        '3' => 'Walk-in',
-                                                        '4' => 'Other',
+                                                        'ecommerce' => 'E-commerce',
+                                                        'admin_panel' => 'Admin Panel',
+                                                        'app' => 'App',
+                                                        'call' => 'Call',
+                                                        'walk_in' => 'Walk-in',
+                                                        'other' => 'Other',
                                                     ],
                                                 ])
                                             </div>
@@ -413,15 +414,24 @@
                                     <div class="card-body">
                                         <div class="row">
                                             <div class=" mb-3">
+                                                @include('components.form.input', [
+                                                    'label' => 'Profile Image',
+                                                    'name' => 'profile',
+                                                    'type' => 'file',
+                                                    'placeholder' => 'Profile Image',
+                                                ])
+                                            </div>
+                                            <div class=" mb-3">
                                                 @include('components.form.select', [
                                                     'label' => 'Status',
                                                     'name' => 'status',
+                                                    'value' => 'active',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
-                                                        '2' => 'Blocked',
-                                                        '3' => 'Suspended',
+                                                        'inactive' => 'Inactive',
+                                                        'active' => 'Active',
+                                                        'blocked' => 'Blocked',
+                                                        'suspended' => 'Suspended',
                                                     ],
                                                 ])
                                             </div>

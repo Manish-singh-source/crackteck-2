@@ -31,6 +31,22 @@
                                     <table class="table table-bordered table-striped align-middle">
                                         <tbody>
                                             <tr>
+                                                <th style="width: 20%;">Customer Code</th>
+                                                <td>{{ $customer->customer_code }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 20%;">Profile Image</th>
+                                                <td>
+                                                    @if ($customer->profile)
+                                                        <img src="{{ asset('storage/' . $customer->profile) }}"
+                                                            alt="Profile Image" class="img-fluid rounded"
+                                                            style="width: 80px; height: 80px; object-fit: cover;">
+                                                    @else
+                                                        <span class="text-muted">No Image</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                            <tr>
                                                 <th style="width: 20%;">Name</th>
                                                 <td>{{ $customer->first_name }} {{ $customer->last_name }}</td>
                                             </tr>

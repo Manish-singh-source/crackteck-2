@@ -101,9 +101,9 @@
                                                     'name'    => 'gender',
                                                     'options' => [
                                                         ''  => '--Select--',
-                                                        '0' => 'Male',
-                                                        '1' => 'Female',
-                                                        '2' => 'Other',
+                                                        'male' => 'Male',
+                                                        'female' => 'Female',
+                                                        'other' => 'Other',
                                                     ],
                                                     'model'   => $customer,
                                                 ])
@@ -115,10 +115,11 @@
                                                     'name'    => 'customer_type',
                                                     'options' => [
                                                         ''  => '--Select--',
-                                                        '0' => 'E-commerce',
-                                                        '1' => 'AMC',
-                                                        '2' => 'Both',
-                                                        '3' => 'Offline',
+                                                        'ecommerce' => 'E-commerce',
+                                                        'amc' => 'AMC',
+                                                        'non_amc' => 'Non-AMC',
+                                                        'both' => 'Both',
+                                                        'offline' => 'Offline',
                                                     ],
                                                     'model'   => $customer,
                                                 ])
@@ -130,11 +131,12 @@
                                                     'name'    => 'source_type',
                                                     'options' => [
                                                         ''  => '--Select--',
-                                                        '0' => 'E-commerce',
-                                                        '1' => 'App',
-                                                        '2' => 'Call',
-                                                        '3' => 'Walk-in',
-                                                        '4' => 'Other',
+                                                        'ecommerce' => 'E-commerce',
+                                                        'admin_panel' => 'Admin Panel',
+                                                        'app' => 'App',
+                                                        'call' => 'Call',
+                                                        'walk_in' => 'Walk-in',
+                                                        'other' => 'Other',
                                                     ],
                                                     'model'   => $customer,
                                                 ])
@@ -163,7 +165,7 @@
                                                     'name'        => 'aadhar_number',
                                                     'type'        => 'text',
                                                     'placeholder' => 'Enter Aadhar Number',
-                                                    'model'       => $customer->aadharDetail ?? null,
+                                                    'model'       => $customer->aadharDetails ?? null,
                                                 ])
                                             </div>
 
@@ -172,7 +174,7 @@
                                                     'label' => 'Aadhar Front Image',
                                                     'name'  => 'aadhar_front_path',
                                                     'type'  => 'file',
-                                                    'model' => $customer->aadharDetail ?? null,
+                                                    'model' => $customer->aadharDetails ?? null,
                                                 ])
                                             </div>
 
@@ -181,7 +183,7 @@
                                                     'label' => 'Aadhar Back Image',
                                                     'name'  => 'aadhar_back_path',
                                                     'type'  => 'file',
-                                                    'model' => $customer->aadharDetail ?? null,
+                                                    'model' => $customer->aadharDetails ?? null,
                                                 ])
                                             </div>
                                         </div>
@@ -208,7 +210,7 @@
                                                     'name'        => 'pan_number',
                                                     'type'        => 'text',
                                                     'placeholder' => 'Enter Pan Number',
-                                                    'model'       => $customer->panCardDetail ?? null,
+                                                    'model'       => $customer->panCardDetails ?? null,
                                                 ])
                                             </div>
 
@@ -217,7 +219,7 @@
                                                     'label' => 'Pan Front Image',
                                                     'name'  => 'pan_card_front_path',
                                                     'type'  => 'file',
-                                                    'model' => $customer->panCardDetail ?? null,
+                                                    'model' => $customer->panCardDetails ?? null,
                                                 ])
                                             </div>
 
@@ -226,7 +228,7 @@
                                                     'label' => 'Pan Back Image',
                                                     'name'  => 'pan_card_back_path',
                                                     'type'  => 'file',
-                                                    'model' => $customer->panCardDetail ?? null,
+                                                    'model' => $customer->panCardDetails ?? null,
                                                 ])
                                             </div>
                                         </div>
@@ -498,7 +500,7 @@
                                                     'name'        => 'company_name',
                                                     'type'        => 'text',
                                                     'placeholder' => 'Enter Company Name',
-                                                    'model'       => $customer->companyDetail,
+                                                    'model'       => $customer->companyDetails,
                                                 ])
                                             </div>
 
@@ -508,7 +510,7 @@
                                                     'name'        => 'comp_address1',
                                                     'type'        => 'text',
                                                     'placeholder' => 'Enter Company Address Line 1',
-                                                    'model'       => $customer->companyDetail,
+                                                    'model'       => $customer->companyDetails,
                                                 ])
                                             </div>
 
@@ -518,7 +520,7 @@
                                                     'name'        => 'comp_address2',
                                                     'type'        => 'text',
                                                     'placeholder' => 'Enter Company Address Line 2',
-                                                    'model'       => $customer->companyDetail,
+                                                    'model'       => $customer->companyDetails,
                                                 ])
                                             </div>
 
@@ -528,7 +530,7 @@
                                                     'name'        => 'comp_city',
                                                     'type'        => 'text',
                                                     'placeholder' => 'Enter City',
-                                                    'model'       => $customer->companyDetail,
+                                                    'model'       => $customer->companyDetails,
                                                 ])
                                             </div>
 
@@ -538,7 +540,7 @@
                                                     'name'        => 'comp_state',
                                                     'type'        => 'text',
                                                     'placeholder' => 'Enter State',
-                                                    'model'       => $customer->companyDetail,
+                                                    'model'       => $customer->companyDetails,
                                                 ])
                                             </div>
 
@@ -548,7 +550,7 @@
                                                     'name'        => 'comp_country',
                                                     'type'        => 'text',
                                                     'placeholder' => 'Enter Country',
-                                                    'model'       => $customer->companyDetail,
+                                                    'model'       => $customer->companyDetails,
                                                 ])
                                             </div>
 
@@ -558,7 +560,7 @@
                                                     'name'        => 'comp_pincode',
                                                     'type'        => 'text',
                                                     'placeholder' => 'Enter Pincode',
-                                                    'model'       => $customer->companyDetail,
+                                                    'model'       => $customer->companyDetails,
                                                 ])
                                             </div>
 
@@ -568,7 +570,7 @@
                                                     'name'        => 'gst_no',
                                                     'type'        => 'text',
                                                     'placeholder' => 'Enter GST Number',
-                                                    'model'       => $customer->companyDetail,
+                                                    'model'       => $customer->companyDetails,
                                                 ])
                                             </div>
                                         </div>
@@ -584,16 +586,24 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
+                                            <div class=" mb-3">
+                                                @include('components.form.input', [
+                                                    'label' => 'Profile Image',
+                                                    'name' => 'profile',
+                                                    'type' => 'file',
+                                                    'placeholder' => 'Profile Image',
+                                                ])
+                                            </div>
                                             <div class="mb-3">
                                                 @include('components.form.select', [
                                                     'label'   => 'Status',
                                                     'name'    => 'status',
                                                     'options' => [
                                                         ''  => '--Select--',
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
-                                                        '2' => 'Blocked',
-                                                        '3' => 'Suspended',
+                                                        'inactive' => 'Inactive',
+                                                        'active' => 'Active',
+                                                        'blocked' => 'Blocked',
+                                                        'suspended' => 'Suspended',
                                                     ],
                                                     'model'   => $customer,
                                                 ])

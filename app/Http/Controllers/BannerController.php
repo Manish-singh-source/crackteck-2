@@ -14,8 +14,7 @@ class BannerController extends Controller
      */
     public function websiteBanner()
     {
-        // mujhe sub kuch chahiye
-        // sirf type 0 ka nahi 
+        // 
         $website = WebsiteBanner::where('is_active', '1')
             ->orderBy('display_order', 'asc')
             ->paginate(15);

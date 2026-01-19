@@ -244,18 +244,20 @@ Route::prefix('/demo')->group(function () {
 
     // ---------------------------------------- E-Commerce Website Banner Page and Promotional Banner Page ------------------------------------------------
 
-    Route::controller(BannerController::class)->group(function () {
-        // Website Banner Routes
-        Route::get('/e-commerce/website-banner', 'websiteBanner')->name('website.banner.index');
-        Route::get('/e-commerce/add-banner', 'addWebsiteBanner')->name('website.banner.create');
-        Route::post('/e-commerce/store-banner', 'storeWebsiteBanner')->name('website.banner.store');
-        Route::get('/e-commerce/show-banner/{id}', 'showWebsiteBanner')->name('website.banner.show');
-        Route::get('/e-commerce/edit-banner/{id}', 'editWebsiteBanner')->name('website.banner.edit');
-        Route::put('/e-commerce/update-banner/{id}', 'updateWebsiteBanner')->name('website.banner.update');
-        Route::delete('/e-commerce/delete-banner/{id}', 'deleteWebsiteBanner')->name('website.banner.delete');
+    Route::prefix('/e-commerce')->group(function () {
+        Route::controller(BannerController::class)->group(function () {
+            // Website Banner Routes
+            Route::get('/website-banner', 'websiteBanner')->name('website.banner.index');
+            Route::get('/add-banner', 'addWebsiteBanner')->name('website.banner.create');
+            Route::post('/store-banner', 'storeWebsiteBanner')->name('website.banner.store');
+            Route::get('/show-banner/{id}', 'showWebsiteBanner')->name('website.banner.show');
+            Route::get('/edit-banner/{id}', 'editWebsiteBanner')->name('website.banner.edit');
+            Route::put('/update-banner/{id}', 'updateWebsiteBanner')->name('website.banner.update');
+            Route::delete('/delete-banner/{id}', 'deleteWebsiteBanner')->name('website.banner.delete');
 
-        // Promotional Banner Routes (uses same table with type=1)
-        Route::get('/e-commerce/promotional-banner', 'promotionalBanner')->name('promotional.banner.index');
+            // Promotional Banner Routes (uses same table with type=1)
+            Route::get('/promotional-banner', 'promotionalBanner')->name('promotional.banner.index');
+        });
     });
 
     // ------------------------------------------------------------ E-Commerce Product Deals Page -------------------------------------------------------------

@@ -25,7 +25,7 @@ return new class extends Migration
             $table->integer('usage_limit')->nullable();
             $table->integer('used_count')->default(0);
             $table->integer('usage_per_customer')->default(1);
-            $table->boolean('is_active')->default(true);
+            $table->enum('status', ['active', 'inactive', 'expired'])->default('active');
             $table->text('applicable_categories')->nullable();
             $table->text('applicable_brands')->nullable();
             $table->text('excluded_products')->nullable();
@@ -33,7 +33,7 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
 
-            $table->index('code', 'is_active');
+            $table->index('code', 'status');
         });
     }
 

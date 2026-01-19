@@ -22,7 +22,7 @@ class Coupon extends Model
         'usage_limit',
         'used_count',
         'usage_per_customer',
-        'is_active',
+        'status',
         'applicable_categories',
         'applicable_brands',
         'excluded_products',
@@ -33,7 +33,6 @@ class Coupon extends Model
         'applicable_categories' => 'array',
         'applicable_brands' => 'array',
         'excluded_products' => 'array',
-        'is_active' => 'boolean',
         'stackable' => 'boolean',
         'start_date' => 'date',
         'end_date' => 'date',
@@ -44,7 +43,7 @@ class Coupon extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', 1);
+        return $query->where('status', 'active');
     }
 
     /**
@@ -52,7 +51,15 @@ class Coupon extends Model
      */
     public function scopeInactive($query)
     {
-        return $query->where('is_active', 0);
+        return $query->where('status', 'inactive');
+    }
+
+    /**
+     * Scope for expired coupons
+     */
+    public function scopeExpired($query)
+    {
+        return $query->where('status', 'expired');
     }
 
     /**

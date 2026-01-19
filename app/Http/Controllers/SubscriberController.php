@@ -12,7 +12,6 @@ class SubscriberController extends Controller
     public function index()
     {
         $subscriber = Subscriber::all();
-
         return view('/e-commerce/subscribers/index', compact('subscriber'));
     }
 
@@ -27,6 +26,26 @@ class SubscriberController extends Controller
         $subscriber->delete();
 
         return redirect()->route('subscriber.index')->with('success', 'Subscriber deleted successfully.');
+    }
+
+    public function sendMails(Request $request)
+    {
+        $request->validate([
+            'subject' => 'required',
+            'body' => 'required',
+        ]);
+        $subject = $request->subject;
+        $body = $request->body;
+
+        $subscribers = Subscriber::all();
+        foreach ($subscribers as $subscriber) {
+            $email = $subscriber->email;
+            // send mail
+
+            // Mail::to($email)->send(new \App\Mail\SubscriberMail($subject, $body));
+        }
+
+        return redirect()->route('subscriber.index')->with('success', 'Mail sent successfully.');
     }
 
     /**

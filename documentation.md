@@ -1879,8 +1879,7 @@ etc.
             $table->text('description')->nullable();
             $table->string('image_url')->nullable();
             $table->integer('sort_order')->default(0);
-            $table->boolean('is_active')->default(true);
-            $table->integer('products_count')->default(0);
+            $table->boolean('active')->default(active);
             $table->timestamps();
             $table->softDeletes();
 

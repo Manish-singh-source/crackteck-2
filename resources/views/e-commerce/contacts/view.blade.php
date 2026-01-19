@@ -3,19 +3,19 @@
 @section('content')
     <div class="content">
         <div class="container-fluid">
+            <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
+                <div class="flex-grow-1">
+                    <h4 class="fs-18 fw-semibold m-0">Contacts Details</h4>
+                </div>
+                <div>
+                    <a href="{{ route('contact.index') }}" class="btn btn-secondary">Back to Contacts</a>
+                </div>
+            </div>
 
             <div class="row pt-3">
                 <div class="col-xl-12 mx-auto">
 
                     <div class="card">
-                        <div class="card-header border-bottom-dashed">
-                            <div class="d-flex">
-                                <h5 class="card-title flex-grow-1 mb-0">
-                                    Contact Details
-                                </h5>
-                            </div>
-                        </div>
-
                         <div class="card-body">
                             <ul class="list-group list-group-flush">
 

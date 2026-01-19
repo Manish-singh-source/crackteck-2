@@ -35,7 +35,6 @@ class CouponsController extends Controller
         }
 
         $coupons = $query->orderBy('created_at', 'desc')->paginate(15);
-
         return view('e-commerce.coupons.index', compact('coupons'));
     }
 

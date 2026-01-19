@@ -19,113 +19,56 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-body border border-dashed border-end-0 border-start-0">
-                            <form action="#" method="get">
-                                <div class="d-flex justify-content-between">
-                                    <div class="row">
-                                        <div class="col-xl-10 col-md-10 col-sm-10">
-                                            <div class="search-box">
-                                                <input type="text" name="search" value=""
-                                                    class="form-control search" placeholder="Search Name">
-                                                <i class="ri-search-line search-icon"></i>
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-2 col-md-2 col-sm-2 col-2">
-                                            <div class="d-flex justify-content-center align-items-center">
-                                                <button type="submit" class="btn btn-primary waves ripple-light">
-                                                    <i class="fa-solid fa-magnifying-glass "></i>
+                        <div class="card-body">
+                            @php
+                                $statuses = [
+                                    'all' => ['label' => 'All', 'icon' => 'mdi-format-list-bulleted', 'color' => ''],
+                                    'active' => [
+                                        'label' => 'Active',
+                                        'icon' => 'mdi-check-circle-outline',
+                                        'color' => 'text-success',
+                                    ],
+                                    'inactive' => [
+                                        'label' => 'Inactive',
+                                        'icon' => 'mdi-close-circle-outline',
+                                        'color' => 'text-danger',
+                                    ],
+                                    'blocked' => [
+                                        'label' => 'Blocked',
+                                        'icon' => 'mdi-block-helper',
+                                        'color' => 'text-danger',
+                                    ],
+                                    'suspended' => [
+                                        'label' => 'Suspended',
+                                        'icon' => 'mdi-pause-circle-outline',
+                                        'color' => 'text-warning',
+                                    ],
+                                ];
 
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                $currentStatus = request()->get('status') ?? 'all';
+                            @endphp
 
-                                    <div class="row g-3">
-                                        <div class="col-xl-6 col-md-6 col-sm-6 col-6 btn-group" role="group">
-                                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fa-solid fa-arrow-up-z-a "></i>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="#">Sort By Name</a></li>
-                                                <li><a class="dropdown-item" href="#">Sort By Username</a></li>
-                                                <li><a class="dropdown-item" href="#">Sort By Orders</a></li>
-                                                <li><a class="dropdown-item" href="#">Sort By Joined Date</a></li>
-                                            </ul>
-                                        </div>
-
-                                        <div class="col-xl-6 col-md-6 col-sm-6 col-6 btn-group" role="group">
-                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#standard-modal">
-                                                <i class="fa-solid fa-filter "></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="modal fade" id="standard-modal" tabindex="-1"
-                                        aria-labelledby="standard-modalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="standard-modalLabel">Filters</h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                                </div>
-
-                                                <div class="modal-body px-3 py-md-2">
-                                                    <h5>Status</h5>
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check mb-2">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault1">
-                                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                                        Active
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault2">
-                                                                    <label class="form-check-label" for="flexRadioDefault2">
-                                                                        Inactive
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-light"
-                                                        data-bs-dismiss="modal">Close</button>
-                                                    <button type="button" class="btn btn-primary">Save changes</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                            </form>
-                        </div>
-                        <div class="card-body pt-0">
-                            <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link active p-2" id="all_customer_tab" data-bs-toggle="tab"
-                                        href="#all_customer" role="tab">
-                                        <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
-                                        <span class="d-none d-sm-block">All Customer</span>
-                                    </a>
-                                </li>
-
+                            <ul class="nav nav-underline border-bottom" id="pills-tab" role="tablist">
+                                @foreach ($statuses as $key => $status)
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link {{ $currentStatus === $key ? 'active' : '' }} p-2"
+                                            href="{{ $key === 'all' ? route('ec.customer.index') : route('ec.customer.index', ['status' => $key]) }}">
+                                            <span class="d-block d-sm-none">
+                                                <i class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>
+                                            </span>
+                                            <span class="d-none d-sm-block">
+                                                <i
+                                                    class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>{{ $status['label'] }}
+                                            </span>
+                                        </a>
+                                    </li>
+                                @endforeach
                             </ul>
+
 
                             <div class="tab-content text-muted">
 
-                                <div class="tab-pane active show pt-4" id="all_customer" role="tabpanel">
+                                <div class="tab-pane active show" id="all_customer" role="tabpanel">
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="card shadow-none">
@@ -134,10 +77,12 @@
                                                         class="table table-striped table-borderless dt-responsive nowrap">
                                                         <thead>
                                                             <tr>
-                                                                <th>Name</th>
-                                                                <th>Username</th>
+                                                                <th>Sr No.</th>
+                                                                <th>Customer Code</th>
+                                                                <th>Customer Name</th>
+                                                                <th>Phone</th>
                                                                 <th>Email</th>
-                                                                <th>Contact Number</th>
+                                                                <th>Branches</th>
                                                                 <th>Number of Orders</th>
                                                                 <th>Status</th>
                                                                 <th>Joined At</th>
@@ -145,21 +90,34 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($customers as $customer)
+                                                            @foreach ($customers as $index => $customer)
                                                                 <tr>
-                                                                    <td>{{ $customer->full_name }}</td>
-                                                                    <td>{{ $customer->display_username }}</td>
-                                                                    <td>{{ $customer->email }}</td>
+                                                                    <td>{{ $index + 1 }}</td>
+                                                                    <td>{{ $customer->customer_code }}</td>
+                                                                    <td>{{ $customer->first_name }}
+                                                                        {{ $customer->last_name }}</td>
                                                                     <td>{{ $customer->phone ?: 'N/A' }}</td>
-                                                                    <td>{{ $customer->total_orders_count }}</td>
+                                                                    <td>{{ $customer->email }}</td>
+                                                                    <td>{{ $customer->branches->count() }}</td>
+                                                                    <td>{{ $customer->orders->count() }}</td>
+                                                                    @php
+                                                                        $statusClasses = [
+                                                                            'active' =>
+                                                                                'bg-success-subtle text-success',
+                                                                            'inactive' =>
+                                                                                'bg-secondary-subtle text-secondary',
+                                                                            'blocked' => 'bg-danger-subtle text-danger',
+                                                                            'suspended' =>
+                                                                                'bg-warning-subtle text-warning',
+                                                                        ];
+                                                                    @endphp
+
                                                                     <td>
-                                                                        <div class="form-check form-switch mb-2">
-                                                                            <input class="form-check-input"
-                                                                                type="checkbox" role="switch"
-                                                                                id="flexSwitchCheckChecked_{{ $customer->id }}"
-                                                                                {{ $customer->status === 'active' ? 'checked' : '' }}>
-                                                                            <label class="form-check-label"
-                                                                                for="flexSwitchCheckChecked_{{ $customer->id }}"></label>
+                                                                        <div>
+                                                                            <span
+                                                                                class="badge fw-semibold {{ $statusClasses[$customer->status] ?? 'bg-secondary-subtle text-secondary' }}">
+                                                                                {{ ucfirst($customer->status) }}
+                                                                            </span>
                                                                         </div>
                                                                     </td>
                                                                     <td>{{ $customer->created_at->toDateString() }}</td>
@@ -280,9 +238,9 @@
                                         <div class="col-12">
                                             <div class="card shadow-none">
                                                 <!-- <div class="card-header">
-                                                                <h5 class="card-title mb-0">Tables</h5>
-                                                            </div>
-                                                            -->
+                                                                                <h5 class="card-title mb-0">Tables</h5>
+                                                                            </div>
+                                                                            -->
                                                 <div class="card-body">
                                                     <table id="responsive-datatable"
                                                         class="table table-striped table-borderless dt-responsive nowrap">
@@ -355,9 +313,9 @@
                                         <div class="col-12">
                                             <div class="card shadow-none">
                                                 <!-- <div class="card-header">
-                                                                <h5 class="card-title mb-0">Tables</h5>
-                                                            </div>
-                                                            -->
+                                                                                <h5 class="card-title mb-0">Tables</h5>
+                                                                            </div>
+                                                                            -->
                                                 <div class="card-body">
                                                     <table id="responsive-datatable"
                                                         class="table table-striped table-borderless dt-responsive nowrap">

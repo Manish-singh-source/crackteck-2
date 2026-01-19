@@ -31,7 +31,7 @@
         </div>
 
         <!-- Status Filter Tabs -->
-        <div class="row mb-3">
+        {{-- <div class="row mb-3">
             <div class="col-12">
                 <div class="card">
                     <div class="card-body border-bottom">
@@ -82,10 +82,10 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         <!-- Search and Filter Form -->
-        <div class="row mb-3">
+        <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
@@ -147,6 +147,51 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        @php
+                                $statuses = [
+                                    'all' => ['label' => 'All', 'icon' => 'mdi-format-list-bulleted', 'color' => ''],
+                                    'active' => [
+                                        'label' => 'Active',
+                                        'icon' => 'mdi-check-circle-outline',
+                                        'color' => 'text-success',
+                                    ],
+                                    'inactive' => [
+                                        'label' => 'Inactive',
+                                        'icon' => 'mdi-close-circle-outline',
+                                        'color' => 'text-danger',
+                                    ],
+                                    'blocked' => [
+                                        'label' => 'Blocked',
+                                        'icon' => 'mdi-block-helper',
+                                        'color' => 'text-danger',
+                                    ],
+                                    'suspended' => [
+                                        'label' => 'Suspended',
+                                        'icon' => 'mdi-pause-circle-outline',
+                                        'color' => 'text-warning',
+                                    ],
+                                ];
+
+                                $currentStatus = request()->get('status') ?? 'all';
+                            @endphp
+
+                            <ul class="nav nav-underline border-bottom" id="pills-tab" role="tablist">
+                                @foreach ($statuses as $key => $status)
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link {{ $currentStatus === $key ? 'active' : '' }} p-2"
+                                            href="{{ $key === 'all' ? route('ec.customer.index') : route('ec.customer.index', ['status' => $key]) }}">
+                                            <span class="d-block d-sm-none">
+                                                <i class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>
+                                            </span>
+                                            <span class="d-none d-sm-block">
+                                                <i
+                                                    class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>{{ $status['label'] }}
+                                            </span>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                            
                         @if($orders->count() > 0)
                             <div class="table-responsive">
                                 <table class="table table-striped table-hover align-middle">

@@ -35,13 +35,13 @@ Route::prefix('/demo')->group(function () {
         // Create EC Customer Page
         Route::get('/e-commerce/create-customer', 'ec_create')->name('ec.customer.create');
         // Store EC Customer Detail
-        Route::post('/e-commerce/store-customer', 'ec_store')->name('ec.customer.store');
+        Route::post('/e-commerce/store-customer', 'store')->name('ec.customer.store');
         // View EC Customer Page
         Route::get('/e-commerce/view-customer/{id}', 'ec_view')->name('ec.customer.view');
         // Edit EC Customer Page
         Route::get('/e-commerce/edit-customer/{id}', 'ec_edit')->name('ec.customer.edit');
         // Update EC Customer Page
-        Route::put('/e-commerce/update-customer/{id}', 'ec_update')->name('ec.customer.update');
+        Route::put('/e-commerce/update-customer/{id}', 'update')->name('ec.customer.update');
         // Delete EC Customer Page
         Route::delete('/e-commerce/delete-customer/{id}', 'ec_delete')->name('ec.customer.delete');
     });

@@ -66,8 +66,18 @@ class ProfileController extends Controller
         $validated = Validator::make($request->all(), [
             // validation rules if any
             'role_id' => 'required|in:1,2,3,4',
-            'user_id' => 'required',
+            'user_id' => 'required|exists:customers,id',
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email',
+            'dob' => 'nullable|date',
+            'gender' => 'nullable|in:male,female,other',
         ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
 
         $validated = $validated->validated();
         // return response()->json(['message' => $request->all()], 501);
@@ -127,7 +137,7 @@ class ProfileController extends Controller
         $validated = Validator::make($request->all(), [
             // validation rules if any
             'role_id' => 'required|in:1,2,3,4',
-            'user_id' => 'required',
+            'user_id' => 'required|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
@@ -135,11 +145,11 @@ class ProfileController extends Controller
         }
         $validated = $validated->validated();
 
-        if ($validated['role_id'] == 4) {
-            $addresses = CustomerAddressDetail::where('customer_id', $validated['user_id'])->get();
-        } else {
+        if ($validated['role_id'] != 4) {
             return response()->json(['success' => false, 'message' => 'Addresses are only available for customers.'], 400);
         }
+
+        $addresses = CustomerAddressDetail::where('customer_id', $validated['user_id'])->get();
 
         if (! $addresses) {
             return response()->json(['success' => false, 'message' => 'Addresses not found.'], 404);
@@ -153,46 +163,56 @@ class ProfileController extends Controller
         $validated = Validator::make($request->all(), [
             // validation rules if any
             'role_id' => 'required|in:1,2,3,4',
-            'user_id' => 'required',
+            'user_id' => 'required|exists:customers,id',
+            'is_primary' => 'required|in:yes,no',
+            'branch_name' => 'required',
+            'address1' => 'required',
+            'address2' => 'nullable',
+            'city' => 'required',
+            'state' => 'required',
+            'country' => 'required',
+            'pincode' => 'required',
         ]);
 
         if ($validated->fails()) {
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
+
         $validated = $validated->validated();
 
-        if ($validated['role_id'] == 4) {
-            $primaryAddress = CustomerAddressDetail::where('customer_id', $validated['user_id'])->where('is_primary', "1")->first();
-
-            if ($request->filled('is_primary')) {
-                if ($request->is_primary && ! $primaryAddress) {
-                    $request->is_primary = "yes";
-                } else {
-                    $request->is_primary = "no";
-                }
-            } else {
-                if (! $primaryAddress) {
-                    $request->is_primary = "yes";
-                } else {
-                    $request->is_primary = "no";
-                }
-            }
-
-
-            $address = CustomerAddressDetail::create([
-                'customer_id' => $validated['user_id'],
-                'branch_name' => $request->branch_name,
-                'address1' => $request->address1,
-                'address2' => $request->address2,
-                'city' => $request->city,
-                'state' => $request->state,
-                'country' => $request->country,
-                'pincode' => $request->pincode,
-                'is_primary' => $request->is_primary,
-            ]);
-        } else {
+        if ($validated['role_id'] != 4) {
             return response()->json(['success' => false, 'message' => 'Addresses are only available for customers.'], 400);
         }
+
+        $primaryAddress = CustomerAddressDetail::where('customer_id', $validated['user_id'])->where('is_primary', "yes")->first();
+
+        if ($request->filled('is_primary')) {
+            if ($request->is_primary && !$primaryAddress) {
+                $request->is_primary = "yes";
+            } else {
+                $request->is_primary = "no";
+            }
+        } else {
+            if (! $primaryAddress) {
+                $request->is_primary = "yes";
+            } else {
+                $request->is_primary = "no";
+            }
+        }
+
+
+        $address = CustomerAddressDetail::create([
+            'customer_id' => $validated['user_id'],
+            'branch_name' => $request->branch_name,
+            'address1' => $request->address1,
+            'address2' => $request->address2,
+            'city' => $request->city,
+            'state' => $request->state,
+            'country' => $request->country,
+            'pincode' => $request->pincode,
+            'is_primary' => $request->is_primary,
+        ]);
+
 
         if (! $address) {
             return response()->json(['success' => false, 'message' => 'Address not added.'], 404);
@@ -206,7 +226,15 @@ class ProfileController extends Controller
         $validated = Validator::make($request->all(), [
             // validation rules if any
             'role_id' => 'required|in:1,2,3,4',
-            'user_id' => 'required',
+            'user_id' => 'required|exists:customers,id',
+            'is_primary' => 'required|in:yes,no',
+            'branch_name' => 'required',
+            'address1' => 'required',
+            'address2' => 'nullable',
+            'city' => 'required',
+            'state' => 'required',
+            'country' => 'required',
+            'pincode' => 'required',
         ]);
 
         if ($validated->fails()) {
@@ -216,6 +244,11 @@ class ProfileController extends Controller
 
         if ($validated['role_id'] == 4) {
             $address = CustomerAddressDetail::where('customer_id', $validated['user_id'])->find($id);
+
+            if (! $address) {
+                return response()->json(['success' => false, 'message' => 'Address not found.'], 404);
+            }
+
             $address->branch_name = $request->branch_name ?? '';
             $address->address1 = $request->address1;
             $address->address2 = $request->address2;
@@ -257,8 +290,17 @@ class ProfileController extends Controller
         $validated = $validated->validated();
 
         if ($validated['role_id'] == 4) {
+            // check customer exists 
+            $customer = Customer::where('id', $validated['user_id'])->first();
+            if (! $customer) {
+                return response()->json(['success' => false, 'message' => 'Customer not found.'], 404);
+            }
             $aadharCard = CustomerAadharDetail::where('customer_id', $validated['user_id'])->first();
         } else {
+            $staff = Staff::where('id', $validated['user_id'])->first();
+            if (! $staff) {
+                return response()->json(['success' => false, 'message' => 'Staff not found.'], 404);
+            }
             $aadharCard = StaffAadharDetail::where('staff_id', $validated['user_id'])->first();
         }
 
@@ -269,15 +311,15 @@ class ProfileController extends Controller
         return response()->json(['aadhar_card' => $aadharCard], 200);
     }
 
-    // check if aadhar card is already avaialble then return error
-    // aadhar card can be added only once
-    // and if not available then only add
     public function addAadharCard(Request $request)
     {
         $validated = Validator::make($request->all(), [
             // validation rules if any
             'role_id' => 'required|in:1,2,3,4',
             'user_id' => 'required',
+            'aadhar_number' => 'required',
+            'aadhar_front_path' => 'required|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+            'aadhar_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
         ]);
 
         if ($validated->fails()) {
@@ -286,11 +328,19 @@ class ProfileController extends Controller
         $validated = $validated->validated();
 
         if ($validated['role_id'] == 4) {
+            // check customer exists 
+            $customer = Customer::where('id', $validated['user_id'])->first();
+            if (! $customer) {
+                return response()->json(['success' => false, 'message' => 'Customer not found.'], 404);
+            }
+
+            // check if aadhar card already exists
             $existingAadhar = CustomerAadharDetail::where('customer_id', $validated['user_id'])->first();
             if ($existingAadhar) {
                 return response()->json(['success' => false, 'message' => 'Aadhar card already exists.'], 400);
             }
 
+            // upload aadhar card
             if ($request->hasFile('aadhar_front_path')) {
                 if ($request->aadhar_front_path && File::exists(public_path($request->aadhar_front_path))) {
                     File::delete(public_path($request->aadhar_front_path));
@@ -313,6 +363,7 @@ class ProfileController extends Controller
                 $aadharBackPath = 'uploads/crm/customer/aadhar/' . $filename;
             }
 
+            // create aadhar card
             $aadharCard = CustomerAadharDetail::create([
                 'customer_id' => $validated['user_id'],
                 'aadhar_number' => $request->aadhar_number,
@@ -320,11 +371,19 @@ class ProfileController extends Controller
                 'aadhar_back_path' => $aadharBackPath,
             ]);
         } else {
+            // check staff exists 
+            $staff = Staff::where('id', $validated['user_id'])->first();
+            if (! $staff) {
+                return response()->json(['success' => false, 'message' => 'Staff not found.'], 404);
+            }
+
+            // check if aadhar card already exists
             $existingAadhar = StaffAadharDetail::where('staff_id', $validated['user_id'])->first();
             if ($existingAadhar) {
                 return response()->json(['success' => false, 'message' => 'Aadhar card already exists.'], 400);
             }
 
+            // upload aadhar card            
             $aadharCard = StaffAadharDetail::create([
                 'staff_id' => $validated['user_id'],
                 'aadhar_number' => $request->aadhar_number,
@@ -340,14 +399,15 @@ class ProfileController extends Controller
         return response()->json(['aadhar_card' => $aadharCard], 200);
     }
 
-    // i want to update aadhar card details same as addAadharCard function store file uploaded
     public function updateAadharCard(Request $request, $id)
     {
-        // return response()->json(['message' => 'here', 'data' => $request->all()], 501);
         $validated = Validator::make($request->all(), [
             // validation rules if any
             'role_id' => 'required|in:1,2,3,4',
             'user_id' => 'required',
+            'aadhar_number' => 'required',
+            'aadhar_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+            'aadhar_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
         ]);
 
         if ($validated->fails()) {
@@ -356,8 +416,22 @@ class ProfileController extends Controller
         $validated = $validated->validated();
 
         if ($validated['role_id'] == 4) {
+            // check customer exists 
+            $customer = Customer::where('id', $validated['user_id'])->first();
+            if (! $customer) {
+                return response()->json(['success' => false, 'message' => 'Customer not found.'], 404);
+            }
+
+            // check if aadhar card already exists
             $aadharCard = CustomerAadharDetail::where('customer_id', $validated['user_id'])->find($id);
         } else {
+            // check staff exists 
+            $staff = Staff::where('id', $validated['user_id'])->first();
+            if (! $staff) {
+                return response()->json(['success' => false, 'message' => 'Staff not found.'], 404);
+            }
+
+            // check if aadhar card already exists
             $aadharCard = StaffAadharDetail::where('staff_id', $validated['user_id'])->find($id);
         }
 
@@ -404,7 +478,7 @@ class ProfileController extends Controller
     {
         $validated = Validator::make($request->all(), [
             // validation rules if any
-            'role_id' => ['required', 'integer', Rule::in([1,2,3,4])],
+            'role_id' => 'required|in:1,2,3,4',
             'user_id' => 'required',
         ]);
 
@@ -414,8 +488,18 @@ class ProfileController extends Controller
         $validated = $validated->validated();
 
         if ($validated['role_id'] == 4) {
+            // check customer exists 
+            $customer = Customer::where('id', $validated['user_id'])->first();
+            if (! $customer) {
+                return response()->json(['success' => false, 'message' => 'Customer not found.'], 404);
+            }
             $panCard = CustomerPanCardDetail::where('customer_id', $validated['user_id'])->first();
         } else {
+            // check staff exists 
+            $staff = Staff::where('id', $validated['user_id'])->first();
+            if (! $staff) {
+                return response()->json(['success' => false, 'message' => 'Staff not found.'], 404);
+            }
             $panCard = StaffPanCardDetail::where('staff_id', $validated['user_id'])->first();
         }
 
@@ -435,6 +519,9 @@ class ProfileController extends Controller
             // validation rules if any
             'role_id' => 'required|in:1,2,3,4',
             'user_id' => 'required',
+            'pan_number' => 'required',
+            'pan_card_front_path' => 'required|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+            'pan_card_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
         ]);
 
         if ($validated->fails()) {
@@ -443,6 +530,12 @@ class ProfileController extends Controller
         $validated = $validated->validated();
 
         if ($validated['role_id'] == 4) {
+            // check customer exists 
+            $customer = Customer::where('id', $validated['user_id'])->first();
+            if (! $customer) {
+                return response()->json(['success' => false, 'message' => 'Customer not found.'], 404);
+            }
+
             $existingPan = CustomerPanCardDetail::where('customer_id', $validated['user_id'])->first();
             if ($existingPan) {
                 return response()->json(['success' => false, 'message' => 'Pan card already exists.'], 400);
@@ -503,6 +596,9 @@ class ProfileController extends Controller
             // validation rules if any
             'role_id' => 'required|in:1,2,3,4',
             'user_id' => 'required',
+            'pan_number' => 'required',
+            'pan_card_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+            'pan_card_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
         ]);
 
         if ($validated->fails()) {
@@ -585,6 +681,14 @@ class ProfileController extends Controller
             // validation rules if any
             'role_id' => 'required|in:1,2,3,4',
             'user_id' => 'required',
+            'company_name' => 'required',
+            'comp_address1' => 'nullable',
+            'comp_address2' => 'nullable',
+            'comp_city' => 'nullable',
+            'comp_state' => 'nullable',
+            'comp_country' => 'nullable',
+            'comp_pincode' => 'nullable',
+            'gst_no' => 'nullable',
         ]);
 
         if ($validated->fails()) {

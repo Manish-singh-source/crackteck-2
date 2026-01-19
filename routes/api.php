@@ -38,73 +38,6 @@ use App\Http\Controllers\Api\NonAmcServicesController;
 |
 */
 
-// // Public API routes (no authentication required)
-// Route::prefix('auth')->group(function () {
-//     // Route::post('/login', [ApiAuthController::class, 'login']);
-// });
-
-// // Order-related API routes (public for now, can be protected later)
-// Route::get('/search-product', [OrderController::class, 'searchProducts']);
-// Route::get('/search-customer', [OrderController::class, 'searchCustomers']);
-
-// // Protected API routes (authentication required)
-// Route::middleware('auth:sanctum')->group(function () {
-//     // Authentication routes
-//     Route::prefix('auth')->group(function () {
-//         Route::post('/logout', [ApiAuthController::class, 'logout']);
-//         Route::get('/user', [ApiAuthController::class, 'user']);
-//     });
-
-//     // Example protected routes with role-based access
-//     Route::middleware('role:admin')->group(function () {
-//         Route::get('/admin/users', function () {
-//             return response()->json(['message' => 'Admin only endpoint']);
-//         });
-//     });
-
-//     Route::middleware('role:user,admin')->group(function () {
-//         Route::get('/user/profile', function () {
-//             return response()->json(['message' => 'User or Admin endpoint']);
-//         });
-
-//         // AMC Request Routes (Commented out - using FrontendController instead)
-//         // Route::prefix('crm')->group(function () {
-//         //     Route::post('/create-amc-request', [AMCRequestController::class, 'store']);
-//         //     Route::get('/amc-plans', [AMCRequestController::class, 'getAmcPlans']);
-//         // });
-//     });
-// });
-
-// /*
-// |--------------------------------------------------------------------------
-// | SDUI API Routes for Flutter App
-// |--------------------------------------------------------------------------
-// |
-// | These routes provide Server-Driven UI configuration for the Flutter app.
-// | They can be accessed with or without authentication based on settings.
-// |
-// */
-
-// // SDUI Public Routes (can be protected via settings)
-// Route::prefix('ui')->group(function () {
-//     Route::get('/role-selection', [SDUIController::class, 'handleRoleSelectionSchema']);
-//     // Route::get('/login', [SDUIController::class, 'handleLoginSchema']);
-//     // Get SDUI configuration for a specific screen/role (returns complete JSON schema)
-//     Route::get('/config', [SDUIController::class, 'getConfig']);
-
-//     // Get all available screens for a role
-//     Route::get('/screens', [SDUIController::class, 'getScreens']);
-
-//     // Get component types and schemas (reference documentation)
-//     Route::get('/component-types', [SDUIController::class, 'getComponentTypes']);
-// });
-
-// // SDUI Protected Routes (admin only)
-// Route::prefix('ui')->middleware(['auth:sanctum', 'role:admin'])->group(function () {
-//     // Clear SDUI cache
-//     Route::post('/clear-cache', [SDUIController::class, 'clearCache']);
-// });
-
 Route::prefix('v1')->group(function () {
     Route::post('/signup', [ApiAuthController::class, 'signup']);
     Route::post('/send-otp', [ApiAuthController::class, 'login']);
@@ -220,16 +153,8 @@ Route::prefix('v1')->group(function () {
         Route::controller(AmcServicesController::class)->group(function () {
             Route::get('/amc-plans', 'getAmcPlans');
             Route::get('/amc-plan-details/{id}', 'amcPlanDetails');
-            Route::post('/create-amc-request', 'store');
+            // Route::post('/create-amc-request', 'store');
         });
-
-        Route::controller(NonAmcServicesController::class)->group(function () {
-            // Installation Request APIs
-            Route::post('/installation-request', 'installationStore');
-            // Repair Request APIs
-            Route::post('/repair-request', 'repairStore');
-        });
-
 
         // Delivery Man APIs
         Route::controller(DeliveryOrderController::class)->group(function () {
@@ -348,3 +273,42 @@ Route::prefix('v1')->group(function () {
     });
 });
 
+/**
+ * 
+ * signup
+ * send-otp
+ * verify-otp 
+ * logout
+ * refresh-token 
+ * banners 
+ * 
+ * 
+ * service-requests                     - service request list
+ * service-request/{id}                 - service request detail
+ * service-request/{id}/{product_id}    - service request product detail
+ * service-request/{id}/accept          - accept service request
+ * service-request/{id}/case-transfer    - case transfer 
+ * service-request/{id}/reschedule      - reschedule service request
+ * service-request/{id}/{product_id}/diagnosis-list - list of diagnosis 
+ * service-request/{id}/{product_id}/submit-diagnosis - submit diagnosis
+ * 
+ * 
+ * stock-in-hand                         - stock in hand products
+ * stock-in-hand/{id}                    - stock in hand product detail 
+ * 
+ * 
+ * products                              - products list
+ * products/{id}                         - product detail
+ * request-part                          - request part (stock in hand/spare part), multiple
+ * 
+ * 
+ * 
+ * 
+ * attendance 
+ * check-in 
+ * check-out
+ * 
+ * 
+ * 
+ * 
+ */

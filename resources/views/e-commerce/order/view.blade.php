@@ -1,7 +1,6 @@
 @extends('e-commerce/layouts/master')
 
 @section('content')
-
     <div class="content">
         <div class="container-fluid">
             <!-- Success/Error Messages -->
@@ -60,10 +59,9 @@
                                             <span class="fw-semibold">Order Source:</span>
                                             @php
                                                 $sourcePlatform = match ($order->source_platform) {
-                                                    "0" => 'Website',
-                                                    "1" => 'Mobile App',
-                                                    "2" => 'Third-Party Marketplace',
-                                                    default => 'Website',
+                                                    'website' => 'Website',
+                                                    'mobile_app' => 'Mobile App',
+                                                    'admin_panel' => 'Admin Panel',
                                                 };
                                             @endphp
                                             <span>{{ $sourcePlatform }}</span>
@@ -72,63 +70,60 @@
                                             <span class="fw-semibold">Total Items:</span>
                                             <span>{{ $order->orderItems->count() }} items</span>
                                         </li>
-                                    </ul>
-                                </div>
-                                <div class="col-lg-6">
-                                    <ul class="list-group list-group-flush">
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Status:</span>
                                             @php
                                                 // Determine badge color based on status
                                                 $badgeColor = match ($order->order_status) {
-                                                    "0" => 'warning',
-                                                    "1" => 'info',
-                                                    "2" => 'primary', // processing
-                                                    "3" => 'primary', // shipped
-                                                    "4" => 'success',
-                                                    "5" => 'danger',
-                                                    "6" => 'warning', // returned
+                                                    'pending' => 'warning',
+                                                    'confirmed' => 'info',
+                                                    'processing' => 'primary', // processing
+                                                    'shipped' => 'primary', // shipped
+                                                    'delivered' => 'success',
+                                                    'cancelled' => 'danger',
+                                                    'returned' => 'warning', // returned
                                                     default => 'secondary',
                                                 };
                                             @endphp
                                             <span class="badge bg-{{ $badgeColor }}">
-                                                @if ($order->order_status === "0")
+                                                @if ($order->order_status === 'pending')
                                                     Pending
-                                                @elseif ($order->order_status === "1")
+                                                @elseif ($order->order_status === 'confirmed')
                                                     Confirmed
-                                                @elseif ($order->order_status === "2")
+                                                @elseif ($order->order_status === 'processing')
                                                     Processing
-                                                @elseif ($order->order_status === "3")
+                                                @elseif ($order->order_status === 'shipped')
                                                     Shipped
-                                                @elseif ($order->order_status === "4")
+                                                @elseif ($order->order_status === 'delivered')
                                                     Delivered
-                                                @elseif ($order->order_status === "5")
+                                                @elseif ($order->order_status === 'cancelled')
                                                     Cancelled
-                                                @elseif ($order->order_status === "6")
+                                                @elseif ($order->order_status === 'returned')
                                                     Returned
                                                 @else
                                                     Unknown
                                                 @endif
                                             </span>
                                         </li>
-                                        @if ($order->confirmed_at)
-                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                                <span class="fw-semibold">Confirmed At:</span>
-                                                <span>{{ $order->confirmed_at }}</span>
-                                            </li>
-                                        @endif
-                                        @if ($order->shipped_at)
-                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                                <span class="fw-semibold">Shipped At:</span>
-                                                <span>{{ $order->shipped_at }}</span>
-                                            </li>
-                                        @endif
-                                        @if ($order->delivered_at)
-                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                                <span class="fw-semibold">Delivered At:</span>
-                                                <span>{{ $order->delivered_at }}</span>
-                                            </li>
-                                        @endif
+                                    </ul>
+                                </div>
+                                <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-semibold">Confirmed At:</span>
+                                            <span>{{ $order->confirmed_at ?? 'N/A' }}</span>
+                                        </li>
+
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-semibold">Shipped At:</span>
+                                            <span>{{ $order->shipped_at ?? 'N/A' }}</span>
+                                        </li>
+
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-semibold">Delivered At:</span>
+                                            <span>{{ $order->delivered_at ?? 'N/A' }}</span>
+                                        </li>
+
                                     </ul>
                                 </div>
                             </div>
@@ -195,11 +190,11 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th>Product</th>
-                                            <th>HSN/SAC Code</th>
+                                            <th>HSN & SKU Code</th>
                                             <th>Quantity</th>
-                                            <th>Unit Price</th>
+                                            <th>Price Per Unit</th>
                                             <th>Tax Amount</th>
-                                            <th>Total</th>
+                                            <th>Total Price</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -207,9 +202,10 @@
                                             <tr>
                                                 <td>
                                                     <div class="d-flex align-items-center">
-                                                        @if ($item->product_image)
-                                                            <img src="{{ asset($item->product_image) }}" alt="Product"
-                                                                class="rounded me-2" width="50" height="50">
+                                                        @if ($item->product->main_product_image)
+                                                            <img src="{{ asset($item->product->main_product_image) }}"
+                                                                alt="Product" class="rounded me-2" width="50"
+                                                                height="50">
                                                         @else
                                                             <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center"
                                                                 style="width: 50px; height: 50px;">
@@ -217,33 +213,45 @@
                                                             </div>
                                                         @endif
                                                         <div>
-                                                            <div class="fw-medium">{{ $item->product_name }}</div>
-                                                            <small class="text-muted">SKU:
-                                                                {{ $item->product_sku ?? 'N/A' }}</small>
+                                                            <div class="fw-medium">{{ $item->product->product_name }}</div>
+                                                            <small class="text-muted">Model:
+                                                                {{ $item->product->model_no ?? 'N/A' }}</small>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <span class="fw-medium">{{ $item->hsn_sac_code ?? 'N/A' }}</span>
+                                                    <div>
+                                                        <small class="text-muted">HSN Code:
+                                                            {{ $item->hsn_code ?? 'N/A' }}</small>
+                                                        <br>
+                                                        <small class="text-muted">SKU Code:
+                                                            {{ $item->product_sku ?? 'N/A' }}</small>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <span class="fw-medium">{{ $item->quantity }}</span>
                                                 </td>
                                                 <td>
-                                                    <span
-                                                        class="fw-medium">₹{{ number_format($item->unit_price, 2) }}</span>
+                                                    <small class="fw-medium">Unit Price:
+                                                        ₹{{ number_format($item->unit_price, 2) }}</small>
+                                                    <br>
+                                                    <small class="fw-medium">Discount Price:
+                                                        ₹{{ number_format($item->discount_per_unit, 2) }}</small>
+                                                    <br>
                                                 </td>
                                                 <td>
-                                                    <span
+                                                    {{-- <span
                                                         class="fw-medium">₹{{ number_format($item->igst_amount, 2) }}</span>
                                                     @if ($item->tax_percentage > 0)
                                                         <br><small
                                                             class="text-muted">({{ $item->tax_percentage }}%)</small>
-                                                    @endif
+                                                    @endif --}}
+                                                    <small class="fw-medium">
+                                                        ₹{{ number_format($item->tax_per_unit, 2) }}</small>
                                                 </td>
                                                 <td>
                                                     <span
-                                                        class="fw-bold text-success">₹{{ number_format($item->total_price, 2) }}</span>
+                                                        class="fw-bold text-success">₹{{ number_format($item->line_total, 2) }}</span>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -259,59 +267,69 @@
                             <h5 class="card-title mb-0">Payment Information</h5>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                            <span class="fw-semibold">Payment Method:</span>
-                                            <span
-                                                class="badge bg-{{ $order->payment_method === 'cod' ? 'warning' : 'info' }}">
-                                                @if ($order->payment_method === 'mastercard' || $order->payment_method === 'visa')
-                                                    {{ ucfirst($order->payment_method) }} Card
-                                                @elseif($order->payment_method === 'cod')
-                                                    Cash on Delivery
-                                                @else
-                                                    {{ ucfirst($order->payment_method) }}
-                                                @endif
-                                            </span>
-                                        </li>
-                                        @if ($order->payment_method !== 'cod' && $order->card_last_four)
+                            @foreach ($order->orderPayments as $key => $payment)
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <ul class="list-group list-group-flush">
                                             <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                                <span class="fw-semibold">Card Number:</span>
-                                                <span>**** **** **** {{ $order->card_last_four }}</span>
+                                                <span class="fw-semibold">Payment Method:</span>
+                                                @php
+                                                    $paymentMethod = [
+                                                        'online' => 'Online',
+                                                        'cod' => 'Cash on Delivery',
+                                                        'cheque' => 'Cheque',
+                                                        'bank_transfer' => 'Bank Transfer',
+                                                    ];
+                                                @endphp
+                                                <span class="badge bg-info">
+                                                    @if ($payment->payment_method)
+                                                        {{ $paymentMethod[$payment->payment_method] }}
+                                                    @else
+                                                        N/A
+                                                    @endif
+                                                </span>
                                             </li>
-                                        @endif
-                                        @if ($order->card_name)
-                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                                <span class="fw-semibold">Card Holder:</span>
-                                                <span>{{ $order->card_name }}</span>
-                                            </li>
-                                        @endif
-                                    </ul>
-                                </div>
-                                <div class="col-lg-6">
-                                    @if (!$order->billing_same_as_shipping)
-                                        <div>
-                                            <span class="fw-semibold">Billing Address:</span>
-                                            <div class="mt-1">
-                                                {{ $order->billing_first_name }} {{ $order->billing_last_name }}<br>
-                                                {{ $order->billing_address_line_1 }}<br>
-                                                @if ($order->billing_address_line_2)
-                                                    {{ $order->billing_address_line_2 }}<br>
-                                                @endif
-                                                {{ $order->billing_city }}, {{ $order->billing_state }}
-                                                {{ $order->billing_zipcode }}<br>
-                                                {{ $order->billing_country }}
+                                            @if ($payment->payment_method !== 'cod' && $payment->card_last_four)
+                                                <li
+                                                    class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                    <span class="fw-semibold">Card Number:</span>
+                                                    <span>**** **** **** {{ $payment->card_last_four }}</span>
+                                                </li>
+                                            @endif
+                                            @if ($payment->card_name)
+                                                <li
+                                                    class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                    <span class="fw-semibold">Card Holder:</span>
+                                                    <span>{{ $payment->card_name }}</span>
+                                                </li>
+                                            @endif
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        @if (!$order->billing_same_as_shipping)
+                                            <div>
+                                                <span class="fw-semibold">Billing Address:</span>
+                                                <div class="mt-1">
+                                                    {{ $order->billing_first_name }} {{ $order->billing_last_name }}<br>
+                                                    {{ $order->billing_address_line_1 }}<br>
+                                                    @if ($order->billing_address_line_2)
+                                                        {{ $order->billing_address_line_2 }}<br>
+                                                    @endif
+                                                    {{ $order->billing_city }}, {{ $order->billing_state }}
+                                                    {{ $order->billing_zipcode }}<br>
+                                                    {{ $order->billing_country }}
+                                                </div>
                                             </div>
-                                        </div>
-                                    @else
-                                        <div class="text-muted">
-                                            <i class="fas fa-info-circle me-1"></i>
-                                            Billing address same as shipping address
-                                        </div>
-                                    @endif
+                                        @else
+                                            <div class="text-muted">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Billing address same as shipping address
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
+                            @endforeach
+
                         </div>
                     </div>
 
@@ -328,32 +346,33 @@
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item border-0 d-flex justify-content-between">
                                     <span>Subtotal:</span>
-                                    <span class="fw-medium">₹{{ number_format($totals['subtotal'], 2) }}</span>
+                                    <span class="fw-medium">₹{{ number_format($order->subtotal, 2) }}</span>
                                 </li>
-                                @if ($totals['shipping_charges'] > 0)
-                                    <li class="list-group-item border-0 d-flex justify-content-between">
-                                        <span>Shipping Charges:</span>
-                                        <span
-                                            class="fw-medium">₹{{ number_format($totals['shipping_charges'], 2) }}</span>
-                                    </li>
-                                @endif
-                                @if ($totals['tax_amount'] > 0)
-                                    <li class="list-group-item border-0 d-flex justify-content-between">
-                                        <span>Tax Amount:</span>
-                                        <span class="fw-medium">₹{{ number_format($totals['tax_amount'], 2) }}</span>
-                                    </li>
-                                @endif
-                                @if ($totals['discount_amount'] > 0)
-                                    <li class="list-group-item border-0 d-flex justify-content-between">
-                                        <span>Discount:</span>
-                                        <span
-                                            class="fw-medium text-success">-₹{{ number_format($totals['discount_amount'], 2) }}</span>
-                                    </li>
-                                @endif
+                                <li class="list-group-item border-0 d-flex justify-content-between">
+                                    <span>Tax Amount:</span>
+                                    <span class="fw-medium">₹{{ number_format($order->tax_amount, 2) }}</span>
+                                </li>
+                                <li class="list-group-item border-0 d-flex justify-content-between">
+                                    <span>Discount:</span>
+                                    <span
+                                        class="fw-medium text-success">-₹{{ number_format($order->discount_amount, 2) }}</span>
+                                </li>
+                                <li class="list-group-item border-0 d-flex justify-content-between">
+                                    <span>Shipping Charges:</span>
+                                    <span class="fw-medium">₹{{ number_format($order->shipping_charges, 2) }}</span>
+                                </li>
+                                <li class="list-group-item border-0 d-flex justify-content-between">
+                                    <span>Packaging Charges:</span>
+                                    <span class="fw-medium">₹{{ number_format($order->packaging_charges, 2) }}</span>
+                                </li>
+                                <li class="list-group-item border-0 d-flex justify-content-between">
+                                    <span>Coupon Applied:</span>
+                                    <span class="fw-medium">₹{{ number_format($order->coupon_code, 2) }}</span>
+                                </li>
                                 <li class="list-group-item border-0 d-flex justify-content-between border-top pt-3">
                                     <span class="fw-bold">Grand Total:</span>
                                     <span
-                                        class="fw-bold text-success fs-5">₹{{ number_format($totals['grand_total'], 2) }}</span>
+                                        class="fw-bold text-success fs-5">₹{{ number_format($order->total_amount, 2) }}</span>
                                 </li>
                             </ul>
                         </div>
@@ -372,7 +391,9 @@
                                     <select class="form-select" name="status" id="delivery-man">
                                         <option value="">-- Select Delivery Man --</option>
                                         @forelse ($deliveryMen as $deliveryMan)
-                                            <option value="{{ $deliveryMan->id }}" {{ $order->delivery_man_id == $deliveryMan->id ? 'selected' : '' }}>{{ $deliveryMan->first_name }}
+                                            <option value="{{ $deliveryMan->id }}"
+                                                {{ $order->delivery_man_id == $deliveryMan->id ? 'selected' : '' }}>
+                                                {{ $deliveryMan->first_name }}
                                                 {{ $deliveryMan->last_name }}</option>
                                         @empty
                                             <option value="">No Delivery Men Found</option>
@@ -628,5 +649,4 @@
             });
         });
     </script>
-
 @endsection

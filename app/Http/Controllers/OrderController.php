@@ -426,12 +426,14 @@ class OrderController extends Controller
             return response()->json([]);
         }
 
-        $customers = Customer::where(function ($q) use ($query) {
+        $customers = Customer::with('addressDetails')
+            ->where(function ($q) use ($query) {
             $q->where('first_name', 'LIKE', "%{$query}%")
                 ->orWhere('last_name', 'LIKE', "%{$query}%")
-                ->orWhere('email', 'LIKE', "%{$query}%");
+                ->orWhere('email', 'LIKE', "%{$query}%")
+                ->orWhere('phone', 'LIKE', "%{$query}%");
         })
-            ->select('id', 'first_name', 'last_name', 'email') // lightweight
+            ->select('id', 'first_name', 'last_name', 'email', 'phone') // lightweight
             ->limit(10)
             ->get();
 

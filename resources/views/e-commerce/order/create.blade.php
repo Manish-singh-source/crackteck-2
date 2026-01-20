@@ -80,8 +80,14 @@
 
                         <!-- Shipping Address Card -->
                         <div class="card">
-                            <div class="card-header border-bottom-dashed">
+                            <div class="card-header border-bottom-dashed d-flex justify-content-between align-items-center">
                                 <h5 class="card-title mb-0">Shipping Address</h5>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <select id="customer_address_select" class="form-select form-select-sm"
+                                        style="min-width: 260px; display:none;">
+                                        <option value="">Select Customer Address</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -126,25 +132,25 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="shipping_address_line_1" class="form-label">Address Line 1 <span
+                                            <label for="shipping_address1" class="form-label">Address Line 1 <span
                                                     class="text-danger">*</span></label>
                                             <input type="text"
-                                                class="form-control @error('shipping_address_line_1') is-invalid @enderror"
-                                                id="shipping_address_line_1" name="shipping_address_line_1"
-                                                value="{{ old('shipping_address_line_1') }}" required>
-                                            @error('shipping_address_line_1')
+                                                class="form-control @error('shipping_address1') is-invalid @enderror"
+                                                id="shipping_address1" name="shipping_address1"
+                                                value="{{ old('shipping_address1') }}" required>
+                                            @error('shipping_address1')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="shipping_address_line_2" class="form-label">Address Line 2</label>
+                                            <label for="shipping_address2" class="form-label">Address Line 2</label>
                                             <input type="text"
-                                                class="form-control @error('shipping_address_line_2') is-invalid @enderror"
-                                                id="shipping_address_line_2" name="shipping_address_line_2"
-                                                value="{{ old('shipping_address_line_2') }}">
-                                            @error('shipping_address_line_2')
+                                                class="form-control @error('shipping_address2') is-invalid @enderror"
+                                                id="shipping_address2" name="shipping_address2"
+                                                value="{{ old('shipping_address2') }}">
+                                            @error('shipping_address2')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -177,13 +183,13 @@
                                     </div>
                                     <div class="col-md-3">
                                         <div class="mb-3">
-                                            <label for="shipping_zipcode" class="form-label">Zipcode <span
+                                            <label for="shipping_pincode" class="form-label">Pincode <span
                                                     class="text-danger">*</span></label>
                                             <input type="text"
-                                                class="form-control @error('shipping_zipcode') is-invalid @enderror"
-                                                id="shipping_zipcode" name="shipping_zipcode"
-                                                value="{{ old('shipping_zipcode') }}" required>
-                                            @error('shipping_zipcode')
+                                                class="form-control @error('shipping_pincode') is-invalid @enderror"
+                                                id="shipping_pincode" name="shipping_pincode"
+                                                value="{{ old('shipping_pincode') }}" required>
+                                            @error('shipping_pincode')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -450,6 +456,7 @@
         $(document).ready(function() {
             let orderItems = [];
             let selectedProduct = null;
+            let lastCustomer = null;
 
             // Payment method change handler
             $('#payment_method').on('change', function() {
@@ -463,7 +470,7 @@
 
             // Customer search functionality
             $('#customer_search').on('input', function() {
-                const query = $(this).val();
+                const query = $(this).val().trim();
 
                 if (query.length >= 2) {
                     $.ajax({
@@ -471,30 +478,36 @@
                         method: 'GET',
                         data: {
                             q: query
-                        }, // <-- yahan 'q' bhejna hai
+                        },
                         success: function(response) {
                             let suggestions = '';
 
-                            if (response.length === 0) {
-                                $('#customer_suggestions').hide();
+                            if (!response || response.length === 0) {
+                                $('#customer_suggestions').removeClass('show').hide();
                                 return;
                             }
 
                             response.forEach(function(customer) {
-                                const fullName = (customer.first_name || '') + ' ' + (
-                                    customer.last_name || '');
+                                const fullName =
+                                    `${customer.first_name ?? ''} ${customer.last_name ?? ''}`
+                                    .trim();
+                                const addresses = customer.address_details ||
+                            []; // yahi sahi key hai
+
                                 suggestions += `
-                        <a class="dropdown-item customer-suggestion" href="#"
-                           data-id="${customer.id}"
-                           data-name="${fullName.trim()}"
-                           data-email="${customer.email || ''}">
-                            ${fullName.trim()} - ${customer.email || ''}
-                        </a>`;
+                                    <a class="dropdown-item customer-suggestion" href="#"
+                                    data-id="${customer.id}"
+                                    data-name="${fullName}"
+                                    data-email="${customer.email ?? ''}"
+                                    data-phone="${customer.phone ?? ''}"
+                                    data-addresses='${JSON.stringify(addresses)}'>
+                                        ${fullName} - ${customer.email ?? ''}
+                                    </a>`;
                             });
 
                             $('#customer_suggestions')
                                 .html(suggestions)
-                                .addClass('show') // Bootstrap dropdown styling
+                                .addClass('show')
                                 .show();
                         },
                         error: function(xhr) {
@@ -513,12 +526,77 @@
                 const id = $(this).data('id');
                 const name = $(this).data('name');
                 const email = $(this).data('email');
+                const phone = $(this).data('phone');
+                const addresses = $(this).data('addresses') || [];
 
                 $('#customer_id').val(id);
                 $('#customer_search').val(name);
                 $('#email').val(email);
+                $('#phone').val(phone);
+                lastCustomer = {
+                    id,
+                    name,
+                    email,
+                    phone,
+                    addresses
+                };
+
+                // Populate address dropdown
+                const $addressSelect = $('#customer_address_select');
+                $addressSelect.empty();
+
+                if (!addresses.length) {
+                    $addressSelect
+                        .append('<option value="">No saved addresses found</option>')
+                        .show();
+                } else {
+                    $addressSelect.append('<option value="">Select Customer Address</option>');
+                    addresses.forEach(function(addr, index) {
+                        const label = [
+                            addr.address1,
+                            addr.address2,
+                            addr.city,
+                            addr.state,
+                            addr.pincode,
+                            addr.country
+                        ].filter(Boolean).join(', ');
+
+                        $addressSelect.append(
+                            `<option value="${index}">
+                    ${label}
+                 </option>`
+                        );
+                    });
+                    $addressSelect.show();
+                }
 
                 $('#customer_suggestions').removeClass('show').hide();
+
+                // Optionally default first address select + fill
+                if (addresses.length === 1) {
+                    $addressSelect.val(0).trigger('change');
+                }
+            });
+
+            // Address selection change
+            $('#customer_address_select').on('change', function() {
+                const index = $(this).val();
+                if (!lastCustomer || index === '') return;
+
+                const addr = lastCustomer.addresses[index];
+                if (!addr) return;
+
+                $('#shipping_first_name').val(addr.first_name || lastCustomer.name.split(' ')[0] || '');
+                $('#shipping_last_name').val(addr.last_name || lastCustomer.name.split(' ').slice(1).join(
+                    ' ') || '');
+                $('#shipping_phone').val(addr.phone || lastCustomer.phone || '');
+
+                $('#shipping_address1').val(addr.address1 || '');
+                $('#shipping_address2').val(addr.address2 || '');
+                $('#shipping_city').val(addr.city || '');
+                $('#shipping_state').val(addr.state || '');
+                $('#shipping_pincode').val(addr.pincode || '');
+                $('#shipping_country').val(addr.country || 'India');
             });
 
             // Product search functionality

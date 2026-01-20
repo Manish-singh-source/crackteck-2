@@ -420,7 +420,7 @@ class OrderController extends Controller
      */
     public function searchCustomers(Request $request)
     {
-        $query = $request->get('q', '');
+        $query = $request->query('q', '');
 
         if (strlen($query) < 2) {
             return response()->json([]);
@@ -430,7 +430,10 @@ class OrderController extends Controller
             $q->where('first_name', 'LIKE', "%{$query}%")
                 ->orWhere('last_name', 'LIKE', "%{$query}%")
                 ->orWhere('email', 'LIKE', "%{$query}%");
-        })->get();
+        })
+            ->select('id', 'first_name', 'last_name', 'email') // lightweight
+            ->limit(10)
+            ->get();
 
         return response()->json($customers);
     }

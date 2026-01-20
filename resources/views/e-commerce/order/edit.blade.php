@@ -142,25 +142,32 @@
                                                 value="{{ $order->shippingAddress->address2 }}" readonly>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="mb-3">
                                             <label class="form-label">City</label>
                                             <input type="text" class="form-control"
                                                 value="{{ $order->shippingAddress->city }}" readonly>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="mb-3">
                                             <label class="form-label">State</label>
                                             <input type="text" class="form-control"
                                                 value="{{ $order->shippingAddress->state }}" readonly>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="mb-3">
                                             <label class="form-label">Pincode</label>
                                             <input type="text" class="form-control"
                                                 value="{{ $order->shippingAddress->pincode }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Country</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ $order->shippingAddress->country }}" readonly>
                                         </div>
                                     </div>
                                 </div>

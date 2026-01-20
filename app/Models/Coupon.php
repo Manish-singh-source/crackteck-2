@@ -68,9 +68,9 @@ class Coupon extends Model
      */
     public function getFormattedDiscountAttribute()
     {
-        if ($this->type == 0) { // Percentage
+        if ($this->type == 'percentage') { // Percentage
             return $this->discount_value . '%';
-        } elseif ($this->type == 1) { // Fixed
+        } elseif ($this->type == 'fixed') { // Fixed
             return '₹' . number_format($this->discount_value, 2);
         } else { // Buy X Get Y
             return 'Buy X Get Y';
@@ -101,6 +101,6 @@ class Coupon extends Model
      */
     public function getIsValidAttribute()
     {
-        return $this->is_active && !$this->is_expired && now()->gte($this->start_date);
+        return $this->status == 'active' && !$this->status == 'expired' && now()->gte($this->start_date);
     }
 }

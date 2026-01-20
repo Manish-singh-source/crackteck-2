@@ -215,7 +215,7 @@ Route::prefix('/demo')->group(function () {
             Route::get('/coupons/search-categories', 'searchCategories')->name('coupon.search-categories');
             Route::get('/coupons/search-brands', 'searchBrands')->name('coupon.search-brands');
             Route::get('/coupons/search-products', 'searchProducts')->name('coupon.search-products');
-        });
+        }); 
 
         // ------------------------------------------------------------ E-Commerce Subscribers Page -------------------------------------------------------------
         Route::controller(SubscriberController::class)->group(function () {

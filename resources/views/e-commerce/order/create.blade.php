@@ -56,10 +56,10 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="user_search" class="form-label">Search Existing Customer</label>
-                                        <input type="text" id="user_search" class="form-control" placeholder="Type to search customers..." autocomplete="off">
-                                        <input type="hidden" id="user_id" name="user_id">
-                                        <div id="user_suggestions" class="dropdown-menu w-100" style="display: none;"></div>
+                                        <label for="customer_search" class="form-label">Search Existing Customer</label>
+                                        <input type="text" id="customer_search" class="form-control" placeholder="Type to search customers..." autocomplete="off">
+                                        <input type="hidden" id="customer_id" name="customer_id">
+                                        <div id="customer_suggestions" class="dropdown-menu w-100" style="display: none;"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -412,46 +412,52 @@ $(document).ready(function() {
         }
     });
 
-    // User search functionality
-    $('#user_search').on('input', function() {
+    // Customer search functionality
+    $('#customer_search').on('input', function() {
         const query = $(this).val();
         if (query.length >= 2) {
+            console.log(query);
             $.ajax({
-                url: '/e-commerce/search-users',
+                url: '/demo/e-commerce/search-customers',
                 method: 'GET',
                 data: { query: query },
-                success: function(users) {
+                success: function(response) {
+                    console.log(response);
                     let suggestions = '';
-                    users.forEach(function(user) {
-                        suggestions += `<a class="dropdown-item user-suggestion" href="#"
-                                          data-id="${user.id}"
-                                          data-name="${user.name}"
-                                          data-email="${user.email}">
-                                          ${user.name} - ${user.email}
+                    response.forEach(function(customer) {
+                        suggestions += `<a class="dropdown-item customer-suggestion" href="#"
+                                          data-id="${customer.id}"
+                                          data-name="${customer.first_name + ' ' + customer.last_name}"
+                                          data-email="${customer.email}">
+                                          ${customer.first_name + ' ' + customer.last_name} - ${customer.email}
                                         </a>`;
                     });
-                    $('#user_suggestions').html(suggestions).show();
+                    $('#customer_suggestions').html(suggestions).show();
+                },
+
+                error: function(xhr) {
+                    console.log(xhr.responseText);
                 }
             });
         } else {
-            $('#user_suggestions').hide();
+            $('#customer_suggestions').hide();
         }
     });
 
-    // User selection
-    $(document).on('click', '.user-suggestion', function(e) {
+    // Customer selection
+    $(document).on('click', '.customer-suggestion', function(e) {
         e.preventDefault();
         const userId = $(this).data('id');
         const userName = $(this).data('name');
         const userEmail = $(this).data('email');
 
-        $('#user_id').val(userId);
-        $('#user_search').val(userName);
+        $('#customer_id').val(userId);
+        $('#customer_search').val(userName);
         $('#email').val(userEmail);
-        $('#user_suggestions').hide();
+        $('#customer_suggestions').hide();
 
         // Auto-fill shipping address if available
-        // You can extend this to fetch user's saved address
+        // You can extend this to fetch customer's saved address
     });
 
     // Product search functionality
@@ -663,8 +669,8 @@ $(document).ready(function() {
 
     // Hide dropdowns when clicking outside
     $(document).on('click', function(e) {
-        if (!$(e.target).closest('#user_search, #user_suggestions').length) {
-            $('#user_suggestions').hide();
+        if (!$(e.target).closest('#customer_search, #customer_suggestions').length) {
+            $('#customer_suggestions').hide();
         }
         if (!$(e.target).closest('#product_search, #product_suggestions').length) {
             $('#product_suggestions').hide();

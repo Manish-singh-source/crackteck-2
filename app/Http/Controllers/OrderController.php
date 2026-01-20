@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\DeliveryMan;
 use App\Models\EcommerceOrder;
 use App\Models\EcommerceOrderItem;
@@ -27,24 +28,6 @@ class OrderController extends Controller
     {
         $query = Order::with(['customer', 'orderItems.ecommerceProduct.warehouseProduct']);
 
-        // Search functionality
-        if ($request->has('search') && ! empty($request->search)) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('order_number', 'like', "%{$search}%")
-                    ->orWhere('total_amount', 'like', "%{$search}%")
-                    ->orWhere('shipping_first_name', 'like', "%{$search}%")
-                    ->orWhere('shipping_last_name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('shipping_phone', 'like', "%{$search}%")
-                    ->orWhereHas('customer', function ($userQuery) use ($search) {
-                        $userQuery->where('first_name', 'like', "%{$search}%")
-                            ->orWhere('last_name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%");
-                    });
-            });
-        }
-
         // Status filter
         if ($request->has('order_status') && ! empty($request->order_status)) {
             $query->where('order_status', $request->order_status);
@@ -59,33 +42,28 @@ class OrderController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        $orders = $query->orderBy('created_at', 'desc')->paginate(15);
+        // Paginate orders
+        $orders = $query->orderByDesc('created_at')->paginate(10)->withQueryString();
 
-        // Get status counts for filter tabs
-        $statusCounts = [
-            'all' => Order::count(),
-            'pending' => Order::where('order_status', 'pending')->count(),
-            'confirmed' => Order::where('order_status', 'confirmed')->count(),
-            'processing' => Order::where('order_status', 'processing')->count(),
-            'shipped' => Order::where('order_status', 'shipped')->count(),
-            'delivered' => Order::where('order_status', 'delivered')->count(),
-            'cancelled' => Order::where('order_status', 'cancelled')->count(),
-        ];
+        // Efficiently get status counts
+        $statusCounts = Order::selectRaw('order_status, COUNT(*) as count')
+            ->groupBy('order_status')
+            ->pluck('count', 'order_status')
+            ->toArray();
+
+        // Ensure all statuses are represented, including 'all'
+        $allStatuses = ['all', 'pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
+        $statusCounts = array_merge(array_fill_keys($allStatuses, 0), $statusCounts);
+        $statusCounts['all'] = Order::count();
 
         return view('e-commerce.order.index', compact('orders', 'statusCounts'));
     }
 
-    /**
-     * Show the form for creating a new order.
-     */
     public function create()
     {
         return view('e-commerce.order.create');
     }
 
-    /**
-     * Store a newly created order in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -129,13 +107,13 @@ class OrderController extends Controller
             $totalAmount = $subtotal + $taxAmount + $shippingCharges - $discountAmount;
 
             // Generate order number
-            $orderNumber = 'ORD-'.date('Ymd').'-'.str_pad(Order::count() + 1, 4, '0', STR_PAD_LEFT);
+            $orderNumber = 'ORD-' . date('Ymd') . '-' . str_pad(Order::count() + 1, 4, '0', STR_PAD_LEFT);
 
             // Create the order
             $order = Order::create([
                 'customer_id' => $request->customer_id,
                 'order_number' => $orderNumber,
-                'source_platform' => '0',
+                'source_platform' => 'website',
                 'email' => $request->email,
                 'shipping_first_name' => $request->shipping_first_name,
                 'shipping_last_name' => $request->shipping_last_name,
@@ -163,7 +141,7 @@ class OrderController extends Controller
                 'discount_amount' => $discountAmount,
                 'total_amount' => $totalAmount,
                 'order_status' => $request->order_status,
-                'confirmed_at' => $request->order_status === '1' ? now() : null,
+                'confirmed_at' => $request->order_status === 'confirmed' ? now() : null,
             ]);
 
             // Create order items
@@ -193,13 +171,12 @@ class OrderController extends Controller
 
             return redirect()->route('order.view', $order->id)
                 ->with('success', 'E-commerce order created successfully!');
-
         } catch (\Exception $e) {
             DB::rollback();
 
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Failed to create order: '.$e->getMessage());
+                ->with('error', 'Failed to create order: ' . $e->getMessage());
         }
     }
 
@@ -222,7 +199,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
 
         $request->validate([
-            'status' => 'required|in:0,1,2,3,4,5',
+            'status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled',
             'shipping_first_name' => 'required|string|max:255',
             'shipping_last_name' => 'required|string|max:255',
             'shipping_phone' => 'required|string|max:20',
@@ -244,18 +221,25 @@ class OrderController extends Controller
             }
 
             $data = $request->only([
-                'status', 'shipping_first_name', 'shipping_last_name', 'shipping_phone',
-                'shipping_address_line_1', 'shipping_address_line_2', 'shipping_city',
-                'shipping_state', 'shipping_zipcode', 'notes',
+                'status',
+                'shipping_first_name',
+                'shipping_last_name',
+                'shipping_phone',
+                'shipping_address_line_1',
+                'shipping_address_line_2',
+                'shipping_city',
+                'shipping_state',
+                'shipping_zipcode',
+                'notes',
             ]);
 
             // Update status timestamps
             if ($request->status !== $order->status) {
-                if ($request->status === '1' && $order->status !== '1') {
+                if ($request->status === 'confirmed' && $order->status !== 'confirmed') {
                     $data['confirmed_at'] = now();
-                } elseif ($request->status === '3' && $order->status !== '3') {
+                } elseif ($request->status === 'shipped' && $order->status !== 'shipped') {
                     $data['shipped_at'] = now();
-                } elseif ($request->status === '4' && $order->status !== '4') {
+                } elseif ($request->status === 'delivered' && $order->status !== 'delivered') {
                     $data['delivered_at'] = now();
                 }
             }
@@ -266,14 +250,13 @@ class OrderController extends Controller
 
             return redirect()->route('order.view', $order->id)
                 ->with('success', 'Order updated successfully!');
-
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error updating order: '.$e->getMessage());
+            Log::error('Error updating order: ' . $e->getMessage());
 
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'An error occurred while updating the order: '.$e->getMessage());
+                ->with('error', 'An error occurred while updating the order: ' . $e->getMessage());
         }
     }
 
@@ -303,13 +286,12 @@ class OrderController extends Controller
                 'success' => true,
                 'message' => 'Order deleted successfully!',
             ]);
-
         } catch (\Exception $e) {
-            Log::error('Error deleting order: '.$e->getMessage());
+            Log::error('Error deleting order: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while deleting the order: '.$e->getMessage(),
+                'message' => 'An error occurred while deleting the order: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -359,8 +341,8 @@ class OrderController extends Controller
                         $deletedCount++;
                     }
                 } catch (\Exception $e) {
-                    $errors[] = "Failed to delete order ID {$orderId}: ".$e->getMessage();
-                    Log::error("Error deleting order {$orderId}: ".$e->getMessage());
+                    $errors[] = "Failed to delete order ID {$orderId}: " . $e->getMessage();
+                    Log::error("Error deleting order {$orderId}: " . $e->getMessage());
                 }
             }
 
@@ -388,14 +370,13 @@ class OrderController extends Controller
                     'errors' => $errors,
                 ], 400);
             }
-
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error in bulk delete: '.$e->getMessage());
+            Log::error('Error in bulk delete: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while deleting orders: '.$e->getMessage(),
+                'message' => 'An error occurred while deleting orders: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -427,7 +408,7 @@ class OrderController extends Controller
                     'sku' => $product->warehouseProduct->sku,
                     'brand' => $product->warehouseProduct->brand->brand_title ?? 'N/A',
                     'price' => $product->warehouseProduct->selling_price,
-                    'display' => $product->warehouseProduct->product_name.' ('.$product->warehouseProduct->sku.')',
+                    'display' => $product->warehouseProduct->product_name . ' (' . $product->warehouseProduct->sku . ')',
                 ];
             });
 
@@ -435,9 +416,9 @@ class OrderController extends Controller
     }
 
     /**
-     * Search users for Ajax autocomplete
+     * Search customers for Ajax autocomplete
      */
-    public function searchUsers(Request $request)
+    public function searchCustomers(Request $request)
     {
         $query = $request->get('q', '');
 
@@ -445,22 +426,13 @@ class OrderController extends Controller
             return response()->json([]);
         }
 
-        $users = User::where(function ($q) use ($query) {
-            $q->where('name', 'LIKE', "%{$query}%")
+        $customers = Customer::where(function ($q) use ($query) {
+            $q->where('first_name', 'LIKE', "%{$query}%")
+                ->orWhere('last_name', 'LIKE', "%{$query}%")
                 ->orWhere('email', 'LIKE', "%{$query}%");
-        })
-            ->limit(10)
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'display' => $user->name.' ('.$user->email.')',
-                ];
-            });
+        })->get();
 
-        return response()->json($users);
+        return response()->json($customers);
     }
 
     /**
@@ -468,7 +440,7 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $order = Order::with(['customer', 'orderItems.product.ecommerceProduct'])
+        $order = Order::with(['customer', 'orderItems.product.ecommerceProduct', 'orderPayments'])
             ->findOrFail($id);
         $deliveryMen = Staff::where('staff_role', '2')->where('status', 'Active')->get();
         // Calculate totals
@@ -504,7 +476,7 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'order_status' => 'required|in:0,1,2,3,4,5',
+            'order_status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled',
         ]);
 
         if ($validator->fails()) {
@@ -522,11 +494,11 @@ class OrderController extends Controller
             // Update status with timestamps
             $order->order_status = $newStatus;
 
-            if ($newStatus === '1' && $oldStatus !== '1') {
+            if ($newStatus === 'confirmed' && $oldStatus !== 'confirmed') {
                 $order->confirmed_at = now();
-            } elseif ($newStatus === '3' && $oldStatus !== '3') {
+            } elseif ($newStatus === 'shipped' && $oldStatus !== 'shipped') {
                 $order->shipped_at = now();
-            } elseif ($newStatus === '4' && $oldStatus !== '4') {
+            } elseif ($newStatus === 'delivered' && $oldStatus !== 'delivered') {
                 $order->delivered_at = now();
             }
 
@@ -537,7 +509,7 @@ class OrderController extends Controller
                 'message' => 'Order status updated successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating order status: '.$e->getMessage());
+            Log::error('Error updating order status: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -572,7 +544,7 @@ class OrderController extends Controller
                 'message' => 'Delivery man assigned successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error assigning delivery man: '.$e->getMessage());
+            Log::error('Error assigning delivery man: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -598,7 +570,7 @@ class OrderController extends Controller
             $invoiceData = [
                 'order' => $order,
                 'totals' => $totals,
-                'invoice_number' => 'INV-'.$order->order_number,
+                'invoice_number' => 'INV-' . $order->order_number,
                 'invoice_date' => $order->created_at->format('d/m/Y'),
                 'amount_in_words' => $this->convertNumberToWords($totals['grand_total']),
                 'company' => [
@@ -624,13 +596,12 @@ class OrderController extends Controller
             ]);
 
             // Generate filename
-            $filename = 'invoice-'.$order->order_number.'.pdf';
+            $filename = 'invoice-' . $order->order_number . '.pdf';
 
             // Return PDF download response
             return $pdf->download($filename);
-
         } catch (\Exception $e) {
-            Log::error('Error generating invoice: '.$e->getMessage());
+            Log::error('Error generating invoice: ' . $e->getMessage());
 
             return redirect()->back()->with('error', 'Failed to generate invoice. Please try again.');
         }
@@ -648,51 +619,73 @@ class OrderController extends Controller
         }
 
         $words = [
-            0 => '', 1 => 'One', 2 => 'Two', 3 => 'Three', 4 => 'Four', 5 => 'Five',
-            6 => 'Six', 7 => 'Seven', 8 => 'Eight', 9 => 'Nine', 10 => 'Ten',
-            11 => 'Eleven', 12 => 'Twelve', 13 => 'Thirteen', 14 => 'Fourteen', 15 => 'Fifteen',
-            16 => 'Sixteen', 17 => 'Seventeen', 18 => 'Eighteen', 19 => 'Nineteen', 20 => 'Twenty',
-            30 => 'Thirty', 40 => 'Forty', 50 => 'Fifty', 60 => 'Sixty', 70 => 'Seventy',
-            80 => 'Eighty', 90 => 'Ninety',
+            0 => '',
+            1 => 'One',
+            2 => 'Two',
+            3 => 'Three',
+            4 => 'Four',
+            5 => 'Five',
+            6 => 'Six',
+            7 => 'Seven',
+            8 => 'Eight',
+            9 => 'Nine',
+            10 => 'Ten',
+            11 => 'Eleven',
+            12 => 'Twelve',
+            13 => 'Thirteen',
+            14 => 'Fourteen',
+            15 => 'Fifteen',
+            16 => 'Sixteen',
+            17 => 'Seventeen',
+            18 => 'Eighteen',
+            19 => 'Nineteen',
+            20 => 'Twenty',
+            30 => 'Thirty',
+            40 => 'Forty',
+            50 => 'Fifty',
+            60 => 'Sixty',
+            70 => 'Seventy',
+            80 => 'Eighty',
+            90 => 'Ninety',
         ];
 
         $result = '';
 
         if ($number >= 10000000) { // Crores
             $crores = intval($number / 10000000);
-            $result .= $this->convertHundreds($crores, $words).' Crore ';
+            $result .= $this->convertHundreds($crores, $words) . ' Crore ';
             $number %= 10000000;
         }
 
         if ($number >= 100000) { // Lakhs
             $lakhs = intval($number / 100000);
-            $result .= $this->convertHundreds($lakhs, $words).' Lakh ';
+            $result .= $this->convertHundreds($lakhs, $words) . ' Lakh ';
             $number %= 100000;
         }
 
         if ($number >= 1000) { // Thousands
             $thousands = intval($number / 1000);
-            $result .= $this->convertHundreds($thousands, $words).' Thousand ';
+            $result .= $this->convertHundreds($thousands, $words) . ' Thousand ';
             $number %= 1000;
         }
 
         if ($number >= 100) { // Hundreds
             $hundreds = intval($number / 100);
-            $result .= $words[$hundreds].' Hundred ';
+            $result .= $words[$hundreds] . ' Hundred ';
             $number %= 100;
         }
 
         if ($number >= 20) {
             $tens = intval($number / 10) * 10;
-            $result .= $words[$tens].' ';
+            $result .= $words[$tens] . ' ';
             $number %= 10;
         }
 
         if ($number > 0) {
-            $result .= $words[$number].' ';
+            $result .= $words[$number] . ' ';
         }
 
-        return trim($result).' Rupees Only';
+        return trim($result) . ' Rupees Only';
     }
 
     /**
@@ -704,18 +697,18 @@ class OrderController extends Controller
 
         if ($number >= 100) {
             $hundreds = intval($number / 100);
-            $result .= $words[$hundreds].' Hundred ';
+            $result .= $words[$hundreds] . ' Hundred ';
             $number %= 100;
         }
 
         if ($number >= 20) {
             $tens = intval($number / 10) * 10;
-            $result .= $words[$tens].' ';
+            $result .= $words[$tens] . ' ';
             $number %= 10;
         }
 
         if ($number > 0) {
-            $result .= $words[$number].' ';
+            $result .= $words[$number] . ' ';
         }
 
         return trim($result);

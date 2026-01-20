@@ -15,45 +15,22 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-body border border-dashed border-end-0 border-start-0">
-                            <form action="#" method="get">
-                                <div class="d-flex justify-content-between">
-                                    <div class="row">
-                                        <div class="col-xl-10 col-md-10 col-sm-10">
-                                            <div class="search-box">
-                                                <input type="text" name="search" value=""
-                                                    class="form-control search" placeholder="Search Name">
-                                                <i class="ri-search-line search-icon"></i>
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-2 col-md-2 col-sm-2 col-2">
-                                            <div class="d-flex justify-content-center align-items-center">
-                                                <button type="submit" class="btn btn-primary waves ripple-light">
-                                                    <i class="fa-solid fa-magnifying-glass "></i>
 
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row g-3">
-                                        <div class="col-xl-6 col-md-6 col-sm-6 col-6 btn-group" role="group">
-                                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fa-solid fa-arrow-up-z-a "></i>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="#">Sort By Name</a></li>
-                                                <li><a class="dropdown-item" href="#">Sort By E-mail</a></li>
-                                            </ul>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
                         <div class="card-body pt-0">
+                            <ul class="nav nav-underline border-bottom" id="pills-tab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active p-2"
+                                        href="{{ route('contact.index') }}">
+                                        <span class="d-block d-sm-none">
+                                            <i class="mdi mdi-format-list-bulleted fs-16 me-1 text-primary"></i>
+                                        </span>
+                                        <span class="d-none d-sm-block">
+                                            <i class="mdi mdi-format-list-bulleted fs-16 me-1 text-primary"></i>All
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+
                             <div class="tab-content text-muted">
                                 <div class="row">
                                     <div class="col-12">

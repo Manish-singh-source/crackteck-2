@@ -11,7 +11,6 @@
                 </div>
                 <div>
                     <a href="{{ route('subscriber.send-mail') }}" class="btn btn-primary">Send Mail</a>
-                    <!-- <button class="btn btn-primary">Send Mail</button> -->
                 </div>
             </div>
 
@@ -19,6 +18,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
+                        {{-- 
                         <div class="card-body border border-dashed border-end-0 border-start-0">
                             <form action="#" method="get">
                                 <div class="d-flex justify-content-between">
@@ -56,7 +56,8 @@
                                 </div>
 
                             </form>
-                        </div>
+                        </div> 
+                        --}}
                         <div class="card-body pt-0">
                             <div class="tab-content text-muted">
                                 <div class="row">

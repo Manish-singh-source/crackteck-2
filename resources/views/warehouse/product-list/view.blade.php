@@ -680,7 +680,7 @@
                     <h5 class="modal-title" id="scrapSerialModalLabel">Scrap Serial Number</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="Scrap Serial Number">
+                <form id="scrapSerialForm">
                     @csrf
                     <div class="modal-body" style="background-color: #fff; padding: 20px;">
                         <div class="alert alert-warning">
@@ -1097,6 +1097,65 @@
                 });
             });
 
+        });
+
+        // Handle scrap serial form submission
+        $('#scrapSerialForm').on('submit', function(e) {
+            e.preventDefault();
+            const form = $(this);
+            const submitBtn = $('#scrapSerialSubmitBtn');
+            const spinner = submitBtn.find('.spinner-border');
+
+            console.log(form.serialize());
+            // Clear previous errors
+            $('.invalid-feedback').text('');
+            $('.is-invalid').removeClass('is-invalid');
+
+            // Show loading state
+            submitBtn.prop('disabled', true);
+            spinner.removeClass('d-none');
+
+            $.ajax({
+                url: '{{ route('scrap-items.add-to-scrap') }}',
+                method: 'POST',
+                data: form.serialize(),
+                success: function(response) {
+                    // Hide loading state first
+                    submitBtn.prop('disabled', false);
+                    spinner.addClass('d-none');
+
+                    if (response.success) {
+                        // Show success message
+                        toastr.success(response.message);
+
+                        // Close modal
+                        $('#scrapSerialModal').modal('hide');
+
+                        // Reload page to show updated data
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function(xhr) {
+                    // Hide loading state first
+                    submitBtn.prop('disabled', false);
+                    spinner.addClass('d-none');
+
+                    if (xhr.status === 422) {
+                        // Validation errors
+                        const errors = xhr.responseJSON.errors;
+                        Object.keys(errors).forEach(function(key) {
+                            $('#' + key).addClass('is-invalid');
+                            $('#' + key + '_error').text(errors[key][0]);
+                        });
+                    } else {
+                        toastr.error('An error occurred while processing your request.');
+                    }
+                }
+            });
         });
     </script>
 @endsection

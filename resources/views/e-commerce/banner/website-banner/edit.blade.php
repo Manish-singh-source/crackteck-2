@@ -55,8 +55,8 @@
                                 <div class="col-lg-3">
                                     <label class="form-label">Banner Type <span class="text-danger">*</span></label>
                                     <select class="form-select @error('type') is-invalid @enderror" name="type" required>
-                                        <option value="0" {{ old('type', $website->type) == 0 ? 'selected' : '' }}>Website</option>
-                                        <option value="1" {{ old('type', $website->type) == 1 ? 'selected' : '' }}>Promotional</option>
+                                        <option value="website" {{ old('type', $website->type) == 'website' ? 'selected' : '' }}>Website</option>
+                                        <option value="promotional" {{ old('type', $website->type) == 'promotional' ? 'selected' : '' }}>Promotional</option>
                                     </select>
                                     @error('type')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
@@ -65,8 +65,8 @@
                                 <div class="col-lg-3">
                                     <label class="form-label">Channel <span class="text-danger">*</span></label>
                                     <select class="form-select @error('channel') is-invalid @enderror" name="channel" required>
-                                        <option value="0" {{ old('channel', $website->channel) == 0 ? 'selected' : '' }}>Website</option>
-                                        <option value="1" {{ old('channel', $website->channel) == 1 ? 'selected' : '' }}>Mobile</option>
+                                        <option value="website" {{ old('channel', $website->channel) == 'website' ? 'selected' : '' }}>Website</option>
+                                        <option value="mobile" {{ old('channel', $website->channel) == 'mobile' ? 'selected' : '' }}>Mobile</option>
                                     </select>
                                     @error('channel')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
@@ -84,10 +84,10 @@
                                     <label class="form-label">Promotion Type</label>
                                     <select class="form-select @error('promotion_type') is-invalid @enderror" name="promotion_type">
                                         <option value="">Select</option>
-                                        <option value="0" {{ old('promotion_type', $website->promotion_type) == 0 ? 'selected' : '' }}>Discount</option>
-                                        <option value="1" {{ old('promotion_type', $website->promotion_type) == 1 ? 'selected' : '' }}>Coupon</option>
-                                        <option value="2" {{ old('promotion_type', $website->promotion_type) == 2 ? 'selected' : '' }}>Flash Sale</option>
-                                        <option value="3" {{ old('promotion_type', $website->promotion_type) == 3 ? 'selected' : '' }}>Event</option>
+                                        <option value="discount" {{ old('promotion_type', $website->promotion_type) == 'discount' ? 'selected' : '' }}>Discount</option>
+                                        <option value="coupon" {{ old('promotion_type', $website->promotion_type) == 'coupon' ? 'selected' : '' }}>Coupon</option>
+                                        <option value="flash_sale" {{ old('promotion_type', $website->promotion_type) == 'flash_sale' ? 'selected' : '' }}>Flash Sale</option>
+                                        <option value="event" {{ old('promotion_type', $website->promotion_type) == 'event' ? 'selected' : '' }}>Event</option>
                                     </select>
                                     @error('promotion_type')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
@@ -105,8 +105,8 @@
                                     <label class="form-label">Discount Type</label>
                                     <select class="form-select @error('discount_type') is-invalid @enderror" name="discount_type">
                                         <option value="">Select</option>
-                                        <option value="0" {{ old('discount_type', $website->discount_type) == 0 ? 'selected' : '' }}>Percentage</option>
-                                        <option value="1" {{ old('discount_type', $website->discount_type) == 1 ? 'selected' : '' }}>Fixed</option>
+                                        <option value="percentage" {{ old('discount_type', $website->discount_type) == 'percentage' ? 'selected' : '' }}>Percentage</option>
+                                        <option value="fixed" {{ old('discount_type', $website->discount_type) == 'fixed' ? 'selected' : '' }}>Fixed</option>
                                     </select>
                                     @error('discount_type')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
@@ -131,8 +131,8 @@
                                 <div class="col-lg-3">
                                     <label class="form-label">Link Target</label>
                                     <select class="form-select @error('link_target') is-invalid @enderror" name="link_target">
-                                        <option value="0" {{ old('link_target', $website->link_target) == 0 ? 'selected' : '' }}>Self</option>
-                                        <option value="1" {{ old('link_target', $website->link_target) == 1 ? 'selected' : '' }}>Blank</option>
+                                        <option value="self" {{ old('link_target', $website->link_target) == 'self' ? 'selected' : '' }}>Self</option>
+                                        <option value="blank" {{ old('link_target', $website->link_target) == 'blank' ? 'selected' : '' }}>Blank</option>
                                     </select>
                                     @error('link_target')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
@@ -141,12 +141,12 @@
                                 <div class="col-lg-3">
                                     <label class="form-label">Position <span class="text-danger">*</span></label>
                                     <select class="form-select @error('position') is-invalid @enderror" name="position" required>
-                                        <option value="0" {{ old('position', $website->position) == 0 ? 'selected' : '' }}>Homepage</option>
-                                        <option value="1" {{ old('position', $website->position) == 1 ? 'selected' : '' }}>Category</option>
-                                        <option value="2" {{ old('position', $website->position) == 2 ? 'selected' : '' }}>Product</option>
-                                        <option value="3" {{ old('position', $website->position) == 3 ? 'selected' : '' }}>Slider</option>
-                                        <option value="4" {{ old('position', $website->position) == 4 ? 'selected' : '' }}>Checkout</option>
-                                        <option value="5" {{ old('position', $website->position) == 5 ? 'selected' : '' }}>Cart</option>
+                                        <option value="homepage" {{ old('position', $website->position) == 'homepage' ? 'selected' : '' }}>Homepage</option>
+                                        <option value="category" {{ old('position', $website->position) == 'category' ? 'selected' : '' }}>Category</option>
+                                        <option value="product" {{ old('position', $website->position) == 'product' ? 'selected' : '' }}>Product</option>
+                                        <option value="slider" {{ old('position', $website->position) == 'slider' ? 'selected' : '' }}>Slider</option>
+                                        <option value="checkout" {{ old('position', $website->position) == 'checkout' ? 'selected' : '' }}>Checkout</option>
+                                        <option value="cart" {{ old('position', $website->position) == 'cart' ? 'selected' : '' }}>Cart</option>
                                     </select>
                                     @error('position')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>

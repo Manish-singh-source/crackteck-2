@@ -26,6 +26,12 @@ use Illuminate\Support\Facades\Validator;
 
 class ProductListController extends Controller
 {
+    /**
+     * Products List
+     *
+     * @param Request $request
+     * @return void
+     */
     public function index(Request $request)
     {
         $products = Product::query();
@@ -39,6 +45,10 @@ class ProductListController extends Controller
         return view('/warehouse/product-list/index', compact('products'));
     }
 
+    /**
+     * Create new product
+     * 
+     */
     public function create()
     {
         $vendors = Vendor::selectRaw(
@@ -64,13 +74,15 @@ class ProductListController extends Controller
         // Initialize empty selectedVariations for create page
         $selectedVariations = [];
 
-        // dd($subCategories);
-
-        // $parentCategories = Categorie::pluck('name', 'id');
-        // $subCategories = SubCategorie::pluck('name', 'id');
         return view('/warehouse/product-list/create', compact('brands', 'vendors', 'vendorPurchaseOrders', 'parentCategories', 'subCategories', 'warehouses', 'warehouseRacks', 'zoneAreas', 'rackNo', 'levelNo', 'positionNo', 'variationAttributes', 'variationAttributeValues', 'selectedVariations'));
     }
 
+    /**
+     * Store new product
+     * 
+     * @param StoreProductRequest $request
+     * @return void
+     */
     public function store(StoreProductRequest $request)
     {
         DB::beginTransaction();
@@ -140,6 +152,12 @@ class ProductListController extends Controller
         }
     }
 
+    /**
+     * View product details
+     * 
+     * @param int $id
+     * @return void
+     */
     public function view($id)
     {
         $product = Product::with([
@@ -158,37 +176,11 @@ class ProductListController extends Controller
     }
 
     /**
-     * Ensure product serials exist for the product based on stock quantity
+     * Edit product
+     * 
+     * @param int $id
+     * @return void
      */
-    private function ensureProductSerials(Product $product)
-    {
-        $stockQuantity = $product->stock_quantity ?? 0;
-        $existingSerials = $product->productSerials()->count();
-
-        // If we need more serials, create them
-        if ($existingSerials < $stockQuantity) {
-            $serialsToCreate = $stockQuantity - $existingSerials;
-
-            for ($i = 0; $i < $serialsToCreate; $i++) {
-                $autoSerial = ProductSerial::generateAutoSerial($product->sku);
-
-                ProductSerial::create([
-                    'product_id' => $product->id,
-                    'auto_generated_serial' => $autoSerial,
-                    'cost_price' => $product->cost_price,
-                    'selling_price' => $product->selling_price,
-                    'discount_price' => $product->discount_price,
-                    'tax' => $product->tax,
-                    'final_price' => $product->final_price,
-                    'main_product_image' => $product->main_product_image,
-                    'additional_product_images' => $product->additional_product_images,
-                    'variations' => $product->variation_options,
-                    'status' => $product->status,
-                ]);
-            }
-        }
-    }
-
     public function edit($id)
     {
         $product = Product::findOrFail($id);
@@ -226,6 +218,13 @@ class ProductListController extends Controller
         ));
     }
 
+    /**
+     * Update product
+     * 
+     * @param UpdateProductRequest $request
+     * @param int $id
+     * @return void
+     */
     public function update(UpdateProductRequest $request, $id)
     {
         DB::beginTransaction();
@@ -281,6 +280,12 @@ class ProductListController extends Controller
         }
     }
 
+    /**
+     * Delete product
+     * 
+     * @param int $id
+     * @return void
+     */
     public function destroy($id)
     {
         try {
@@ -312,174 +317,38 @@ class ProductListController extends Controller
     }
 
 
-    public function scrapProduct(Request $request)
+    /**
+     * Ensure product serials exist for the product based on stock quantity
+     */
+    private function ensureProductSerials(Product $product)
     {
-        $validator = Validator::make($request->all(), [
-            'serial_ids' => 'required|string',
-            'reason' => 'required|string|max:500',
-        ]);
+        $stockQuantity = $product->stock_quantity ?? 0;
+        $existingSerials = $product->productSerials()->count();
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
+        // If we need more serials, create them
+        if ($existingSerials < $stockQuantity) {
+            $serialsToCreate = $stockQuantity - $existingSerials;
 
-        try {
-            DB::beginTransaction();
+            for ($i = 0; $i < $serialsToCreate; $i++) {
+                $autoSerial = ProductSerial::generateAutoSerial($product->sku);
 
-            $serialIds = array_map('trim', explode(',', $request->serial_ids));
-            $scrappedCount = 0;
-            $errors = [];
-
-            foreach ($serialIds as $serialId) {
-                if (empty($serialId)) {
-                    continue;
-                }
-
-                // Find the product serial
-                $productSerial = ProductSerial::where('final_serial', $serialId)
-                    ->where('status', 'active')
-                    ->first();
-
-                if (! $productSerial) {
-                    $errors[] = "Serial ID '{$serialId}' not found or already inactive";
-
-                    continue;
-                }
-
-                $product = $productSerial->product;
-                if (! $product) {
-                    $errors[] = "Product not found for serial ID '{$serialId}'";
-
-                    continue;
-                }
-
-                // Create scrap item record
-                ScrapItem::create([
+                ProductSerial::create([
                     'product_id' => $product->id,
-                    'product_serial_id' => $productSerial->id,
-                    'serial_number' => $serialId,
-                    'product_name' => $product->product_name,
-                    'product_sku' => $product->sku,
-                    'reason_for_scrap' => $request->reason,
-                    'quantity_scrapped' => 1,
-                    'scrapped_at' => now(),
-                    'scrapped_by' => Auth::user()->id ?? null,
+                    'auto_generated_serial' => $autoSerial,
+                    'cost_price' => $product->cost_price,
+                    'selling_price' => $product->selling_price,
+                    'discount_price' => $product->discount_price,
+                    'tax' => $product->tax,
+                    'final_price' => $product->final_price,
+                    'main_product_image' => $product->main_product_image,
+                    'additional_product_images' => $product->additional_product_images,
+                    'variations' => $product->variation_options,
+                    'status' => $product->status,
                 ]);
-
-                // Update product serial status to 'scrap'
-                $productSerial->update(['status' => 'scrap']);
-
-                // Log activity
-                activity()
-                    ->performedOn($productSerial)
-                    ->causedBy(Auth::user())
-                    ->log('Product serial scrapped: ' . $serialId);
-
-                // Decrease product quantity
-                if ($product->stock_quantity > 0) {
-                    $product->decrement('stock_quantity', 1);
-                }
-
-                $scrappedCount++;
             }
-
-            DB::commit();
-
-            if ($scrappedCount > 0) {
-                $message = $scrappedCount . ' item(s) scrapped successfully';
-                if (! empty($errors)) {
-                    $message .= '. Some items had errors: ' . implode(', ', $errors);
-                }
-
-                return response()->json([
-                    'success' => true,
-                    'message' => $message,
-                    'scrapped_count' => $scrappedCount,
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No items were scrapped. Errors: ' . implode(', ', $errors),
-                ], 400);
-            }
-        } catch (\Exception $e) {
-            DB::rollback();
-
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while scrapping items: ' . $e->getMessage(),
-            ], 500);
         }
     }
 
-    public function restoreProduct(Request $request, $scrapItemId)
-    {
-        try {
-            DB::beginTransaction();
-
-            $scrapItem = ScrapItem::with(['product', 'productSerial'])->findOrFail($scrapItemId);
-
-            // Restore the product serial status
-            if ($scrapItem->productSerial) {
-                $scrapItem->productSerial->update(['status' => 'active']);
-            }
-
-            // Increase product quantity
-            if ($scrapItem->product) {
-                $scrapItem->product->increment('stock_quantity', $scrapItem->quantity_scrapped);
-            }
-
-            // Delete the scrap item record
-            $scrapItem->delete();
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Product restored successfully',
-            ]);
-        } catch (\Exception $e) {
-            DB::rollback();
-
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while restoring the product: ' . $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    public function ec_index()
-    {
-        return view('/e-commerce/products/index');
-    }
-
-    public function ec_create()
-    {
-        $brand = Brand::pluck('brand_title', 'id');
-        $parentCategorie = ParentCategorie::pluck('parent_categories', 'id');
-        $subcategorie = SubCategorie::pluck('sub_categorie', 'id');
-
-        return view('/e-commerce/products/create', compact('brand', 'parentCategorie', 'subcategorie'));
-    }
-
-    public function ec_view()
-    {
-        return view('/e-commerce/products/view');
-    }
-
-    public function ec_edit()
-    {
-        return view('/e-commerce/products/edit');
-    }
-
-    public function ec_scrapItems()
-    {
-        return view('/e-commerce/products/scrap-items');
-    }
 
     /**
      * Save or update a product serial number

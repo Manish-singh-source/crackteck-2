@@ -12,31 +12,21 @@ class ProductVariantsController extends Controller
     //
     public function index()
     {
-        $attributeName = ProductVariantAttribute::all();
-
+        $status = request()->get('status') ?? 'all';
+        $query = ProductVariantAttribute::query();
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+        $attributeName = $query->get();
         return view('/e-commerce/product-variants/index', compact('attributeName'));
     }
 
-    public function view($id)
-    {
-        $attributeName = ProductVariantAttribute::findOrFail($id);
-        $attributeValue = ProductVariantAttributeValue::where('attribute_id', $id)->get();
-
-        return view('/e-commerce/product-variants/view', compact('attributeName', 'attributeValue'));
-    }
-
-    public function editAttribute($id)
-    {
-        $attributeName = ProductVariantAttribute::findOrFail($id);
-
-        return view('/e-commerce/product-variants/edit', compact('attributeName'));
-    }
 
     public function storeAttribute(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'status' => 'required',
+            'name' => 'required|string|max:255',
+            'status' => 'required|in:active,inactive',
         ]);
 
         if ($validator->fails()) {
@@ -56,28 +46,21 @@ class ProductVariantsController extends Controller
         return redirect()->route('variant.index')->with('success', 'Product Variant Attribute added successfully.');
     }
 
-    public function storeAttributeValue(Request $request)
+    public function view($id)
     {
-        $validator = Validator::make($request->all(), [
-            'attribute_id' => 'required',
-            'value' => 'required',
-        ]);
+        $attributeName = ProductVariantAttribute::findOrFail($id);
+        $attributeValue = ProductVariantAttributeValue::where('attribute_id', $id)->get();
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
-        }
-
-        $attributeValue = new ProductVariantAttributeValue;
-        $attributeValue->attribute_id = $request->attribute_id;
-        $attributeValue->value = $request->value;
-        $attributeValue->save();
-
-        if (! $attributeValue) {
-            return back()->with('error', 'Something went wrong.');
-        }
-
-        return back()->with('success', 'Product Variant Attribute Value added successfully.');
+        return view('/e-commerce/product-variants/view', compact('attributeName', 'attributeValue'));
     }
+
+    public function editAttribute($id)
+    {
+        $attributeName = ProductVariantAttribute::findOrFail($id);
+
+        return view('/e-commerce/product-variants/edit', compact('attributeName'));
+    }
+
 
     public function deleteAttribute($id)
     {
@@ -110,6 +93,29 @@ class ProductVariantsController extends Controller
         return back()->with('success', 'Product Variant updated successfully.');
     }
 
+    public function storeAttributeValue(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'attribute_id' => 'required',
+            'value' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $attributeValue = new ProductVariantAttributeValue;
+        $attributeValue->attribute_id = $request->attribute_id;
+        $attributeValue->value = $request->value;
+        $attributeValue->save();
+
+        if (! $attributeValue) {
+            return back()->with('error', 'Something went wrong.');
+        }
+
+        return back()->with('success', 'Product Variant Attribute Value added successfully.');
+    }
+
     public function updateAttributeValue(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -120,7 +126,7 @@ class ProductVariantsController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        $attributeValue = ProductVariantAttributeValue::findOrFail($id);
+        $attributeValue = ProductVariantAttributeValue::find($id);
         $attributeValue->value = $request->value;
         $attributeValue->save();
 
@@ -128,7 +134,7 @@ class ProductVariantsController extends Controller
             return back()->with('error', 'Something went wrong.');
         }
 
-        return back()->with('success', 'Product Variant updated successfully.');
+        return redirect()->route('variant.view', $attributeValue->attribute_id)->with('success', 'Product Variant updated successfully.');
     }
 
     public function deleteAttributeValue($id)

@@ -22,7 +22,7 @@ class Coupon extends Model
         'usage_limit',
         'used_count',
         'usage_per_customer',
-        'is_active',
+        'status',
         'applicable_categories',
         'applicable_brands',
         'excluded_products',
@@ -33,7 +33,6 @@ class Coupon extends Model
         'applicable_categories' => 'array',
         'applicable_brands' => 'array',
         'excluded_products' => 'array',
-        'is_active' => 'boolean',
         'stackable' => 'boolean',
         'start_date' => 'date',
         'end_date' => 'date',
@@ -44,7 +43,7 @@ class Coupon extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', 1);
+        return $query->where('status', 'active');
     }
 
     /**
@@ -52,7 +51,15 @@ class Coupon extends Model
      */
     public function scopeInactive($query)
     {
-        return $query->where('is_active', 0);
+        return $query->where('status', 'inactive');
+    }
+
+    /**
+     * Scope for expired coupons
+     */
+    public function scopeExpired($query)
+    {
+        return $query->where('status', 'expired');
     }
 
     /**
@@ -61,9 +68,9 @@ class Coupon extends Model
      */
     public function getFormattedDiscountAttribute()
     {
-        if ($this->type == 0) { // Percentage
+        if ($this->type == 'percentage') { // Percentage
             return $this->discount_value . '%';
-        } elseif ($this->type == 1) { // Fixed
+        } elseif ($this->type == 'fixed') { // Fixed
             return '₹' . number_format($this->discount_value, 2);
         } else { // Buy X Get Y
             return 'Buy X Get Y';
@@ -94,6 +101,6 @@ class Coupon extends Model
      */
     public function getIsValidAttribute()
     {
-        return $this->is_active && !$this->is_expired && now()->gte($this->start_date);
+        return $this->status == 'active' && !$this->status == 'expired' && now()->gte($this->start_date);
     }
 }

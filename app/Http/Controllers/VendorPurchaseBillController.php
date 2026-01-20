@@ -89,12 +89,6 @@ class VendorPurchaseBillController extends Controller
     /**
      * Show the form for editing the specified vendor purchase bill.
      */
-    // public function edit($id)
-    // {
-    //     $vendorPurchaseBill = VendorPurchaseBill::findOrFail($id);
-    //     return view('/warehouse/vendor-purchase-bills/edit', compact('vendorPurchaseBill'));
-    // }
-
     public function edit($id)
     {
         $vendorPurchaseBill = VendorPurchaseOrder::find($id);
@@ -111,50 +105,51 @@ class VendorPurchaseBillController extends Controller
      * Update the specified vendor purchase bill in storage.
      */
     public function update(UpdateVendorPurchaseOrderRequest $request, $id)
-{
-    try {
-        DB::beginTransaction();
+    {
+        try {
+            DB::beginTransaction();
 
-        $purchaseOrder = VendorPurchaseOrder::findOrFail($id);
-        $data = $request->validated();
+            $purchaseOrder = VendorPurchaseOrder::findOrFail($id);
+            $data = $request->validated();
 
-        // Replace invoice file if uploaded
-        if ($request->hasFile('invoice_pdf')) {
+            // Replace invoice file if uploaded
+            if ($request->hasFile('invoice_pdf')) {
 
-            if ($purchaseOrder->invoice_pdf &&
-                Storage::disk('public')->exists($purchaseOrder->invoice_pdf)) {
-                Storage::disk('public')->delete($purchaseOrder->invoice_pdf);
+                if (
+                    $purchaseOrder->invoice_pdf &&
+                    Storage::disk('public')->exists($purchaseOrder->invoice_pdf)
+                ) {
+                    Storage::disk('public')->delete($purchaseOrder->invoice_pdf);
+                }
+
+                $file = $request->file('invoice_pdf');
+                $filename = time() . '_' . $file->getClientOriginalName();
+
+                $data['invoice_pdf'] = $file->storeAs(
+                    'uploads/vendor-purchase-bills',
+                    $filename,
+                    'public'
+                );
             }
 
-            $file = $request->file('invoice_pdf');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            // Recalculate pending amount
+            $data['po_amount_pending'] = $data['po_amount'] - $data['po_amount_paid'];
 
-            $data['invoice_pdf'] = $file->storeAs(
-                'uploads/vendor-purchase-bills',
-                $filename,
-                'public'
-            );
+            $purchaseOrder->update($data);
+
+            DB::commit();
+
+            return redirect()
+                ->route('vendor.index')
+                ->with('success', 'Vendor Purchase Bill updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return back()
+                ->with('error', 'Failed to update vendor purchase bill.')
+                ->withInput();
         }
-
-        // Recalculate pending amount
-        $data['po_amount_pending'] = $data['po_amount'] - $data['po_amount_paid'];
-
-        $purchaseOrder->update($data);
-
-        DB::commit();
-
-        return redirect()
-            ->route('vendor.index')
-            ->with('success', 'Vendor Purchase Bill updated successfully.');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-
-        return back()
-            ->with('error', 'Failed to update vendor purchase bill.')
-            ->withInput();
     }
-}
 
     /**
      * Remove the specified vendor purchase bill from storage.

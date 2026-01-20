@@ -44,7 +44,7 @@ etc.
 
 # Backend (CRM)
 
--   The backend panel is diveded into four parts such as e-commerce section, crm section, warehouse section and App settings
+- The backend panel is diveded into four parts such as e-commerce section, crm section, warehouse section and App settings
 
 ## Warehouse
 
@@ -63,13 +63,11 @@ etc.
 5.  warehouses
     - softdelete need to be added
 6.  warehouse rack
-
     - softdelete need to be added
 
     (CRM)
 
 7.  Permissions:
-
     - List of permissions available in the system
     - Add Permission
     - Update Permission
@@ -77,7 +75,6 @@ etc.
     - toggle status
 
 8.  Roles: List of roles available in the system
-
     - List of roles available in the system
     - Add Role
     - Update Role
@@ -85,7 +82,6 @@ etc.
     - toggle status
 
 9.  Staff: List of staff available in the system (admin, sales person, field executive, delivery man, engineer)
-
     - List of staff available in the system
     - Add Staff
     - View Staff
@@ -158,11 +154,9 @@ etc.
             - employment_history
 
 10. Customers:
-
     - List of customers available in the system (e-commerce customers, crm customers, both)
 
     (E-commerce)
-
     - E-commerce Customers:
         - List of customers available in the system
         - View Customer
@@ -171,7 +165,6 @@ etc.
         - Delete Customer
 
     (CRM & App Customers)
-
     - CRM & App Customers:
         - List of customers available in the system
         - View Customer
@@ -180,85 +173,30 @@ etc.
         - Delete Customer
 
     Table:
-    `customers`: - customer_id (auto generated) - created_by - default null - first_name - last_name - phone - email - dob - gender - customer_type (e-commerce, crm, both, offline)  
-     - source_type (website, app, call, walkin, other) - password - status (active, inactive, blocked, suspended) - created_at - updated_at - deleted_at
+    `customers`: - customer_id (auto generated) - created_by - default null - first_name - last_name - phone - email - dob - gender - customer_type (e-commerce, crm, both, offline)
+    - source_type (website, app, call, walkin, other) - password - status (active, inactive, blocked, suspended) - created_at - updated_at - deleted_at
 
-        Note:
-            - Created By: default null, only if admin creates customer, fill created by using login user id
-            - phone: unique
-            - email: unique
-            - soft delete
+        Note: - Created By: default null, only if admin creates customer, fill created by using login user id - phone: unique - email: unique - soft delete
 
-        `customer_company_details`:
-            - customer_id (foreign key)
-            - company_name
-            - address1
-            - address2
-            - city
-            - state
-            - country
-            - pincode
-            - gst_no
+        `customer_company_details`: - customer_id (foreign key) - company_name - address1 - address2 - city - state - country - pincode - gst_no
 
-        Note:
-            - Not mandatory table
-            - Company name is unique
-            - GST number is unique
-            - Multiple addresses can be added
-            - soft delete
+        Note: - Not mandatory table - Company name is unique - GST number is unique - Multiple addresses can be added - soft delete
 
-        `customer_address_details`:
-            - customer_id (foreign key)
-            - branch_name
-            - address1
-            - address2
-            - city
-            - state
-            - country
-            - pincode
-            - is_primary (1 - primary, 0 - secondary)
-            - created_at
-            - updated_at
-            - deleted_at
+        `customer_address_details`: - customer_id (foreign key) - branch_name - address1 - address2 - city - state - country - pincode - is_primary (1 - primary, 0 - secondary) - created_at - updated_at - deleted_at
 
-        Note:
-            - Customer can have multiple addresses
-            - One address can be primary and rest can be secondary
-            - Primary address is used for all communications
-            - Secondary address is used for reference only
-            - Primary address is mandatory
-            - Soft delete
+        Note: - Customer can have multiple addresses - One address can be primary and rest can be secondary - Primary address is used for all communications - Secondary address is used for reference only - Primary address is mandatory - Soft delete
 
-        `customer_aadhar_details`:
-            - customer_id (foreign key)
-            - aadhar_number (unique)
-            - aadhar_front_path
-            - aadhar_back_path
-            - created_at
-            - updated_at
-            - deleted_at
+        `customer_aadhar_details`: - customer_id (foreign key) - aadhar_number (unique) - aadhar_front_path - aadhar_back_path - created_at - updated_at - deleted_at
 
-        Note:
-            - Not mandatory table
-            - soft delete
+        Note: - Not mandatory table - soft delete
 
-        `customer_pan_card_details`:
-            - customer_id (foreign key)
-            - pan_number (unique)
-            - pan_card_front_path
-            - pan_card_back_path
-            - created_at
-            - updated_at
-            - deleted_at
+        `customer_pan_card_details`: - customer_id (foreign key) - pan_number (unique) - pan_card_front_path - pan_card_back_path - created_at - updated_at - deleted_at
 
-        Note:
-            - Not mandatory table
-            - soft delete
+        Note: - Not mandatory table - soft delete
 
     (Warehouse)
 
 11. Warehouses:
-
     - Warehouse List
     - Add Warehouse
     - View Warehouse
@@ -301,7 +239,6 @@ etc.
         - add if something is missing
 
     Note:
-
     - verification_status: 0 - Pending, 1 - Verified, 2 - Rejected
     - default_warehouse: 0 - No, 1 - Yes
     - status: 0 - Inactive, 1 - Active
@@ -314,12 +251,10 @@ etc.
     Defaults: - verification_status: 0 - default_warehouse: 0 - status: 1
 
     Model Relationships:
-
     1. Has Many Warehouse Rack
        warehousesRacks()
 
     2. Has Many Product
-
         - total products count
         - total available stock count
         - total low stock count
@@ -329,7 +264,6 @@ etc.
         products()
 
 12. Warehouse Rack:
-
     - Rack List
     - Add Rack
     - Edit Rack
@@ -351,21 +285,17 @@ etc.
     deleted_at
 
     Note:
-
     - filled_quantity <= quantity (constraint)
     - Soft delete
 
     Model Relationships:
-
     1. Belongs To Warehouse
        warehouse()
 
     (E-commerce)
 
 13. Category:
-
     - Parent Category
-
         - List of categories available in the system
         - Add Category
         - View Category
@@ -413,7 +343,6 @@ etc.
             - Status: 0 - Inactive, 1 - Active
 
 14. Brand:
-
     - List of brands available in the system
     - Add Brand
     - Update Brand
@@ -425,9 +354,7 @@ etc.
     Note: - Slug is auto generated from name - Slug is unique - Soft delete - Status ecommerce: 0 - No, 1 - Yes (for showing on e-commerce website) - Status: 0 - Inactive, 1 - Active
 
 15. Variations:
-
     - Attributes:
-
         - List of attributes available in the system
         - Add Attribute
         - View Attribute
@@ -456,7 +383,6 @@ etc.
     (Warehouse)
 
 16. Vendor:
-
     - List of vendors available in the system
     - Add Vendor
     - View Vendor
@@ -464,28 +390,27 @@ etc.
     - Delete Vendor
 
     Table:
-    `vendors`: - vendor_id (auto generated) - created by - default null - name  
-     - phone - email
+    `vendors`: - vendor_id (auto generated) - created by - default null - name
+    - phone - email
 
-            - address1
-            - address2
-            - city
-            - state
-            - country
-            - pincode
+             - address1
+             - address2
+             - city
+             - state
+             - country
+             - pincode
 
-            - pan_no
-            - gst_no
+             - pan_no
+             - gst_no
 
-            - status
-            - created_at
-            - updated_at
-            - deleted_at
+             - status
+             - created_at
+             - updated_at
+             - deleted_at
 
     Note: - Created by: default null, only if admin creates vendor, fill created by using login user id - Soft delete - Status: 0 - Inactive, 1 - Active - Create Own warehouse for currently available stock
 
 17. Vendor Purchase Order:
-
     - List of vendor purchase orders available in the system
     - Add Vendor Purchase Order
     - View Vendor Purchase Order
@@ -500,7 +425,6 @@ etc.
     (CRM)
 
 18. Manage Pincode:
-
     - List of pincodes available in the system
     - Add Pincode
     - View Pincode
@@ -514,7 +438,6 @@ etc.
 
 19. Product:
     (Warehouse)
-
     - Warehouse Product:
         - List of All products available in the system
         - Add Warehouse Product
@@ -608,9 +531,7 @@ etc.
             - deleted_at
 
     (E-commerce)
-
-    -   E-commerce Product:
-
+    - E-commerce Product:
         - List of All products available in the system
         - Add E-commerce Product
         - View E-commerce Product
@@ -657,26 +578,24 @@ etc.
     (CRM)
 
 20. Covered Items:
-
     - Add Covered Item
     - Edit Covered Item
     - Delete Covered Item
     - List of covered items lists with (service type, covered item name, no of diagonisis)
 
     Table:
-    `covered_items`: - id (auto generated)  
-     - service_type (amc, quick_service, installation, repair) - service_name - service_charge ( if service type is amc then not required ) - status
+    `covered_items`: - id (auto generated)
+    - service_type (amc, quick_service, installation, repair) - service_name - service_charge ( if service type is amc then not required ) - status
 
-            - diagonisis_list (json)
+             - diagonisis_list (json)
 
-            - created_at
-            - updated_at
-            - deleted_at
+             - created_at
+             - updated_at
+             - deleted_at
 
     Note: - Soft delete - Status: 0 - Inactive, 1 - Active - Diagonisis List: json array of diagonisis list - If service type is amc then not required to add service charge
 
 21. AMC Plans: List of AMC plans like Yearly, Monthly, etc. with covered items
-
     - Add AMC Plan
     - View AMC Plan
     - Update AMC Plan
@@ -709,7 +628,6 @@ etc.
     Note: - Plan Code is unique - Duration: 1 - 6 Months, 2 - 12 months, 3 - 24 months, 4 - 36 months, 5 - Custom - Soft delete - Status: 0 - Inactive, 1 - Active
 
 22. Quick Services Plans: List of quick services like Quick Repair, Full Cleaning, etc. with price and covered items
-
     - List of quick services available in the system
     - No of Diagnosis available for each quick service
     - Price for each quick service
@@ -721,14 +639,12 @@ etc.
     - Price for each installation service
     - View Installation Service
 24. Repairing Services Plans: List of repairing services like Battery Replacement, Screen Repair, etc. with price and covered items
-
     - List of repairing services available in the system
     - No of Diagnosis available for each repairing service
     - Price for each repairing service
     - View Repairing Service
 
 25. Service Request:
-
     1. Non-AMC Service: - Installation Services - Repairing Services: List of non amc services requested by customers
     2. AMC Services: List of AMC services requested by customers
     3. Quick Service Requests: List of quick service requests requested by customers
@@ -982,11 +898,9 @@ etc.
             - deleted_at
 
 26. Track Request: No need of table.
-
     - Search by service request id
 
 27. Case Transfer: List of case transfer requests from engineer
-
     - List of case transfer requests
     - View Case Transfer Request
     - Approve/Reject Case Transfer Request
@@ -1014,14 +928,11 @@ etc.
             $table->index(['service_request_id', 'status']);
         });
 
-
-
     Note: - Service Request Type: 1 - AMC, 2 - Non-AMC, 3 - Quick Service - Service Request Id: foreign key from respective service request table - Status: pending -> approved -> rejected - Soft delete - Show Diagnosis details when view - When transferred, update the service request table with new engineer id
 
     Model Relationships: 1. Belongs To Service Request (Polymorphic) 2. Belongs To Requested By (Engineer) 3. Belongs To Re-assigned Engineer (Engineer)
 
 28. Chats Logs:
-
     - List of all chats
     - View Chat
     - Add Chat
@@ -1034,7 +945,6 @@ etc.
 29. Activity Log: List of all activities performed in the system
 
 30. Pickup Request: List of pickup requests from engineers for customer product
-
     - List of pickup requests
     - View Pickup Request
         - List of products
@@ -1084,7 +994,6 @@ etc.
     Note: - Status: pending -> approved -> rejected - Either delivery man will be assigned or engineer will pick the product - Soft delete - Change status to picked for service request when engineer picks the product - Change status to completed/cancelled for service request when delivery man delivers the product - When product delivered verify customer using otp verification
 
 31. Remote Jobs: visible to admin, team head
-
     - List of requests coming from field executive for remote diagnosis
     - List of remote jobs
     - View Remote Job
@@ -1119,7 +1028,6 @@ etc.
         });
 
 32. Assigned Jobs: No need of table.
-
     - visible to remote engineers
     - List of jobs assigned to engineers
     - View Assigned Job
@@ -1132,7 +1040,6 @@ etc.
     Note: - Display Escalate button only if job is not escalated and for every step
 
 33. Field Issues: visible to admin, team head
-
     - List of field issues
     - View Field Issue
         - Assign Remote Engineer
@@ -1164,7 +1071,6 @@ etc.
         });
 
 34. Stock In Hand: engineer get stock from warehouse and use it for field service
-
     - List of stock in hand
         - All, Available, Used
     - View Stock In Hand
@@ -1224,7 +1130,6 @@ etc.
     Note: - Requested By is foreign key from Engineers table - Status: pending -> approved -> picked -> used -> returned -> cancelled - Soft delete
 
 35. Spare Parts Request: List of spare parts request sent by engineers after going to customer site
-
     - List of spare parts request
         - All, Pending, Approved, Rejected, Cancelled
     - View Spare Parts Request
@@ -1278,7 +1183,6 @@ etc.
     Note: - Product Id is foreign key from Products table - Product Serial Id is foreign key from Product Serials table - Requested By is foreign key from Engineers table - Requested For is foreign key from Customers table - Assigned Delivery Man is foreign key from Delivery Men table - Soft delete - etc.
 
 36. Leads:
-
     - List of leads
     - View Lead
     - Add Lead
@@ -1320,7 +1224,6 @@ etc.
         });
 
 37. Follow Up:
-
     - List of follow up
     - View Follow Up
     - Add Follow Up
@@ -1350,7 +1253,6 @@ etc.
         });
 
 38. Meets:
-
     - List of meets
     - View Meet
     - Add Meet
@@ -1386,7 +1288,6 @@ etc.
         });
 
 39. Quotations:
-
     - List of quotations
     - View Quotation
     - Add Quotation
@@ -1451,7 +1352,6 @@ etc.
     (Warehouse)
 
 40. Scrap Items:
-
     - List of scrap items
     - View Scrap Item
     - Add Scrap Item
@@ -1479,7 +1379,6 @@ etc.
         });
 
 41. Track Product: No need of table.
-
     - Search Product by SKU or Serial Number
     - View Product Details
     - View Serial Numbers
@@ -1494,7 +1393,6 @@ etc.
     - View Product Actions
 
 42. Stock Reports: No need of table.
-
     - List of stock reports
     - View Stock Report
     - Add Stock Report
@@ -1504,7 +1402,6 @@ etc.
     - Import Stock Report
 
 43. Low Stock Report: No need of table.
-
     - List of low stock report
     - View Low Stock Report
     - Add Low Stock Report
@@ -1516,7 +1413,6 @@ etc.
     (E-commerce)
 
 44. Orders:
-
     - List of orders
     - View Order
     - Add Order
@@ -1660,7 +1556,6 @@ etc.
         });
 
 45. Coupons:
-
     - List of coupons
     - View Coupon
     - Add Coupon
@@ -1684,7 +1579,7 @@ etc.
             $table->integer('usage_limit')->nullable();
             $table->integer('used_count')->default(0);
             $table->integer('usage_per_customer')->default(1);
-            $table->boolean('is_active')->default(true);
+            $table->enum('status', ['active', 'inactive', 'expired'])->default('active');
             $table->text('applicable_categories')->nullable();
             $table->text('applicable_brands')->nullable();
             $table->text('excluded_products')->nullable();
@@ -1693,25 +1588,24 @@ etc.
             $table->softDeletes();
 
             $table->index('code');
-            $table->index('is_active');
+            $table->index('status');
         });
 
     Table:
     `coupon_usage`:
-    // Coupons Usage History
-    Schema::create('coupon_usage', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('coupon_id')->constrained('coupons')->onDelete('cascade');
-    $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
-    $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
-    $table->decimal('discount_amount', 15, 2);
-    $table->timestamps();
+        // Coupons Usage History
+        Schema::create('coupon_usage', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('coupon_id')->constrained('coupons')->onDelete('cascade');
+            $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
+            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
+            $table->decimal('discount_amount', 15, 2);
+            $table->timestamps();
 
             $table->index(['coupon_id', 'customer_id']);
         });
 
 46. Subscribers:
-
     - List of subscribers
     - Send Mail to all subscribers
     - Delete Subscriber
@@ -1726,7 +1620,6 @@ etc.
         });
 
 47. Contacts:
-
     - List of contacts
     - View Contact
     - Add Contact
@@ -1748,9 +1641,7 @@ etc.
         });
 
 48. Banner:
-
-    -   Website Banner
-
+    - Website Banner
         - List of website banners
         - View Website Banner
         - Add Website Banner
@@ -1830,7 +1721,6 @@ etc.
               };
 
 49. Testimonials:
-
     - List of testimonials
     - View Testimonial
     - Add Testimonial
@@ -1862,7 +1752,6 @@ etc.
 50. Product Deal Offers:
 
 51. Collections:
-
     - List of collections
     - View Collection
     - Add Collection
@@ -1879,8 +1768,7 @@ etc.
             $table->text('description')->nullable();
             $table->string('image_url')->nullable();
             $table->integer('sort_order')->default(0);
-            $table->boolean('is_active')->default(true);
-            $table->integer('products_count')->default(0);
+            $table->boolean('active')->default(active);
             $table->timestamps();
             $table->softDeletes();
 
@@ -2253,7 +2141,6 @@ website banners - done
 feedbacks - done
 
 2. payment after service request completion
-
 
 3. my orders - profile
 4. my services

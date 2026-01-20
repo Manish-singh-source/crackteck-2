@@ -52,8 +52,8 @@
                                         'name' => 'type',
                                         'required' => true,
                                         'options' => [
-                                            '0' => 'Website',
-                                            '1' => 'Promotional'
+                                            'website' => 'Website',
+                                            'promotional' => 'Promotional'
                                         ]
                                     ])
                                 </div>
@@ -64,8 +64,8 @@
                                         'name' => 'channel',
                                         'required' => true,
                                         'options' => [
-                                            '0' => 'Website',
-                                            '1' => 'Mobile App'
+                                            'website' => 'Website',
+                                            'mobile' => 'Mobile App'
                                         ]
                                     ])
                                 </div>
@@ -83,10 +83,10 @@
                                         'name' => 'promotion_type',
                                         'options' => [
                                             '' => 'None',
-                                            '0' => 'Discount',
-                                            '1' => 'Coupon',
-                                            '2' => 'Flash Sale',
-                                            '3' => 'Event'
+                                            'discount' => 'Discount',
+                                            'coupon' => 'Coupon',
+                                            'flash_sale' => 'Flash Sale',
+                                            'event' => 'Event'
                                         ]
                                     ])
                                 </div>
@@ -108,8 +108,8 @@
                                         'name' => 'discount_type',
                                         'options' => [
                                             '' => 'Select',
-                                            '0' => 'Percentage (%)',
-                                            '1' => 'Fixed Amount'
+                                            'percentage' => 'Percentage (%)',
+                                            'fixed' => 'Fixed Amount'
                                         ]
                                     ])
                                 </div>
@@ -138,8 +138,8 @@
                                         'label' => 'Link Target',
                                         'name' => 'link_target',
                                         'options' => [
-                                            '0' => 'Same Tab',
-                                            '1' => 'New Tab'
+                                            'self' => 'Same Tab',
+                                            'blank' => 'New Tab'
                                         ]
                                     ])
                                 </div>
@@ -151,12 +151,12 @@
                                         'name' => 'position',
                                         'required' => true,
                                         'options' => [
-                                            '0' => 'Homepage',
-                                            '1' => 'Category Page',
-                                            '2' => 'Product Page',
-                                            '3' => 'Slider',
-                                            '4' => 'Checkout',
-                                            '5' => 'Cart'
+                                            'homepage' => 'Homepage',
+                                            'category' => 'Category Page',
+                                            'product' => 'Product Page',
+                                            'slider' => 'Slider',
+                                            'checkout' => 'Checkout',
+                                            'cart' => 'Cart'
                                         ]
                                     ])
                                 </div>

@@ -40,13 +40,15 @@
                                 <div class="col-lg-6">
                                     @include('components.form.input', [
                                         'label' => 'Collection Title',
-                                        'name' => 'title',
+                                        'name' => 'name',
                                         'type' => 'text',
                                         'placeholder' => 'Enter Collection Title',
                                         'model' => $collection,
                                         'required' => true,
                                     ])
                                 </div>
+
+
                                 <div class="col-lg-6">
                                     <label for="image" class="form-label">Collection Image</label>
                                     <input type="file" id="image" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/jpeg,image/jpg,image/png">
@@ -61,6 +63,8 @@
                                         </div>
                                     @endif
                                 </div>
+
+
                                 <div class="col-lg-12">
                                     <label for="description" class="form-label">Description</label>
                                     <textarea id="description" name="description" class="form-control @error('description') is-invalid @enderror" rows="4" placeholder="Enter Collection Description">{{ old('description', $collection->description) }}</textarea>
@@ -68,11 +72,13 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+
+
                                 <div class="col-lg-6">
                                     @include('components.form.select', [
                                         'label' => 'Status',
                                         'name' => 'status',
-                                        'options' => ['1' => 'Active', '0' => 'Inactive'],
+                                        'options' => ['active' => 'Active', 'inactive' => 'Inactive'],
                                         'model' => $collection,
                                     ])
                                 </div>
@@ -116,7 +122,7 @@
                                                     <tbody id="selected_categories">
                                                         @foreach($collection->categories as $category)
                                                             <tr>
-                                                                <td>{{ $category->parent_categories }}</td>
+                                                                <td>{{ $category->name }}</td>
                                                                 <td><span class="badge bg-info-subtle text-info">{{ $category->products->count() }} products</span></td>
                                                                 <td>
                                                                     <button type="button" class="btn btn-sm btn-danger" onclick="removeCategory({{ $category->id }}, this)">

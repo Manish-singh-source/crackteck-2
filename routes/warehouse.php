@@ -24,7 +24,7 @@ Route::prefix('demo/warehouse')->group(function () {
         return view('/warehouse/index');
     })->name('warehouse/index');
 
-    
+
     // ------------------------------------------------------------ Warehouse Page ------------------------------------------------------------
 
     Route::controller(WarehouseController::class)->group(function () {
@@ -40,28 +40,12 @@ Route::prefix('demo/warehouse')->group(function () {
         Route::get('/edit-warehouse/{id}', 'edit')->name('warehouses-list.edit');
         // Update Warehouse Page
         Route::put('/update-warehouse/{id}', 'update')->name('warehouse.update');
-        // Update Status Of Warehouse
+        // Update Status Of Warehouse from view page
         Route::put('/update-status/{id}', 'updateStatus')->name('warehouse.updateStatus');
         // Delete Warehouse Page
         Route::delete('/delete-warehouse/{id}', 'delete')->name('warehouse.delete');
     });
 
-    // ------------------------------------------------------------ Warehouse Rack Page -------------------------------------------------------------
-
-    Route::controller(WarehouseRackController::class)->group(function () {
-        // Warehouse Rack Page
-        Route::get('/rack', 'index')->name('rack.index');
-        // Create Warehouse Rack Page
-        Route::get('/create-rack', 'create')->name('rack.create');
-        // Store Warehouse Rack Page
-        Route::post('/store-rack', 'store')->name('rack.store');
-        // Edit Warehouse Rack Page
-        Route::get('/edit-rack/{id}', 'edit')->name('rack.edit');
-        // Update Warehouse Rack Page
-        Route::put('/update-rack/{id}', 'update')->name('rack.update');
-        // Delete Warehouse Rack Page
-        Route::delete('/delete-rack/{id}', 'delete')->name('rack.delete');
-    });
 
     // ------------------------------------------------------------ Vendor Purchase Page -------------------------------------------------------------
 
@@ -72,8 +56,6 @@ Route::prefix('demo/warehouse')->group(function () {
         Route::get('/create-vendor', 'create')->name('vendor_list.create');
         // Store Vendor
         Route::post('/create-vendor', 'store')->name('vendor_list.store');
-        // View Vendor Page
-        Route::get('/view-vendor/{id}', 'view')->name('vendor_list.view');
         // Edit Vendor Page
         Route::get('/edit-vendor/{id}', 'edit')->name('vendor_list.edit');
         // Update Vendor
@@ -119,12 +101,9 @@ Route::prefix('demo/warehouse')->group(function () {
         Route::put('/edit-product-list/{id}', 'update')->name('product-list.update');
         // Delete Product
         Route::delete('/product-list/{id}', 'destroy')->name('product-list.destroy');
-        // Scrap Items Page
-        Route::get('/scrap-items', 'scrapItems')->name('product-list.scrap-items');
-        // Scrap Product
-        Route::post('/scrap-product', 'scrapProduct')->name('product-list.scrap-product');
-        // Restore Product
-        Route::post('/restore-product/{scrapItemId}', 'restoreProduct')->name('product-list.restore-product');
+
+
+        // Need to check
         // Save Serial Number
         Route::post('/save-serial', 'saveSerial')->name('product-list.save-serial');
         // Get Serial Data
@@ -136,7 +115,6 @@ Route::prefix('demo/warehouse')->group(function () {
 
         Route::get('/get-vendor-purchase-orders-by-vendor', 'getVendorPurchaseOrdersByVendor')->name('product-list.get-vendor-purchase-orders-by-vendor');
         Route::get('/get-sub-categories', 'getSubCategories')->name('product-list.get-sub-categories');
-
     });
 
     Route::get('/warehouse-dependent', [WarehouseRackController::class, 'getDependentData']);
@@ -170,16 +148,6 @@ Route::prefix('demo/warehouse')->group(function () {
         Route::get('/spare-parts/{stockRequest}', 'view')->name('spare-parts.view');
         // Assign Delivery Man/Engineer
         Route::put('/assign-person/{id}', 'assignPerson')->name('spare-parts.assign-person');
-
-        //warehouse_show')->name('stock-request.show');
-
-        // // Update Stock Request
-        // Route::put('/stock-requests/{stockRequest}', 'warehouse_update')->name('stock-request.update');
-        // // Remove Product from Stock Request
-        // Route::delete('/stock-requests/remove-product/{id}', 'removeProduct')->name('stock-request.remove-product');
-
-        // // Assign Delivery Man
-        // Route::post('/assign-delivery-man/{id}', 'assignDeliveryMan')->name('spare-parts.assign-delivery-man');
     });
 
     // ------------------------------------------------------------ Stock Requests Page -------------------------------------------------------------
@@ -196,5 +164,31 @@ Route::prefix('demo/warehouse')->group(function () {
         Route::get('/low-stock-alert', 'index')->name('low-stock.index');
         // export low stock products
         Route::get('/export-low-stock', 'exportLowStock')->name('low-stock.export');
+    });
+
+
+
+
+
+
+
+
+
+
+    // ------------------------------------------------------------ Not Needed/Future Functionality Warehouse Rack Page -------------------------------------------------------------
+
+    Route::controller(WarehouseRackController::class)->group(function () {
+        // Warehouse Rack Page
+        Route::get('/rack', 'index')->name('rack.index');
+        // Create Warehouse Rack Page
+        Route::get('/create-rack', 'create')->name('rack.create');
+        // Store Warehouse Rack Page
+        Route::post('/store-rack', 'store')->name('rack.store');
+        // Edit Warehouse Rack Page
+        Route::get('/edit-rack/{id}', 'edit')->name('rack.edit');
+        // Update Warehouse Rack Page
+        Route::put('/update-rack/{id}', 'update')->name('rack.update');
+        // Delete Warehouse Rack Page
+        Route::delete('/delete-rack/{id}', 'delete')->name('rack.delete');
     });
 });

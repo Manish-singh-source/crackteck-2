@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WebsiteBanner;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\{Auth, DB, File, Log, Validator};
+use App\Models\WebsiteBanner;
 use Illuminate\Validation\Rule;
+use App\Http\Requests\StoreWebsiteBannerRequest;
+use App\Http\Requests\UpdateWebsiteBannerRequest;
+use Illuminate\Support\Facades\{Auth, DB, File, Log, Validator};
 
 class BannerController extends Controller
 {
@@ -14,11 +17,17 @@ class BannerController extends Controller
      */
     public function websiteBanner()
     {
-        // mujhe sub kuch chahiye
-        // sirf type 0 ka nahi 
-        $website = WebsiteBanner::where('is_active', '1')
-            ->orderBy('display_order', 'asc')
-            ->paginate(15);
+        // 
+        $status = request()->get('status') ?? 'all';
+
+        $website = WebsiteBanner::query();
+
+        if ($status != 'all') {
+            $website->where('is_active', $status);
+        }
+
+        $website->orderBy('display_order', 'asc');
+        $website = $website->paginate(15);
 
         return view('/e-commerce/banner/website-banner/index', compact('website'));
     }
@@ -31,42 +40,10 @@ class BannerController extends Controller
     /**
      * Store website banner
      */
-    public function storeWebsiteBanner(Request $request)
+    public function storeWebsiteBanner(StoreWebsiteBannerRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'title'           => 'required|string|min:3|max:255',
-            'image'           => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'type'            => 'required|in:0,1',
-            'channel'         => 'required|in:0,1',
-            'description'     => 'nullable|string|min:3',
-            'promotion_type'  => 'nullable|in:0,1,2,3',
-            'discount_value'  => 'nullable|numeric|min:0',
-            'discount_type'   => 'nullable|in:0,1',
-            'promo_code'      => 'nullable|string|max:100',
-            'link_url'        => 'nullable|url|max:255',
-            'link_target'     => 'nullable|in:0,1',
-            'position'        => 'required|in:0,1,2,3,4,5',
-            'display_order'   => [
-                'required',
-                'integer',
-                'min:0',
-                Rule::unique('website_banners', 'display_order')
-                    ->where('type', $request->type)
-                    ->whereNull('deleted_at')
-            ],
-            'start_at'        => 'required|date',
-            'end_at'          => 'required|date|after:start_at',
-            'is_active'       => 'required|in:0,1',
-            'metadata'        => 'nullable|json',
-        ], [
-            'display_order.unique' => 'This display order is already taken for this banner type. Please choose a different order.',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
         DB::beginTransaction();
+
         try {
             // Image upload
             $path = null;
@@ -79,34 +56,44 @@ class BannerController extends Controller
 
             $banner = WebsiteBanner::create([
                 'title'          => $request->title,
-                'slug'           => \Illuminate\Support\Str::slug($request->title),
+                'slug'           => Str::slug($request->title),
                 'description'    => $request->description,
                 'image_url'      => $path,
                 'type'           => $request->type,
                 'channel'        => $request->channel,
-                'promotion_type' => $request->promotion_type !== '' ? $request->promotion_type : null,
+                'promotion_type' => $request->promotion_type ?: null,
                 'discount_value' => $request->discount_value,
-                'discount_type'  => $request->discount_type !== '' ? $request->discount_type : null,
+                'discount_type'  => $request->discount_type ?: null,
                 'promo_code'     => $request->promo_code,
                 'link_url'       => $request->link_url,
-                'link_target'    => $request->link_target ?? 1,
+                'link_target'    => $request->link_target ?? 'self',
                 'position'       => $request->position,
-                'display_order'  => $request->display_order ?? 0,
+                'display_order'  => $request->display_order,
                 'start_at'       => $request->start_at,
                 'end_at'         => $request->end_at,
                 'is_active'      => $request->is_active,
-                'click_count'    => 0,
-                'view_count'     => 0,
-                'metadata'       => $request->metadata ? json_decode($request->metadata, true) : null,
+                'metadata'       => $request->metadata
+                    ? json_decode($request->metadata, true)
+                    : null,
             ]);
 
             DB::commit();
-            activity()->performedOn($banner)->causedBy(Auth::user())->log('Banner created');
-            return redirect()->route('website.banner.index')->with('success', 'Banner added successfully.');
+
+            activity()
+                ->performedOn($banner)
+                ->causedBy(Auth::user())
+                ->log('Banner created');
+
+            return redirect()
+                ->route('website.banner.index')
+                ->with('success', 'Banner added successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Banner Store Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Error: ' . $e->getMessage())->withInput();
+
+            return back()
+                ->withInput()
+                ->with('error', 'Something went wrong while saving the banner.');
         }
     }
 
@@ -131,52 +118,18 @@ class BannerController extends Controller
     /**
      * Update website banner
      */
-    public function updateWebsiteBanner(Request $request, $id)
+    public function updateWebsiteBanner(UpdateWebsiteBannerRequest $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'title'           => 'required|string|min:3|max:255',
-            'image'           => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'type'            => 'required|in:0,1',
-            'channel'         => 'required|in:0,1',
-            'description'     => 'nullable|string|min:3',
-            'promotion_type'  => 'nullable|in:0,1,2,3',
-            'discount_value'  => 'nullable|numeric|min:0',
-            'discount_type'   => 'nullable|in:0,1',
-            'promo_code'      => 'nullable|string|max:100',
-            'link_url'        => 'nullable|url|max:255',
-            'link_target'     => 'nullable|in:0,1',
-            'position'        => 'required|in:0,1,2,3,4,5',
-            'display_order'   => [
-                'required',
-                'integer',
-                'min:0',
-                Rule::unique('website_banners', 'display_order')
-                    ->where('type', $request->type)
-                    ->ignore($id)
-                    ->whereNull('deleted_at')
-            ],
-            'start_at'        => 'required|date',
-            'end_at'          => 'required|date|after:start_at',
-            'is_active'       => 'required|in:0,1',
-            'metadata'        => 'nullable|json',
-        ], [
-            'display_order.unique' => 'This display order is already taken for this banner type. Please choose a different order.',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
         DB::beginTransaction();
+
         try {
             $banner = WebsiteBanner::findOrFail($id);
 
-            // Handle image upload
+            // Image upload
             $path = $banner->image_url;
             if ($request->hasFile('image')) {
-                // Delete old image
-                if ($banner->image_url && File::exists(public_path($banner->image_url))) {
-                    File::delete(public_path($banner->image_url));
+                if ($path && File::exists(public_path($path))) {
+                    File::delete(public_path($path));
                 }
 
                 $file = $request->file('image');
@@ -187,32 +140,51 @@ class BannerController extends Controller
 
             $banner->update([
                 'title'          => $request->title,
-                'slug'           => \Illuminate\Support\Str::slug($request->title),
+                'slug'           => Str::slug($request->title),
                 'description'    => $request->description,
                 'image_url'      => $path,
                 'type'           => $request->type,
                 'channel'        => $request->channel,
-                'promotion_type' => $request->promotion_type !== '' ? $request->promotion_type : null,
+
+                // ?: explained here
+                'promotion_type' => $request->promotion_type ?: null,
+                'discount_type'  => $request->discount_type ?: null,
+
                 'discount_value' => $request->discount_value,
-                'discount_type'  => $request->discount_type !== '' ? $request->discount_type : null,
                 'promo_code'     => $request->promo_code,
                 'link_url'       => $request->link_url,
+
+                // ?? is safer for defaults
                 'link_target'    => $request->link_target ?? 1,
+
                 'position'       => $request->position,
-                'display_order'  => $request->display_order ?? 0,
+                'display_order'  => $request->display_order,
                 'start_at'       => $request->start_at,
                 'end_at'         => $request->end_at,
                 'is_active'      => $request->is_active,
-                'metadata'       => $request->metadata ? json_decode($request->metadata, true) : null,
+
+                'metadata'       => $request->metadata
+                    ? json_decode($request->metadata, true)
+                    : null,
             ]);
 
             DB::commit();
-            activity()->performedOn($banner)->causedBy(Auth::user())->log('Banner updated');
-            return redirect()->route('website.banner.index')->with('success', 'Banner updated successfully.');
+
+            activity()
+                ->performedOn($banner)
+                ->causedBy(Auth::user())
+                ->log('Banner updated');
+
+            return redirect()
+                ->route('website.banner.index')
+                ->with('success', 'Banner updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Banner Update Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Error: ' . $e->getMessage())->withInput();
+
+            return back()
+                ->withInput()
+                ->with('error', 'Something went wrong while updating the banner.');
         }
     }
 
@@ -241,20 +213,6 @@ class BannerController extends Controller
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
     }
-
-    /**
-     * Display promotional banners (type = 1)
-     */
-    public function promotionalBanner()
-    {
-        $promotionalBanner = WebsiteBanner::where('type', '1')
-            ->orderBy('display_order', 'asc')
-            ->paginate(15);
-
-        return view('/e-commerce/banner/promotional-banner/index', compact('promotionalBanner'));
-    }
-
-
 
     /**
      * Update banner sort order via AJAX for drag & drop functionality

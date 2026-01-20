@@ -120,48 +120,33 @@ Route::prefix('/demo')->group(function () {
         // Scrap Items Product Page
         Route::get('/e-commerce/scrap-items', 'ec_scrapItems')->name('scrap-items');
     });
-
-    // ------------------------------------------------------------ E-Commerce Categories Page -------------------------------------------------------------
-
-    Route::controller(CategorieController::class)->group(function () {
-        // Categorie Page
-        Route::get('/e-commerce/categories', 'index')->name('category.index');
-        // Create Categorie Page
-        Route::get('/e-commerce/create-categorie', 'create')->name('category.create');
-        // Store Categorie Page
-        // Route::post('/e-commerce/store-categorie' ,'store')->name('category.store');
-        // Parent Categorie Store
-        Route::post('/e-commerce/store-parent-categorie', 'storeParent')->name('parent.category.store');
-        // Sub Categorie Store
-        Route::post('/e-commerce/store-sub-categorie', 'storeSubCategorie')->name('sub.category.store');
-        // View Sub Categorie From Parent View
-        Route::get('/e-commerce/view-categorie/{id}', 'parentCategorie')->name('categorie.view');
-        // Edit Create Categorie Page
-        Route::get('/e-commerce/edit-categorie/{id}', 'edit')->name('category.edit');
-        // Update Categorie Page
-        Route::put('/e-commerce/update-categorie/{id}', 'update')->name('category.update');
-        // Delete Categorie Page
-        Route::delete('/e-commerce/delete-categorie/{id}', 'delete')->name('category.delete');
-        // Edit Child Category
-        Route::get('/e-commerce/edit-child-categorie/{id}', 'editChild')->name('child.category.edit');
-        // Update Child Category
-        Route::put('/e-commerce/update-child-categorie/{id}', 'updateChild')->name('child.category.update');
-        // Delete Child Category
-        Route::delete('/e-commerce/delete-child-categorie/{id}', 'destroyChild')->name('child.category.delete');
-        // Update Category Order
-        Route::post('/e-commerce/update-category-order', 'updateOrder')->name('category.update.order');
-        // Get Child Category Data for AJAX
-        Route::get('/e-commerce/get-child-category-data/{id}', 'getChildCategoryData')->name('child.category.data');
-
-        Route::get('/e-commerce/check-sort-order-unique', 'checkSortOrderUnique')->name('category.check-sort-order');
-    });
-
+    
     Route::get('/categorie-dependent', [CategorieController::class, 'getDependentData']);
-
-
-
-
+    
+    
+    
+    
     Route::prefix('/e-commerce')->group(function () {
+            // ------------------------------------------------------------ E-Commerce Categories Page -------------------------------------------------------------
+            Route::controller(CategorieController::class)->group(function () {
+                Route::get('/categories', 'index')->name('category.index');
+                Route::get('/create-categorie', 'create')->name('category.create');
+                Route::post('/store-parent-categorie', 'storeParent')->name('parent.category.store');
+                Route::post('/store-sub-categorie', 'storeSubCategorie')->name('sub.category.store');
+                
+                Route::delete('/delete-categorie/{id}', 'delete')->name('category.delete');
+
+                // Route::post('/store-categorie' ,'store')->name('category.store');
+                Route::get('/view-categorie/{id}', 'parentCategorie')->name('categorie.view');
+                Route::get('/edit-categorie/{id}', 'edit')->name('category.edit');
+                Route::put('/update-categorie/{id}', 'update')->name('category.update');
+                Route::get('/edit-child-categorie/{id}', 'editChild')->name('child.category.edit');
+                Route::put('/update-child-categorie/{id}', 'updateChild')->name('child.category.update');
+                Route::delete('/delete-child-categorie/{id}', 'destroyChild')->name('child.category.delete');
+                Route::post('/update-category-order', 'updateOrder')->name('category.update.order');
+                Route::get('/get-child-category-data/{id}', 'getChildCategoryData')->name('child.category.data');
+                Route::get('/check-sort-order-unique', 'checkSortOrderUnique')->name('category.check-sort-order');
+            });
         // ------------------------------------------------------------ E-Commerce Brands Page -------------------------------------------------------------
         Route::controller(BrandController::class)->group(function () {
             Route::get('/brands', 'index')->name('brand.index');

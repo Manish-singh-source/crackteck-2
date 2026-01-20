@@ -11,6 +11,7 @@
     'model' => $user ?? null,
     'autofocus' => true,
     'class' => 'custom-class',
+    id => 'custom-id',
 ]) 
 --}}
 
@@ -20,7 +21,7 @@
 
     {{-- Input Field --}}
     <input type="{{ $type ?? 'text' }}" class="form-control @error($name) is-invalid @enderror {{ $class ?? '' }}" name="{{ $name }}"
-        id="{{ $name }}" {{-- Optional Attributes --}}
+        id="{{ $id ?? $name }}" {{-- Optional Attributes --}}
         @if (!empty($placeholder)) placeholder="{{ $placeholder }}" @endif
         @if (!empty($autofocus)) autofocus @endif @if (!empty($disabled)) disabled @endif
         @if (!empty($readonly)) readonly @endif {{-- Value: from old input or model --}}

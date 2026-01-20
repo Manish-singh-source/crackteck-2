@@ -12,10 +12,11 @@
                 <div>
                     <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target=".attribute-value">Add
                         Attribute Value</button>
+                    <a href="{{ route('variant.index') }}" class="btn btn-secondary">Back to List</a>
 
                     <!-- Modals -->
-                    <div class="modal fade attribute-value" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
-                        aria-hidden="true">
+                    <div class="modal fade attribute-value" tabindex="-1" role="dialog"
+                        aria-labelledby="mySmallModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                             <div class="modal-content">
                                 <div class="modal-header bg-light">
@@ -83,7 +84,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
 
@@ -174,6 +174,7 @@
                                                                         class="btn btn-icon btn-sm bg-warning-subtle me-1 btn-edit-attr-value"
                                                                         data-id="{{ $value->id }}"
                                                                         data-value="{{ $value->value }}"
+                                                                        data-action="{{ route('variant.update.attribute.value', $value->id) }}"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target=".attribute-value-edit"
                                                                         data-bs-original-title="Edit">
@@ -216,28 +217,16 @@
 
 
 @section('scripts')
-<script>
-    $(document).ready(function() {
-        $('.btn-edit-attr-value').click(function() {
+    <script>
+        $(document).ready(function() {
+            $('.btn-edit-attr-value').click(function() {
+                var id = $(this).data('id');
+                var value = $(this).data('value');
+                var action = $(this).data('action');
 
-            var id = $(this).data('id');
-            var value = $(this).data('value');
-
-            $('#edit_attribute_value').val(value);
-            $('#editAttributeValueForm').attr('action', '' + id);
+                $('#edit_attribute_value').val(value);
+                $('#editAttributeValueForm').attr('action', action);
+            });
         });
-    });
-
-    // $(document).ready(function() {
-    //     $('.btn-edit-attr-value').click(function() {
-            
-    //         var id = $(this).data('id');
-    //         var value = $(this).data('value');
-
-    //         $('#edit_attribute_value').val(value);
-    //         $('#editAttributeValueForm').attr('action', '/e-commerce/update-product-attribute-value/' + id);
-    //     });
-    // });
-
-</script>
+    </script>
 @endsection

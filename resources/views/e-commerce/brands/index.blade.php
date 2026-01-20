@@ -3,7 +3,6 @@
 @section('content')
     <div class="content">
 
-        <!-- Start Content-->
         <div class="container-fluid">
             <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
                 <div class="flex-grow-1">
@@ -11,7 +10,6 @@
                 </div>
                 <div>
                     <a href="{{ route('brand.create') }}" class="btn btn-primary">Add New Brand</a>
-                    <!-- <button class="btn btn-primary">Add New Brand</button> -->
                 </div>
             </div>
 
@@ -19,123 +17,66 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-body border border-dashed border-end-0 border-start-0">
-                            <form action="#" method="get">
-                                <div class="d-flex justify-content-between">
-                                    <div class="row">
-                                        <div class="col-xl-10 col-md-10 col-sm-10">
-                                            <div class="search-box">
-                                                <input type="text" name="search" value=""
-                                                    class="form-control search" placeholder="Search Brand">
-                                                <i class="ri-search-line search-icon"></i>
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-2 col-md-2 col-sm-2 col-2">
-                                            <div class="d-flex justify-content-center align-items-center">
-                                                <button type="submit" class="btn btn-primary waves ripple-light">
-                                                    <i class="fa-solid fa-magnifying-glass "></i>
-
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row g-3">
-                                        <div class="col-xl-6 col-md-6 col-sm-6 col-6 btn-group" role="group">
-                                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fa-solid fa-arrow-up-z-a "></i>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="#">Sort By Name</a></li>
-                                            </ul>
-                                        </div>
-
-                                        <div class="col-xl-6 col-md-6 col-sm-6 col-6 btn-group" role="group">
-                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#standard-modal">
-                                                <i class="fa-solid fa-filter "></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="modal fade" id="standard-modal" tabindex="-1"
-                                        aria-labelledby="standard-modalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="standard-modalLabel">Filters</h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                                </div>
-
-                                                <div class="modal-body px-3 py-md-2">
-                                                    <h5>Top Brand</h5>
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check mb-2">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault1">
-                                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                                        Active
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault2">
-                                                                    <label class="form-check-label" for="flexRadioDefault2">
-                                                                        Inactive
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <br>
-                                                    <h5>Brand Status</h5>
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check mb-2">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault1">
-                                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                                        Active
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault2">
-                                                                    <label class="form-check-label" for="flexRadioDefault2">
-                                                                        Inactive
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-light"
-                                                        data-bs-dismiss="modal">Close</button>
-                                                    <button type="button" class="btn btn-primary">Save changes</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                            </form>
-                        </div>
                         <div class="card-body pt-0">
                             <div class="tab-content text-muted">
+                                <ul class="nav nav-underline border-bottom" id="pills-tab" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link p-2" href="{{ route('brand.index') }}">
+                                            <span class="d-block d-sm-none">
+                                                <i class="mdi mdi-format-list-bulleted fs-16 me-1 text-primary"></i>
+                                            </span>
+                                            <span class="d-none d-sm-block">
+                                                <i class="mdi mdi-format-list-bulleted fs-16 me-1 text-primary"></i>All
+                                                Brands
+                                            </span>
+                                        </a>
+                                    </li>
+                                    {{-- Active Status Brands --}}
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link p-2" href="{{ route('brand.index', ['status' => 'active']) }}">
+                                            <span class="d-block d-sm-none">
+                                                <i class="mdi mdi-check-circle-outline fs-16 me-1 text-success"></i>
+                                            </span>
+                                            <span class="d-none d-sm-block">
+                                                <i class="mdi mdi-check-circle-outline fs-16 me-1 text-success"></i>Active
+                                                Brands
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link p-2" href="{{ route('brand.index', ['status' => 'inactive']) }}">
+                                            <span class="d-block d-sm-none">
+                                                <i class="mdi mdi-close-circle-outline fs-16 me-1 text-danger"></i>
+                                            </span>
+                                            <span class="d-none d-sm-block">
+                                                <i class="mdi mdi-close-circle-outline fs-16 me-1 text-danger"></i>Inactive
+                                                Brands
+                                            </span>
+                                        </a>
+                                    </li>
+                                    
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link p-2" href="{{ route('brand.index', ['status_ecommerce' => 'active']) }}">
+                                            <span class="d-block d-sm-none">
+                                                <i class="mdi mdi-check-circle-outline fs-16 me-1 text-success"></i>
+                                            </span>
+                                            <span class="d-none d-sm-block">
+                                                <i class="mdi mdi-check-circle-outline fs-16 me-1 text-success"></i>Active on E-commerce
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link p-2" href="{{ route('brand.index', ['status_ecommerce' => 'inactive']) }}">
+                                            <span class="d-block d-sm-none">
+                                                <i class="mdi mdi-close-circle-outline fs-16 me-1 text-danger"></i>
+                                            </span>
+                                            <span class="d-none d-sm-block">
+                                                <i class="mdi mdi-close-circle-outline fs-16 me-1 text-danger"></i>Inactive on E-commerce
+                                            </span>
+                                        </a>
+                                    </li>
+
+                                </ul>
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="card shadow-none">
@@ -149,7 +90,7 @@
                                                             <th>Slug</th>
                                                             <th>Image</th>
                                                             <th>E-commerce Status</th>
-                                                            <th>Status</th> 
+                                                            <th>Status</th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
@@ -171,14 +112,14 @@
                                                                 </td>
                                                                 <td>
                                                                     <span
-                                                                        class="badge fw-semibold {{ $brand->status_ecommerce === '1' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
-                                                                        {{ $brand->status_ecommerce == '1' ? 'Active' : 'Inactive' }}
+                                                                        class="badge fw-semibold {{ $brand->status_ecommerce === 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
+                                                                        {{ $brand->status_ecommerce == 'active' ? 'Active' : 'Inactive' }}
                                                                     </span>
-                                                                </td>   
+                                                                </td>
                                                                 <td>
                                                                     <span
-                                                                        class="badge fw-semibold {{ $brand->status === '1' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
-                                                                        {{ $brand->status == '1' ? 'Active' : 'Inactive' }}
+                                                                        class="badge fw-semibold {{ $brand->status === 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
+                                                                        {{ $brand->status == 'active' ? 'Active' : 'Inactive' }}
                                                                     </span>
                                                                 </td>
                                                                 <td>

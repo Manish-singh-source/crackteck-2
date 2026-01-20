@@ -158,49 +158,33 @@ Route::prefix('/demo')->group(function () {
 
     Route::get('/categorie-dependent', [CategorieController::class, 'getDependentData']);
 
-    // ------------------------------------------------------------ E-Commerce Brands Page -------------------------------------------------------------
-
-    Route::controller(BrandController::class)->group(function () {
-        // Brands Page
-        Route::get('/e-commerce/brands', 'index')->name('brand.index');
-        // Create Brands Page
-        Route::get('/e-commerce/create-brand', 'create')->name('brand.create');
-        // Store Brands Page
-        Route::post('/e-commerce/store-brand', 'store')->name('brand.store');
-        // Edit Brands Page
-        Route::get('/e-commerce/edit-brand/{id}', 'edit')->name('brand.edit');
-        // Update Brands Page
-        Route::put('/e-commerce/update-brand/{id}', 'update')->name('brand.update');
-        // Delete Brands Page
-        Route::delete('/e-commerce/delete-brand/{id}', 'delete')->name('brand.delete');
-    });
-
-    // ------------------------------------------------------------ E-Commerce Product Variants Page -------------------------------------------------------------
-
-    Route::controller(ProductVariantsController::class)->group(function () {
-        // Product Variants Page
-        Route::get('/e-commerce/product-variants', 'index')->name('variant.index');
-        // Product Attribute List Page
-        Route::get('/e-commerce/product-attribute-list/{id}', 'view')->name('variant.view');
-        // Edit Product Attribute List
-        Route::get('/e-commerce/edit-product-attribute/{id}', 'editAttribute')->name('variant.edit');
-        // Update Product Attribute List
-        Route::put('/e-commerce/update-product-attribute/{id}', 'updateAttribute')->name('variant.update');
-        // Store Product Attribute
-        Route::post('/e-commerce/store-product-attribute', 'storeAttribute')->name('variant.store');
-        // Delete Product Attribute
-        Route::delete('/e-commerce/delete-product-attribute/{id}', 'deleteAttribute')->name('variant.delete');
-        // Store Product Attribute Value
-        Route::post('/e-commerce/store-product-attribute-value', 'storeAttributeValue')->name('variant.store.attribute.value');
-        // Update Product Attribute Value
-        Route::put('/e-commerce/update-product-attribute-value/{id}', 'updateAttributeValue')->name('variant.update.attribute.value');
-        // Delete Product Attribute Value
-        Route::delete('/e-commerce/delete-product-attribute-value/{id}', 'deleteAttributeValue')->name('variant.delete.attribute.value');
-    });
 
 
 
     Route::prefix('/e-commerce')->group(function () {
+        // ------------------------------------------------------------ E-Commerce Brands Page -------------------------------------------------------------
+        Route::controller(BrandController::class)->group(function () {
+            Route::get('/brands', 'index')->name('brand.index');
+            Route::get('/create-brand', 'create')->name('brand.create');
+            Route::post('/store-brand', 'store')->name('brand.store');
+            Route::get('/edit-brand/{id}', 'edit')->name('brand.edit');
+            Route::put('/update-brand/{id}', 'update')->name('brand.update');
+            Route::delete('/delete-brand/{id}', 'delete')->name('brand.delete');
+        });
+
+        // ------------------------------------------------------------ E-Commerce Product Variants Page -------------------------------------------------------------
+        Route::controller(ProductVariantsController::class)->group(function () {
+            Route::get('/product-variants', 'index')->name('variant.index');
+            Route::post('/store-product-attribute', 'storeAttribute')->name('variant.store');
+            Route::post('/store-product-attribute-value', 'storeAttributeValue')->name('variant.store.attribute.value');
+            Route::get('/product-attribute-list/{id}', 'view')->name('variant.view');
+            Route::delete('/delete-product-attribute/{id}', 'deleteAttribute')->name('variant.delete');
+
+            Route::get('/edit-product-attribute/{id}', 'editAttribute')->name('variant.edit');
+            Route::put('/update-product-attribute/{id}', 'updateAttribute')->name('variant.update');
+            Route::put('/update-product-attribute-value/{id}', 'updateAttributeValue')->name('variant.update.attribute.value');
+            Route::delete('/delete-product-attribute-value/{id}', 'deleteAttributeValue')->name('variant.delete.attribute.value');
+        });
 
         // ------------------------------------------------------------ E-Commerce Coupons Page -------------------------------------------------------------
         Route::controller(CouponsController::class)->group(function () {
@@ -215,7 +199,7 @@ Route::prefix('/demo')->group(function () {
             Route::get('/coupons/search-categories', 'searchCategories')->name('coupon.search-categories');
             Route::get('/coupons/search-brands', 'searchBrands')->name('coupon.search-brands');
             Route::get('/coupons/search-products', 'searchProducts')->name('coupon.search-products');
-        }); 
+        });
 
         // ------------------------------------------------------------ E-Commerce Subscribers Page -------------------------------------------------------------
         Route::controller(SubscriberController::class)->group(function () {

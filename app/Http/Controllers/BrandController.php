@@ -12,8 +12,16 @@ class BrandController extends Controller
     //
     public function index()
     {
-        $brand = Brand::all();
-
+        $status = request()->get('status') ?? 'all';
+        $status_ecommerce = request()->get('status_ecommerce') ?? 'all';
+        $query = Brand::query();
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+        if ($status_ecommerce != 'all') {
+            $query->where('status_ecommerce', $status_ecommerce);
+        }
+        $brand = $query->get();
         return view('e-commerce/brands/index', compact('brand'));
     }
 
@@ -25,10 +33,10 @@ class BrandController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'image' => 'required',
-            'status_ecommerce' => 'required',
-            'status' => 'required',
+            'name' => 'required|string|max:255',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status_ecommerce' => 'required|in:active,inactive',
+            'status' => 'required|in:active,inactive',
         ]);
 
         if ($validator->fails()) {
@@ -43,10 +51,10 @@ class BrandController extends Controller
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time().'.'.$file->getClientOriginalExtension();
+            $filename = time() . '.' . $file->getClientOriginalExtension();
 
             $file->move(public_path('uploads/e-commerce/brands'), $filename);
-            $brand->image = 'uploads/e-commerce/brands/'.$filename;
+            $brand->image = 'uploads/e-commerce/brands/' . $filename;
         }
 
         $brand->save();
@@ -61,16 +69,16 @@ class BrandController extends Controller
     public function edit($id)
     {
         $brand = Brand::find($id);
-
         return view('e-commerce/brands/edit', compact('brand'));
     }
 
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'status_ecommerce' => 'required',
-            'status' => 'required',
+            'name' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status_ecommerce' => 'required|in:active,inactive',
+            'status' => 'required|in:active,inactive',
         ]);
 
         if ($validator->fails()) {
@@ -90,10 +98,10 @@ class BrandController extends Controller
             }
 
             $file = $request->file('image');
-            $filename = time().'.'.$file->getClientOriginalExtension();
+            $filename = time() . '.' . $file->getClientOriginalExtension();
 
             $file->move(public_path('uploads/e-commerce/brands'), $filename);
-            $brand->image = 'uploads/e-commerce/brands/'.$filename;
+            $brand->image = 'uploads/e-commerce/brands/' . $filename;
         }
 
         $brand->save();
@@ -103,7 +111,19 @@ class BrandController extends Controller
 
     public function delete($id)
     {
-        $brand = Brand::findOrFail($id);
+        $brand = Brand::withCount('products')->find($id);
+        if (! $brand) {
+            return back()->with('error', 'Something went wrong.');
+        }
+
+        if ($brand->products_count > 0) {
+            return back()->with('error', 'Cannot delete brand with associated products.');
+        }
+
+        if ($brand->image && File::exists(public_path($brand->image))) {
+            File::delete(public_path($brand->image));
+        }
+
         $brand->delete();
 
         return redirect()->route('brand.index')->with('success', 'Brand deleted successfully.');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreOrderRequest;
 use App\Models\Customer;
 use App\Models\DeliveryMan;
 use App\Models\EcommerceOrder;
@@ -65,42 +66,8 @@ class OrderController extends Controller
         return view('e-commerce.order.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreOrderRequest $request)
     {
-        // dd($request->all());
-        $request->validate([
-            'email' => 'required|email',
-            'shipping_first_name' => 'required|string|max:255',
-            'shipping_last_name' => 'required|string|max:255',
-            'shipping_phone' => 'required|string|max:20',
-            'shipping_address1' => 'required|string|max:255',
-            'shipping_address2' => 'nullable|string|max:255',
-            'shipping_city' => 'required|string|max:100',
-            'shipping_state' => 'required|string|max:100',
-            'shipping_pincode' => 'required|string|max:20',
-            'shipping_country' => 'required|string|max:100',
-            'payment_status' => 'required|in:pending,partial,completed,failed,refunded',
-            'payment_method' => 'required|in:online,cod',
-            
-            'shipping_charges' => 'nullable|numeric|min:0',
-            'packaging_charges' => 'nullable|numeric|min:0',
-            'discount_amount' => 'nullable|numeric|min:0',
-            'coupon_code' => 'nullable|numeric|min:0',
-
-            'order_status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled,returned',
-
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|integer',
-            'items.*.product_name' => 'required|string',
-            'items.*.product_sku' => 'required|string',
-            'items.*.hsn_code' => 'nullable|string',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.unit_price' => 'required|numeric|min:0',
-            'items.*.discount_per_unit' => 'nullable|numeric|min:0',
-            'items.*.tax_per_unit' => 'nullable|numeric|min:0',
-            'items.*.line_total' => 'required|numeric|min:0',
-        ]);
-
         try {
             DB::beginTransaction();
 
@@ -120,17 +87,16 @@ class OrderController extends Controller
             $order = Order::create([
                 'customer_id' => $request->customer_id,
                 'order_number' => $orderNumber,
-                'source_platform' => 'admin',
+                'source_platform' => 'admin_panel',
+                'total_items' => count($request->items),
                 'email' => $request->email,
                 'shipping_first_name' => $request->shipping_first_name,
                 'shipping_last_name' => $request->shipping_last_name,
                 'shipping_phone' => $request->shipping_phone,
                 'shipping_address_id' => $request->shipping_address_id,
-                'billing_same_as_shipping' => true, // Default for admin created orders
+                'billing_same_as_shipping' => true,
                 'billing_address_id' => $request->shipping_address_id,
                 'payment_status' => $request->payment_status,
-                'card_name' => $request->card_name,
-                'card_last_four' => $request->card_last_four,
                 'subtotal' => $subtotal,
                 'tax_amount' => $taxAmount,
                 'shipping_charges' => $shippingCharges,
@@ -147,18 +113,14 @@ class OrderController extends Controller
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $itemData['product_id'],
-                    'product_serial_id' => null,
                     'product_name' => $itemData['product_name'],
                     'product_sku' => $itemData['product_sku'],
                     'hsn_code' => $itemData['hsn_code'],
                     'quantity' => $itemData['quantity'],
                     'unit_price' => $itemData['unit_price'],
                     'discount_per_unit' => $itemData['discount_per_unit'] ?? 0,
-                    'tax_per_unit' => $itemData['tax_per_unit'] ?? 0,   
+                    'tax_per_unit' => $itemData['tax_per_unit'] ?? 0,
                     'line_total' => $itemData['line_total'],
-                    'variant_details' => json_encode([]),
-                    'custom_options' => json_encode([]),
-                    'item_status' => $request->order_status,
                 ]);
             }
 
@@ -172,25 +134,20 @@ class OrderController extends Controller
                 'amount' => $totalAmount,
                 'currency' => 'INR',
                 'status' => $request->payment_status,
-                'response_data' => json_encode([]),
                 'processed_at' => now(),
-                'failure_reason' => null,
-                'notes' => 'Initial payment',
             ]);
 
-            // Update product quantities in warehouse and e-commerce
-            // $this->updateProductQuantities($order);
+            // Optional: Update product quantities after order confirmation
+            $this->updateProductQuantities($order);
 
             DB::commit();
 
-            return redirect()->route('order.view', $order->id)
+            return redirect()->route('order.index')
                 ->with('success', 'E-commerce order created successfully!');
         } catch (\Exception $e) {
             DB::rollback();
-
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Failed to create order: ' . $e->getMessage());
+            \Log::error('Order creation failed', ['error' => $e->getMessage(), 'order_data' => $request->all()]);
+            return redirect()->back()->withInput()->with('error', 'Failed to create order: ' . $e->getMessage());
         }
     }
 
@@ -442,11 +399,11 @@ class OrderController extends Controller
 
         $customers = Customer::with('addressDetails')
             ->where(function ($q) use ($query) {
-            $q->where('first_name', 'LIKE', "%{$query}%")
-                ->orWhere('last_name', 'LIKE', "%{$query}%")
-                ->orWhere('email', 'LIKE', "%{$query}%")
-                ->orWhere('phone', 'LIKE', "%{$query}%");
-        })
+                $q->where('first_name', 'LIKE', "%{$query}%")
+                    ->orWhere('last_name', 'LIKE', "%{$query}%")
+                    ->orWhere('email', 'LIKE', "%{$query}%")
+                    ->orWhere('phone', 'LIKE', "%{$query}%");
+            })
             ->select('id', 'first_name', 'last_name', 'email', 'phone') // lightweight
             ->limit(10)
             ->get();

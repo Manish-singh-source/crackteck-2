@@ -747,7 +747,6 @@
 
                 const subtotal = quantity * unitPrice;
                 const taxAmount = (subtotal * taxPercentage) / 100;
-                const total = subtotal + taxAmount;
 
                 const item = {
                     product_id: selectedProduct.id,
@@ -756,10 +755,9 @@
                     hsn_code: selectedProduct.hsn,
                     quantity: quantity,
                     unit_price: unitPrice,
-                    tax_percentage: taxPercentage,
-                    taxable_value: subtotal,
-                    igst_amount: taxAmount,
-                    total_price: total
+                    discount_per_unit: 0,
+                    tax_per_unit: taxAmount,
+                    line_total: subtotal
                 };
 
                 orderItems.push(item);
@@ -794,7 +792,7 @@
                 $('#no-items-message').hide();
 
                 let html =
-                    '<div class="table-responsive"><table class="table table-bordered"><thead class="table-light"><tr><th>Product</th><th>HSN/SAC</th><th>Qty</th><th>Unit Price</th><th>Tax</th><th>Total</th><th>Action</th></tr></thead><tbody>';
+                    '<div class="table-responsive"><table class="table table-bordered"><thead class="table-light"><tr><th>Product</th><th>HSN/SAC</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Action</th></tr></thead><tbody>';
 
                 orderItems.forEach(function(item, index) {
                     html += `<tr>
@@ -805,8 +803,7 @@
                 <td>${item.hsn_code}</td>
                 <td>${item.quantity}</td>
                 <td>₹${item.unit_price.toFixed(2)}</td>
-                <td>₹${item.igst_amount.toFixed(2)} (${item.tax_percentage}%)</td>
-                <td>₹${item.total_price.toFixed(2)}</td>
+                <td>₹${item.line_total.toFixed(2)}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-danger remove-item" data-index="${index}">
                         <i class="fas fa-trash"></i>
@@ -822,10 +819,9 @@
                 <input type="hidden" name="items[${index}][hsn_code]" value="${item.hsn_code}">
                 <input type="hidden" name="items[${index}][quantity]" value="${item.quantity}">
                 <input type="hidden" name="items[${index}][unit_price]" value="${item.unit_price}">
-                <input type="hidden" name="items[${index}][tax_percentage]" value="${item.tax_percentage}">
-                <input type="hidden" name="items[${index}][taxable_value]" value="${item.taxable_value}">
-                <input type="hidden" name="items[${index}][igst_amount]" value="${item.igst_amount}">
-                <input type="hidden" name="items[${index}][total_price]" value="${item.total_price}">
+                <input type="hidden" name="items[${index}][discount_per_unit]" value="${item.discount_per_unit}">
+                <input type="hidden" name="items[${index}][tax_per_unit]" value="${item.tax_per_unit}">
+                <input type="hidden" name="items[${index}][line_total]" value="${item.line_total}">
             `;
                 });
 
@@ -843,8 +839,8 @@
 
             // Update order summary
             function updateOrderSummary() {
-                const subtotal = orderItems.reduce((sum, item) => sum + item.taxable_value, 0);
-                const taxAmount = orderItems.reduce((sum, item) => sum + item.igst_amount, 0);
+                const subtotal = orderItems.reduce((sum, item) => sum + item.line_total, 0);
+                const taxAmount = orderItems.reduce((sum, item) => sum + item.tax_per_unit, 0);
                 const shippingCharges = parseFloat($('#shipping_charges').val()) || 0;
                 const packagingCharges = parseFloat($('#packaging_charges').val()) || 0;
                 const couponCode = parseFloat($('#coupon_code').val()) || 0;

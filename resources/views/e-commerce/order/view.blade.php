@@ -417,18 +417,18 @@
                                 @csrf
                                 <div class="mb-3">
                                     <label class="form-label">Order Status</label>
-                                    <select class="form-select" name="status" id="order-status">
-                                        <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>
+                                    <select class="form-select" name="order_status" id="order-status">
+                                        <option value="pending" {{ $order->order_status == 'pending' ? 'selected' : '' }}>
                                             Pending</option>
-                                        <option value="confirmed" {{ $order->status == 'confirmed' ? 'selected' : '' }}>
+                                        <option value="confirmed" {{ $order->order_status == 'confirmed' ? 'selected' : '' }}>
                                             Confirmed</option>
-                                        <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>
+                                        <option value="processing" {{ $order->order_status == 'processing' ? 'selected' : '' }}>
                                             Processing</option>
-                                        <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>
+                                        <option value="shipped" {{ $order->order_status == 'shipped' ? 'selected' : '' }}>
                                             Shipped</option>
-                                        <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>
+                                        <option value="delivered" {{ $order->order_status == 'delivered' ? 'selected' : '' }}>
                                             Delivered</option>
-                                        <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>
+                                        <option value="cancelled" {{ $order->order_status == 'cancelled' ? 'selected' : '' }}>
                                             Cancelled</option>
                                     </select>
                                 </div>
@@ -436,30 +436,6 @@
                                     <i class="fas fa-save me-1"></i> Update Status
                                 </button>
                             </form>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions Card -->
-                    <div class="card">
-                        <div class="card-header border-bottom-dashed">
-                            <h5 class="card-title mb-0">Quick Actions</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-grid gap-2">
-                                <a href="{{ route('order.invoice', $order->id) }}" class="btn btn-success"
-                                    target="_blank">
-                                    <i class="fas fa-file-pdf me-1"></i> Download Invoice
-                                </a>
-                                <a href="{{ route('order.edit', $order->id) }}" class="btn btn-primary">
-                                    <i class="fas fa-edit me-1"></i> Edit Order
-                                </a>
-                                @if (!in_array($order->status, ['shipped', 'delivered']))
-                                    <button type="button" class="btn btn-danger" id="delete-order-btn"
-                                        data-order-id="{{ $order->id }}">
-                                        <i class="fas fa-trash me-1"></i> Delete Order
-                                    </button>
-                                @endif
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -475,7 +451,7 @@
                     <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body m-3">
                     Are you sure you want to delete this order? This action cannot be undone.
                 </div>
                 <div class="modal-footer">
@@ -501,7 +477,7 @@
                     '<i class="fas fa-spinner fa-spin me-1"></i> Assigning...');
 
                 $.ajax({
-                    url: `/e-commerce/order/${orderId}/assign-delivery-man`,
+                    url: `/demo/e-commerce/order/${orderId}/assign-delivery-man`,
                     method: 'POST',
                     data: {
                         delivery_man_id: deliveryManId,
@@ -553,13 +529,14 @@
                     '<i class="fas fa-spinner fa-spin me-1"></i> Updating...');
 
                 $.ajax({
-                    url: `/e-commerce/order/${orderId}/update-status`,
+                    url: `/demo/e-commerce/order/${orderId}/update-status`,
                     method: 'POST',
                     data: {
-                        status: newStatus,
+                        order_status: newStatus,
                         _token: '{{ csrf_token() }}'
                     },
                     success: function(response) {
+                        console.log('Response:', response);
                         if (response.success) {
                             if (typeof toastr !== 'undefined') {
                                 toastr.success(response.message);

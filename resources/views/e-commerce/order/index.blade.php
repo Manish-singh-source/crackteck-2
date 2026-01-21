@@ -325,21 +325,6 @@
                                                             class="text-muted">{{ $order->created_at->format('h:i A') }}</small>
                                                     </td>
                                                     <td>
-                                                        {{-- <div class="btn-group" role="group">
-                                                            <a href="{{ route('order.view', $order->id) }}"
-                                                                class="btn btn-sm btn-outline-info" title="View">
-                                                                <i class="fas fa-eye"></i>
-                                                            </a>
-                                                            <a href="{{ route('order.edit', $order->id) }}"
-                                                                class="btn btn-sm btn-outline-primary" title="Edit">
-                                                                <i class="fas fa-edit"></i>
-                                                            </a>
-                                                            <button type="button"
-                                                                class="btn btn-sm btn-outline-danger delete-order"
-                                                                data-id="{{ $order->id }}" title="Delete">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </div> --}}
                                                         <a aria-label="anchor"
                                                             href="{{ route('order.view', $order->id) }}"
                                                             class="btn btn-icon btn-sm bg-primary-subtle me-1"
@@ -466,7 +451,7 @@
                 const originalValue = selectElement.data('original-value') || selectElement.val();
 
                 $.ajax({
-                    url: `/e-commerce/order/${orderId}/update-status`,
+                    url: `/demo/e-commerce/order/${orderId}/update-status`,
                     method: 'POST',
                     data: {
                         order_status: newStatus,
@@ -529,7 +514,7 @@
 
                 if (selectedOrderIds.length > 0) {
                     $.ajax({
-                        url: '/e-commerce/orders/bulk-delete',
+                        url: '/demo/e-commerce/orders/bulk-delete',
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
@@ -575,7 +560,7 @@
             $('#confirmDelete').on('click', function() {
                 if (orderToDelete) {
                     $.ajax({
-                        url: `/e-commerce/order/${orderToDelete}`,
+                        url: `demo/e-commerce/order/${orderToDelete}`,
                         method: 'DELETE',
                         data: {
                             _token: '{{ csrf_token() }}'

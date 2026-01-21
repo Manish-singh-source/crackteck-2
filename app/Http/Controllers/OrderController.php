@@ -23,9 +23,6 @@ use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of orders.
-     */
     public function index(Request $request)
     {
         $query = Order::with(['customer', 'orderItems.ecommerceProduct.warehouseProduct']);
@@ -151,9 +148,6 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified order.
-     */
     public function edit($id)
     {
         $order = Order::with(['customer', 'orderItems.product.ecommerceProduct'])
@@ -162,9 +156,6 @@ class OrderController extends Controller
         return view('e-commerce.order.edit', compact('order'));
     }
 
-    /**
-     * Update the specified order in storage.
-     */
     public function update(Request $request, $id)
     {
         $order = Order::findOrFail($id);
@@ -231,9 +222,6 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Remove the specified order from storage.
-     */
     public function destroy($id)
     {
         try {
@@ -241,10 +229,7 @@ class OrderController extends Controller
 
             // Check if order can be deleted (business logic)
             if (in_array($order->status, ['shipped', 'delivered'])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Cannot delete orders that have been shipped or delivered.',
-                ], 400);
+                return redirect()->back()->with('error', 'Cannot delete orders that have been shipped or delivered.');
             }
 
             // Delete order items first
@@ -253,23 +238,14 @@ class OrderController extends Controller
             // Delete the order
             $order->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Order deleted successfully!',
-            ]);
+            return redirect()->route('order.index')->with('success', 'Order deleted successfully!');
         } catch (\Exception $e) {
             Log::error('Error deleting order: ' . $e->getMessage());
 
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while deleting the order: ' . $e->getMessage(),
-            ], 500);
+            return redirect()->back()->with('error', 'An error occurred while deleting the order: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Remove multiple orders from storage.
-     */
     public function bulkDestroy(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -352,9 +328,6 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Search products for Ajax autocomplete
-     */
     public function searchProducts(Request $request)
     {
         $query = $request->get('q', '');
@@ -386,9 +359,6 @@ class OrderController extends Controller
         return response()->json($products);
     }
 
-    /**
-     * Search customers for Ajax autocomplete
-     */
     public function searchCustomers(Request $request)
     {
         $query = $request->query('q', '');
@@ -411,9 +381,6 @@ class OrderController extends Controller
         return response()->json($customers);
     }
 
-    /**
-     * Display the specified order.
-     */
     public function show($id)
     {
         $order = Order::with(['customer', 'orderItems.product.ecommerceProduct', 'orderPayments'])
@@ -425,9 +392,6 @@ class OrderController extends Controller
         return view('e-commerce.order.view', compact('order', 'totals', 'deliveryMen'));
     }
 
-    /**
-     * Calculate order totals.
-     */
     private function calculateOrderTotals($order)
     {
         $subtotal = $order->orderItems->sum('total_price');
@@ -446,9 +410,6 @@ class OrderController extends Controller
         ];
     }
 
-    /**
-     * Update order status
-     */
     public function updateStatus(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -494,9 +455,6 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Assign delivery man to an order
-     */
     public function assignDeliveryMan(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -529,9 +487,6 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Generate and download PDF invoice for an order
-     */
     public function generateInvoice($id)
     {
         try {
@@ -583,9 +538,6 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Convert number to words (Indian format)
-     */
     private function convertNumberToWords($number)
     {
         $number = (int) $number;
@@ -664,9 +616,6 @@ class OrderController extends Controller
         return trim($result) . ' Rupees Only';
     }
 
-    /**
-     * Helper method to convert hundreds
-     */
     private function convertHundreds($number, $words)
     {
         $result = '';
@@ -690,9 +639,6 @@ class OrderController extends Controller
         return trim($result);
     }
 
-    /**
-     * Update product quantities in warehouse and e-commerce after order placement.
-     */
     private function updateProductQuantities($order)
     {
         foreach ($order->orderItems as $orderItem) {

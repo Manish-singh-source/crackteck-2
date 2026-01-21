@@ -44,10 +44,10 @@
                 </div>
             @endif
 
-            @if (in_array($order->status, ['shipped', 'delivered']))
+            @if (in_array($order->order_status, ['shipped', 'delivered']))
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-triangle me-1"></i>
-                    <strong>Note:</strong> This order has been {{ $order->status }} and cannot be modified.
+                    <strong>Note:</strong> This order has been {{ $order->order_status }} and cannot be modified.
                 </div>
             @endif
 
@@ -241,73 +241,41 @@
                             </div>
                         </div>
 
-                        <!-- Order Status Card -->
+                        <!-- Status Management Card -->
                         <div class="card">
                             <div class="card-header border-bottom-dashed">
-                                <h5 class="card-title mb-0">Order Status</h5>
+                                <h5 class="card-title mb-0">Status Management</h5>
                             </div>
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="status" class="form-label">Status <span
-                                                    class="text-danger">*</span></label>
-                                            <select class="form-select @error('status') is-invalid @enderror" id="status"
-                                                name="status"
-                                                {{ in_array($order->status, ['shipped', 'delivered']) ? 'disabled' : '' }}>
-                                                <option value="pending"
-                                                    {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                                <option value="confirmed"
-                                                    {{ $order->status == 'confirmed' ? 'selected' : '' }}>Confirmed
-                                                </option>
-                                                <option value="processing"
-                                                    {{ $order->status == 'processing' ? 'selected' : '' }}>Processing
-                                                </option>
-                                                <option value="shipped"
-                                                    {{ $order->status == 'shipped' ? 'selected' : '' }}>Shipped</option>
-                                                <option value="delivered"
-                                                    {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered
-                                                </option>
-                                                <option value="cancelled"
-                                                    {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled
-                                                </option>
-                                            </select>
-                                            @error('status')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+                                <form id="status-update-form">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label class="form-label">Order Status</label>
+                                        <select class="form-select" name="order_status" id="order-status">
+                                            <option value="pending"
+                                                {{ $order->order_status == 'pending' ? 'selected' : '' }}>
+                                                Pending</option>
+                                            <option value="confirmed"
+                                                {{ $order->order_status == 'confirmed' ? 'selected' : '' }}>
+                                                Confirmed</option>
+                                            <option value="processing"
+                                                {{ $order->order_status == 'processing' ? 'selected' : '' }}>
+                                                Processing</option>
+                                            <option value="shipped"
+                                                {{ $order->order_status == 'shipped' ? 'selected' : '' }}>
+                                                Shipped</option>
+                                            <option value="delivered"
+                                                {{ $order->order_status == 'delivered' ? 'selected' : '' }}>
+                                                Delivered</option>
+                                            <option value="cancelled"
+                                                {{ $order->order_status == 'cancelled' ? 'selected' : '' }}>
+                                                Cancelled</option>
+                                        </select>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Current Status</label>
-                                            <div class="pt-2">
-                                                <span
-                                                    class="badge bg-{{ $order->order_status === 'delivered' ? 'success' : ($order->order_status === 'shipped' ? 'primary' : ($order->order_status === 'cancelled' ? 'danger' : 'warning')) }} fs-6">
-                                                    {{ ucfirst($order->order_status) }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Actions Card -->
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-grid gap-2">
-                                    @if (!in_array($order->status, ['shipped', 'delivered']))
-                                        <button type="submit" class="btn btn-success">
-                                            <i class="fas fa-save me-1"></i> Update Order
-                                        </button>
-                                    @endif
-                                    <a href="{{ route('order.view', $order->id) }}" class="btn btn-info">
-                                        <i class="fas fa-eye me-1"></i> View Order
-                                    </a>
-                                    <a href="{{ route('order.index') }}" class="btn btn-secondary">
-                                        <i class="fas fa-times me-1"></i> Cancel
-                                    </a>
-                                </div>
+                                    <button type="button" class="btn btn-primary w-100" id="update-status-btn">
+                                        <i class="fas fa-save me-1"></i> Update Status
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -315,4 +283,169 @@
             </form>
         </div>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            const orderId = {{ $order->id }};
+
+            // Update order status
+            $('#assign-delivery-man-btn').on('click', function() {
+                const deliveryManId = $('#delivery-man').val();
+                const button = $(this);
+                const originalText = button.html();
+
+                // Show loading state
+                button.prop('disabled', true).html(
+                    '<i class="fas fa-spinner fa-spin me-1"></i> Assigning...');
+
+                $.ajax({
+                    url: `/demo/e-commerce/order/${orderId}/assign-delivery-man`,
+                    method: 'POST',
+                    data: {
+                        delivery_man_id: deliveryManId,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.success(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+                            // Reload page to show updated timestamps
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+                        }
+                    },
+                    error: function(xhr) {
+                        const message = xhr.responseJSON?.message ||
+                            'Failed to assign delivery man';
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error(message);
+                        } else {
+                            alert(message);
+                        }
+                    },
+                    complete: function() {
+                        // Restore button state
+                        button.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+
+            // Update order status
+            $('#update-status-btn').on('click', function() {
+                const newStatus = $('#order-status').val();
+                const button = $(this);
+                const originalText = button.html();
+
+                // Show loading state
+                button.prop('disabled', true).html(
+                    '<i class="fas fa-spinner fa-spin me-1"></i> Updating...');
+
+                $.ajax({
+                    url: `/demo/e-commerce/order/${orderId}/update-status`,
+                    method: 'POST',
+                    data: {
+                        order_status: newStatus,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        console.log('Response:', response);
+                        if (response.success) {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.success(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+                            // Reload page to show updated timestamps
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+                        }
+                    },
+                    error: function(xhr) {
+                        const message = xhr.responseJSON?.message ||
+                            'Failed to update order status';
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error(message);
+                        } else {
+                            alert(message);
+                        }
+                    },
+                    complete: function() {
+                        // Restore button state
+                        button.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+
+            // Delete order
+            $('#delete-order-btn').on('click', function() {
+                $('#deleteModal').modal('show');
+            });
+
+            $('#confirmDelete').on('click', function() {
+                const button = $(this);
+                const originalText = button.html();
+
+                // Show loading state
+                button.prop('disabled', true).html(
+                    '<i class="fas fa-spinner fa-spin me-1"></i> Deleting...');
+
+                $.ajax({
+                    url: `/e-commerce/order/${orderId}`,
+                    method: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#deleteModal').modal('hide');
+                            if (typeof toastr !== 'undefined') {
+                                toastr.success(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+                            // Redirect to orders list
+                            setTimeout(() => {
+                                window.location.href = '{{ route('order.index') }}';
+                            }, 1000);
+                        } else {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+                        }
+                    },
+                    error: function(xhr) {
+                        const message = xhr.responseJSON?.message || 'Failed to delete order';
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error(message);
+                        } else {
+                            alert(message);
+                        }
+                    },
+                    complete: function() {
+                        // Restore button state
+                        button.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

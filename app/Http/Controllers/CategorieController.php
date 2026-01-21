@@ -13,86 +13,53 @@ class CategorieController extends Controller
     //
     public function index()
     {
-        // $categorie = Categorie::all();
-        $parentCategorie = ParentCategory::all();
+        $status = request()->get('status') ?? 'all';
+        $status_ecommerce = request()->get('status_ecommerce') ?? 'all';
+        $query = ParentCategory::query();
 
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+
+        if ($status_ecommerce != 'all') {
+            $query->where('status_ecommerce', $status_ecommerce);
+        }
+
+        $parentCategorie = $query->get();
         return view('/e-commerce/categories/index', compact('parentCategorie'));
     }
-
-    // public function create()
-    // {
-    //     return view('/e-commerce/categories/create');
-    // }
-
-    // public function store(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'parent_category' => 'required',
-    //         'sub_category' => 'required',
-    //         'feature_image' => 'required',
-    //         'icon_image' => 'required',
-    //         'status' => 'required',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return back()->withErrors($validator)->withInput();
-    //     }
-
-    //     $categorie = new Categorie();
-    //     $categorie->parent_category = $request->parent_category;
-    //     $categorie->sub_category = $request->sub_category;
-
-    //     if ($request->hasFile('feature_image')) {
-    //         $file = $request->file('feature_image');
-    //         $filename = time() . '.' . $file->getClientOriginalExtension();
-
-    //         $file->move(public_path('uploads/crm/categorie/feature_image'), $filename);
-    //         $categorie->feature_image = 'uploads/crm/categorie/feature_image/' . $filename;
-    //     }
-
-    //     if ($request->hasFile('icon_image')) {
-    //         $file = $request->file('icon_image');
-    //         $filename = time() . '.' . $file->getClientOriginalExtension();
-
-    //         $file->move(public_path('uploads/crm/categorie/icon_image'), $filename);
-    //         $categorie->icon_image = 'uploads/crm/categorie/icon_image/' . $filename;
-    //     }
-
-    //     $categorie->status = $request->status;
-    //     $categorie->save();
-
-    //     if (!$categorie) {
-    //         return back()->with('error', 'Something went wrong.');
-    //     }
-    //     return redirect()->route('category.index')->with('success', 'Categorie added successfully.');
-    // }
 
     public function storeParent(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'image' => 'required',
-            'status' => 'required',
-            'status_ecommerce' => 'required',
+            'name' => 'required|string|max:255',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status' => 'required|in:inactive,active',
+            'status_ecommerce' => 'required|in:inactive,active',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
+        // sort order
+        $sortOrder = ParentCategory::max('sort_order') + 1;
+        if ($sortOrder == 0) {
+            $sortOrder = 1;
+        }
 
         $parentCategorie = new ParentCategory;
         $parentCategorie->name = $request->name;
         $parentCategorie->slug = strtolower(str_replace(' ', '-', $request->name));
-        $parentCategorie->sort_order = $request->sort_order;
+        $parentCategorie->sort_order = $sortOrder;
         $parentCategorie->status = $request->status;
         $parentCategorie->status_ecommerce = $request->status_ecommerce;
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time().'.'.$file->getClientOriginalExtension();
+            $filename = time() . '.' . $file->getClientOriginalExtension();
 
             $file->move(public_path('uploads/e-commerce/categories'), $filename);
-            $parentCategorie->image = 'uploads/e-commerce/categories/'.$filename;
+            $parentCategorie->image = 'uploads/e-commerce/categories/' . $filename;
         }
 
         $parentCategorie->save();
@@ -106,7 +73,6 @@ class CategorieController extends Controller
 
     public function storeSubCategorie(Request $request)
     {
-        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'parent_category_id' => 'required|exists:parent_categories,id',
             'name' => 'required|string|max:255',
@@ -129,7 +95,7 @@ class CategorieController extends Controller
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time().'.'.$file->getClientOriginalExtension();
+            $filename = time() . '.' . $file->getClientOriginalExtension();
 
             $uploadPath = public_path('uploads/e-commerce/categories');
             if (! File::exists($uploadPath)) {
@@ -137,12 +103,12 @@ class CategorieController extends Controller
             }
 
             $file->move($uploadPath, $filename);
-            $subCategorie->image = 'uploads/e-commerce/categories/'.$filename;
+            $subCategorie->image = 'uploads/e-commerce/categories/' . $filename;
         }
 
         if ($request->hasFile('icon_image')) {
             $file = $request->file('icon_image');
-            $filename = time().'_icon.'.$file->getClientOriginalExtension();
+            $filename = time() . '_icon.' . $file->getClientOriginalExtension();
 
             $uploadPath = public_path('uploads/e-commerce/categories');
             if (! File::exists($uploadPath)) {
@@ -150,7 +116,7 @@ class CategorieController extends Controller
             }
 
             $file->move($uploadPath, $filename);
-            $subCategorie->icon_image = 'uploads/e-commerce/categories/'.$filename;
+            $subCategorie->icon_image = 'uploads/e-commerce/categories/' . $filename;
         }
 
         $subCategorie->save();
@@ -230,7 +196,7 @@ class CategorieController extends Controller
             }
 
             $file = $request->file('image');
-            $filename = time().'.'.$file->getClientOriginalExtension();
+            $filename = time() . '.' . $file->getClientOriginalExtension();
 
             $uploadPath = public_path('uploads/e-commerce/categories');
             if (! File::exists($uploadPath)) {
@@ -238,7 +204,7 @@ class CategorieController extends Controller
             }
 
             $file->move($uploadPath, $filename);
-            $parentCategorie->image = 'uploads/e-commerce/categories/'.$filename;
+            $parentCategorie->image = 'uploads/e-commerce/categories/' . $filename;
         }
 
         $parentCategorie->save();
@@ -276,7 +242,7 @@ class CategorieController extends Controller
             }
 
             $file = $request->file('image');
-            $filename = time().'.'.$file->getClientOriginalExtension();
+            $filename = time() . '.' . $file->getClientOriginalExtension();
 
             $uploadPath = public_path('uploads/e-commerce/categories');
             if (! File::exists($uploadPath)) {
@@ -284,7 +250,7 @@ class CategorieController extends Controller
             }
 
             $file->move($uploadPath, $filename);
-            $subCategorie->image = 'uploads/e-commerce/categories/'.$filename;
+            $subCategorie->image = 'uploads/e-commerce/categories/' . $filename;
         }
 
         // Handle icon image upload
@@ -295,7 +261,7 @@ class CategorieController extends Controller
             }
 
             $file = $request->file('icon_image');
-            $filename = time().'_icon.'.$file->getClientOriginalExtension();
+            $filename = time() . '_icon.' . $file->getClientOriginalExtension();
 
             $uploadPath = public_path('uploads/e-commerce/categories');
             if (! File::exists($uploadPath)) {
@@ -303,7 +269,7 @@ class CategorieController extends Controller
             }
 
             $file->move($uploadPath, $filename);
-            $subCategorie->icon_image = 'uploads/e-commerce/categories/'.$filename;
+            $subCategorie->icon_image = 'uploads/e-commerce/categories/' . $filename;
         }
 
         $subCategorie->save();

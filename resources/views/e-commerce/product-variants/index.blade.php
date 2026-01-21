@@ -92,8 +92,7 @@
                                                                         class="btn btn-icon btn-sm bg-primary-subtle me-1"
                                                                         data-bs-toggle="tooltip"
                                                                         data-bs-original-title="View">
-                                                                        <i
-                                                                            class="mdi mdi-eye-outline fs-14 text-primary"></i>
+                                                                        <i class="mdi mdi-eye-outline fs-14 text-primary"></i>
                                                                     </a>
                                                                     <form style="display: inline-block"
                                                                         action="{{ route('variant.delete', $attribute->id) }}"

@@ -10,6 +10,7 @@ use App\Models\EcommerceProduct;
 use App\Models\InventoryUpdateLog;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\OrderPayment;
 use App\Models\Product;
 use App\Models\Staff;
 use App\Models\User;
@@ -66,45 +67,51 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $request->validate([
             'email' => 'required|email',
             'shipping_first_name' => 'required|string|max:255',
             'shipping_last_name' => 'required|string|max:255',
             'shipping_phone' => 'required|string|max:20',
-            'shipping_address_line_1' => 'required|string|max:255',
-            'shipping_address_line_2' => 'nullable|string|max:255',
+            'shipping_address1' => 'required|string|max:255',
+            'shipping_address2' => 'nullable|string|max:255',
             'shipping_city' => 'required|string|max:100',
             'shipping_state' => 'required|string|max:100',
-            'shipping_zipcode' => 'required|string|max:20',
+            'shipping_pincode' => 'required|string|max:20',
             'shipping_country' => 'required|string|max:100',
-            'payment_method' => 'required|in:cod,visa,mastercard',
-            'card_last_four' => 'nullable|string|size:4',
-            'card_name' => 'nullable|string|max:255',
+            'payment_status' => 'required|in:pending,partial,completed,failed,refunded',
+            'payment_method' => 'required|in:online,cod',
+            
             'shipping_charges' => 'nullable|numeric|min:0',
+            'packaging_charges' => 'nullable|numeric|min:0',
             'discount_amount' => 'nullable|numeric|min:0',
-            'status' => 'required|in:pending,confirmed,processing',
+            'coupon_code' => 'nullable|numeric|min:0',
+
+            'order_status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled,returned',
+
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|integer',
             'items.*.product_name' => 'required|string',
             'items.*.product_sku' => 'required|string',
-            'items.*.hsn_sac_code' => 'nullable|string',
+            'items.*.hsn_code' => 'nullable|string',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.unit_price' => 'required|numeric|min:0',
-            'items.*.tax_percentage' => 'nullable|numeric|min:0|max:100',
-            'items.*.taxable_value' => 'required|numeric|min:0',
-            'items.*.igst_amount' => 'required|numeric|min:0',
-            'items.*.total_price' => 'required|numeric|min:0',
+            'items.*.discount_per_unit' => 'nullable|numeric|min:0',
+            'items.*.tax_per_unit' => 'nullable|numeric|min:0',
+            'items.*.line_total' => 'required|numeric|min:0',
         ]);
 
         try {
             DB::beginTransaction();
 
             // Calculate totals
-            $subtotal = collect($request->items)->sum('taxable_value');
-            $taxAmount = collect($request->items)->sum('igst_amount');
+            $subtotal = collect($request->items)->sum('line_total');
+            $taxAmount = collect($request->items)->sum('tax_per_unit');
             $shippingCharges = $request->shipping_charges ?? 0;
             $discountAmount = $request->discount_amount ?? 0;
-            $totalAmount = $subtotal + $taxAmount + $shippingCharges - $discountAmount;
+            $couponCode = $request->coupon_code ?? 0;
+            $packagingCharges = $request->packaging_charges ?? 0;
+            $totalAmount = $subtotal + $taxAmount + $shippingCharges + $packagingCharges - $discountAmount - $couponCode;
 
             // Generate order number
             $orderNumber = 'ORD-' . date('Ymd') . '-' . str_pad(Order::count() + 1, 4, '0', STR_PAD_LEFT);
@@ -113,32 +120,23 @@ class OrderController extends Controller
             $order = Order::create([
                 'customer_id' => $request->customer_id,
                 'order_number' => $orderNumber,
-                'source_platform' => 'website',
+                'source_platform' => 'admin',
                 'email' => $request->email,
                 'shipping_first_name' => $request->shipping_first_name,
                 'shipping_last_name' => $request->shipping_last_name,
                 'shipping_phone' => $request->shipping_phone,
-                'shipping_address_line_1' => $request->shipping_address_line_1,
-                'shipping_address_line_2' => $request->shipping_address_line_2,
-                'shipping_city' => $request->shipping_city,
-                'shipping_state' => $request->shipping_state,
-                'shipping_zipcode' => $request->shipping_zipcode,
-                'shipping_country' => $request->shipping_country,
+                'shipping_address_id' => $request->shipping_address_id,
                 'billing_same_as_shipping' => true, // Default for admin created orders
-                'billing_first_name' => $request->shipping_first_name,
-                'billing_last_name' => $request->shipping_last_name,
-                'billing_address_line_1' => $request->shipping_address_line_1,
-                'billing_address_line_2' => $request->shipping_address_line_2,
-                'billing_city' => $request->shipping_city,
-                'billing_state' => $request->shipping_state,
-                'billing_zipcode' => $request->shipping_zipcode,
-                'billing_country' => $request->shipping_country,
+                'billing_address_id' => $request->shipping_address_id,
                 'payment_status' => $request->payment_status,
                 'card_name' => $request->card_name,
                 'card_last_four' => $request->card_last_four,
                 'subtotal' => $subtotal,
+                'tax_amount' => $taxAmount,
                 'shipping_charges' => $shippingCharges,
+                'packaging_charges' => $packagingCharges,
                 'discount_amount' => $discountAmount,
+                'coupon_code' => $couponCode,
                 'total_amount' => $totalAmount,
                 'order_status' => $request->order_status,
                 'confirmed_at' => $request->order_status === 'confirmed' ? now() : null,
@@ -149,23 +147,39 @@ class OrderController extends Controller
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $itemData['product_id'],
+                    'product_serial_id' => null,
                     'product_name' => $itemData['product_name'],
                     'product_sku' => $itemData['product_sku'],
-                    'hsn_sac_code' => $itemData['hsn_sac_code'],
+                    'hsn_code' => $itemData['hsn_code'],
                     'quantity' => $itemData['quantity'],
                     'unit_price' => $itemData['unit_price'],
-                    'total_price' => $itemData['total_price'],
-                    'tax_percentage' => $itemData['tax_percentage'] ?? 0,
-                    'taxable_value' => $itemData['taxable_value'],
-                    'igst_amount' => $itemData['igst_amount'],
-                    'final_amount' => $itemData['total_price'],
-                    'shipping_charges' => 0, // Individual item shipping charges
-                    'free_shipping' => false,
+                    'discount_per_unit' => $itemData['discount_per_unit'] ?? 0,
+                    'tax_per_unit' => $itemData['tax_per_unit'] ?? 0,   
+                    'line_total' => $itemData['line_total'],
+                    'variant_details' => json_encode([]),
+                    'custom_options' => json_encode([]),
+                    'item_status' => $request->order_status,
                 ]);
             }
 
+            // Create payment record
+            OrderPayment::create([
+                'order_id' => $order->id,
+                'payment_id' => 'PMT-' . strtoupper(uniqid()),
+                'transaction_id' => 'TXN-' . strtoupper(uniqid()),
+                'payment_method' => $request->payment_method,
+                'payment_gateway' => $request->payment_method === 'online' ? 'phonepe' : 'cash_on_delivery',
+                'amount' => $totalAmount,
+                'currency' => 'INR',
+                'status' => $request->payment_status,
+                'response_data' => json_encode([]),
+                'processed_at' => now(),
+                'failure_reason' => null,
+                'notes' => 'Initial payment',
+            ]);
+
             // Update product quantities in warehouse and e-commerce
-            $this->updateProductQuantities($order);
+            // $this->updateProductQuantities($order);
 
             DB::commit();
 
@@ -395,18 +409,18 @@ class OrderController extends Controller
         $products = EcommerceProduct::with(['warehouseProduct.brand'])
             ->whereHas('warehouseProduct', function ($q) use ($query) {
                 $q->where('product_name', 'LIKE', "%{$query}%")
-                    ->orWhere('sku', 'LIKE', "%{$query}%")
-                    ->where('status', 'active');
+                    ->orWhere('sku', 'LIKE', "%{$query}%");
             })
-            ->where('ecommerce_status', 'active')
+            ->where('status', 'active')
             ->limit(10)
             ->get()
             ->map(function ($product) {
                 return [
                     'id' => $product->id,
-                    'name' => $product->warehouseProduct->product_name,
+                    'product_name' => $product->warehouseProduct->product_name,
                     'sku' => $product->warehouseProduct->sku,
-                    'brand' => $product->warehouseProduct->brand->brand_title ?? 'N/A',
+                    'brand' => $product->warehouseProduct->brand->name ?? 'N/A',
+                    'hsn_code' => $product->warehouseProduct->hsn_code,
                     'price' => $product->warehouseProduct->selling_price,
                     'display' => $product->warehouseProduct->product_name . ' (' . $product->warehouseProduct->sku . ')',
                 ];

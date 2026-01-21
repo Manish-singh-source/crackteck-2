@@ -62,13 +62,14 @@
 
                                             <div id="customer_suggestions" class="dropdown-menu w-100"></div>
                                         </div>
+                                        <input type="hidden" id="customer_id" name="customer_id">
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="email" class="form-label">Email <span
                                                     class="text-danger">*</span></label>
                                             <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                                id="email" name="email" value="{{ old('email') }}" required>
+                                                id="email" name="email" value="{{ old('email') }}" required readonly>
                                             @error('email')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -98,7 +99,7 @@
                                             <input type="text"
                                                 class="form-control @error('shipping_first_name') is-invalid @enderror"
                                                 id="shipping_first_name" name="shipping_first_name"
-                                                value="{{ old('shipping_first_name') }}" required>
+                                                value="{{ old('shipping_first_name') }}" required readonly>
                                             @error('shipping_first_name')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -111,7 +112,7 @@
                                             <input type="text"
                                                 class="form-control @error('shipping_last_name') is-invalid @enderror"
                                                 id="shipping_last_name" name="shipping_last_name"
-                                                value="{{ old('shipping_last_name') }}" required>
+                                                value="{{ old('shipping_last_name') }}" required readonly>
                                             @error('shipping_last_name')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -124,10 +125,17 @@
                                             <input type="text"
                                                 class="form-control @error('shipping_phone') is-invalid @enderror"
                                                 id="shipping_phone" name="shipping_phone"
-                                                value="{{ old('shipping_phone') }}" required>
+                                                value="{{ old('shipping_phone') }}" required readonly>
                                             @error('shipping_phone')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
+                                        </div>
+                                    </div>
+                                    {{-- The shipping address is fetch from customer address details table when customer is selected
+                                    so i want to add this field as hidden shipping_address_id --}}
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <input type="hidden" id="shipping_address_id" name="shipping_address_id">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -137,7 +145,7 @@
                                             <input type="text"
                                                 class="form-control @error('shipping_address1') is-invalid @enderror"
                                                 id="shipping_address1" name="shipping_address1"
-                                                value="{{ old('shipping_address1') }}" required>
+                                                value="{{ old('shipping_address1') }}" required readonly>
                                             @error('shipping_address1')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -149,7 +157,7 @@
                                             <input type="text"
                                                 class="form-control @error('shipping_address2') is-invalid @enderror"
                                                 id="shipping_address2" name="shipping_address2"
-                                                value="{{ old('shipping_address2') }}">
+                                                value="{{ old('shipping_address2') }}" readonly>
                                             @error('shipping_address2')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -162,7 +170,7 @@
                                             <input type="text"
                                                 class="form-control @error('shipping_city') is-invalid @enderror"
                                                 id="shipping_city" name="shipping_city"
-                                                value="{{ old('shipping_city') }}" required>
+                                                value="{{ old('shipping_city') }}" required readonly>
                                             @error('shipping_city')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -175,7 +183,7 @@
                                             <input type="text"
                                                 class="form-control @error('shipping_state') is-invalid @enderror"
                                                 id="shipping_state" name="shipping_state"
-                                                value="{{ old('shipping_state') }}" required>
+                                                value="{{ old('shipping_state') }}" required readonly>
                                             @error('shipping_state')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -188,7 +196,7 @@
                                             <input type="text"
                                                 class="form-control @error('shipping_pincode') is-invalid @enderror"
                                                 id="shipping_pincode" name="shipping_pincode"
-                                                value="{{ old('shipping_pincode') }}" required>
+                                                value="{{ old('shipping_pincode') }}" required readonly>
                                             @error('shipping_pincode')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -201,7 +209,7 @@
                                             <input type="text"
                                                 class="form-control @error('shipping_country') is-invalid @enderror"
                                                 id="shipping_country" name="shipping_country"
-                                                value="{{ old('shipping_country', 'India') }}" required>
+                                                value="{{ old('shipping_country', 'India') }}" required readonly>
                                             @error('shipping_country')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -246,40 +254,42 @@
                                             <select class="form-select @error('payment_method') is-invalid @enderror"
                                                 id="payment_method" name="payment_method" required>
                                                 <option value="">Select Payment Method</option>
+                                                <option value="online"
+                                                    {{ old('payment_method') == 'online' ? 'selected' : '' }}>Online
+                                                </option>
                                                 <option value="cod"
                                                     {{ old('payment_method') == 'cod' ? 'selected' : '' }}>Cash on Delivery
                                                 </option>
-                                                <option value="visa"
-                                                    {{ old('payment_method') == 'visa' ? 'selected' : '' }}>Visa Card
-                                                </option>
-                                                <option value="mastercard"
-                                                    {{ old('payment_method') == 'mastercard' ? 'selected' : '' }}>
-                                                    Mastercard</option>
                                             </select>
                                             @error('payment_method')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
-                                    <div class="col-md-6" id="card-details" style="display: none;">
+                                    <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="card_last_four" class="form-label">Card Last 4 Digits</label>
-                                            <input type="text"
-                                                class="form-control @error('card_last_four') is-invalid @enderror"
-                                                id="card_last_four" name="card_last_four"
-                                                value="{{ old('card_last_four') }}" maxlength="4" pattern="[0-9]{4}">
-                                            @error('card_last_four')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6" id="card-name-field" style="display: none;">
-                                        <div class="mb-3">
-                                            <label for="card_name" class="form-label">Card Holder Name</label>
-                                            <input type="text"
-                                                class="form-control @error('card_name') is-invalid @enderror"
-                                                id="card_name" name="card_name" value="{{ old('card_name') }}">
-                                            @error('card_name')
+                                            <label for="payment_status" class="form-label">Payment Status <span
+                                                    class="text-danger">*</span></label>
+                                            <select class="form-select @error('payment_status') is-invalid @enderror"
+                                                id="payment_status" name="payment_status" required>
+                                                <option value="">Select Payment Status</option>
+                                                <option value="pending"
+                                                    {{ old('payment_status') == 'pending' ? 'selected' : '' }}>Pending
+                                                </option>
+                                                <option value="partial"
+                                                    {{ old('payment_status') == 'partial' ? 'selected' : '' }}>Partial
+                                                </option>
+                                                <option value="completed"
+                                                    {{ old('payment_status') == 'completed' ? 'selected' : '' }}>Completed
+                                                </option>
+                                                <option value="failed"
+                                                    {{ old('payment_status') == 'failed' ? 'selected' : '' }}>Failed
+                                                </option>
+                                                <option value="refunded"
+                                                    {{ old('payment_status') == 'refunded' ? 'selected' : '' }}>Refunded
+                                                </option>
+                                            </select>
+                                            @error('payment_status')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -298,6 +308,16 @@
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
+                                    <label for="discount_amount" class="form-label">Discount Amount</label>
+                                    <input type="number"
+                                        class="form-control @error('discount_amount') is-invalid @enderror"
+                                        id="discount_amount" name="discount_amount"
+                                        value="{{ old('discount_amount', 0) }}" min="0" step="0.01">
+                                    @error('discount_amount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3">
                                     <label for="shipping_charges" class="form-label">Shipping Charges</label>
                                     <input type="number"
                                         class="form-control @error('shipping_charges') is-invalid @enderror"
@@ -308,12 +328,21 @@
                                     @enderror
                                 </div>
                                 <div class="mb-3">
-                                    <label for="discount_amount" class="form-label">Discount Amount</label>
+                                    <label for="packaging_charges" class="form-label">Packaging Charges</label>
                                     <input type="number"
-                                        class="form-control @error('discount_amount') is-invalid @enderror"
-                                        id="discount_amount" name="discount_amount"
-                                        value="{{ old('discount_amount', 0) }}" min="0" step="0.01">
-                                    @error('discount_amount')
+                                        class="form-control @error('packaging_charges') is-invalid @enderror"
+                                        id="packaging_charges" name="packaging_charges"
+                                        value="{{ old('packaging_charges', 0) }}" min="0" step="0.01">
+                                    @error('packaging_charges')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3">
+                                    <label for="coupon_code" class="form-label">Coupon Code</label>
+                                    <input type="number" class="form-control @error('coupon_code') is-invalid @enderror"
+                                        id="coupon_code" name="coupon_code" value="{{ old('coupon_code', 0) }}"
+                                        min="0" step="0.01">
+                                    @error('coupon_code')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -328,13 +357,22 @@
                                         <span id="tax-display">₹0.00</span>
                                     </div>
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span>Shipping:</span>
-                                        <span id="shipping-display">₹0.00</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2">
                                         <span>Discount:</span>
                                         <span id="discount-display" class="text-success">-₹0.00</span>
                                     </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Shipping Charges:</span>
+                                        <span id="shipping-display" class="text-success">₹0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Packaging Charges:</span>
+                                        <span id="packaging-display" class="text-success">₹0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Coupon Applied:</span>
+                                        <span id="coupon-display" class="text-success">-₹0.00</span>
+                                    </div>
+
                                     <div class="d-flex justify-content-between fw-bold border-top pt-2">
                                         <span>Grand Total:</span>
                                         <span id="total-display" class="text-success">₹0.00</span>
@@ -350,17 +388,32 @@
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
-                                    <label for="status" class="form-label">Initial Status</label>
-                                    <select class="form-select @error('status') is-invalid @enderror" id="status"
-                                        name="status">
+                                    <label for="order_status" class="form-label">Initial Status</label>
+                                    <select class="form-select @error('order_status') is-invalid @enderror"
+                                        id="order_status" name="order_status">
                                         <option value="pending"
-                                            {{ old('status', 'pending') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="confirmed" {{ old('status') == 'confirmed' ? 'selected' : '' }}>
+                                            {{ old('order_status', 'pending') == 'pending' ? 'selected' : '' }}>Pending
+                                        </option>
+                                        <option value="confirmed"
+                                            {{ old('order_status') == 'confirmed' ? 'selected' : '' }}>
                                             Confirmed</option>
-                                        <option value="processing" {{ old('status') == 'processing' ? 'selected' : '' }}>
+                                        <option value="processing"
+                                            {{ old('order_status') == 'processing' ? 'selected' : '' }}>
                                             Processing</option>
+                                        <option value="shipped" 
+                                            {{ old('order_status') == 'shipped' ? 'selected' : '' }}>
+                                            Shipped</option>
+                                        <option value="delivered"
+                                            {{ old('order_status') == 'delivered' ? 'selected' : '' }}>
+                                            Delivered</option>
+                                        <option value="cancelled"
+                                            {{ old('order_status') == 'cancelled' ? 'selected' : '' }}>
+                                            Cancelled</option>
+                                        <option value="returned"
+                                            {{ old('order_status') == 'returned' ? 'selected' : '' }}>
+                                            Returned</option>
                                     </select>
-                                    @error('status')
+                                    @error('order_status')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -395,7 +448,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
+                    <div class="m-3">
                         <label for="product_search" class="form-label">Search Product <span
                                 class="text-danger">*</span></label>
                         <input type="text" id="product_search" class="form-control"
@@ -403,7 +456,7 @@
                         <div id="product_suggestions" class="dropdown-menu w-100" style="display: none;"></div>
                     </div>
 
-                    <div id="selected_product_details" style="display: none;">
+                    <div id="selected_product_details" style="display: none; padding: 0px 20px;">
                         <div class="alert alert-info">
                             <h6>Selected Product:</h6>
                             <p class="mb-1"><strong>Name:</strong> <span id="selected_product_name"></span></p>
@@ -461,10 +514,10 @@
             // Payment method change handler
             $('#payment_method').on('change', function() {
                 const paymentMethod = $(this).val();
-                if (paymentMethod === 'visa' || paymentMethod === 'mastercard') {
-                    $('#card-details, #card-name-field').show();
+                if (paymentMethod === 'online') {
+                    $('#payment-details').show();
                 } else {
-                    $('#card-details, #card-name-field').hide();
+                    $('#payment-details').hide();
                 }
             });
 
@@ -590,6 +643,7 @@
                 $('#shipping_last_name').val(addr.last_name || lastCustomer.name.split(' ').slice(1).join(
                     ' ') || '');
                 $('#shipping_phone').val(addr.phone || lastCustomer.phone || '');
+                $('#shipping_address_id').val(addr.id);
 
                 $('#shipping_address1').val(addr.address1 || '');
                 $('#shipping_address2').val(addr.address2 || '');
@@ -602,26 +656,31 @@
             // Product search functionality
             $('#product_search').on('input', function() {
                 const query = $(this).val();
+                console.log(query);
                 if (query.length >= 2) {
                     $.ajax({
-                        url: '/e-commerce/search-products',
+                        url: '{{ route('order.search-products') }}',
                         method: 'GET',
                         data: {
-                            query: query
+                            q: query
                         },
                         success: function(products) {
                             let suggestions = '';
                             products.forEach(function(product) {
+                                console.log(product);
                                 suggestions += `<a class="dropdown-item product-suggestion" href="#"
-                                          data-id="${product.id}"
-                                          data-name="${product.product_name}"
-                                          data-sku="${product.sku}"
-                                          data-hsn="${product.hsn_code || 'N/A'}"
-                                          data-price="${product.price}">
-                                          ${product.product_name} - ${product.sku}
-                                        </a>`;
+                                data-id="${product.id}"
+                                data-name="${product.product_name}"
+                                data-sku="${product.sku}"
+                                data-hsn="${product.hsn_code || 'N/A'}"
+                                data-price="${product.price}">
+                                ${product.product_name} - ${product.sku}
+                            </a>`;
                             });
                             $('#product_suggestions').html(suggestions).show();
+                        },
+                        error: function(xhr) {
+                            console.log(xhr.responseText);
                         }
                     });
                 } else {
@@ -694,7 +753,7 @@
                     product_id: selectedProduct.id,
                     product_name: selectedProduct.name,
                     product_sku: selectedProduct.sku,
-                    hsn_sac_code: selectedProduct.hsn,
+                    hsn_code: selectedProduct.hsn,
                     quantity: quantity,
                     unit_price: unitPrice,
                     tax_percentage: taxPercentage,
@@ -743,7 +802,7 @@
                     <div><strong>${item.product_name}</strong></div>
                     <small class="text-muted">SKU: ${item.product_sku}</small>
                 </td>
-                <td>${item.hsn_sac_code}</td>
+                <td>${item.hsn_code}</td>
                 <td>${item.quantity}</td>
                 <td>₹${item.unit_price.toFixed(2)}</td>
                 <td>₹${item.igst_amount.toFixed(2)} (${item.tax_percentage}%)</td>
@@ -760,7 +819,7 @@
                 <input type="hidden" name="items[${index}][product_id]" value="${item.product_id}">
                 <input type="hidden" name="items[${index}][product_name]" value="${item.product_name}">
                 <input type="hidden" name="items[${index}][product_sku]" value="${item.product_sku}">
-                <input type="hidden" name="items[${index}][hsn_sac_code]" value="${item.hsn_sac_code}">
+                <input type="hidden" name="items[${index}][hsn_code]" value="${item.hsn_code}">
                 <input type="hidden" name="items[${index}][quantity]" value="${item.quantity}">
                 <input type="hidden" name="items[${index}][unit_price]" value="${item.unit_price}">
                 <input type="hidden" name="items[${index}][tax_percentage]" value="${item.tax_percentage}">
@@ -787,18 +846,24 @@
                 const subtotal = orderItems.reduce((sum, item) => sum + item.taxable_value, 0);
                 const taxAmount = orderItems.reduce((sum, item) => sum + item.igst_amount, 0);
                 const shippingCharges = parseFloat($('#shipping_charges').val()) || 0;
+                const packagingCharges = parseFloat($('#packaging_charges').val()) || 0;
+                const couponCode = parseFloat($('#coupon_code').val()) || 0;
                 const discountAmount = parseFloat($('#discount_amount').val()) || 0;
-                const grandTotal = subtotal + taxAmount + shippingCharges - discountAmount;
+                const grandTotal = subtotal + taxAmount + shippingCharges + packagingCharges - discountAmount -
+                    couponCode;
 
                 $('#subtotal-display').text('₹' + subtotal.toFixed(2));
                 $('#tax-display').text('₹' + taxAmount.toFixed(2));
                 $('#shipping-display').text('₹' + shippingCharges.toFixed(2));
+                $('#packaging-display').text('₹' + packagingCharges.toFixed(2));
+                $('#coupon-display').text('-₹' + couponCode.toFixed(2));
                 $('#discount-display').text('-₹' + discountAmount.toFixed(2));
                 $('#total-display').text('₹' + grandTotal.toFixed(2));
             }
 
             // Shipping and discount change handlers
-            $('#shipping_charges, #discount_amount').on('input', updateOrderSummary);
+            $('#shipping_charges, #discount_amount, #packaging_charges, #coupon_code').on('input',
+                updateOrderSummary);
 
             // Form submission
             $('#orderForm').on('submit', function(e) {

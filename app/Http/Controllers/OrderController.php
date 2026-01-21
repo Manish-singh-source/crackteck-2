@@ -102,6 +102,8 @@ class OrderController extends Controller
                 'coupon_code' => $couponCode,
                 'total_amount' => $totalAmount,
                 'order_status' => $request->order_status,
+                'assigned_person_type' => $request->assigned_person_type,
+                'assigned_person_id' => $request->assigned_person_id,
                 'confirmed_at' => $request->order_status === 'confirmed' ? now() : null,
             ]);
 
@@ -385,7 +387,7 @@ class OrderController extends Controller
     {
         $order = Order::with(['customer', 'orderItems.product.ecommerceProduct', 'orderPayments'])
             ->findOrFail($id);
-        $deliveryMen = Staff::where('staff_role', '2')->where('status', 'Active')->get();
+        $deliveryMen = Staff::where('staff_role', 'delivery_man')->where('status', 'active')->get();
         // Calculate totals
         $totals = $this->calculateOrderTotals($order);
 

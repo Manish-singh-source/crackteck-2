@@ -44,6 +44,9 @@ class StoreOrderRequest extends FormRequest
             'discount_amount' => 'nullable|numeric|min:0',
             'coupon_code' => 'nullable|numeric|min:0',
 
+            'assigned_person_type' => 'nullable|in:delivery_man,engineer',
+            'assigned_person_id' => 'nullable|integer',
+
             'order_status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled,returned',
 
             'items' => 'required|array|min:1',

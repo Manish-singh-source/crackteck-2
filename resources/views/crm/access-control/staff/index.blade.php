@@ -62,7 +62,7 @@
                                                                 <tr>
                                                                     <td>{{ $staff->staff_code }}</td>
                                                                     <td>
-                                                                        {{ $staff->role->name }}
+                                                                        {{ $staff->staff_role }}
                                                                     </td>
                                                                     <td>{{ $staff->first_name }} {{ $staff->last_name }}
                                                                     </td>

@@ -81,4 +81,10 @@ class Order extends Model
     {
         return $this->hasMany(OrderPayment::class);
     }
+
+    public function deliveryMan()
+    {
+        return $this->belongsTo(Staff::class, 'delivery_man_id');
+    }
+    
 }

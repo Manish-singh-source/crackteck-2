@@ -24,7 +24,12 @@ class EcommerceProductController extends Controller
      */
     public function index()
     {
-        $products = EcommerceProduct::with([
+        $status = request()->get('status') ?? 'all';
+        $query = EcommerceProduct::query();
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+        $products = $query->with([
             'warehouseProduct.brand',
             'warehouseProduct.parentCategorie',
             'warehouseProduct.subCategorie',

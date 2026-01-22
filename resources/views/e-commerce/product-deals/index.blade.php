@@ -146,16 +146,10 @@
                                                                             $currentTime,
                                                                         );
                                                                         $badgeClass = 'bg-warning';
-                                                                        if ($timeLeft < 3600) {
-                                                                            $timeText =
-                                                                                floor($timeLeft / 60) . 'm left';
-                                                                        } elseif ($timeLeft < 86400) {
-                                                                            $timeText =
-                                                                                floor($timeLeft / 3600) . 'h left';
-                                                                        } else {
-                                                                            $timeText =
-                                                                                floor($timeLeft / 86400) . 'd left';
-                                                                        }
+                                                                        $days = floor($timeLeft / 86400);
+                                                                        $hours = floor(($timeLeft % 86400) / 3600);
+                                                                        $minutes = floor(($timeLeft % 3600) / 60);
+                                                                        $timeText = "{$days}d {$hours}h {$minutes}m left";
                                                                     } else {
                                                                         $timeLeft = 0;
                                                                         $timeText = 'Deal Ended';

@@ -105,6 +105,21 @@
                                                 @endif
                                             </span>
                                         </li>
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                            @php
+                                                $assignedPersonType = match ($order->assigned_person_type) {
+                                                    'engineer' => 'Engineer',
+                                                    'delivery_man' => 'Delivery Man',
+                                                };
+                                            @endphp
+                                            <span class="fw-semibold">Assigned Person Type:</span>
+                                            <span>{{ $assignedPersonType ?? 'N/A' }}</span>
+                                        </li>
+
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-semibold">Assigned Person:</span>
+                                            <span>{{ $assignedPerson->first_name . ' ' . $assignedPerson->last_name ?? 'N/A' }}</span>
+                                        </li>
                                     </ul>
                                 </div>
                                 <div class="col-lg-6">
@@ -378,33 +393,78 @@
                         </div>
                     </div>
 
-                    <!-- Status Management Card -->
                     <div class="card">
                         <div class="card-header border-bottom-dashed">
-                            <h5 class="card-title mb-0">Assign Delivery Man</h5>
+                            <div class="d-flex">
+                                <h5 class="card-title flex-grow-1 mb-0">
+                                    Assign Delivery Man
+                                </h5>
+                            </div>
                         </div>
+
                         <div class="card-body">
-                            <form id="assign-delivery-man-form">
+                            <form action="{{ route('order.assign-person', $order->id) }}" method="POST">
                                 @csrf
+                                @method('PUT')
+
                                 <div class="mb-3">
-                                    <label class="form-label">Delivery Man</label>
-                                    <select class="form-select" name="status" id="delivery-man">
-                                        <option value="">-- Select Delivery Man --</option>
-                                        @forelse ($deliveryMen as $deliveryMan)
-                                            <option value="{{ $deliveryMan->id }}"
-                                                {{ $order->delivery_man_id == $deliveryMan->id ? 'selected' : '' }}>
-                                                {{ $deliveryMan->first_name }}
-                                                {{ $deliveryMan->last_name }}</option>
-                                        @empty
-                                            <option value="">No Delivery Men Found</option>
-                                        @endforelse
+                                    <label for="approval_status" class="form-label">Select Assignment Type</label>
+                                    <select class="form-select @error('assigned_person_type') is-invalid @enderror"
+                                        id="assigned_person_type" name="assigned_person_type" required>
+                                        <option value="" selected disabled>-- Select Assignment Type --</option>
+                                        <option value="engineer"
+                                            {{ $order->assigned_person_type == 'engineer' ? 'selected' : '' }}>
+                                            Engineer</option>
+                                        <option value="delivery_man"
+                                            {{ $order->assigned_person_type == 'delivery_man' ? 'selected' : '' }}>
+                                            Delivery
+                                            Man</option>
                                     </select>
+                                    @error('assigned_person_type')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
-                                <button type="button" class="btn btn-primary w-100" id="assign-delivery-man-btn">
-                                    <i class="fas fa-save me-1"></i> Assign
+
+                                <div class="mb-3" id="deliveryManSection" style="display: none;">
+                                    <label for="delivery_man_id" class="form-label">Select Delivery Man</label>
+                                    <select class="form-select @error('delivery_man_id') is-invalid @enderror"
+                                        id="delivery_man_id" name="delivery_man_id">
+                                        <option value="" selected disabled>-- Select Delivery Man --</option>
+                                        @foreach ($deliveryMen as $deliveryMan)
+                                            <option value="{{ $deliveryMan->id }}"
+                                                @if ($order->assigned_person_id == $deliveryMan->id) selected @endif>
+                                                {{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('delivery_man_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3" id="engineerSection" style="display: none;">
+                                    <label for="engineer_id" class="form-label">Select Engineer</label>
+                                    <select class="form-select @error('engineer_id') is-invalid @enderror"
+                                        id="engineer_id" name="engineer_id">
+                                        <option value="" selected disabled>-- Select Engineer --</option>
+                                        @foreach ($engineers as $engineer)
+                                            <option value="{{ $engineer->id }}"
+                                                @if ($order->assigned_person_id == $engineer->id) selected @endif>
+                                                {{ $engineer->first_name }} {{ $engineer->last_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('engineer_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 mt-3">
+                                    <i class="mdi mdi-check-circle me-2"></i>Update
                                 </button>
                             </form>
                         </div>
+
                     </div>
 
                     <!-- Status Management Card -->
@@ -420,15 +480,19 @@
                                     <select class="form-select" name="order_status" id="order-status">
                                         <option value="pending" {{ $order->order_status == 'pending' ? 'selected' : '' }}>
                                             Pending</option>
-                                        <option value="confirmed" {{ $order->order_status == 'confirmed' ? 'selected' : '' }}>
+                                        <option value="confirmed"
+                                            {{ $order->order_status == 'confirmed' ? 'selected' : '' }}>
                                             Confirmed</option>
-                                        <option value="processing" {{ $order->order_status == 'processing' ? 'selected' : '' }}>
+                                        <option value="processing"
+                                            {{ $order->order_status == 'processing' ? 'selected' : '' }}>
                                             Processing</option>
                                         <option value="shipped" {{ $order->order_status == 'shipped' ? 'selected' : '' }}>
                                             Shipped</option>
-                                        <option value="delivered" {{ $order->order_status == 'delivered' ? 'selected' : '' }}>
+                                        <option value="delivered"
+                                            {{ $order->order_status == 'delivered' ? 'selected' : '' }}>
                                             Delivered</option>
-                                        <option value="cancelled" {{ $order->order_status == 'cancelled' ? 'selected' : '' }}>
+                                        <option value="cancelled"
+                                            {{ $order->order_status == 'cancelled' ? 'selected' : '' }}>
                                             Cancelled</option>
                                     </select>
                                 </div>
@@ -623,6 +687,37 @@
                         button.prop('disabled', false).html(originalText);
                     }
                 });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            var assignedPersonType = '{{ $order->assigned_person_type }}'; 
+            if (assignedPersonType === 'engineer') {
+                $('#engineerSection').show();
+                $('#deliveryManSection').hide();
+            } else if (assignedPersonType === 'delivery_man') {
+                $('#deliveryManSection').show();
+                $('#engineerSection').hide();
+            }
+
+            $('#assigned_person_type').on('change', function() {
+                var selectedValue = $(this).val();
+
+                if (selectedValue === 'engineer') {
+                    $('#deliveryManSection').hide();
+                    $('#engineerSection').show();
+                    $('#assigned_person_id').prop('required', true);
+                } else if (selectedValue === 'delivery_man') {
+                    $('#engineerSection').hide();
+                    $('#deliveryManSection').show();
+                    $('#assigned_person_id').prop('required', true);
+                } else {
+                    $('#engineerSection').hide();
+                    $('#deliveryManSection').hide();
+                    $('#assigned_person_id').prop('required', false);
+                }
             });
         });
     </script>

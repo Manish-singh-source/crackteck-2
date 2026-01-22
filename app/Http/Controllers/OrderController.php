@@ -388,10 +388,39 @@ class OrderController extends Controller
         $order = Order::with(['customer', 'orderItems.product.ecommerceProduct', 'orderPayments'])
             ->findOrFail($id);
         $deliveryMen = Staff::where('staff_role', 'delivery_man')->where('status', 'active')->get();
+        $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
+        $assignedPerson = Staff::find($order->assigned_person_id);
+        // dd($assignedPerson);
         // Calculate totals
         $totals = $this->calculateOrderTotals($order);
 
-        return view('e-commerce.order.view', compact('order', 'totals', 'deliveryMen'));
+        return view('e-commerce.order.view', compact('order', 'totals', 'deliveryMen', 'engineers', 'assignedPerson'));
+    }
+
+    public function assignPerson(Request $request, $id)
+    {
+        $request->validate([
+            'assigned_person_type' => 'required|in:engineer,delivery_man',
+            'delivery_man_id' => 'nullable|exists:staff,id',
+            'engineer_id' => 'nullable|exists:staff,id',
+        ]);
+
+        try {
+            $order = Order::findOrFail($id);
+            $order->assigned_person_type = $request->assigned_person_type;
+            if ($request->assigned_person_type == 'engineer') {
+                $order->assigned_person_id = $request->engineer_id;
+            } else {
+                $order->assigned_person_id = $request->delivery_man_id;
+            }
+            $order->save();
+
+            return redirect()->back()->with('success', 'Person assigned successfully');
+        } catch (\Exception $e) {
+            Log::error('Error assigning person: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'Failed to assign person');
+        }
     }
 
     private function calculateOrderTotals($order)

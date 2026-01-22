@@ -186,12 +186,12 @@ $(document).ready(function() {
                     <div class="product-result d-flex justify-content-between align-items-center p-2 border-bottom">
                         <div class="d-flex align-items-center">
                             <div class="me-3">
-                                ${product.image ? `<img src="${product.image}" alt="${product.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">` : '<div style="width: 50px; height: 50px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fa fa-image"></i></div>'}
+                                ${product.image ? `<img src="/${product.image}" alt="${product.name}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px;">` : '<div style="width: 50px; height: 50px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fa fa-image"></i></div>'}
                             </div>
                             <div>
                                 <strong>${product.name}</strong><br>
                                 <small class="text-muted">SKU: ${product.sku} | Brand: ${product.brand}</small><br>
-                                <span class="badge bg-success">₹${parseFloat(product.selling_price).toLocaleString()}</span>
+                                <span class="badge bg-success">₹${parseFloat(product.final_price).toLocaleString()}</span>
                             </div>
                         </div>
                         <button type="button" class="btn btn-primary btn-sm add-product" data-product='${JSON.stringify(product)}'>
@@ -217,7 +217,7 @@ $(document).ready(function() {
         // Add default discount values
         product.discount_type = 'percentage';
         product.discount_value = 10;
-        product.offer_price = calculateOfferPrice(product.selling_price, 'percentage', 10);
+        product.offer_price = calculateOfferPrice(product.final_price, 'percentage', 10);
 
         selectedProducts.push(product);
         updateSelectedProductsDisplay();
@@ -262,7 +262,7 @@ $(document).ready(function() {
                     <td>
                         <div class="d-flex align-items-center">
                             <div class="me-2">
-                                ${product.image ? `<img src="${product.image}" alt="${product.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">` : '<div style="width: 40px; height: 40px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fa fa-image"></i></div>'}
+                                ${product.image ? `<img src="/${product.image}" alt="${product.name}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px;">` : '<div style="width: 40px; height: 40px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fa fa-image"></i></div>'}
                             </div>
                             <div>
                                 <strong>${product.name}</strong><br>
@@ -270,7 +270,7 @@ $(document).ready(function() {
                             </div>
                         </div>
                     </td>
-                    <td>₹${parseFloat(product.selling_price).toLocaleString()}</td>
+                    <td>₹${parseFloat(product.final_price).toLocaleString()}</td>
                     <td>
                         <select class="form-select form-select-sm discount-type" data-product-id="${product.id}">
                             <option value="percentage" ${product.discount_type === 'percentage' ? 'selected' : ''}>Percentage (%)</option>
@@ -351,7 +351,7 @@ $(document).ready(function() {
         const product = selectedProducts.find(p => p.id === productId);
         if (!product) return;
 
-        const originalPrice = parseFloat(product.selling_price);
+        const originalPrice = parseFloat(product.final_price);
         const discountType = product.discount_type;
         const discountValue = parseFloat(product.discount_value) || 0;
 
@@ -408,7 +408,7 @@ $(document).ready(function() {
 
         // Validate each product's discount values
         selectedProducts.forEach(function(product, index) {
-            const originalPrice = parseFloat(product.selling_price);
+            const originalPrice = parseFloat(product.final_price);
             const discountValue = parseFloat(product.discount_value);
 
             if (product.discount_type === 'percentage' && discountValue > 100) {

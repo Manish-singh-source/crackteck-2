@@ -1750,6 +1750,37 @@ etc.
         });
 
 50. Product Deal Offers:
+    <!-- id	deal_title	created_at	updated_at	offer_start_date	offer_end_date	status -->
+
+    Table:
+    `product_deals`:
+
+        Schema::create('product_deals', function (Blueprint $table) {
+            $table->id();
+            $table->string('deal_title');
+            $table->dateTime('offer_start_date');
+            $table->dateTime('offer_end_date');
+            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+    <!-- id	product_deal_id	ecommerce_product_id	original_price	discount_type	discount_value	offer_price	created_at	updated_at	 -->
+
+    Table:
+    `product_deal_items`:
+
+        Schema::create('product_deal_items', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_deal_id')->constrained('product_deals')->onDelete('cascade');
+            $table->foreignId('ecommerce_product_id')->constrained('ecommerce_products')->onDelete('cascade');  
+            $table->decimal('original_price', 15, 2);
+            $table->enum('discount_type', ['percentage', 'flat']);
+            $table->decimal('discount_value', 15, 2);
+            $table->decimal('offer_price', 15, 2);
+            $table->timestamps();
+            $table->softDeletes();
+        });
 
 51. Collections:
     - List of collections

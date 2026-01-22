@@ -65,6 +65,8 @@ Route::prefix('/demo')->group(function () {
         Route::post('/e-commerce/orders/bulk-delete', 'bulkDestroy')->name('order.bulk-delete');
         // View Order Page
         Route::get('/e-commerce/view-order/{id}', 'show')->name('order.view');
+        // Assign Person
+        Route::put('/e-commerce/order/{id}/assign-person', 'assignPerson')->name('order.assign-person');
         // Generate PDF Invoice
         Route::get('/order/{id}/invoice', 'generateInvoice')->name('order.invoice');
         // AJAX Routes for Order Management

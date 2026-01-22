@@ -307,7 +307,7 @@
 
                 const $button = $(this);
                 const childId = $button.data('id');
-
+                console.log(childId)
                 if (!childId) {
                     console.error('Child ID not found!');
                     return;
@@ -318,23 +318,22 @@
                     url: `/demo/e-commerce/get-child-category-data/${childId}`,
                     method: 'GET',
                     dataType: 'json',
-                    beforeSend: function() {
-                        $button.prop('disabled', true).html(
-                            '<i class="fas fa-spinner fa-spin"></i> Loading...');
-                    },
                     success: function(response) {
                         const data = response.data;
 
-                        if(response.status == 'success'){
-
+                        if (response.success) {
+                            console.log(response.success)
                             // Set the form action URL
                             document.getElementById('editChildCategoryForm').action =
-                            `/e-commerce/update-child-categorie/${childId}`;
+                                `/demo/e-commerce/update-child-categorie/${childId}`;
 
                             // Populate form fields
                             document.getElementById('edit_name').value = data.name;
                             document.getElementById('edit_status').value = data.status;
-                            document.getElementById('edit_status_ecommerce').value = data.status_ecommerce;
+                            document.getElementById('edit_status_ecommerce').value = data
+                                .status_ecommerce;
+                        } else {
+                            console.error(response.message);
                         }
                     },
                     error: function(xhr, status, error) {

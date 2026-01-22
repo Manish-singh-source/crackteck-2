@@ -219,8 +219,8 @@ class CategorieController extends Controller
             'name' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'icon_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|boolean',
-            'status_ecommerce' => 'required|boolean',
+            'status' => 'required|in:inactive,active',
+            'status_ecommerce' => 'required|in:no,yes',
         ]);
 
         if ($validator->fails()) {

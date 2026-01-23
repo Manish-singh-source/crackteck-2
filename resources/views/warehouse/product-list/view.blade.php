@@ -1038,12 +1038,13 @@
                                 Object.keys(errors).forEach(function(key) {
                                     $('#' + key).addClass('is-invalid');
                                     $('#' + key + '_error').text(errors[key][
-                                    0]);
+                                        0
+                                    ]);
                                 });
                             } else {
                                 toastr.error(
                                     'An error occurred while processing your request.'
-                                    );
+                                );
                             }
                         }
                     });
@@ -1058,7 +1059,7 @@
                         button.prop('disabled', true);
 
                         $.ajax({
-                            url: '{{ route('product-list.restore-product', ':id') }}'
+                            url: '{{ route('scrap-items.remove-from-scrap', ':id') }}'
                                 .replace(':id',
                                     scrapId),
                             method: 'POST',
@@ -1082,14 +1083,15 @@
                                         }
                                     });
                                 } else {
-                                    toastr.error(response.message);
+                                    console.log(response)
                                     button.prop('disabled', false);
                                 }
                             },
-                            error: function() {
+                            error: function(xhr) {
+                                console.log(xhr.responseJSON)
                                 toastr.error(
                                     'An error occurred while restoring the product.'
-                                    );
+                                );
                                 button.prop('disabled', false);
                             }
                         });
@@ -1125,9 +1127,6 @@
                     spinner.addClass('d-none');
 
                     if (response.success) {
-                        // Show success message
-                        toastr.success(response.message);
-
                         // Close modal
                         $('#scrapSerialModal').modal('hide');
 
@@ -1158,10 +1157,4 @@
             });
         });
     </script>
-@endsection
-
-@section('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
-        integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 @endsection

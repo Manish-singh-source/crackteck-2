@@ -309,28 +309,39 @@
                                                         @if ($product->warehouseProduct->main_product_image)
                                                             <img src="{{ asset($product->warehouseProduct->main_product_image) }}"
                                                                 alt="{{ $product->warehouseProduct->product_name }}"
-                                                                width="40" height="40" class="img-fluid rounded me-2">
+                                                                width="40" height="40"
+                                                                class="img-fluid rounded me-2">
                                                         @else
-                                                            <div class="bg-light rounded d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                                            <div class="bg-light rounded d-flex align-items-center justify-content-center me-2"
+                                                                style="width: 40px; height: 40px;">
                                                                 <i class="mdi mdi-package-variant text-muted"></i>
                                                             </div>
                                                         @endif
                                                         <div>
-                                                            <div class="fw-semibold">{{ $product->warehouseProduct->product_name }}</div>
-                                                            <div class="text-muted small">SKU: {{ $product->warehouseProduct->sku }}</div>
+                                                            <div class="fw-semibold">
+                                                                {{ $product->warehouseProduct->product_name }}</div>
+                                                            <div class="text-muted small">SKU:
+                                                                {{ $product->warehouseProduct->sku }}</div>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>{{ $serial->auto_generated_serial }}</td>
                                                 <td>{{ $serial->manual_serial ?? 'N/A' }}</td>
-                                                <td>    
-                                                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($serial->auto_generated_serial, 'C128') }}" alt="Barcode" width="100">
+                                                <td>
+                                                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($serial->auto_generated_serial, 'C128') }}"
+                                                        alt="Barcode" width="100">
                                                 </td>
                                                 <td>
                                                     <button type="button" class="btn btn-sm btn-warning edit-serial-btn"
                                                         data-serial-id="{{ $serial->id }}">
                                                         <i class="mdi mdi-pencil"></i>
                                                     </button>
+                                                    <button type="button" class="btn btn-sm btn-danger scrap-serial-btn"
+                                                        data-serial-id="{{ $serial->id }}"
+                                                        data-serial-number="{{ $serial->auto_generated_serial }}">
+                                                        <i class="mdi mdi-recycle"></i>
+                                                    </button>
+
                                                 </td>
                                             </tr>
                                         @empty
@@ -439,12 +450,18 @@
                                         $images = $product->warehouseProduct->additional_product_images;
                                     } else {
                                         // Try JSON decode
-                                        $decoded = json_decode($product->warehouseProduct->additional_product_images, true);
+                                        $decoded = json_decode(
+                                            $product->warehouseProduct->additional_product_images,
+                                            true,
+                                        );
                                         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
                                             $images = $decoded;
                                         } else {
                                             // Fallback: comma-separated string
-                                            $images = explode(',', $product->warehouseProduct->additional_product_images);
+                                            $images = explode(
+                                                ',',
+                                                $product->warehouseProduct->additional_product_images,
+                                            );
                                         }
                                     }
                                 }
@@ -544,7 +561,7 @@
                                 {{-- @php $variations = json_decode($product->warehouseProduct->variation_options, true); 
                                     // print_r($variations);
                                 @endphp --}}
-                                @foreach ($product->warehouseProduct->variation_options as $key=> $attribute)
+                                @foreach ($product->warehouseProduct->variation_options as $key => $attribute)
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label class="fw-semibold">{{ $key }}:</label>
@@ -553,11 +570,11 @@
                                                     {{ $value }},
                                                 @endforeach
                                             </p>
-                                        </div>  
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
-                        </div>  
+                        </div>
 
                     </div>
 
@@ -571,7 +588,6 @@
                                 <label class="fw-semibold">Installation Options:</label>
                                 <p class="text-muted">
                                     @if ($product->with_installation && is_array($product->with_installation))
-
                                         @foreach ($product->with_installation as $option)
                                             <span class="badge bg-secondary me-1">{{ $option }}</span>
                                         @endforeach
@@ -653,11 +669,11 @@
                                         <label class="fw-semibold">E-commerce Status:</label>
                                         <p class="text-muted">
                                             @php
-                                            $ecommerceStatus = [
-                                                0 => 'Inactive',
-                                                1 => 'Active',
-                                                2 => 'Draft',
-                                            ];
+                                                $ecommerceStatus = [
+                                                    0 => 'Inactive',
+                                                    1 => 'Active',
+                                                    2 => 'Draft',
+                                                ];
                                             @endphp
                                             <span
                                                 class="badge {{ $product->status == '1' ? 'bg-success' : 'bg-danger' }}">
@@ -687,11 +703,8 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
-
             </div>
-
         </div>
     </div> <!-- content -->
 
@@ -706,7 +719,7 @@
                 </div>
                 <form id="scrapSerialForm">
                     @csrf
-                    <div class="modal-body">
+                    <div class="modal-body" style="background-color: #fff; padding: 20px;">
                         <div class="alert alert-warning">
                             <i class="mdi mdi-alert-circle-outline me-2"></i>
                             <strong>Warning:</strong> This action will permanently scrap the selected serial number.
@@ -803,10 +816,10 @@
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
             alertDiv.innerHTML = `
-        <i class="mdi mdi-${type === 'success' ? 'check-circle' : 'alert-circle'}-outline me-2"></i>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
+                <i class="mdi mdi-${type === 'success' ? 'check-circle' : 'alert-circle'}-outline me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
 
             // Insert at the top of the content
             const content = document.querySelector('.content .container-fluid');
@@ -849,18 +862,34 @@
                 });
             });
 
-            // Handle scrap serial form submission
-            document.getElementById('scrapSerialForm').addEventListener('submit', function(e) {
+            // Handle edit button clicks
+            document.querySelectorAll('.edit-serial-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const serialId = this.getAttribute('data-serial-id');
+                    editSerial(serialId);
+                });
+            });
+
+            // Handle scrap button clicks
+            document.querySelectorAll('.scrap-serial-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const serialId = this.getAttribute('data-serial-id');
+                    const serialNumber = this.getAttribute('data-serial-number');
+                    scrapSerial(serialNumber, serialId);
+                });
+            });
+
+            // Handle edit serial form submission
+            document.getElementById('editSerialForm').addEventListener('submit', function(e) {
                 e.preventDefault();
 
                 const form = this;
-                const submitBtn = document.getElementById('scrapSerialSubmitBtn');
+                const submitBtn = document.getElementById('editSerialSubmitBtn');
                 const spinner = submitBtn.querySelector('.spinner-border');
-                const serialNumber = document.getElementById('scrapSerialNumber').value;
 
                 // Clear previous errors
-                document.getElementById('reason_error').textContent = '';
-                document.getElementById('scrapReason').classList.remove('is-invalid');
+                document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+                document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
 
                 // Show loading state
                 submitBtn.disabled = true;
@@ -869,7 +898,7 @@
                 // Prepare form data
                 const formData = new FormData(form);
 
-                fetch('{{ route('product-list.scrap-product') }}', {
+                fetch('{{ route('product-list.update-serial') }}', {
                         method: 'POST',
                         body: formData,
                         headers: {
@@ -888,30 +917,28 @@
 
                             // Close modal
                             const modal = bootstrap.Modal.getInstance(document.getElementById(
-                                'scrapSerialModal'));
+                                'editSerialModal'));
                             modal.hide();
 
-                            // Remove the scrapped serial row from the table
-                            const serialRow = document.querySelector(`tr[id*="${serialNumber}"]`);
-                            if (serialRow) {
-                                serialRow.style.transition = 'opacity 0.3s';
-                                serialRow.style.opacity = '0';
-                                setTimeout(() => {
-                                    serialRow.remove();
-
-                                    // Check if no more serial numbers are left
-                                    const remainingRows = document.querySelectorAll(
-                                        '#serial-row-');
-                                    if (remainingRows.length === 0) {
-                                        // Reload page if no serial numbers left
-                                        setTimeout(() => {
-                                            location.reload();
-                                        }, 1000);
-                                    }
-                                }, 300);
-                            }
+                            // Reload page to show updated data
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
                         } else {
-                            showAlert('error', data.message);
+                            // Show validation errors
+                            if (data.errors) {
+                                Object.keys(data.errors).forEach(key => {
+                                    const errorElement = document.getElementById(
+                                        `${key}_error`);
+                                    const inputElement = document.querySelector(
+                                        `[name="${key}"]`);
+                                    if (errorElement && inputElement) {
+                                        errorElement.textContent = data.errors[key][0];
+                                        inputElement.classList.add('is-invalid');
+                                    }
+                                });
+                            }
+                            showAlert('error', data.message || 'Validation failed');
                         }
                     })
                     .catch(error => {
@@ -920,8 +947,180 @@
                         spinner.classList.add('d-none');
 
                         console.error('Error:', error);
-                        showAlert('error', 'An error occurred while scrapping the serial number');
+                        showAlert('error', 'An error occurred while updating the serial number');
                     });
+            });
+
+            // Handle scrap serial form submission
+            (document).ready(function() {
+                // Handle scrap product form submission
+                $('#scrapProductForm').on('submit', function(e) {
+                    e.preventDefault();
+                    const form = $(this);
+                    const submitBtn = $('#scrapSubmitBtn');
+                    const spinner = submitBtn.find('.spinner-border');
+                    console.log(form.serialize());
+                    // Clear previous errors
+                    $('.is-invalid').removeClass('is-invalid');
+                    $('.invalid-feedback').text('');
+
+                    // Show loading state
+                    submitBtn.prop('disabled', true);
+                    spinner.removeClass('d-none');
+
+                    $.ajax({
+                        url: '{{ route('scrap-items.add-to-scrap') }}',
+                        method: 'POST',
+                        data: form.serialize(),
+                        success: function(response) {
+                            // Hide loading state first
+                            submitBtn.prop('disabled', false);
+                            spinner.addClass('d-none');
+
+                            if (response.success) {
+                                // Show success message
+                                toastr.success(response.message);
+
+                                // Reset form and close modal
+                                form[0].reset();
+                                $('#addScrapModal').modal('hide');
+
+                                // Reload page to show updated data
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1000);
+                            } else {
+                                toastr.error(response.message);
+                            }
+                        },
+                        error: function(xhr) {
+                            console.log(xhr.responseJSON);
+                            // Hide loading state first
+                            submitBtn.prop('disabled', false);
+                            spinner.addClass('d-none');
+
+                            if (xhr.status === 422) {
+                                // Validation errors
+                                const errors = xhr.responseJSON.errors;
+                                Object.keys(errors).forEach(function(key) {
+                                    $('#' + key).addClass('is-invalid');
+                                    $('#' + key + '_error').text(errors[key][
+                                        0
+                                    ]);
+                                });
+                            } else {
+                                toastr.error(
+                                    'An error occurred while processing your request.'
+                                );
+                            }
+                        }
+                    });
+                });
+
+                // Handle restore product
+                $('.restore-btn').on('click', function() {
+                    const scrapId = $(this).data('scrap-id');
+                    const button = $(this);
+
+                    if (confirm('Are you sure you want to restore this product?')) {
+                        button.prop('disabled', true);
+
+                        $.ajax({
+                            url: '{{ route('scrap-items.remove-from-scrap', ':id') }}'
+                                .replace(':id',
+                                    scrapId),
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    // toastr.success(response.message);
+                                    location.reload();
+                                    // Remove the row from table
+                                    button.closest('tr').fadeOut(function() {
+                                        $(this).remove();
+
+                                        // Check if table is empty and reload if needed
+                                        if ($('tbody tr:visible').length ===
+                                            0) {
+                                            setTimeout(function() {
+                                                location.reload();
+                                            }, 1000);
+                                        }
+                                    });
+                                } else {
+                                    console.log(response)
+                                    button.prop('disabled', false);
+                                }
+                            },
+                            error: function(xhr) {
+                                console.log(xhr.responseJSON)
+                                toastr.error(
+                                    'An error occurred while restoring the product.'
+                                );
+                                button.prop('disabled', false);
+                            }
+                        });
+                    }
+                });
+            });
+
+        });
+
+        // Handle scrap serial form submission
+        $('#scrapSerialForm').on('submit', function(e) {
+            e.preventDefault();
+            const form = $(this);
+            const submitBtn = $('#scrapSerialSubmitBtn');
+            const spinner = submitBtn.find('.spinner-border');
+
+            console.log(form.serialize());
+            // Clear previous errors
+            $('.invalid-feedback').text('');
+            $('.is-invalid').removeClass('is-invalid');
+
+            // Show loading state
+            submitBtn.prop('disabled', true);
+            spinner.removeClass('d-none');
+
+            $.ajax({
+                url: '{{ route('scrap-items.add-to-scrap') }}',
+                method: 'POST',
+                data: form.serialize(),
+                success: function(response) {
+                    // Hide loading state first
+                    submitBtn.prop('disabled', false);
+                    spinner.addClass('d-none');
+
+                    if (response.success) {
+                        // Close modal
+                        $('#scrapSerialModal').modal('hide');
+
+                        // Reload page to show updated data
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function(xhr) {
+                    // Hide loading state first
+                    submitBtn.prop('disabled', false);
+                    spinner.addClass('d-none');
+
+                    if (xhr.status === 422) {
+                        // Validation errors
+                        const errors = xhr.responseJSON.errors;
+                        Object.keys(errors).forEach(function(key) {
+                            $('#' + key).addClass('is-invalid');
+                            $('#' + key + '_error').text(errors[key][0]);
+                        });
+                    } else {
+                        toastr.error('An error occurred while processing your request.');
+                    }
+                }
             });
         });
     </script>

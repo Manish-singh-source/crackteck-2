@@ -24,10 +24,11 @@ return new class extends Migration
             $table->enum('gender', ['male', 'female', 'other'])->nullable();
 
             $table->enum('customer_type', ['ecommerce', 'amc', 'non_amc', 'both', 'offline'])->default('ecommerce');
-            $table->enum('source_type', ['ecommerce', 'app', 'call', 'walk_in', 'other', 'admin_panel'])->default('ecommerce')->nullable();
+            $table->enum('source_type', ['ecommerce', 'app', 'call', 'walk_in', 'other', 'admin_panel', 'lead'])->default('ecommerce')->nullable();
             $table->string('password')->nullable();
             $table->enum('status', ['inactive', 'active', 'blocked', 'suspended'])->default('active');
-
+            $table->boolean('is_lead')->default(false);
+            
             // Authentication / Verification
             $table->string('otp')->nullable();
             $table->timestamp('otp_expiry')->nullable();

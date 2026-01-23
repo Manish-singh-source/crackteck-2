@@ -107,14 +107,12 @@
                                                                     <td>{{ $scrapItem->productSerial->auto_generated_serial }}
                                                                     </td>
                                                                     <td>
-                                                                        <button type="button"
-                                                                            class="btn btn-icon btn-sm bg-success-subtle restore-btn"
-                                                                            data-scrap-id="{{ $scrapItem->id }}"
-                                                                            data-bs-toggle="tooltip"
-                                                                            data-bs-original-title="Restore">
-                                                                            <i
-                                                                                class="mdi mdi-restore fs-14 text-success"></i>
-                                                                        </button>
+                                                                        <form action="{{ route('scrap-items.remove-from-scrap', $scrapItem->id) }}" method="POST">
+                                                                            @csrf
+                                                                            <button type="submit" class="btn btn-icon btn-sm bg-success-subtle">
+                                                                                <i class="mdi mdi-restore fs-14 text-success"></i>
+                                                                            </button>
+                                                                        </form>
                                                                     </td>
                                                                 </tr>
                                                             @empty
@@ -144,8 +142,7 @@
         </div> <!-- content -->
 
         <!-- Add Scrap Product Modal -->
-        <div class="modal fade" id="addScrapModal" tabindex="-1" aria-labelledby="addScrapModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="addScrapModal" tabindex="-1" aria-labelledby="addScrapModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -165,8 +162,7 @@
                                 <div class="invalid-feedback" id="serial_ids_error"></div>
                             </div>
                             <div class="mb-3">
-                                <label for="reason" class="form-label">Reason <span
-                                        class="text-danger">*</span></label>
+                                <label for="reason" class="form-label">Reason <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="reason" name="reason" rows="3"
                                     placeholder="Enter the reason for scrapping this product" required></textarea>
                                 <div class="invalid-feedback" id="reason_error"></div>
@@ -261,7 +257,7 @@
                         button.prop('disabled', true);
 
                         $.ajax({
-                            url: '{{ route('product-list.restore-product', ':id') }}'.replace(':id',
+                            url: '{{ route('scrap-items.remove-from-scrap', ':id') }}'.replace(':id',
                                 scrapId),
                             method: 'POST',
                             data: {
@@ -271,17 +267,6 @@
                                 if (response.success) {
                                     // toastr.success(response.message);
                                     location.reload();
-                                    // Remove the row from table
-                                    button.closest('tr').fadeOut(function() {
-                                        $(this).remove();
-
-                                        // Check if table is empty and reload if needed
-                                        if ($('tbody tr:visible').length === 0) {
-                                            setTimeout(function() {
-                                                location.reload();
-                                            }, 1000);
-                                        }
-                                    });
                                 } else {
                                     toastr.error(response.message);
                                     button.prop('disabled', false);

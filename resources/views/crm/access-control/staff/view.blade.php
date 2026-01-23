@@ -6,49 +6,23 @@
             <div class="pt-2">
                 <div class="pb-3 d-flex align-items-sm-center flex-sm-row flex-column">
                     <div class="flex-grow-1">
-                        <?php
-                        $staffRole = $staff->staff_role;
-                        $staffRoleName = '';
-                        switch ($staffRole) {
-                            case 0:
-                                $staffRoleName = 'Admin';
-                                break;
-                            case 1:
-                                $staffRoleName = 'Engineer';
-                                break;
-                            case 2:
-                                $staffRoleName = 'Delivery Man';
-                                break;
-                            case 3:
-                                $staffRoleName = 'Sales Person';
-                                break;
-                            case 4:
-                                $staffRoleName = 'Customer';
-                                break;
-                            default:
-                                $staffRoleName = 'Unknown';
-                                break;
-                        }
-                        ?>
-                        <h4 class="fs-18 fw-semibold m-0">{{ $staffRoleName }} Details</h4>
+                        <h4 class="fs-18 fw-semibold m-0">{{ ucwords(str_replace('_', ' ', $staff->staff_role)) }} Details
+                        </h4>
                     </div>
                 </div>
-
                 <div class="row">
                     <div class="col-md-12 col-lg-12 col-xl-12">
                         <div class="card">
                             <div class="card-body">
                                 <div class="widget-first">
-
                                     <div class="d-flex align-items-center gap-3 mb-2">
                                         <div class="overflow-hidden ms-md-4 ms-0">
-                                            <h4 class="m-0 text-dark fs-20 mt-2 mt-md-0">{{ $staff->first_name }}
-                                                {{ $staff->last_name }}</h4>
+                                            <h4 class="m-0 text-dark fs-20 mt-2 mt-md-0">{{ ucwords($staff->first_name) }}
+                                                {{ ucwords($staff->last_name) }}</h4>
                                             <!-- <div class="mb-0 text-dark fs-15">John Doe</div> -->
                                             <p class="my-1 text-muted fs-16">{{ $staff->designation }}</p>
                                             <span class="fs-15">KYC Status: <span
                                                     class="badge bg-success-subtle text-success px-2 py-1 fs-13 fw-normal">Verified</span>
-
                                         </div>
                                     </div>
 
@@ -319,49 +293,24 @@
                                                                 <span class="fw-semibold text-break">Address :
                                                                 </span>
                                                                 <span>
-                                                                    <div class="text-end">{{ $staff->address->address1 ?? '' }}</div>
-                                                                    <div class="text-end">{{ $staff->address->address2 ?? '' }}</div>
+                                                                    <div class="text-end">
+                                                                        {{ $staff->address->address1 ?? '' }}</div>
+                                                                    <div class="text-end">
+                                                                        {{ $staff->address->address2 ?? '' }}</div>
                                                                 </span>
                                                             </li>
                                                             <li
                                                                 class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                                                 <span class="fw-semibold text-break">Status :</span>
                                                                 <span>
-                                                                    @switch($staff->status)
-                                                                        @case(0)
-                                                                            InActive
-                                                                            @break
-                                                                        @case(1)
-                                                                            Active
-                                                                            @break
-                                                                        @case(2)
-                                                                            Resigned
-                                                                            @break
-                                                                        @case(3)
-                                                                            Terminated
-                                                                            @break
-                                                                        @case(4)
-                                                                            Blocked
-                                                                            @break
-                                                                        @case(5)
-                                                                            Suspended
-                                                                            @break
-                                                                        @case(6)
-                                                                            Pending
-                                                                            @break
-                                                                        @default
-                                                                            Unknown
-                                                                    @endswitch
+                                                                    {{ ucwords($staff->status) }}
                                                                 </span>
                                                             </li>
-
                                                         </ul>
                                                     </div>
                                                 </div>
-
                                             </div>
                                         </div>
-
                                     </div>
 
                                     <div class="tab-pane pt-4" id="profile_experience" role="tabpanel">
@@ -387,8 +336,8 @@
                                                                     Job Title :
                                                                 </span>
                                                                 <span>
-                                                                    <span class="fw-bold text-dark">Hardware Support
-                                                                        Engineer</span><br>
+                                                                    <span
+                                                                        class="fw-bold text-dark">{{ $staff->designation }}</span><br>
                                                                 </span>
                                                             </li>
 
@@ -405,40 +354,15 @@
                                                                 <span class="fw-semibold text-break">Employee Type :
 
                                                                 </span>
-                                                                <span>Full-time</span>
+                                                                <span>{{ ucwords(str_replace('_', ' ', $staff->employment_type)) }}</span>
                                                             </li>
 
                                                             <li
                                                                 class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                                                 <span class="fw-semibold text-break">Date of Joining :
                                                                 </span>
-                                                                <span>13-May-2025</span>
+                                                                <span>{{ Carbon\Carbon::parse($staff->joining_date)->format('d M Y') }}</span>
                                                             </li>
-
-                                                            <li
-                                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                                <span class="fw-semibold text-break">Manager/Supervisor
-                                                                    Name :
-
-                                                                </span>
-                                                                <span>John Doe</span>
-                                                            </li>
-
-                                                            <li
-                                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                                <span class="fw-semibold text-break">Office Location/Branch
-                                                                    :
-                                                                </span>
-                                                                <span>Kandivali</span>
-                                                            </li>
-
-                                                            <li
-                                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                                <span class="fw-semibold text-break">Shift Timing :
-                                                                </span>
-                                                                <span>Pending</span>
-                                                            </li>
-
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -462,11 +386,10 @@
                                                             <li
                                                                 class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                                                 <span class="fw-semibold text-break">
-                                                                    Technicals Skills :
+                                                                    Technical Skills :
                                                                 </span>
                                                                 <span>
-                                                                    <span class="fw-bold text-dark">Hardware
-                                                                        Maintenance</span><br>
+                                                                    {{ $staff->workSkills->primary_skills ?? 'N/A' }}
                                                                 </span>
                                                             </li>
 
@@ -475,7 +398,9 @@
                                                                 <span class="fw-semibold text-break">Certifications :
                                                                 </span>
                                                                 <span>
-                                                                    <div>CompTIA A+</div>
+                                                                    <div>
+                                                                        {{ $staff->workSkills->certificates ?? 'N/A' }}
+                                                                    </div>
                                                                 </span>
                                                             </li>
 
@@ -484,7 +409,7 @@
                                                                 <span class="fw-semibold text-break">Experience :
                                                                 </span>
                                                                 <span>
-                                                                    <div>5 Years</div>
+                                                                    <div>{{ $staff->workSkills->experience ?? 'N/A' }} Years</div>
                                                                 </span>
                                                             </li>
                                                             <li
@@ -492,7 +417,9 @@
                                                                 <span class="fw-semibold text-break">Languages Known :
                                                                 </span>
                                                                 <span>
-                                                                    <div>English, Hindi, Marathi</div>
+                                                                    <div>
+                                                                        {{ $staff->workSkills->languages_known ?? 'N/A' }}
+                                                                    </div>
                                                                 </span>
                                                             </li>
                                                         </ul>
@@ -638,7 +565,6 @@
                                                                                             Present
                                                                                         </td>
                                                                                     </tr>
-
                                                                                 </tbody>
                                                                             </table>
                                                                         </div>
@@ -648,7 +574,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
                                             </div>
                                         </div>
                                     </div>
@@ -666,16 +591,22 @@
                                                                 <div class="col-12">
                                                                     <div class="card shadow-none">
                                                                         <div class="card-body">
-                                                                            @if(session('success'))
-                                                                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                                                            @if (session('success'))
+                                                                                <div class="alert alert-success alert-dismissible fade show"
+                                                                                    role="alert">
                                                                                     {{ session('success') }}
-                                                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                                                    <button type="button"
+                                                                                        class="btn-close"
+                                                                                        data-bs-dismiss="alert"></button>
                                                                                 </div>
                                                                             @endif
-                                                                            @if(session('error'))
-                                                                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                                            @if (session('error'))
+                                                                                <div class="alert alert-danger alert-dismissible fade show"
+                                                                                    role="alert">
                                                                                     {{ session('error') }}
-                                                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                                                    <button type="button"
+                                                                                        class="btn-close"
+                                                                                        data-bs-dismiss="alert"></button>
                                                                                 </div>
                                                                             @endif
 
@@ -689,7 +620,8 @@
                                                                                         <th>Assigned Date</th>
                                                                                         <th>Assignment Type</th>
                                                                                         <th>Approval Status</th>
-                                                                                        <th style="width:120px;">Action</th>
+                                                                                        <th style="width:120px;">Action
+                                                                                        </th>
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
@@ -699,20 +631,33 @@
                                                                                                 '0' => 'AMC',
                                                                                                 '1' => 'Quick Service',
                                                                                                 '2' => 'Installation',
-                                                                                                '3' => 'Repair'
+                                                                                                '3' => 'Repair',
                                                                                             ];
-                                                                                            $serviceType = $serviceTypeMap[$task->serviceRequest->service_type ?? ''] ?? 'N/A';
+                                                                                            $serviceType =
+                                                                                                $serviceTypeMap[
+                                                                                                    $task
+                                                                                                        ->serviceRequest
+                                                                                                        ->service_type ??
+                                                                                                        ''
+                                                                                                ] ?? 'N/A';
 
                                                                                             // Check if task is overdue (48 hours)
-                                                                                            $isOverdue = $task->is_overdue;
+                                                                                            $isOverdue =
+                                                                                                $task->is_overdue;
                                                                                         @endphp
-                                                                                        <tr class="{{ $isOverdue ? 'table-warning' : '' }}">
+                                                                                        <tr
+                                                                                            class="{{ $isOverdue ? 'table-warning' : '' }}">
                                                                                             <td>
-                                                                                                <a href="{{ route('service-request.view', $task->service_request_id) }}">
+                                                                                                <a
+                                                                                                    href="{{ route('service-request.view', $task->service_request_id) }}">
                                                                                                     {{ $task->serviceRequest->request_id ?? 'N/A' }}
                                                                                                 </a>
-                                                                                                @if($isOverdue)
-                                                                                                    <br><small class="text-danger"><i class="bx bx-time-five"></i> Over 48 hours</small>
+                                                                                                @if ($isOverdue)
+                                                                                                    <br><small
+                                                                                                        class="text-danger"><i
+                                                                                                            class="bx bx-time-five"></i>
+                                                                                                        Over 48
+                                                                                                        hours</small>
                                                                                                 @endif
                                                                                             </td>
                                                                                             <td>
@@ -720,49 +665,66 @@
                                                                                                 {{ $task->serviceRequest->customer->last_name ?? '' }}
                                                                                             </td>
                                                                                             <td>
-                                                                                                <span class="badge bg-info-subtle text-info">{{ $serviceType }}</span>
+                                                                                                <span
+                                                                                                    class="badge bg-info-subtle text-info">{{ $serviceType }}</span>
                                                                                             </td>
-                                                                                            <td>{{ $task->assigned_at ? $task->assigned_at->format('d M Y, h:i A') : 'N/A' }}</td>
+                                                                                            <td>{{ $task->assigned_at ? $task->assigned_at->format('d M Y, h:i A') : 'N/A' }}
+                                                                                            </td>
                                                                                             <td>
-                                                                                                @if($task->assignment_type == '0')
-                                                                                                    <span class="badge bg-primary-subtle text-primary">Individual</span>
+                                                                                                @if ($task->assignment_type == '0')
+                                                                                                    <span
+                                                                                                        class="badge bg-primary-subtle text-primary">Individual</span>
                                                                                                 @else
-                                                                                                    <span class="badge bg-secondary-subtle text-secondary">Group - {{ $task->group_name }}</span>
+                                                                                                    <span
+                                                                                                        class="badge bg-secondary-subtle text-secondary">Group
+                                                                                                        -
+                                                                                                        {{ $task->group_name }}</span>
                                                                                                 @endif
                                                                                             </td>
                                                                                             <td>
-                                                                                                @if($task->is_approved_by_engineer)
-                                                                                                    <span class="badge bg-success-subtle text-success">
-                                                                                                        <i class="bx bx-check-circle"></i> Approved
+                                                                                                @if ($task->is_approved_by_engineer)
+                                                                                                    <span
+                                                                                                        class="badge bg-success-subtle text-success">
+                                                                                                        <i
+                                                                                                            class="bx bx-check-circle"></i>
+                                                                                                        Approved
                                                                                                     </span>
-                                                                                                    <br><small class="text-muted">{{ $task->engineer_approved_at->format('d M Y, h:i A') }}</small>
+                                                                                                    <br><small
+                                                                                                        class="text-muted">{{ $task->engineer_approved_at }}</small>
                                                                                                 @else
-                                                                                                    <span class="badge bg-warning-subtle text-warning">
-                                                                                                        <i class="bx bx-time"></i> Pending Approval
+                                                                                                    <span
+                                                                                                        class="badge bg-warning-subtle text-warning">
+                                                                                                        <i
+                                                                                                            class="bx bx-time"></i>
+                                                                                                        Pending Approval
                                                                                                     </span>
                                                                                                 @endif
                                                                                             </td>
                                                                                             <td>
                                                                                                 <a href="{{ route('service-request.view', $task->service_request_id) }}"
-                                                                                                   class="btn btn-sm btn-info"
-                                                                                                   data-bs-toggle="tooltip"
-                                                                                                   title="View Details">
-                                                                                                    <i class="bx bx-show"></i>
+                                                                                                    class="btn btn-sm btn-info"
+                                                                                                    data-bs-toggle="tooltip"
+                                                                                                    title="View Details">
+                                                                                                    <i
+                                                                                                        class="bx bx-show"></i>
                                                                                                 </a>
-                                                                                                @if(!$task->is_approved_by_engineer)
+                                                                                                @if (!$task->is_approved_by_engineer)
                                                                                                     <button type="button"
-                                                                                                            class="btn btn-sm btn-success approve-task-btn"
-                                                                                                            data-assignment-id="{{ $task->id }}"
-                                                                                                            data-bs-toggle="tooltip"
-                                                                                                            title="Approve Task">
-                                                                                                        <i class="bx bx-check"></i> Approve
+                                                                                                        class="btn btn-sm btn-success approve-task-btn"
+                                                                                                        data-assignment-id="{{ $task->id }}"
+                                                                                                        data-bs-toggle="tooltip"
+                                                                                                        title="Approve Task">
+                                                                                                        <i
+                                                                                                            class="bx bx-check"></i>
+                                                                                                        Approve
                                                                                                     </button>
                                                                                                 @endif
                                                                                             </td>
                                                                                         </tr>
                                                                                     @empty
                                                                                         <tr>
-                                                                                            <td colspan="7" class="text-center text-muted py-4">
+                                                                                            <td colspan="7"
+                                                                                                class="text-center text-muted py-4">
                                                                                                 No tasks assigned yet
                                                                                             </td>
                                                                                         </tr>
@@ -1288,105 +1250,105 @@
     </div>
 
     @push('scripts')
-    <script>
-        $(document).ready(function() {
-            // CSRF token setup for AJAX
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
+        <script>
+            $(document).ready(function() {
+                // CSRF token setup for AJAX
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
 
-            // Handle approve task button click
-            $('.approve-task-btn').on('click', function() {
-                const button = $(this);
-                const assignmentId = button.data('assignment-id');
-                const row = button.closest('tr');
+                // Handle approve task button click
+                $('.approve-task-btn').on('click', function() {
+                    const button = $(this);
+                    const assignmentId = button.data('assignment-id');
+                    const row = button.closest('tr');
 
-                // Confirm approval
-                if (!confirm('Are you sure you want to approve this task?')) {
-                    return;
-                }
+                    // Confirm approval
+                    if (!confirm('Are you sure you want to approve this task?')) {
+                        return;
+                    }
 
-                // Disable button and show loading
-                button.prop('disabled', true);
-                button.html('<i class="bx bx-loader bx-spin"></i> Approving...');
+                    // Disable button and show loading
+                    button.prop('disabled', true);
+                    button.html('<i class="bx bx-loader bx-spin"></i> Approving...');
 
-                // Send AJAX request
-                $.ajax({
-                    url: '{{ route("staff.approve.task") }}',
-                    type: 'POST',
-                    data: {
-                        assignment_id: assignmentId
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            // Show success message
-                            const alertHtml = `
+                    // Send AJAX request
+                    $.ajax({
+                        url: '{{ route('staff.approve.task') }}',
+                        type: 'POST',
+                        data: {
+                            assignment_id: assignmentId
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Show success message
+                                const alertHtml = `
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                                     ${response.message}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                 </div>
                             `;
-                            $('.card-body').prepend(alertHtml);
+                                $('.card-body').prepend(alertHtml);
 
-                            // Update the approval status column
-                            const statusCell = row.find('td:eq(5)');
-                            statusCell.html(`
+                                // Update the approval status column
+                                const statusCell = row.find('td:eq(5)');
+                                statusCell.html(`
                                 <span class="badge bg-success-subtle text-success">
                                     <i class="bx bx-check-circle"></i> Approved
                                 </span>
                                 <br><small class="text-muted">${response.approved_at}</small>
                             `);
 
-                            // Remove the approve button
-                            button.remove();
+                                // Remove the approve button
+                                button.remove();
 
-                            // Remove warning highlight if present
-                            row.removeClass('table-warning');
+                                // Remove warning highlight if present
+                                row.removeClass('table-warning');
 
-                            // Auto-dismiss alert after 5 seconds
-                            setTimeout(function() {
-                                $('.alert-success').fadeOut('slow', function() {
-                                    $(this).remove();
-                                });
-                            }, 5000);
-                        } else {
-                            alert('Error: ' + response.message);
-                            button.prop('disabled', false);
-                            button.html('<i class="bx bx-check"></i> Approve');
-                        }
-                    },
-                    error: function(xhr) {
-                        let errorMessage = 'An error occurred while approving the task.';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        }
+                                // Auto-dismiss alert after 5 seconds
+                                setTimeout(function() {
+                                    $('.alert-success').fadeOut('slow', function() {
+                                        $(this).remove();
+                                    });
+                                }, 5000);
+                            } else {
+                                alert('Error: ' + response.message);
+                                button.prop('disabled', false);
+                                button.html('<i class="bx bx-check"></i> Approve');
+                            }
+                        },
+                        error: function(xhr) {
+                            let errorMessage = 'An error occurred while approving the task.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
 
-                        const alertHtml = `
+                            const alertHtml = `
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 ${errorMessage}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         `;
-                        $('.card-body').prepend(alertHtml);
+                            $('.card-body').prepend(alertHtml);
 
-                        button.prop('disabled', false);
-                        button.html('<i class="bx bx-check"></i> Approve');
+                            button.prop('disabled', false);
+                            button.html('<i class="bx bx-check"></i> Approve');
 
-                        // Auto-dismiss alert after 5 seconds
-                        setTimeout(function() {
-                            $('.alert-danger').fadeOut('slow', function() {
-                                $(this).remove();
-                            });
-                        }, 5000);
-                    }
+                            // Auto-dismiss alert after 5 seconds
+                            setTimeout(function() {
+                                $('.alert-danger').fadeOut('slow', function() {
+                                    $(this).remove();
+                                });
+                            }, 5000);
+                        }
+                    });
                 });
-            });
 
-            // Initialize tooltips
-            $('[data-bs-toggle="tooltip"]').tooltip();
-        });
-    </script>
+                // Initialize tooltips
+                $('[data-bs-toggle="tooltip"]').tooltip();
+            });
+        </script>
     @endpush
 @endsection

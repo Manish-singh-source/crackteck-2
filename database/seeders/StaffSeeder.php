@@ -35,27 +35,31 @@ class StaffSeeder extends Seeder
         ];
 
         $areas = ['Mumbai', 'Delhi', 'Bangalore', 'Pune', 'Chennai', 'Hyderabad'];
-        $genders = ['0', '1', '2'];
-        $marital = ['0', '1', '2'];
-        $employment = ['0', '1'];
+        $genders = ['male', 'female', 'other'];
+        $marital = ['unmarried', 'married', 'divorced'];
+        $employment = ['full_time', 'part_time', 'contractual'];
+        $statuses = ['active', 'inactive', 'resigned', 'terminated', 'blocked', 'suspended', 'pending'];
 
         $i = 1;
 
         foreach ($roles as $roleId => $roleName) {
-            for ($j = 1; $j <= 4; $j++) { // 4 records per role → 24 total
+            for ($j = 1; $j <= 5; $j++) { 
                 $staff[] = [
                     'staff_code' => 'STF' . str_pad($i, 3, '0', STR_PAD_LEFT),
                     'staff_role' => $staffRoles[$roleId],
-                    'first_name' => $roleName . $j,
-                    'last_name' => 'User',
+                    'first_name' => fake()->firstName(),
+                    'last_name' => fake()->lastName(),
                     'phone' => '98' . rand(10000000, 99999999),
-                    'email' => strtolower(str_replace(' ', '', $roleName)) . $j . '@example.com',
-                    'dob' => Carbon::now()->subYears(rand(22, 40))->format('Y-m-d'),
+                    'email' => fake()->unique()->safeEmail(),
+                    'dob' => fake()->date(),
                     'gender' => $genders[array_rand($genders)],
                     'marital_status' => $marital[array_rand($marital)],
                     'employment_type' => $employment[array_rand($employment)],
-                    'joining_date' => Carbon::now()->subMonths(rand(1, 48))->format('Y-m-d'),
+                    'joining_date' => fake()->date(),
                     'assigned_area' => $areas[array_rand($areas)],
+                    'status' => $statuses[array_rand($statuses)],
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
                 ];
                 $i++;
             }

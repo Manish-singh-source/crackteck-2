@@ -173,16 +173,102 @@ etc.
         - Delete Customer
 
     Table:
-    `customers`: - customer_id (auto generated) - created_by - default null - first_name - last_name - phone - email - dob - gender - customer_type (e-commerce, crm, both, offline)
-    - source_type (website, app, call, walkin, other) - password - status (active, inactive, blocked, suspended) - created_at - updated_at - deleted_at
+    `customers`: -
+        Schema::create('customers', function (Blueprint $table) {
+            $table->id();
 
-        Note: - Created By: default null, only if admin creates customer, fill created by using login user id - phone: unique - email: unique - soft delete
+            $table->string('customer_code')->unique();
 
-        `customer_company_details`: - customer_id (foreign key) - company_name - address1 - address2 - city - state - country - pincode - gst_no
+            $table->string('first_name', 50);
+            $table->string('last_name', 50);
+            $table->string('phone', 10)->unique();
+            $table->string('email')->unique();
+            $table->date('dob')->nullable(); // Use proper date type
+            $table->enum('gender', ['male', 'female', 'other'])->nullable();
+            $table->string('profile')->nullable()->after('email');
+
+            $table->enum('customer_type', ['ecommerce', 'amc', 'non_amc', 'both', 'offline'])->default('ecommerce');
+            $table->enum('source_type', ['ecommerce', 'app', 'call', 'walk_in', 'other', 'admin_panel', 'lead'])->default('ecommerce')->nullable();
+            $table->boolean('is_lead')->default(false);
+            $table->string('password')->nullable();
+            $table->enum('status', ['inactive', 'active', 'blocked', 'suspended'])->default('active');
+
+            // Authentication / Verification
+            $table->string('otp')->nullable();
+            $table->timestamp('otp_expiry')->nullable();
+
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->softDeletes();
+            $table->timestamps();
+
+            $table->index('created_by');
+            $table->index('phone');
+            $table->index('email');
+        });
+
+        Schema::create('leads', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
+            $table->string('lead_number')->unique();
+
+            
+            $table->string('requirement_type')->nullable();
+            $table->string('budget_range')->nullable(); 
+
+            $table->enum('urgency', ['low', 'medium', 'high', 'critical'])->default('medium')->comment('0 - Low, 1 - Medium, 2 - High, 3 - Critical');
+            $table->enum('status', ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost', 'nurture'])->default('new')->comment('0 - New, 1 - Contacted, 2 - Qualified, 3 - Proposal, 4 - Won, 5 - Lost, 6 - Nurture');
+
+            $table->decimal('estimated_value', 15, 2)->nullable();
+            $table->text('notes')->nullable();
+
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->created_by()->nullable();
+            $table->softDeletes();
+            $table->timestamps();
+        });
+
+        `customer_address_details`
+            - branches details 
+
+        `customer_company_details` 
+            - company details
+            
+            $table->string('company_name')->nullable();
+            - other details same 
+            <!-- if required
+            $table->string('designation')->nullable();
+            -->
+
+
+        Note: -
+            - Created By: default null, only if admin creates customer, fill created by using login user id - phone: unique - email: unique - soft delete
+
+        `customer_company_details`:
+            - customer_id (foreign key)
+            - company_name
+            - address1
+            - address2
+            - city
+            - state
+            - country
+            - pincode
+            - gst_no
 
         Note: - Not mandatory table - Company name is unique - GST number is unique - Multiple addresses can be added - soft delete
 
-        `customer_address_details`: - customer_id (foreign key) - branch_name - address1 - address2 - city - state - country - pincode - is_primary (1 - primary, 0 - secondary) - created_at - updated_at - deleted_at
+        `customer_address_details`:
+            - customer_id (foreign key)
+            - branch_name
+            - address1
+            - address2
+            - city
+            - state
+            - country
+            - pincode
+            - is_primary (1 - primary, 0 - secondary)
+            - created_at
+            - updated_at
+            - deleted_at
 
         Note: - Customer can have multiple addresses - One address can be primary and rest can be secondary - Primary address is used for all communications - Secondary address is used for reference only - Primary address is mandatory - Soft delete
 
@@ -393,20 +479,20 @@ etc.
     `vendors`: - vendor_id (auto generated) - created by - default null - name
     - phone - email
 
-             - address1
-             - address2
-             - city
-             - state
-             - country
-             - pincode
+               - address1
+               - address2
+               - city
+               - state
+               - country
+               - pincode
 
-             - pan_no
-             - gst_no
+               - pan_no
+               - gst_no
 
-             - status
-             - created_at
-             - updated_at
-             - deleted_at
+               - status
+               - created_at
+               - updated_at
+               - deleted_at
 
     Note: - Created by: default null, only if admin creates vendor, fill created by using login user id - Soft delete - Status: 0 - Inactive, 1 - Active - Create Own warehouse for currently available stock
 
@@ -541,37 +627,37 @@ etc.
         Table:
         `ecommerce_products`: - ecommerce_product_id (auto generated) - warehouse_product_id (foreign key) - sku
 
-              - with_installation (json)
+                - with_installation (json)
 
-              <!-- optional fields repeated from warehouse product -->
-              - company_warranty
-              - short_description
-              - full_description
-              - technical_specification
+                <!-- optional fields repeated from warehouse product -->
+                - company_warranty
+                - short_description
+                - full_description
+                - technical_specification
 
-              - min_order_qty - default 1
-              - max_order_qty - default : stock quantity
+                - min_order_qty - default 1
+                - max_order_qty - default : stock quantity
 
-              - shipping_charges
-              - shipping_class (light, heavy, fragile)
+                - shipping_charges
+                - shipping_class (light, heavy, fragile)
 
-              - is_featured
-              - is_best_seller
-              - is_suggested
-              - is_todays_deal
+                - is_featured
+                - is_best_seller
+                - is_suggested
+                - is_todays_deal
 
-              - product_tags (json)
+                - product_tags (json)
 
-              - status (active, inactive, draft)
+                - status (active, inactive, draft)
 
-              - meta_title
-              - meta_description
-              - meta_keywords
-              - meta_product_url_slug
+                - meta_title
+                - meta_description
+                - meta_keywords
+                - meta_product_url_slug
 
-              - created_at
-              - updated_at
-              - deleted_at
+                - created_at
+                - updated_at
+                - deleted_at
 
         Note: - SKU is unique - Meta Product URL Slug is unique - Soft delete - Status: 0 - Inactive, 1 - Active, 2 - Draft - Meta Product URL Slug is auto generated from meta title - This product relates to the warehouse product - Warehouse product can be related to multiple product serials table
 
@@ -587,11 +673,11 @@ etc.
     `covered_items`: - id (auto generated)
     - service_type (amc, quick_service, installation, repair) - service_name - service_charge ( if service type is amc then not required ) - status
 
-             - diagonisis_list (json)
+               - diagonisis_list (json)
 
-             - created_at
-             - updated_at
-             - deleted_at
+               - created_at
+               - updated_at
+               - deleted_at
 
     Note: - Soft delete - Status: 0 - Inactive, 1 - Active - Diagonisis List: json array of diagonisis list - If service type is amc then not required to add service charge
 
@@ -1593,14 +1679,14 @@ etc.
 
     Table:
     `coupon_usage`:
-        // Coupons Usage History
-        Schema::create('coupon_usage', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('coupon_id')->constrained('coupons')->onDelete('cascade');
-            $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
-            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
-            $table->decimal('discount_amount', 15, 2);
-            $table->timestamps();
+    // Coupons Usage History
+    Schema::create('coupon_usage', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('coupon_id')->constrained('coupons')->onDelete('cascade');
+    $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
+    $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
+    $table->decimal('discount_amount', 15, 2);
+    $table->timestamps();
 
             $table->index(['coupon_id', 'customer_id']);
         });
@@ -1651,74 +1737,74 @@ etc.
         Table:
         `website_banners`:
 
-              return new class extends Migration {
-                  public function up(): void
-                  {
-                      Schema::create('banners', function (Blueprint $table) {
-                          $table->id();
+                return new class extends Migration {
+                    public function up(): void
+                    {
+                        Schema::create('banners', function (Blueprint $table) {
+                            $table->id();
 
-                          // Core Info
-                          $table->string('title');
-                          $table->string('slug')->unique();
-                          $table->text('description')->nullable();
-                          $table->string('image_url');
+                            // Core Info
+                            $table->string('title');
+                            $table->string('slug')->unique();
+                            $table->text('description')->nullable();
+                            $table->string('image_url');
 
-                          // Banner Classification
-                          $table->string('type')->default('website');
-                          // website, promotional
+                            // Banner Classification
+                            $table->string('type')->default('website');
+                            // website, promotional
 
-                          $table->string('channel')->default('website');
-                          // website, mobile, email
+                            $table->string('channel')->default('website');
+                            // website, mobile, email
 
-                          // Promotion-Specific Fields
-                          $table->string('promotion_type')->nullable();
-                          // discount, coupon, flash_sale, event
+                            // Promotion-Specific Fields
+                            $table->string('promotion_type')->nullable();
+                            // discount, coupon, flash_sale, event
 
-                          $table->decimal('discount_value', 8, 2)->nullable();
-                          $table->string('discount_type')->nullable();
-                          // percentage, fixed
+                            $table->decimal('discount_value', 8, 2)->nullable();
+                            $table->string('discount_type')->nullable();
+                            // percentage, fixed
 
-                          $table->string('promo_code')->nullable();
+                            $table->string('promo_code')->nullable();
 
-                          // Link & Display
-                          $table->string('link_url')->nullable();
-                          $table->string('link_target')->default('_self');
-                          // _self, _blank
+                            // Link & Display
+                            $table->string('link_url')->nullable();
+                            $table->string('link_target')->default('_self');
+                            // _self, _blank
 
-                          $table->string('position')->default('homepage');
-                          // homepage, category, product, slider, checkout, cart
+                            $table->string('position')->default('homepage');
+                            // homepage, category, product, slider, checkout, cart
 
-                          $table->integer('display_order')->default(0);
+                            $table->integer('display_order')->default(0);
 
-                          // Scheduling
-                          $table->dateTime('start_at');
-                          $table->dateTime('end_at');
+                            // Scheduling
+                            $table->dateTime('start_at');
+                            $table->dateTime('end_at');
 
-                          // Status & Analytics
-                          $table->boolean('is_active')->default(true);
-                          $table->integer('click_count')->default(0);
-                          $table->integer('view_count')->default(0);
+                            // Status & Analytics
+                            $table->boolean('is_active')->default(true);
+                            $table->integer('click_count')->default(0);
+                            $table->integer('view_count')->default(0);
 
-                          // Extensibility
-                          $table->text('metadata')->nullable();
+                            // Extensibility
+                            $table->text('metadata')->nullable();
 
-                          $table->timestamps();
-                          $table->softDeletes();
+                            $table->timestamps();
+                            $table->softDeletes();
 
-                          // Indexes
-                          $table->index('type');
-                          $table->index('channel');
-                          $table->index('position');
-                          $table->index('is_active');
-                          $table->index('promotion_type');
-                      });
-                  }
+                            // Indexes
+                            $table->index('type');
+                            $table->index('channel');
+                            $table->index('position');
+                            $table->index('is_active');
+                            $table->index('promotion_type');
+                        });
+                    }
 
-                  public function down(): void
-                  {
-                      Schema::dropIfExists('banners');
-                  }
-              };
+                    public function down(): void
+                    {
+                        Schema::dropIfExists('banners');
+                    }
+                };
 
 49. Testimonials:
     - List of testimonials

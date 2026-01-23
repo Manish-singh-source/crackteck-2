@@ -11,20 +11,16 @@
                     <a href="{{ route('staff.create') }}" class="btn btn-primary">Add New Staff</a>
                 </div>
             </div>
-
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body pt-0">
-
                             <div class="tab-content text-muted">
-
                                 <div class="tab-pane active show pt-4" id="all_staff" role="tabpanel">
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="card shadow-none">
                                                 <div class="card-body">
-
                                                     {{-- ROLE FILTER DROPDOWN --}}
                                                     <div
                                                         class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -62,34 +58,17 @@
                                                                 <tr>
                                                                     <td>{{ $staff->staff_code }}</td>
                                                                     <td>
-                                                                        {{ $staff->staff_role }}
+                                                                        {{ $staff->staff_role ? ucwords(str_replace('_', ' ', $staff->staff_role)) : 'N/A'}}
                                                                     </td>
                                                                     <td>{{ $staff->first_name }} {{ $staff->last_name }}
                                                                     </td>
                                                                     <td>{{ $staff->phone }}</td>
                                                                     <td>{{ $staff->email }}</td>
                                                                     <td>
-                                                                        @if ($staff->employment_type == 0)
-                                                                            Full-time
-                                                                        @elseif ($staff->employment_type == 1)
-                                                                            Part-time
-                                                                        @else
-                                                                            Unknown
-                                                                        @endif
+                                                                        {{ $staff->employment_type ? ucwords(str_replace('_', ' ', $staff->employment_type)) : 'N/A' }}
                                                                     </td>
                                                                     <td>
-                                                                        @php
-                                                                            $statusMap = [
-                                                                                0 => 'Inactive',
-                                                                                1 => 'Active',
-                                                                                2 => 'Resigned',
-                                                                                3 => 'Terminated',
-                                                                                4 => 'Blocked',
-                                                                                5 => 'Suspended',
-                                                                                6 => 'Pending',
-                                                                            ];
-                                                                        @endphp
-                                                                        {{ $statusMap[$staff->status] ?? 'Unknown' }}
+                                                                        {{ $staff->status ? ucwords(str_replace('_', ' ', $staff->status)) : 'Unknown' }}
                                                                     </td>
                                                                     <td class="text-center">
                                                                         <a aria-label="anchor"

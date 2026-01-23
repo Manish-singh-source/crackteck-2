@@ -20,6 +20,7 @@ return new class extends Migration
                 ->onUpdate('cascade');
 
             $table->string('company_name')->unique();
+            $table->string('industry_type')->nullable();
             $table->string('address1');
             $table->string('address2')->nullable();
             $table->string('city');
@@ -30,7 +31,6 @@ return new class extends Migration
 
             $table->softDeletes();
             $table->timestamps();
-
         });
     }
 

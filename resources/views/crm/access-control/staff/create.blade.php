@@ -60,14 +60,14 @@
                                                 $roleOptions = [];
                                                 $roleOptions[''] = '--Select--';
                                                     foreach ($roles as $role){
-                                                        $roleOptions[$role->id] = $role->name;
+                                                        $roleOptions[str_replace(' ', '_', strtolower($role->name))] = $role->name;
                                                     }
                                                 @endphp
                                                 @include('components.form.select', [
                                                     'label' => 'Role',
                                                     'name' => 'role',
                                                     'options' => $roleOptions,
-                                                    'value' => $role->id ?? '',
+                                                    'value' => $role->name ?? '',
                                                     'model' => $role,
                                                 ])
                                             </div>
@@ -139,9 +139,9 @@
                                                     'name' => 'gender',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Male',
-                                                        '1' => 'Female',
-                                                        '2' => 'Other',
+                                                        'male' => 'Male',
+                                                        'female' => 'Female',
+                                                        'other' => 'Other',
                                                     ],
                                                 ])
                                             </div>
@@ -152,9 +152,9 @@
                                                     'name' => 'marital_status',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Married',
-                                                        '1' => 'Unmarried',
-                                                        '2' => 'Divorced',
+                                                        'married' => 'Married',
+                                                        'unmarried' => 'Unmarried',
+                                                        'divorced' => 'Divorced',
                                                     ],
                                                 ])
                                             </div>
@@ -165,8 +165,8 @@
                                                     'name' => 'employment_type',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Full-time',
-                                                        '1' => 'Part-time',
+                                                        'full_time' => 'Full-time',
+                                                        'part_time' => 'Part-time',
                                                     ],
                                                 ])
                                             </div>
@@ -481,10 +481,10 @@
                                                     'name' => 'vehicle_type',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Two Wheeler',
-                                                        '1' => 'Three Wheeler',
-                                                        '2' => 'Four Wheeler',
-                                                        '3' => 'Other',
+                                                        'two_wheeler' => 'Two Wheeler',
+                                                        'three_wheeler' => 'Three Wheeler',
+                                                        'four_wheeler' => 'Four Wheeler',
+                                                        'other' => 'Other',
                                                     ],
                                                 ])
                                             </div>
@@ -544,8 +544,8 @@
                                                     'name' => 'police_verification',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'No',
-                                                        '1' => 'Yes',
+                                                        'no' => 'No',
+                                                        'yes' => 'Yes',
                                                     ],
                                                 ])
                                             </div>
@@ -556,8 +556,8 @@
                                                     'name' => 'police_verification_status',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Pending',
-                                                        '1' => 'Completed',
+                                                        'pending' => 'Pending',
+                                                        'completed' => 'Completed',
                                                     ],
                                                 ])
                                             </div>
@@ -588,13 +588,13 @@
                                                     'value' => '1', // Active selected by default
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
-                                                        '2' => 'Resigned',
-                                                        '3' => 'Terminated',
-                                                        '4' => 'Blocked',
-                                                        '5' => 'Suspended',
-                                                        '6' => 'Pending',
+                                                        'inactive' => 'Inactive',
+                                                        'active' => 'Active',
+                                                        'resigned' => 'Resigned',
+                                                        'terminated' => 'Terminated',
+                                                        'blocked' => 'Blocked',
+                                                        'suspended' => 'Suspended',
+                                                        'pending' => 'Pending',
                                                     ],
                                                 ])
                                             </div>

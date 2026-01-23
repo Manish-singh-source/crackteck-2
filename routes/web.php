@@ -124,99 +124,48 @@ Route::prefix('/demo')->group(function () {
 
     // ------------------------------------------------------------ Access Control ( Staff Page) -------------------------------------------------------------
 
-    Route::controller(StaffController::class)->group(function () {
-        // Staff List
-        Route::get('/crm/staff', 'index')->name('staff.index');
-        // Create Staff List
-        Route::get('/crm/create-staff/{role?}', 'create')->name('staff.create');
-        // View Staff List
-        Route::get('/crm/view-staff/{id}', 'view')->name('staff.view');
-        // Store Staff List
-        Route::post('/crm/store-staff', 'store')->name('staff.store');
-        // Edit Staff
-        Route::get('/crm/edit-staff/{id}', 'edit')->name('staff.edit');
-        // Update Staff
-        Route::put('/crm/update-staff/{id}', 'update')->name('staff.update');
-        // Delete Staff
-        Route::delete('/crm/delete-staff/{id}', 'delete')->name('staff.delete');
-        // Assign Role To Staff
-        Route::put('/crm/assign-role-to-staff/{id}', 'assignRole')->name('assign.role');
-        // Approve Task
-        Route::post('/crm/approve-task', 'approveTask')->name('staff.approve.task');
+    Route::prefix('/crm')->group(function () {
+
+        Route::controller(StaffController::class)->group(function () {
+            Route::get('/staff', 'index')->name('staff.index');
+            Route::get('/create-staff/{role?}', 'create')->name('staff.create');
+            Route::post('/store-staff', 'store')->name('staff.store');
+            Route::delete('/delete-staff/{id}', 'delete')->name('staff.delete');
+
+            
+            
+            Route::get('/edit-staff/{id}', 'edit')->name('staff.edit');
+            Route::get('/view-staff/{id}', 'view')->name('staff.view');
+            Route::put('/update-staff/{id}', 'update')->name('staff.update');
+
+            Route::put('/assign-role-to-staff/{id}', 'assignRole')->name('assign.role');
+            Route::post('/approve-task', 'approveTask')->name('staff.approve.task');
+        });
+        
+        // ------------------------------------------------------------ Access Control ( Roles Page) -------------------------------------------------------------
+        // completed
+        Route::controller(RoleController::class)->group(function () {
+            Route::get('/roles', 'index')->name('roles.index');
+            Route::get('/create-role', 'create')->name('roles.create');
+            Route::post('/store-role', 'store')->name('role.store');
+            Route::get('/edit-role/{id}', 'edit')->name('roles.edit');
+            Route::put('/update-role/{id}', 'update')->name('role.update');
+            Route::delete('/delete-role/{id}', 'delete')->name('role.delete');
+        });
+        
+        // ------------------------------------------------------------ Access Control ( Permission Page) -------------------------------------------------------------
+        // completed
+        Route::controller(PermissionController::class)->group(function () {
+            Route::get('/permission', 'index')->name('permission.index');
+            Route::get('/create-permission', 'create')->name('permission.create');
+            Route::post('/store-permission', 'store')->name('permission.store');
+            Route::get('/edit-permission/{id}', 'edit')->name('permission.edit');
+            Route::put('/update-permission/{id}', 'update')->name('permission.update');
+            Route::delete('/delete-permission/{id}', 'delete')->name('permission.delete');
+        });
     });
 
-    // Staff List
-    // Route::get('/crm/staff', function () {
-    //     return view('/crm/access-control/staff/index');
-    // })->name('staff.index');
 
-    // Staff Create
-    // Route::get('/crm/create-staff', function () {
-    //     return view('/crm/access-control/staff/create');
-    // })->name('staff.create');
-
-    // Staff View
-    // Route::get('/crm/view-staff', function () {
-    //     return view('/crm/access-control/staff/view');
-    // })->name('staff.view');
-
-    // Staff Edit route removed as controller handles it
-
-    // ------------------------------------------------------------ Access Control ( Roles Page) -------------------------------------------------------------
-
-    Route::controller(RoleController::class)->group(function () {
-        // Role List
-        Route::get('/crm/roles', 'index')->name('roles.index');
-        // Create Role
-        Route::get('/crm/create-role', 'create')->name('roles.create');
-        // Store Role List
-        Route::post('/crm/store-role', 'store')->name('role.store');
-        // Edit Role
-        Route::get('/crm/edit-role/{id}', 'edit')->name('roles.edit');
-        // Update Role List
-        Route::put('/crm/update-role/{id}', 'update')->name('role.update');
-        // Delete Role List
-        Route::delete('/crm/delete-role/{id}', 'delete')->name('role.delete');
-    });
-    // Route::get('/crm/roles', function () {
-    //     return view('/crm/access-control/roles/index');
-    // })->name('roles.index');
-
-    // Role Create
-    // Route::get('/crm/create-roles', function () {
-    //     return view('/crm/access-control/roles/create');
-    // })->name('roles.create');
-
-    // Role Edit
-    // Route::get('/crm/edit-roles', function () {
-    //     return view('/crm/access-control/roles/edit');
-    // })->name('roles.edit');
-
-    // ------------------------------------------------------------ Access Control ( Permission Page) -------------------------------------------------------------
-
-    // Permission List
-    // Route::get('/crm/permission', function () {
-    //     return view('/crm/access-control/permission/index');
-    // })->name('roles.permission');
-
-    // Permission List
-    // Route::get('/crm/permission', [PermissionController::class, 'index'])->name('permission.index');
-    // Route::get('/crm/create-permission', [PermissionController::class, 'create'])->name('permission.create');
-
-    Route::controller(PermissionController::class)->group(function () {
-        // Permission List
-        Route::get('/crm/permission', 'index')->name('permission.index');
-        // Create Permission List
-        Route::get('/crm/create-permission', 'create')->name('permission.create');
-        // Store Permission List
-        Route::post('/crm/store-permission', 'store')->name('permission.store');
-        // Edit Permission List
-        Route::get('/crm/edit-permission/{id}', 'edit')->name('permission.edit');
-        // Update Permission List
-        Route::put('/crm/update-permission/{id}', 'update')->name('permission.update');
-        // Delete Permission List
-        Route::delete('/crm/delete-permission/{id}', 'delete')->name('permission.delete');
-    });
 
     // ------------------------------------------------------------ Accounts Page -------------------------------------------------------------
 

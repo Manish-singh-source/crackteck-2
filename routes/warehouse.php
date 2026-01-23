@@ -127,7 +127,7 @@ Route::prefix('demo/warehouse')->group(function () {
         // Add to Scrap
         Route::post('/add-to-scrap', 'addToScrap')->name('scrap-items.add-to-scrap');
         // Remove from Scrap
-        Route::post('/remove-from-scrap', 'removeFromScrap')->name('scrap-items.remove-from-scrap');
+        Route::post('/remove-from-scrap/{id}', 'removeFromScrap')->name('scrap-items.remove-from-scrap');
     });
 
     // ------------------------------------------------------------ Track Product List -------------------------------------------------------------

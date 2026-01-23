@@ -21,7 +21,7 @@ class ScrapItemController extends Controller
         $scrapItems = ScrapItem::with(['product', 'productSerial'])
             ->orderBy('created_at', 'desc')
             ->get();
-            // dd($scrapItems);
+        // dd($scrapItems);
 
         return view('/warehouse/scrap-items/index',  compact('scrapItems'));
     }
@@ -86,7 +86,7 @@ class ScrapItemController extends Controller
 
                 // Update product serial status
                 $productSerial->update(['status' => 'scrap']);
-                
+
                 // Decrease product quantity
                 if ($product->product->stock_quantity > 0) {
                     $product->product->decrement('stock_quantity', 1);
@@ -124,48 +124,38 @@ class ScrapItemController extends Controller
         }
     }
 
-    public function removeFromScrap(Request $request)
+    public function removeFromScrap($id)
     {
-        $validator = Validator::make($request->all(), [
-            'scrap_item_id' => 'required|exists:scrap_items,id',
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|exists:scrap_items,id',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
+            return redirect()->back()->with('error', 'Validation failed');
         }
         try {
             DB::beginTransaction();
 
-            $scrapItem = ScrapItem::findOrFail($request->scrap_item_id);
+            $scrapItem = ScrapItem::find($id);
+            if ($scrapItem) {
+                // Update product serial status
+                $scrapItem->productSerial->update(['status' => 'active']);
 
-            // Update product serial status
-            $scrapItem->productSerial->update(['status' => 'active']);
+                // Increase product quantity
+                if ($scrapItem->product) {
+                    $scrapItem->product->increment('stock_quantity', 1);
+                }
 
-            // Increase product quantity
-            if ($scrapItem->product) {
-                $scrapItem->product->increment('stock_quantity', 1);
+                // Delete the scrap item record
+                $scrapItem->delete();
             }
-
-            // Delete the scrap item record
-            $scrapItem->delete();
 
             DB::commit();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Item removed from scrap successfully',
-            ]);
+            return redirect()->back()->with('success', 'Item removed from scrap successfully');
         } catch (\Exception $e) {
             DB::rollback();
-
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while removing the item from scrap: ' . $e->getMessage(),
-            ], 500);
+            return redirect()->back()->with('error', 'An error occurred while removing item from scrap: ' . $e->getMessage());
         }
     }
 }

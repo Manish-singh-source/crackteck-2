@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Staff;
 use App\Models\User;
-use App\Models\AssignedEngineer;
+use App\Models\Staff;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\{Auth, DB, Log, Validator};
+use App\Models\AssignedEngineer;
 use Spatie\Permission\Models\Role;
+use App\Http\Requests\StoreStaffRequest;
+use Illuminate\Support\Facades\{Auth, DB, Log, Validator};
 
 class StaffController extends Controller
 {
@@ -32,121 +33,16 @@ class StaffController extends Controller
         return view('/crm/access-control/staff/create', compact('role', 'roles'));
     }
 
-    public function edit($id)
+    public function store(StoreStaffRequest $request)
     {
-        $staff = Staff::with(['address', 'bankDetails', 'workSkills', 'aadharDetails', 'panDetails', 'vehicleDetails', 'policeVerification'])->findOrFail($id);
-        $roles = Role::where('name', '!=', 'Customer')->get();
-
-        return view('/crm/access-control/staff/edit', compact('staff', 'roles'));
-    }
-
-    public function view($id)
-    {
-        $staff = Staff::with(['address', 'bankDetails', 'workSkills', 'aadharDetails', 'panDetails', 'vehicleDetails', 'policeVerification'])->findOrFail($id);
-        $roles = Role::where('name', '!=', 'Customer')->get();
-
-        // Fetch assigned tasks for this engineer
-        $assignedTasks = AssignedEngineer::with([
-            'serviceRequest.customer',
-            'serviceRequest.customerAddress',
-            'groupEngineers'
-        ])
-        ->where(function($query) use ($id) {
-            // Individual assignments
-            $query->where('engineer_id', $id)
-                  ->where('assignment_type', '0');
-        })
-        ->orWhereHas('groupEngineers', function($query) use ($id) {
-            // Group assignments where this engineer is a member
-            $query->where('engineer_id', $id);
-        })
-        ->where('status', '0') // Active assignments only
-        ->orderBy('assigned_at', 'desc')
-        ->get();
-
-        return view('/crm/access-control/staff/view', compact('staff', 'roles', 'assignedTasks'));
-    }
-
-    // Role Access (staff table)
-    // Personal Information (staff table)
-    // Address Details (staff_address table)
-    // Bank Account Details (staff_bank_details table)
-    // Work Skills (staff_work_skills table)
-    // Aadhar Card Details (staff_aadhar_details table)
-    // Pan Card Details (staff_pan_card_details table)
-    // Vehicle Details (staff_vehicle_details table)
-    // Police Verification (staff_police_verification table)
-    // Status (staff table)
-
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            // Role / staff table
-            'role' => 'required|integer',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'nullable|string|max:255',
-            'phone' => 'required|string|max:20',
-            'email' => 'required|email|unique:staff,email',
-            'dob' => 'nullable|date',
-            'gender' => 'nullable|in:0,1,2',
-            'marital_status' => 'nullable|in:0,1,2',
-            'employment_type' => 'nullable|in:0,1',
-            'joining_date' => 'nullable|date',
-            'assigned_area' => 'nullable|string|max:255',
-            'status' => 'nullable|in:0,1,2,3,4,5,6',
-
-            // Address
-            'address1' => 'required',
-            'address2' => 'nullable',
-            'city' => 'required',
-            'state' => 'required',
-            'country' => 'required',
-            'pincode' => 'required|string|max:20',
-
-            // Bank
-            'bank_acc_holder_name' => 'nullable|string|max:255',
-            'bank_acc_number' => 'nullable|string|max:50',
-            'bank_name' => 'nullable|string|max:255',
-            'ifsc_code' => 'nullable|string|max:20',
-            'passbook_pic' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-
-            // Work skills
-            'primary_skills' => 'nullable|array',
-            'primary_skills.*' => 'string',
-            'languages_known' => 'nullable|array',
-            'languages_known.*' => 'string',
-            'certifications' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-            'experience' => 'nullable|integer',
-
-            // Aadhar
-            'aadhar_number' => 'nullable|string|max:20',
-            'aadhar_front_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-            'aadhar_back_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-
-            // PAN
-            'pan_number' => 'nullable|string|max:20',
-            'pan_card_front_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-            'pan_card_back_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-
-            // Vehicle
-            'vehicle_type' => 'nullable|in:0,1,2,3',
-            'vehicle_number' => 'nullable|string|max:50|unique:staff_vehicle_details,vehicle_number',
-            'driving_license_no' => 'nullable|string|max:50|unique:staff_vehicle_details,driving_license_no',
-            'driving_license_front_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-            'driving_license_back_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-
-            // Police verification
-            'police_verification' => 'nullable|in:0,1',
-            'police_verification_status' => 'nullable|in:0,1',
-            'police_certificate' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-        ]);
+        $validated = $request->validated();
 
         try {
             \DB::transaction(function () use ($request, $validated) {
 
                 // 1. Staff (main)
                 $nextNumber = (Staff::max('id') ?? 0) + 1;
-                $staffCode = 'STF'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+                $staffCode = 'STF' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
                 $staff = Staff::create([
                     'staff_code' => $staffCode,
@@ -161,7 +57,7 @@ class StaffController extends Controller
                     'employment_type' => $validated['employment_type'] ?? null,
                     'joining_date' => $validated['joining_date'] ?? null,
                     'assigned_area' => $validated['assigned_area'] ?? null,
-                    'status' => $validated['status'] ?? 1,
+                    'status' => $validated['status'] ?? 'active',
                 ]);
 
                 // 2. Address
@@ -173,140 +69,202 @@ class StaffController extends Controller
                     'country' => $validated['country'],
                     'pincode' => $validated['pincode'],
                 ]);
-
-                // ---------- File uploads: store relative paths ----------
-                $passbookPath = null;
-                if ($request->hasFile('passbook_pic')) {
-                    $file = $request->file('passbook_pic');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $file->move(public_path('staff/passbook'), $filename);
-                    $passbookPath = 'staff/passbook/'.$filename;
-                }
-
-                $certPath = null;
-                if ($request->hasFile('certifications')) {
-                    $file = $request->file('certifications');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $file->move(public_path('staff/certifications'), $filename);
-                    $certPath = 'staff/certifications/'.$filename;
-                }
-
-                $aadharFront = null;
-                if ($request->hasFile('aadhar_front_path')) {
-                    $file = $request->file('aadhar_front_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $file->move(public_path('staff/aadhar'), $filename);
-                    $aadharFront = 'staff/aadhar/'.$filename;
-                }
-
-                $aadharBack = null;
-                if ($request->hasFile('aadhar_back_path')) {
-                    $file = $request->file('aadhar_back_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $file->move(public_path('staff/aadhar'), $filename);
-                    $aadharBack = 'staff/aadhar/'.$filename;
-                }
-
-                $panFront = null;
-                if ($request->hasFile('pan_card_front_path')) {
-                    $file = $request->file('pan_card_front_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $file->move(public_path('staff/pan'), $filename);
-                    $panFront = 'staff/pan/'.$filename;
-                }
-
-                $panBack = null;
-                if ($request->hasFile('pan_card_back_path')) {
-                    $file = $request->file('pan_card_back_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $file->move(public_path('staff/pan'), $filename);
-                    $panBack = 'staff/pan/'.$filename;
-                }
-
-                $dlFront = null;
-                if ($request->hasFile('driving_license_front_path')) {
-                    $file = $request->file('driving_license_front_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $file->move(public_path('staff/license'), $filename);
-                    $dlFront = 'staff/license/'.$filename;
-                }
-
-                $dlBack = null;
-                if ($request->hasFile('driving_license_back_path')) {
-                    $file = $request->file('driving_license_back_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $file->move(public_path('staff/license'), $filename);
-                    $dlBack = 'staff/license/'.$filename;
-                }
-
-                $policeCert = null;
-                if ($request->hasFile('police_certificate')) {
-                    $file = $request->file('police_certificate');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $file->move(public_path('staff/police'), $filename);
-                    $policeCert = 'staff/police/'.$filename;
-                }
+                // End
 
                 // 3. Bank
-                $staff->bankDetails()->create([
-                    'bank_acc_holder_name' => $validated['bank_acc_holder_name'] ?? null,
-                    'bank_acc_number' => $validated['bank_acc_number'] ?? null,
-                    'bank_name' => $validated['bank_name'] ?? null,
-                    'ifsc_code' => $validated['ifsc_code'] ?? null,
-                    'passbook_pic' => $passbookPath,
-                ]);
+                if ($validated['bank_acc_holder_name'] || $validated['bank_acc_number'] || $validated['bank_name'] || $validated['ifsc_code']) {
+                    $passbookPath = null;
+                    if ($request->hasFile('passbook_pic')) {
+                        $file = $request->file('passbook_pic');
+                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $file->move(public_path('staff/passbook'), $filename);
+                        $passbookPath = 'staff/passbook/' . $filename;
+                    }
+
+                    $staff->bankDetails()->create([
+                        'bank_acc_holder_name' => $validated['bank_acc_holder_name'] ?? null,
+                        'bank_acc_number' => $validated['bank_acc_number'] ?? null,
+                        'bank_name' => $validated['bank_name'] ?? null,
+                        'ifsc_code' => $validated['ifsc_code'] ?? null,
+                        'passbook_pic' => $passbookPath,
+                    ]);
+                }
+                // End
 
                 // 4. Work skills
-                $staff->workSkills()->create([
-                    'primary_skills' => isset($validated['primary_skills'])
-                        ? json_encode($validated['primary_skills'])
-                        : null,
-                    'languages_known' => isset($validated['languages_known'])
-                        ? json_encode($validated['languages_known'])
-                        : null,
-                    'certifications' => $certPath,
-                    'experience' => $validated['experience'] ?? null,
-                ]);
+                if ($validated['primary_skills'] || $validated['languages_known'] || $validated['certifications'] || $validated['experience']) {
+                    $certPath = null;
+                    if ($request->hasFile('certifications')) {
+                        $file = $request->file('certifications');
+                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $file->move(public_path('staff/certifications'), $filename);
+                        $certPath = 'staff/certifications/' . $filename;
+                    }
+
+                    $staff->workSkills()->create([
+                        'primary_skills' => isset($validated['primary_skills'])
+                            ? json_encode($validated['primary_skills'])
+                            : null,
+                        'languages_known' => isset($validated['languages_known'])
+                            ? json_encode($validated['languages_known'])
+                            : null,
+                        'certifications' => $certPath,
+                        'experience' => $validated['experience'] ?? null,
+                    ]);
+                }
+                // End
+
 
                 // 5. Aadhar
-                $staff->aadharDetails()->create([
-                    'aadhar_number' => $validated['aadhar_number'] ?? null,
-                    'aadhar_front_path' => $aadharFront,
-                    'aadhar_back_path' => $aadharBack,
-                ]);
+                if ($validated['aadhar_number'] || $request->hasFile('aadhar_front_path') || $request->hasFile('aadhar_back_path')) {
+                    $aadharFront = null;
+                    if ($request->hasFile('aadhar_front_path')) {
+                        $file = $request->file('aadhar_front_path');
+                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $file->move(public_path('staff/aadhar'), $filename);
+                        $aadharFront = 'staff/aadhar/' . $filename;
+                    }
+
+                    $aadharBack = null;
+                    if ($request->hasFile('aadhar_back_path')) {
+                        $file = $request->file('aadhar_back_path');
+                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $file->move(public_path('staff/aadhar'), $filename);
+                        $aadharBack = 'staff/aadhar/' . $filename;
+                    }
+
+                    $staff->aadharDetails()->create([
+                        'aadhar_number' => $validated['aadhar_number'] ?? null,
+                        'aadhar_front_path' => $aadharFront,
+                        'aadhar_back_path' => $aadharBack,
+                    ]);
+                }
 
                 // 6. PAN
-                $staff->panDetails()->create([
-                    'pan_number' => $validated['pan_number'] ?? null,
-                    'pan_card_front_path' => $panFront,
-                    'pan_card_back_path' => $panBack,
-                ]);
+                if ($validated['pan_number'] || $request->hasFile('pan_card_front_path') || $request->hasFile('pan_card_back_path')) {
+                    $panFront = null;
+                    if ($request->hasFile('pan_card_front_path')) {
+                        $file = $request->file('pan_card_front_path');
+                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $file->move(public_path('staff/pan'), $filename);
+                        $panFront = 'staff/pan/' . $filename;
+                    }
+
+                    $panBack = null;
+                    if ($request->hasFile('pan_card_back_path')) {
+                        $file = $request->file('pan_card_back_path');
+                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $file->move(public_path('staff/pan'), $filename);
+                        $panBack = 'staff/pan/' . $filename;
+                    }
+
+                    $staff->panDetails()->create([
+                        'pan_number' => $validated['pan_number'] ?? null,
+                        'pan_card_front_path' => $panFront,
+                        'pan_card_back_path' => $panBack,
+                    ]);
+                }
 
                 // 7. Vehicle
-                $staff->vehicleDetails()->create([
-                    'vehicle_type' => $validated['vehicle_type'] ?? null,
-                    'vehicle_number' => $validated['vehicle_number'] ?? null,
-                    'driving_license_no' => $validated['driving_license_no'] ?? null,
-                    'driving_license_front_path' => $dlFront,
-                    'driving_license_back_path' => $dlBack,
-                ]);
+                if ($validated['vehicle_type'] || $validated['vehicle_number'] || $validated['driving_license_no']) {
+                    $dlFront = null;
+                    if ($request->hasFile('driving_license_front_path')) {
+                        $file = $request->file('driving_license_front_path');
+                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $file->move(public_path('staff/license'), $filename);
+                        $dlFront = 'staff/license/' . $filename;
+                    }
+
+                    $dlBack = null;
+                    if ($request->hasFile('driving_license_back_path')) {
+                        $file = $request->file('driving_license_back_path');
+                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $file->move(public_path('staff/license'), $filename);
+                        $dlBack = 'staff/license/' . $filename;
+                    }
+
+                    $staff->vehicleDetails()->create([
+                        'vehicle_type' => $validated['vehicle_type'] ?? null,
+                        'vehicle_number' => $validated['vehicle_number'] ?? null,
+                        'driving_license_no' => $validated['driving_license_no'] ?? null,
+                        'driving_license_front_path' => $dlFront,
+                        'driving_license_back_path' => $dlBack,
+                    ]);
+                }
 
                 // 8. Police verification
-                $staff->policeVerification()->create([
-                    'police_verification' => $validated['police_verification'] ?? null,
-                    'police_verification_status' => $validated['police_verification_status'] ?? null,
-                    'police_certificate' => $policeCert,
-                ]);
+                if ($validated['police_verification'] || $validated['police_verification_status'] || $request->hasFile('police_certificate')) {
+                    $policeCert = null;
+                    if ($request->hasFile('police_certificate')) {
+                        $file = $request->file('police_certificate');
+                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $file->move(public_path('staff/police'), $filename);
+                        $policeCert = 'staff/police/' . $filename;
+                    }
+
+                    $staff->policeVerification()->create([
+                        'police_verification' => $validated['police_verification'] ?? null,
+                        'police_verification_status' => $validated['police_verification_status'] ?? null,
+                        'police_certificate' => $policeCert,
+                    ]);
+                }
+                // End
             });
         } catch (\Exception $e) {
-            dd($e->getMessage());
 
             return redirect()->back()
                 ->withInput()
-                ->withErrors(['error' => 'An error occurred while saving the staff data. Please try again.']);
+                ->with('error', 'Error creating staff: ' . $e->getMessage());
         }
 
         return redirect()->route('staff.index')->with('success', 'Staff created successfully.');
+    }
+
+    public function delete($id)
+    {
+        $staff = Staff::find($id);
+        if (! $staff) {
+            return redirect()->route('staff.index')->with('error', 'Staff not found.');
+        }
+        $staff->delete();
+
+        return redirect()->route('staff.index')
+            ->with('success', 'Staff deleted successfully.');
+    }
+
+    public function edit($id)
+    {
+        $staff = Staff::with(['address', 'bankDetails', 'workSkills', 'aadharDetails', 'panDetails', 'vehicleDetails', 'policeVerification'])->findOrFail($id);
+        $roles = Role::where('name', '!=', 'Customer')->get();
+
+        return view('/crm/access-control/staff/edit', compact('staff', 'roles'));
+    }
+
+    public function view($id)
+    {
+        $staff = Staff::with(['address', 'bankDetails', 'workSkills', 'aadharDetails', 'panDetails', 'vehicleDetails', 'policeVerification'])->findOrFail($id);
+        $roles = Role::where('name', '!=', 'Customer')->get();
+        // dd($staff);
+        // Fetch assigned tasks for this engineer
+        $assignedTasks = AssignedEngineer::with([
+            'serviceRequest.customer',
+            'serviceRequest.customerAddress',
+            'groupEngineers'
+        ])
+            ->where(function ($query) use ($id) {
+                // Individual assignments
+                $query->where('engineer_id', $id)
+                    ->where('assignment_type', 'individual');
+            })
+            ->orWhereHas('groupEngineers', function ($query) use ($id) {
+                // Group assignments where this engineer is a member
+                $query->where('engineer_id', $id);
+            })
+            ->where('status', 'active') // Active assignments only
+            ->orderBy('assigned_at', 'desc')
+            ->get();
+
+        return view('/crm/access-control/staff/view', compact('staff', 'roles', 'assignedTasks'));
     }
 
     public function update(Request $request, $id)
@@ -319,7 +277,7 @@ class StaffController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'nullable|string|max:255',
             'phone' => 'required|string|max:20',
-            'email' => 'required|email|unique:staff,email,'.$id.',id',
+            'email' => 'required|email|unique:staff,email,' . $id . ',id',
             'dob' => 'nullable|date',
             'gender' => 'nullable|in:0,1,2',
             'marital_status' => 'nullable|in:0,1,2',
@@ -363,8 +321,8 @@ class StaffController extends Controller
 
             // Vehicle
             'vehicle_type' => 'nullable|in:0,1,2,3',
-            'vehicle_number' => 'nullable|string|max:50|unique:staff_vehicle_details,vehicle_number,'.$id.',staff_id',
-            'driving_license_no' => 'nullable|string|max:50|unique:staff_vehicle_details,driving_license_no,'.$id.',staff_id',
+            'vehicle_number' => 'nullable|string|max:50|unique:staff_vehicle_details,vehicle_number,' . $id . ',staff_id',
+            'driving_license_no' => 'nullable|string|max:50|unique:staff_vehicle_details,driving_license_no,' . $id . ',staff_id',
             'driving_license_front_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             'driving_license_back_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
 
@@ -407,63 +365,63 @@ class StaffController extends Controller
                 $passbookPath = null;
                 if ($request->hasFile('passbook_pic')) {
                     $file = $request->file('passbook_pic');
-                    $filename = time().'_'.$file->getClientOriginalName();
+                    $filename = time() . '_' . $file->getClientOriginalName();
                     $passbookPath = $file->storeAs('staff/passbook', $filename, 'public');
                 }
 
                 $certPath = null;
                 if ($request->hasFile('certifications')) {
                     $file = $request->file('certifications');
-                    $filename = time().'_'.$file->getClientOriginalName();
+                    $filename = time() . '_' . $file->getClientOriginalName();
                     $certPath = $file->storeAs('staff/certifications', $filename, 'public');
                 }
 
                 $aadharFront = null;
                 if ($request->hasFile('aadhar_front_path')) {
                     $file = $request->file('aadhar_front_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
+                    $filename = time() . '_' . $file->getClientOriginalName();
                     $aadharFront = $file->storeAs('staff/aadhar', $filename, 'public');
                 }
 
                 $aadharBack = null;
                 if ($request->hasFile('aadhar_back_path')) {
                     $file = $request->file('aadhar_back_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
+                    $filename = time() . '_' . $file->getClientOriginalName();
                     $aadharBack = $file->storeAs('staff/aadhar', $filename, 'public');
                 }
 
                 $panFront = null;
                 if ($request->hasFile('pan_card_front_path')) {
                     $file = $request->file('pan_card_front_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
+                    $filename = time() . '_' . $file->getClientOriginalName();
                     $panFront = $file->storeAs('staff/pan', $filename, 'public');
                 }
 
                 $panBack = null;
                 if ($request->hasFile('pan_card_back_path')) {
                     $file = $request->file('pan_card_back_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
+                    $filename = time() . '_' . $file->getClientOriginalName();
                     $panBack = $file->storeAs('staff/pan', $filename, 'public');
                 }
 
                 $dlFront = null;
                 if ($request->hasFile('driving_license_front_path')) {
                     $file = $request->file('driving_license_front_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
+                    $filename = time() . '_' . $file->getClientOriginalName();
                     $dlFront = $file->storeAs('staff/license', $filename, 'public');
                 }
 
                 $dlBack = null;
                 if ($request->hasFile('driving_license_back_path')) {
                     $file = $request->file('driving_license_back_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
+                    $filename = time() . '_' . $file->getClientOriginalName();
                     $dlBack = $file->storeAs('staff/license', $filename, 'public');
                 }
 
                 $policeCert = null;
                 if ($request->hasFile('police_certificate')) {
                     $file = $request->file('police_certificate');
-                    $filename = time().'_'.$file->getClientOriginalName();
+                    $filename = time() . '_' . $file->getClientOriginalName();
                     $policeCert = $file->storeAs('staff/police', $filename, 'public');
                 }
 
@@ -526,15 +484,6 @@ class StaffController extends Controller
 
         return redirect()->route('staff.index')
             ->with('success', 'Staff updated successfully.');
-    }
-
-    public function delete($id)
-    {
-        $staff = Staff::findOrFail($id);
-        $staff->delete();
-
-        return redirect()->route('staff.index')
-            ->with('success', 'Staff deleted successfully.');
     }
 
     public function assignRole(Request $request, $id)

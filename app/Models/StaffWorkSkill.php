@@ -17,7 +17,6 @@ class StaffWorkSkill extends Model
 
     protected $casts = [
         'primary_skills' => 'array',
-        'certifications' => 'array',
         'languages_known' => 'array',
     ];
 }

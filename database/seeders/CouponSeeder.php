@@ -108,6 +108,5 @@ class CouponSeeder extends Seeder
             Coupon::updateOrCreate(['code' => $couponData['code']], $couponData);
         }
 
-        $this->command->info('Test coupons created successfully!');
     }
 }

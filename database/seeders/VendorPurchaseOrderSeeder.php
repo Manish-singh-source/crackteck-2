@@ -25,7 +25,7 @@ class VendorPurchaseOrderSeeder extends Seeder
                 'po_amount' => 15000.00,
                 'po_amount_paid' => 5000.00,
                 'po_amount_pending' => 10000.00,
-                'po_status' => '0', // pending
+                'po_status' => 'pending', // pending
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
@@ -39,7 +39,7 @@ class VendorPurchaseOrderSeeder extends Seeder
                 'po_amount' => 25000.00,
                 'po_amount_paid' => 25000.00,
                 'po_amount_pending' => 0.00,
-                'po_status' => '1', // approved
+                'po_status' => 'approved', // approved
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
@@ -53,7 +53,7 @@ class VendorPurchaseOrderSeeder extends Seeder
                 'po_amount' => 5000.00,
                 'po_amount_paid' => 0.00,
                 'po_amount_pending' => 5000.00,
-                'po_status' => '0', // pending
+                'po_status' => 'pending', // pending
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],

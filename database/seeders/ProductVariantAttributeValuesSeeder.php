@@ -28,7 +28,7 @@ class ProductVariantAttributeValuesSeeder extends Seeder
             [
                 'attribute_id' => 1, 
                 'value' => 'Blue',
-                'status' => "active",
+                'status' => "inactive",
             ],
             [
                 'attribute_id' => 1, 
@@ -38,14 +38,14 @@ class ProductVariantAttributeValuesSeeder extends Seeder
             [
                 'attribute_id' => 1, 
                 'value' => 'Silver',
-                'status' => "active",
+                'status' => "inactive",
             ],
 
             // Size (attribute_id = 2)
             [
                 'attribute_id' => 2, 
                 'value' => 'Small',
-                'status' => "active",
+                'status' => "inactive",
             ],
             [
                 'attribute_id' => 2, 
@@ -62,7 +62,7 @@ class ProductVariantAttributeValuesSeeder extends Seeder
             [
                 'attribute_id' => 3, 
                 'value' => '64GB',
-                'status' => "active",
+                'status' => "inactive",
             ],
             [
                 'attribute_id' => 3, 
@@ -77,7 +77,7 @@ class ProductVariantAttributeValuesSeeder extends Seeder
             [
                 'attribute_id' => 3, 
                 'value' => '512GB',
-                'status' => "active",
+                'status' => "inactive",
             ],
 
             // RAM (attribute_id = 4)
@@ -94,7 +94,7 @@ class ProductVariantAttributeValuesSeeder extends Seeder
             [
                 'attribute_id' => 4, 
                 'value' => '8GB',
-                'status' => "active",
+                'status' => "inactive",
             ],
             [
                 'attribute_id' => 4, 
@@ -116,7 +116,7 @@ class ProductVariantAttributeValuesSeeder extends Seeder
             [
                 'attribute_id' => 5, 
                 'value' => '3 Years',
-                'status' => "active",
+                'status' => "inactive",
             ],
             [
                 'attribute_id' => 5, 

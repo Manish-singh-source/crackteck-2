@@ -48,9 +48,9 @@ return new class extends Migration
             $table->string('hsn_code');
             $table->string('sku')->unique();
             $table->string('model_no');
-            $table->string('short_description')->nullable();
-            $table->string('full_description')->nullable();
-            $table->string('technical_specification')->nullable();
+            $table->text('short_description')->nullable();
+            $table->text('full_description')->nullable();
+            $table->text('technical_specification')->nullable();
             $table->string('brand_warranty')->nullable();
             $table->string('company_warranty')->nullable();
 

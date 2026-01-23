@@ -16,80 +16,59 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-        // User::factory()->create([
-        //     'name' => 'Support',
-        //     'email' => 'support@technofra.com',
-        //     'password' => '123456'
-        // ]);
+        User::factory()->create([
+            'name' => 'Support',
+            'email' => 'support@technofra.com',
+            'password' => '123456'
+        ]);
 
-        // // Create roles idempotently
-        // Role::firstOrCreate(['name' => 'Engineer']);
-        // Role::firstOrCreate(['name' => 'Delivery Man']);
-        // Role::firstOrCreate(['name' => 'Sales Person']);
-        // Role::firstOrCreate(['name' => 'Customer']);
-        // Role::firstOrCreate(['name' => 'Admin']);
-        // Role::firstOrCreate(['name' => 'Warehouse Manager']);
+        // Create roles idempotently
+        Role::firstOrCreate(['name' => 'Engineer']);
+        Role::firstOrCreate(['name' => 'Delivery Man']);
+        Role::firstOrCreate(['name' => 'Sales Person']);
+        Role::firstOrCreate(['name' => 'Customer']);
+        Role::firstOrCreate(['name' => 'Admin']);
+        Role::firstOrCreate(['name' => 'Warehouse Manager']);
 
         $this->call([
-            // StaffSeeder::class,
-            // StaffAddressSeeder::class,
-            // StaffAadharDetailSeeder::class,
-            // StaffPanCardDetailSeeder::class,
-            // StaffBankDetailSeeder::class,
-            // StaffVehicleDetailSeeder::class,
-            // StaffPoliceVerificationSeeder::class,
-            // StaffWorkSkillSeeder::class,
-            
-            // CustomerSeeder::class,
-            // CustomerAddressDetailsSeeder::class,
-            // CustomerAadharDetailSeeder::class,
-            // CustomerPanCardDetailSeeder::class,
-            // CustomerCompanyDetailSeeder::class,
-            
+            StaffSeeder::class,
+            StaffAddressSeeder::class,
+            StaffAadharDetailSeeder::class,
+            StaffPanCardDetailSeeder::class,
+            StaffBankDetailSeeder::class,
+            StaffVehicleDetailSeeder::class,
+            StaffPoliceVerificationSeeder::class,
+            StaffWorkSkillSeeder::class,
 
-            // LeadTableSeeder::class,
+            CustomerSeeder::class,
+            CustomerAddressDetailsSeeder::class,
+            CustomerAadharDetailSeeder::class,
+            CustomerPanCardDetailSeeder::class,
+            CustomerCompanyDetailSeeder::class,
+
+
+            // warehouse ================
+            VendorSeeder::class,
+            VendorPurchaseOrderSeeder::class,
+            WarehousesSeeder::class,
+
+
+
+
+            // crm ====================
+            LeadTableSeeder::class,
             FollowUpTableSeeder::class,
             MeetTableSeeder::class,
 
             // QuotationTableSeeder::class,
             // QuotationProductTableSeeder::class,
 
+            CoveredItemSeeder::class,
+            AmcPlanSeeder::class,
+
+            PincodeSeeder::class,
+
             
-            // BrandsSeeder::class,
-            // ContactSeeder::class,
-            // CouponSeeder::class,
-            
-            // VendorSeeder::class,
-            // VendorPurchaseOrderSeeder::class,
-            // WarehousesSeeder::class,
-            // ParentCategoriesSeeder::class,
-            // SubCategoriesSeeder::class,
-            // ProductsSeeder::class,
-            // EcommerceProductsSeeder::class,
-            // ProductSerialSeeder::class,
-            // CoveredItemSeeder::class,
-            // AmcPlanSeeder::class,
-            // ServiceRequestSeeder::class,
-            // ServiceRequestProductSeeder::class,
-            // RemoteJobSeeder::class,
-            // CaseTransferRequestSeeder::class,
-            // PickupRequestSeeder::class,
-            // StockInHandSeeder::class,
-            // StockInHandProductSeeder::class,
-            // FieldIssueSeeder::class,
-            // PincodeSeeder::class,
-            
-            // OrderSeeder::class,
-            // OrderItemSeeder::class,
-            // OrderPaymentSeeder::class,
-            // SubscriberSeeder::class,
-            // CouponUsageSeeder::class,
-            // TestimonialSeeder::class,
-            // CollectionSeeder::class,
-            // TicketSeeder::class,
-            // TicketCommentSeeder::class,
-            // InvoiceSeeder::class,
-            // InvoiceItemSeeder::class,
             // AssignedEngineerSeeder::class,
             // EngineerDiagnosisDetailSeeder::class,
             // ServiceRequestProductPickupSeeder::class,
@@ -98,8 +77,61 @@ class DatabaseSeeder extends Seeder
             // ServiceRequestQuotationSeeder::class,
             // RequestedPartDeliverySeeder::class,
             // AssignedEngineerGroupSeeder::class,
-            // WebsiteBannerSeeder::class,
+            
+            // TicketSeeder::class,
+            // TicketCommentSeeder::class,
+
+            // InvoiceSeeder::class,
+            // InvoiceItemSeeder::class,
+            
+
+            // ServiceRequestSeeder::class,
+            // ServiceRequestProductSeeder::class,
+
+            // RemoteJobSeeder::class,
+            // CaseTransferRequestSeeder::class,
+            // PickupRequestSeeder::class,
+            // StockInHandSeeder::class,
+            // StockInHandProductSeeder::class,
+            // FieldIssueSeeder::class,
+            // CustomerFeedbackSeeder::class,
+
+
+
+
+
+
+            // OrderSeeder::class,
+            // OrderItemSeeder::class,
+            // OrderPaymentSeeder::class,
+
+            ParentCategoriesSeeder::class,
+            SubCategoriesSeeder::class,
+
+            BrandsSeeder::class,
+            ProductVariantAttributesSeeder::class,
+            ProductVariantAttributeValuesSeeder::class,
+
+            CouponSeeder::class,
+            CouponUsageSeeder::class,
+            SubscriberSeeder::class,
+            ContactSeeder::class,
+
+            WebsiteBannerSeeder::class,
+            // product deal offer seeder
+            CollectionSeeder::class,
+
+            // e-commerce data ====================
+            // TestimonialSeeder::class,
             // FeedbackSeeder::class,
+
+
+            ProductsSeeder::class,
+            // EcommerceProductsSeeder::class,
+            // ProductSerialSeeder::class,
+
+
+
         ]);
     }
 }

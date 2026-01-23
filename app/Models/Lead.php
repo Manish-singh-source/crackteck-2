@@ -11,6 +11,7 @@ class Lead extends Model
 
     //
     protected $fillable = [
+        'customer_id',
         'staff_id',
         'lead_number',
         'first_name',
@@ -36,4 +37,18 @@ class Lead extends Model
         return $this->belongsTo(Staff::class, 'staff_id');
     }
 
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function customerAddress()
+    {
+        return $this->belongsTo(CustomerAddressDetail::class, 'customer_address_id');
+    }
+
+    public function companyDetails()
+    {
+        return $this->belongsTo(CustomerCompanyDetail::class, 'customer_id');
+    }
 }

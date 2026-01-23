@@ -227,14 +227,14 @@
                                                     'name' => 'requirement_type',
                                                     'options' => [
                                                         '' => '--Select Requirement--',
-                                                        'Servers' => 'Servers',
-                                                        'CCTV' => 'CCTV',
-                                                        'Biometric' => 'Biometric',
-                                                        'Networking' => 'Networking',
-                                                        'Laptops' => 'Laptops',
-                                                        'Desktops' => 'Desktops',
-                                                        'Accessories' => 'Accessories',
-                                                        'Other' => 'Other',
+                                                        'servers' => 'Servers',
+                                                        'cctv' => 'CCTV',
+                                                        'biometric' => 'Biometric',
+                                                        'networking' => 'Networking',
+                                                        'laptops' => 'Laptops',
+                                                        'desktops' => 'Desktops',
+                                                        'accessories' => 'Accessories',
+                                                        'other' => 'Other',
                                                     ],
                                                 ])
                                             </div>
@@ -267,13 +267,13 @@
                                                     'label' => 'Lead Status',
                                                     'name' => 'status',
                                                     'options' => [
-                                                        '0' => '--Select Status--',
+                                                        '' => '--Select Status--',
                                                         'new' => 'New',
                                                         'contacted' => 'Contacted',
                                                         'qualified' => 'Qualified',
                                                         'proposal' => 'Proposal',
                                                         'won' => 'Won',
-                                                        'Lost' => 'Lost',
+                                                        'lost' => 'Lost',
                                                         'nurtured' => 'Nurtured',
                                                     ],
                                                 ])
@@ -283,7 +283,25 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Sales Person',
                                                     'name' => 'sales_person_id',
-                                                    'options' => $salesPersons->pluck('first_name', 'id')->prepend('--Select Sales Person--', 0),
+                                                    'options' => $salesPersons->pluck('first_name', 'id')->prepend('--Select Sales Person--', ''),
+                                                ])
+                                            </div>
+
+                                            {{-- estimated_value --}}
+                                            <div class="col-3">
+                                                @include('components.form.input', [
+                                                    'label' => 'Estimated Value',
+                                                    'name' => 'estimated_value',
+                                                    'type' => 'number',
+                                                    'placeholder' => 'Enter Estimated Value',
+                                                ])
+                                            </div>
+
+                                            <div class="col-6">
+                                                @include('components.form.input', [
+                                                    'label' => 'Notes',
+                                                    'name' => 'notes',
+                                                    'placeholder' => 'Enter any notes',
                                                 ])
                                             </div>
 

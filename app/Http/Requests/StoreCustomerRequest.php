@@ -33,6 +33,7 @@ class StoreCustomerRequest extends FormRequest
             'source_type' => 'nullable|in:ecommerce,admin_panel,app,call,walk_in,other',
             'status' => 'nullable|in:active,inactive,blocked,suspended',
             'profile' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'is_lead' => 'nullable|in:0,1',
 
             // Aadhar
             'aadhar_number' => 'nullable|string|max:20',

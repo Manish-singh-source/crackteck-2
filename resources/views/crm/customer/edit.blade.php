@@ -22,6 +22,16 @@
                 </div>
             </div>
 
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="row">
                 <div class="col-12">
                     <form action="{{ route('customer.update', $customer->id) }}" method="POST" enctype="multipart/form-data">
@@ -367,8 +377,8 @@
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="radio"
                                                                    name="is_primary"
-                                                                   value="{{ $index }}" id="primary_{{ $index }}" checked>
-                                                            <label class="form-check-label" for="primary_{{ $index }}">
+                                                                   value="0" id="primary_0" checked>
+                                                            <label class="form-check-label" for="primary_0">
                                                                 Primary Branch
                                                             </label>
                                                         </div>
@@ -606,6 +616,19 @@
                                                         'suspended' => 'Suspended',
                                                     ],
                                                     'model'   => $customer,
+                                                ])
+                                            </div>
+                                            <div class="mb-3">
+                                                {{-- is_lead --}}
+                                                @include('components.form.select', [    
+                                                    'label' => 'Is Lead',
+                                                    'name' => 'is_lead',
+                                                    'options' => [
+                                                        '' => '--Select--',
+                                                        '0' => 'No',
+                                                        '1' => 'Yes',
+                                                    ],
+                                                    'model' => $customer,
                                                 ])
                                             </div>
                                         </div>

@@ -435,6 +435,18 @@
                                                     ],
                                                 ])
                                             </div>
+                                            <div class="mb-3">
+                                                {{-- is_lead --}}
+                                                @include('components.form.select', [
+                                                    'label' => 'Is Lead',
+                                                    'name' => 'is_lead',
+                                                    'options' => [
+                                                        '' => '--Select--',
+                                                        '0' => 'No',
+                                                        '1' => 'Yes',
+                                                    ],
+                                                ])
+                                            </div>
                                         </div>
                                     </div>
 

@@ -84,51 +84,45 @@ class LeadController extends Controller
 
     public function edit($id)
     {
-        $lead = Lead::with('customerAddress', 'companyDetails')->find($id);
+        $lead = Lead::with('customer', 'staff', 'customerAddress', 'companyDetails')->find($id);
         $salesPersons = Staff::where('staff_role', 'sales_person')->get();
+        // dd($lead);
 
         return view('/crm/leads/edit', compact('lead', 'salesPersons'));
     }
 
     public function update(Request $request, $id)
     {
-
         $validator = Validator::make($request->all(), [
-            'first_name' => 'required|min:3',
-            'last_name' => 'required|min:3',
-            'phone' => 'required|digits:10',
-            'email' => 'required|email|unique:leads,email,' . $id,
-            'dob' => 'required',
-            'gender' => 'required',
+            'customer_id' => 'required|exists:customers,id',
+            'shipping_address_id' => 'required|exists:customer_address_details,id',
+            'requirement_type' => 'required',
+            'budget_range' => 'nullable',
+            'urgency' => 'required|in:low,medium,high,critical',
+            'status' => 'required|in:new,contacted,qualified,proposal,won,lost,nurtured',
+            'staff_id' => 'required|exists:staff,id',
+            'estimated_value' => 'nullable|numeric',
+            'notes' => 'nullable',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
-        // dd($request->all());
 
         $lead = Lead::findOrFail($id);
-        $lead->first_name = $request->first_name;
-        $lead->last_name = $request->last_name;
-        $lead->phone = $request->phone;
-        $lead->email = $request->email;
-        $lead->dob = $request->dob;
-        $lead->gender = $request->gender;
-
-        $lead->company_name = $request->company_name;
-        $lead->designation = $request->designation;
-        $lead->industry_type = $request->industry_type;
-        $lead->source = $request->source;
+        $lead->customer_id = $request->customer_id;
+        $lead->customer_address_id = $request->shipping_address_id;
         $lead->requirement_type = $request->requirement_type;
-
         $lead->budget_range = $request->budget_range;
         $lead->urgency = $request->urgency;
-        $lead->staff_id = $request->sales_person_id;
         $lead->status = $request->status;
+        $lead->staff_id = $request->staff_id;
+        $lead->estimated_value = $request->estimated_value;
+        $lead->notes = $request->notes;
 
         $lead->save();
 
-        return redirect()->route('leads.index')->with('success', 'Leads updated successfully.');
+        return redirect()->route('leads.index')->with('success', 'Lead updated successfully.');
     }
 
     public function delete($id)

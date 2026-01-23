@@ -122,31 +122,31 @@
                 {{-- @endcan --}}
 
                 {{-- @can('Engineer List') --}}
-                <li>
+                {{-- <li>
                     <a class='tp-link' href="{{ route('engineers.index') }}">
                         <!-- <i data-feather="columns"></i> -->
                         <i class="fas fa-user-cog"></i>
                         <span class="ps-1"> Engineers </span>
                     </a>
-                </li>
+                </li> --}}
                 {{-- @endcan --}}
 
                 {{-- @can('Delivery Man List') --}}
-                <li>
+                {{-- <li>
                     <a class='tp-link' href="{{ route('delivery-man.index') }}">
                         <!-- <i data-feather="columns"></i> -->
                         <i class="fas fa-shipping-fast"></i>
                         <span class="ps-1"> Delivery Man </span>
                     </a>
-                </li>
+                </li> --}}
                 {{-- @endcan --}}
 
-                <li>
+                {{-- <li>
                     <a class='tp-link' href="{{ route('sales-person.index') }}">
                         <i class="fas fa-user-tie"></i>
                         <span class="ps-1"> Sales Person </span>
                     </a>
-                </li>
+                </li> --}}
 
                 <li class="menu-title mt-2">Sales Person</li>
 

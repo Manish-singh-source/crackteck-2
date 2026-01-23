@@ -274,7 +274,7 @@
                                                         'proposal' => 'Proposal',
                                                         'won' => 'Won',
                                                         'lost' => 'Lost',
-                                                        'nurtured' => 'Nurtured',
+                                                        'nurture' => 'Nurtured',
                                                     ],
                                                 ])
                                             </div>

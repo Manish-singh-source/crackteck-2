@@ -237,6 +237,7 @@
                                                     'low' => 'Low',
                                                     'medium' => 'Medium',
                                                     'high' => 'High',
+                                                    'critical' => 'Critical',
                                                 ];
                                             @endphp
                                             @php
@@ -244,6 +245,7 @@
                                                     'low' => 'bg-success-subtle text-success',
                                                     'medium' => 'bg-warning-subtle text-warning',
                                                     'high' => 'bg-danger-subtle text-danger',
+                                                    'critical' => 'bg-danger-subtle text-danger',
                                                 };
                                             @endphp
                                             <span class="badge {{ $badgeClass }} fw-semibold">

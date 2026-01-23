@@ -142,6 +142,8 @@
                                                                                     => 'bg-warning-subtle text-warning',
                                                                                 'high'
                                                                                     => 'bg-danger-subtle text-danger',
+                                                                                'critical'
+                                                                                    => 'bg-danger-subtle text-danger',
                                                                                 default
                                                                                     => 'bg-secondary-subtle text-secondary',
                                                                             };
@@ -151,6 +153,7 @@
                                                                                 'low' => 'Low',
                                                                                 'medium' => 'Medium',
                                                                                 'high' => 'High',
+                                                                                'critical' => 'Critical',
                                                                             ];
                                                                         @endphp
                                                                         <span

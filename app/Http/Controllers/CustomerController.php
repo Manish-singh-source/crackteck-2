@@ -45,6 +45,7 @@ class CustomerController extends Controller
 
     public function store(StoreCustomerRequest $request)
     {
+
         $validated = $request->validated();
 
         \DB::transaction(function () use ($request, $validated) {
@@ -53,7 +54,7 @@ class CustomerController extends Controller
             $lastCustomer = Customer::orderBy('id', 'desc')->first();
             $lastCustomerCode = $lastCustomer?->customer_code ?? 'CUST0000';
             $customerCode = str_replace('CUST', '', $lastCustomerCode);
-            $customerCode = $customerCode + 1;
+            $customerCode = (int) $customerCode + 1;
 
             $customerCode = 'CUST' . str_pad($customerCode, 4, '0', STR_PAD_LEFT);
 
@@ -68,8 +69,9 @@ class CustomerController extends Controller
                 'gender' => $validated['gender'] ?? null,
                 'customer_type' => $validated['customer_type'] ?? 'ecommerce',
                 'source_type' => $validated['source_type'] ?? 'admin_panel',
-                'profile' => $validated['profile'] ?? null,
+                'profile' => $profile ?? null,
                 'status' => $validated['status'] ?? 'active',
+                'is_lead' => $validated['is_lead'] ?? 0,
             ]);
 
             // Handle files
@@ -79,7 +81,7 @@ class CustomerController extends Controller
             $panFront = $request->file('pan_card_front_path')?->store('customers/pan', 'public');
             $panBack = $request->file('pan_card_back_path')?->store('customers/pan', 'public');
 
-            if ($validated['profile']) {
+            if ($request->file('profile')) {
                 $customer->profile = $profile;
                 $customer->save();
             }
@@ -105,7 +107,7 @@ class CustomerController extends Controller
             }
 
             // 4. Branches
-            $primaryBranch = $validated['is_primary'] ?? 0;
+            $primaryBranch = $validated['is_primary'] ?? 'no';
             foreach ($validated['branches'] as $index => $branch) {
                 CustomerAddressDetail::create([
                     'customer_id' => $customer->id,
@@ -116,7 +118,7 @@ class CustomerController extends Controller
                     'state' => $branch['state'],
                     'country' => $branch['country'],
                     'pincode' => $branch['pincode'],
-                    'is_primary' => ($index == $primaryBranch) ? 1 : 0,
+                    'is_primary' => ($index == $primaryBranch) ? 'yes' : 'no',
                 ]);
             }
 
@@ -162,6 +164,7 @@ class CustomerController extends Controller
 
     public function update(UpdateCustomerRequest $request, $id)
     {
+        // dd($request->all());
         $customer = Customer::with([
             'aadharDetails',
             'panCardDetails',
@@ -193,6 +196,7 @@ class CustomerController extends Controller
                 'source_type' => $validated['source_type'] ?? null,
                 'profile' => $profile,
                 'status' => $validated['status'] ?? $customer->status,
+                'is_lead' => $validated['is_lead'] ?? $customer->is_lead,
             ]);
 
             /* ================= AADHAR ================= */
@@ -238,10 +242,10 @@ class CustomerController extends Controller
             /* ================= BRANCHES ================= */
             $existingIds = $customer->addressDetails->pluck('id')->toArray();
             $sentIds = [];
-            $primaryIndex = (int) ($validated['is_primary'] ?? 0);
+            $primaryIndex = (int) ($validated['is_primary'] ?? 'no');
 
             foreach ($validated['branches'] as $index => $branch) {
-                $isPrimary = ($index === $primaryIndex) ? 1 : 0;
+                $isPrimary = ($index === $primaryIndex) ? 'yes' : 'no';
 
                 if (!empty($branch['id'])) {
                     $address = $customer->addressDetails()->find($branch['id']);

@@ -32,10 +32,10 @@ Route::prefix('/demo/e-commerce')->group(function () {
     Route::controller(CustomerController::class)->group(function () {
         Route::get('/customers', 'ec_index')->name('ec.customer.index');
         Route::get('/create-customer', 'ec_create')->name('ec.customer.create');
-        Route::post('/store-customer', 'ec_store')->name('ec.customer.store');
+        Route::post('/store-customer', 'store')->name('ec.customer.store');
         Route::get('/view-customer/{id}', 'ec_view')->name('ec.customer.view');
         Route::get('/edit-customer/{id}', 'ec_edit')->name('ec.customer.edit');
-        Route::put('/update-customer/{id}', 'ec_update')->name('ec.customer.update');
+        Route::put('/update-customer/{id}', 'update')->name('ec.customer.update');
         Route::delete('/delete-customer/{id}', 'ec_delete')->name('ec.customer.delete');
     });
 

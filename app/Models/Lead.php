@@ -31,60 +31,13 @@ class Lead extends Model
         'notes',
     ];
 
-    public function setGenderAttribute($value)
+    public function staff()
     {
-        $map = [
-            'male' => '0',
-            'female' => '1',
-            'other' => '2',
-        ];
-
-        $this->attributes['gender'] = is_numeric($value)
-            ? $value
-            : ($map[strtolower($value)] ?? null);
+        return $this->belongsTo(Staff::class, 'staff_id');
     }
 
-    public function setSourceAttribute($value)
+    public function branches()
     {
-        $map = [
-            'website' => '0',
-            'referral' => '1',
-            'call' => '2',
-            'walk_in' => '3',
-            'event' => '4',
-        ];
-
-        $this->attributes['source'] = is_numeric($value)
-            ? $value
-            : ($map[strtolower($value)] ?? null);
-    }
-
-    public function setStatusAttribute($value)
-    {
-        $map = [
-            'new' => '0',
-            'qualified' => '1',
-            'contacted' => '2',
-            'converted' => '3',
-            'lost' => '4',
-        ];
-
-        $this->attributes['status'] = is_numeric($value)
-            ? $value
-            : ($map[strtolower($value)] ?? null);
-    }
-
-    public function setUrgencyAttribute($value)
-    {
-        $map = [
-            'low' => '0',
-            'medium' => '1',
-            'high' => '2',
-            'critical' => '3',
-        ];
-
-        $this->attributes['urgency'] = is_numeric($value)
-            ? $value
-            : ($map[strtolower($value)] ?? null);
+        return $this->hasMany(LeadBranch::class);
     }
 }

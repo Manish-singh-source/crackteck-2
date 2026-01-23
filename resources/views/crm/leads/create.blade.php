@@ -6,8 +6,8 @@
 
         <div class="container-fluid">
 
-            <div class="bradcrumb pt-3 ps-2 bg-light">
-                <div class="row ">
+            <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
+                <div class="flex-grow-1">
                     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -16,21 +16,196 @@
                         </ol>
                     </nav>
                 </div>
-            </div>
-
-            <div class="py-1 d-flex align-items-sm-center flex-sm-row flex-column">
-                <div class="flex-grow-1">
-                    <h4 class="fs-18 fw-semibold m-0"></h4>
+                <div>
+                    <a href="{{ route('customer.create') }}" class="btn btn-primary">Add New Customer</a>
+                    <!-- <button class="btn btn-primary">Add New Customer</button> -->
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-12">
-                    <form action="{{ route('leads.store') }}" method="POST">
+                    <form action="{{ route('leads.store') }}" method="POST" id="orderForm">
                         @csrf
-                        @method('POST')
                         <div class="row">
+                            <!-- Left Column -->
                             <div class="col-lg-12">
+                                <!-- Customer Information Card -->
+                                <div class="card">
+                                    <div class="card-header border-bottom-dashed">
+                                        <h5 class="card-title mb-0">Customer Information</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="customer_search" class="form-label">Search Existing
+                                                        Customer</label>
+                                                    <input type="text" id="customer_search" class="form-control"
+                                                        placeholder="Type to search customers..." autocomplete="off"
+                                                        data-bs-toggle="dropdown">
+
+                                                    <div id="customer_suggestions" class="dropdown-menu w-100"></div>
+                                                </div>
+                                                <input type="hidden" id="customer_id" name="customer_id">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="email" class="form-label">Email <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="email"
+                                                        class="form-control @error('email') is-invalid @enderror"
+                                                        id="email" name="email" value="{{ old('email') }}" required
+                                                        readonly>
+                                                    @error('email')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Branch Information Card -->
+                                <div class="card">
+                                    <div
+                                        class="card-header border-bottom-dashed d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">Branch Information</h5>
+                                        <div class="d-flex gap-2 align-items-center">
+                                            <select id="customer_address_select" class="form-select form-select-sm"
+                                                style="min-width: 260px; display:none;">
+                                                <option value="">Select Customer Address</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="shipping_first_name" class="form-label">First Name <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text"
+                                                        class="form-control @error('shipping_first_name') is-invalid @enderror"
+                                                        id="shipping_first_name" name="shipping_first_name"
+                                                        value="{{ old('shipping_first_name') }}" required readonly>
+                                                    @error('shipping_first_name')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="shipping_last_name" class="form-label">Last Name <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text"
+                                                        class="form-control @error('shipping_last_name') is-invalid @enderror"
+                                                        id="shipping_last_name" name="shipping_last_name"
+                                                        value="{{ old('shipping_last_name') }}" required readonly>
+                                                    @error('shipping_last_name')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="shipping_phone" class="form-label">Phone <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text"
+                                                        class="form-control @error('shipping_phone') is-invalid @enderror"
+                                                        id="shipping_phone" name="shipping_phone"
+                                                        value="{{ old('shipping_phone') }}" required readonly>
+                                                    @error('shipping_phone')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <input type="hidden" id="shipping_address_id"
+                                                        name="shipping_address_id">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="shipping_address1" class="form-label">Address Line 1 <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text"
+                                                        class="form-control @error('shipping_address1') is-invalid @enderror"
+                                                        id="shipping_address1" name="shipping_address1"
+                                                        value="{{ old('shipping_address1') }}" required readonly>
+                                                    @error('shipping_address1')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="shipping_address2" class="form-label">Address Line
+                                                        2</label>
+                                                    <input type="text"
+                                                        class="form-control @error('shipping_address2') is-invalid @enderror"
+                                                        id="shipping_address2" name="shipping_address2"
+                                                        value="{{ old('shipping_address2') }}" readonly>
+                                                    @error('shipping_address2')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label for="shipping_city" class="form-label">City <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text"
+                                                        class="form-control @error('shipping_city') is-invalid @enderror"
+                                                        id="shipping_city" name="shipping_city"
+                                                        value="{{ old('shipping_city') }}" required readonly>
+                                                    @error('shipping_city')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label for="shipping_state" class="form-label">State <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text"
+                                                        class="form-control @error('shipping_state') is-invalid @enderror"
+                                                        id="shipping_state" name="shipping_state"
+                                                        value="{{ old('shipping_state') }}" required readonly>
+                                                    @error('shipping_state')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label for="shipping_pincode" class="form-label">Pincode <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text"
+                                                        class="form-control @error('shipping_pincode') is-invalid @enderror"
+                                                        id="shipping_pincode" name="shipping_pincode"
+                                                        value="{{ old('shipping_pincode') }}" required readonly>
+                                                    @error('shipping_pincode')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="mb-3">
+                                                    <label for="shipping_country" class="form-label">Country <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text"
+                                                        class="form-control @error('shipping_country') is-invalid @enderror"
+                                                        id="shipping_country" name="shipping_country"
+                                                        value="{{ old('shipping_country', 'India') }}" required readonly>
+                                                    @error('shipping_country')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="card">
                                     <div class="card-header border-bottom-dashed">
                                         <div class="row g-4 align-items-center">
@@ -42,127 +217,29 @@
                                         </div>
                                     </div>
 
+
                                     <div class="card-body">
                                         <div class="row g-3">
 
-                                            <!-- Existing Fields -->
-                                            <div class="col-4">
-                                                @include('components.form.input', [
-                                                    'label' => 'First Name',
-                                                    'name' => 'first_name',
-                                                    'type' => 'text',
-                                                    'placeholder' => 'Enter First Name',
-                                                ])
-                                            </div>
-
-                                            <div class="col-4">
-                                                @include('components.form.input', [
-                                                    'label' => 'Last Name',
-                                                    'name' => 'last_name',
-                                                    'type' => 'text',
-                                                    'placeholder' => 'Enter Last Name',
-                                                ])
-                                            </div>
-
-                                            <div class="col-4">
-                                                @include('components.form.input', [
-                                                    'label' => 'Phone number',
-                                                    'name' => 'phone',
-                                                    'type' => 'text',
-                                                    'placeholder' => 'Enter Phone number',
-                                                ])
-                                            </div>
-
-                                            <div class="col-4">
-                                                @include('components.form.input', [
-                                                    'label' => 'E-mail address',
-                                                    'name' => 'email',
-                                                    'type' => 'email',
-                                                    'placeholder' => 'Enter E-mail Id',
-                                                ])
-                                            </div>
-
-                                            <div class="col-4">
-                                                @include('components.form.input', [
-                                                    'label' => 'Date of Birth',
-                                                    'name' => 'dob',
-                                                    'type' => 'date',
-                                                ])
-                                            </div>
-
-                                            <div class="col-4">
-                                                @include('components.form.select', [
-                                                    'label' => 'Gender',
-                                                    'name' => 'gender',
-                                                    'options' => [
-                                                        '0' => '--Select--',
-                                                        'Male' => 'Male',
-                                                        'Female' => 'Female',
-                                                    ],
-                                                ])
-                                            </div>
-
-                                            <!-- Lead Management Fields -->
-                                            <div class="col-4">
-                                                @include('components.form.input', [
-                                                    'label' => 'Company Name',
-                                                    'name' => 'company_name',
-                                                    'type' => 'text',
-                                                    'placeholder' => 'Enter Company Name',
-                                                ])
-                                            </div>
-
-                                            <div class="col-4">
-                                                @include('components.form.input', [
-                                                    'label' => 'Designation',
-                                                    'name' => 'designation',
-                                                    'type' => 'text',
-                                                    'placeholder' => 'Enter Designation',
-                                                ])
-                                            </div>
-
-                                            <div class="col-4">
-                                                @include('components.form.select', [
-                                                    'label' => 'Industry Type',
-                                                    'name' => 'industry_type',
-                                                    'options' => [
-                                                        '0' => '--Select Industry Type--',
-                                                        'Pharma' => 'Pharma',
-                                                        'School' => 'School',
-                                                        'Manufacturing' => 'Manufacturing',
-                                                    ],
-                                                ])
-                                            </div>
-
-                                            <div class="col-4">
-                                                @include('components.form.select', [
-                                                    'label' => 'Source',
-                                                    'name' => 'source',
-                                                    'options' => [
-                                                        '0' => '--Select Source--',
-                                                        'Referral' => 'Referral',
-                                                        'Website' => 'Website',
-                                                        'Walk-in' => 'Walk-in',
-                                                        'Event' => 'Event',
-                                                    ],
-                                                ])
-                                            </div>
-
-                                            <div class="col-4">
+                                            <div class="col-3">
                                                 @include('components.form.select', [
                                                     'label' => 'Requirement Type',
                                                     'name' => 'requirement_type',
                                                     'options' => [
-                                                        '0' => '--Select Requirement--',
+                                                        '' => '--Select Requirement--',
                                                         'Servers' => 'Servers',
                                                         'CCTV' => 'CCTV',
                                                         'Biometric' => 'Biometric',
                                                         'Networking' => 'Networking',
+                                                        'Laptops' => 'Laptops',
+                                                        'Desktops' => 'Desktops',
+                                                        'Accessories' => 'Accessories',
+                                                        'Other' => 'Other',
                                                     ],
                                                 ])
                                             </div>
 
-                                            <div class="col-4">
+                                            <div class="col-3">
                                                 @include('components.form.input', [
                                                     'label' => 'Budget Range',
                                                     'name' => 'budget_range',
@@ -171,45 +248,38 @@
                                                 ])
                                             </div>
 
-                                            <div class="col-4">
+                                            <div class="col-3">
                                                 @include('components.form.select', [
                                                     'label' => 'Urgency',
                                                     'name' => 'urgency',
                                                     'options' => [
-                                                        '0' => '--Select Urgency--',
-                                                        'Low' => 'Low',
-                                                        'Medium' => 'Medium',
-                                                        'High' => 'High',
+                                                        '' => '--Select Urgency--',
+                                                        'low' => 'Low',
+                                                        'medium' => 'Medium',
+                                                        'high' => 'High',
+                                                        'critical' => 'Critical',
                                                     ],
                                                 ])
                                             </div>
-                                            <!--
-                                                <div class="col-4">
-                                                    <label for="region" class="form-label">Region</label>
-                                                <input type="text" name="region" id="region" class="form-control" placeholder="Enter Region">
-                                            </div> -->
 
-                                            <!-- <div class="col-4">
-                                                <label for="assigned_to" class="form-label">Assigned To</label>
-                                                <input type="text" name="assigned_to" id="assigned_to" class="form-control" placeholder="Enter Salesperson Name or ID">
-                                            </div> -->
-
-                                            <div class="col-4">
+                                            <div class="col-3">
                                                 @include('components.form.select', [
                                                     'label' => 'Lead Status',
                                                     'name' => 'status',
                                                     'options' => [
                                                         '0' => '--Select Status--',
-                                                        'New' => 'New',
-                                                        'Contacted' => 'Contacted',
-                                                        'Qualified' => 'Qualified',
-                                                        'Quoted' => 'Quoted',
+                                                        'new' => 'New',
+                                                        'contacted' => 'Contacted',
+                                                        'qualified' => 'Qualified',
+                                                        'proposal' => 'Proposal',
+                                                        'won' => 'Won',
                                                         'Lost' => 'Lost',
+                                                        'nurtured' => 'Nurtured',
                                                     ],
                                                 ])
                                             </div>
 
-                                            <div class="col-4">
+                                            <div class="col-3">
                                                 @include('components.form.select', [
                                                     'label' => 'Sales Person',
                                                     'name' => 'sales_person_id',
@@ -219,137 +289,20 @@
 
                                         </div>
                                     </div>
-
                                 </div>
 
-                                <!-- Branch Information Section -->
-                                <div class="card mt-3">
-                                    <div class="card-header border-bottom-dashed">
-                                        <div class="row g-4 align-items-center">
-                                            <div class="col-sm">
-                                                <h5 class="card-title mb-0">
-                                                    Branch Information
-                                                </h5>
-                                            </div>
-                                            <div class="col-sm-auto">
-                                                <button type="button" class="btn btn-primary btn-sm" id="add-branch-btn">
-                                                    <i class="mdi mdi-plus me-1"></i> Add Branch
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="card-body branch-form-section" style="display: none;">
-                                        <div class="row g-3">
-                                            <div class="col-6">
-                                                @include('components.form.input', [
-                                                    'label' => 'Branch Name',
-                                                    'name' => 'branch_name',
-                                                    'type' => 'text',
-                                                    'placeholder' => 'Enter Branch Name',
-                                                ])
-                                            </div>
-
-                                            <div class="col-6">
-                                                @include('components.form.input', [
-                                                    'label' => 'Address Line 1',
-                                                    'name' => 'address_line1',
-                                                    'type' => 'text',
-                                                    'placeholder' => 'Enter Address Line 1',
-                                                ])
-                                            </div>
-
-                                            <div class="col-6">
-                                                @include('components.form.input', [
-                                                    'label' => 'Address Line 2',
-                                                    'name' => 'address_line2',
-                                                    'type' => 'text',
-                                                    'placeholder' => 'Enter Address Line 2 (Optional)',
-                                                ])
-                                            </div>
-
-                                            <div class="col-6">
-                                                @include('components.form.input', [
-                                                    'label' => 'City',
-                                                    'name' => 'city',
-                                                    'type' => 'text',
-                                                    'placeholder' => 'Enter City',
-                                                ])
-                                            </div>
-
-                                            <div class="col-6">
-                                                @include('components.form.input', [
-                                                    'label' => 'State',
-                                                    'name' => 'state',
-                                                    'type' => 'text',
-                                                    'placeholder' => 'Enter State',
-                                                ])
-                                            </div>
-
-                                            <div class="col-6">
-                                                @include('components.form.input', [
-                                                    'label' => 'Country',
-                                                    'name' => 'country',
-                                                    'type' => 'text',
-                                                    'placeholder' => 'Enter Country',
-                                                ])
-                                            </div>
-
-                                            <div class="col-6">
-                                                @include('components.form.input', [
-                                                    'label' => 'Pincode',
-                                                    'name' => 'pincode',
-                                                    'type' => 'text',
-                                                    'placeholder' => 'Enter Pincode',
-                                                ])
-                                            </div>
-
-                                            <div class="col-12">
-                                                <div class="text-end">
-                                                    <button type="button" class="btn btn-success" id="save-branch-btn">
-                                                        Save Branch
-                                                    </button>
-                                                    <button type="button" class="btn btn-secondary" id="cancel-branch-btn">
-                                                        Cancel
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="card-body branch-table-section" style="display: none;">
-                                        <table class="table table-striped table-borderless dt-responsive nowrap">
-                                            <thead>
-                                                <tr>
-                                                    <th>Branch Name</th>
-                                                    <th>Address</th>
-                                                    <th>City</th>
-                                                    <th>State</th>
-                                                    <th>Country</th>
-                                                    <th>Pincode</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="branches-table-body">
-                                                <!-- Branches will be added here dynamically -->
-                                            </tbody>
-                                        </table>
+                                <div class="col-lg-12">
+                                    <div class="text-start mb-3">
+                                        <button type="submit" class="btn btn-success w-sm waves ripple-light">
+                                            Submit
+                                        </button>
                                     </div>
                                 </div>
 
                             </div>
-
-
-                            <div class="col-lg-12">
-                                <div class="text-start mb-3">
-                                    <button type="submit" class="btn btn-success w-sm waves ripple-light">
-                                        Submit
-                                    </button>
-                                </div>
-                            </div>
-
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -357,163 +310,181 @@
 
     <script>
         $(document).ready(function() {
-            let leadId = null;
-            let branches = [];
+            let lastCustomer = null;
 
-            // Show branch form when Add Branch button is clicked
-            $('#add-branch-btn').on('click', function() {
-                $('.branch-form-section').slideDown();
-                clearBranchForm();
-            });
-
-            // Cancel branch form
-            $('#cancel-branch-btn').on('click', function() {
-                $('.branch-form-section').slideUp();
-                clearBranchForm();
-            });
-
-            // Save branch (temporarily store in array until lead is created)
-            $('#save-branch-btn').on('click', function() {
-                const branchData = {
-                    branch_name: $('input[name="branch_name"]').val(),
-                    address_line1: $('input[name="address_line1"]').val(),
-                    address_line2: $('input[name="address_line2"]').val(),
-                    city: $('input[name="city"]').val(),
-                    state: $('input[name="state"]').val(),
-                    country: $('input[name="country"]').val(),
-                    pincode: $('input[name="pincode"]').val()
-                };
-
-                // Validate required fields
-                if (!branchData.branch_name || !branchData.address_line1 || !branchData.city ||
-                    !branchData.state || !branchData.country || !branchData.pincode) {
-                    alert('Please fill all required fields');
-                    return;
+            // Payment method change handler
+            $('#payment_method').on('change', function() {
+                const paymentMethod = $(this).val();
+                if (paymentMethod === 'online') {
+                    $('#payment-details').show();
+                } else {
+                    $('#payment-details').hide();
                 }
-
-                // Add to temporary array
-                branches.push(branchData);
-
-                // Add to table
-                addBranchToTable(branchData, branches.length - 1);
-
-                // Hide form and clear
-                $('.branch-form-section').slideUp();
-                $('.branch-table-section').show();
-                clearBranchForm();
             });
 
-            // Delete branch from temporary array
-            $(document).on('click', '.delete-branch-temp', function() {
-                const index = $(this).data('index');
-                branches.splice(index, 1);
-                refreshBranchTable();
-            });
+            // Customer search functionality
+            $('#customer_search').on('input', function() {
+                const query = $(this).val().trim();
 
-            // Add branch to table
-            function addBranchToTable(branch, index) {
-                const address = branch.address_line1 + (branch.address_line2 ? ', ' + branch.address_line2 : '');
-                const row = `
-                    <tr>
-                        <td>${branch.branch_name}</td>
-                        <td>${address}</td>
-                        <td>${branch.city}</td>
-                        <td>${branch.state}</td>
-                        <td>${branch.country}</td>
-                        <td>${branch.pincode}</td>
-                        <td>
-                            <button type="button" class="btn btn-icon btn-sm bg-danger-subtle delete-branch-temp" data-index="${index}">
-                                <i class="mdi mdi-delete fs-14 text-danger"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                $('#branches-table-body').append(row);
-            }
-
-            // Refresh branch table
-            function refreshBranchTable() {
-                $('#branches-table-body').empty();
-                branches.forEach((branch, index) => {
-                    addBranchToTable(branch, index);
-                });
-                if (branches.length === 0) {
-                    $('.branch-table-section').hide();
-                }
-            }
-
-            // Clear branch form
-            function clearBranchForm() {
-                $('input[name="branch_name"]').val('');
-                $('input[name="address_line1"]').val('');
-                $('input[name="address_line2"]').val('');
-                $('input[name="city"]').val('');
-                $('input[name="state"]').val('');
-                $('input[name="country"]').val('India');
-                $('input[name="pincode"]').val('');
-            }
-
-            // Intercept form submission to save branches after lead is created
-            $('form').on('submit', function(e) {
-                e.preventDefault();
-                const form = $(this);
-                const formData = new FormData(this);
-
-                // Submit lead first
-                $.ajax({
-                    url: form.attr('action'),
-                    method: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        // If lead created successfully and there are branches to save
-                        if (branches.length > 0) {
-                            // Extract lead ID from redirect URL or response
-                            // For now, we'll need to modify the controller to return the lead ID
-                            saveBranches(response.lead_id);
-                        } else {
-                            // Redirect to leads index
-                            window.location.href = "{{ route('leads.index') }}";
-                        }
-                    },
-                    error: function(xhr) {
-                        // Handle validation errors
-                        if (xhr.status === 422) {
-                            const errors = xhr.responseJSON.errors;
-                            let errorMessage = '';
-                            for (let field in errors) {
-                                errorMessage += errors[field][0] + '\n';
-                            }
-                            alert(errorMessage);
-                        } else {
-                            alert('An error occurred. Please try again.');
-                        }
-                    }
-                });
-            });
-
-            // Save all branches for the created lead
-            function saveBranches(leadId) {
-                let savedCount = 0;
-                branches.forEach((branch, index) => {
-                    branch.lead_id = leadId;
+                if (query.length >= 2) {
                     $.ajax({
-                        url: "{{ route('leads.branches.store') }}",
-                        method: 'POST',
+                        url: '{{ route('leads.search-customers') }}',
+                        method: 'GET',
                         data: {
-                            ...branch,
-                            _token: '{{ csrf_token() }}'
+                            q: query
                         },
-                        success: function() {
-                            savedCount++;
-                            if (savedCount === branches.length) {
-                                window.location.href = "{{ route('leads.index') }}";
+                        success: function(response) {
+                            console.log(response);
+                            let suggestions = '';
+
+                            if (!response || response.length === 0) {
+                                $('#customer_suggestions').removeClass('show').hide();
+                                $('#customer_suggestions').html(
+                                    '<a class="dropdown-item" href="#">No customers found</a>'
+                                    ).show();
+                                return;
+                            }
+
+                            response.forEach(function(customer) {
+                                const fullName =
+                                    `${customer.first_name ?? ''} ${customer.last_name ?? ''}`
+                                    .trim();
+                                const addresses = customer.address_details ||
+                            []; // yahi sahi key hai
+
+                                suggestions += `
+                                    <a class="dropdown-item customer-suggestion" href="#"
+                                    data-id="${customer.id}"
+                                    data-name="${fullName}"
+                                    data-email="${customer.email ?? ''}"
+                                    data-phone="${customer.phone ?? ''}"
+                                    data-addresses='${JSON.stringify(addresses)}'>
+                                        ${fullName} - ${customer.email ?? ''}
+                                    </a>`;
+                            });
+
+                            $('#customer_suggestions')
+                                .html(suggestions)
+                                .addClass('show')
+                                .show();
+                        },
+                        error: function(xhr) {
+                            console.log(xhr);
+
+                            if (xhr.status === 404) {
+                                $('#customer_suggestions').removeClass('show').hide();
+                                $('#customer_suggestions').html(
+                                    '<a class="dropdown-item" href="#">No customers found</a>'
+                                    ).show();
+                                return;
                             }
                         }
                     });
-                });
-            }
+                } else {
+                    $('#customer_suggestions').removeClass('show').hide();
+                }
+            });
+
+            // Suggestion click
+            $(document).on('click', '.customer-suggestion', function(e) {
+                e.preventDefault();
+
+                const id = $(this).data('id');
+                const name = $(this).data('name');
+                const email = $(this).data('email');
+                const phone = $(this).data('phone');
+                const addresses = $(this).data('addresses') || [];
+
+                $('#customer_id').val(id);
+                $('#customer_search').val(name);
+                $('#email').val(email);
+                $('#phone').val(phone);
+                lastCustomer = {
+                    id,
+                    name,
+                    email,
+                    phone,
+                    addresses
+                };
+
+                // Populate address dropdown
+                const $addressSelect = $('#customer_address_select');
+                $addressSelect.empty();
+
+                if (!addresses.length) {
+                    $addressSelect
+                        .append('<option value="">No saved addresses found</option>')
+                        .show();
+                } else {
+                    $addressSelect.append('<option value="">Select Customer Address</option>');
+                    addresses.forEach(function(addr, index) {
+                        const label = [
+                            addr.address1,
+                            addr.address2,
+                            addr.city,
+                            addr.state,
+                            addr.pincode,
+                            addr.country
+                        ].filter(Boolean).join(', ');
+
+                        $addressSelect.append(
+                            `<option value="${index}">
+                    ${label}
+                 </option>`
+                        );
+                    });
+                    $addressSelect.show();
+                }
+
+                $('#customer_suggestions').removeClass('show').hide();
+
+                // Optionally default first address select + fill
+                if (addresses.length === 1) {
+                    $addressSelect.val(0).trigger('change');
+                }
+            });
+
+            // Address selection change
+            $('#customer_address_select').on('change', function() {
+                const index = $(this).val();
+                if (!lastCustomer || index === '') return;
+
+                const addr = lastCustomer.addresses[index];
+                if (!addr) return;
+
+                $('#shipping_first_name').val(addr.first_name || lastCustomer.name.split(' ')[0] || '');
+                $('#shipping_last_name').val(addr.last_name || lastCustomer.name.split(' ').slice(1).join(
+                    ' ') || '');
+                $('#shipping_phone').val(addr.phone || lastCustomer.phone || '');
+                $('#shipping_address_id').val(addr.id);
+
+                $('#shipping_address1').val(addr.address1 || '');
+                $('#shipping_address2').val(addr.address2 || '');
+                $('#shipping_city').val(addr.city || '');
+                $('#shipping_state').val(addr.state || '');
+                $('#shipping_pincode').val(addr.pincode || '');
+                $('#shipping_country').val(addr.country || 'India');
+            });
+
+
+            // Form submission
+            $('#orderForm').on('submit', function(e) {
+                if (lastCustomer === null) {
+                    e.preventDefault();
+                    alert('Please select a customer');
+                    return false;
+                }
+            });
+
+            // Hide dropdowns when clicking outside
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#customer_search, #customer_suggestions').length) {
+                    $('#customer_suggestions').hide();
+                }
+                if (!$(e.target).closest('#product_search, #product_suggestions').length) {
+                    $('#product_suggestions').hide();
+                }
+            });
         });
     </script>
 @endsection

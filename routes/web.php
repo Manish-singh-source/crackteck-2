@@ -132,8 +132,8 @@ Route::prefix('/demo')->group(function () {
             Route::post('/store-staff', 'store')->name('staff.store');
             Route::delete('/delete-staff/{id}', 'delete')->name('staff.delete');
 
-            
-            
+
+
             Route::get('/edit-staff/{id}', 'edit')->name('staff.edit');
             Route::get('/view-staff/{id}', 'view')->name('staff.view');
             Route::put('/update-staff/{id}', 'update')->name('staff.update');
@@ -141,7 +141,7 @@ Route::prefix('/demo')->group(function () {
             Route::put('/assign-role-to-staff/{id}', 'assignRole')->name('assign.role');
             Route::post('/approve-task', 'approveTask')->name('staff.approve.task');
         });
-        
+
         // ------------------------------------------------------------ Access Control ( Roles Page) -------------------------------------------------------------
         // completed
         Route::controller(RoleController::class)->group(function () {
@@ -152,7 +152,7 @@ Route::prefix('/demo')->group(function () {
             Route::put('/update-role/{id}', 'update')->name('role.update');
             Route::delete('/delete-role/{id}', 'delete')->name('role.delete');
         });
-        
+
         // ------------------------------------------------------------ Access Control ( Permission Page) -------------------------------------------------------------
         // completed
         Route::controller(PermissionController::class)->group(function () {
@@ -379,6 +379,9 @@ Route::prefix('/demo')->group(function () {
         Route::put('/crm/update-leads/{id}', 'update')->name('leads.update');
         // Delete Leads Page
         Route::delete('/crm/delete-leads/{id}', 'delete')->name('leads.delete');
+
+        Route::get('/search-customers', 'searchCustomers')->name('leads.search-customers');
+
 
         // Branch Management Routes
         Route::post('/crm/leads/branches/store', 'storeBranch')->name('leads.branches.store');

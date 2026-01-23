@@ -30,5 +30,10 @@ class Lead extends Model
         'estimated_value',
         'notes',
     ];
-    
+
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class, 'staff_id');
+    }
+
 }

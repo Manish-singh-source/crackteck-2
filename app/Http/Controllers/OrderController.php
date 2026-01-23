@@ -376,8 +376,7 @@ class OrderController extends Controller
                     ->orWhere('email', 'LIKE', "%{$query}%")
                     ->orWhere('phone', 'LIKE', "%{$query}%");
             })
-            ->select('id', 'first_name', 'last_name', 'email', 'phone') // lightweight
-            ->limit(10)
+            ->select('id', 'first_name', 'last_name', 'email', 'phone')
             ->get();
 
         return response()->json($customers);

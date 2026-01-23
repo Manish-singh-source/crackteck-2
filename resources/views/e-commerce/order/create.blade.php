@@ -537,6 +537,7 @@
 
                             if (!response || response.length === 0) {
                                 $('#customer_suggestions').removeClass('show').hide();
+                                $('#customer_suggestions').html('<a class="dropdown-item" href="#">No customers found</a>').show();
                                 return;
                             }
 

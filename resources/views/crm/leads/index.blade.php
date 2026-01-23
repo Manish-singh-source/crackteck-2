@@ -60,7 +60,7 @@
                                                             @foreach ($lead as $lead)
                                                                 <tr>
                                                                     <td>{{ $lead->id }}</td>
-                                                                    <td>{{ $lead->user->first_name }}</td>
+                                                                    <td>{{ $lead->staff->first_name. ' ' .$lead->staff->last_name }}</td>
                                                                     <td>{{ $lead->first_name }} {{ $lead->last_name }}</td>
                                                                     <td>{{ $lead->phone }}</td>
                                                                     <td>{{ $lead->company_name }}</td>

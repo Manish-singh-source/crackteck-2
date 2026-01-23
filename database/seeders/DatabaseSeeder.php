@@ -15,46 +15,46 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Support',
-            'email' => 'support@technofra.com',
-            'password' => '123456'
-        ]);
+        // User::factory()->create([
+        //     'name' => 'Support',
+        //     'email' => 'support@technofra.com',
+        //     'password' => '123456'
+        // ]);
 
-        // Create roles idempotently
-        Role::firstOrCreate(['name' => 'Engineer']);
-        Role::firstOrCreate(['name' => 'Delivery Man']);
-        Role::firstOrCreate(['name' => 'Sales Person']);
-        Role::firstOrCreate(['name' => 'Customer']);
-        Role::firstOrCreate(['name' => 'Admin']);
-        Role::firstOrCreate(['name' => 'Warehouse Manager']);
+        // // Create roles idempotently
+        // Role::firstOrCreate(['name' => 'Engineer']);
+        // Role::firstOrCreate(['name' => 'Delivery Man']);
+        // Role::firstOrCreate(['name' => 'Sales Person']);
+        // Role::firstOrCreate(['name' => 'Customer']);
+        // Role::firstOrCreate(['name' => 'Admin']);
+        // Role::firstOrCreate(['name' => 'Warehouse Manager']);
 
         $this->call([
-            StaffSeeder::class,
-            StaffAddressSeeder::class,
-            StaffAadharDetailSeeder::class,
-            StaffPanCardDetailSeeder::class,
-            StaffBankDetailSeeder::class,
-            StaffVehicleDetailSeeder::class,
-            StaffPoliceVerificationSeeder::class,
-            StaffWorkSkillSeeder::class,
+            // StaffSeeder::class,
+            // StaffAddressSeeder::class,
+            // StaffAadharDetailSeeder::class,
+            // StaffPanCardDetailSeeder::class,
+            // StaffBankDetailSeeder::class,
+            // StaffVehicleDetailSeeder::class,
+            // StaffPoliceVerificationSeeder::class,
+            // StaffWorkSkillSeeder::class,
             
-            CustomerSeeder::class,
-            CustomerAddressDetailsSeeder::class,
-            CustomerAadharDetailSeeder::class,
-            CustomerPanCardDetailSeeder::class,
-            CustomerCompanyDetailSeeder::class,
+            // CustomerSeeder::class,
+            // CustomerAddressDetailsSeeder::class,
+            // CustomerAadharDetailSeeder::class,
+            // CustomerPanCardDetailSeeder::class,
+            // CustomerCompanyDetailSeeder::class,
             
 
-            LeadTableSeeder::class,
-            // FollowUpTableSeeder::class,
-            // MeetTableSeeder::class,
+            // LeadTableSeeder::class,
+            FollowUpTableSeeder::class,
+            MeetTableSeeder::class,
 
-            
             // QuotationTableSeeder::class,
             // QuotationProductTableSeeder::class,
+
+            
             // BrandsSeeder::class,
             // ContactSeeder::class,
             // CouponSeeder::class,

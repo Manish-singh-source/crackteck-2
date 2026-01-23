@@ -20,16 +20,25 @@ class FollowUpTableSeeder extends Seeder
 
         $leads = Lead::all();
 
-        FollowUp::factory()->count(20)->make()->each(function ($followUp) use ($leads) {
-            $lead = $leads->random();
-            $followUp->lead_id = $lead->id;
+        $followUps = [];
 
-            // If lead has an assigned staff, use it for the follow up
-            if (isset($lead->staff_id)) {
-                $followUp->staff_id = $lead->staff_id;
-            }
+        $followUpTypes = ['call', 'email', 'meeting', 'sms'];
+        $statuses = ['pending', 'completed', 'rescheduled', 'cancelled'];
 
-            $followUp->save();
-        });
+        foreach ($leads as $lead) {
+            $followUps[] = [
+                'lead_id' => $lead->id,
+                'staff_id' => $lead->staff_id,
+                'followup_date' => now()->addDays(rand(1, 30))->toDateString(),
+                'followup_time' => now()->addHours(rand(1, 24))->toTimeString(),
+                'followup_type' => $followUpTypes[array_rand($followUpTypes)],
+                'status' => $statuses[array_rand($statuses)],
+                'remarks' => 'Follow up remark',
+                'next_action' => 'Follow up next action',
+                'next_followup_date' => now()->addDays(rand(1, 30))->toDateTimeString(),
+            ];
+        }
+
+        \DB::table('follow_ups')->insert($followUps);
     }
 }

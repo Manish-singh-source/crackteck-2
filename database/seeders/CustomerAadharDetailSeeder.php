@@ -14,14 +14,16 @@ class CustomerAadharDetailSeeder extends Seeder
      */
     public function run(): void
     {
+
         $data = [
-            ['code' => 'CUS001', 'aadhar_number' => '111122223333', 'front' => 'customers/aadhar/front_1.jpg', 'back' => 'customers/aadhar/back_1.jpg'],
-            ['code' => 'CUS002', 'aadhar_number' => '222233334444', 'front' => 'customers/aadhar/front_2.jpg', 'back' => 'customers/aadhar/back_2.jpg'],
-            ['code' => 'CUS003', 'aadhar_number' => '333344445555', 'front' => 'customers/aadhar/front_3.jpg', 'back' => 'customers/aadhar/back_3.jpg'],
-            ['code' => 'CUS004', 'aadhar_number' => '444455556666', 'front' => 'customers/aadhar/front_4.jpg', 'back' => 'customers/aadhar/back_4.jpg'],
+            ['code' => 'CUS001', 'aadhar_number' => '111122223333', 'front' => 'frontend-assets/images/new-products/1-1.png', 'back' => 'frontend-assets/images/new-products/1-1.png'],
+            ['code' => 'CUS002', 'aadhar_number' => '222233334444', 'front' => 'frontend-assets/images/new-products/1-1.png', 'back' => 'frontend-assets/images/new-products/1-1.png'],
+            ['code' => 'CUS003', 'aadhar_number' => '333344445555', 'front' => 'frontend-assets/images/new-products/1-1.png', 'back' => 'frontend-assets/images/new-products/1-1.png'],
+            ['code' => 'CUS004', 'aadhar_number' => '444455556666', 'front' => 'frontend-assets/images/new-products/1-1.png', 'back' => 'frontend-assets/images/new-products/1-1.png'],
         ];
 
         foreach ($data as $d) {
+
             $cid = DB::table('customers')->where('customer_code', $d['code'])->value('id');
             if ($cid) {
                 DB::table('customer_aadhar_details')->updateOrInsert([

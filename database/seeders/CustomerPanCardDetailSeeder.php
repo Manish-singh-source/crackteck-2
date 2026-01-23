@@ -15,10 +15,10 @@ class CustomerPanCardDetailSeeder extends Seeder
     public function run(): void
     {
         $data = [
-            ['code' => 'CUS001', 'pan' => 'ABCDE1111F', 'front' => 'customers/pan/front_1.jpg', 'back' => 'customers/pan/back_1.jpg'],
-            ['code' => 'CUS002', 'pan' => 'FGHIJ2222K', 'front' => 'customers/pan/front_2.jpg', 'back' => 'customers/pan/back_2.jpg'],
-            ['code' => 'CUS003', 'pan' => 'KLMNO3333P', 'front' => 'customers/pan/front_3.jpg', 'back' => 'customers/pan/back_3.jpg'],
-            ['code' => 'CUS004', 'pan' => 'QRSTU4444V', 'front' => 'customers/pan/front_4.jpg', 'back' => 'customers/pan/back_4.jpg'],
+            ['code' => 'CUS001', 'pan' => 'ABCDE1111F', 'front' => 'frontend-assets/images/new-products/1-1.png', 'back' => 'frontend-assets/images/new-products/1-1.png'],
+            ['code' => 'CUS002', 'pan' => 'FGHIJ2222K', 'front' => 'frontend-assets/images/new-products/1-1.png', 'back' => 'frontend-assets/images/new-products/1-1.png'],
+            ['code' => 'CUS003', 'pan' => 'KLMNO3333P', 'front' => 'frontend-assets/images/new-products/1-1.png', 'back' => 'frontend-assets/images/new-products/1-1.png'],
+            ['code' => 'CUS004', 'pan' => 'QRSTU4444V', 'front' => 'frontend-assets/images/new-products/1-1.png', 'back' => 'frontend-assets/images/new-products/1-1.png'],
         ];
 
         foreach ($data as $d) {

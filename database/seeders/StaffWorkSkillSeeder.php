@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Staff;
 use App\Models\StaffWorkSkill;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class StaffWorkSkillSeeder extends Seeder
@@ -16,40 +15,18 @@ class StaffWorkSkillSeeder extends Seeder
     {
         StaffWorkSkill::truncate();
 
-        $engineerSkills = ['AC Repair', 'Washing Machine Repair', 'Refrigerator Repair', 'Micro Oven Repair', 'TV Repair'];
-        $deliverySkills = ['Two Wheeler Delivery', 'Four Wheeler Delivery', 'Heavy Load Handling'];
-        $salesSkills = ['B2B Sales', 'Retail Sales', 'Customer Acquisition'];
-
-        Staff::chunk(50, function ($staffs) use ($engineerSkills, $deliverySkills, $salesSkills) {
+        Staff::chunk(50, function ($staffs) {
             foreach ($staffs as $staff) {
-                $primary = [];
-                $certs = [];
+                $primary = ['AC Repair', 'Washing Machine Repair', 'Refrigerator Repair', 'Micro Oven Repair', 'TV Repair'];
+                $certs = ['AC Repair', 'Washing Machine Repair', 'Refrigerator Repair', 'Micro Oven Repair', 'TV Repair'];
                 $langs = ['Hindi', 'English', 'Marathi', 'Tamil', 'Telugu', 'Kannada'];
-
-                switch ($staff->staff_role) {
-                    case 1: // Engineer
-                        $primary = (array) array_rand(array_flip($engineerSkills), rand(1, 3));
-                        $certs = ['Basic Repair Certification', 'Safety Training'];
-                        break;
-                    case 2: // Delivery
-                        $primary = (array) array_rand(array_flip($deliverySkills), 1);
-                        $certs = ['Driving License'];
-                        break;
-                    case 3: // Sales
-                        $primary = (array) array_rand(array_flip($salesSkills), rand(1, 2));
-                        $certs = ['Sales Training'];
-                        break;
-                    default:
-                        $primary = ['General'];
-                        $certs = [];
-                }
 
                 StaffWorkSkill::create([
                     'staff_id' => $staff->id,
-                    'primary_skills' => array_values((array)$primary),
-                    'certifications' => $certs,
+                    'primary_skills' => json_encode($primary),
+                    'certifications' => json_encode($certs),
                     'experience' => rand(1, 12),
-                    'languages_known' => array_values(array_slice($langs, 0, rand(1, 3))),
+                    'languages_known' => json_encode($langs),
                 ]);
             }
         });

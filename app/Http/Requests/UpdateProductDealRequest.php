@@ -53,7 +53,7 @@ class UpdateProductDealRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $product = EcommerceProduct::with('warehouseProduct')
                         ->where('id', $value)
-                        ->where('ecommerce_status', 'active')
+                        ->where('status', 'active')
                         ->whereHas('warehouseProduct', function ($query) {
                             $query->where('status', 'active');
                         })

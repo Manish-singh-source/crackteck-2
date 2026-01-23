@@ -190,10 +190,11 @@ Route::prefix('/demo/e-commerce')->group(function () {
         Route::put('/edit-product-deal/{productDeal}', 'update')->name('product-deals.update');
         Route::delete('/delete-product-deal/{productDeal}', 'destroy')->name('product-deals.delete');
 
-        // AJAX Routes for E-commerce Product Search
-        Route::get('/search-ecommerce-products', 'searchEcommerceProducts')->name('product-deals.search-products');
-        Route::get('/get-ecommerce-product/{id}', 'getEcommerceProduct')->name('product-deals.get-product');
-    });
+            // AJAX Routes for E-commerce Product Search
+            Route::get('/search-ecommerce-products', 'searchEcommerceProducts')->name('product-deals.search-products');
+            Route::get('/get-ecommerce-product/{id}', 'getEcommerceProduct')->name('product-deals.get-product');
+            Route::post('/remove-product-from-deal', 'removeProductFromDeal')->name('product-deals.remove-product');
+        });
 
     // ------------------------------------------------------------ E-Commerce Collection Page -------------------------------------------------------------
     Route::controller(CollectionController::class)->group(function () {

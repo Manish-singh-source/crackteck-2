@@ -512,9 +512,9 @@
                                         'value' => old('ecommerce_status', $product->status),
                                         'options' => [
                                             '' => '--Select--',
-                                            '0' => 'Inactive',
-                                            '1' => 'Active',
-                                            '2' => 'Draft',
+                                            'inactive' => 'Inactive',
+                                            'active' => 'Active',
+                                            'draft' => 'Draft',
                                         ],
                                     ])
                                 </div>

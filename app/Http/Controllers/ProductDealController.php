@@ -13,29 +13,25 @@ use Illuminate\Support\Facades\DB;
 
 class ProductDealController extends Controller
 {
-    /**
-     * Display a listing of product deals.
-     */
     public function index()
     {
-        $deals = ProductDeal::with(['dealItems.ecommerceProduct.warehouseProduct'])
+        $status = request()->get('status') ?? 'all';
+        $query = ProductDeal::query();
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+        $deals = $query->with(['dealItems.ecommerceProduct.warehouseProduct'])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
         return view('e-commerce.product-deals.index', compact('deals'));
     }
 
-    /**
-     * Show the form for creating a new product deal.
-     */
     public function create()
     {
         return view('e-commerce.product-deals.create');
     }
 
-    /**
-     * Store a newly created product deal in storage.
-     */
     public function store(StoreProductDealRequest $request)
     {
         $validated = $request->validated();
@@ -56,7 +52,7 @@ class ProductDealController extends Controller
                 $ecommerceProduct = EcommerceProduct::with('warehouseProduct')
                     ->findOrFail($productData['ecommerce_product_id']);
 
-                $originalPrice = $ecommerceProduct->warehouseProduct->selling_price;
+                $originalPrice = $ecommerceProduct->warehouseProduct->final_price;
 
                 // Calculate offer price
                 if ($productData['discount_type'] === 'percentage') {
@@ -78,17 +74,13 @@ class ProductDealController extends Controller
             DB::commit();
 
             return redirect()->route('product-deals.index')->with('success', 'Product deal created successfully!');
-
         } catch (\Exception $e) {
             DB::rollback();
 
-            return back()->with('error', 'Error creating product deal: '.$e->getMessage())->withInput();
+            return back()->with('error', 'Error creating product deal: ' . $e->getMessage())->withInput();
         }
     }
 
-    /**
-     * Display the specified product deal.
-     */
     public function show(ProductDeal $productDeal)
     {
         $productDeal->load(['dealItems.ecommerceProduct.warehouseProduct']);
@@ -96,20 +88,14 @@ class ProductDealController extends Controller
         return view('e-commerce.product-deals.view', compact('productDeal'));
     }
 
-    /**
-     * Show the form for editing the specified product deal.
-     */
     public function edit(ProductDeal $productDeal)
     {
-        // dd($productDeal->dealItems);
         return view('e-commerce.product-deals.edit', compact('productDeal'));
     }
 
-    /**
-     * Update the specified product deal in storage.
-     */
     public function update(UpdateProductDealRequest $request, ProductDeal $productDeal)
     {
+        // Validate the incoming request data
         $validated = $request->validated();
 
         try {
@@ -123,47 +109,72 @@ class ProductDealController extends Controller
                 'status' => $validated['status'],
             ]);
 
-            // Delete existing deal items
-            $productDeal->dealItems()->delete();
-
-            // Create new deal items for each product
+            // Update or create deal items for each product
             foreach ($validated['products'] as $productData) {
-                $ecommerceProduct = EcommerceProduct::with('warehouseProduct')
-                    ->findOrFail($productData['ecommerce_product_id']);
+                // Find existing deal item or create a new one if not found
+                $dealItem = ProductDealItem::where('product_deal_id', $productDeal->id)
+                    ->where('ecommerce_product_id', $productData['ecommerce_product_id'])
+                    ->first();
 
-                $originalPrice = $ecommerceProduct->warehouseProduct->selling_price;
+                // If the deal item exists, update it
+                if ($dealItem) {
+                    $ecommerceProduct = EcommerceProduct::with('warehouseProduct')
+                        ->findOrFail($productData['ecommerce_product_id']);
 
-                // Calculate offer price
-                if ($productData['discount_type'] === 'percentage') {
-                    $offerPrice = $originalPrice - ($originalPrice * $productData['discount_value'] / 100);
+                    $originalPrice = $ecommerceProduct->warehouseProduct->final_price;
+
+                    // Calculate offer price based on discount type
+                    if ($productData['discount_type'] === 'percentage') {
+                        $offerPrice = $originalPrice - ($originalPrice * $productData['discount_value'] / 100);
+                    } else {
+                        $offerPrice = $originalPrice - $productData['discount_value'];
+                    }
+
+                    // Update existing deal item
+                    $dealItem->update([
+                        'original_price' => $originalPrice,
+                        'discount_type' => $productData['discount_type'],
+                        'discount_value' => $productData['discount_value'],
+                        'offer_price' => $offerPrice,
+                    ]);
                 } else {
-                    $offerPrice = $originalPrice - $productData['discount_value'];
-                }
+                    // If the deal item doesn't exist, create a new one
+                    $ecommerceProduct = EcommerceProduct::with('warehouseProduct')
+                        ->findOrFail($productData['ecommerce_product_id']);
 
-                ProductDealItem::create([
-                    'product_deal_id' => $productDeal->id,
-                    'ecommerce_product_id' => $productData['ecommerce_product_id'],
-                    'original_price' => $originalPrice,
-                    'discount_type' => $productData['discount_type'],
-                    'discount_value' => $productData['discount_value'],
-                    'offer_price' => $offerPrice,
-                ]);
+                    $originalPrice = $ecommerceProduct->warehouseProduct->final_price;
+
+                    // Calculate offer price
+                    if ($productData['discount_type'] === 'percentage') {
+                        $offerPrice = $originalPrice - ($originalPrice * $productData['discount_value'] / 100);
+                    } else {
+                        $offerPrice = $originalPrice - $productData['discount_value'];
+                    }
+
+                    // Create new product deal item
+                    ProductDealItem::create([
+                        'product_deal_id' => $productDeal->id,
+                        'ecommerce_product_id' => $productData['ecommerce_product_id'],
+                        'original_price' => $originalPrice,
+                        'discount_type' => $productData['discount_type'],
+                        'discount_value' => $productData['discount_value'],
+                        'offer_price' => $offerPrice,
+                    ]);
+                }
             }
 
+            // Commit the transaction if everything is fine
             DB::commit();
 
             return redirect()->route('product-deals.index')->with('success', 'Product deal updated successfully!');
-
         } catch (\Exception $e) {
+            // Rollback the transaction in case of any error
             DB::rollback();
 
-            return back()->with('error', 'Error updating product deal: '.$e->getMessage())->withInput();
+            return back()->with('error', 'Error updating product deal: ' . $e->getMessage())->withInput();
         }
     }
 
-    /**
-     * Remove the specified product deal from storage.
-     */
     public function destroy(ProductDeal $productDeal)
     {
         try {
@@ -172,13 +183,10 @@ class ProductDealController extends Controller
 
             return redirect()->route('product-deals.index')->with('success', 'Product deal deleted successfully!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting product deal: '.$e->getMessage());
+            return back()->with('error', 'Error deleting product deal: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Search for e-commerce products via AJAX.
-     */
     public function searchEcommerceProducts(Request $request): JsonResponse
     {
         $search = $request->get('search', '');
@@ -187,7 +195,7 @@ class ProductDealController extends Controller
             ->where(function ($query) use ($search) {
                 // Search in e-commerce product SKU
                 $query->where('sku', 'LIKE', "%{$search}%")
-                      // Or search in warehouse product name and SKU
+                    // Or search in warehouse product name and SKU
                     ->orWhereHas('warehouseProduct', function ($subQuery) use ($search) {
                         $subQuery->where('product_name', 'LIKE', "%{$search}%")
                             ->orWhere('sku', 'LIKE', "%{$search}%");
@@ -196,7 +204,7 @@ class ProductDealController extends Controller
             ->whereHas('warehouseProduct', function ($query) {
                 $query->where('status', 'active');
             })
-            ->where('ecommerce_status', 'active')
+            ->where('status', 'active')
             ->limit(10)
             ->get()
             ->map(function ($product) {
@@ -206,23 +214,20 @@ class ProductDealController extends Controller
                     'sku' => $product->sku, // E-commerce SKU
                     'warehouse_sku' => $product->warehouseProduct->sku, // Warehouse SKU
                     'brand' => $product->warehouseProduct->brand->brand_title ?? 'N/A',
-                    'selling_price' => $product->warehouseProduct->selling_price,
+                    'final_price' => $product->warehouseProduct->final_price,
                     'image' => $product->warehouseProduct->main_product_image,
-                    'display_text' => $product->warehouseProduct->product_name.' (SKU: '.$product->sku.')',
+                    'display_text' => $product->warehouseProduct->product_name . ' (SKU: ' . $product->sku . ')',
                 ];
             });
 
         return response()->json($products);
     }
 
-    /**
-     * Get specific e-commerce product details via AJAX.
-     */
     public function getEcommerceProduct($id): JsonResponse
     {
         $product = EcommerceProduct::with(['warehouseProduct.brand'])
             ->where('id', $id)
-            ->where('ecommerce_status', 'active')
+            ->where('status', 'active')
             ->whereHas('warehouseProduct', function ($query) {
                 $query->where('status', 'active');
             })
@@ -236,8 +241,21 @@ class ProductDealController extends Controller
             'id' => $product->id,
             'name' => $product->warehouseProduct->product_name,
             'brand' => $product->warehouseProduct->brand->brand_title ?? 'N/A',
-            'selling_price' => $product->warehouseProduct->selling_price,
+            'final_price' => $product->warehouseProduct->final_price,
             'image' => $product->warehouseProduct->main_product_image,
         ]);
+    }
+
+    public function removeProductFromDeal(Request $request): JsonResponse
+    {
+        $request->validate([
+            'product_id' => 'required|exists:product_deal_items,ecommerce_product_id',
+        ]);
+
+        $productId = $request->input('product_id');
+
+        ProductDealItem::where('ecommerce_product_id', $productId)->delete();
+
+        return response()->json(['message' => 'Product removed from deal successfully']);
     }
 }

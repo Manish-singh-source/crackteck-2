@@ -90,4 +90,9 @@ class EcommerceProduct extends Model
     {
         return $this->hasMany(ProductVariantAttributeValue::class);
     }
+
+    public function dealItems()
+    {
+        return $this->hasMany(ProductDealItem::class);
+    }
 }

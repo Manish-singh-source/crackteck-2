@@ -36,8 +36,4 @@ class Lead extends Model
         return $this->belongsTo(Staff::class, 'staff_id');
     }
 
-    public function branches()
-    {
-        return $this->hasMany(LeadBranch::class);
-    }
 }

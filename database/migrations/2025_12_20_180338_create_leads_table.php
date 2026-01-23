@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('leads', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
+            $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade'); // Sales Person
+            $table->foreignId('customer_address_id')->constrained('customer_address_details')->nullable()->onDelete('cascade');
             $table->string('lead_number')->unique();
 
             $table->string('requirement_type')->nullable();
-            $table->string('budget_range')->nullable(); 
+            $table->string('budget_range')->nullable();
 
             $table->enum('urgency', ['low', 'medium', 'high', 'critical'])->default('medium')->comment('0 - Low, 1 - Medium, 2 - High, 3 - Critical');
             $table->enum('status', ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost', 'nurture'])->default('new')->comment('0 - New, 1 - Contacted, 2 - Qualified, 3 - Proposal, 4 - Won, 5 - Lost, 6 - Nurture');

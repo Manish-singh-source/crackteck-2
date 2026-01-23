@@ -15,8 +15,13 @@ class LeadController extends Controller
     //
     public function index()
     {
-        $lead = Lead::with('staff')->get();
-        return view('/crm/leads/index', compact('lead'));
+        $status = request()->get('status') ?? 'all';
+        $query = Lead::query();
+        if ($status != 'all') {
+            $query->where('status', $status);
+        }
+        $leads = $query->with('staff', 'customer', 'customerAddress', 'companyDetails')->get();
+        return view('/crm/leads/index', compact('leads'));
     }
 
     public function create()
@@ -29,21 +34,16 @@ class LeadController extends Controller
 
     public function store(Request $request)
     {
-        //
-        // i want to store customer id and customer address id in lead table from customer table and customer_address_details table
-        // and also want to store lead details in lead table
-        // i will send all the details from frontend in one request.
-
-        dd($request->all());
-
         $validator = Validator::make($request->all(), [
             'customer_id' => 'required',
+            'sales_person_id' => 'required|exists:staff,id',
             'shipping_address_id' => 'required',
             'requirement_type' => 'required',
             'budget_range' => 'required',
             'urgency' => 'required',
+            'estimated_value' => 'required|numeric',
+            'notes' => 'nullable',
             'status' => 'required',
-            'sales_person_id' => 'required|exists:staff,id',
         ]);
 
         if ($validator->fails()) {
@@ -59,12 +59,15 @@ class LeadController extends Controller
 
         $lead = new Lead;
         $lead->customer_id = $customer->id;
-        $lead->customer_address_id = $customer_address->id;
+        $lead->staff_id = $request->sales_person_id;
+        $lead->customer_address_id = $request->shipping_address_id;
+        $lead->lead_number = 'LEAD' . str_pad(Lead::count() + 1, 3, '0', STR_PAD_LEFT);
         $lead->requirement_type = $request->requirement_type;
         $lead->budget_range = $request->budget_range;
         $lead->urgency = $request->urgency;
-        $lead->staff_id = $request->sales_person_id;
         $lead->status = $request->status;
+        $lead->estimated_value = $request->estimated_value;
+        $lead->notes = $request->notes;
 
         $lead->save();
 
@@ -73,7 +76,7 @@ class LeadController extends Controller
 
     public function view($id)
     {
-        $lead = Lead::with('branches')->find($id);
+        $lead = Lead::with('customerAddress', 'companyDetails')->find($id);
         $salesPersons = Staff::where('staff_role', 'sales_person')->get();
 
         return view('/crm/leads/view', compact('lead', 'salesPersons'));
@@ -81,7 +84,7 @@ class LeadController extends Controller
 
     public function edit($id)
     {
-        $lead = Lead::with('branches')->find($id);
+        $lead = Lead::with('customerAddress', 'companyDetails')->find($id);
         $salesPersons = Staff::where('staff_role', 'sales_person')->get();
 
         return view('/crm/leads/edit', compact('lead', 'salesPersons'));
@@ -131,8 +134,6 @@ class LeadController extends Controller
     public function delete($id)
     {
         $lead = Lead::findOrFail($id);
-        // Delete all related branches (cascade delete is also set in migration)
-        $lead->branches()->delete();
         $lead->delete();
 
         return redirect()->route('leads.index')->with('success', 'Leads deleted successfully.');
@@ -153,6 +154,7 @@ class LeadController extends Controller
                     ->orWhere('email', 'LIKE', "%{$query}%")
                     ->orWhere('phone', 'LIKE', "%{$query}%");
             })
+            ->where('is_lead', true)
             ->select('id', 'first_name', 'last_name', 'email', 'phone')
             ->get();
 

@@ -7,11 +7,10 @@
         <div class="container-fluid">
             <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
                 <div class="flex-grow-1">
-                    <h4 class="fs-18 fw-semibold m-0">Leads</h4>
+                    <h4 class="fs-18 fw-semibold m-0">Leads List</h4>
                 </div>
                 <div>
-                    <a href="{{ route('leads.create') }}" class="btn btn-primary">Add New Leads</a>
-                    <!-- <button class="btn btn-primary">Add New Customer</button> -->
+                    <a href="{{ route('leads.create') }}" class="btn btn-primary">Add New Lead</a>
                 </div>
             </div>
 
@@ -20,19 +19,69 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body pt-0">
-                            <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link active p-2" id="all_customer_tab" data-bs-toggle="tab"
-                                        href="#all_customer" role="tab">
-                                        <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
-                                        <span class="d-none d-sm-block">All Leads</span>
-                                    </a>
-                                </li>
+                            @php
+                                $statuses = [
+                                    'all' => ['label' => 'All', 'icon' => 'mdi-format-list-bulleted', 'color' => ''],
+                                    'new' => [
+                                        'label' => 'New',
+                                        'icon' => 'mdi-plus-circle-outline',
+                                        'color' => 'text-success',
+                                    ],
+                                    'contacted' => [
+                                        'label' => 'Contacted',
+                                        'icon' => 'mdi-phone-check',
+                                        'color' => 'text-warning',
+                                    ],
+                                    'qualified' => [
+                                        'label' => 'Qualified',
+                                        'icon' => 'mdi-check-circle-outline',
+                                        'color' => 'text-primary',
+                                    ],
+                                    'proposal' => [
+                                        'label' => 'Proposal',
+                                        'icon' => 'mdi-file-document-outline',
+                                        'color' => 'text-info',
+                                    ],
+                                    'won' => [
+                                        'label' => 'Won',
+                                        'icon' => 'mdi-trophy-outline',
+                                        'color' => 'text-success',
+                                    ],
+                                    'lost' => [
+                                        'label' => 'Lost',
+                                        'icon' => 'mdi-close-circle-outline',
+                                        'color' => 'text-danger',
+                                    ],
+                                    'nurture' => [
+                                        'label' => 'Nurture',
+                                        'icon' => 'mdi-leaf',
+                                        'color' => 'text-secondary',
+                                    ],
+                                ];
+
+                                $currentStatus = request()->get('status') ?? 'all';
+                            @endphp
+
+                            <ul class="nav nav-underline border-bottom" id="pills-tab" role="tablist">
+                                @foreach ($statuses as $key => $status)
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link {{ $currentStatus === $key ? 'active' : '' }} p-2"
+                                            href="{{ $key === 'all' ? route('leads.index') : route('leads.index', ['status' => $key]) }}">
+                                            <span class="d-block d-sm-none">
+                                                <i class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>
+                                            </span>
+                                            <span class="d-none d-sm-block">
+                                                <i
+                                                    class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>{{ $status['label'] }}
+                                            </span>
+                                        </a>
+                                    </li>
+                                @endforeach
                             </ul>
 
                             <div class="tab-content text-muted">
 
-                                <div class="tab-pane active show pt-4" id="all_customer" role="tabpanel">
+                                <div class="tab-pane active show" id="all_customer" role="tabpanel">
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="card shadow-none">
@@ -42,70 +91,109 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>Lead Id</th>
+                                                                <th>Lead Number</th>
                                                                 <th>Sales Person</th>
                                                                 <th>Customer Name</th>
                                                                 <th>Contact No</th>
                                                                 <th>Company Name</th>
                                                                 <th>Industry</th>
-                                                                <th>Source</th>
                                                                 <th>Requirement</th>
                                                                 <th>Budget</th>
                                                                 <th>Urgency</th>
                                                                 <th>Status</th>
-                                                                <th>Created By</th>
                                                                 <th>Actions</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($lead as $lead)
+                                                            @foreach ($leads as $lead)
                                                                 <tr>
                                                                     <td>{{ $lead->id }}</td>
-                                                                    <td>{{ $lead->staff->first_name. ' ' .$lead->staff->last_name }}</td>
-                                                                    <td>{{ $lead->first_name }} {{ $lead->last_name }}</td>
-                                                                    <td>{{ $lead->phone }}</td>
-                                                                    <td>{{ $lead->company_name }}</td>
-                                                                    <td>{{ $lead->industry_type }}</td>
-                                                                    <td>{{ $lead->source }}</td>
-                                                                    <td>{{ $lead->requirement_type }}</td>
+                                                                    <td>{{ $lead->lead_number }}</td>
+                                                                    <td>{{ $lead->staff->first_name . ' ' . $lead->staff->last_name }}
+                                                                    </td>
+                                                                    <td>{{ $lead->customer->first_name }}
+                                                                        {{ $lead->customer->last_name }}</td>
+                                                                    <td>{{ $lead->customer->phone }}</td>
+                                                                    <td>{{ $lead->companyDetails?->company_name ?? 'N/A' }}
+                                                                    </td>
+                                                                    <td>{{ $lead->customer->industry_type ?? 'N/A' }}</td>
+                                                                    <td>
+                                                                        @php
+                                                                            $requirementTypes = [
+                                                                                'servers' => 'Servers',
+                                                                                'cctv' => 'CCTV',
+                                                                                'biometric' => 'Biometric',
+                                                                                'networking' => 'Networking',
+                                                                                'laptops' => 'Laptops',
+                                                                                'desktops' => 'Desktops',
+                                                                                'accessories' => 'Accessories',
+                                                                                'other' => 'Other',
+                                                                            ];
+                                                                        @endphp
+                                                                        {{ $requirementTypes[$lead->requirement_type] }}
+                                                                    </td>
                                                                     <td>{{ $lead->budget_range }}</td>
                                                                     <td>
                                                                         @php
                                                                             $badgeClass = match ($lead->urgency) {
-                                                                                'Low' => 'bg-success-subtle text-success',
-                                                                                'Medium' => 'bg-warning-subtle text-warning',
-                                                                                'High' => 'bg-danger-subtle text-danger',
-                                                                                default => 'bg-secondary-subtle text-secondary',
-                                                                            };
-                                                                        @endphp
-                                                                        <span
-                                                                            class="badge fw-semibold {{ $badgeClass }}">
-                                                                            {{ $lead->urgency }}
-                                                                        </span>
-                                                                    </td>
-                                                                    <td>
-                                                                        @php
-                                                                            $badgeClass = match ($lead->status) {
-                                                                                'New'
+                                                                                'low'
                                                                                     => 'bg-success-subtle text-success',
-                                                                                'Contacted'
+                                                                                'medium'
                                                                                     => 'bg-warning-subtle text-warning',
-                                                                                'Qualified'
-                                                                                    => 'bg-primary-subtle text-primary',
-                                                                                'Quoted' => 'bg-info-subtle text-info',
-                                                                                'Lost'
+                                                                                'high'
                                                                                     => 'bg-danger-subtle text-danger',
                                                                                 default
                                                                                     => 'bg-secondary-subtle text-secondary',
                                                                             };
                                                                         @endphp
+                                                                        @php
+                                                                            $urgencyTypes = [
+                                                                                'low' => 'Low',
+                                                                                'medium' => 'Medium',
+                                                                                'high' => 'High',
+                                                                            ];
+                                                                        @endphp
+                                                                        <span
+                                                                            class="badge fw-semibold {{ $badgeClass }}">
+                                                                            {{ $urgencyTypes[$lead->urgency] }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        @php
+                                                                            $badgeClass = match ($lead->status) {
+                                                                                'new'
+                                                                                    => 'bg-success-subtle text-success',
+                                                                                'contacted'
+                                                                                    => 'bg-warning-subtle text-warning',
+                                                                                'qualified'
+                                                                                    => 'bg-primary-subtle text-primary',
+                                                                                'proposal'
+                                                                                    => 'bg-info-subtle text-info',
+                                                                                'won'
+                                                                                    => 'bg-success-subtle text-success',
+                                                                                'lost'
+                                                                                    => 'bg-danger-subtle text-danger',
+                                                                                'nurture'
+                                                                                    => 'bg-secondary-subtle text-secondary',
+                                                                            };
+                                                                        @endphp
+                                                                        @php
+                                                                            $statusTypes = [
+                                                                                'new' => 'New',
+                                                                                'contacted' => 'Contacted',
+                                                                                'qualified' => 'Qualified',
+                                                                                'proposal' => 'Proposal',
+                                                                                'won' => 'Won',
+                                                                                'lost' => 'Lost',
+                                                                                'nurture' => 'Nurtured',
+                                                                            ];
+                                                                        @endphp
 
                                                                         <span
                                                                             class="badge fw-semibold {{ $badgeClass }}">
-                                                                            {{ $lead->status }}
+                                                                            {{ $statusTypes[$lead->status] }}
                                                                         </span>
                                                                     </td>
-                                                                    <td>Super Admin</td>
-
                                                                     <td>
                                                                         <a aria-label="anchor"
                                                                             href="{{ route('leads.view', $lead->id) }}"

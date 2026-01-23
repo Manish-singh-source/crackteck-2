@@ -22,6 +22,7 @@ class Customer extends Authenticatable implements JWTSubject
         'password',
         'status',
         'created_by',
+        'is_lead',
     ];
 
     protected $hidden = [
@@ -74,5 +75,10 @@ class Customer extends Authenticatable implements JWTSubject
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function leads()
+    {
+        return $this->hasMany(Lead::class);
     }
 }

@@ -46,144 +46,247 @@
                         <div class="card-header border-bottom-dashed">
                             <div class="d-flex">
                                 <h5 class="card-title flex-grow-1 mb-0">
-                                    Leads Details
+                                    Customer Details
                                 </h5>
-                                <div class="fw-bold text-dark">
-                                    #{{ $lead->id }}
-                                </div>
                             </div>
                         </div>
 
                         <div class="card-body">
                             <div class="row">
-
-
                                 <div class="col-lg-6">
                                     <ul class="list-group list-group-flush ">
-
                                         <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
-                                            <span class="fw-semibold text-break">Client Name :
+                                            <span class="fw-semibold text-break">Customer Code :
                                             </span>
                                             <span>
-                                                {{ $lead->first_name }} {{ $lead->last_name }}
+                                                {{ $lead->customer->customer_code }}
                                             </span>
                                         </li>
-
                                         <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
-                                            <span class="fw-semibold text-break">Contact no :
+                                            <span class="fw-semibold text-break">Customer Name :
                                             </span>
                                             <span>
-                                                {{ $lead->phone ?? 'N/A' }}
+                                                {{ $lead->customer->first_name }} {{ $lead->customer->last_name }}
                                             </span>
                                         </li>
-
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Contact No :
+                                            </span>
+                                            <span>
+                                                {{ $lead->customer->phone }}
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush ">
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Email :
+                                            </span>
+                                            <span>
+                                                {{ $lead->customer->email }}
+                                            </span>
+                                        </li>
                                         <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
                                             <span class="fw-semibold text-break">Gender :
                                             </span>
                                             <span>
-                                                {{ $lead->gender ?? 'N/A' }}
+                                                {{ $lead->customer->gender }}
                                             </span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
                                             <span class="fw-semibold text-break">Date of Birth :
                                             </span>
                                             <span>
-                                                {{ $lead->dob ?? 'N/A' }}
+                                                {{ $lead->customer->dob }}
                                             </span>
                                         </li>
-                                        <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
-                                            <span class="fw-semibold text-break">Source :
-                                            </span>
-                                            <span>
-                                                {{ $lead->source ?? 'N/A' }}
-                                            </span>
-                                        </li>
-                                        <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
-                                            <span class="fw-semibold text-break">Budget Range :
-                                            </span>
-                                            <span>
-                                                {{ $lead->budget_range ?? 'N/A' }}
-                                            </span>
-                                        </li>
-                                        <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
-                                            <span class="fw-semibold text-break">Lead Status :
-                                            </span>
-                                            @php
-                                                $badgeClass = match ($lead->status) {
-                                                    'New' => 'bg-success-subtle text-success',
-                                                    'Contacted' => 'bg-warning-subtle text-warning',
-                                                    'Qualified' => 'bg-primary-subtle text-primary',
-                                                    'Quoted' => 'bg-info-subtle text-info',
-                                                    'Lost' => 'bg-danger-subtle text-danger',
-                                                    default => 'bg-secondary-subtle text-secondary',
-                                                };
-                                            @endphp
-                                            <span>
-                                                <span class="badge fw-semibold {{ $badgeClass }}">
-                                                    {{ $lead->status ?? 'N/A' }}
-                                                </span>
-                                            </span>
-                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
 
+                    </div>
 
+                    <div class="card">
+                        <div class="card-header border-bottom-dashed">
+                            <div class="d-flex">
+                                <h5 class="card-title flex-grow-1 mb-0">
+                                    Address/Branch Details
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush ">
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Branch Name :
+                                            </span>
+                                            <span>
+                                                {{ $lead->customerAddress->branch_name ?? 'N/A' }}
+                                            </span>
+                                        </li>
+                                        
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Address Line 2 :
+                                            </span>
+                                            <span>
+                                                {{ $lead->customerAddress->address2 ?? 'N/A' }}
+                                            </span>
+                                        </li>
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">State :
+                                            </span>
+                                            <span>
+                                                {{ $lead->customerAddress->state ?? 'N/A' }}
+                                            </span>
+                                        </li>                                        
                                     </ul>
                                 </div>
                                 <div class="col-lg-6">
                                     <ul class="list-group list-group-flush ">
-
                                         <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
-                                            <span class="fw-semibold text-break">Email :
+                                            <span class="fw-semibold text-break">Address Line 1 :
                                             </span>
                                             <span>
-                                                {{ $lead->email ?? 'N/A' }}
+                                                {{ $lead->customerAddress->address1 ?? 'N/A' }}
                                             </span>
                                         </li>
-
                                         <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
-                                            <span class="fw-semibold text-break">Company Name :
+                                            <span class="fw-semibold text-break">City :
                                             </span>
                                             <span>
-                                                {{ $lead->company_name ?? 'N/A' }}
+                                                {{ $lead->customerAddress->city ?? 'N/A' }}
                                             </span>
                                         </li>
-
                                         <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
-                                            <span class="fw-semibold text-break">Designation :
+                                            <span class="fw-semibold text-break">Pincode :
                                             </span>
                                             <span>
-                                                {{ $lead->designation ?? 'N/A' }}
+                                                {{ $lead->customerAddress->pincode ?? 'N/A' }}
                                             </span>
                                         </li>
+                                         
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
 
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header border-bottom-dashed">
+                            <div class="d-flex">
+                                <h5 class="card-title flex-grow-1 mb-0">
+                                    Lead Details
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                {{-- lead_number
+                                requirement_type
+                                budget_range
+                                urgency
+                                status
+                                estimated_value
+                                notes --}}
+
+                                <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush ">
                                         <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
-                                            <span class="fw-semibold text-break">Industry Type :
+                                            <span class="fw-semibold text-break">Lead Number :
                                             </span>
                                             <span>
-                                                {{ $lead->industry_type ?? 'N/A' }}
+                                                {{ $lead->lead_number }}
                                             </span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
                                             <span class="fw-semibold text-break">Requirement Type :
                                             </span>
                                             <span>
-                                                {{ $lead->requirement_type ?? 'N/A' }}
+                                                {{ $lead->requirement_type }}
                                             </span>
                                         </li>
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Budget Range :
+                                            </span>
+                                            <span>
+                                                {{ $lead->budget_range }}
+                                            </span>
+                                        </li>
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Notes :
+                                            </span>
+                                            <span>
+                                                {{ $lead->notes }}
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush ">
                                         <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
                                             <span class="fw-semibold text-break">Urgency :
                                             </span>
-                                            <span>
-                                                {{ $lead->urgency ?? 'N/A' }}
+                                            @php
+                                                $urgencyTypes = [
+                                                    'low' => 'Low',
+                                                    'medium' => 'Medium',
+                                                    'high' => 'High',
+                                                ];
+                                            @endphp
+                                            @php
+                                                $badgeClass = match ($lead->urgency) {
+                                                    'low' => 'bg-success-subtle text-success',
+                                                    'medium' => 'bg-warning-subtle text-warning',
+                                                    'high' => 'bg-danger-subtle text-danger',
+                                                };
+                                            @endphp
+                                            <span class="badge {{ $badgeClass }} fw-semibold">
+                                                {{ $urgencyTypes[$lead->urgency] }}
                                             </span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
-                                            <span class="fw-semibold text-break">Sales Person :
+                                            <span class="fw-semibold text-break">Status :
                                             </span>
-                                            <span>
-                                                {{ $lead->user->first_name ?? 'N/A' }}
+                                            @php
+                                                $statusTypes = [
+                                                    'new' => 'New',
+                                                    'contacted' => 'Contacted',
+                                                    'qualified' => 'Qualified',
+                                                    'proposal' => 'Proposal',
+                                                    'won' => 'Won',
+                                                    'lost' => 'Lost',
+                                                    'nurture' => 'Nurtured',
+                                                ];
+                                            @endphp
+                                            @php
+                                                $badgeClass = match ($lead->status) {
+                                                    'new' => 'bg-success-subtle text-success',
+                                                    'contacted' => 'bg-warning-subtle text-warning',
+                                                    'qualified' => 'bg-primary-subtle text-primary',
+                                                    'proposal' => 'bg-info-subtle text-info',
+                                                    'won' => 'bg-success-subtle text-success',
+                                                    'lost' => 'bg-danger-subtle text-danger',
+                                                    'nurture' => 'bg-secondary-subtle text-secondary',
+                                                };
+                                            @endphp
+                                            <span class="badge {{ $badgeClass }} fw-semibold">
+                                                {{ $statusTypes[$lead->status] }}
                                             </span>
                                         </li>
-
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Estimated Value :
+                                            </span>
+                                            <span>
+                                                {{ $lead->estimated_value }}
+                                            </span>
+                                        </li>
+                                        
                                     </ul>
                                 </div>
                             </div>
@@ -191,98 +294,7 @@
 
                     </div>
 
-                    <!-- Branch Information Section -->
-                    @if($lead->branches && $lead->branches->count() > 0)
-                    <div class="card mt-3">
-                        <div class="card-header border-bottom-dashed">
-                            <h5 class="card-title mb-0">
-                                Branch Information
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-borderless dt-responsive nowrap">
-                                    <thead>
-                                        <tr>
-                                            <th>Branch Name</th>
-                                            <th>Address</th>
-                                            <th>City</th>
-                                            <th>State</th>
-                                            <th>Country</th>
-                                            <th>Pincode</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($lead->branches as $branch)
-                                        <tr>
-                                            <td>{{ $branch->branch_name }}</td>
-                                            <td>
-                                                {{ $branch->address_line1 }}
-                                                @if($branch->address_line2)
-                                                    , {{ $branch->address_line2 }}
-                                                @endif
-                                            </td>
-                                            <td>{{ $branch->city }}</td>
-                                            <td>{{ $branch->state }}</td>
-                                            <td>{{ $branch->country }}</td>
-                                            <td>{{ $branch->pincode }}</td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
-
                 </div>
-                {{-- <div class="col-xl-4 mx-auto">
-                    <div class="card">
-                        <div class="card-body">
-                            <form class="row g-3">
-                                <div class="col-12">
-                                    @include('components.form.select', [
-                                        'label' => 'Lead Status',
-                                        'name' => 'status',
-                                        'options' => [
-                                            '0' => '--Select Status--',
-                                            '1' => 'New',
-                                            '2' => 'Contacted',
-                                            '3' => 'Qualified',
-                                            '4' => 'Quoted',
-                                            'Converted',
-                                            '5' => 'Lost',
-                                        ],
-                                    ])
-                                </div>
-                                <div class="col-12">
-                                    @include('components.form.select', [
-                                        'label' => 'AMC Type',
-                                        'name' => 'amc_type',
-                                        'options' => [
-                                            '0' => '--Select AMC Type--',
-                                            '1' => 'AMC',
-                                            '2' => 'Non AMC',
-                                        ],
-                                    ])
-                                </div>
-                                <div class="col-12">
-                                    @include('components.form.input', [
-                                        'label' => 'Reasons',
-                                        'name' => 'region',
-                                        'type' => 'text',
-                                        'placeholder' => 'Enter Reasons',
-                                    ])
-                                </div>
-
-
-                                <div class="col-12 mt-3">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div> --}}
             </div>
         </div>
     </div>

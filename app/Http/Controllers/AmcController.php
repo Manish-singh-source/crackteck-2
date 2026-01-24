@@ -24,7 +24,7 @@ class AmcController extends Controller
     public function create()
     {
         $coveredItems = CoveredItem::all();
-
+        // dd($coveredItems);
         return view('/crm/amc-plans/create', compact('coveredItems'));
     }
 
@@ -38,7 +38,6 @@ class AmcController extends Controller
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
-        // dd($request->all());
 
         try {
             $amc = new AmcPlan;
@@ -70,7 +69,6 @@ class AmcController extends Controller
             return redirect()->route('amc-plans.index')->with('success', 'AMC Plan added successfully.');
         } catch (\Exception $e) {
             Log::error('AMC Plan Store Error: '.$e->getMessage());
-
             return redirect()->back()->with('error', 'Error creating AMC Plan: '.$e->getMessage())->withInput();
         }
     }
@@ -175,9 +173,17 @@ class AmcController extends Controller
         return redirect()->route('amc-plans.index')->with('success', 'AMC Plan deleted successfully.');
     }
 
+
+
     public function coveredItems()
     {
-        $coveredItems = CoveredItem::all();
+        $coveredItems = CoveredItem::query();
+
+        if ($status = request()->get('status')) {
+            $coveredItems->where('status', $status);
+        }
+
+        $coveredItems = $coveredItems->get();
 
         return view('/crm/amc-plans/covered-items/index', compact('coveredItems'));
     }
@@ -191,21 +197,23 @@ class AmcController extends Controller
     {
         // 1) Validate input
         $validated = $request->validate([
-            'service_type' => 'required|in:0,1,2,3',
+            'service_type' => 'required|in:amc,quick_service,installation,repair',
             'service_name' => 'required|string|max:255',
             // service_charge required only when type is NOT 0 (AMC)
             'service_charge' => 'nullable|numeric|min:0|required_unless:service_type,0',
-            'status' => 'nullable|in:0,1',
+            'status' => 'nullable|in:active,inactive',
             'diagnosis_list' => 'nullable|string', // JSON string from hidden field
         ]);
-
+    
         try {
             DB::beginTransaction();
 
             $data = $validated;
 
+            // dd($data);
+
             // Default status = Active (1) if not sent
-            $data['status'] = $request->input('status', 1);
+            $data['status'] = $request->input('status', 'active');
 
             // Decode diagnosis_list JSON to array and clean it
             $diagnosis = [];
@@ -222,12 +230,21 @@ class AmcController extends Controller
                 'item_code' => CoveredItem::generateItemCode($data['service_type']),
                 'service_type' => $data['service_type'],            // 0,1,2,3
                 'service_name' => $data['service_name'],
-                'service_charge' => $data['service_type'] === '0'
+                'service_charge' => $data['service_type'] === 'amc'
                     ? null
                     : ($data['service_charge'] ?? null),
                 'status' => $data['status'],                 // 0/1
                 'diagnosis_list' => $diagnosis,                      // array, casted as JSON
             ]);
+
+            if(!$coveredItem) {
+                DB::rollBack();
+
+                return redirect()
+                    ->back()
+                    ->with('error', 'An error occurred while creating the service.')
+                    ->withInput();
+            }
 
             DB::commit();
 
@@ -253,7 +270,6 @@ class AmcController extends Controller
     public function editCoveredItems($id)
     {
         $coveredItem = CoveredItem::findOrFail($id);
-
         return view('/crm/amc-plans/covered-items/edit', compact('coveredItem'));
     }
 
@@ -261,17 +277,17 @@ class AmcController extends Controller
     {
         // 1) Validate input
         $validated = $request->validate([
-            'service_type' => 'required|in:0,1,2,3',
+            'service_type' => 'required|in:amc,quick_service,installation,repair',
             'service_name' => 'required|string|max:255',
             'service_charge' => 'nullable|numeric|min:0|required_unless:service_type,0',
-            'status' => 'nullable|in:0,1',
+            'status' => 'nullable|in:active,inactive',
             'diagnosis_list' => 'nullable|string',
         ]);
 
         $coveredItem = CoveredItem::findOrFail($id);
 
         $data = $validated;
-        $data['status'] = $request->input('status', 1);
+        $data['status'] = $request->input('status', 'active');
 
         $diagnosis = [];
         if ($request->filled('diagnosis_list')) {
@@ -285,7 +301,7 @@ class AmcController extends Controller
         $coveredItem->update([
             'service_type' => $data['service_type'],
             'service_name' => $data['service_name'],
-            'service_charge' => $data['service_type'] === '0'
+            'service_charge' => $data['service_type'] === 'amc'
                 ? null
                 : ($data['service_charge'] ?? null),
             'status' => $data['status'],

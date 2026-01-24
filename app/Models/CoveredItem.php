@@ -26,7 +26,7 @@ class CoveredItem extends Model
 
     public static function generateItemCode($typeCode): string
     {
-        $typeName = static::getServiceTypeName($typeCode);          // e.g. "Installation"
+        $typeName = $typeCode;          // e.g. "Installation"
         $typeSlug = Str::upper(Str::slug($typeName, ''));           // "INSTALLATION"
 
         $random = Str::upper(Str::random(4));                     // 4 random chars

@@ -18,131 +18,40 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-body border border-dashed border-end-0 border-start-0">
-                            <form action="#" method="get">
-                                <div class="d-flex justify-content-between">
-                                    <div class="row">
-                                        <div class="col-xl-10 col-md-10 col-sm-10">
-                                            <div class="search-box">
-                                                <input type="text" name="search" value=""
-                                                    class="form-control search" placeholder="Search By Pincode">
-                                                <i class="ri-search-line search-icon"></i>
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-2 col-md-2 col-sm-2 col-2">
-                                            <div class="d-flex justify-content-center align-items-center">
-                                                <button type="submit" class="btn btn-primary waves ripple-light">
-                                                    <i class="fa-solid fa-magnifying-glass "></i>
-
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row g-3">
-                                        <div class="col-xl-6 col-md-6 col-sm-6 col-6 btn-group" role="group">
-                                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fa-solid fa-arrow-up-z-a "></i>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="#">Sort By Name</a></li>
-                                            </ul>
-                                        </div>
-
-                                        <div class="col-xl-6 col-md-6 col-sm-6 col-6 btn-group" role="group">
-                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#standard-modal">
-                                                <i class="fa-solid fa-filter "></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="modal fade" id="standard-modal" tabindex="-1"
-                                        aria-labelledby="standard-modalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="standard-modalLabel">Filters</h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                                </div>
-
-                                                <div class="modal-body px-3 py-md-2">
-                                                    <h5>Delivery Status</h5>
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check mb-2">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault1">
-                                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                                        Avaliable
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault2">
-                                                                    <label class="form-check-label" for="flexRadioDefault2">
-                                                                        Not Avaliable
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-body px-3 py-md-2">
-                                                    <h5>Installation Status</h5>
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check mb-2">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault3">
-                                                                    <label class="form-check-label" for="flexRadioDefault3">
-                                                                        Avaliable
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault4">
-                                                                    <label class="form-check-label" for="flexRadioDefault4">
-                                                                        Not Avaliable
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-light"
-                                                        data-bs-dismiss="modal">Close</button>
-                                                    <button type="button" class="btn btn-primary">Save changes</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                            </form>
-                        </div>
                         <div class="card-body pt-0">
-                            <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link active p-2" id="all_customer_tab" data-bs-toggle="tab"
-                                        href="#all_customer" role="tab">
-                                        <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
-                                        <span class="d-none d-sm-block">All Covered Items</span>
-                                    </a>
-                                </li>
+                            @php
+                                $statuses = [
+                                    'all' => ['label' => 'All', 'icon' => 'mdi-format-list-bulleted', 'color' => ''],
+                                    'active' => [
+                                        'label' => 'Active',
+                                        'icon' => 'mdi-check-circle-outline',
+                                        'color' => 'text-success',
+                                    ],
+                                    'inactive' => [
+                                        'label' => 'Inactive',
+                                        'icon' => 'mdi-close-circle-outline',
+                                        'color' => 'text-danger',
+                                    ],
+                                ];
+
+                                $currentStatus = request()->get('status') ?? 'all';
+                            @endphp
+
+                            <ul class="nav nav-underline border-bottom" id="pills-tab" role="tablist">
+                                @foreach ($statuses as $key => $status)
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link {{ $currentStatus === $key ? 'active' : '' }} p-2"
+                                            href="{{ $key === 'all' ? route('covered-items.index') : route('covered-items.index', ['status' => $key]) }}">
+                                            <span class="d-block d-sm-none">
+                                                <i class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>
+                                            </span>
+                                            <span class="d-none d-sm-block">
+                                                <i
+                                                    class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>{{ $status['label'] }}
+                                            </span>
+                                        </a>
+                                    </li>
+                                @endforeach
                             </ul>
 
                             <div class="tab-content text-muted">
@@ -172,22 +81,14 @@
                                                                     <td>{{ $item->id }}</td>
                                                                     <td>{{ $item->item_code }}</td>
                                                                     <td>
-                                                                        @if ($item->service_type == 0) {
-                                                                            AMC
-                                                                        } @elseif ($item->service_type == 1) {
-                                                                            Quick Service
-                                                                        } @elseif ($item->service_type == 2) {
-                                                                            Installation
-                                                                        } @elseif ($item->service_type == 3) {
-                                                                            Repair
-                                                                        } @endif
+                                                                        {{ ucwords(str_replace('_', ' ', $item->service_type)) }}
                                                                     </td>
                                                                     <td>{{ $item->service_name }}</td>
                                                                     <td>{{ $item->service_charge }}</td>
                                                                     <td>
                                                                         <span
-                                                                            class="badge {{ $item->status == 1 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
-                                                                        {{ $item->status == 1 ? 'Active' : 'Inactive' }}
+                                                                            class="badge {{ $item->status == 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
+                                                                            {{ $item->status == 'active' ? 'Active' : 'Inactive' }}
                                                                     </td>
                                                                     <td>{{ count($item->diagnosis_list) }}</td>
                                                                     <td>
@@ -199,7 +100,10 @@
                                                                             <i
                                                                                 class="mdi mdi-pencil-outline fs-14 text-warning"></i>
                                                                         </a>
-                                                                        <form action="{{ route('covered-items.delete', $item->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this covered item?');">
+                                                                        <form
+                                                                            action="{{ route('covered-items.delete', $item->id) }}"
+                                                                            method="POST" style="display: inline-block;"
+                                                                            onsubmit="return confirm('Are you sure you want to delete this covered item?');">
                                                                             @csrf
                                                                             @method('DELETE')
                                                                             <button type="submit" aria-label="anchor"

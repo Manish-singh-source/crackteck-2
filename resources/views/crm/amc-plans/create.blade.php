@@ -208,8 +208,8 @@
                                                     'name' => 'pay_terms',
                                                     'options' => [
                                                         '' => '--Select --',
-                                                        '0' => 'Full Payment',
-                                                        '1' => 'Installments',
+                                                        'full_payment' => 'Full Payment',
+                                                        'installments' => 'Installments',
                                                     ],
                                                     'value' => old('pay_terms'),
                                                 ])
@@ -242,9 +242,9 @@
                                                     'name' => 'support_type',
                                                     'options' => [
                                                         '' => '--Select --',
-                                                        '0' => 'Onsite',
-                                                        '1' => 'Remote',
-                                                        '2' => 'Both',
+                                                        'onsite' => 'Onsite',
+                                                        'remote' => 'Remote',
+                                                        'both' => 'Both',
                                                     ],
                                                     'value' => old('support_type'),
                                                 ])
@@ -307,10 +307,6 @@
                                                     <div class="text-danger small mt-1">{{ $message }}</div>
                                                 @enderror
                                             </div>
-
-
-
-
                                         </div>
                                     </div>
                                 </div>
@@ -367,8 +363,8 @@
                                                     'name' => 'status',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'inactive' => 'Inactive',
+                                                        'active' => 'Active',
                                                     ],
                                                     'value' => old('status', '1'),
                                                 ])
@@ -595,12 +591,12 @@
                     chip.dataset.id = id;
 
                     chip.innerHTML = `
-                <span>${label}</span>
-                <button type="button"
-                        class="btn-close btn-close-white btn-sm"
-                        aria-label="Remove"
-                        style="font-size: 0.5rem;"></button>
-            `;
+                        <span>${label}</span>
+                        <button type="button"
+                                class="btn-close btn-close-white btn-sm"
+                                aria-label="Remove"
+                                style="font-size: 0.5rem;"></button>
+                    `;
 
                     // Insert before search input
                     control.insertBefore(chip, searchInput);

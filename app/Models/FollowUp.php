@@ -21,36 +21,13 @@ class FollowUp extends Model
         'next_followup_date',
     ];
 
-    public function setStatusAttribute($value)
-    {
-        $map = [
-            'pending' => '0',
-            'completed' => '1',
-            'rescheduled' => '2',
-            'cancelled' => '3',
-        ];
-
-        $this->attributes['status'] = is_numeric($value)
-            ? $value
-            : ($map[strtolower($value)] ?? null);
-    }
-    
-    public function setFollowupTypeAttribute($value)
-    {
-        $map = [
-            'call' => '0',
-            'email' => '1',
-            'meeting' => '2',
-            'sms' => '3',
-        ];
-
-        $this->attributes['followup_type'] = is_numeric($value)
-            ? $value
-            : ($map[strtolower($value)] ?? null);
-    }
-
     public function leadDetails()
     {
         return $this->belongsTo(Lead::class, 'lead_id', 'id');
+    }
+
+    public function staffDetails()
+    {
+        return $this->belongsTo(Staff::class, 'staff_id', 'id');
     }
 }

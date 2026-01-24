@@ -20,35 +20,54 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body pt-0">
-                            <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link active p-2" id="all_customer_tab" data-bs-toggle="tab"
-                                        href="#all_customer" role="tab">
-                                        <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
-                                        <span class="d-none d-sm-block">All Follow-Up</span>
-                                    </a>
-                                </li>
-                                <!-- <li class="nav-item">
-                                    <a class="nav-link p-2" id="active_customer_tab" data-bs-toggle="tab" href="#active_customer"
-                                        role="tab">
-                                        <span class="d-block d-sm-none"><i
-                                                class="mdi mdi-sitemap-outline"></i></span>
-                                        <span class="d-none d-sm-block">Active Customer</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link p-2" id="banned_customers_tab" data-bs-toggle="tab"
-                                        href="#banned_customers" role="tab">
-                                        <span class="d-block d-sm-none"><i
-                                                class="mdi mdi-sitemap-outline"></i></span>
-                                        <span class="d-none d-sm-block">Banned Customer</span>
-                                    </a>
-                                </li> -->
+                            @php
+                                $statuses = [
+                                    'all' => ['label' => 'All', 'icon' => 'mdi-format-list-bulleted', 'color' => ''],
+                                    'pending' => [
+                                        'label' => 'Pending',
+                                        'icon' => 'mdi-timer-sand',
+                                        'color' => 'text-warning',
+                                    ],
+                                    'completed' => [
+                                        'label' => 'Completed',
+                                        'icon' => 'mdi-check-circle-outline',
+                                        'color' => 'text-success',
+                                    ],
+                                    'rescheduled' => [
+                                        'label' => 'Rescheduled',
+                                        'icon' => 'mdi-clock-outline',
+                                        'color' => 'text-primary',
+                                    ],
+                                    'cancelled' => [
+                                        'label' => 'Cancelled',
+                                        'icon' => 'mdi-close-circle-outline',
+                                        'color' => 'text-danger',
+                                    ],
+                                ];
+
+                                $currentStatus = request()->get('status') ?? 'all';
+                            @endphp
+
+                            <ul class="nav nav-underline border-bottom" id="pills-tab" role="tablist">
+                                @foreach ($statuses as $key => $status)
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link {{ $currentStatus === $key ? 'active' : '' }} p-2"
+                                            href="{{ $key === 'all' ? route('follow-up.index') : route('follow-up.index', ['status' => $key]) }}">
+                                            <span class="d-block d-sm-none">
+                                                <i class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>
+                                            </span>
+                                            <span class="d-none d-sm-block">
+                                                <i
+                                                    class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>{{ $status['label'] }}
+                                            </span>
+                                        </a>
+                                    </li>
+                                @endforeach
                             </ul>
 
                             <div class="tab-content text-muted">
 
-                                <div class="tab-pane active show pt-4" id="all_customer" role="tabpanel">
+                                <div class="tab-pane active show" id="all_customer" role="tabpanel">
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="card shadow-none">
@@ -57,15 +76,14 @@
                                                         class="table table-striped table-borderless dt-responsive nowrap">
                                                         <thead>
                                                             <tr>
-                                                                <th>Lead Id</th>
+                                                                <th>Follow-Up Id</th>
+                                                                <th>Lead Number</th>
                                                                 <th>Client Name</th>
                                                                 <th>Contact Number</th>
                                                                 <th>Email</th>
                                                                 <th>Follow-Up Date</th>
                                                                 <th>Follow-Up Time</th>
                                                                 <th>Status</th>
-                                                                <th>Remarks</th>
-                                                                <th>Created By</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
@@ -73,32 +91,37 @@
                                                             @foreach ($followup as $followup)
                                                                 <tr>
                                                                     <td>
-                                                                        <a href="">
-                                                                            {{ $followup->lead_id }}
-                                                                        </a>
+                                                                        {{ $followup->id }}
                                                                     </td>
-                                                                    <td>{{ $followup->lead->first_name }} {{ $followup->lead->last_name }}</td>
-                                                                    <td>{{ $followup->lead->phone }}</td>
-                                                                    <td>{{ $followup->lead->email }}</td>
+                                                                    <td>{{ $followup->leadDetails->lead_number }}</td>
+                                                                    <td>{{ $followup->leadDetails->customer->first_name }}
+                                                                        {{ $followup->leadDetails->customer->last_name }}
+                                                                    </td>
+                                                                    <td>{{ $followup->leadDetails->customer->phone }}</td>
+                                                                    <td>{{ $followup->leadDetails->customer->email }}</td>
                                                                     <td>{{ $followup->followup_date }}</td>
                                                                     <td>{{ $followup->followup_time }}</td>
                                                                     <td>
                                                                         @php
                                                                             $badgeClass = match ($followup->status) {
-                                                                                'Pending' => 'bg-warning-subtle text-warning',
-                                                                                'Done' => 'bg-success-subtle text-success',
-                                                                                'Rescheduled' => 'bg-primary-subtle text-primary',
-                                                                                'Cancelled' => 'bg-danger-subtle text-danger',
-                                                                                default => 'bg-secondary-subtle text-secondary',
+                                                                                'pending' => 'bg-warning-subtle text-warning',
+                                                                                'completed' => 'bg-success-subtle text-success',
+                                                                                'rescheduled' => 'bg-primary-subtle text-primary',
+                                                                                'cancelled' => 'bg-danger-subtle text-danger',
                                                                             };
                                                                         @endphp
-                                                                        <span
-                                                                            class="badge fw-semibold {{ $badgeClass }}">
-                                                                            {{ $followup->status }}
-                                                                        </span>
+                                                                        @php
+                                                                            $statusTypes = [
+                                                                                'pending' => 'Pending',
+                                                                                'completed' => 'Completed',
+                                                                                'rescheduled' => 'Rescheduled',
+                                                                                'cancelled' => 'Cancelled',
+                                                                            ];
+                                                                        @endphp
+                                                                        <span class="badge fw-semibold {{ $badgeClass }}">
+                                                                            {{ $statusTypes[$followup->status] }}
+                                                                        </span> 
                                                                     </td>
-                                                                    <td>{{ $followup->remarks }}</td>
-                                                                    <td>Admin</td>
                                                                     <td>
                                                                         <a href="{{ route('follow-up.view-page', $followup->id) }}"
                                                                             class="btn btn-icon btn-sm bg-primary-subtle me-1"

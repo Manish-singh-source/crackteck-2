@@ -44,20 +44,6 @@
 
                                     <div class="card-body">
                                         <div class="row g-3">
-                                            {{-- <div class="col-6">
-                                                @include('components.form.select', [
-                                                    'label' => 'Lead Id',
-                                                    'name' => 'lead_id',
-                                                    'options' => [
-                                                        '0' => '--Select Lead id--',
-                                                        'L-001' => 'L-001',
-                                                        'L-002' => 'L-002',
-                                                        'L-003' => 'L-003',
-                                                        'L-004' => 'L-004',
-                                                        'L-005' => 'L-005',
-                                                    ],
-                                                ])
-                                            </div> --}}
                                             <div class="col-6">
                                                 <label for="warehouse" class="form-label">Lead Id <span
                                                         class="text-danger">*</span></label>
@@ -122,22 +108,6 @@
                                                 ])
                                             </div>
                                             
-                                            <!-- <div class="col-6">
-                                                    <label for="assignedSalesRep" class="form-label">Assigned Sales Rep</label>
-                                                    <select class="form-control" name="assignedSalesRep" id="assignedSalesRep">
-                                                        <option selected disabled>-- Select Sales Rep --</option>
-                                                        <option value="">John Doe</option>
-                                                        <option value="">Mike Doe</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-6">
-                                                    <label for="engineer" class="form-label">Engineer (if any)</label>
-                                                    <select class="form-control" name="engineer" id="engineer">
-                                                        <option selected disabled>-- Select Sales Rep --</option>
-                                                        <option value="">John Doe</option>
-                                                        <option value="">Mike Doe</option>
-                                                    </select>
-                                                </div> -->
                                             <div class="col-6">
                                                 <label for="meetAgenda" class="form-label">Meeting Agenda / Notes<span
                                                         class="text-danger">*</span></label>
@@ -169,7 +139,7 @@
                                                     'label' => 'Status',
                                                     'name' => 'status',
                                                     'options' => [
-                                                        '0' => '--Select Sales Rep--',
+                                                        '' => '--Select Sales Rep--',
                                                         'Scheduled' => 'Scheduled',
                                                         'Confirmed' => 'Confirmed',
                                                         'Completed' => 'Completed',
@@ -215,7 +185,7 @@
             let leadId = this.value;
 
             if (leadId) {
-                fetch(`/crm/fetch-leads/${leadId}`)
+                fetch(`/demo/crm/fetch-leads/${leadId}`)
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)

@@ -44,19 +44,6 @@
 
                                     <div class="card-body">
                                         <div class="row g-3">
-                                            {{-- <div class="col-6">
-                                                @include('components.form.select', [
-                                                    'label' => 'Lead Id',
-                                                    'name' => 'lead_id',
-                                                    'options' => [
-                                                        '0' => '--Select Lead--',
-                                                        'L-001' => 'L-001',
-                                                        'L-002' => 'L-002',
-                                                        'L-003' => 'L-003',
-                                                        'L-004' => 'L-004',
-                                                    ],
-                                                ])
-                                            </div> --}}
                                             <div class="col-6">
                                                 <label for="warehouse" class="form-label">Lead Id <span
                                                         class="text-danger">*</span></label>
@@ -65,7 +52,7 @@
                                                     @foreach ($leads as $lead)
                                                         <option value="{{ $lead->id }}"
                                                             {{ old('lead_id') == $lead->id ? 'selected' : '' }}>
-                                                            {{ $lead->id . ' - ' . $lead->first_name . ' ' . $lead->last_name }}
+                                                            {{ $lead->id . ' - ' . $lead->lead_number }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -82,7 +69,28 @@
                                                     'placeholder' => 'Select Lead',
                                                     'readonly' => true,
                                                 ])
+                                            </div>
 
+                                            <div class="col-6">
+                                                @include('components.form.input', [
+                                                    'label' => 'Sales Person Name',
+                                                    'name' => 'staff_name',
+                                                    'id' => 'staff_name',
+                                                    'type' => 'text',
+                                                    'placeholder' => 'Select Lead',
+                                                    'readonly' => true,
+                                                ])
+                                            </div>
+
+                                            <div class="col-6 d-none">
+                                                @include('components.form.input', [
+                                                    'label' => 'Sales Person Name',
+                                                    'name' => 'staff_id',
+                                                    'id' => 'staff_id',
+                                                    'type' => 'text',
+                                                    'placeholder' => 'Select Lead',
+                                                    'readonly' => true,
+                                                ])
                                             </div>
 
                                             <div class="col-6">
@@ -128,11 +136,11 @@
                                                     'label' => 'Status',
                                                     'name' => 'status',
                                                     'options' => [
-                                                        '0' => '--Select--',
-                                                        'Pending' => 'Pending',
-                                                        'Done' => 'Done',
-                                                        'Rescheduled' => 'Rescheduled',
-                                                        'Cancelled' => 'Cancelled',
+                                                        '' => '--Select--',
+                                                        'pending' => 'Pending',
+                                                        'completed' => 'Completed',
+                                                        'rescheduled' => 'Rescheduled',
+                                                        'cancelled' => 'Cancelled',
                                                     ],
                                                 ])
                                             </div>
@@ -144,22 +152,11 @@
                                         </div>
                                     </div>
                                 </div>
-
-
-
-                                <!-- <div class="text-start mb-3">
-                                                            <button type="submit" class="btn btn-success w-sm waves ripple-light">
-                                                                Submit
-                                                            </button>
-                                                        </div> -->
                             </div>
 
 
                             <div class="col-lg-12">
                                 <div class="text-start mb-3">
-                                    {{-- <a href="{{ route('follow-up.index') }}" class="btn btn-success w-sm waves ripple-light">
-                                Submit
-                            </a> --}}
                                     <button type="submit" class="btn btn-success w-sm waves ripple-light">
                                         Submit
                                     </button>
@@ -190,17 +187,33 @@
             let leadId = this.value;
 
             if (leadId) {
-                fetch(`/crm/fetch-leads/${leadId}`)
-                    .then(response => response.json())
+                // Send GET request to fetch lead data
+                fetch(`/demo/crm/fetch-leads/${leadId}`)
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`Network response was not ok: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        console.log(data)
+                        console.log('Data:', data);
+                        // If no error in data, update the form fields
                         if (!data.error) {
-                            document.querySelector('[name="client_name"]').value = data.client_name ?? '';
-                            document.querySelector('[name="email"]').value = data.email ?? '';
-                            document.querySelector('[name="contact"]').value = data.phone ?? '';
+                            document.querySelector('[name="staff_name"]').value = data.staff_name || '';
+                            document.querySelector('[name="staff_id"]').value = data.staff_id || '';
+                            document.querySelector('[name="client_name"]').value = data.client_name || '';
+                            document.querySelector('[name="email"]').value = data.email || '';
+                            document.querySelector('[name="contact"]').value = data.email || '';
+                            document.querySelector('[name="contact"]').value = data.phone || '';
+                        } else {
+                            alert('Error: ' + data.error);
                         }
                     })
-                    .catch(error => console.error('Error:', error));
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while fetching the lead data: ' + error.message);
+                    });
             }
         });
     </script>

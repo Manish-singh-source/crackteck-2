@@ -43,32 +43,31 @@
                                     <div class="card-body">
                                         <div class="row g-3">
                                             <div class="col-6">
-                                                @include('components.form.input', [
-                                                    'label' => 'Lead Id',
-                                                    'name' => 'lead_id',
-                                                    'options' => [],
-                                                    'model' => $followup,
-                                                    'readonly' => true,
-                                                ])
+                                                <label for="lead_id" class="form-label">Lead Id</label>
+                                                <input type="text" name="lead_id" id="lead_id" class="form-control"
+                                                    value="{{ ($followup->lead_id ?? '') . ' - ' . ($followup->leadDetails->lead_number ?? '') }}" readonly>
                                             </div>
+
                                             <div class="col-6">
-                                                @include('components.form.input', [
-                                                    'label' => 'Client Name',
-                                                    'name' => 'client_name',
-                                                    'type' => 'text',
-                                                    'placeholder' => 'Enter Client Name',
-                                                    'model' => $followup,
-                                                    'readonly' => true,
-                                                ])
+                                                <label for="first_name" class="form-label">Client Name</label>
+                                                <input type="text" name="first_name" id="first_name" class="form-control"
+                                                    value="{{ ($followup->leadDetails->customer->first_name ?? '') . ' ' . ($followup->leadDetails->customer->last_name ?? '') }}" readonly>
                                             </div>
+
+                                            <div class="col-6">
+                                                <label for="first_name" class="form-label">Sales Person Name</label>
+                                                <input type="text" name="first_name" id="first_name" class="form-control"
+                                                    value="{{ ($followup->staffDetails->first_name ?? '') . ' ' . ($followup->staffDetails->last_name ?? '') }}"
+                                                    readonly>
+                                            </div>
+
 
                                             <div class="col-6">
                                                 @include('components.form.input', [
                                                     'label' => 'Contact Number',
-                                                    'name' => 'contact',
+                                                    'name' => 'phone',
                                                     'type' => 'text',
-                                                    'placeholder' => 'Enter Contact Number',
-                                                    'model' => $followup,
+                                                    'model' => $followup->leadDetails->customer ?? '',
                                                     'readonly' => true,
                                                 ])
                                             </div>
@@ -78,8 +77,7 @@
                                                     'label' => 'Email ID',
                                                     'name' => 'email',
                                                     'type' => 'email',
-                                                    'placeholder' => 'Enter Email Id',
-                                                    'model' => $followup,
+                                                    'model' => $followup->leadDetails->customer ?? '',
                                                     'readonly' => true,
                                                 ])
                                             </div>
@@ -109,11 +107,11 @@
                                                     'label' => 'Status',
                                                     'name' => 'status',
                                                     'options' => [
-                                                        '0' => '--Select--',
-                                                        'Pending' => 'Pending',
-                                                        'Done' => 'Done',
-                                                        'Rescheduled' => 'Rescheduled',
-                                                        'Cancelled' => 'Cancelled',
+                                                        '' => '--Select--',
+                                                        'pending' => 'Pending',
+                                                        'completed' => 'Completed',
+                                                        'rescheduled' => 'Rescheduled',
+                                                        'cancelled' => 'Cancelled',
                                                     ],
                                                     'model' => $followup,
                                                 ])
@@ -126,26 +124,14 @@
                                         </div>
                                     </div>
                                 </div>
-
-
-
-                                <!-- <div class="text-start mb-3">
-                                        <button type="submit" class="btn btn-success w-sm waves ripple-light">
-                                            Submit
-                                        </button>
-                                    </div> -->
                             </div>
 
 
                             <div class="col-lg-12">
                                 <div class="text-start mb-3">
-                                    {{-- <a href="{{ route('follow-up.index') }}"
-                                        class="btn btn-success w-sm waves ripple-light">
-                                        Submit
-                                    </a> --}}
                                     <button type="submit" class="btn btn-success w-sm waves ripple-light">
-                                            Submit
-                                        </button> 
+                                        Submit
+                                    </button>
                                 </div>
                             </div>
 

@@ -408,7 +408,7 @@ Route::prefix('/demo')->group(function () {
         // Delete Follow Up Page
         Route::delete('/crm/delete-follow-up/{id}', 'delete')->name('follow-up.delete');
         // Fetch leads Data
-        Route::get('/crm/fetch-leads/{id}', 'fetchLeads')->name('follow-up.view');
+        Route::get('/crm/fetch-leads/{id}', [FollowUpController::class, 'fetchLeads'])->name('follow-up.fetch-leads');
     });
 
     // ------------------------------------------------------------ Meets Pages -------------------------------------------------------------

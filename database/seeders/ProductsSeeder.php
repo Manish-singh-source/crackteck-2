@@ -74,8 +74,8 @@ class ProductsSeeder extends Seeder
                 'short_description' => fake()->paragraph(),
                 'full_description' => fake()->paragraph(),
                 'technical_specification' => fake()->paragraph(),
-                'brand_warranty' => fake()->paragraph(),
-                'company_warranty' => fake()->paragraph(),
+                'brand_warranty' => fake()->sentence(),
+                'company_warranty' => fake()->sentence(),
 
                 'cost_price' => $cost_price,
                 'selling_price' => $selling_price,

@@ -66,6 +66,7 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>Sr. No.</th>
+                                                                <th>Image</th>
                                                                 <th>Item Code</th>
                                                                 <th>Service Type</th>
                                                                 <th>Service Name</th>
@@ -79,6 +80,15 @@
                                                             @forelse ($coveredItems as $item)
                                                                 <tr>
                                                                     <td>{{ $item->id }}</td>
+                                                                    <td>
+                                                                        @if ($item->image)
+                                                                            <img src={{ asset($item->image) }}
+                                                                                alt={{ $item->service_name }} width="50"
+                                                                                height="50" />
+                                                                        @else
+                                                                            <img src="https://placehold.co/50x50"
+                                                                                alt={{ $item->service_name }} />
+                                                                        @endif
                                                                     <td>{{ $item->item_code }}</td>
                                                                     <td>
                                                                         {{ ucwords(str_replace('_', ' ', $item->service_type)) }}

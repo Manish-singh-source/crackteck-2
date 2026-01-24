@@ -8,6 +8,7 @@ use App\Models\CoveredItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
 class AmcController extends Controller
@@ -232,6 +233,7 @@ class AmcController extends Controller
             'service_type' => 'required|in:amc,quick_service,installation,repair',
             'service_name' => 'required|string|max:255',
             // service_charge required only when type is NOT 0 (AMC)
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'service_charge' => 'nullable|numeric|min:0|required_unless:service_type,0',
             'status' => 'nullable|in:active,inactive',
             'diagnosis_list' => 'nullable|string', // JSON string from hidden field
@@ -242,7 +244,6 @@ class AmcController extends Controller
 
             $data = $validated;
 
-            // dd($data);
 
             // Default status = Active (1) if not sent
             $data['status'] = $request->input('status', 'active');
@@ -257,10 +258,21 @@ class AmcController extends Controller
                 }
             }
 
+            // 
+            // Handle image upload
+            $filePath = null;
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = time() . '_covered_item.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/crm/covered-items'), $filename);
+                $filePath = 'uploads/crm/covered-items/' . $filename;
+            }
+
             // Create record (CoveredItem model with JSON cast for diagnosis_list)
             $coveredItem = CoveredItem::create([
                 'item_code' => CoveredItem::generateItemCode($data['service_type']),
                 'service_type' => $data['service_type'],            // 0,1,2,3
+                'image' => $filePath,
                 'service_name' => $data['service_name'],
                 'service_charge' => $data['service_type'] === 'amc'
                     ? null
@@ -311,6 +323,7 @@ class AmcController extends Controller
         $validated = $request->validate([
             'service_type' => 'required|in:amc,quick_service,installation,repair',
             'service_name' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'service_charge' => 'nullable|numeric|min:0|required_unless:service_type,0',
             'status' => 'nullable|in:active,inactive',
             'diagnosis_list' => 'nullable|string',
@@ -330,8 +343,22 @@ class AmcController extends Controller
             }
         }
 
+        // Handle image upload
+        $filePath = null;
+        if ($request->hasFile('image')) {
+            if ($coveredItem->image && File::exists(public_path($coveredItem->image))) {
+                File::delete(public_path($coveredItem->image));
+            }
+
+            $file = $request->file('image');
+            $filename = time() . '_covered_item.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/crm/covered-items'), $filename);
+            $filePath = 'uploads/crm/covered-items/' . $filename;
+        }
+
         $coveredItem->update([
             'service_type' => $data['service_type'],
+            'image' => $filePath,
             'service_name' => $data['service_name'],
             'service_charge' => $data['service_type'] === 'amc'
                 ? null

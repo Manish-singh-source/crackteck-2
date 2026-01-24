@@ -60,8 +60,8 @@
                                                     'label' => 'Delivery',
                                                     'name' => 'delivery',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'active' => 'Active',
+                                                        'inactive' => 'Inactive',
                                                     ],
                                                     'model' => $pincode,
                                                 ])
@@ -72,8 +72,8 @@
                                                     'label' => 'Installation',
                                                     'name' => 'installation',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'active' => 'Active',
+                                                        'inactive' => 'Inactive',
                                                     ],
                                                     'model' => $pincode,
                                                 ])
@@ -84,8 +84,8 @@
                                                     'label' => 'Repair',
                                                     'name' => 'repair',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'active' => 'Active',
+                                                        'inactive' => 'Inactive',
                                                     ],
                                                     'model' => $pincode,
                                                 ])
@@ -96,8 +96,8 @@
                                                     'label' => 'Quick Service',
                                                     'name' => 'quick_service',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'active' => 'Active',
+                                                        'inactive' => 'Inactive',
                                                     ],
                                                     'model' => $pincode,
                                                 ])
@@ -108,12 +108,12 @@
                                                     'label' => 'AMC',
                                                     'name' => 'amc',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'active' => 'Active',
+                                                        'inactive' => 'Inactive',
                                                     ],
                                                     'model' => $pincode,
                                                 ])
-                                            </div>  
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -124,7 +124,7 @@
                                 <div class="text-start mb-3">
                                     <button type="submit" class="btn btn-success w-sm waves ripple-light">
                                         Update
-                                    </button> 
+                                    </button>
                                 </div>
                             </div>
 

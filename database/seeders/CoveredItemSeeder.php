@@ -71,6 +71,7 @@ class CoveredItemSeeder extends Seeder
                 'item_code' => $prefix . '-' . str_pad($index + 1, 6, '0', STR_PAD_LEFT),
                 'service_type' => $it['service_type'],
                 'service_name' => $it['service_name'],
+                'image' => null,
                 'service_charge' => $it['service_charge'],
                 'status' => "active",
                 'diagnosis_list' => json_encode($it['diagnosis_list']),

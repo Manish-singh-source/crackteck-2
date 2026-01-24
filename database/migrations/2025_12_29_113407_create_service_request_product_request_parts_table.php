@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('request_id')->constrained('service_requests')->cascadeOnDelete();
             $table->foreignId('product_id')->constrained('service_request_products')->cascadeOnDelete();
             $table->foreignId('engineer_id')->constrained('assigned_engineers')->cascadeOnDelete();
-            $table->foreignId('part_id')->constrained('products')->cascadeOnDelete();
+            $table->foreignId('part_id')->constrained('product_serials')->cascadeOnDelete();
             $table->enum('request_type', ['stock_in_hand', 'part_request'])->comment('0 - Stock In Hand, 1 - Part Request');
 
             $table->enum('assigned_person_type', ['delivery_man', 'engineer'])->comment('0 - Delivery Man, 1 - Engineer')->nullable();

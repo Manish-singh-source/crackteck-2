@@ -30,10 +30,7 @@
                         @csrf
 
                         <div class="row">
-                            {{-- LEFT: Plan + duration + pricing --}}
                             <div class="col-lg-8">
-
-                                {{-- Plan Information --}}
                                 <div class="card">
                                     <div class="card-header border-bottom-dashed">
                                         <h5 class="card-title mb-0">Plan Information</h5>
@@ -80,7 +77,6 @@
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>
@@ -143,7 +139,6 @@
                                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                                 @enderror
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>
@@ -258,10 +253,16 @@
                                                 <label class="form-label mb-1">Covered AMC Items</label>
 
                                                 @php
-                                                    $selectedCoveredItems = old(
-                                                        'covered_items_ids',
-                                                        $selectedCoveredItems ?? [],
-                                                    );
+                                                    $selectedCoveredItems = $selectedCoveredItems ?? [];
+                                                    if ($oldInput = old('covered_items_ids')) {
+                                                        $decoded = json_decode($oldInput, true);
+                                                        if (
+                                                            json_last_error() === JSON_ERROR_NONE &&
+                                                            is_array($decoded)
+                                                        ) {
+                                                            $selectedCoveredItems = $decoded;
+                                                        }
+                                                    }
                                                 @endphp
 
                                                 <div class="position-relative" id="covered-items-multiselect">
@@ -284,7 +285,7 @@
                                                         id="covered-items-dropdown"
                                                         style="z-index: 1050; max-height: 260px; overflow-y: auto; display: none;">
                                                         @forelse ($coveredItems as $item)
-                                                            @if ($item->service_type == 0)
+                                                            @if ($item->service_type == 'amc')
                                                                 <div class="px-2 py-1 covered-item-option"
                                                                     data-id="{{ $item->id }}"
                                                                     data-label="{{ $item->service_name }}">
@@ -345,7 +346,6 @@
                                                 <textarea name="replacement_policy" id="replacement_policy" class="form-control"
                                                     placeholder="Enter Replacement Policy" rows="3">{{ old('replacement_policy') }}</textarea>
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>
@@ -386,13 +386,10 @@
                                     </button>
                                 </div>
                             </div>
-
                         </div>
                     </form>
-
                 </div>
             </div>
-
         </div>
     </div>
 @endsection
@@ -448,105 +445,6 @@
                 durationTypeSelect.addEventListener('change', syncDuration);
                 syncDuration();
             }
-
-            // Covered items -> chips + hidden JSON
-            const coveredCheckboxes = document.querySelectorAll('input[name="covered_items_ids[]"]');
-            const chipsContainer = document.getElementById('covered_items_chips');
-            const hiddenJsonField = document.getElementById('covered_items_json');
-
-            let selectedIds = [];
-
-            // Load initial from hidden JSON / old()
-            try {
-                const initial = hiddenJsonField.value ? JSON.parse(hiddenJsonField.value) : [];
-                if (Array.isArray(initial)) {
-                    selectedIds = initial.map(id => parseInt(id, 10)).filter(id => !isNaN(id));
-                }
-            } catch (e) {
-                selectedIds = [];
-            }
-
-            // Sync checkbox checked state from selectedIds
-            coveredCheckboxes.forEach(cb => {
-                const id = parseInt(cb.value, 10);
-                if (selectedIds.includes(id)) {
-                    cb.checked = true;
-                }
-                // store label in data-label for chips
-                if (!cb.dataset.label) {
-                    const labelEl = cb.closest('.form-check').querySelector('label.form-check-label');
-                    if (labelEl) cb.dataset.label = labelEl.textContent.trim();
-                }
-            });
-
-            function renderChips() {
-                chipsContainer.innerHTML = '';
-
-                if (!selectedIds.length) {
-                    chipsContainer.innerHTML =
-                        '<span class="text-muted small">No item selected.</span>';
-                    hiddenJsonField.value = '[]';
-                    return;
-                }
-
-                selectedIds.forEach(id => {
-                    const cb = document.querySelector('input[name="covered_items_ids[]"][value="' + id +
-                        '"]');
-                    if (!cb) return;
-                    const label = cb.dataset.label || ('Item ' + id);
-
-                    const chip = document.createElement('span');
-                    chip.className = 'badge bg-primary me-2 mb-2';
-                    chip.dataset.id = id;
-
-                    chip.innerHTML = `
-                ${label}
-                <button type="button"
-                        class="btn-close btn-close-white btn-sm ms-1"
-                        aria-label="Remove"
-                        style="font-size: 0.6rem;"></button>
-            `;
-
-                    chipsContainer.appendChild(chip);
-                });
-
-                hiddenJsonField.value = JSON.stringify(selectedIds);
-            }
-
-            // Checkbox change
-            coveredCheckboxes.forEach(cb => {
-                cb.addEventListener('change', function() {
-                    const id = parseInt(this.value, 10);
-                    if (isNaN(id)) return;
-
-                    if (this.checked) {
-                        if (!selectedIds.includes(id)) selectedIds.push(id);
-                    } else {
-                        selectedIds = selectedIds.filter(x => x !== id);
-                    }
-                    renderChips();
-                });
-            });
-
-            // Chip X click
-            chipsContainer.addEventListener('click', function(e) {
-                if (e.target.classList.contains('btn-close')) {
-                    const chip = e.target.closest('span.badge');
-                    if (!chip) return;
-
-                    const id = parseInt(chip.dataset.id, 10);
-                    if (isNaN(id)) return;
-
-                    const cb = document.querySelector('input[name="covered_items_ids[]"][value="' + id +
-                        '"]');
-                    if (cb) cb.checked = false;
-
-                    selectedIds = selectedIds.filter(x => x !== id);
-                    renderChips();
-                }
-            });
-
-            renderChips();
         });
     </script>
 

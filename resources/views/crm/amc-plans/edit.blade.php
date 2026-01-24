@@ -32,17 +32,13 @@
                         @method('PUT')
 
                         <div class="row">
-                            {{-- LEFT: Plan + duration + pricing --}}
                             <div class="col-lg-8">
-
-                                {{-- Plan Information --}}
                                 <div class="card">
                                     <div class="card-header border-bottom-dashed">
                                         <h5 class="card-title mb-0">Plan Information</h5>
                                     </div>
                                     <div class="card-body">
                                         <div class="row g-3 pb-3">
-
                                             {{-- Plan Name --}}
                                             <div class="col-xl-6 col-lg-6">
                                                 @include('components.form.input', [
@@ -82,7 +78,6 @@
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>
@@ -94,7 +89,6 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="row g-3">
-
                                             {{-- Contract Duration type (6m/12m/24m/custom) --}}
                                             @php
                                                 // Convert stored duration (months) to a type for edit
@@ -165,7 +159,6 @@
                                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                                 @enderror
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>
@@ -230,10 +223,10 @@
                                                     'name' => 'pay_terms',
                                                     'options' => [
                                                         '' => '--Select --',
-                                                        '0' => 'Full Payment',
-                                                        '1' => 'Installments',
+                                                        'full_payment' => 'Full Payment',
+                                                        'installments' => 'Installments',
                                                     ],
-                                                    'value' => old('pay_terms', (string) $amcPlan->pay_terms),
+                                                    'value' => old('pay_terms', $amcPlan->pay_terms),
                                                 ])
                                                 @error('pay_terms')
                                                     <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -264,9 +257,9 @@
                                                     'name' => 'support_type',
                                                     'options' => [
                                                         '' => '--Select --',
-                                                        '0' => 'Onsite',
-                                                        '1' => 'Remote',
-                                                        '2' => 'Both',
+                                                        'onsite' => 'Onsite',
+                                                        'remote' => 'Remote',
+                                                        'both' => 'Both',
                                                     ],
                                                     'value' => old(
                                                         'support_type',
@@ -308,7 +301,7 @@
                                                         style="z-index: 1050; max-height: 260px; overflow-y: auto; display: none;">
 
                                                         @forelse ($coveredItems as $item)
-                                                            @if ($item->service_type == 0)
+                                                            @if ($item->service_type == 'amc')
                                                                 <div class="px-2 py-1 covered-item-option"
                                                                     data-id="{{ $item->id }}"
                                                                     data-label="{{ $item->service_name }}">
@@ -394,8 +387,8 @@
                                                     'name' => 'status',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'inactive' => 'Inactive',
+                                                        'active' => 'Active',
                                                     ],
                                                     'value' => old('status', (string) $amcPlan->status),
                                                 ])

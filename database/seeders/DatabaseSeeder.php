@@ -66,41 +66,6 @@ class DatabaseSeeder extends Seeder
 
 
 
-
-
-            
-            // AssignedEngineerSeeder::class,
-            // EngineerDiagnosisDetailSeeder::class,
-            // ServiceRequestProductPickupSeeder::class,
-            // ServiceRequestProductRequestPartSeeder::class,
-            // ServiceRequestPaymentSeeder::class,
-            // ServiceRequestQuotationSeeder::class,
-            // RequestedPartDeliverySeeder::class,
-            // AssignedEngineerGroupSeeder::class,
-            
-            // TicketSeeder::class,
-            // TicketCommentSeeder::class,
-
-            // InvoiceSeeder::class,
-            // InvoiceItemSeeder::class,
-            
-
-            // ServiceRequestSeeder::class,
-            // ServiceRequestProductSeeder::class,
-
-            // RemoteJobSeeder::class,
-            // CaseTransferRequestSeeder::class,
-            // PickupRequestSeeder::class,
-            // StockInHandSeeder::class,
-            // StockInHandProductSeeder::class,
-            // FieldIssueSeeder::class,
-            // CustomerFeedbackSeeder::class,
-
-
-
-
-
-
             // OrderSeeder::class,
             // OrderItemSeeder::class,
             // OrderPaymentSeeder::class,
@@ -130,6 +95,44 @@ class DatabaseSeeder extends Seeder
             // EcommerceProductsSeeder::class,
             // ProductSerialSeeder::class,
 
+
+
+
+            ServiceRequestSeeder::class,
+            ServiceRequestProductSeeder::class,
+
+            
+            AssignedEngineerSeeder::class,
+            EngineerDiagnosisDetailSeeder::class,
+            ServiceRequestProductPickupSeeder::class,
+            ServiceRequestProductRequestPartSeeder::class,
+            // ServiceRequestPaymentSeeder::class,
+            // ServiceRequestQuotationSeeder::class,
+            // RequestedPartDeliverySeeder::class,
+            // AssignedEngineerGroupSeeder::class,
+            
+            // TicketSeeder::class,
+            // TicketCommentSeeder::class,
+
+            // InvoiceSeeder::class,
+            // InvoiceItemSeeder::class,
+            
+
+
+            // RemoteJobSeeder::class,
+            // CaseTransferRequestSeeder::class,
+            // PickupRequestSeeder::class,
+            // StockInHandSeeder::class,
+            // StockInHandProductSeeder::class,
+            // FieldIssueSeeder::class,
+            // CustomerFeedbackSeeder::class,
+
+
+
+
+
+
+            
 
 
         ]);

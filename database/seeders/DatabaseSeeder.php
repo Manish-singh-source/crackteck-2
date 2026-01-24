@@ -52,9 +52,6 @@ class DatabaseSeeder extends Seeder
             VendorPurchaseOrderSeeder::class,
             WarehousesSeeder::class,
 
-
-
-
             // crm ====================
             LeadTableSeeder::class,
             FollowUpTableSeeder::class,
@@ -62,11 +59,14 @@ class DatabaseSeeder extends Seeder
 
             // QuotationTableSeeder::class,
             // QuotationProductTableSeeder::class,
-
+            
             CoveredItemSeeder::class,
             AmcPlanSeeder::class,
-
             PincodeSeeder::class,
+
+
+
+
 
             
             // AssignedEngineerSeeder::class,
@@ -109,8 +109,8 @@ class DatabaseSeeder extends Seeder
             SubCategoriesSeeder::class,
 
             BrandsSeeder::class,
-            ProductVariantAttributesSeeder::class,
-            ProductVariantAttributeValuesSeeder::class,
+            // ProductVariantAttributesSeeder::class,
+            // ProductVariantAttributeValuesSeeder::class,
 
             CouponSeeder::class,
             CouponUsageSeeder::class,
@@ -122,7 +122,7 @@ class DatabaseSeeder extends Seeder
             CollectionSeeder::class,
 
             // e-commerce data ====================
-            // TestimonialSeeder::class,
+            TestimonialSeeder::class,
             // FeedbackSeeder::class,
 
 
@@ -135,3 +135,4 @@ class DatabaseSeeder extends Seeder
         ]);
     }
 }
+    

@@ -20,41 +20,67 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body pt-0">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
+                            @php
+                                $statuses = [
+                                    'all' => [
+                                        'label' => 'All',
+                                        'icon' => 'mdi-format-list-bulleted',
+                                        'color' => '',
+                                    ],
+                                    'scheduled' => [
+                                        'label' => 'Scheduled',
+                                        'icon' => 'mdi-calendar-clock',
+                                        'color' => 'text-primary',
+                                    ],
+                                    'confirmed' => [
+                                        'label' => 'Confirmed',
+                                        'icon' => 'mdi-check-decagram',
+                                        'color' => 'text-info',
+                                    ],
+                                    'completed' => [
+                                        'label' => 'Completed',
+                                        'icon' => 'mdi-check-circle-outline',
+                                        'color' => 'text-success',
+                                    ],
+                                    'rescheduled' => [
+                                        'label' => 'Rescheduled',
+                                        'icon' => 'mdi-clock-outline',
+                                        'color' => 'text-warning',
+                                    ],
+                                    'cancelled' => [
+                                        'label' => 'Cancelled',
+                                        'icon' => 'mdi-close-circle-outline',
+                                        'color' => 'text-danger',
+                                    ],
+                                ];
+
+                                $currentStatus = request('status', 'all');
+
+                                if (!array_key_exists($currentStatus, $statuses)) {
+                                    $currentStatus = 'all';
+                                }
+                            @endphp
+
+                            <ul class="nav nav-underline border-bottom" role="tablist">
+                                @foreach ($statuses as $key => $status)
                                     <li class="nav-item" role="presentation">
-                                        <a class="nav-link active p-2" onclick="showSection()" id="all_services_tab"
-                                            data-bs-toggle="tab" href="#all_services" role="tab">
-                                            <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
-                                            <span class="d-none d-sm-block">Upcoming</span>
+                                        <a class="nav-link p-2 {{ $currentStatus === $key ? 'active' : '' }}"
+                                            href="{{ $key === 'all' ? route('meets.index') : route('meets.index', ['status' => $key]) }}">
+                                            <span class="d-block d-sm-none">
+                                                <i class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>
+                                            </span>
+                                            <span class="d-none d-sm-block">
+                                                <i class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>
+                                                {{ $status['label'] }}
+                                            </span>
                                         </a>
                                     </li>
-                                    <li class="nav-item" role="presentation">
-                                        <a class="nav-link p-2" onclick="showSection()" id="all_services_tab"
-                                            data-bs-toggle="tab" href="#all_services" role="tab">
-                                            <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
-                                            <span class="d-none d-sm-block">Today</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <a class="nav-link p-2" onclick="showSection()" id="all_services_tab"
-                                            data-bs-toggle="tab" href="#all_services" role="tab">
-                                            <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
-                                            <span class="d-none d-sm-block">Completed</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <a class="nav-link p-2" onclick="showSection()" id="all_services_tab"
-                                            data-bs-toggle="tab" href="#all_services" role="tab">
-                                            <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
-                                            <span class="d-none d-sm-block">Missed</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
+                                @endforeach
+                            </ul>
+
 
                             <div class="tab-content text-muted">
-                                <div class="tab-pane active show pt-4" id="all_services" role="tabpanel">
+                                <div class="tab-pane active show" id="all_services" role="tabpanel">
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="card shadow-none">
@@ -63,49 +89,75 @@
                                                         class="table table-striped table-borderless dt-responsive nowrap">
                                                         <thead>
                                                             <tr>
-                                                                <th>Lead Id</th>
                                                                 <th>Meeting ID</th>
+                                                                <th>Lead Id</th>
                                                                 <th>Title</th>
                                                                 <th>Type</th>
                                                                 <th>Date & Time</th>
                                                                 <th>Location / Link</th>
-                                                                {{-- <th>Assigned Rep</th> --}}
-                                                                <th>Engineer (if any)</th>
                                                                 <th>Status</th>
-                                                                {{-- <th>Follow-up Task</th> --}}
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             @foreach ($meet as $meet)
                                                                 <tr>
-                                                                    <td>
-                                                                        <a href="">
-                                                                            {{ $meet->lead_id }}
-                                                                        </a>
-                                                                    </td>
                                                                     <td>{{ $meet->id }}</td>
-                                                                    <td>{{ $meet->meet_title }}</td>
-                                                                    <td>{{ $meet->meeting_type }}</td>
+                                                                    <td>
+                                                                        {{ $meet->leadDetails->lead_number }}
+                                                                    </td>
+                                                                    <td class="text-truncate" style="max-width: 200px;">
+                                                                        {{ $meet->meet_title }}
+                                                                    </td>
+                                                                    <td>
+                                                                        @php
+                                                                            $meetingTypes = [
+                                                                                'onsite_demo' => 'Onsite Demo',
+                                                                                'virtual_meeting' => 'Virtual Meeting',
+                                                                                'technical_visit' => 'Techncal Visit',
+                                                                                'business_meeting' =>
+                                                                                    'Business Meeting',
+                                                                                'other' => 'Other',
+                                                                            ];
+                                                                        @endphp
+
+                                                                        <span>
+                                                                            {{ $meetingTypes[$meet->meeting_type] ?? 'Unknown' }}
+                                                                        </span> 
+                                                                    </td>
                                                                     <td>{{ $meet->date }} {{ $meet->time }}</td>
                                                                     <td>{{ $meet->location }}</td>
-                                                                    {{-- <td>NA</td> --}}
-                                                                    <td>NA</td>
                                                                     <td>
                                                                         @php
                                                                             $badgeClass = match ($meet->status) {
-                                                                                'Scheduled' => 'bg-warning-subtle text-warning',
-                                                                                'Confirmed' => 'bg-success-subtle text-success',
-                                                                                'Completed' => 'bg-info-subtle text-info',
-                                                                                'Cancelled' => 'bg-danger-subtle text-danger',
-                                                                                default => 'bg-secondary-subtle text-secondary',
+                                                                                'scheduled'
+                                                                                    => 'bg-warning-subtle text-warning',
+                                                                                'confirmed'
+                                                                                    => 'bg-primary-subtle text-primary',
+                                                                                'completed'
+                                                                                    => 'bg-success-subtle text-success',
+                                                                                'rescheduled'
+                                                                                    => 'bg-info-subtle text-info',
+                                                                                'cancelled'
+                                                                                    => 'bg-danger-subtle text-danger',
+                                                                                default
+                                                                                    => 'bg-secondary-subtle text-secondary',
                                                                             };
+
+                                                                            $statusTypes = [
+                                                                                'scheduled' => 'Scheduled',
+                                                                                'confirmed' => 'Confirmed',
+                                                                                'completed' => 'Completed',
+                                                                                'rescheduled' => 'Rescheduled',
+                                                                                'cancelled' => 'Cancelled',
+                                                                            ];
                                                                         @endphp
-                                                                        <span class="badge fw-semibold {{ $badgeClass }}">
-                                                                        {{ $meet->status }}
+
+                                                                        <span
+                                                                            class="badge fw-semibold {{ $badgeClass }}">
+                                                                            {{ $statusTypes[$meet->status] ?? 'Unknown' }}
                                                                         </span>
                                                                     </td>
-                                                                    {{-- <td>{{ $meet->followUp }}</td> --}}
                                                                     <td>
                                                                         <a aria-label="anchor"
                                                                             href="{{ route('meets.view', $meet->id) }}"

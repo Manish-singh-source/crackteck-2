@@ -31,36 +31,13 @@ class Meet extends Model
         'attendees' => 'array',
     ];
 
-    public function setMeetingTypeAttribute($value)
-    {
-        $map = [
-            'in_person' => '0',
-            'virtual' => '1',
-            'phone' => '2',
-        ];
-
-        $this->attributes['meeting_type'] = is_numeric($value)
-            ? $value
-            : ($map[strtolower($value)] ?? null);
-    }
-    
-    public function setStatusAttribute($value)
-    {
-        $map = [
-            'scheduled' => '0',
-            'confirmed' => '1',
-            'completed' => '2',
-            'cancelled' => '3',
-            'rescheduled' => '4',
-        ];
-
-        $this->attributes['status'] = is_numeric($value)
-            ? $value
-            : ($map[strtolower($value)] ?? null);
-    }
-
     public function leadDetails()
     {
         return $this->belongsTo(Lead::class, 'lead_id', 'id');
+    }
+
+    public function staffDetails()
+    {
+        return $this->belongsTo(Staff::class, 'staff_id', 'id');
     }
 }

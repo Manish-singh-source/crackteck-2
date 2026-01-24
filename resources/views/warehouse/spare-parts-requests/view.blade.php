@@ -90,7 +90,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="text-center">
-                                        @if ($stockRequests->requestedPart->product->main_product_image)
+                                        @if ($stockRequests->requestedPart?->product?->main_product_image)
                                             <img src="{{ asset($stockRequests->requestedPart->product->main_product_image) }}"
                                                 alt="Product" width="150px" class="img-fluid d-block rounded">
                                         @else
@@ -109,24 +109,24 @@
                                         <li
                                             class="list-group-item border-0 d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                             <span class="fw-semibold">Type:</span>
-                                            <span>{{ $stockRequests->requestedPart->product->parent_category_id ? $stockRequests->requestedPart->product->parentCategorie->name : 'N/A' }}</span>
+                                            <span>{{ $stockRequests->requestedPart?->product?->parent_category_id ? $stockRequests->requestedPart?->product?->parentCategorie->name : 'N/A' }}</span>
                                         </li>
                                         <li
                                             class="list-group-item border-0 d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                             <span class="fw-semibold">Brand:</span>
-                                            <span>{{ $stockRequests->requestedPart->product->brand_id ? $stockRequests->requestedPart->product->brand->name : 'N/A' }}</span>
+                                            <span>{{ $stockRequests->requestedPart?->product?->brand_id ? $stockRequests->requestedPart?->product?->brand->name : 'N/A' }}</span>
                                         </li>
                                         <li
                                             class="list-group-item border-0 d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                             <span class="fw-semibold">Model Number:</span>
-                                            <span>{{ $stockRequests->requestedPart->product->model_no ?? 'N/A' }}</span>
+                                            <span>{{ $stockRequests->requestedPart?->product?->model_no ?? 'N/A' }}</span>
                                         </li>
                                         <li
                                             class="list-group-item border-0 d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                             <span class="fw-semibold">Serial Number:</span>
                                             <span>{{ $stockRequests->requestedPart->auto_generated_serial ?? 'N/A' }}</span>
                                         </li>
-                                        @if ($stockRequests->requestedPart->manual_serial)
+                                        @if ($stockRequests->requestedPart?->manual_serial)
                                             <li
                                                 class="list-group-item border-0 d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                                 <span class="fw-semibold">Serial Number:</span>

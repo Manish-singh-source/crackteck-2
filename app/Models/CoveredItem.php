@@ -13,6 +13,7 @@ class CoveredItem extends Model
     protected $fillable = [
         'item_code',
         'service_type',
+        'image',
         'service_name',
         'service_charge',
         'status',

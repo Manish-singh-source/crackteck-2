@@ -24,7 +24,7 @@
 
             <div class="row">
                 <div class="col-12">
-                    <form action="{{ route('covered-items.update', $coveredItem->id) }}" method="POST">
+                    <form action="{{ route('covered-items.update', $coveredItem->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -113,6 +113,23 @@
                                                 @error('status')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                @include('components.form.input', [
+                                                    'label' => 'Covered Item Image',
+                                                    'name' => 'image',
+                                                    'type' => 'file',
+                                                    'placeholder' => 'Upload Image',
+                                                    'accept' => 'image/*',
+                                                ])
+                                                {{-- <div id="emailHelp" class="text-danger">Image Size Should Be
+                                                    800x650
+                                                </div> --}}
+
+                                                <div>
+                                                    <a href="{{ asset($coveredItem->image) }}" target="_blank">View Image</a>
+                                                </div>
                                             </div>
 
                                             {{-- Diagnosis List (JSON) --}}

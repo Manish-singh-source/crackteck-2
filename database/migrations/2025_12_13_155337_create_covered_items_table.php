@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('service_type', ['amc', 'quick_service', 'installation', 'repair'])->default('quick_service');
             $table->string('service_name');
             $table->decimal('service_charge', 10, 2)->nullable();
+            $table->string('image')->nullable();
 
             $table->enum('status', ['inactive', 'active'])->default('active');
 

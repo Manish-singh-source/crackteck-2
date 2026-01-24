@@ -181,24 +181,6 @@
                     </a>
                 </li>
 
-                <li class="menu-title mt-2">Customer App</li>
-
-                <li>
-                    <a class='tp-link' href="{{ route('quick-services.index') }}">
-                        <i class="fas fa-life-ring"></i>
-                        <span class="ps-1"> Quick Services List </span>
-                    </a>
-                </li>
-
-                {{-- @if(\App\Models\QuickServiceRequest::processingOrActive()->exists()) --}}
-                <li>
-                    <a class='tp-link' href="{{ route('quick-service-requests.index') }}">
-                        <i class="fas fa-life-ring"></i>
-                        <span class="ps-1"> Quick Services Request </span>
-                    </a>
-                </li>
-                {{-- @endif --}}
-
                 <li class="menu-title mt-2">Operation Managers</li>
 
                 <li>
@@ -208,15 +190,6 @@
                         <span class="ps-1"> AMC Plans </span>
                     </a>
                 </li>
-                {{-- @if(\App\Models\AmcService::active()->exists()) --}}
-                <li>
-                    <a class='tp-link' href="{{ route('amc-services.index') }}">
-                        <i class="fas fa-clipboard-check"></i>
-
-                        <span class="ps-1"> AMC Services </span>
-                    </a>
-                </li>
-                {{-- @endif --}}
                 <li>
                     <a class='tp-link' href="{{ route('covered-items.index') }}">
                         <i class="fas fa-project-diagram"></i>

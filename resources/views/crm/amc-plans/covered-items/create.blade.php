@@ -24,7 +24,7 @@
 
             <div class="row">
                 <div class="col-12">
-                    <form action="{{ route('covered-items.store') }}" method="POST">
+                    <form action="{{ route('covered-items.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <div class="row">
@@ -43,7 +43,7 @@
 
                                     <div class="card-body">
                                         <div class="row g-3">
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 @include('components.form.select', [
                                                     'label' => 'Service Type',
                                                     'name' => 'service_type',
@@ -61,7 +61,7 @@
                                             </div>
 
                                             {{-- Service Name --}}
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 @include('components.form.input', [
                                                     'label' => 'Service Name',
                                                     'name' => 'service_name',
@@ -71,7 +71,7 @@
                                             </div>
 
                                             {{-- Service Charge (not required for AMC) --}}
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 <label for="service_charge" class="form-label">
                                                     Service Charge
                                                     <small class="text-muted">(Not required for AMC)</small>
@@ -86,7 +86,7 @@
                                             </div>
 
                                             {{-- Status --}}
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 <label for="status" class="form-label">Status</label>
                                                 <select name="status" id="status"
                                                     class="form-select @error('status') is-invalid @enderror">
@@ -98,6 +98,19 @@
                                                 @error('status')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                @include('components.form.input', [
+                                                    'label' => 'Covered Item Image',
+                                                    'name' => 'image',
+                                                    'type' => 'file',
+                                                    'placeholder' => 'Upload Image',
+                                                    'accept' => 'image/*',
+                                                ])
+                                                {{-- <div id="emailHelp" class="text-danger">Image Size Should Be
+                                                    800x650
+                                                </div> --}}
                                             </div>
 
                                             {{-- Diagnosis List (JSON) --}}

@@ -11,7 +11,25 @@ class PincodeController extends Controller
     //
     public function index()
     {
-        $pincode = Pincode::all();
+        $pincode = Pincode::query();
+        
+        if($status = request()->get('delivery_status')) {
+            $pincode = $pincode->where('delivery', $status);
+        }
+        if($status = request()->get('installation_status')) {
+            $pincode = $pincode->where('installation', $status);
+        }
+        if($status = request()->get('repair_status')) {
+            $pincode = $pincode->where('repair', $status);
+        }
+        if($status = request()->get('quick_service_status')) {
+            $pincode = $pincode->where('quick_service', $status);
+        }
+        if($status = request()->get('amc_status')) {
+            $pincode = $pincode->where('amc', $status);
+        }
+        $pincode = $pincode->get();
+
 
         return view('/crm/manage-pincodes/index', compact('pincode'));
     }
@@ -27,19 +45,23 @@ class PincodeController extends Controller
         $validator = Validator::make($request->all(), [
             'pincode' => 'required',
             'delivery' => 'required',
+            'repair' => 'required',
+            'quick_service' => 'required',
+            'amc' => 'required',
             'installation' => 'required',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
-        // dd($request->all());
 
         $pincode = new Pincode;
         $pincode->pincode = $request->pincode;
         $pincode->delivery = $request->delivery;
         $pincode->installation = $request->installation;
-
+        $pincode->repair = $request->repair;
+        $pincode->quick_service = $request->quick_service;
+        $pincode->amc = $request->amc;
         $pincode->save();
 
         if (! $pincode) {
@@ -69,7 +91,7 @@ class PincodeController extends Controller
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
-        // dd($request->all());
+
         $pincode = Pincode::findOrFail($id);
         $pincode->pincode = $request->pincode;
         $pincode->delivery = $request->delivery;

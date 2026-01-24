@@ -4,7 +4,7 @@
     <div class="content">
 
         <!-- Start Content-->
-        <div class="container-fluid">
+        <div class="container-fluid p-3">
             <div class="pb-3 d-flex align-items-sm-center flex-sm-row flex-column">
                 <div class="flex-grow-1">
                     <h4 class="fs-18 fw-semibold m-0">Pincode List</h4>
@@ -18,131 +18,121 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-body border border-dashed border-end-0 border-start-0">
-                            <form action="#" method="get">
-                                <div class="d-flex justify-content-between">
-                                    <div class="row">
-                                        <div class="col-xl-10 col-md-10 col-sm-10">
-                                            <div class="search-box">
-                                                <input type="text" name="search" value=""
-                                                    class="form-control search" placeholder="Search By Pincode">
-                                                <i class="ri-search-line search-icon"></i>
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-2 col-md-2 col-sm-2 col-2">
-                                            <div class="d-flex justify-content-center align-items-center">
-                                                <button type="submit" class="btn btn-primary waves ripple-light">
-                                                    <i class="fa-solid fa-magnifying-glass "></i>
-
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row g-3">
-                                        <div class="col-xl-6 col-md-6 col-sm-6 col-6 btn-group" role="group">
-                                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle"
+                        <div class="card-body pt-0">
+                            <ul class="nav nav-underline justify-content-between border-bottom p-2" id="pills-tab"
+                                role="tablist">
+                                <div class="fs-18 fw-semibold m-0">
+                                    Pincode Lists
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-12 text-end">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-primary dropdown-toggle" type="button"
                                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="fa-solid fa-arrow-up-z-a "></i>
+                                                <i class="fa-solid fa-sliders me-1"></i>
+                                                {{ ucfirst(str_replace('_', ' ', request()->get('status', 'all'))) }}
                                             </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="#">Sort By Pincode</a></li>
+
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                {{-- All Status --}}
+                                                <li class="dropdown-header">Status Filter</li>
+                                                <li>
+                                                    <a class="dropdown-item {{ request()->get('all') === 'active' ? 'active' : '' }}"
+                                                        href="{{ route('pincodes.index', ['all' => 'active']) }}">
+                                                        <i
+                                                            class="fa-solid fa-circle me-2 {{ request()->get('all') === 'active' ? 'text-primary' : 'text-muted' }} fs-14"></i>
+                                                        All
+                                                    </a>
+                                                </li>
+                                                <li class="dropdown-header">Delivery Status Filter</li>
+                                                <li>
+                                                    <a class="dropdown-item {{ request()->get('delivery_status') === 'active' ? 'active' : '' }}"
+                                                        href="{{ route('pincodes.index', ['delivery_status' => 'active']) }}">
+                                                        <i
+                                                            class="fa-solid fa-circle me-2 {{ request()->get('delivery_status') === 'active' ? 'text-primary' : 'text-muted' }} fs-14"></i>
+                                                        Active
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item {{ request()->get('delivery_status') === 'inactive' ? 'inactive' : '' }}"
+                                                        href="{{ route('pincodes.index', ['delivery_status' => 'inactive']) }}">
+                                                        <i
+                                                            class="fa-solid fa-circle me-2 {{ request()->get('delivery_status') === 'inactive' ? 'text-primary' : 'text-muted' }} fs-14"></i>
+                                                        Inactive
+                                                    </a>
+                                                </li>
+                                                <li class="dropdown-header">Installation Status Filter</li>
+                                                <li>
+                                                    <a class="dropdown-item {{ request()->get('installation_status') === 'active' ? 'active' : '' }}"
+                                                        href="{{ route('pincodes.index', ['installation_status' => 'active']) }}">
+                                                        <i
+                                                            class="fa-solid fa-circle me-2 {{ request()->get('installation_status') === 'active' ? 'text-primary' : 'text-muted' }} fs-14"></i>
+                                                        Active
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item {{ request()->get('installation_status') === 'inactive' ? 'inactive' : '' }}"
+                                                        href="{{ route('pincodes.index', ['installation_status' => 'inactive']) }}">
+                                                        <i
+                                                            class="fa-solid fa-circle me-2 {{ request()->get('installation_status') === 'inactive' ? 'text-primary' : 'text-muted' }} fs-14"></i>
+                                                        Inactive
+                                                    </a>
+                                                </li>
+                                                <li class="dropdown-header">Repair Status Filter</li>
+                                                <li>
+                                                    <a class="dropdown-item {{ request()->get('repair_status') === 'active' ? 'active' : '' }}"
+                                                        href="{{ route('pincodes.index', ['repair_status' => 'active']) }}">
+                                                        <i
+                                                            class="fa-solid fa-circle me-2 {{ request()->get('repair_status') === 'active' ? 'text-primary' : 'text-muted' }} fs-14"></i>
+                                                        Active
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item {{ request()->get('repair_status') === 'inactive' ? 'inactive' : '' }}"
+                                                        href="{{ route('pincodes.index', ['repair_status' => 'inactive']) }}">
+                                                        <i
+                                                            class="fa-solid fa-circle me-2 {{ request()->get('repair_status') === 'inactive' ? 'text-primary' : 'text-muted' }} fs-14"></i>
+                                                        Inactive
+                                                    </a>
+                                                </li>
+                                                <li class="dropdown-header">Quick Service Status Filter</li>
+                                                <li>
+                                                    <a class="dropdown-item {{ request()->get('quick_service_status') === 'active' ? 'active' : '' }}"
+                                                        href="{{ route('pincodes.index', ['quick_service_status' => 'active']) }}">
+                                                        <i
+                                                            class="fa-solid fa-circle me-2 {{ request()->get('quick_service_status') === 'active' ? 'text-primary' : 'text-muted' }} fs-14"></i>
+                                                        Active
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item {{ request()->get('quick_service_status') === 'inactive' ? 'inactive' : '' }}"
+                                                        href="{{ route('pincodes.index', ['quick_service_status' => 'inactive']) }}">
+                                                        <i
+                                                            class="fa-solid fa-circle me-2 {{ request()->get('quick_service_status') === 'inactive' ? 'text-primary' : 'text-muted' }} fs-14"></i>
+                                                        Inactive
+                                                    </a>
+                                                </li>
+                                                <li class="dropdown-header">AMC Status Filter</li>
+                                                <li>
+                                                    <a class="dropdown-item {{ request()->get('amc_status') === 'active' ? 'active' : '' }}"
+                                                        href="{{ route('pincodes.index', ['amc_status' => 'active']) }}">
+                                                        <i
+                                                            class="fa-solid fa-circle me-2 {{ request()->get('amc_status') === 'active' ? 'text-primary' : 'text-muted' }} fs-14"></i>
+                                                        Active
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item {{ request()->get('amc_status') === 'inactive' ? 'inactive' : '' }}"
+                                                        href="{{ route('pincodes.index', ['amc_status' => 'inactive']) }}">
+                                                        <i
+                                                            class="fa-solid fa-circle me-2 {{ request()->get('amc_status') === 'inactive' ? 'text-primary' : 'text-muted' }} fs-14"></i>
+                                                        Inactive
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </div>
-
-                                        <div class="col-xl-6 col-md-6 col-sm-6 col-6 btn-group" role="group">
-                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#standard-modal">
-                                                <i class="fa-solid fa-filter "></i>
-                                            </button>
-                                        </div>
                                     </div>
-                                    <div class="modal fade" id="standard-modal" tabindex="-1"
-                                        aria-labelledby="standard-modalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="standard-modalLabel">Filters</h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                                </div>
-
-                                                <div class="modal-body px-3 py-md-2">
-                                                    <h5>Delivery Status</h5>
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check mb-2">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault1">
-                                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                                        Avaliable
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault2">
-                                                                    <label class="form-check-label" for="flexRadioDefault2">
-                                                                        Not Avaliable
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-body px-3 py-md-2">
-                                                    <h5>Installation Status</h5>
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check mb-2">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault3">
-                                                                    <label class="form-check-label" for="flexRadioDefault3">
-                                                                        Avaliable
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <div class="mt-3">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="flexRadioDefault" id="flexRadioDefault4">
-                                                                    <label class="form-check-label" for="flexRadioDefault4">
-                                                                        Not Avaliable
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-light"
-                                                        data-bs-dismiss="modal">Close</button>
-                                                    <button type="button" class="btn btn-primary">Save changes</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                 </div>
-
-                            </form>
-                        </div>
-                        <div class="card-body pt-0">
-                            <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link active p-2" id="all_customer_tab" data-bs-toggle="tab"
-                                        href="#all_customer" role="tab">
-                                        <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
-                                        <span class="d-none d-sm-block">All Pincodes</span>
-                                    </a>
-                                </li>
                             </ul>
 
                             <div class="tab-content text-muted">
@@ -171,12 +161,37 @@
                                                                 <tr>
                                                                     <td>{{ $pincode->id }}</td>
                                                                     <td>{{ $pincode->pincode }}</td>
-                                                                    <td>{{ $pincode->delivery == 1 ? 'Active' : 'Inactive' }}</td>
-                                                                    <td>{{ $pincode->installation == 1 ? 'Active' : 'Inactive' }}</td>
-                                                                    <td>{{ $pincode->repair == 1 ? 'Active' : 'Inactive' }}</td>
-                                                                    <td>{{ $pincode->quick_service == 1 ? 'Active' : 'Inactive' }}</td>
-                                                                    <td>{{ $pincode->amc == 1 ? 'Active' : 'Inactive' }}</td>
-                                                                
+                                                                    <td>
+                                                                        <span
+                                                                            class="badge {{ $pincode->delivery == 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
+                                                                            {{ $pincode->delivery == 'active' ? 'Active' : 'Inactive' }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span
+                                                                            class="badge {{ $pincode->installation == 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
+                                                                            {{ $pincode->installation == 'active' ? 'Active' : 'Inactive' }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span
+                                                                            class="badge {{ $pincode->repair == 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
+                                                                            {{ $pincode->repair == 'active' ? 'Active' : 'Inactive' }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span
+                                                                            class="badge {{ $pincode->quick_service == 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
+                                                                            {{ $pincode->quick_service == 'active' ? 'Active' : 'Inactive' }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span
+                                                                            class="badge {{ $pincode->amc == 'active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} fw-semibold">
+                                                                            {{ $pincode->amc == 'active' ? 'Active' : 'Inactive' }}
+                                                                        </span>
+                                                                    </td>
+
                                                                     <td>
                                                                         <a aria-label="anchor"
                                                                             href="{{ route('pincodes.edit', $pincode->id) }}"

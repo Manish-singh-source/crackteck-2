@@ -58,10 +58,10 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Delivery',
                                                     'name' => 'delivery',
-                                                    'value' => '1',
+                                                    'value' => 'active',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'active' => 'Active',
+                                                        'inactive' => 'Inactive',
                                                     ],
                                                 ])
                                             </div>
@@ -70,10 +70,10 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Installation',
                                                     'name' => 'installation',
-                                                    'value' => '1',
+                                                    'value' => 'active',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'active' => 'Active',
+                                                        'inactive' => 'Inactive',
                                                     ],
                                                 ])
                                             </div>
@@ -82,10 +82,10 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Repair',
                                                     'name' => 'repair',
-                                                    'value' => '1',
+                                                    'value' => 'active',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'active' => 'Active',
+                                                        'inactive' => 'Inactive',
                                                     ],
                                                 ])
                                             </div>
@@ -94,10 +94,10 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Quick Service',
                                                     'name' => 'quick_service',
-                                                    'value' => '1',
+                                                    'value' => 'active',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'active' => 'Active',
+                                                        'inactive' => 'Inactive',
                                                     ],
                                                 ])
                                             </div>
@@ -106,10 +106,10 @@
                                                 @include('components.form.select', [
                                                     'label' => 'AMC',
                                                     'name' => 'amc',
-                                                    'value' => '1',
+                                                    'value' => 'active',
                                                     'options' => [
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
+                                                        'active' => 'Active',
+                                                        'inactive' => 'Inactive',
                                                     ],
                                                 ])
                                             </div>  
@@ -124,8 +124,6 @@
                                     <button type="submit" class="btn btn-success w-sm waves ripple-light">
                                         Submit
                                     </button> 
-                                    {{-- <a href="{{ route('pincodes.index') }}"
-                                        class="btn btn-success w-sm waves ripple-light">Submit</a> --}}
                                 </div>
                             </div>
 

@@ -24,6 +24,16 @@
                 </div>
             </div>
 
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="row">
                 <div class="col-12">
                     <form action="{{ route('meets.store') }}" method="POST" enctype="multipart/form-data">
@@ -52,7 +62,7 @@
                                                     @foreach ($leads as $lead)
                                                         <option value="{{ $lead->id }}"
                                                             {{ old('lead_id') == $lead->id ? 'selected' : '' }}>
-                                                            {{ $lead->id . ' - ' . $lead->first_name . ' ' . $lead->last_name }}
+                                                            {{ $lead->id . ' - ' . $lead->lead_number }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -70,6 +80,29 @@
                                                     'readonly' => true,
                                                 ])
                                             </div>
+
+                                            <div class="col-6">
+                                                @include('components.form.input', [
+                                                    'label' => 'Sales Person Name',
+                                                    'name' => 'staff_name',
+                                                    'id' => 'staff_name',
+                                                    'type' => 'text',
+                                                    'placeholder' => 'Select Lead',
+                                                    'readonly' => true,
+                                                ])
+                                            </div>
+
+                                            <div class="col-6 d-none">
+                                                @include('components.form.input', [
+                                                    'label' => 'Sales Person Name',
+                                                    'name' => 'staff_id',
+                                                    'id' => 'staff_id',
+                                                    'type' => 'text',
+                                                    'placeholder' => 'Select Lead',
+                                                    'readonly' => true,
+                                                ])
+                                            </div>
+
                                             <div class="col-6">
                                                 @include('components.form.input', [
                                                     'label' => 'Meeting Title',
@@ -78,20 +111,6 @@
                                                     'placeholder' => 'Enter Meeting Title',
                                                 ])
                                             </div>
-                                            <div class="col-6">
-                                                @include('components.form.select', [
-                                                    'label' => 'Meeting Type',
-                                                    'name' => 'meeting_type',
-                                                    'options' => [
-                                                        '0' => '--Select Meeting Type--',
-                                                        'Onsite Demo' => 'Onsite Demo',
-                                                        'Virtual Meeting' => 'Virtual Meeting',
-                                                        'Technical Visit' => 'Technical Visit',
-                                                        'Business Meeting' => 'Business Meeting',
-                                                    ],
-                                                ])
-                                            </div>
-
 
                                             <div class="col-6">
                                                 @include('components.form.input', [
@@ -100,6 +119,7 @@
                                                     'type' => 'date',
                                                 ])
                                             </div>
+
                                             <div class="col-6">
                                                 @include('components.form.input', [
                                                     'label' => 'Time',
@@ -107,17 +127,22 @@
                                                     'type' => 'time',
                                                 ])
                                             </div>
-                                            
+
                                             <div class="col-6">
-                                                <label for="meetAgenda" class="form-label">Meeting Agenda / Notes<span
-                                                        class="text-danger">*</span></label>
-                                                <textarea name="meetAgenda" id="meetAgenda" class="form-control"></textarea>
+                                                @include('components.form.select', [
+                                                    'label' => 'Meeting Type',
+                                                    'name' => 'meeting_type',
+                                                    'options' => [
+                                                        '' => '--Select Meeting Type--',
+                                                        'onsite_demo' => 'Onsite Demo',
+                                                        'virtual_meeting' => 'Virtual Meeting',
+                                                        'technical_visit' => 'Technical Visit',
+                                                        'business_meeting' => 'Business Meeting',
+                                                        'other' => 'Other',
+                                                    ],
+                                                ])
                                             </div>
-                                            <div class="col-6">
-                                                <label for="followUp" class="form-label">Follow-up Task<span
-                                                        class="text-danger">*</span></label>
-                                                <textarea name="followUp" id="followUp" class="form-control"></textarea>
-                                            </div>
+
                                             <div class="col-6">
                                                 @include('components.form.input', [
                                                     'label' => 'Location / Meeting Link',
@@ -126,6 +151,18 @@
                                                     'placeholder' => 'Enter Location / Meeting Link',
                                                 ])
                                             </div>
+                                            
+                                            <div class="col-6">
+                                                <label for="meetAgenda" class="form-label">Meeting Agenda<span
+                                                        class="text-danger">*</span></label>
+                                                <textarea name="meetAgenda" id="meetAgenda" class="form-control"></textarea>
+                                            </div>
+                                            <div class="col-6">
+                                                <label for="followUp" class="form-label">Follow-up Task<span
+                                                        class="text-danger">*</span></label>
+                                                <textarea name="followUp" id="followUp" class="form-control"></textarea>
+                                            </div>
+                                            
                                             <div class="col-6">
                                                 @include('components.form.input', [
                                                     'label' => 'Attachments',
@@ -139,25 +176,15 @@
                                                     'label' => 'Status',
                                                     'name' => 'status',
                                                     'options' => [
-                                                        '' => '--Select Sales Rep--',
-                                                        'Scheduled' => 'Scheduled',
-                                                        'Confirmed' => 'Confirmed',
-                                                        'Completed' => 'Completed',
-                                                        'Cancelled' => 'Cancelled',
+                                                        '' => '--Select Status--',
+                                                        'scheduled' => 'Scheduled',
+                                                        'confirmed' => 'Confirmed',
+                                                        'completed' => 'Completed',
+                                                        'cancelled' => 'Cancelled',
+                                                        'rescheduled' => 'Rescheduled',
                                                     ],
                                                 ])
                                             </div>
-
-
-                                            <!-- <div class="col-6">
-                                                    <label for="reminderSetting" class="form-label">Reminder Settings <span class="text-danger">*</span></label>
-                                                    <input type="date" required="" name="reminderSetting" id="reminderSetting" class="form-control" value="" placeholder="">
-                                                </div>
-                                                <div class="col-6">
-                                                    <label for="calendar" class="form-label">Calendar Sync <span class="text-danger">*</span></label>
-                                                    <input type="date" required="" name="calendar" id="calendar" class="form-control" value="" placeholder="">
-                                                </div> -->
-
                                         </div>
                                     </div>
                                 </div>
@@ -169,7 +196,6 @@
                                     <button type="submit" class="btn btn-success w-sm waves ripple-light">
                                         Submit
                                     </button>
-                                    {{-- <a href="{{ route('meets.index') }}" class="btn btn-success w-sm waves ripple-light">Submit</a> --}}
                                 </div>
                             </div>
 
@@ -185,15 +211,30 @@
             let leadId = this.value;
 
             if (leadId) {
+                // Send GET request to fetch lead data
                 fetch(`/demo/crm/fetch-leads/${leadId}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`Network response was not ok: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        console.log(data)
+                        console.log('Data:', data);
+                        // If no error in data, update the form fields
                         if (!data.error) {
-                            document.getElementById('client_name').value = data.client_name ?? '';
+                            document.querySelector('[name="staff_name"]').value = data.staff_name || '';
+                            document.querySelector('[name="staff_id"]').value = data.staff_id || '';
+                            document.querySelector('[name="client_name"]').value = data.client_name || '';
+                        } else {
+                            alert('Error: ' + data.error);
                         }
                     })
-                    .catch(error => console.error('Error:', error));
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while fetching the lead data: ' + error.message);
+                    });
             }
         });
     </script>

@@ -473,15 +473,15 @@ Route::prefix('/demo')->group(function () {
             Route::put('/update-amc-plans/{id}', 'update')->name('amc-plan.update');
             Route::delete('/delete-amc-plans{id}', 'delete')->name('amc-plan.delete');
 
-            // Covered Items Page
-            Route::get('/covered-items', 'coveredItems')->name('covered-items.index');
-            Route::get('/create-covered-items', 'createCoveredItems')->name('covered-items.create');
-            Route::post('/store-covered-items', 'storeCoveredItems')->name('covered-items.store');
-            Route::get('/edit-covered-items/{id}', 'editCoveredItems')->name('covered-items.edit');
-            Route::put('/update-covered-items/{id}', 'updateCoveredItems')->name('covered-items.update');
-            Route::delete('/delete-covered-items/{id}', 'deleteCoveredItems')->name('covered-items.delete');
-        });
+        // Covered Items Page
+        Route::get('/crm/covered-items', 'coveredItems')->name('covered-items.index');
+        Route::get('/crm/create-covered-items', 'createCoveredItems')->name('covered-items.create');
+        Route::post('/crm/store-covered-items', 'storeCoveredItems')->name('covered-items.store');
+        Route::get('/crm/edit-covered-items/{id}', 'editCoveredItems')->name('covered-items.edit');
+        Route::put('/crm/update-covered-items/{id}', 'updateCoveredItems')->name('covered-items.update');
+        Route::delete('/crm/delete-covered-items/{id}', 'deleteCoveredItems')->name('covered-items.delete');
     });
+
     // ------------------------------------------------------------ AMC Services Page (Active AMC Services) -------------------------------------------------------------
 
     Route::controller(AmcServicesController::class)->group(function () {

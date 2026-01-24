@@ -599,21 +599,16 @@ Route::prefix('/demo')->group(function () {
         Route::get('/crm/activity-logs', 'index')->name('activity-logs.index');
     });
 
-    // ------------------------------------------------------------ Pincodes Page -------------------------------------------------------------
-
-    Route::controller(PincodeController::class)->group(function () {
-        // Pincodes Page
-        Route::get('/crm/manage-pincodes', 'index')->name('pincodes.index');
-        // Create Pincode Page
-        Route::get('/crm/create-manage-pincodes', 'create')->name('pincodes.create');
-        // Store Pincode Page
-        Route::post('/crm/store-manage-pincodes', 'store')->name('pincodes.store');
-        // Edit Pincode Page
-        Route::get('/crm/edit-manage-pincodes/{id}', 'edit')->name('pincodes.edit');
-        // Update Pincode Page
-        Route::put('/crm/update-manage-pincodes/{id}', 'update')->name('pincodes.update');
-        // Delete Pincode Page
-        Route::delete('/crm/delete-manage-pincode/{id}', 'delete')->name('pincodes.delete');
+    Route::prefix('/crm')->group(function () {
+        // ------------------------------------------------------------ Pincodes Page -------------------------------------------------------------
+        Route::controller(PincodeController::class)->group(function () {
+            Route::get('/manage-pincodes', 'index')->name('pincodes.index');
+            Route::get('/create-manage-pincodes', 'create')->name('pincodes.create');
+            Route::post('/store-manage-pincodes', 'store')->name('pincodes.store');
+            Route::get('/edit-manage-pincodes/{id}', 'edit')->name('pincodes.edit');
+            Route::put('/update-manage-pincodes/{id}', 'update')->name('pincodes.update');
+            Route::delete('/delete-manage-pincode/{id}', 'delete')->name('pincodes.delete');
+        });
     });
 
     // ------------------------------------------------------------ Pickup Requests Page -------------------------------------------------------------

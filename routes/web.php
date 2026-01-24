@@ -463,21 +463,15 @@ Route::prefix('/demo')->group(function () {
         Route::post('/crm/quotation/assign-engineer', 'assignEngineer')->name('quotation.assign-engineer');
     });
 
-    // ------------------------------------------------------------ AMC Plans Page -------------------------------------------------------------
-
-    Route::controller(AmcController::class)->group(function () {
-        // AMC Plans Page
-        Route::get('/crm/amc-plans', 'index')->name('amc-plans.index');
-        // Create AMC Plans Page
-        Route::get('/crm/create-amc-plans', 'create')->name('amc-plan.create');
-        // Store AMC Plans Page
-        Route::post('/crm/store-amc-plans', 'store')->name('amc-plan.store');
-        // Edit AMC Plans Page
-        Route::get('/crm/edit-amc-plans/{id}', 'edit')->name('amc-plan.edit');
-        // Update AMC Plans Page
-        Route::put('/crm/update-amc-plans/{id}', 'update')->name('amc-plan.update');
-        // Delete AMC Plans page
-        Route::delete('/crm/delete-amc-plans{id}', 'delete')->name('amc-plan.delete');
+    Route::prefix('/crm')->group(function () {
+        // ------------------------------------------------------------ AMC Plans Page -------------------------------------------------------------
+        Route::controller(AmcController::class)->group(function () {
+            Route::get('/amc-plans', 'index')->name('amc-plans.index');
+            Route::get('/create-amc-plans', 'create')->name('amc-plan.create');
+            Route::post('/store-amc-plans', 'store')->name('amc-plan.store');
+            Route::get('/edit-amc-plans/{id}', 'edit')->name('amc-plan.edit');
+            Route::put('/update-amc-plans/{id}', 'update')->name('amc-plan.update');
+            Route::delete('/delete-amc-plans{id}', 'delete')->name('amc-plan.delete');
 
         // Covered Items Page
         Route::get('/crm/covered-items', 'coveredItems')->name('covered-items.index');

@@ -15,7 +15,12 @@ class AmcController extends Controller
     //
     public function index()
     {
-        $amcPlans = AmcPlan::all();
+        $amcPlans = AmcPlan::query();
+        if ($status = request()->get('status')) {
+            $amcPlans->where('status', $status);
+        }
+        $amcPlans = $amcPlans->get();
+
         $coveredItems = CoveredItem::all();
 
         return view('/crm/amc-plans/index', compact('amcPlans', 'coveredItems'));
@@ -23,16 +28,29 @@ class AmcController extends Controller
 
     public function create()
     {
-        $coveredItems = CoveredItem::all();
-        // dd($coveredItems);
+        $coveredItems = CoveredItem::where('status', 'active')
+            ->orderBy('service_type')
+            ->orderBy('service_name')
+            ->get();
         return view('/crm/amc-plans/create', compact('coveredItems'));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'plan_name' => 'required',
+            'plan_name' => 'required|string|max:255',
             'plan_code' => 'required',
+            'description' => 'nullable|string|max:255',
+            'duration' => 'required|numeric|min:1',
+            'total_visits' => 'required|numeric|min:1',
+            'plan_cost' => 'required|numeric|min:0',
+            'tax' => 'required|numeric|min:0',
+            'total_cost' => 'required|numeric|min:0',
+            'pay_terms' => 'required|string|max:255',
+            'support_type' => 'required|string|max:255',
+            'tandc' => 'nullable|string|max:255',
+            'replacement_policy' => 'nullable|string|max:255',
+            'status' => 'required|in:active,inactive',
         ]);
 
         if ($validator->fails()) {
@@ -51,13 +69,13 @@ class AmcController extends Controller
             $amc->total_cost = $request->total_cost;
             $amc->pay_terms = $request->pay_terms;
             $amc->support_type = $request->support_type;
-            $amc->covered_items = json_encode($request->covered_items_ids) ?? [];
+            $amc->covered_items = $request->covered_items_ids ?? [];
 
             if ($request->hasFile('brochure')) {
                 $file = $request->file('brochure');
-                $filename = time().'.'.$file->getClientOriginalExtension();
+                $filename = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/amc/brochure'), $filename);
-                $amc->brochure = 'uploads/crm/amc/brochure/'.$filename;
+                $amc->brochure = 'uploads/crm/amc/brochure/' . $filename;
             }
 
             $amc->tandc = $request->tandc;
@@ -68,15 +86,18 @@ class AmcController extends Controller
 
             return redirect()->route('amc-plans.index')->with('success', 'AMC Plan added successfully.');
         } catch (\Exception $e) {
-            Log::error('AMC Plan Store Error: '.$e->getMessage());
-            return redirect()->back()->with('error', 'Error creating AMC Plan: '.$e->getMessage())->withInput();
+            Log::error('AMC Plan Store Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error creating AMC Plan: ' . $e->getMessage())->withInput();
         }
     }
 
     public function edit($id)
     {
         $amcPlan = AmcPlan::findOrFail($id);
-        $coveredItems = CoveredItem::all();
+        $coveredItems = CoveredItem::where('status', 'active')
+            ->orderBy('service_type')
+            ->orderBy('service_name')
+            ->get();
 
         // Normalize covered_items to array
         $selectedCoveredItems = [];
@@ -96,8 +117,19 @@ class AmcController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'plan_name' => 'required',
+            'plan_name' => 'required|string|max:255',
             'plan_code' => 'required',
+            'description' => 'nullable|string|max:255',
+            'duration' => 'required|numeric|min:1',
+            'total_visits' => 'required|numeric|min:1',
+            'plan_cost' => 'required|numeric|min:0',
+            'tax' => 'required|numeric|min:0',
+            'total_cost' => 'required|numeric|min:0',
+            'pay_terms' => 'required|string|max:255',
+            'support_type' => 'required|string|max:255',
+            'tandc' => 'nullable|string|max:255',
+            'replacement_policy' => 'nullable|string|max:255',
+            'status' => 'required|in:active,inactive',
         ]);
 
         if ($validator->fails()) {
@@ -126,7 +158,7 @@ class AmcController extends Controller
                     $coveredIds = array_values(
                         array_filter(
                             array_map('intval', $decoded),
-                            fn ($id) => $id > 0
+                            fn($id) => $id > 0
                         )
                     );
                 }
@@ -141,9 +173,9 @@ class AmcController extends Controller
                 }
 
                 $file = $request->file('brochure');
-                $filename = time().'.'.$file->getClientOriginalExtension();
+                $filename = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/amc/brochure'), $filename);
-                $amc->brochure = 'uploads/crm/amc/brochure/'.$filename;
+                $amc->brochure = 'uploads/crm/amc/brochure/' . $filename;
             }
 
             $amc->tandc = $request->tandc;
@@ -156,11 +188,11 @@ class AmcController extends Controller
                 ->route('amc-plans.index')
                 ->with('success', 'AMC Plan updated successfully.');
         } catch (\Exception $e) {
-            Log::error('AMC Plan Update Error: '.$e->getMessage());
+            Log::error('AMC Plan Update Error: ' . $e->getMessage());
 
             return redirect()
                 ->back()
-                ->with('error', 'Error updating AMC Plan: '.$e->getMessage())
+                ->with('error', 'Error updating AMC Plan: ' . $e->getMessage())
                 ->withInput();
         }
     }
@@ -204,7 +236,7 @@ class AmcController extends Controller
             'status' => 'nullable|in:active,inactive',
             'diagnosis_list' => 'nullable|string', // JSON string from hidden field
         ]);
-    
+
         try {
             DB::beginTransaction();
 
@@ -237,7 +269,7 @@ class AmcController extends Controller
                 'diagnosis_list' => $diagnosis,                      // array, casted as JSON
             ]);
 
-            if(!$coveredItem) {
+            if (!$coveredItem) {
                 DB::rollBack();
 
                 return redirect()
@@ -254,7 +286,7 @@ class AmcController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            Log::error('Error creating covered item: '.$e->getMessage(), [
+            Log::error('Error creating covered item: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
 
@@ -262,7 +294,7 @@ class AmcController extends Controller
                 ->back()
                 ->withInput()
                 ->withErrors([
-                    'error' => 'An error occurred while creating the service: '.$e->getMessage(),
+                    'error' => 'An error occurred while creating the service: ' . $e->getMessage(),
                 ]);
         }
     }

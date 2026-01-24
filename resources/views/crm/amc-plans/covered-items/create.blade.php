@@ -43,43 +43,16 @@
 
                                     <div class="card-body">
                                         <div class="row g-3">
-
-                                            {{-- Service Type --}}
-                                            {{-- <div class="col-md-4">
-                                                <label for="service_type" class="form-label">
-                                                    Service Type <span class="text-danger">*</span>
-                                                </label>
-                                                <select name="service_type" id="service_type"
-                                                        class="form-select @error('service_type') is-invalid @enderror">
-                                                    <option value="">-- Select Service Type --</option>
-                                                    <option value="amc" {{ old('service_type') == 'amc' ? 'selected' : '' }}>
-                                                        AMC
-                                                    </option>
-                                                    <option value="quick_service" {{ old('service_type') == 'quick_service' ? 'selected' : '' }}>
-                                                        Quick Service
-                                                    </option>
-                                                    <option value="installation" {{ old('service_type') == 'installation' ? 'selected' : '' }}>
-                                                        Installation
-                                                    </option>
-                                                    <option value="repair" {{ old('service_type') == 'repair' ? 'selected' : '' }}>
-                                                        Repair
-                                                    </option>
-                                                </select>
-                                                @error('service_type')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div> --}}
-
                                             <div class="col-md-3">
                                                 @include('components.form.select', [
                                                     'label' => 'Service Type',
                                                     'name' => 'service_type',
                                                     'options' => [
                                                         '' => '--Select --',
-                                                        '0' => 'AMC',
-                                                        '1' => 'Quick Service',
-                                                        '2' => 'Installation',
-                                                        '3' => 'Repair',
+                                                        'amc' => 'AMC',
+                                                        'quick_service' => 'Quick Service',
+                                                        'installation' => 'Installation',
+                                                        'repair' => 'Repair',
                                                     ],
                                                 ])
                                                 @error('service_type')
@@ -103,13 +76,10 @@
                                                     Service Charge
                                                     <small class="text-muted">(Not required for AMC)</small>
                                                 </label>
-                                                <input type="number"
-                                                       step="0.01"
-                                                       class="form-control @error('service_charge') is-invalid @enderror"
-                                                       id="service_charge"
-                                                       name="service_charge"
-                                                       placeholder="Enter Service Charge"
-                                                       value="{{ old('service_charge') }}">
+                                                <input type="number" step="0.01"
+                                                    class="form-control @error('service_charge') is-invalid @enderror"
+                                                    id="service_charge" name="service_charge"
+                                                    placeholder="Enter Service Charge" value="{{ old('service_charge') }}">
                                                 @error('service_charge')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -119,9 +89,11 @@
                                             <div class="col-md-3">
                                                 <label for="status" class="form-label">Status</label>
                                                 <select name="status" id="status"
-                                                        class="form-select @error('status') is-invalid @enderror">
-                                                    <option value="1" {{ old('status', '1') == '1' ? 'selected' : '' }}>Active</option>
-                                                    <option value="0" {{ old('status') === '0' ? 'selected' : '' }}>Inactive</option>
+                                                    class="form-select @error('status') is-invalid @enderror">
+                                                    <option value="active"
+                                                        {{ old('status', '1') == '1' ? 'selected' : '' }}>Active</option>
+                                                    <option value="inactive" {{ old('status') === '0' ? 'selected' : '' }}>
+                                                        Inactive</option>
                                                 </select>
                                                 @error('status')
                                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -134,26 +106,20 @@
                                                     Diagnosis List
                                                 </label>
                                                 <div class="input-group mb-2">
-                                                    <input type="text"
-                                                           class="form-control"
-                                                           id="diagnosis_input"
-                                                           placeholder="Enter a diagnosis and click Add">
-                                                    <button type="button"
-                                                            class="btn btn-outline-primary"
-                                                            id="add_diagnosis_btn">
+                                                    <input type="text" class="form-control" id="diagnosis_input"
+                                                        placeholder="Enter a diagnosis and click Add">
+                                                    <button type="button" class="btn btn-outline-primary"
+                                                        id="add_diagnosis_btn">
                                                         Add
                                                     </button>
                                                 </div>
 
-                                                <div id="diagnosis_list"
-                                                     class="border rounded p-2"
-                                                     style="min-height: 40px;">
+                                                <div id="diagnosis_list" class="border rounded p-2"
+                                                    style="min-height: 40px;">
                                                 </div>
 
-                                                <input type="hidden"
-                                                       name="diagnosis_list"
-                                                       id="diagnosis_list_json"
-                                                       value='@json(old("diagnosis_list", []))'>
+                                                <input type="hidden" name="diagnosis_list" id="diagnosis_list_json"
+                                                    value='@json(old('diagnosis_list', []))'>
                                                 @error('diagnosis_list')
                                                     <div class="text-danger small">{{ $message }}</div>
                                                 @enderror
@@ -184,60 +150,60 @@
 @endsection
 
 @section('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Service charge required toggle (optional UX)
-    const typeSelect = document.getElementById('service_type');
-    const chargeInput = document.getElementById('service_charge');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Service charge required toggle (optional UX)
+            const typeSelect = document.getElementById('service_type');
+            const chargeInput = document.getElementById('service_charge');
 
-    function toggleServiceChargeRequired() {
-        if (typeSelect.value === '0') {
-            chargeInput.removeAttribute('required');
-        } else {
-            chargeInput.setAttribute('required', 'required');
-        }
-    }
-    if (typeSelect && chargeInput) {
-        typeSelect.addEventListener('change', toggleServiceChargeRequired);
-        toggleServiceChargeRequired();
-    }
+            function toggleServiceChargeRequired() {
+                if (typeSelect.value === '0') {
+                    chargeInput.removeAttribute('required');
+                } else {
+                    chargeInput.setAttribute('required', 'required');
+                }
+            }
+            if (typeSelect && chargeInput) {
+                typeSelect.addEventListener('change', toggleServiceChargeRequired);
+                toggleServiceChargeRequired();
+            }
 
-    // Diagnosis list tag manager
-    const diagInput   = document.getElementById('diagnosis_input');
-    const addDiagBtn  = document.getElementById('add_diagnosis_btn');
-    const listDiv     = document.getElementById('diagnosis_list');
-    const jsonField   = document.getElementById('diagnosis_list_json');
+            // Diagnosis list tag manager
+            const diagInput = document.getElementById('diagnosis_input');
+            const addDiagBtn = document.getElementById('add_diagnosis_btn');
+            const listDiv = document.getElementById('diagnosis_list');
+            const jsonField = document.getElementById('diagnosis_list_json');
 
-    if (!diagInput || !addDiagBtn || !listDiv || !jsonField) {
-        return;
-    }
+            if (!diagInput || !addDiagBtn || !listDiv || !jsonField) {
+                return;
+            }
 
-    let items = [];
+            let items = [];
 
-    // Load existing (old) values
-    try {
-        const existing = jsonField.value ? JSON.parse(jsonField.value) : [];
-        if (Array.isArray(existing)) {
-            items = existing;
-        }
-    } catch (e) {
-        items = [];
-    }
+            // Load existing (old) values
+            try {
+                const existing = jsonField.value ? JSON.parse(jsonField.value) : [];
+                if (Array.isArray(existing)) {
+                    items = existing;
+                }
+            } catch (e) {
+                items = [];
+            }
 
-    function renderDiagnosis() {
-        listDiv.innerHTML = '';
+            function renderDiagnosis() {
+                listDiv.innerHTML = '';
 
-        if (!items.length) {
-            listDiv.innerHTML =
-                '<span class="text-muted small">No diagnosis added yet.</span>';
-        }
+                if (!items.length) {
+                    listDiv.innerHTML =
+                        '<span class="text-muted small">No diagnosis added yet.</span>';
+                }
 
-        items.forEach((item, index) => {
-            const id = 'diag_' + index;
-            const wrapper = document.createElement('div');
-            wrapper.className = 'form-check form-check-inline me-3 mb-1';
+                items.forEach((item, index) => {
+                    const id = 'diag_' + index;
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'form-check form-check-inline me-3 mb-1';
 
-            wrapper.innerHTML = `
+                    wrapper.innerHTML = `
                 <input class="form-check-input diagnosis-checkbox"
                        type="checkbox"
                        id="${id}"
@@ -248,46 +214,46 @@ document.addEventListener('DOMContentLoaded', function () {
                 </label>
             `;
 
-            listDiv.appendChild(wrapper);
-        });
+                    listDiv.appendChild(wrapper);
+                });
 
-        jsonField.value = JSON.stringify(items);
-    }
-
-    function addDiagnosisFromInput() {
-        const value = diagInput.value.trim();
-        if (!value) return;
-
-        const exists = items.some(t => t.toLowerCase() === value.toLowerCase());
-        if (!exists) {
-            items.push(value);
-            renderDiagnosis();
-        }
-        diagInput.value = '';
-        diagInput.focus();
-    }
-
-    addDiagBtn.addEventListener('click', addDiagnosisFromInput);
-
-    diagInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            addDiagnosisFromInput();
-        }
-    });
-
-    listDiv.addEventListener('change', function (e) {
-        if (!e.target.classList.contains('diagnosis-checkbox')) return;
-        const index = parseInt(e.target.getAttribute('data-index'), 10);
-        if (!isNaN(index) && items[index] !== undefined) {
-            if (!e.target.checked) {
-                items.splice(index, 1);
-                renderDiagnosis();
+                jsonField.value = JSON.stringify(items);
             }
-        }
-    });
 
-    renderDiagnosis();
-});
-</script>
+            function addDiagnosisFromInput() {
+                const value = diagInput.value.trim();
+                if (!value) return;
+
+                const exists = items.some(t => t.toLowerCase() === value.toLowerCase());
+                if (!exists) {
+                    items.push(value);
+                    renderDiagnosis();
+                }
+                diagInput.value = '';
+                diagInput.focus();
+            }
+
+            addDiagBtn.addEventListener('click', addDiagnosisFromInput);
+
+            diagInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addDiagnosisFromInput();
+                }
+            });
+
+            listDiv.addEventListener('change', function(e) {
+                if (!e.target.classList.contains('diagnosis-checkbox')) return;
+                const index = parseInt(e.target.getAttribute('data-index'), 10);
+                if (!isNaN(index) && items[index] !== undefined) {
+                    if (!e.target.checked) {
+                        items.splice(index, 1);
+                        renderDiagnosis();
+                    }
+                }
+            });
+
+            renderDiagnosis();
+        });
+    </script>
 @endsection

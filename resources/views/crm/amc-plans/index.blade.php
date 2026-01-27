@@ -56,7 +56,7 @@
                             </ul>
 
                             <div class="tab-content text-muted">
-                                <div class="tab-pane active show pt-4" id="all_active" role="tabpanel">
+                                <div class="tab-pane active show" id="all_active" role="tabpanel">
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="card shadow-none">

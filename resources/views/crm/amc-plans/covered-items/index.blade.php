@@ -5,7 +5,7 @@
 
         <!-- Start Content-->
         <div class="container-fluid">
-            <div class="pb-3 d-flex align-items-sm-center flex-sm-row flex-column">
+            <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
                 <div class="flex-grow-1">
                     <h4 class="fs-18 fw-semibold m-0">Covered Items List</h4>
                 </div>
@@ -56,7 +56,7 @@
 
                             <div class="tab-content text-muted">
 
-                                <div class="tab-pane active show pt-4" id="all_customer" role="tabpanel">
+                                <div class="tab-pane active show" id="all_customer" role="tabpanel">
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="card shadow-none">

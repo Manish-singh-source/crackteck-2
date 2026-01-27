@@ -48,10 +48,37 @@ class ServiceRequestController extends Controller
     //
     public function index()
     {
-        $serviceRequests = ServiceRequest::with(['customer', 'products'])->get();
+        // Common relationships
+        $baseQuery = ServiceRequest::with(['customer', 'products']);
 
-        return view('/crm/service-request/index', compact('serviceRequests'));
+        // AMC
+        $amcServices = (clone $baseQuery)
+            ->where('service_type', 'amc')
+            ->get();
+
+        // Installation
+        $installationServices = (clone $baseQuery)
+            ->where('service_type', 'installation')
+            ->get();
+
+        // Repairing
+        $repairingServices = (clone $baseQuery)
+            ->where('service_type', 'repairing')
+            ->get();
+
+        // Quick
+        $quickServiceRequests = (clone $baseQuery)
+            ->where('service_type', 'quick_service')
+            ->get();
+
+        return view('crm.service-request.index', compact(
+            'amcServices',
+            'installationServices',
+            'repairingServices',
+            'quickServiceRequests'
+        ));
     }
+
 
     public function create()
     {
@@ -1353,7 +1380,7 @@ class ServiceRequestController extends Controller
             $serviceRequest->update([
                 'customer_id' => $customer->id,
                 'service_type' => 'quick_service', // Quick Service
-                'request_source' => 'system',   
+                'request_source' => 'system',
                 'request_date' => $serviceRequest->request_date ?? now(),
                 'created_by' => $serviceRequest->created_by ?? Auth::id(),
                 'status' => $request->status ?? $serviceRequest->status,

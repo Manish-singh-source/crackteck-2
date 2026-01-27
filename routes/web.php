@@ -54,7 +54,7 @@ Route::get('/', function () {
 })->name('comming-soon');
 
 Route::prefix('/demo')->group(function () {
-    
+
     Route::controller(AuthController::class)->group(function () {
         // Login Page
         Route::get('/admin/login', 'login')->name('login');
@@ -694,7 +694,7 @@ Route::prefix('/demo')->group(function () {
         // Spare Parts Requests Page
         Route::get('/crm/spare-parts-requests', 'index')->name('spare-parts-requests.index');
         // View Parts Requests Page
-        Route::get('/crm/view-spare-parts-requests', 'view')->name('spare-parts-requests.view');
+        Route::get('/crm/spare-parts-requests/{id}', 'view')->name('spare-parts-requests.view');
     });
 
     // ------------------------------------------------------------ Assign Products Page -------------------------------------------------------------
@@ -787,5 +787,4 @@ Route::prefix('/demo')->group(function () {
         // Assign Engineer to Quick Service Request
         Route::post('crm/quick-service-requests/assign-engineer', 'assignEngineer')->name('quick-service-requests.assign-engineer');
     });
-
 });

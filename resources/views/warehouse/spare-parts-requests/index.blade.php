@@ -74,9 +74,10 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>Sr. No.</th>
+                                                                <th>Request Id</th>
                                                                 <th>Requested By</th>
                                                                 <th>Requested Date</th>
-                                                                <th>No of Items</th>
+                                                                <th>Part Id</th>
                                                                 <th>Total Quantity</th>
                                                                 <th>Request Type</th>
                                                                 <th>Approval Status</th>
@@ -126,11 +127,12 @@
                                                             @forelse($stockRequests as $index => $request)
                                                                 <tr>
                                                                     <td>{{ $index + 1 }}</td>
+                                                                    <td>{{ $request->serviceRequest->request_id ?? 'N/A' }}
                                                                     <td>{{ $request->fromEngineer->first_name ?? 'N/A' }}
                                                                         {{ $request->fromEngineer->last_name ?? 'N/A' }}
                                                                     </td>
                                                                     <td>{{ $request->created_at->format('Y-m-d') }}</td>
-                                                                    <td>{{ $request->requested_part_count }}</td>
+                                                                    <td>{{ $request->product->product_name }}</td>
                                                                     <td>{{ $request?->requested_quantity ?? '0' }}</td>
                                                                     <td>
                                                                         {{ ucwords(str_replace('_', ' ', $request->request_type)) }}

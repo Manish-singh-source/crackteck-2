@@ -67,4 +67,9 @@ class ServiceRequestProductRequestPart extends Model
     {
     return $this->belongsTo(ProductSerial::class, 'part_id');
     }
+
+    public function product()
+    {
+    return $this->belongsTo(Product::class, 'part_id');
+    }
 }

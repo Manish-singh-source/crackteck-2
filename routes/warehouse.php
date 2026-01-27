@@ -145,7 +145,7 @@ Route::prefix('demo/warehouse')->group(function () {
         // Spare Parts Requests
         Route::get('/spare-parts', 'index')->name('spare-parts.index');
         // View/Edit Stock Request Page
-        Route::get('/spare-parts/{stockRequest}', 'view')->name('spare-parts.view');
+        Route::get('/spare-parts/{id}', 'view')->name('spare-parts.view');
         // Assign Delivery Man/Engineer
         Route::put('/assign-person/{id}', 'assignPerson')->name('spare-parts.assign-person');
     });

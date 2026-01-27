@@ -21,27 +21,63 @@ class SparePartController extends Controller
     /**
      * Display a listing of all spare part requests.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $status = request()->get('status') ?? 'all';
-        
+        $status = $request->get('status', 'all');
+
         $stockRequests = ServiceRequestProductRequestPart::query();
-        if ($status != 'all') {
+
+        if ($status !== 'all') {
             $stockRequests->where('status', $status);
         }
-       $stockRequests = $stockRequests->withCount('requestedPart')
-        ->with(['serviceRequest', 'serviceRequestProduct', 'fromEngineer', 'assignedEngineer', 'requestedPart'])
-            ->orderBy('created_at', 'desc')
+
+        $stockRequests = $stockRequests
+            ->withCount('requestedPart')
+            ->with([
+                'serviceRequest',
+                'serviceRequestProduct',
+                'fromEngineer',
+                'assignedEngineer',
+                'requestedPart',
+            ])
+            ->orderByDesc('created_at')
             ->get();
 
-        // dd($stockRequests);
-        return view('/warehouse/spare-parts-requests/index', compact('stockRequests'));
+        if ($request->is('demo/crm/spare-parts-requests')) {
+            return view('crm.spare-parts-requests.index', compact('stockRequests'));
+        }
+
+        if ($request->is('demo/warehouse/spare-parts')) {
+            return view('warehouse.spare-parts-requests.index', compact('stockRequests'));
+        }
+
+        abort(404);
     }
 
     /**
      * Display a specific spare part request.
      */
-    public function view($id)
+    // public function view($id)
+    // {
+    //     $stockRequests = ServiceRequestProductRequestPart::with([
+    //         'serviceRequest.customer',
+    //         'serviceRequest.customer.primaryAddress',
+    //         'serviceRequestProduct',
+    //         'fromEngineer',
+    //         'assignedEngineer',
+    //         'requestedPart.product',
+    //         'requestedPart.product.parentCategorie',
+    //         'requestedPart.product.brand',
+    //         'requestedPart.product.subCategorie',
+    //     ])
+    //         ->findOrFail($id);
+    //     // dd($stockRequests);
+    //     $deliveryMen = Staff::where('staff_role', 'delivery_man')->get();
+    //     $engineers = Staff::where('staff_role', 'engineer')->get();
+    //     return view('crm.spare-parts-requests.view', compact('stockRequests', 'deliveryMen', 'engineers'));
+    // }
+
+    public function view(Request $request, $id)
     {
         $stockRequests = ServiceRequestProductRequestPart::with([
             'serviceRequest.customer',
@@ -49,16 +85,24 @@ class SparePartController extends Controller
             'serviceRequestProduct',
             'fromEngineer',
             'assignedEngineer',
+            'requestedPart.product',
             'requestedPart.product.parentCategorie',
             'requestedPart.product.brand',
-            'requestedPart.product.subCategorie'
-        ])
-            ->findOrFail($id);
-        // dd($stockRequests);
+            'requestedPart.product.subCategorie',
+        ])->findOrFail($id);
+
         $deliveryMen = Staff::where('staff_role', 'delivery_man')->get();
-        $engineers = Staff::where('staff_role', 'engineer')->get();
-        return view('/warehouse/spare-parts-requests/view', compact('stockRequests', 'deliveryMen', 'engineers'));
+        $engineers   = Staff::where('staff_role', 'engineer')->get();
+
+        if ($request->routeIs('spare-parts-requests.view')) {
+            return view('crm.spare-parts-requests.view', compact('stockRequests', 'deliveryMen', 'engineers'));
+        }
+
+        if ($request->routeIs('spare-parts.view')) {
+            return view('warehouse.spare-parts-requests.view', compact('stockRequests', 'deliveryMen', 'engineers'));
+        }
     }
+
 
     public function assignPerson(Request $request, $id)
     {
@@ -92,5 +136,4 @@ class SparePartController extends Controller
         return redirect()->route('spare-parts.index', $id)
             ->with('success', 'Person assigned successfully.');
     }
-
 }

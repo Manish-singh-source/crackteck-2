@@ -52,6 +52,40 @@ class DatabaseSeeder extends Seeder
             VendorPurchaseOrderSeeder::class,
             WarehousesSeeder::class,
 
+            
+            ParentCategoriesSeeder::class,
+            SubCategoriesSeeder::class,
+            
+            BrandsSeeder::class,
+            // ProductVariantAttributesSeeder::class,
+            // ProductVariantAttributeValuesSeeder::class,
+            
+            
+            ProductsSeeder::class,
+            // EcommerceProductsSeeder::class,
+            // ProductSerialSeeder::class,
+
+            CouponSeeder::class,
+            CouponUsageSeeder::class,
+            CollectionSeeder::class,
+
+            SubscriberSeeder::class,
+            ContactSeeder::class,
+            
+            WebsiteBannerSeeder::class,
+
+            // OrderSeeder::class,
+            // OrderItemSeeder::class,
+            // OrderPaymentSeeder::class,
+
+
+            // e-commerce data ====================
+            TestimonialSeeder::class,
+            FeedbackSeeder::class,
+            
+            
+            
+            
             // crm ====================
             LeadTableSeeder::class,
             FollowUpTableSeeder::class,
@@ -65,75 +99,35 @@ class DatabaseSeeder extends Seeder
             PincodeSeeder::class,
 
 
-
-            // OrderSeeder::class,
-            // OrderItemSeeder::class,
-            // OrderPaymentSeeder::class,
-
-            ParentCategoriesSeeder::class,
-            SubCategoriesSeeder::class,
-
-            BrandsSeeder::class,
-            // ProductVariantAttributesSeeder::class,
-            // ProductVariantAttributeValuesSeeder::class,
-
-            CouponSeeder::class,
-            CouponUsageSeeder::class,
-            SubscriberSeeder::class,
-            ContactSeeder::class,
-
-            WebsiteBannerSeeder::class,
-            // product deal offer seeder
-            CollectionSeeder::class,
-
-            // e-commerce data ====================
-            TestimonialSeeder::class,
-            // FeedbackSeeder::class,
-
-
-            ProductsSeeder::class,
-            // EcommerceProductsSeeder::class,
-            // ProductSerialSeeder::class,
-
-
-
-
             ServiceRequestSeeder::class,
             ServiceRequestProductSeeder::class,
+            // ServiceRequestQuotationSeeder::class,
 
             
             AssignedEngineerSeeder::class,
             EngineerDiagnosisDetailSeeder::class,
             ServiceRequestProductPickupSeeder::class,
             ServiceRequestProductRequestPartSeeder::class,
-            // ServiceRequestPaymentSeeder::class,
-            // ServiceRequestQuotationSeeder::class,
             // RequestedPartDeliverySeeder::class,
             // AssignedEngineerGroupSeeder::class,
-            
-            // TicketSeeder::class,
-            // TicketCommentSeeder::class,
-
-            // InvoiceSeeder::class,
-            // InvoiceItemSeeder::class,
-            
-
-
+            // ServiceRequestPaymentSeeder::class,
+           
             // RemoteJobSeeder::class,
             // CaseTransferRequestSeeder::class,
             // PickupRequestSeeder::class,
             // StockInHandSeeder::class,
             // StockInHandProductSeeder::class,
             // FieldIssueSeeder::class,
-            // CustomerFeedbackSeeder::class,
-
-
-
-
-
-
             
-
+            
+            
+            // InvoiceSeeder::class,
+            // InvoiceItemSeeder::class,
+            
+            
+            // CustomerFeedbackSeeder::class,
+            // TicketSeeder::class,
+            // TicketCommentSeeder::class,
 
         ]);
     }

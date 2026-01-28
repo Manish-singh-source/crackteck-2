@@ -569,6 +569,7 @@ Route::prefix('/demo')->group(function () {
     Route::controller(TrackRequestController::class)->group(function () {
         // Track Request Page
         Route::get('/crm/track-request', 'index')->name('track-request.index');
+        Route::post('/crm/track-request', 'track')->name('track-request.track');
     });
 
     // ------------------------------------------------------------ Case Transfer Page -------------------------------------------------------------

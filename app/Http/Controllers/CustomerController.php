@@ -391,8 +391,8 @@ class CustomerController extends Controller
         }
 
         $customer_address = $customer->addressDetails->first();
-        $customer_company = $customer->companyDetails->first();
-        $customer_pan = $customer->panCardDetails->first();
+        $customer_company = $customer->companyDetails;
+        $customer_pan = $customer->panCardDetails;
 
         return response()->json([
             'found' => true,

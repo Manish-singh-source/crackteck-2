@@ -80,10 +80,10 @@ class ServiceRequestController extends Controller
     }
 
 
-    public function create()
-    {
-        return view('/crm/service-request/create-servies');
-    }
+    // public function create()
+    // {
+    //     return view('/crm/service-request/create-servies');
+    // }
 
     public function view()
     {
@@ -1114,15 +1114,15 @@ class ServiceRequestController extends Controller
 
     public function createQuickServiceRequest()
     {
-        $quickService = CoveredItem::where('service_type', '1')->get(); // Get as Collection
+        $quickService = CoveredItem::where('service_type', 'quick_service')->where('status', 'active')->get(); // Get as Collection
         $quickServiceOptions = $quickService->pluck('service_name', 'id')->prepend('--Select Quick Service--', 0);
-
-        $categories = ParentCategory::where('status', '1')
-            ->where('status_ecommerce', '1')
-            ->pluck('name', 'id');
-        $brands = Brand::where('status', '1')->pluck('name', 'id');
+        
+        $categories = ParentCategory::where('status', 'active')
+        ->pluck('name', 'id');
+        $brands = Brand::where('status', 'active')->pluck('name', 'id');
         $customers = Customer::all();
-
+        // dd($quickService);
+        
         return view('crm/service-request/create-quick', compact('quickService', 'quickServiceOptions', 'customers', 'categories', 'brands'));
     }
 
@@ -1195,8 +1195,8 @@ class ServiceRequestController extends Controller
                 'service_type' => $request->service_type,
                 'customer_id' => $customer->id,
                 'request_date' => now(),
-                'request_status' => '0',
-                'request_source' => '1',
+                'request_status' => 'pending',
+                'request_source' => 'system',
                 'created_by' => Auth::id(),
             ]);
 
@@ -1263,13 +1263,13 @@ class ServiceRequestController extends Controller
     {
         try {
             $request = ServiceRequest::with([
-                'customer',
-                'customerAddress',
-                'customerCompany',
-                'customerPan',
+                'customer.addressDetails',
+                'customer.companyDetails',
+                'customer.panCardDetails',
                 'products',
                 'parentCategorie',
             ])->findOrFail($id);
+            // dd($request);
 
             // same data as create
             $quickService = CoveredItem::where('service_type', 'quick_service')->get(); // Collection

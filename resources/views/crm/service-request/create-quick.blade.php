@@ -46,7 +46,7 @@
 
                                     <div class="col-xl-4 col-lg-6">
                                         <div>
-                                            <input type="hidden" name="service_type" value="1">
+                                            <input type="hidden" name="service_type" value="quick_service">
                                         </div>
                                         <div>
                                             @include('components.form.input', [
@@ -122,9 +122,9 @@
                                                 'name' => 'gender',
                                                 'options' => [
                                                     '' => '--Select Gender--',
-                                                    '0' => 'Male',
-                                                    '1' => 'Female',
-                                                    '2' => 'Other',
+                                                    'male' => 'Male',
+                                                    'female' => 'Female',
+                                                    'other' => 'Other',
                                                 ],
                                             ])
                                         </div>
@@ -204,7 +204,7 @@
                                     {{-- Source Type --}}
                                     <div class="col-xl-4 col-lg-6">
                                         <div>
-                                            <input type="hidden" name="source_type_label" value="admin_panel" readonly>
+                                            <input type="hidden" name="request_source" value="system" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -607,10 +607,13 @@
                             showBox(data.customer);
                         } else {
                             hideBox();
+                            // Show customer not found message
+                            alert('Customer not found for the entered email address.');
                         }
                     })
                     .catch(() => {
                         hideBox();
+                        alert('Error searching for customer. Please try again.');
                     });
             });
 

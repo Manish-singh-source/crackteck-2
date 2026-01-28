@@ -76,7 +76,7 @@
                                 <div class="row g-3 pb-3">
 
                                     {{-- hidden service_type = 1 (Quick Service) --}}
-                                    <input type="hidden" name="service_type" value="1">
+                                    <input type="hidden" name="service_type" value="quick_service">
 
                                     <div class="col-xl-4 col-lg-6">
                                         <div>
@@ -115,6 +115,7 @@
                                                 'placeholder' => 'Enter Your First Name',
                                                 'value' => old('first_name', $request->customer->first_name ?? ''),
                                                 'model' => $request->customer,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -128,6 +129,7 @@
                                                 'placeholder' => 'Enter Your Last Name',
                                                 'value' => old('last_name', $request->customer->last_name ?? ''),
                                                 'model' => $request->customer,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -141,6 +143,7 @@
                                                 'placeholder' => '+91 000 000 XXXX',
                                                 'value' => old('phone', $request->customer->phone ?? ''),
                                                 'model' => $request->customer,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -153,6 +156,7 @@
                                                 'type' => 'date',
                                                 'value' => old('dob', $request->customer->dob ?? ''),
                                                 'model' => $request->customer,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -164,18 +168,19 @@
                                                 'name' => 'gender',
                                                 'options' => [
                                                     '' => '--Select Gender--',
-                                                    '0' => 'Male',
-                                                    '1' => 'Female',
-                                                    '2' => 'Other',
+                                                    'male' => 'Male',
+                                                    'female' => 'Female',
+                                                    'other' => 'Other',
                                                 ],
                                                 'value' => old('gender', $request->customer->gender ?? ''),
                                                 'model' => $request->customer,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
 
-                                    {{-- CUSTOMER ADDRESS (from customerAddress relation) --}}
-                                    @php $addr = $request->customerAddress; @endphp
+                                    {{-- CUSTOMER ADDRESS (from customer relation) --}}
+                                    @php $addr = $request->customer->addressDetails->first(); @endphp
 
                                     <div class="col-xl-4 col-lg-6">
                                         <div>
@@ -186,6 +191,7 @@
                                                 'placeholder' => 'Enter Your Branch Name',
                                                 'value' => old('branch_name', $addr->branch_name ?? ''),
                                                 'model' => $request->customerAddress,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -199,6 +205,7 @@
                                                 'placeholder' => 'Enter Your Address',
                                                 'value' => old('address1', $addr->address1 ?? ''),
                                                 'model' => $request->customerAddress,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -212,6 +219,7 @@
                                                 'placeholder' => 'Enter Your Address 2',
                                                 'value' => old('address2', $addr->address2 ?? ''),
                                                 'model' => $request->customerAddress,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -225,6 +233,7 @@
                                                 'placeholder' => 'Enter Your Country',
                                                 'value' => old('country', $addr->country ?? ''),
                                                 'model' => $request->customerAddress,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -238,6 +247,7 @@
                                                 'placeholder' => 'Enter Your State',
                                                 'value' => old('state', $addr->state ?? ''),
                                                 'model' => $request->customerAddress,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -251,6 +261,7 @@
                                                 'placeholder' => 'Enter Your City',
                                                 'value' => old('city', $addr->city ?? ''),
                                                 'model' => $request->customerAddress,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -264,19 +275,20 @@
                                                 'placeholder' => 'Enter Your Pin Code',
                                                 'value' => old('pincode', $addr->pincode ?? ''),
                                                 'model' => $request->customerAddress,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
 
                                     {{-- Source Type --}}
-                                    <input type="hidden" name="source_type_label" value="admin_panel" readonly>
+                                    <input type="hidden" name="request_source" value="system" readonly>
                                 </div>
                             </div>
 
                             {{-- COMPANY DETAILS (same card as create, prefilled from customerCompany) --}}
                             <div class="card-body">
                                 <div class="row g-3 pb-3">
-                                    @php $comp = $request->customerCompany; @endphp
+                                    @php $comp = $request->customer->companyDetails; @endphp
 
                                     <div class="col-xl-4 col-lg-6">
                                         <div>
@@ -287,6 +299,7 @@
                                                 'placeholder' => 'Enter Your Company Name',
                                                 'value' => old('company_name', $comp->company_name ?? ''),
                                                 'model' => $request->customerCompany,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -300,6 +313,7 @@
                                                 'placeholder' => 'Enter Your GST Number',
                                                 'value' => old('gst_no', $comp->gst_no ?? ''),
                                                 'model' => $request->customerCompany,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -313,8 +327,9 @@
                                                 'placeholder' => 'Enter Your PAN Number',
                                                 'value' => old(
                                                     'pan_number',
-                                                    optional($request->customerPan)->pan_number ?? ''),
-                                                'model' => $request->customerPan,
+                                                    optional($request->customer->panCardDetails)->pan_number ?? ''),
+                                                'model' => $request->customer->panCardDetails,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -327,8 +342,11 @@
                                                 'name' => 'comp_address1',
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your Address',
-                                                'value' => old('comp_address1', $comp->address1 ?? ''),
-                                                'model' => $request->customerCompany,
+                                                'value' => old(
+                                                    'comp_address1',
+                                                    optional($request->customer->companyDetails)->comp_address1 ?? ''),
+                                                'model' => $request->customer->companyDetails,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -340,8 +358,12 @@
                                                 'name' => 'comp_address2',
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your Address 2',
-                                                'value' => old('comp_address2', $comp->address2 ?? ''),
+                                                'value' => old(
+                                                    'comp_address2',
+                                                    optional($request->customer->companyDetails)->comp_address2 ?? ''),
+                                                'model' => $request->customer->companyDetails,
                                                 'model' => $request->customerCompany,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -353,8 +375,12 @@
                                                 'name' => 'comp_country',
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your Country',
-                                                'value' => old('comp_country', $comp->country ?? ''),
+                                                'value' => old(
+                                                    'comp_country',
+                                                    optional($request->customer->companyDetails)->comp_country ?? ''),
+                                                'model' => $request->customer->companyDetails,
                                                 'model' => $request->customerCompany,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -366,8 +392,12 @@
                                                 'name' => 'comp_state',
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your State',
-                                                'value' => old('comp_state', $comp->state ?? ''),
+                                                'value' => old(
+                                                    'comp_state',
+                                                    optional($request->customer->companyDetails)->comp_state ?? ''),
+                                                'model' => $request->customer->companyDetails,
                                                 'model' => $request->customerCompany,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -379,8 +409,12 @@
                                                 'name' => 'comp_city',
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your City',
-                                                'value' => old('comp_city', $comp->city ?? ''),
+                                                'value' => old(
+                                                    'comp_city',
+                                                    optional($request->customer->companyDetails)->comp_city ?? ''),
+                                                'model' => $request->customer->companyDetails,
                                                 'model' => $request->customerCompany,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>
@@ -392,8 +426,12 @@
                                                 'name' => 'comp_pincode',
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your Pin Code',
-                                                'value' => old('comp_pincode', $comp->pincode ?? ''),
+                                                'value' => old(
+                                                    'comp_pincode',
+                                                    optional($request->customer->companyDetails)->comp_pincode ?? ''),
+                                                'model' => $request->customer->companyDetails,
                                                 'model' => $request->customerCompany,
+                                                'readonly' => true
                                             ])
                                         </div>
                                     </div>

@@ -42,7 +42,7 @@
 
     <!-- Start Content-->
     <div class="container-fluid">
-        <div class=" d-flex align-items-sm-center flex-sm-row flex-column">
+        <div class="py-2 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
                 <h4 class="fs-18 fw-semibold m-0"></h4>
             </div>
@@ -57,12 +57,13 @@
                     </div>
                     <div class="card-body">
                         <div>
-                            <form action="#" method="POST" id="service-form" enctype="multipart/form-data">
+                            <form action="{{ route('track-request.track') }}" method="POST" id="service-form" enctype="multipart/form-data">
+                                @csrf
                                 <div class="row g-3 align-items-end">
                                     <div class="col-6">
                                         @include('components.form.input', [
                                         'label' => 'Tracking (Service) Id',
-                                        'name' => 'dob',
+                                        'name' => 'service_id',
                                         'type' => 'text',
                                         'placeholder' => 'Enter Service Id'
                                         ])
@@ -78,7 +79,11 @@
             </div>
         </div>
 
+        @if(isset($serviceRequest))
         <div class="row service-info pt-3">
+            <div class="col-12 mb-3">
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">Back</a>
+            </div>
             <div class="col-xl-8 mx-auto">
 
                 <div class="card">
@@ -88,7 +93,7 @@
                                 Customer Details
                             </h5>
                             <div class="fw-bold text-dark">
-                                #1001
+                                #{{ $serviceRequest->request_id }}
                             </div>
                         </div>
                     </div>
@@ -104,7 +109,7 @@
                                         <span class="fw-semibold text-break">Customer Name :
                                         </span>
                                         <span>
-                                            Shyam Jaiswal
+                                            {{ $serviceRequest->customer->first_name . ' ' . $serviceRequest->customer->last_name }}
                                         </span>
                                     </li>
 
@@ -112,7 +117,7 @@
                                         <span class="fw-semibold text-break">Contact no :
                                         </span>
                                         <span>
-                                            9004086582
+                                            {{ $serviceRequest->customer->phone }}
                                         </span>
                                     </li>
 
@@ -127,14 +132,14 @@
                                         <span class="fw-semibold text-break">Company Name :
                                         </span>
                                         <span>
-                                            Technofra
+                                            {{ $serviceRequest->customer->companyDetails ? $serviceRequest->customer->companyDetails->company_name : 'N/A' }}
                                         </span>
                                     </li>
                                     <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
                                         <span class="fw-semibold text-break">GST No :
                                         </span>
                                         <span>
-                                            988498
+                                            {{ $serviceRequest->customer->companyDetails ? $serviceRequest->customer->companyDetails->gst_no : 'N/A' }}
                                         </span>
                                     </li>
 
@@ -147,7 +152,7 @@
                                         <span class="fw-semibold text-break">Email :
                                         </span>
                                         <span>
-                                            shyam@gmail.com
+                                            {{ $serviceRequest->customer->email }}
                                         </span>
                                     </li>
 
@@ -155,7 +160,7 @@
                                         <span class="fw-semibold text-break">Address :
                                         </span>
                                         <span>
-                                            Lalji Pada , Kandivali West, Mumbai, Maharashtra 400067
+                                            {{ $serviceRequest->customer->primaryAddress ? $serviceRequest->customer->primaryAddress->address : 'N/A' }}
                                         </span>
                                     </li>
 
@@ -163,21 +168,21 @@
                                         <span class="fw-semibold text-break">Customer Type :
                                         </span>
                                         <span>
-                                            Retailer
+                                            {{ ucfirst($serviceRequest->customer->customer_type) }}
                                         </span>
                                     </li>
                                     <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
                                         <span class="fw-semibold text-break">Company Address :
                                         </span>
                                         <span>
-                                            Lalji Pada , Maharashtra 400067
+                                            {{ $serviceRequest->customer->companyDetails ? $serviceRequest->customer->companyDetails->company_address : 'N/A' }}
                                         </span>
                                     </li>
                                     <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
                                         <span class="fw-semibold text-break">PAN No :
                                         </span>
                                         <span>
-                                            789MTUO
+                                            {{ $serviceRequest->customer->companyDetails ? $serviceRequest->customer->companyDetails->pan_no : 'N/A' }}
                                         </span>
                                     </li>
                                 </ul>
@@ -205,7 +210,7 @@
                                             Service Id :
                                         </span>
                                         <span>
-                                            <span class="fw-bold text-dark">#1001</span><br>
+                                            <span class="fw-bold text-dark">#{{ $serviceRequest->request_id }}</span><br>
                                         </span>
                                     </li>
 
@@ -213,8 +218,8 @@
                                         <span class="fw-semibold text-break">Date :
                                         </span>
                                         <span>
-                                            <div>2 weeks ago</div>
-                                            <div>2025-04-04 06:09 PM</div>
+                                            <div>{{ $serviceRequest->request_date->diffForHumans() }}</div>
+                                            <div>{{ $serviceRequest->request_date->format('Y-m-d H:i A') }}</div>
                                         </span>
                                     </li>
                                     <li class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
@@ -257,7 +262,7 @@
                                         <span class="fw-semibold text-break">Status :
 
                                         </span>
-                                        <span class="badge bg-danger-subtle text-danger fw-semibold">Pending</span>
+                                        <span class="badge bg-danger-subtle text-danger fw-semibold">{{ ucfirst($serviceRequest->request_status) }}</span>
                                     </li>
 
                                 </ul>
@@ -357,6 +362,7 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <div class="table-responsive">
                         <table
                             class="table table-striped table-borderless dt-responsive nowrap">
                             <thead>
@@ -371,37 +377,38 @@
                                 </tr>
                             </thead>
                             <tbody>
-
+                                @foreach($serviceRequest->products as $product)
                                 <tr class="align-middle">
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div>
-                                                <img src="https://placehold.co/100x100" alt="Headphone" width="100px" class="img-fluid d-block">
+                                                <img src="{{ $product->images ? (is_array($product->images) ? ($product->images[0] ?? 'https://placehold.co/100x100') : (json_decode($product->images, true)[0] ?? 'https://placehold.co/100x100')) : 'https://placehold.co/100x100' }}" alt="{{ $product->name }}" width="100px" class="img-fluid d-block">
                                             </div>
                                         </div>
                                     </td>
                                     <td>
                                         <div>
-                                            Headphone
+                                            {{ $product->name }}
                                         </div>
                                     </td>
                                     <td>
-                                        Computer
+                                        {{ $product->status }}
                                     </td>
                                     <td>
-                                        Sony
+                                        {{ $product->brand ?? 'N/A' }}
                                     </td>
                                     <td>
-                                        Inspiron 3511
+                                        {{ $product->model_no ?? 'N/A' }}
                                     </td>
                                     <td>
-                                        B0BB7FQBBS
+                                        {{ $product->sku ?? 'N/A' }}
                                     </td>
-                                    <td>2025-04-04 06:09 PM</td>
+                                    <td>{{ $product->created_at->format('Y-m-d H:i A') }}</td>
                                 </tr>
-
+                                @endforeach
                             </tbody>
                         </table>
+                        </div>
                     </div>
 
                 </div>
@@ -434,24 +441,18 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <ul class="list-group list-group-flush">
-
+                                    @foreach($serviceRequest->assignedEngineers as $assigned)
                                     <li class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                        <span class="fw-semibold text-break">Engineer 1:
+                                        <span class="fw-semibold text-break">Engineer {{ $loop->iteration }}:
                                         </span>
                                         <span>
-                                            Supervisor
+                                            {{ $assigned->engineer ? ($assigned->engineer->first_name . ' ' . $assigned->engineer->last_name) : 'N/A' }}
                                         </span>
                                     </li>
-
-                                    <li class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                        <span class="fw-semibold text-break">Engineer 2 :
-                                        </span>
-                                    </li>
-
-                                    <li class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                        <span class="fw-semibold text-break">Engineer 3 :
-                                        </span>
-                                    </li>
+                                    @endforeach
+                                    @if($serviceRequest->assignedEngineers->isEmpty())
+                                    <li class="list-group-item">No engineers assigned yet.</li>
+                                    @endif
                                 </ul>
                             </div>
                         </div>
@@ -556,16 +557,6 @@
     </div>
 </div> <!-- container-fluid -->
 </div> <!-- content -->
-
-<script>
-    $(document).ready(function() {
-        $(".service-info").hide();
-
-        $("#service-form").on('submit', function(e) {
-            e.preventDefault();
-            $(".service-info").show();
-        })
-    });
-</script>
+@endif
 
 @endsection

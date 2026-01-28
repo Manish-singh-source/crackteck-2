@@ -680,7 +680,7 @@
                                                                             {{ $request->customer->phone ?? 'N/A' }}
                                                                         </div>
                                                                     </td>
-                                                                    <td>{{ $request->request_date }}</td>
+                                                                    <td>{{ $request->request_date->format('Y-m-d') }}</td>
                                                                     <td>
                                                                         <div class="fw-semibold">
                                                                             {{ $request->products->count() }} Product(s)

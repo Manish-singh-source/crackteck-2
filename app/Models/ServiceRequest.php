@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class ServiceRequest extends Model
 {
     //
+    protected $casts = [
+        'request_date' => 'date',
+    ];
+
     protected $fillable = [
         'request_id',
         // 'item_code_id',

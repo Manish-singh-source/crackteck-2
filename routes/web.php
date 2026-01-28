@@ -519,13 +519,35 @@ Route::prefix('/demo')->group(function () {
         // Edit Service Request Page
         Route::get('/crm/edit-service-request', 'edit')->name('service-request.edit-service');
 
-        // Quick Service Request Routes (in service-request directory)
+        // Quick Service Request Create
         Route::get('/crm/create-quick-request', 'createQuickServiceRequest')->name('quick-service-requests.create');
+        // Quick Service Request Store
         Route::post('/crm/store-quick-request', 'storeQuickServiceRequest')->name('quick-service-requests.store');
+        // Quick Service Request View
         Route::get('/crm/service-request/view-quick-service-request/{id}', 'viewQuickServiceRequest')->name('service-request.view-quick-service-request');
+        // Quick Service Request Edit
         Route::get('/crm/service-request/edit-quick-service-request/{id}', 'editQuickServiceRequest')->name('service-request.edit-quick-service-request');
+        // Quick Service Request Update
         Route::put('/crm/service-request/update-quick-service-request/{id}', 'updateQuickServiceRequest')->name('service-request.update-quick-service-request');
+
+
+        // Repairing Service Request Create
+        Route::get('/crm/create-repairing-request', 'createRepairingServiceRequest')->name('repairing-service-requests.create');
+        // Repairing Service Request Store
+        Route::post('/crm/store-repairing-request', 'storeRepairingServiceRequest')->name('repairing-service-requests.store');
+        // Repairing Service Request View
+        Route::get('/crm/service-request/view-repairing-service-request/{id}', 'viewRepairingServiceRequest')->name('service-request.view-repairing-service-request');
+        // Repairing Service Request Edit
+        Route::get('/crm/service-request/edit-repairing-service-request/{id}', 'editRepairingServiceRequest')->name('service-request.edit-repairing-service-request');
+        // Repairing Service Request Update
+        Route::put('/crm/service-request/update-repairing-service-request/{id}', 'updateRepairingServiceRequest')->name('service-request.update-repairing-service-request');
+
+        
+
+        // Delete Section For All the Service Request
         Route::delete('/crm/service-request/destroy-quick-service-request/{id}', 'destroyQuickServiceRequest')->name('service-request.destroy-quick-service-request');
+
+        // Need To Check
         Route::post('/crm/service-request/assign-quick-service-engineer', 'assignQuickServiceEngineer')->name('service-request.assign-quick-service-engineer');
         Route::post('/crm/service-request/assign-non-amc-engineer', 'assignNonAmcEngineer')->name('service-request.assign-non-amc-engineer');
 

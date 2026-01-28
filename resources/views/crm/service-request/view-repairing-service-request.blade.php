@@ -55,7 +55,7 @@
             <div class="row py-3">
                 <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
                     <div class="flex-grow-1">
-                        <h4 class="fs-18 fw-semibold m-0">View Quick Service Request</h4>
+                        <h4 class="fs-18 fw-semibold m-0">View Repairing Service Request</h4>
                     </div>
                 </div>
                 <div class="col-xl-8 mx-auto">

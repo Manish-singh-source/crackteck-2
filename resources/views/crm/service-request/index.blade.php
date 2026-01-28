@@ -63,7 +63,7 @@
                                         class="btn btn-primary">Create AMC Service</a>
                                     <a href="{{ route('service-request.create-non-amc') }}" id="mySection2"
                                         class="btn btn-primary">Create Installation Service</a>
-                                    <a href="{{ route('quick-service-requests.create') }}" id="mySection3"
+                                    <a href="{{ route('repairing-service-requests.create') }}" id="mySection3"
                                         class="btn btn-primary">Create Repairing Service</a>
                                     <a href="{{ route('quick-service-requests.create') }}" id="mySection4"
                                         class="btn btn-primary">Create Quick Service</a>
@@ -587,7 +587,7 @@
                                                                     </td>
                                                                     <td>
                                                                         <a aria-label="anchor"
-                                                                            href="{{ route('service-request.view-quick-service-request', $request->id) }}"
+                                                                            href="{{ route('service-request.view-repairing-service-request', $request->id) }}"
                                                                             class="btn btn-icon btn-sm bg-primary-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="View">
@@ -595,7 +595,7 @@
                                                                                 class="mdi mdi-eye-outline fs-14 text-primary"></i>
                                                                         </a>
                                                                         <a aria-label="anchor"
-                                                                            href="{{ route('service-request.edit-quick-service-request', $request->id) }}"
+                                                                            href="{{ route('service-request.edit-repairing-service-request', $request->id) }}"
                                                                             class="btn btn-icon btn-sm bg-warning-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="Edit">

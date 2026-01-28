@@ -7,15 +7,15 @@
         <div class="container-fluid">
             <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
                 <div class="flex-grow-1">
-                    <h4 class="fs-18 fw-semibold m-0">Create Amc Service Request</h4>
+                    <h4 class="fs-18 fw-semibold m-0">Create Installation Service Request</h4>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-12">
-                    <form action="{{ route('amc-service-requests.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('installation-service-requests.store') }}" method="POST" enctype="multipart/form-data"
+                        id="nonAmcForm">
                         @csrf
-                        @method('POST')
 
                         {{-- Global validation error summary --}}
                         @if ($errors->any())
@@ -46,7 +46,7 @@
 
                                     <div class="col-xl-4 col-lg-6">
                                         <div>
-                                            <input type="hidden" name="service_type" value="amc">
+                                            <input type="hidden" name="service_type" value="installation">
                                         </div>
                                         <div>
                                             @include('components.form.input', [
@@ -197,29 +197,6 @@
                                                 'name' => 'pincode',
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your Pin Code',
-                                            ])
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-4 col-lg-6">
-                                        <div>
-                                            @include('components.form.select', [
-                                                'class' => 'amc-service-select',
-                                                'label' => 'Amc Service',
-                                                'name' => 'amc_plan_id',
-                                                'options' => $amcServiceOptions,
-                                                'required' => true,
-                                            ])
-                                        </div>
-                                    </div>
-
-                                    <div class="col-xl-4 col-lg-6">
-                                        <div>
-                                            @include('components.form.input', [
-                                                'class' => 'amc-service-price',
-                                                'label' => 'Amc Service Price',
-                                                'name' => 'price',
-                                                'type' => 'text',
-                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -409,7 +386,31 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-8">
+                                        {{-- Select Qucik service --}}
+                                        <div class="col-xl-4 col-lg-6">
+                                            <div>
+                                                @include('components.form.select', [
+                                                    'class' => 'installation-service-select',
+                                                    'label' => 'Installation Service',
+                                                    'name' => 'products[0][installation_service_id]',
+                                                    'options' => $installationServiceOptions,
+                                                ])
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xl-4 col-lg-6">
+                                            <div>
+                                                @include('components.form.input', [
+                                                    'class' => 'installation-service-price',
+                                                    'label' => 'Installation Service Price',
+                                                    'name' => 'products[0][price]',
+                                                    'type' => 'text',
+                                                    'readonly' => true,
+                                                ])
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12">
                                             <div>
                                                 <label for="products[0][issue_description]" class="form-label">Issue
                                                     Description</label>
@@ -502,7 +503,28 @@
                             <input type="file" name="products[${productIndex}][product_image]" class="form-control" accept="image/*">
                         </div>
                     </div>
-                    <div class="col-8">
+                    <div class="col-xl-4 col-lg-6">
+                        <div>
+                            @include('components.form.select', [
+                                'class' => 'installation-service-select',
+                                'label' => 'Installation Service',
+                                'name' => 'products[${productIndex}][installation_service_id]',
+                                'options' => $installationServiceOptions,
+                            ])
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-6">
+                        <div>
+                            @include('components.form.input', [
+                                'class' => 'installation-service-price',
+                                'label' => 'Installation Service Price',
+                                'name' => 'products[${productIndex}][price]',
+                                'type' => 'text',
+                                'readonly' => true,
+                            ])
+                        </div>
+                    </div>
+                    <div class="col-12">
                         <div>
                             <label class="form-label">Issue Description</label>
                             <textarea name="products[${productIndex}][issue_description]" class="form-control" rows="3" placeholder="Describe the issue in detail"></textarea>
@@ -644,15 +666,17 @@
 
     <script>
         $(document).ready(function() {
-            const amcServicePrices = @json($amcService->pluck('total_cost', 'id'));
+            const installationServicePrices = @json($installationService->pluck('service_charge', 'id'));
 
-            $(document).on('change', '.amc-service-select', function() {
+            $(document).on('change', '.installation-service-select', function() {
                 const id = $(this).val();
 
-                const priceInput = $('.amc-service-price');
+                const priceInput = $(this)
+                    .closest('.product-entry')
+                    .find('.installation-service-price');
 
-                if (amcServicePrices[id]) {
-                    priceInput.val(amcServicePrices[id]);
+                if (installationServicePrices[id]) {
+                    priceInput.val(installationServicePrices[id]);
                 } else {
                     priceInput.val('');
                 }

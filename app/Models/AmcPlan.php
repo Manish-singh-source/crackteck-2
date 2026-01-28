@@ -41,6 +41,6 @@ class AmcPlan extends Model
 
     public function coveredItems()
     {
-        return CoveredItem::whereIn('id', $this->covered_items)->get();
+        return CoveredItem::whereIn('id', $this->covered_items ?? []);
     }
 }

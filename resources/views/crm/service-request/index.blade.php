@@ -59,9 +59,9 @@
 
 
                                 <div>
-                                    <a href="{{ route('service-request.create-amc') }}" id="mySection1"
+                                    <a href="{{ route('amc-service-requests.create') }}" id="mySection1"
                                         class="btn btn-primary">Create AMC Service</a>
-                                    <a href="{{ route('service-request.create-non-amc') }}" id="mySection2"
+                                    <a href="{{ route('installation-service-requests.create') }}" id="mySection2"
                                         class="btn btn-primary">Create Installation Service</a>
                                     <a href="{{ route('repairing-service-requests.create') }}" id="mySection3"
                                         class="btn btn-primary">Create Repairing Service</a>
@@ -110,7 +110,7 @@
                                                                             {{ $request->customer->phone ?? 'N/A' }}
                                                                         </div>
                                                                     </td>
-                                                                    <td>{{ $request->request_date }}</td>
+                                                                    <td>{{ $request->request_date->format('Y-m-d') }}</td>
                                                                     <td>
                                                                         <div class="fw-semibold">
                                                                             {{ $request->products->count() }} Product(s)
@@ -207,7 +207,7 @@
                                                                     </td>
                                                                     <td>
                                                                         <a aria-label="anchor"
-                                                                            href="{{ route('service-request.view-quick-service-request', $request->id) }}"
+                                                                            href="{{ route('service-request.view-amc-service-request', $request->id) }}"
                                                                             class="btn btn-icon btn-sm bg-primary-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="View">
@@ -215,7 +215,7 @@
                                                                                 class="mdi mdi-eye-outline fs-14 text-primary"></i>
                                                                         </a>
                                                                         <a aria-label="anchor"
-                                                                            href="{{ route('service-request.edit-quick-service-request', $request->id) }}"
+                                                                            href="{{ route('service-request.edit-amc-service-request', $request->id) }}"
                                                                             class="btn btn-icon btn-sm bg-warning-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="Edit">
@@ -300,7 +300,7 @@
                                                                             {{ $request->customer->phone ?? 'N/A' }}
                                                                         </div>
                                                                     </td>
-                                                                    <td>{{ $request->request_date }}</td>
+                                                                    <td>{{ $request->request_date->format('Y-m-d') }}</td>
                                                                     <td>
                                                                         <div class="fw-semibold">
                                                                             {{ $request->products->count() }} Product(s)
@@ -397,7 +397,7 @@
                                                                     </td>
                                                                     <td>
                                                                         <a aria-label="anchor"
-                                                                            href="{{ route('service-request.view-quick-service-request', $request->id) }}"
+                                                                            href="{{ route('service-request.view-installation-service-request', $request->id) }}"
                                                                             class="btn btn-icon btn-sm bg-primary-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="View">
@@ -405,7 +405,7 @@
                                                                                 class="mdi mdi-eye-outline fs-14 text-primary"></i>
                                                                         </a>
                                                                         <a aria-label="anchor"
-                                                                            href="{{ route('service-request.edit-quick-service-request', $request->id) }}"
+                                                                            href="{{ route('service-request.edit-installation-service-request', $request->id) }}"
                                                                             class="btn btn-icon btn-sm bg-warning-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="Edit">
@@ -490,7 +490,7 @@
                                                                             {{ $request->customer->phone ?? 'N/A' }}
                                                                         </div>
                                                                     </td>
-                                                                    <td>{{ $request->request_date }}</td>
+                                                                    <td>{{ $request->request_date->format('Y-m-d') }}</td>
                                                                     <td>
                                                                         <div class="fw-semibold">
                                                                             {{ $request->products->count() }} Product(s)

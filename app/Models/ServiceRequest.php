@@ -70,6 +70,11 @@ class ServiceRequest extends Model
         return $this->belongsTo(CoveredItem::class, 'item_code_id');
     }
 
+    public function amcPlan()
+    {
+        return $this->belongsTo(AmcPlan::class, 'amc_plan_id');
+    }
+
     public function assignedEngineers()
     {
         return $this->hasMany(AssignedEngineer::class);

@@ -26,12 +26,14 @@
     </label>
 
     {{-- Select Field --}}
-    <select id="{{ $name }}" name="{{ $name }}" class="form-select w-100 {{ $class ?? '' }}">
+    <select id="{{ $name }}" name="{{ $name }}" class="form-select w-100 {{ $class ?? '' }}"
+        @if($required ?? false) required @endif
+        @if($disabled ?? false) disabled @endif
+    >
         @foreach($options as $key => $option)
             <option value="{{ $key }}"
                 {{ (string)$key === (string)$selectedValue ? 'selected' : '' }}
                 @if($errors->has($name)) class="text-neg" @endif
-                @if($disabled ?? false) disabled @endif
             >
                 {{ $option }}
             </option>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AMC;
 use App\Models\AmcBranch;
+use App\Models\AmcPlan;
 use App\Models\AmcEngineerAssignment;
 use App\Models\AmcGroupEngineer;
 use App\Models\AmcProduct;
@@ -117,11 +118,12 @@ class ServiceRequestController extends Controller
 
     public function create_amc()
     {
-        $amcPlans = AMC::where('status', 'Active')->get();
+        $amcPlans = AmcPlan::where('status', 'Active')->get();
+        $amcServiceOptions = $amcPlans->pluck('plan_name', 'id')->prepend('--Select AMC Service--', '');
         $productTypes = ParentCategorie::active()->orderBy('parent_categories')->get();
         $brands = Brand::where('status', '1')->orderBy('brand_title')->get();
 
-        return view('/crm/service-request/create-amc', compact('amcPlans', 'productTypes', 'brands'));
+        return view('/crm/service-request/create-amc', compact('amcPlans', 'amcServiceOptions', 'productTypes', 'brands'));
     }
 
     public function store_amc(Request $request)
@@ -1110,6 +1112,559 @@ class ServiceRequestController extends Controller
         }
     }
 
+    // ---------------------------------------------------------- AMC Service Request Methods -----------------------------------------------------------
+
+    public function createAmcServiceRequest()
+    {
+        // Get active AMC plans
+        $amcService = AmcPlan::where('status', 'active')->get(); // Get as Collection
+        // Prepare options for dropdown
+        $amcServiceOptions = $amcService->pluck('plan_name', 'id')->prepend('--Select AMC Service--', '');
+
+        // Get active categories
+        $categories = ParentCategory::where('status', 'active')
+            ->pluck('name', 'id');
+
+        // Get active brands
+        $brands = Brand::where('status', 'active')
+            ->pluck('name', 'id');
+
+        // Get all customers
+        $customers = Customer::all();
+
+        return view('crm/service-request/create-amc', compact(
+            'amcService',
+            'amcServiceOptions',
+            'customers',
+            'categories',
+            'brands'
+        ));
+    }
+
+    public function storeAmcServiceRequest(Request $request)
+    {
+        // dd($request->all());
+        $request->validate([
+            'email' => 'required|email',
+            'amc_plan_id' => 'required',
+            'products' => 'required|array',
+            'products.*.product_name' => 'required|string',
+        ]);
+
+        // 1. Check if customer exists
+        $customer = Customer::where('email', $request->email)->first();
+
+        try {
+            DB::beginTransaction();
+            if (! $customer) {
+                // Create new customer
+                $customer = Customer::create([
+                    'customer_code' => $this->generateCustomerCode(),
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'phone' => $request->phone,
+                    'email' => $request->email,
+                    'dob' => $request->dob,
+                    'gender' => $request->gender,
+                ]);
+
+                // Store customer address
+                CustomerAddressDetail::create([
+                    'customer_id' => $customer->id,
+                    'branch_name' => $request->branch_name,
+                    'address1' => $request->address1,
+                    'address2' => $request->address2,
+                    'country' => $request->country,
+                    'state' => $request->state,
+                    'city' => $request->city,
+                    'pincode' => $request->pincode,
+                ]);
+
+                // Store company details
+                CustomerCompanyDetail::create([
+                    'customer_id' => $customer->id,
+                    'company_name' => $request->company_name,
+                    'gst_no' => $request->gst_no,
+                    'pan_no' => $request->pan_no,
+                    'address1' => $request->address1,
+                    'address2' => $request->address2,
+                    'country' => $request->country,
+                    'state' => $request->state,
+                    'city' => $request->city,
+                    'pincode' => $request->pincode,
+                ]);
+            }
+            // dd($request->service_type);
+
+            // 2. Store service request
+            $serviceRequest = ServiceRequest::create([
+                'request_id' => $this->generateServiceId(),
+                'service_type' => $request->service_type,
+                'amc_plan_id' => $request->amc_plan_id,
+                'price' => $request->price,
+                'customer_id' => $customer->id,
+                'request_date' => now(),
+                'request_status' => 'pending',
+                'request_source' => 'system',
+                'created_by' => Auth::id(),
+            ]);
+
+            // 3. Store products
+            foreach ($request->products as $product) {
+                $imagePath = null;
+                if (isset($product['product_image']) && $product['product_image'] instanceof \Illuminate\Http\UploadedFile) {
+                    $imagePath = $product['product_image']->store('service-request-images', 'public');
+                }
+
+                ServiceRequestProduct::create([
+                    'service_requests_id' => $serviceRequest->id,
+                    'name' => $product['product_name'],
+                    'type' => $product['product_type'],
+                    'brand' => $product['product_brand'],
+                    'model_no' => $product['model_no'] ?? null,
+                    'hsn' => $product['hsn'] ?? null,
+                    'purchase_date' => $product['purchase_date'] ?? null,
+                    'item_code_id' => $product['amc_service_id'] ?? null,
+                    'service_charge' => $product['price'] ?? null,
+                    'description' => $product['issue_description'] ?? null,
+                    'images' => $imagePath ?? null,
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('service-request.index')->with('success', 'Service request created successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            dd($e->getMessage());
+
+            return redirect()->back()->with('error', 'Error creating service request: ' . $e->getMessage());
+        }
+    }
+
+    public function viewAmcServiceRequest($id)
+    {
+        $request = ServiceRequest::with([
+            'customer',
+            'customerAddress',
+            'customerCompany',
+            'customerPan',
+            'products.itemCode',
+            'parentCategorie',
+            'amcPlan',
+            'activeAssignment.engineer',
+            'activeAssignment.groupEngineers',
+            'activeAssignment.transferredTo',
+            'inactiveAssignments.engineer',
+            'inactiveAssignments.groupEngineers',
+            'inactiveAssignments.transferredTo',
+        ])->findOrFail($id);
+        $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
+        return view('crm/service-request/view-amc-service-request', compact('request', 'engineers'));
+    }
+
+    public function editAmcServiceRequest($id)
+    {
+        try {
+            $request = ServiceRequest::with([
+                'customer.addressDetails',
+                'customer.companyDetails',
+                'customer.panCardDetails',
+                'products',
+                'parentCategorie',
+            ])->findOrFail($id);
+            // dd($request);
+
+            // same data as create
+            $amcService = AmcPlan::where('status', 'active')->get(); // Collection
+            $amcServiceOptions = $amcService
+                ->pluck('plan_name', 'id')
+                ->prepend('--Select Amc Service--', '');
+
+            $amcServicePrices = $amcService->pluck('service_charge', 'id');
+            // dd($quickServicePrices, $quickServiceOptions);
+
+            $categories = ParentCategory::where('status', 'active')
+                ->pluck('name', 'id');
+
+            $brands = Brand::where('status', 'active')
+                ->pluck('name', 'id');
+
+            $customers = Customer::all();
+
+            return view('crm/service-request/edit-amc-service-request', compact(
+                'request',
+                'amcService',
+                'amcServiceOptions',
+                'amcServicePrices',
+                'customers',
+                'categories',
+                'brands'
+            ));
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('service-request.index')
+                ->with('error', 'Installation Service Request not found: ' . $e->getMessage());
+        }
+    }
+
+    public function updateAmcServiceRequest(Request $request, $id)
+    {
+        // Basic validation
+        $request->validate([
+            'email' => 'required|email',
+            'products' => 'required|array',
+            'products.*.product_name' => 'required|string|max:255',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $serviceRequest = ServiceRequest::findOrFail($id);
+
+            // Update service request
+            $serviceRequest->update([
+                'amc_plan_id' => $request->amc_plan_id,
+                'price' => $request->price,
+            ]);
+
+            // Update products
+            foreach ($request->products as $index => $productData) {
+                if (isset($serviceRequest->products[$index])) {
+                    $product = $serviceRequest->products[$index];
+                    $product->update([
+                        'name' => $productData['product_name'],
+                        'type' => $productData['product_type'] ?? null,
+                        'brand' => $productData['product_brand'] ?? null,
+                        'model_no' => $productData['model_no'] ?? null,
+                        'hsn' => $productData['hsn'] ?? null,
+                        'purchase_date' => $productData['purchase_date'] ?? null,
+                        'issue_description' => $productData['issue_description'] ?? null,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('service-request.index')->with('success', 'AMC Service Request updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return back()->with('error', 'Error updating AMC Service Request: ' . $e->getMessage())->withInput();
+        }
+    }
+    
+
+    // ---------------------------------------------------------- Installation Service Request Methods -----------------------------------------------------------
+
+    public function createInstallationServiceRequest()
+    {
+        $installationService = CoveredItem::where('service_type', 'installation')->where('status', 'active')->get(); // Get as Collection
+        $installationServiceOptions = $installationService->pluck('service_name', 'id')->prepend('--Select Installation Service--', 0);
+
+        $categories = ParentCategory::where('status', 'active')
+            ->pluck('name', 'id');
+        $brands = Brand::where('status', 'active')->pluck('name', 'id');
+        $customers = Customer::all();
+        // dd($repairingService);
+
+        return view('crm/service-request/create-installation', compact('installationService', 'installationServiceOptions', 'customers', 'categories', 'brands'));
+    }
+
+    public function storeInstallationServiceRequest(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'products' => 'required|array',
+            'products.*.product_name' => 'required|string',
+            // Add other validations as needed
+        ]);
+
+        // 1. Check if customer exists
+        $customer = Customer::where('email', $request->email)->first();
+
+        try {
+            DB::beginTransaction();
+            if (! $customer) {
+                // Create new customer
+                $customer = Customer::create([
+                    'customer_code' => $this->generateCustomerCode(),
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'phone' => $request->phone,
+                    'email' => $request->email,
+                    'dob' => $request->dob,
+                    'gender' => $request->gender,
+                ]);
+
+                // Store customer address
+                CustomerAddressDetail::create([
+                    'customer_id' => $customer->id,
+                    'branch_name' => $request->branch_name,
+                    'address1' => $request->address1,
+                    'address2' => $request->address2,
+                    'country' => $request->country,
+                    'state' => $request->state,
+                    'city' => $request->city,
+                    'pincode' => $request->pincode,
+                ]);
+
+                // Store company details
+                CustomerCompanyDetail::create([
+                    'customer_id' => $customer->id,
+                    'company_name' => $request->company_name,
+                    'gst_no' => $request->gst_no,
+                    'pan_no' => $request->pan_no,
+                    'address1' => $request->address1,
+                    'address2' => $request->address2,
+                    'country' => $request->country,
+                    'state' => $request->state,
+                    'city' => $request->city,
+                    'pincode' => $request->pincode,
+                ]);
+            }
+            // dd($request->service_type);
+
+            // 2. Store service request
+            $serviceRequest = ServiceRequest::create([
+                'request_id' => $this->generateServiceId(),
+                'service_type' => $request->service_type,
+                'customer_id' => $customer->id,
+                'request_date' => now(),
+                'request_status' => 'pending',
+                'request_source' => 'system',
+                'created_by' => Auth::id(),
+            ]);
+
+            // 3. Store products
+            foreach ($request->products as $product) {
+                $imagePath = null;
+                if (isset($product['product_image']) && $product['product_image'] instanceof \Illuminate\Http\UploadedFile) {
+                    $imagePath = $product['product_image']->store('service-request-images', 'public');
+                }
+
+                ServiceRequestProduct::create([
+                    'service_requests_id' => $serviceRequest->id,
+                    'name' => $product['product_name'],
+                    'type' => $product['product_type'],
+                    'brand' => $product['product_brand'],
+                    'model_no' => $product['model_no'] ?? null,
+                    'hsn' => $product['hsn'] ?? null,
+                    'purchase_date' => $product['purchase_date'] ?? null,
+                    'item_code_id' => $product['installation_service_id'] ?? null,
+                    'service_charge' => $product['price'] ?? null,
+                    'description' => $product['issue_description'] ?? null,
+                    'images' => $imagePath ?? null,
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('service-request.index')->with('success', 'Service request created successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            dd($e->getMessage());
+
+            return redirect()->back()->with('error', 'Error creating service request: ' . $e->getMessage());
+        }
+    }
+
+    public function viewInstallationServiceRequest($id)
+    {
+        $request = ServiceRequest::with([
+            'customer',
+            'customerAddress',
+            'customerCompany',
+            'customerPan',
+            'products.itemCode',
+            'parentCategorie',
+            'activeAssignment.engineer',
+            'activeAssignment.groupEngineers',
+            'activeAssignment.transferredTo',
+            'inactiveAssignments.engineer',
+            'inactiveAssignments.groupEngineers',
+            'inactiveAssignments.transferredTo',
+        ])->findOrFail($id);
+        $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
+        return view('crm/service-request/view-installation-service-request', compact('request', 'engineers'));
+    }
+
+    public function editInstallationServiceRequest($id)
+    {
+        try {
+            $request = ServiceRequest::with([
+                'customer.addressDetails',
+                'customer.companyDetails',
+                'customer.panCardDetails',
+                'products',
+                'parentCategorie',
+            ])->findOrFail($id);
+            // dd($request);
+
+            // same data as create
+            $installationService = CoveredItem::where('service_type', 'installation')->get(); // Collection
+            $installationServiceOptions = $installationService
+                ->pluck('service_name', 'id', 'service_charge')
+                ->prepend('--Select Installation Service--', 0);
+
+            $installationServicePrices = $installationService->pluck('service_charge', 'id');
+            // dd($quickServicePrices, $quickServiceOptions);
+
+            $categories = ParentCategory::where('status', 'active')
+                ->pluck('name', 'id');
+
+            $brands = Brand::where('status', 'active')
+                ->pluck('name', 'id');
+
+            $customers = Customer::all();
+
+            return view('crm/service-request/edit-installation-service-request', compact(
+                'request',
+                'installationService',
+                'installationServiceOptions',
+                'installationServicePrices',
+                'customers',
+                'categories',
+                'brands'
+            ));
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('service-request.index')
+                ->with('error', 'Installation Service Request not found: ' . $e->getMessage());
+        }
+    }
+
+    public function updateInstallationServiceRequest(Request $request, $id)
+    {
+        // Basic validation – extend as needed
+        $request->validate([
+            'email' => 'required|email',
+            'products' => 'required|array',
+            'products.*.product_name' => 'required|string|max:255',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $serviceRequest = ServiceRequest::with(['customer', 'customerAddress', 'customerCompany', 'customerPan', 'products'])
+                ->findOrFail($id);
+
+            /*
+            * 1. UPDATE / CREATE CUSTOMER (by email) + ADDRESS + COMPANY + PAN
+            */
+            $customer = Customer::with(['addressDetails', 'companyDetails', 'panCardDetails'])
+                ->where('email', $request->email)->first();
+
+            if ($customer) {
+                $customer->update([
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'phone' => $request->phone,
+                    'dob' => $request->dob,
+                    'gender' => $request->gender,
+                ]);
+            }
+
+            // Address
+            $addr = $customer->addressDetails()->first() ?? new CustomerAddressDetail;
+            $addr->branch_name = $request->branch_name;
+            $addr->address1 = $request->address1;
+            $addr->address2 = $request->address2;
+            $addr->country = $request->country;
+            $addr->state = $request->state;
+            $addr->city = $request->city;
+            $addr->pincode = $request->pincode;
+            $addr->customer_id = $customer->id;
+            $addr->save();
+
+            // Company
+            if (! empty($request->company_name) || ! empty($request->gst_no)) {
+                $comp = $customer->companyDetails()->first() ?? new CustomerCompanyDetail;
+                $comp->company_name = $request->company_name;
+                $comp->gst_no = $request->gst_no;
+                $comp->comp_address1 = $request->comp_address1;
+                $comp->comp_address2 = $request->comp_address2;
+                $comp->comp_country = $request->comp_country;
+                $comp->comp_state = $request->comp_state;
+                $comp->comp_city = $request->comp_city;
+                $comp->comp_pincode = $request->comp_pincode;
+                $comp->customer_id = $customer->id;
+                $comp->save();
+            }
+
+            // PAN (if you use separate pan table)
+            if (! empty($request->pan_number)) {
+                $pan = $customer->panCardDetails()->first() ?? new CustomerPanCardDetail(['customer_id' => $customer->id]);
+                $pan->pan_number = $request->pan_number;
+                $pan->customer_id = $customer->id;
+                $pan->save();
+            }
+
+            /*
+            * 2. UPDATE SERVICE REQUEST HEADER
+            */
+            $serviceRequest->update([
+                'customer_id' => $customer->id,
+                'service_type' => 'installation',
+                'request_source' => 'system',
+                'request_date' => $serviceRequest->request_date ?? now(),
+                'created_by' => $serviceRequest->created_by ?? Auth::id(),
+                'status' => $request->status ?? $serviceRequest->status,
+            ]);
+
+            /*
+            * 3. UPDATE PRODUCTS (simple strategy: delete old + recreate from form)
+            *    This ensures quick_service_id + price (service_charge) are in sync.
+            */
+            // Handle existing product images deletion only if needed; here we keep them.
+            $serviceRequest->products()->delete();
+
+            foreach ($request->products as $index => $prod) {
+                $imagePath = null;
+
+                // Handle product image upload
+                if (isset($prod['product_image']) && $prod['product_image'] instanceof \Illuminate\Http\UploadedFile) {
+                    $file = $prod['product_image'];
+                    $imageName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('uploads/service-request-products'), $imageName);
+                    $imagePath = 'uploads/service-request-products/' . $imageName;
+                }
+
+                ServiceRequestProduct::create([
+                    'service_requests_id' => $serviceRequest->id,
+                    'name' => $prod['product_name'] ?? null,
+                    'type' => $prod['product_type'] ?? null,
+                    'brand' => $prod['product_brand'] ?? null,
+                    'model_no' => $prod['model_no'] ?? null,
+                    'hsn' => $prod['hsn'] ?? null,
+                    'purchase_date' => $prod['purchase_date'] ?? null,
+                    'item_code_id' => $prod['installation_service_id'] ?? null,
+                    'service_charge' => $prod['price'] ?? null,
+                    'description' => $prod['issue_description'] ?? null,
+                    'images' => $imagePath,
+                ]);
+            }
+
+            DB::commit();
+
+            activity()
+                ->performedOn($serviceRequest)
+                ->causedBy(Auth::user())
+                ->log('Updated Installation Service Request #' . $serviceRequest->id);
+
+            return redirect()
+                ->route('service-request.view-installation-service-request', $serviceRequest->id)
+                ->with('success', 'Installation Service Request updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()
+                ->back()
+                ->with('error', 'Error updating Quick Service Request: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
     // ---------------------------------------------------------- Repairing Service Request Methods -----------------------------------------------------------
 
     public function createRepairingServiceRequest()
@@ -1266,7 +1821,6 @@ class ServiceRequestController extends Controller
             // dd($quickServicePrices, $quickServiceOptions);
 
             $categories = ParentCategory::where('status', 'active')
-                ->where('status_ecommerce', 'active')
                 ->pluck('name', 'id');
 
             $brands = Brand::where('status', 'active')
@@ -1286,7 +1840,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             return redirect()
                 ->route('service-request.index')
-                ->with('error', 'Quick Service Request not found: ' . $e->getMessage());
+                ->with('error', 'Repairing Service Request not found: ' . $e->getMessage());
         }
     }
 
@@ -1394,8 +1948,8 @@ class ServiceRequestController extends Controller
                     'model_no' => $prod['model_no'] ?? null,
                     'hsn' => $prod['hsn'] ?? null,
                     'purchase_date' => $prod['purchase_date'] ?? null,
-                    'item_code_id' => $prod['repairing_service_id'] ?? null,   
-                    'service_charge' => $prod['price'] ?? null,            
+                    'item_code_id' => $prod['repairing_service_id'] ?? null,
+                    'service_charge' => $prod['price'] ?? null,
                     'description' => $prod['issue_description'] ?? null,
                     'images' => $imagePath,
                 ]);
@@ -1586,7 +2140,6 @@ class ServiceRequestController extends Controller
             // dd($quickServicePrices, $quickServiceOptions);
 
             $categories = ParentCategory::where('status', 'active')
-                ->where('status_ecommerce', 'active')
                 ->pluck('name', 'id');
 
             $brands = Brand::where('status', 'active')

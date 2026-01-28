@@ -530,7 +530,7 @@ Route::prefix('/demo')->group(function () {
         // Quick Service Request Update
         Route::put('/crm/service-request/update-quick-service-request/{id}', 'updateQuickServiceRequest')->name('service-request.update-quick-service-request');
 
-
+        
         // Repairing Service Request Create
         Route::get('/crm/create-repairing-request', 'createRepairingServiceRequest')->name('repairing-service-requests.create');
         // Repairing Service Request Store
@@ -543,6 +543,30 @@ Route::prefix('/demo')->group(function () {
         Route::put('/crm/service-request/update-repairing-service-request/{id}', 'updateRepairingServiceRequest')->name('service-request.update-repairing-service-request');
 
         
+        // Installation Service Request Create
+        Route::get('/crm/create-installation-request', 'createInstallationServiceRequest')->name('installation-service-requests.create');
+        // Installation Service Request Store
+        Route::post('/crm/store-installation-request', 'storeInstallationServiceRequest')->name('installation-service-requests.store');
+        // Installation Service Request View
+        Route::get('/crm/service-request/view-installation-service-request/{id}', 'viewInstallationServiceRequest')->name('service-request.view-installation-service-request');
+        // Installation Service Request Edit
+        Route::get('/crm/service-request/edit-installation-service-request/{id}', 'editInstallationServiceRequest')->name('service-request.edit-installation-service-request');
+        // Installation Service Request Update
+        Route::put('/crm/service-request/update-installation-service-request/{id}', 'updateInstallationServiceRequest')->name('service-request.update-installation-service-request');
+
+
+        // Amc Service Request Create
+        Route::get('/crm/create-amc-request', 'createAmcServiceRequest')->name('amc-service-requests.create');
+        // Amc Service Request Store
+        Route::post('/crm/store-amc-request', 'storeAmcServiceRequest')->name('amc-service-requests.store');
+        // Amc Service Request View
+        Route::get('/crm/service-request/view-amc-service-request/{id}', 'viewAmcServiceRequest')->name('service-request.view-amc-service-request');
+        // Amc Service Request Edit
+        Route::get('/crm/service-request/edit-amc-service-request/{id}', 'editAmcServiceRequest')->name('service-request.edit-amc-service-request');
+        // Amc Service Request Update
+        Route::put('/crm/service-request/update-amc-service-request/{id}', 'updateAmcServiceRequest')->name('service-request.update-amc-service-request');
+
+
 
         // Delete Section For All the Service Request
         Route::delete('/crm/service-request/destroy-quick-service-request/{id}', 'destroyQuickServiceRequest')->name('service-request.destroy-quick-service-request');
@@ -553,19 +577,19 @@ Route::prefix('/demo')->group(function () {
 
         // AMC Request CRUD Routes
         // Create AMC Request Page
-        Route::get('/crm/create-amc-request', 'create_amc')->name('service-request.create-amc');
+        // Route::get('/crm/create-amc-request', 'create_amc')->name('service-request.create-amc');
         // Store AMC Request
-        Route::post('/crm/store-amc-request', 'store_amc')->name('service-request.store-amc');
+        // Route::post('/crm/store-amc-request', 'store_amc')->name('service-request.store-amc');
         // View AMC Request Page
-        Route::get('/crm/view-amc-request/{id}', 'view_amc')->name('service-request.view-amc');
+        // Route::get('/crm/view-amc-request/{id}', 'view_amc')->name('service-request.view-amc');
         // Edit AMC Request Page
-        Route::get('/crm/edit-amc-request/{id}', 'edit_amc')->name('service-request.edit-amc');
+        // Route::get('/crm/edit-amc-request/{id}', 'edit_amc')->name('service-request.edit-amc');
         // Update AMC Request
-        Route::put('/crm/update-amc-request/{id}', 'update_amc')->name('service-request.update-amc');
+        // Route::put('/crm/update-amc-request/{id}', 'update_amc')->name('service-request.update-amc');
         // Delete AMC Request
-        Route::delete('/crm/delete-amc-request/{id}', 'destroy_amc')->name('service-request.delete-amc');
+        // Route::delete('/crm/delete-amc-request/{id}', 'destroy_amc')->name('service-request.delete-amc');
         // Get AMC Plan Details (AJAX)
-        Route::get('/crm/get-amc-plan/{id}', 'getAmcPlanDetails')->name('service-request.get-amc-plan');
+        // Route::get('/crm/get-amc-plan/{id}', 'getAmcPlanDetails')->name('service-request.get-amc-plan');
         // Assign Engineer to AMC
         Route::post('/crm/assign-amc-engineer', 'assignEngineer')->name('service-request.assign-engineer');
 

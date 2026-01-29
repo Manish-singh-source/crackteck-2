@@ -57,18 +57,15 @@
                                         <div class="row g-3">
                                             <div class="col-6">
                                                 @php
-                                                $roleOptions = [];
-                                                $roleOptions[''] = '--Select--';
-                                                    foreach ($roles as $role){
-                                                        $roleOptions[str_replace(' ', '_', strtolower($role->name))] = $role->name;
-                                                    }
+                                                $roleOptions = ['' => '--Select--'];
+                                                foreach ($roles as $role) {
+                                                    $roleOptions[$role->name] = $role->name;
+                                                }
                                                 @endphp
                                                 @include('components.form.select', [
                                                     'label' => 'Role',
                                                     'name' => 'role',
                                                     'options' => $roleOptions,
-                                                    'value' => $role->name ?? '',
-                                                    'model' => $role,
                                                 ])
                                             </div>
                                         </div>
@@ -167,6 +164,7 @@
                                                         '' => '--Select--',
                                                         'full_time' => 'Full-time',
                                                         'part_time' => 'Part-time',
+                                                        'contractual' => 'Contractual',
                                                     ],
                                                 ])
                                             </div>
@@ -585,7 +583,7 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Status',
                                                     'name' => 'status',
-                                                    'value' => '1', // Active selected by default
+                                                    'value' => 'active', // Active selected by default
                                                     'options' => [
                                                         '' => '--Select--',
                                                         'inactive' => 'Inactive',

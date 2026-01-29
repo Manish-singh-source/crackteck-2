@@ -59,12 +59,14 @@
                                                 @php
                                                     $roleOptions = ['' => '--Select--'];
                                                     foreach ($roles as $role) {
-                                                        $roleOptions[$role->id] = $role->name;
+                                                        $roleOptions[$role->name] = $role->name;
                                                     }
 
                                                     $selectedRole = old('staff_role', $staff->staff_role ?? '');
+                                                    // $selectedRole = ucwords(str_replace('_', ' ', $selectedRole));
                                                 @endphp
 
+                                                {{-- {{ $selectedRole }} --}}
                                                 @include('components.form.select', [
                                                     'label' => 'Role',
                                                     'name' => 'staff_role', // match update validation
@@ -147,9 +149,9 @@
                                                     'name' => 'gender',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Male',
-                                                        '1' => 'Female',
-                                                        '2' => 'Other',
+                                                        'male' => 'Male',
+                                                        'female' => 'Female',
+                                                        'other' => 'Other',
                                                     ],
                                                     'model' => $staff,
                                                 ])
@@ -161,9 +163,9 @@
                                                     'name' => 'marital_status',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Married',
-                                                        '1' => 'Unmarried',
-                                                        '2' => 'Divorced',
+                                                        'married' => 'Married',
+                                                        'unmarried' => 'Unmarried',
+                                                        'divorced' => 'Divorced',
                                                     ],
                                                     'model' => $staff,
                                                 ])
@@ -175,8 +177,9 @@
                                                     'name' => 'employment_type',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Full-time',
-                                                        '1' => 'Part-time',
+                                                        'full_time' => 'Full-time',
+                                                        'part_time' => 'Part-time',
+                                                        'contractual' => 'Contractual',
                                                     ],
                                                     'model' => $staff,
                                                 ])
@@ -551,10 +554,10 @@
                                                     'name' => 'vehicle_type',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Two Wheeler',
-                                                        '1' => 'Three Wheeler',
-                                                        '2' => 'Four Wheeler',
-                                                        '3' => 'Other',
+                                                        'two_wheeler' => 'Two Wheeler',
+                                                        'three_wheeler' => 'Three Wheeler',
+                                                        'four_wheeler' => 'Four Wheeler',
+                                                        'other' => 'Other',
                                                     ],
                                                     'model' => $staff->vehicleDetails ?? null,
                                                 ])
@@ -631,8 +634,8 @@
                                                     'name' => 'police_verification',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'No',
-                                                        '1' => 'Yes',
+                                                        'no' => 'No',
+                                                        'yes' => 'Yes',
                                                     ],
                                                     'model' => $staff->policeVerification ?? null,
                                                 ])
@@ -644,8 +647,8 @@
                                                     'name' => 'police_verification_status',
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Pending',
-                                                        '1' => 'Completed',
+                                                        'pending' => 'Pending',
+                                                        'completed' => 'Completed',
                                                     ],
                                                     'model' => $staff->policeVerification ?? null,
                                                 ])
@@ -684,13 +687,13 @@
                                                     'value' => '1', // Active selected by default
                                                     'options' => [
                                                         '' => '--Select--',
-                                                        '0' => 'Inactive',
-                                                        '1' => 'Active',
-                                                        '2' => 'Resigned',
-                                                        '3' => 'Terminated',
-                                                        '4' => 'Blocked',
-                                                        '5' => 'Suspended',
-                                                        '6' => 'Pending',
+                                                        'inactive' => 'Inactive',
+                                                        'active' => 'Active',
+                                                        'resigned' => 'Resigned',
+                                                        'terminated' => 'Terminated',
+                                                        'blocked' => 'Blocked',
+                                                        'suspended' => 'Suspended',
+                                                        'pending' => 'Pending',
                                                     ],
                                                     'model' => $staff,
                                                 ])

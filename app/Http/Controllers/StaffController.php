@@ -236,6 +236,7 @@ class StaffController extends Controller
     {
         $staff = Staff::with(['address', 'bankDetails', 'workSkills', 'aadharDetails', 'panDetails', 'vehicleDetails', 'policeVerification'])->findOrFail($id);
         $roles = Role::where('name', '!=', 'Customer')->get();
+        // dd($staff);
 
         return view('/crm/access-control/staff/edit', compact('staff', 'roles'));
     }
@@ -273,18 +274,18 @@ class StaffController extends Controller
 
         $validated = $request->validate([
             // Staff main
-            'staff_role' => 'required|integer',
+            'staff_role' => 'required',
             'first_name' => 'required|string|max:255',
             'last_name' => 'nullable|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|unique:staff,email,' . $id . ',id',
             'dob' => 'nullable|date',
-            'gender' => 'nullable|in:0,1,2',
-            'marital_status' => 'nullable|in:0,1,2',
-            'employment_type' => 'nullable|in:0,1',
+            'gender' => 'nullable|in:male,female,other',
+            'marital_status' => 'nullable|in:unmarried,married,divorced',
+            'employment_type' => 'nullable|in:full_time,part_time,contractual',
             'joining_date' => 'nullable|date',
             'assigned_area' => 'nullable|string|max:255',
-            'status' => 'nullable|in:0,1,2,3,4,5,6',
+            'status' => 'nullable|in:inactive,active,resigned,terminated,blocked,suspended,pending',
 
             // Address
             'address1' => 'required',
@@ -320,15 +321,15 @@ class StaffController extends Controller
             'pan_card_back_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
 
             // Vehicle
-            'vehicle_type' => 'nullable|in:0,1,2,3',
+            'vehicle_type' => 'nullable|in:two_wheeler,three_wheeler,four_wheeler,other',
             'vehicle_number' => 'nullable|string|max:50|unique:staff_vehicle_details,vehicle_number,' . $id . ',staff_id',
             'driving_license_no' => 'nullable|string|max:50|unique:staff_vehicle_details,driving_license_no,' . $id . ',staff_id',
             'driving_license_front_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             'driving_license_back_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
 
             // Police verification
-            'police_verification' => 'nullable|in:0,1',
-            'police_verification_status' => 'nullable|in:0,1',
+            'police_verification' => 'nullable|in:no,yes',
+            'police_verification_status' => 'nullable|in:pending,completed',
             'police_certificate' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
 
@@ -477,6 +478,7 @@ class StaffController extends Controller
                 ]);
             });
         } catch (\Exception $e) {
+            dd($e);
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['error' => 'An error occurred while updating the staff data. Please try again.']);

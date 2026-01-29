@@ -2326,7 +2326,7 @@ class ServiceRequestController extends Controller
     public function assignQuickServiceEngineer(Request $request)
     {
         if ($request->assignment_type == 'individual') {
-            $request->replace($request->except('engineer_id'));
+            $request->replace($request->except('id'));
         }
 
         $validator = Validator::make($request->all(), [
@@ -2368,6 +2368,7 @@ class ServiceRequestController extends Controller
 
             // Update service request status to Assigned (status = 2)
             $serviceRequest->status = 'assigned_engineer';
+            $serviceRequest->is_engineer_assigned = 'assigned';
             $serviceRequest->save();
 
             // Mark previous assignment as inactive

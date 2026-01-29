@@ -104,7 +104,158 @@ class FieldEngineerController extends Controller
         $serviceRequest->status = 'engineer_approved';
         $serviceRequest->save();
 
+        $assignEngineer = AssignedEngineer::where('service_request_id', $id)->first();
+        $assignEngineer->is_approved_by_engineer = '1';
+        $assignEngineer->engineer_approved_at = now();
+        $assignEngineer->save();
+
+
         return response()->json(['message' => 'Service request accepted successfully.'], 200);
+    }
+
+    public function startDiagnosis(Request $request, $id)
+    {
+        try {
+            $serviceRequest = ServiceRequest::find($id);
+
+            if (!$serviceRequest) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Service request not found.'
+                ], 404);
+            }
+
+            if ($serviceRequest->status !== 'engineer_approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP can be sent only after Engineer Approval.'
+                ], 400);
+            }
+
+            if ($serviceRequest->otp && $serviceRequest->otp_expiry && now()->lt($serviceRequest->otp_expiry)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP already sent and is still valid. Please wait before retrying.'
+                ], 400);
+            }
+
+            $otp = rand(1000, 9999);
+
+            DB::beginTransaction();
+            $serviceRequest->otp = $otp;
+            $serviceRequest->otp_expiry = now()->addMinutes(5);
+            $serviceRequest->save();
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully.',
+                'data' => [
+                    'service_request_id' => $serviceRequest->id,
+                    'otp' => $otp,
+                    'otp_expiry' => $serviceRequest->otp_expiry
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Start diagnosis OTP failed', [
+                'service_request_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send OTP. Please try again later.',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
+    }
+
+    public function verifyDiagnosis(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'otp' => 'required|digits:4'
+            ]);
+
+            $serviceRequest = ServiceRequest::find($id);
+
+            if (!$serviceRequest) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Service request not found.'
+                ], 404);
+            }
+
+            if ($serviceRequest->status !== 'engineer_approved') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP verification not allowed at this stage.'
+                ], 400);
+            }
+            if (!$serviceRequest->otp || !$serviceRequest->otp_expiry) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP not generated for this service request.'
+                ], 400);
+            }
+
+            if (now()->gt($serviceRequest->otp_expiry)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP has expired. Please request a new OTP.'
+                ], 400);
+            }
+
+            if ($serviceRequest->otp != $request->otp) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid OTP.'
+                ], 401);
+            }
+
+            DB::beginTransaction();
+
+            $serviceRequest->update([
+                'otp' => null,
+                'otp_expiry' => null,
+                'status' => 'in_progress' // optional, if you want to move workflow forward
+            ]);
+
+            DB::commit();
+
+            // 8️⃣ Success response
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP verified successfully. Diagnosis can be started.',
+                'data' => [
+                    'service_request_id' => $serviceRequest->id,
+                    'verified_at' => now()
+                ]
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Validation errors
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid input.',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            // Other unexpected errors
+            DB::rollBack();
+
+            Log::error('Verify diagnosis OTP failed', [
+                'service_request_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to verify OTP. Please try again later.',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
     }
 
     public function caseTransfer(Request $request, $id)
@@ -191,12 +342,11 @@ class FieldEngineerController extends Controller
         return response()->json(['diagnosisList' => $diagnosisList], 200);
     }
 
-    public function submitDiagnosis(Request $request, $service_request_id, $user_id)
+    public function submitDiagnosis(Request $request, $service_request_id, $product_id)
     {
-        // Validation aligned with docs + your diagnosis_list
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|integer|exists:staff,id', // Or users,id per docs
-            'role_id' => 'required|integer|exists:roles,id', // Generic per docs
+            'user_id' => 'required|integer|exists:staff,id',
+            'role_id' => 'required|integer|exists:roles,id',
             'diagnosis_notes' => 'nullable|string|max:10000',
             'estimated_cost' => 'nullable|numeric|min:0',
             'diagnosis_status' => 'nullable|in:completed,pending_approval',
@@ -204,7 +354,7 @@ class FieldEngineerController extends Controller
             'before_photos.*' => 'nullable|file|mimes:jpeg,jpg,png|max:10240',
             'after_photos' => 'nullable|array',
             'after_photos.*' => 'nullable|file|mimes:jpeg,jpg,png|max:10240',
-            'diagnosis_list' => 'nullable|array|max:10',
+            'diagnosis_list' => 'required|array|min:1|max:10',
             'diagnosis_list.*.name' => 'required|string|max:255',
             'diagnosis_list.*.report' => 'required|string|max:5000',
             'diagnosis_list.*.status' => 'required|in:working,not_working',
@@ -220,116 +370,133 @@ class FieldEngineerController extends Controller
             ], 422);
         }
 
-        // Verify user matches path param and auth
-        if (Auth::id() != $user_id) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized user ID'], 403);
-        }
-
         DB::beginTransaction();
+
         try {
-            // Fetch service request product (adjust relation/query as needed; docs lack product_id)
-            $serviceRequestProduct = ServiceRequestProduct::with(['itemCode'])
-                ->where('service_requests_id', $service_request_id)
-                ->first(); // Or add product filter if multi-products
+            $serviceRequestProduct = ServiceRequestProduct::where('service_requests_id', $service_request_id)
+                ->find($product_id);
 
             if (!$serviceRequestProduct) {
                 throw new \Exception('Service request product not found.');
             }
 
-            $coveredItemId = $serviceRequestProduct->item_code_id;
-            if (!$coveredItemId) {
-                throw new \Exception('Covered item not found.');
+            $assignedEngineer = AssignedEngineer::where('service_request_id', $service_request_id)
+                ->where('engineer_id', $request->user_id)
+                ->first();
+
+            if (!$assignedEngineer) {
+                throw new \Exception('Assigned engineer not found.');
             }
 
-            // Upload before photos (keys: top, bottom, etc.)
+            $coveredItemId = $serviceRequestProduct->item_code_id;
+
+            /** ---------------- Upload Photos ---------------- */
             $beforePhotos = [];
             if ($request->hasFile('before_photos')) {
-                foreach ($request->file('before_photos') as $angle => $photo) {
-                    if ($photo) {
-                        $fileName = 'before_' . $service_request_id . '_' . $user_id . '_' . $angle . '_' . time() . '.' . $photo->getClientOriginalExtension();
-                        $path = $photo->storeAs('diagnosis_photos/before', $fileName, 'public');
-                        $beforePhotos[$angle] = $path;
-                    }
+                foreach ($request->file('before_photos') as $k => $photo) {
+                    $beforePhotos[$k] = $photo->storeAs(
+                        'diagnosis_photos/before',
+                        'before_' . time() . "_$k." . $photo->getClientOriginalExtension(),
+                        'public'
+                    );
                 }
             }
 
-            // Upload after photos
             $afterPhotos = [];
             if ($request->hasFile('after_photos')) {
-                foreach ($request->file('after_photos') as $angle => $photo) {
-                    if ($photo) {
-                        $fileName = 'after_' . $service_request_id . '_' . $user_id . '_' . $angle . '_' . time() . '.' . $photo->getClientOriginalExtension();
-                        $path = $photo->storeAs('diagnosis_photos/after', $fileName, 'public');
-                        $afterPhotos[$angle] = $path;
-                    }
+                foreach ($request->file('after_photos') as $k => $photo) {
+                    $afterPhotos[$k] = $photo->storeAs(
+                        'diagnosis_photos/after',
+                        'after_' . time() . "_$k." . $photo->getClientOriginalExtension(),
+                        'public'
+                    );
                 }
             }
 
-            // Process diagnosis_list images (fix: use storeAs, ensure array)
-            $diagnosisList = $request->diagnosis_list ?? [];
-            foreach ($diagnosisList as $key => &$diagnosis) {
+            /** ---------------- Process Diagnosis List ---------------- */
+            $diagnosisList = $request->diagnosis_list;
+            $allWorking = true;
+
+            foreach ($diagnosisList as $i => &$diagnosis) {
+                if ($diagnosis['status'] !== 'working') {
+                    $allWorking = false;
+                }
+
                 if (!empty($diagnosis['images'])) {
-                    $images = is_array($diagnosis['images']) ? $diagnosis['images'] : [$diagnosis['images']];
-                    $diagnosisImages = [];
-                    foreach ($images as $imgIndex => $photo) {
-                        if ($photo instanceof \Illuminate\Http\UploadedFile) {
-                            $fileName = 'diag_' . $service_request_id . '_' . $key . '_' . $imgIndex . '_' . time() . '.' . $photo->getClientOriginalExtension();
-                            $path = $photo->storeAs('diagnosis_photos/list', $fileName, 'public');
-                            $diagnosisImages[$imgIndex] = $path;
-                        }
+                    $imgs = [];
+                    foreach ($diagnosis['images'] as $j => $img) {
+                        $imgs[] = $img->storeAs(
+                            'diagnosis_photos/list',
+                            'diag_' . time() . "_{$i}_{$j}." . $img->getClientOriginalExtension(),
+                            'public'
+                        );
                     }
-                    $diagnosis['images'] = $diagnosisImages;
+                    $diagnosis['images'] = $imgs;
                 }
             }
 
-            // Create diagnosis
-            $diagnosis = EngineerDiagnosisDetail::create([
+            /** ---------------- FIND EXISTING DIAGNOSIS ---------------- */
+            $existingDiagnosis = EngineerDiagnosisDetail::where([
                 'service_request_id' => $service_request_id,
                 'service_request_product_id' => $serviceRequestProduct->id,
-                'assigned_engineer_id' => $user_id,
+                'assigned_engineer_id' => $assignedEngineer->id,
                 'covered_item_id' => $coveredItemId,
+            ])->first();
+
+            $payload = [
                 'diagnosis_list' => json_encode($diagnosisList),
-                'before_photos' => !empty($beforePhotos) ? json_encode($beforePhotos) : null,
-                'after_photos' => !empty($afterPhotos) ? json_encode($afterPhotos) : null,
+                'before_photos' => $beforePhotos ? json_encode($beforePhotos) : null,
+                'after_photos' => $afterPhotos ? json_encode($afterPhotos) : null,
                 'diagnosis_notes' => $request->diagnosis_notes,
                 'estimated_cost' => $request->estimated_cost,
                 'diagnosis_status' => $request->diagnosis_status ?? 'submitted',
                 'completed_at' => now(),
-            ]);
+            ];
+
+            /** ---------------- CREATE OR UPDATE ---------------- */
+            if ($existingDiagnosis) {
+                $existingDiagnosis->update($payload);
+                $diagnosis = $existingDiagnosis;
+            } else {
+                $diagnosis = EngineerDiagnosisDetail::create(array_merge($payload, [
+                    'service_request_id' => $service_request_id,
+                    'service_request_product_id' => $serviceRequestProduct->id,
+                    'assigned_engineer_id' => $assignedEngineer->id,
+                    'covered_item_id' => $coveredItemId,
+                ]));
+            }
+
+            /** ---------------- UPDATE SERVICE REQUEST STATUS ---------------- */
+            if ($allWorking) {
+                ServiceRequest::where('id', $service_request_id)
+                    ->update(['status' => 'completed']);
+            }
 
             DB::commit();
 
-            // Activity log
-            activity()
-                ->performedOn($diagnosis)
-                ->causedBy(Auth::user())
-                ->log('Diagnosis submitted for service request #' . $service_request_id);
-
             return response()->json([
                 'success' => true,
-                'message' => 'Diagnosis submitted successfully',
+                'message' => 'Diagnosis saved successfully',
                 'data' => [
                     'diagnosis_id' => $diagnosis->id,
-                    'service_request_id' => $service_request_id,
-                    'submitted_by' => $user_id,
-                    'submitted_at' => $diagnosis->completed_at,
-                    'status' => $diagnosis->diagnosis_status ?? 'submitted'
+                    'service_request_status' => $allWorking ? 'completed' : 'pending'
                 ]
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Diagnosis submission failed: ' . $e->getMessage(), [
+
+            Log::error('Diagnosis submit failed', [
                 'service_request_id' => $service_request_id,
-                'user_id' => $user_id,
-                'trace' => $e->getTraceAsString()
+                'error' => $e->getMessage()
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to submit diagnosis: ' . $e->getMessage()
+                'message' => $e->getMessage()
             ], 500);
         }
     }
+
 
     public function stockInHand(Request $request)
     {

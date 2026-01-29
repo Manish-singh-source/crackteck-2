@@ -202,12 +202,12 @@
                                         <div>
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="assignment_type"
-                                                    id="typeIndividual" value="0" checked>
+                                                    id="typeIndividual" value="individual" checked>
                                                 <label class="form-check-label" for="typeIndividual">Individual</label>
                                             </div>
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="assignment_type"
-                                                    id="typeGroup" value="1">
+                                                    id="typeGroup" value="group">
                                                 <label class="form-check-label" for="typeGroup">Group</label>
                                             </div>
                                         </div>
@@ -279,7 +279,7 @@
                                 </h5>
                             </div>
                             <div class="card-body">
-                                @if ($request->activeAssignment->assignment_type === '0')
+                                @if ($request->activeAssignment->assignment_type === 'individual')
                                     <!-- Individual Engineer Card -->
                                     <div class="border rounded p-3 bg-success-subtle">
                                         <div class="d-flex align-items-center">
@@ -358,7 +358,7 @@
                             <div class="card-body">
                                 @foreach ($request->inactiveAssignments as $assignment)
                                     <div class="border rounded p-3 mb-3 bg-light">
-                                        @if ($assignment->assignment_type === '0')
+                                        @if ($assignment->assignment_type === 'individual')
                                             <!-- Individual Assignment -->
                                             <div class="d-flex align-items-start">
                                                 <div class="flex-grow-1">
@@ -429,7 +429,7 @@
         $(document).ready(function() {
             // Toggle between Individual and Group sections
             $('input[name="assignment_type"]').change(function() {
-                if ($(this).val() === '0') {
+                if ($(this).val() === 'individual') {
                     $('#individualSection').show();
                     $('#groupSection').hide();
                     // Clear group fields
@@ -472,12 +472,12 @@
                 const assignmentType = $('input[name="assignment_type"]:checked').val();
 
                 // Validation
-                if (assignmentType === '0') {
+                if (assignmentType === 'individual') {
                     if (!$('#engineer_id').val()) {
                         alert('Please select an engineer');
                         return;
                     }
-                } else if (assignmentType === '1') {
+                } else if (assignmentType === 'group') {
                     if (!$('#group_name').val()) {
                         alert('Please enter group name');
                         return;
@@ -498,12 +498,13 @@
                 // Submit via AJAX
                 const formData = $(this).serialize();
 
+                console.log(formData)
                 $.ajax({
                     url: '{{ route('service-request.assign-quick-service-engineer') }}',
                     method: 'POST',
                     data: formData,
                     success: function(response) {
-                        console.log('Assignment Response:', response);
+                        // console.log('Assignment Response:', response);
                         if (response.success) {
                             let message = response.message;
                             if (response.status_updated) {

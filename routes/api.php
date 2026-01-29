@@ -67,7 +67,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/product/{id}', 'product'); // Sales Person and Customer
 
             Route::post('/buy-product/{id}', 'buyProduct'); // Sales Person and Customer
-            
+
             Route::get('/order', 'listOrders'); // Sales Person and Customer
             Route::get('/order/{id}', 'order'); // Sales Person and Customer
 
@@ -135,7 +135,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/company-details', 'getCompanyDetails');
             Route::post('/company-details', 'addCompanyDetails');
             Route::put('/company-details/{id}', 'updateCompanyDetails');
-
         });
 
         Route::controller(AttendanceController::class)->group(function () {
@@ -190,7 +189,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/driving-license', 'getDrivingLicenseDetails');
             Route::post('/store-driving-license', 'storeDrivingLicense');
             Route::put('/update-driving-license', 'updateDrivingLicense');
-
         });
 
         // Engineer APIs
@@ -243,6 +241,10 @@ Route::prefix('v1')->group(function () {
             // Accept Request 
             Route::post('/service-request/{id}/accept', 'acceptServiceRequest');
 
+            // Send otp for Start Diagnosis
+            Route::post('/service-request/{id}/send-otp', 'startDiagnosis');
+            // Verify otp for Start Diagnosis
+            Route::post('/service-request/{id}/verify-otp', 'verifyDiagnosis');
 
             // Case Transfer API 
             Route::post('/service-request/{id}/case-transfer', 'caseTransfer');
@@ -257,18 +259,17 @@ Route::prefix('v1')->group(function () {
 
             // Stock In Hand Products APIs 
             Route::get('/stock-in-hand', 'stockInHand');
-            
+
             // Products List 
             // same as customer and sales person 
 
             // Request Part 
-            Route::post('/service-request/{id}/{product_id}/request-part', 'requestPart'); 
+            Route::post('/service-request/{id}/{product_id}/request-part', 'requestPart');
 
             // Attendance APIs 
             Route::get('/attendance', 'attendance');
             Route::post('/check-in', 'checkIn');
             Route::post('/check-out', 'checkOut');
-            
         });
     });
 });

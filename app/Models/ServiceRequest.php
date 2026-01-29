@@ -23,6 +23,8 @@ class ServiceRequest extends Model
         'is_engineer_assigned',
         'status',
         'amc_plan_id',
+        'otp',
+        'otp_expiry'
     ];
 
     public function customer()

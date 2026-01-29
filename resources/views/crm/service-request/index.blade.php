@@ -56,19 +56,6 @@
                                         </a>
                                     </li>
                                 </ul>
-
-
-                                <div>
-                                    <a href="{{ route('amc-service-requests.create') }}" id="mySection1"
-                                        class="btn btn-primary">Create AMC Service</a>
-                                    <a href="{{ route('installation-service-requests.create') }}" id="mySection2"
-                                        class="btn btn-primary">Create Installation Service</a>
-                                    <a href="{{ route('repairing-service-requests.create') }}" id="mySection3"
-                                        class="btn btn-primary">Create Repairing Service</a>
-                                    <a href="{{ route('quick-service-requests.create') }}" id="mySection4"
-                                        class="btn btn-primary">Create Quick Service</a>
-                                </div>
-
                             </div>
 
                             <div class="tab-content text-muted">
@@ -79,6 +66,36 @@
                                         <div class="col-12">
                                             <div class="card shadow-none">
                                                 <div class="card-body">
+                                                    <div id="amc_filters" class="d-flex justify-content-between align-items-center mb-3" style="display: none;">
+                                                        <div class="d-flex gap-3">
+                                                            <select class="form-select request-status-filter" data-service="amc" style="width: 200px;">
+                                                                <option value="">All Request Status</option>
+                                                                <option value="pending">Pending</option>
+                                                                <option value="approved">Approved</option>
+                                                                <option value="rejected">Rejected</option>
+                                                                <option value="processing">Processing</option>
+                                                                <option value="processed">Processed</option>
+                                                                <option value="picking">Picking</option>
+                                                                <option value="picked">Picked</option>
+                                                                <option value="completed">Completed</option>
+                                                            </select>
+                                                            <select class="form-select status-filter" data-service="amc" style="width: 200px;">
+                                                                <option value="">All Status</option>
+                                                                <option value="pending">Pending</option>
+                                                                <option value="admin_approved">Admin Approved</option>
+                                                                <option value="assigned_engineer">Engineer Assigned</option>
+                                                                <option value="engineer_approved">Engineer Approved</option>
+                                                                <option value="engineer_not_approved">Engineer Not Approved</option>
+                                                                <option value="in_transfer">In Transfer</option>
+                                                                <option value="transferred">Transferred</option>
+                                                                <option value="in_progress">In Progress</option>
+                                                                <option value="picking">Picking</option>
+                                                                <option value="picked">Picked</option>
+                                                                <option value="completed">Completed</option>
+                                                            </select>
+                                                        </div>
+                                                        <a href="{{ route('amc-service-requests.create') }}" class="btn btn-primary">Create AMC</a>
+                                                    </div>
                                                     <table
                                                         class="table table-striped table-borderless dt-responsive nowrap service-datatable">
                                                         <thead>
@@ -269,6 +286,36 @@
                                         <div class="col-12">
                                             <div class="card shadow-none">
                                                 <div class="card-body">
+                                                    <div id="installation_filters" class="d-flex justify-content-between align-items-center mb-3" style="display: none;">
+                                                        <div class="d-flex gap-3">
+                                                            <select class="form-select request-status-filter" data-service="installation" style="width: 200px;">
+                                                                <option value="">All Request Status</option>
+                                                                <option value="pending">Pending</option>
+                                                                <option value="approved">Approved</option>
+                                                                <option value="rejected">Rejected</option>
+                                                                <option value="processing">Processing</option>
+                                                                <option value="processed">Processed</option>
+                                                                <option value="picking">Picking</option>
+                                                                <option value="picked">Picked</option>
+                                                                <option value="completed">Completed</option>
+                                                            </select>
+                                                            <select class="form-select status-filter" data-service="installation" style="width: 200px;">
+                                                                <option value="">All Status</option>
+                                                                <option value="pending">Pending</option>
+                                                                <option value="admin_approved">Admin Approved</option>
+                                                                <option value="assigned_engineer">Engineer Assigned</option>
+                                                                <option value="engineer_approved">Engineer Approved</option>
+                                                                <option value="engineer_not_approved">Engineer Not Approved</option>
+                                                                <option value="in_transfer">In Transfer</option>
+                                                                <option value="transferred">Transferred</option>
+                                                                <option value="in_progress">In Progress</option>
+                                                                <option value="picking">Picking</option>
+                                                                <option value="picked">Picked</option>
+                                                                <option value="completed">Completed</option>
+                                                            </select>
+                                                        </div>
+                                                        <a href="{{ route('installation-service-requests.create') }}" class="btn btn-primary">Create Installation</a>
+                                                    </div>
                                                     <table
                                                         class="table table-striped table-borderless nowrap service-datatable">
                                                         <thead>
@@ -459,6 +506,36 @@
                                         <div class="col-12">
                                             <div class="card shadow-none">
                                                 <div class="card-body">
+                                                    <div id="repairing_filters" class="d-flex justify-content-between align-items-center mb-3" style="display: none;">
+                                                        <div class="d-flex gap-3">
+                                                            <select class="form-select request-status-filter" data-service="repairing" style="width: 200px;">
+                                                                <option value="">All Request Status</option>
+                                                                <option value="pending">Pending</option>
+                                                                <option value="approved">Approved</option>
+                                                                <option value="rejected">Rejected</option>
+                                                                <option value="processing">Processing</option>
+                                                                <option value="processed">Processed</option>
+                                                                <option value="picking">Picking</option>
+                                                                <option value="picked">Picked</option>
+                                                                <option value="completed">Completed</option>
+                                                            </select>
+                                                            <select class="form-select status-filter" data-service="repairing" style="width: 200px;">
+                                                                <option value="">All Status</option>
+                                                                <option value="pending">Pending</option>
+                                                                <option value="admin_approved">Admin Approved</option>
+                                                                <option value="assigned_engineer">Engineer Assigned</option>
+                                                                <option value="engineer_approved">Engineer Approved</option>
+                                                                <option value="engineer_not_approved">Engineer Not Approved</option>
+                                                                <option value="in_transfer">In Transfer</option>
+                                                                <option value="transferred">Transferred</option>
+                                                                <option value="in_progress">In Progress</option>
+                                                                <option value="picking">Picking</option>
+                                                                <option value="picked">Picked</option>
+                                                                <option value="completed">Completed</option>
+                                                            </select>
+                                                        </div>
+                                                        <a href="{{ route('repairing-service-requests.create') }}" class="btn btn-primary">Create Repairing</a>
+                                                    </div>
                                                     <table
                                                         class="table table-striped table-borderless nowrap service-datatable">
                                                         <thead>
@@ -649,6 +726,36 @@
                                         <div class="col-12">
                                             <div class="card shadow-none">
                                                 <div class="card-body">
+                                                    <div id="quick_filters" class="d-flex justify-content-between align-items-center mb-3" style="display: none;">
+                                                        <div class="d-flex gap-3">
+                                                            <select class="form-select request-status-filter" data-service="quick" style="width: 200px;">
+                                                                <option value="">All Request Status</option>
+                                                                <option value="pending">Pending</option>
+                                                                <option value="approved">Approved</option>
+                                                                <option value="rejected">Rejected</option>
+                                                                <option value="processing">Processing</option>
+                                                                <option value="processed">Processed</option>
+                                                                <option value="picking">Picking</option>
+                                                                <option value="picked">Picked</option>
+                                                                <option value="completed">Completed</option>
+                                                            </select>
+                                                            <select class="form-select status-filter" data-service="quick" style="width: 200px;">
+                                                                <option value="">All Status</option>
+                                                                <option value="pending">Pending</option>
+                                                                <option value="admin_approved">Admin Approved</option>
+                                                                <option value="assigned_engineer">Engineer Assigned</option>
+                                                                <option value="engineer_approved">Engineer Approved</option>
+                                                                <option value="engineer_not_approved">Engineer Not Approved</option>
+                                                                <option value="in_transfer">In Transfer</option>
+                                                                <option value="transferred">Transferred</option>
+                                                                <option value="in_progress">In Progress</option>
+                                                                <option value="picking">Picking</option>
+                                                                <option value="picked">Picked</option>
+                                                                <option value="completed">Completed</option>
+                                                            </select>
+                                                        </div>
+                                                        <a href="{{ route('quick-service-requests.create') }}" class="btn btn-primary">Create Quick</a>
+                                                    </div>
                                                     <table
                                                         class="table table-striped table-borderless nowrap service-datatable">
                                                         <thead>
@@ -843,25 +950,25 @@
 
     <script>
         function showService(type) {
-            // Hide all buttons first
-            document.getElementById("mySection1").style.display = "none";
-            document.getElementById("mySection2").style.display = "none";
-            document.getElementById("mySection3").style.display = "none";
-            document.getElementById("mySection4").style.display = "none";
+            // Hide all filter divs first
+            document.getElementById("amc_filters").style.display = "none";
+            document.getElementById("installation_filters").style.display = "none";
+            document.getElementById("repairing_filters").style.display = "none";
+            document.getElementById("quick_filters").style.display = "none";
 
-            // Show the correct button based on tab
+            // Show the correct filter div based on tab
             switch (type) {
                 case 'AMC':
-                    document.getElementById("mySection1").style.display = "block";
+                    document.getElementById("amc_filters").style.display = "flex";
                     break;
                 case 'Installation':
-                    document.getElementById("mySection2").style.display = "block";
+                    document.getElementById("installation_filters").style.display = "flex";
                     break;
                 case 'Repairing':
-                    document.getElementById("mySection3").style.display = "block";
+                    document.getElementById("repairing_filters").style.display = "flex";
                     break;
                 case 'Quick':
-                    document.getElementById("mySection4").style.display = "block";
+                    document.getElementById("quick_filters").style.display = "flex";
                     break;
             }
         }
@@ -879,6 +986,74 @@
                     });
                 }
             });
+
+            // Filtering functionality for both request status and status
+            $('.request-status-filter, .status-filter').on('change', function() {
+                const serviceType = $(this).data('service');
+                applyFilters(serviceType);
+            });
+
+            function applyFilters(serviceType) {
+                const tableId = getTableId(serviceType);
+                const table = $('#' + tableId).find('table');
+                const filtersDiv = $('#' + serviceType + '_filters');
+                const selectedRequestStatus = filtersDiv.find('.request-status-filter').val();
+                const selectedStatus = filtersDiv.find('.status-filter').val();
+
+                table.find('tbody tr').each(function() {
+                    const requestStatusCell = $(this).find('td').eq(4); // Request Status column (0-indexed)
+                    const statusCell = $(this).find('td').eq(7); // Status column (0-indexed)
+                    const requestStatusBadge = requestStatusCell.find('.badge');
+                    const statusBadge = statusCell.find('.badge');
+                    const requestStatusText = requestStatusBadge.text().trim();
+                    const statusText = statusBadge.text().trim();
+
+                    const requestStatusKey = requestStatusText.toLowerCase(); // display is ucfirst(key)
+                    const statusKey = getStatusKey(statusText);
+
+                    const showRow = (selectedRequestStatus === '' || requestStatusKey === selectedRequestStatus) &&
+                                    (selectedStatus === '' || statusKey === selectedStatus);
+
+                    if (showRow) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                // Reinitialize DataTable if needed
+                if ($.fn.DataTable.isDataTable(table)) {
+                    table.DataTable().draw();
+                }
+            }
+
+            function getStatusKey(displayText) {
+                const statusMap = {
+                    'Pending': 'pending',
+                    'Admin Approved': 'admin_approved',
+                    'Engineer Assigned': 'assigned_engineer',
+                    'Engineer Approved': 'engineer_approved',
+                    'Engineer Not Approved': 'engineer_not_approved',
+                    'In Transfer': 'in_transfer',
+                    'Transferred': 'transferred',
+                    'In Progress': 'in_progress',
+                    'Picking': 'picking',
+                    'Picked': 'picked',
+                    'Completed': 'completed'
+                };
+
+                return statusMap[displayText] || '';
+            }
+
+            function getTableId(serviceType) {
+                switch(serviceType) {
+                    case 'amc': return 'amc_services';
+                    case 'installation': return 'installation_service';
+                    case 'repairing': return 'repairing_services';
+                    case 'quick': return 'quick_services';
+                    default: return 'amc_services';
+                }
+            }
         });
     </script>
 @endsection

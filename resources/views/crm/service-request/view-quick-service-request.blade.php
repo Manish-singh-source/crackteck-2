@@ -187,7 +187,7 @@
                 <div class="col-xl-4">
 
                     <!-- Assign Engineer Card -->
-                    @if ($request->status == 'admin_approved')
+                    @if ($request->status === 'admin_approved' || $request->status === 'in_transfer' || $request->status === 'engineer_not_approved')
                         <div class="card">
                             <div class="card-header border-bottom-dashed">
                                 <h5 class="card-title mb-0">Assign Engineer</h5>

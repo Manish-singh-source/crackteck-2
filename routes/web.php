@@ -625,12 +625,13 @@ Route::prefix('/demo')->group(function () {
         Route::get('/crm/case-transfer', 'index')->name('case-transfer.index');
         // Create Case Transfer Page
         Route::get('/crm/create-case-transfer', 'create')->name('case-transfer.create');
+        // View Case Transfer Page
+        Route::get('/crm/view-case-transfer/{id}', 'view')->name('case-transfer.view');
+        // Approve Case Transfer
+        Route::post('/crm/approve-case-transfer/{id}', 'approve')->name('case-transfer.approve');
     });
 
-    // View Case Transfer Page
-    Route::get('/crm/view-case-transfer', function () {
-        return view('/crm/case-transfer/view');
-    })->name('case-transfer.view');
+    // View Case Transfer Page (duplicate route removed)
 
     // ------------------------------------------------------------ Call Logs Page -------------------------------------------------------------
 

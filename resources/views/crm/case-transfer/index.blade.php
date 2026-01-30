@@ -89,7 +89,7 @@
                                                                     </td>
                                                                     <td>{{ $request->created_at }}</td>
                                                                     <td>{{ $request->requestingEngineer->first_name ?? 'N/A' }} {{ $request->requestingEngineer->last_name ?? ''}}</td>
-                                                                    <td>{{ $request->transferringEngineer->first_name ?? 'N/A' }} {{ $request->transferringEngineer->last_name ?? ''}}</td>
+                                                                    <td>{{ $request->engineer->first_name ?? 'N/A' }} {{ $request->engineer->last_name ?? ''}}</td>
 
                                                                     <td>
                                                                         @if ($request->status == 'pending')

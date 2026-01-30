@@ -2537,8 +2537,8 @@ class ServiceRequestController extends Controller
                 $message = 'Engineer ' . $engineer->first_name . ' ' . $engineer->last_name . ' assigned successfully';
 
                 /** ---------------- CASE TRANSFER UPDATE ---------------- */
-                $caseTransfer = CaseTransferRequest::where('service_request_id', $serviceRequest->id)->first();
-                if ($caseTransfer) {
+                $caseTransfers = CaseTransferRequest::where('service_request_id', $serviceRequest->id)->get();
+                foreach ($caseTransfers as $caseTransfer) {
                     $caseTransfer->update([
                         'new_engineer_id' => $request->engineer_id,
                         'status'          => 'approved',

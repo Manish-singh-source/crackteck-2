@@ -247,12 +247,12 @@
                                             <span class="fw-semibold text-break">Address :
                                             </span>
                                             <span>
-                                                {{ $customerAddress->address1 }},
-                                                {{ $customerAddress->address2 }},
-                                                {{ $customerAddress->city }},
-                                                {{ $customerAddress->state }},
-                                                {{ $customerAddress->pincode }},
-                                                {{ $customerAddress->country }}
+                                                {{ $customerAddress->address1 ?? ' ' }}
+                                                {{ $customerAddress->address2 ?? ' ' }}
+                                                {{ $customerAddress->city ?? ' ' }}
+                                                {{ $customerAddress->state ?? ' ' }}
+                                                {{ $customerAddress->pincode ?? ' ' }}
+                                                {{ $customerAddress->country ?? ' ' }}
                                             </span>
                                         </li>
 
@@ -267,12 +267,12 @@
                                             <span class="fw-semibold text-break">Company Address :
                                             </span>
                                             <span>
-                                                {{ $customerCompany->comp_address1 }},
-                                                {{ $customerCompany->comp_address2 }},
-                                                {{ $customerCompany->comp_state }},
-                                                {{ $customerCompany->comp_city }},
-                                                {{ $customerCompany->comp_pincode }},
-                                                {{ $customerCompany->comp_country }}
+                                                {{ $customerCompany->comp_address1 ?? ' ' }}
+                                                {{ $customerCompany->comp_address2 ?? ' ' }}
+                                                {{ $customerCompany->comp_state ?? ' ' }}
+                                                {{ $customerCompany->comp_city ?? ' ' }}
+                                                {{ $customerCompany->comp_pincode ?? ' ' }}
+                                                {{ $customerCompany->comp_country ?? ' ' }}
                                             </span>
                                         </li>
                                     </ul>

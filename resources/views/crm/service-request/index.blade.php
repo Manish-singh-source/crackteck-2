@@ -16,8 +16,8 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body pt-2">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
+                            <div class="d-flex justify-content-between align-items-center border-bottom">
+                                <ul class="nav nav-underline pt-2" id="pills-tab" role="tablist">
                                     {{-- AMC Services --}}
                                     <li class="nav-item" role="presentation">
                                         <a class="nav-link active p-2" onclick="showService('AMC')" id="amc_service_tab"

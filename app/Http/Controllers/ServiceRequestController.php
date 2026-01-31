@@ -2272,7 +2272,13 @@ class ServiceRequestController extends Controller
                     'service_charge' => $prod['price'] ?? null,              // Quick Service Price from form
                     'description' => $prod['issue_description'] ?? null,
                     'images' => $imagePath,
+                    'status' => 'pending', // Set initial status as pending
                 ]);
+
+            // Update all products from pending to approved after successful update
+            ServiceRequestProduct::where('service_requests_id', $serviceRequest->id)
+                ->where('status', 'pending')
+                ->update(['status' => 'approved']);
             }
 
             DB::commit();
@@ -2371,6 +2377,11 @@ class ServiceRequestController extends Controller
             $serviceRequest->status = 'assigned_engineer';
             $serviceRequest->is_engineer_assigned = 'assigned';
             $serviceRequest->save();
+            
+            // Update all products from approved to processing when engineer is assigned
+            ServiceRequestProduct::where('service_requests_id', $serviceRequest->id)
+                ->where('status', 'approved')
+                ->update(['status' => 'processing']);
 
             // Mark previous assignment as inactive
             if ($previousAssignment) {
@@ -2583,6 +2594,11 @@ class ServiceRequestController extends Controller
                 'status' => 'assigned_engineer',
                 'is_engineer_assigned' => 'assigned'
             ]);
+
+            // Update all products from 'approved' to 'processing' when engineer is assigned
+            ServiceRequestProduct::where('service_requests_id', $serviceRequest->id)
+                ->where('status', 'approved')
+                ->update(['status' => 'processing']);
 
             /** ---------------- LOGGING ---------------- */
             Log::info('Engineer Assigned', [

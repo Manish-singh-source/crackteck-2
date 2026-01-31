@@ -223,6 +223,11 @@ class FieldEngineerController extends Controller
                 'status' => 'in_progress' // optional, if you want to move workflow forward
             ]);
 
+            // Update all service request products status from 'approved' to 'in_progress'
+            ServiceRequestProduct::where('service_requests_id', $id)
+                ->where('status', 'processing')
+                ->update(['status' => 'in_progress']);
+
             DB::commit();
 
             // 8️⃣ Success response
@@ -357,7 +362,7 @@ class FieldEngineerController extends Controller
             'diagnosis_list' => 'required|array|min:1|max:10',
             'diagnosis_list.*.name' => 'required|string|max:255',
             'diagnosis_list.*.report' => 'required|string|max:5000',
-            'diagnosis_list.*.status' => 'required|in:working,not_working',
+            'diagnosis_list.*.status' => 'required|in:working,not_working,picking',
             'diagnosis_list.*.images' => 'nullable|array',
             'diagnosis_list.*.images.*' => 'nullable|file|mimes:jpeg,jpg,png|max:10240',
         ]);
@@ -416,9 +421,17 @@ class FieldEngineerController extends Controller
             /** ---------------- Process Diagnosis List ---------------- */
             $diagnosisList = $request->diagnosis_list;
             $allWorking = true;
+            $hasPicking = false;
+            $hasNotWorking = false;
 
             foreach ($diagnosisList as $i => &$diagnosis) {
-                if ($diagnosis['status'] !== 'working') {
+                if ($diagnosis['status'] === 'picking') {
+                    $hasPicking = true;
+                    $allWorking = false;
+                } elseif ($diagnosis['status'] === 'not_working') {
+                    $hasNotWorking = true;
+                    $allWorking = false;
+                } elseif ($diagnosis['status'] !== 'working') {
                     $allWorking = false;
                 }
 
@@ -466,10 +479,53 @@ class FieldEngineerController extends Controller
                 ]));
             }
 
-            /** ---------------- UPDATE SERVICE REQUEST STATUS ---------------- */
-            if ($allWorking) {
+            /** ---------------- UPDATE PRODUCT STATUS ---------------- */
+            // Determine product status based on diagnosis_list
+            if ($hasPicking) {
+                $productStatus = 'picking';
+            } elseif ($hasNotWorking) {
+                $productStatus = 'on_hold';
+            } elseif ($allWorking) {
+                $productStatus = 'diagnosis_completed';
+            } else {
+                $productStatus = 'diagnosis_submitted';
+            }
+            
+            // Update the service request product status
+            $serviceRequestProduct->update(['status' => $productStatus]);
+
+            /** ---------------- UPDATE SERVICE REQUEST STATUS BASED ON ALL PRODUCTS ---------------- */
+            // Get all products for this service request
+            $allProducts = ServiceRequestProduct::where('service_requests_id', $service_request_id)->get();
+            
+            // Check if all products are diagnosis_completed
+            $allCompleted = $allProducts->every(function ($product) {
+                return $product->status === 'diagnosis_completed';
+            });
+            
+            // Check if any product has picking status
+            $anyPicking = $allProducts->contains(function ($product) {
+                return $product->status === 'picking';
+            });
+            
+            // Check if any product has on_hold status
+            $anyOnHold = $allProducts->contains(function ($product) {
+                return $product->status === 'on_hold';
+            });
+            
+            // Update service request status based on product statuses
+            $newServiceStatus = null;
+            if ($allCompleted) {
+                $newServiceStatus = 'completed';
+            } elseif ($anyPicking) {
+                $newServiceStatus = 'picking';
+            } elseif ($anyOnHold) {
+                $newServiceStatus = 'in_progress';
+            }
+            
+            if ($newServiceStatus) {
                 ServiceRequest::where('id', $service_request_id)
-                    ->update(['status' => 'completed']);
+                    ->update(['status' => $newServiceStatus]);
             }
 
             DB::commit();
@@ -479,7 +535,8 @@ class FieldEngineerController extends Controller
                 'message' => 'Diagnosis saved successfully',
                 'data' => [
                     'diagnosis_id' => $diagnosis->id,
-                    'service_request_status' => $allWorking ? 'completed' : 'pending'
+                    'product_status' => $productStatus,
+                    'service_request_status' => $newServiceStatus ?? 'unchanged'
                 ]
             ], 200);
         } catch (\Exception $e) {

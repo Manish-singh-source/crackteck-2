@@ -153,6 +153,7 @@
                                             <th>Model No</th>
                                             <th>HSN</th>
                                             <th>Brand</th>
+                                            <th>Status</th>
                                             <th>Service Type</th>
                                             <th>Service Price</th>
                                         </tr>
@@ -166,14 +167,58 @@
                                                 <td>{{ $product->model_no ?? '-' }}</td>
                                                 <td>{{ $product->hsn ?? '-' }}</td>
                                                 <td>{{ $product->brand ?? '-' }}</td>
-                                                <td>{{ $product->itemCode->service_type ?? '-' }}</td>
+                                                <td>
+                                                    @php
+                                                        $status = [
+                                                            // enum('pending', 'approved', 'rejected', 'processing', 'in_progress', 'on_hold', 'diagnosis_completed', 'processed', 'picking', 'picked', 'completed')
+                                                            'pending' => 'Pending',
+                                                            'approved' => 'Approved',
+                                                            'rejected' => 'Rejected',
+                                                            'processing' => 'Processing',
+                                                            'in_progress' => 'In Progress',
+                                                            'on_hold' => 'On Hold',
+                                                            'diagnosis_completed' => 'Diagnosis Completed',
+                                                            'processed' => 'Processed',
+                                                            'picking' => 'Picking',
+                                                            'picked' => 'Picked',
+                                                            'completed' => 'Completed',
+                                                        ];
+
+                                                        $statusColor = [
+                                                            // i want all unique status colors here 
+                                                            'pending' => 'bg-warning-subtle text-warning',
+                                                            'approved' => 'bg-success-subtle text-success',
+                                                            'rejected' => 'bg-danger-subtle text-danger',
+                                                            'processing' => 'bg-info-subtle text-info',
+                                                            'in_progress' => 'bg-primary-subtle text-primary',
+                                                            'on_hold' => 'bg-warning-subtle text-warning',
+                                                            'diagnosis_completed' => 'bg-success-subtle text-success',
+                                                            'processed' => 'bg-info-subtle text-info',
+                                                            'picking' => 'bg-primary-subtle text-primary',
+                                                            'picked' => 'bg-success-subtle text-success',
+                                                            'completed' => 'bg-success-subtle text-success',
+                                                        ];
+                                                    @endphp
+                                                    <span class="badge {{ $statusColor[$product->status ?? '-'] ?? 'bg-secondary-subtle text-secondary' }}">{{ $status[$product->status ?? '-'] ?? '-' }}</span>
+                                                </td>
+                                                <td>
+                                                    @php 
+                                                        $serviceType = [
+                                                            'amc' => 'AMC',
+                                                            'quick_service' => 'Quick Service',
+                                                            'repairing' => 'Repairing Service',
+                                                            'installation' => 'Installation Service',
+                                                        ];
+                                                    @endphp
+                                                    {{ $serviceType[$product->itemCode->service_type ?? '-'] ?? '-' }}
+                                                </td>
                                                 <td>{{ $product->service_charge ?? '-' }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="7" class="text-end"><strong>Total</strong></td>
+                                            <td colspan="8" class="text-end"><strong>Total</strong></td>
                                             <td><strong>{{ $request->products->sum('service_charge') }}</strong></td>
                                         </tr>
                                     </tfoot>
@@ -181,6 +226,145 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- Engineer Diagnosis Details Card --}}
+                    @foreach ($request->products as $index => $product)
+                        @if ($product->diagnosisDetails && $product->diagnosisDetails->count() > 0)
+                            <div class="card mt-3">
+                                <div class="card-header border-bottom-dashed bg-info-subtle">
+                                    <h5 class="card-title mb-0">
+                                        <i class="mdi mdi-clipboard-check"></i>
+                                        Diagnosis Details - {{ $product->name }} (Sr No: {{ $index + 1 }})
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    @foreach ($product->diagnosisDetails as $diagnosis)
+                                        <div class="border rounded p-3 mb-3 bg-light">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <ul class="list-group list-group-flush">
+                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                            <span class="fw-semibold">Service Request ID:</span>
+                                                            <span class="text-muted">{{ $diagnosis->service_request_id }}</span>
+                                                        </li>
+                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                            <span class="fw-semibold">Product ID:</span>
+                                                            <span class="text-muted">{{ $diagnosis->service_request_product_id }}</span>
+                                                        </li>
+                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                            <span class="fw-semibold">Assigned Engineer:</span>
+                                                            <span class="text-muted">
+                                                                {{ $diagnosis->engineer->first_name ?? 'N/A' }} 
+                                                                {{ $diagnosis->engineer->last_name ?? '' }}
+                                                            </span>
+                                                        </li>
+                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                            <span class="fw-semibold">Covered Item ID:</span>
+                                                            <span class="text-muted">{{ $diagnosis->covered_item_id ?? 'N/A' }}</span>
+                                                        </li>
+                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                            <span class="fw-semibold">Diagnosis Status:</span>
+                                                            <span class="badge bg-primary">{{ $diagnosis->diagnosis_status ?? 'N/A' }}</span>
+                                                        </li>
+                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                            <span class="fw-semibold">Estimated Cost:</span>
+                                                            <span class="text-muted">₹{{ number_format($diagnosis->estimated_cost ?? 0, 2) }}</span>
+                                                        </li>
+                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                            <span class="fw-semibold">Completed At:</span>
+                                                            <span class="text-muted">{{ $diagnosis->completed_at ? $diagnosis->completed_at : 'N/A' }}</span>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    {{-- Diagnosis List --}}
+                                                    @php
+                                                        $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
+                                                    @endphp
+                                                    @if ($diagnosisList && is_array($diagnosisList))
+                                                        <div class="mb-3">
+                                                            <h6 class="fw-semibold mb-2">Diagnosis List</h6>
+                                                            <div class="table-responsive">
+                                                                <table class="table table-bordered table-sm">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Component</th>
+                                                                            <th>Report</th>
+                                                                            <th>Status</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach ($diagnosisList as $item)
+                                                                            <tr>
+                                                                                <td>{{ $item['name'] ?? 'N/A' }}</td>
+                                                                                <td>{{ $item['report'] ?? 'N/A' }}</td>
+                                                                                <td>
+                                                                                    @php
+                                                                                        $diagStatus = $item['status'] ?? '';
+                                                                                        $diagStatusClass = $diagStatus === 'working' ? 'bg-success' : ($diagStatus === 'not_working' ? 'bg-danger' : 'bg-warning');
+                                                                                        $diagStatusLabel = $diagStatus === 'working' ? 'Working' : ($diagStatus === 'not_working' ? 'Not Working' : ($diagStatus === 'picking' ? 'Picking' : ucfirst($diagStatus)));
+                                                                                    @endphp
+                                                                                    <span class="badge {{ $diagStatusClass }}">{{ $diagStatusLabel }}</span>
+                                                                                </td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    {{-- Before Photos --}}
+                                                    @php
+                                                        $beforePhotos = json_decode($diagnosis->before_photos, true);
+                                                    @endphp
+                                                    @if ($beforePhotos && is_array($beforePhotos) && count($beforePhotos) > 0)
+                                                        <div class="mb-3">
+                                                            <h6 class="fw-semibold mb-2">Before Photos</h6>
+                                                            <div class="d-flex flex-wrap gap-2">
+                                                                @foreach ($beforePhotos as $photo)
+                                                                    <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="glightbox">
+                                                                        <img src="{{ asset('storage/' . $photo) }}" alt="Before Photo" 
+                                                                             class="rounded" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #ddd;">
+                                                                    </a>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    {{-- After Photos --}}
+                                                    @php
+                                                        $afterPhotos = json_decode($diagnosis->after_photos, true);
+                                                    @endphp
+                                                    @if ($afterPhotos && is_array($afterPhotos) && count($afterPhotos) > 0)
+                                                        <div class="mb-3">
+                                                            <h6 class="fw-semibold mb-2">After Photos</h6>
+                                                            <div class="d-flex flex-wrap gap-2">
+                                                                @foreach ($afterPhotos as $photo)
+                                                                    <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="glightbox">
+                                                                        <img src="{{ asset('storage/' . $photo) }}" alt="After Photo" 
+                                                                             class="rounded" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #ddd;">
+                                                                    </a>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    {{-- Diagnosis Notes --}}
+                                                    @if ($diagnosis->diagnosis_notes)
+                                                        <div class="mb-2">
+                                                            <h6 class="fw-semibold mb-1">Notes</h6>
+                                                            <p class="text-muted mb-0">{{ $diagnosis->diagnosis_notes }}</p>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
 
                 </div>
 
@@ -345,6 +529,182 @@
                                 @endif
                             </div>
                         </div>
+                    @endif
+
+                    <!-- Picking Assignment Section -->
+                    @if ($request->status === 'picking')
+                        <div class="card mt-3" id="pickingAssignmentCard">
+                            <div class="card-header border-bottom-dashed bg-warning-subtle">
+                                <h5 class="card-title mb-0">
+                                    <i class="mdi mdi-truck-delivery"></i> Assign Pickup
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="assignPickupForm">
+                                    @csrf
+                                    <input type="hidden" name="service_request_id" value="{{ $request->id }}">
+
+                                    {{-- Display Products with Picking Status --}}
+                                    @php
+                                        $pickingProducts = [];
+                                        foreach ($request->products as $product) {
+                                            if ($product->diagnosisDetails && $product->diagnosisDetails->count() > 0) {
+                                                foreach ($product->diagnosisDetails as $diagnosis) {
+                                                    $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
+                                                    if (is_array($diagnosisList)) {
+                                                        foreach ($diagnosisList as $item) {
+                                                            if (isset($item['status']) && $item['status'] === 'picking') {
+                                                                $pickingProducts[] = $product;
+                                                                break 2;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    @endphp
+
+                                    @if (count($pickingProducts) > 0)
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Products (Picking Status)</label>
+                                            <div class="border rounded p-3 bg-light">
+                                                @foreach ($pickingProducts as $product)
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <i class="mdi mdi-package-variant-closed text-primary me-2"></i>
+                                                        <span>{{ $product->name }} ({{ $product->model_no ?? 'N/A' }})</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Assigned Person Type</label>
+                                        <div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="assigned_person_type"
+                                                    id="personTypeDelivery" value="delivery_man">
+                                                <label class="form-check-label" for="personTypeDelivery">Delivery Man</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="assigned_person_type"
+                                                    id="personTypeEngineer" value="engineer" checked>
+                                                <label class="form-check-label" for="personTypeEngineer">Engineer</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Delivery Man Selection -->
+                                    <div id="deliveryManSection" style="display: none;">
+                                        <div class="mb-3">
+                                            <label for="assigned_person_id" class="form-label">Select Delivery Man</label>
+                                            <select name="assigned_person_id" id="assigned_person_id" class="form-select">
+                                                <option value="">--Select Delivery Man--</option>
+                                                @foreach ($deliveryMen as $deliveryMan)
+                                                    <option value="{{ $deliveryMan->id }}">
+                                                        {{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }} ({{ $deliveryMan->phone }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Engineer Selection -->
+                                    <div id="engineerSection">
+                                        @php
+                                            $assignedEngineerId = null;
+                                            if ($request->activeAssignment && $request->activeAssignment->assignment_type === 'individual') {
+                                                $assignedEngineerId = $request->activeAssignment->engineer_id;
+                                            }
+                                        @endphp
+                                        <div class="mb-3">
+                                            <label for="engineer_assigned_person_id" class="form-label">Select Engineer</label>
+                                            <select name="assigned_person_id" id="engineer_assigned_person_id" class="form-select">
+                                                <option value="">--Select Engineer--</option>
+                                                @foreach ($engineers as $engineer)
+                                                    <option value="{{ $engineer->id }}" {{ $assignedEngineerId == $engineer->id ? 'selected' : '' }}>
+                                                        {{ $engineer->first_name }} {{ $engineer->last_name }} ({{ $engineer->phone }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="mdi mdi-truck-check"></i> Assign Pickup
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Existing Pickups -->
+                        @if (isset($pickups) && $pickups->count() > 0)
+                            <div class="card mt-3">
+                                <div class="card-header border-bottom-dashed bg-light">
+                                    <h5 class="card-title mb-0">
+                                        <i class="mdi mdi-clipboard-list"></i> Pickup Records
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th>Person Type</th>
+                                                    <th>Assigned To</th>
+                                                    <th>Status</th>
+                                                    <th>Assigned At</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($pickups as $pickup)
+                                                    <tr>
+                                                        <td>{{ $pickup->serviceRequestProduct->name ?? 'N/A' }}</td>
+                                                        <td>
+                                                            @if ($pickup->assigned_person_type === 'delivery_man')
+                                                                <span class="badge bg-info">Delivery Man</span>
+                                                            @else
+                                                                <span class="badge bg-primary">Engineer</span>
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ $pickup->assignedPerson->first_name ?? 'N/A' }} {{ $pickup->assignedPerson->last_name ?? '' }}</td>
+                                                        <td>
+                                                            @php
+                                                                $pickupStatus = [
+                                                                    'pending' => 'Pending',
+                                                                    'assigned' => 'Assigned',
+                                                                    'approved' => 'Approved',
+                                                                    'picked' => 'Picked',
+                                                                    'received' => 'Received',
+                                                                    'cancelled' => 'Cancelled',
+                                                                    'returned' => 'Returned',
+                                                                    'completed' => 'Completed',
+                                                                ];
+                                                                $pickupStatusColor = [
+                                                                    'pending' => 'bg-warning',
+                                                                    'assigned' => 'bg-info',
+                                                                    'approved' => 'bg-primary',
+                                                                    'picked' => 'bg-secondary',
+                                                                    'received' => 'bg-success',
+                                                                    'cancelled' => 'bg-danger',
+                                                                    'returned' => 'bg-warning',
+                                                                    'completed' => 'bg-success',
+                                                                ];
+                                                            @endphp
+                                                            <span class="badge {{ $pickupStatusColor[$pickup->status] ?? 'bg-secondary' }}">
+                                                                {{ $pickupStatus[$pickup->status] ?? ucfirst($pickup->status) }}
+                                                            </span>
+                                                        </td>
+                                                        <td>{{ $pickup->assigned_at ? $pickup->assigned_at->format('d M Y, h:i A') : 'N/A' }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     @endif
 
                     <!-- Previous Assignments History -->
@@ -523,6 +883,67 @@
                         console.error('Assignment Error:', xhr);
                         const error = xhr.responseJSON?.message ||
                             'Error assigning engineer. Please try again.';
+                        alert(error);
+                    }
+                });
+            });
+        });
+
+        // Pickup Assignment Form Handling
+        $(document).ready(function() {
+            // Show/hide delivery man or engineer section based on person type selection
+            function updatePersonTypeSections() {
+                var selectedType = $('input[name="assigned_person_type"]:checked').val();
+                if (selectedType === 'delivery_man') {
+                    $('#deliveryManSection').show();
+                    $('#engineerSection').hide();
+                    $('#assigned_person_id').prop('required', true);
+                    $('#engineer_assigned_person_id').prop('required', false);
+                } else {
+                    $('#deliveryManSection').hide();
+                    $('#engineerSection').show();
+                    $('#assigned_person_id').prop('required', false);
+                    $('#engineer_assigned_person_id').prop('required', true);
+                }
+            }
+
+            // Initialize on page load
+            updatePersonTypeSections();
+
+            // Handle person type change
+            $('input[name="assigned_person_type"]').change(function() {
+                updatePersonTypeSections();
+            });
+
+            // Handle pickup assignment form submission
+            $('#assignPickupForm').on('submit', function(e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+                var submitBtn = $(this).find('button[type="submit"]');
+                var originalBtnText = submitBtn.html();
+
+                submitBtn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Processing...');
+
+                $.ajax({
+                    url: "{{ route('service-request.assign-pickup') }}",
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+
+                        if (response.success) {
+                            alert('Pickup assigned successfully!');
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+                        console.error('Pickup Assignment Error:', xhr);
+                        const error = xhr.responseJSON?.message ||
+                            'Error assigning pickup. Please try again.';
                         alert(error);
                     }
                 });

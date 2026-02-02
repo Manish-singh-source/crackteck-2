@@ -24,4 +24,12 @@ class EngineerDiagnosisDetail extends Model
         'before_photos',
         'completed_at',
     ];
+
+    /**
+     * Get the engineer that is assigned to this diagnosis.
+     */
+    public function engineer()
+    {
+        return $this->belongsTo(Staff::class, 'assigned_engineer_id');
+    }
 }

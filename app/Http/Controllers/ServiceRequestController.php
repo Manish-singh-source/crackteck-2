@@ -17,6 +17,7 @@ use App\Models\CustomerAddressDetail;
 use App\Models\CustomerCompanyDetail;
 use App\Models\CustomerPanCardDetail;
 use App\Models\Engineer;
+use App\Models\EngineerDiagnosisDetail;
 use App\Models\NonAmcEngineerAssignment;
 use App\Models\NonAmcProduct;
 use App\Models\NonAmcService;
@@ -24,6 +25,7 @@ use App\Models\ParentCategorie;
 use App\Models\ParentCategory;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
+use App\Models\ServiceRequestProductPickup;
 use App\Models\CaseTransferRequest;
 use App\Models\Staff;
 use Illuminate\Http\Request;
@@ -98,7 +100,9 @@ class ServiceRequestController extends Controller
             'customer',
             'customerAddress',
             'customerCompany',
-            'products',
+            'products' => function ($query) {
+                $query->with(['diagnosisDetails.engineer', 'pickups']);
+            },
         ])->findOrFail($id);
 
         // Get active assignment
@@ -108,8 +112,17 @@ class ServiceRequestController extends Controller
             ->first();
 
         $engineers = Staff::where('staff_role', '1')->get();
+        
+        // Get active delivery men
+        $deliveryMen = Staff::where('staff_role', 'delivery_man')->where('status', 'active')->get();
 
-        return view('/crm/service-request/view-quick-service-request', compact('serviceRequest', 'activeAssignment', 'engineers'));
+        // Get existing pickup records for this service request
+        $pickups = ServiceRequestProductPickup::with(['serviceRequestProduct', 'assignedPerson'])
+            ->where('request_id', $id)
+            ->get();
+
+        return view('/crm/service-request/view-quick-service-request', 
+            compact('serviceRequest', 'activeAssignment', 'engineers', 'deliveryMen', 'pickups'));
     }
 
     public function edit()
@@ -2107,6 +2120,8 @@ class ServiceRequestController extends Controller
             'customerCompany',
             'customerPan',
             'products.itemCode',
+            'products.diagnosisDetails.engineer',
+            'products.pickups',
             'parentCategorie',
             'activeAssignment.engineer',
             'activeAssignment.groupEngineers',
@@ -2115,8 +2130,18 @@ class ServiceRequestController extends Controller
             'inactiveAssignments.groupEngineers',
             'inactiveAssignments.transferredTo',
         ])->findOrFail($id);
+        
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
-        return view('crm/service-request/view-quick-service-request', compact('request', 'engineers'));
+        
+        // Get active delivery men
+        $deliveryMen = Staff::where('staff_role', 'delivery_man')->where('status', 'active')->get();
+
+        // Get existing pickup records for this service request
+        $pickups = ServiceRequestProductPickup::with(['serviceRequestProduct', 'assignedPerson'])
+            ->where('request_id', $id)
+            ->get();
+
+        return view('crm/service-request/view-quick-service-request', compact('request', 'engineers', 'deliveryMen', 'pickups'));
     }
 
     public function editQuickServiceRequest($id)
@@ -2636,6 +2661,131 @@ class ServiceRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error assigning engineer: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Assign pickup for a service request product.
+     */
+    public function assignPickup(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'service_request_id' => 'required|exists:service_requests,id',
+            'assigned_person_type' => 'required|in:delivery_man,engineer',
+            'assigned_person_id' => 'required|exists:staff,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $serviceRequest = ServiceRequest::findOrFail($request->service_request_id);
+
+            // Only allow pickup assignment for picking status
+            if ($serviceRequest->status !== 'picking') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pickup can only be assigned when service request status is picking.',
+                ], 422);
+            }
+
+            // Get the active assignment for this service request
+            $activeAssignment = AssignedEngineer::where('service_request_id', $serviceRequest->id)
+                ->where('status', 'active')
+                ->first();
+
+            if (!$activeAssignment) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No active engineer assignment found for this service request.',
+                ], 422);
+            }
+
+            // Get diagnosis details to extract reason for picking products
+            $pickingProductIds = [];
+            $reason = '';
+            $diagnosisDetails = EngineerDiagnosisDetail::where('service_request_id', $serviceRequest->id)
+                ->get();
+            
+            foreach ($diagnosisDetails as $diagnosis) {
+                if ($diagnosis->diagnosis_list) {
+                    $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
+                    if (is_array($diagnosisList)) {
+                        foreach ($diagnosisList as $item) {
+                            if (isset($item['status']) && $item['status'] === 'picking') {
+                                $pickingProductIds[] = $diagnosis->service_request_product_id;
+                                // Extract component names and reports as reason
+                                $reasonParts[] = ($item['name'] ?? '') . ': ' . ($item['report'] ?? '');
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (!empty($reasonParts)) {
+                $reason = implode('; ', $reasonParts);
+            }
+
+            // Check if pickup record already exists for this request
+            $pickup = ServiceRequestProductPickup::where('request_id', $serviceRequest->id)
+                ->first();
+
+            if ($pickup) {
+                // Update existing pickup record
+                $pickup->update([
+                    'assigned_person_type' => $request->assigned_person_type,
+                    'assigned_person_id' => $request->assigned_person_id,
+                    'status' => 'assigned',
+                    'assigned_at' => now(),
+                ]);
+            } else {
+                // Create new pickup record - use first picking product or first product
+                $productId = !empty($pickingProductIds) ? $pickingProductIds[0] : 
+                    ($serviceRequest->products->first()->id ?? null);
+                
+                if (!$productId) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No products found for this service request.',
+                    ], 422);
+                }
+
+                $pickup = ServiceRequestProductPickup::create([
+                    'request_id' => $serviceRequest->id,
+                    'product_id' => $productId,
+                    'engineer_id' => $activeAssignment->id,
+                    'reason' => $reason,
+                    'assigned_person_type' => $request->assigned_person_type,
+                    'assigned_person_id' => $request->assigned_person_id,
+                    'status' => 'assigned',
+                    'assigned_at' => now(),
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pickup assigned successfully.',
+                'pickup' => $pickup,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Pickup Assignment Failed', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error assigning pickup: ' . $e->getMessage(),
             ], 500);
         }
     }

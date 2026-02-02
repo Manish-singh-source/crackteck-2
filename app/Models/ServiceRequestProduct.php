@@ -37,4 +37,17 @@ class ServiceRequestProduct extends Model
         return $this->belongsTo(CoveredItem::class, 'item_code_id');
     }
 
+    public function diagnosisDetails()
+    {
+        return $this->hasMany(EngineerDiagnosisDetail::class, 'service_request_product_id');
+    }
+
+    /**
+     * Get the pickups for this service request product.
+     */
+    public function pickups()
+    {
+        return $this->hasMany(ServiceRequestProductPickup::class, 'product_id');
+    }
+
 }

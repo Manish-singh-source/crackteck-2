@@ -575,6 +575,9 @@ Route::prefix('/demo')->group(function () {
         Route::post('/crm/service-request/assign-quick-service-engineer', 'assignQuickServiceEngineer')->name('service-request.assign-quick-service-engineer');
         Route::post('/crm/service-request/assign-non-amc-engineer', 'assignNonAmcEngineer')->name('service-request.assign-non-amc-engineer');
 
+        // Assign Pickup for Quick Service Request
+        Route::post('/crm/service-request/assign-pickup', 'assignPickup')->name('service-request.assign-pickup');
+
         // AMC Request CRUD Routes
         // Create AMC Request Page
         // Route::get('/crm/create-amc-request', 'create_amc')->name('service-request.create-amc');

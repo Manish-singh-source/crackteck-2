@@ -11,6 +11,7 @@ use App\Models\CaseTransferRequest;
 use Illuminate\Support\Facades\File;
 use App\Models\ServiceRequestProduct;
 use App\Models\EngineerDiagnosisDetail;
+use App\Models\ServiceRequestProductPickup;
 use Illuminate\Support\Facades\{Auth, DB, Log, Storage, Validator};
 
 class FieldEngineerController extends Controller
@@ -526,6 +527,45 @@ class FieldEngineerController extends Controller
             if ($newServiceStatus) {
                 ServiceRequest::where('id', $service_request_id)
                     ->update(['status' => $newServiceStatus]);
+            }
+
+            /** ---------------- CREATE PICKUP RECORD IF STATUS IS PICKING ---------------- */
+            if ($productStatus === 'picking') {
+                // Get the active assignment for this service request
+                $activeAssignment = AssignedEngineer::where('service_request_id', $service_request_id)
+                    ->where('status', 'active')
+                    ->first();
+
+                if ($activeAssignment) {
+                    // Check if pickup record already exists for this product
+                    $existingPickup = ServiceRequestProductPickup::where('request_id', $service_request_id)
+                        ->where('product_id', $serviceRequestProduct->id)
+                        ->first();
+
+                    if (!$existingPickup) {
+                        // Extract reason from diagnosis list
+                        $reason = '';
+                        if (!empty($diagnosisList)) {
+                            $reasonParts = [];
+                            foreach ($diagnosisList as $item) {
+                                if (isset($item['status']) && $item['status'] === 'picking') {
+                                    $reasonParts[] = ($item['name'] ?? '') . ': ' . ($item['report'] ?? '');
+                                }
+                            }
+                            $reason = implode('; ', $reasonParts);
+                        }
+
+                        ServiceRequestProductPickup::create([
+                            'request_id' => $service_request_id,
+                            'product_id' => $serviceRequestProduct->id,
+                            'engineer_id' => $activeAssignment->id,
+                            'reason' => $reason,
+                            'assigned_person_type' => null,
+                            'assigned_person_id' => null,
+                            'status' => 'pending',
+                        ]);
+                    }
+                }
             }
 
             DB::commit();

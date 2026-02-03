@@ -22,11 +22,19 @@ class LeadResource extends JsonResource
             'name' => $customerInfo
                 ? trim($customerInfo->first_name . ' ' . $customerInfo->last_name)
                 : null,
-            'phone' => $this->phone,
-            'email' => $this->email,
-            'dob' => $this->dob,
+            'phone' => $customerInfo
+                ? trim($customerInfo->phone)
+                : null,
+            'email' => $customerInfo
+                ? trim($customerInfo->email)
+                : null,
+            'dob' => $customerInfo
+                ? trim($customerInfo->dob)
+                : null,
             // 'gender' => $gender[$this->gender],
-            'gender' => $this->gender,
+            'gender' => $customerInfo
+                ? trim($customerInfo->gender)
+                : null,
             'company_name' => $this->company_name,
             'designation' => $this->designation,
             'industry_type' => $this->industry_type,

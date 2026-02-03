@@ -15,7 +15,7 @@ class LeadResource extends JsonResource
     public function toArray(Request $request): array
     {
 
-        $customerInfo = $this->whenLoaded('customer');
+        $customerInfo = $this->whenLoaded('customer.companyDetails');
 
         return [
             'id' => $this->id,
@@ -35,9 +35,13 @@ class LeadResource extends JsonResource
             'gender' => $customerInfo
                 ? trim($customerInfo->gender)
                 : null,
-            'company_name' => $this->company_name,
+            'company_name' => $customerInfo
+                ? trim($customerInfo->companyDetails->company_name)
+                : null,
             'designation' => $this->designation,
-            'industry_type' => $this->industry_type,
+            'industry_type' => $customerInfo
+                ? trim($customerInfo->companyDetails->industry_type)
+                : null,
             // 'source' => $source[$this->source],
             'source' => $this->source,
             'requirement_type' => $this->requirement_type,

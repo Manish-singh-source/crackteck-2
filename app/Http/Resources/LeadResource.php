@@ -49,9 +49,11 @@ class LeadResource extends JsonResource
         //     null => 'Not Specified',
         // ];
 
+        $customerInfo = $this->whenLoaded('customer');
+
         return [
             'id' => $this->id,
-            'name' => $this->first_name.' '.$this->last_name,
+            'name' => $customerInfo->first_name.' '.$customerInfo->last_name,
             'phone' => $this->phone,
             'email' => $this->email,
             'dob' => $this->dob,

@@ -14,44 +14,33 @@ class LeadResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
-        $customerInfo = $this->whenLoaded('customer.companyDetails');
+        $customer = $this->whenLoaded('customer');
+        $company  = $customer?->companyDetails;
 
         return [
             'id' => $this->id,
-            'name' => $customerInfo
-                ? trim($customerInfo->first_name . ' ' . $customerInfo->last_name)
+
+            'name' => $customer
+                ? trim($customer->first_name . ' ' . $customer->last_name)
                 : null,
-            'phone' => $customerInfo
-                ? trim($customerInfo->phone)
-                : null,
-            'email' => $customerInfo
-                ? trim($customerInfo->email)
-                : null,
-            'dob' => $customerInfo
-                ? trim($customerInfo->dob)
-                : null,
-            // 'gender' => $gender[$this->gender],
-            'gender' => $customerInfo
-                ? trim($customerInfo->gender)
-                : null,
-            'company_name' => $customerInfo
-                ? trim($customerInfo->companyDetails->company_name)
-                : null,
+
+            'phone' => $customer?->phone,
+            'email' => $customer?->email,
+            'dob' => $customer?->dob,
+            'gender' => $customer?->gender,
+
+            'company_name' => $company?->company_name,
+            'industry_type' => $company?->industry_type,
+
             'designation' => $this->designation,
-            'industry_type' => $customerInfo
-                ? trim($customerInfo->companyDetails->industry_type)
-                : null,
-            // 'source' => $source[$this->source],
             'source' => $this->source,
             'requirement_type' => $this->requirement_type,
             'budget_range' => $this->budget_range,
-            // 'urgency' => $urgency[$this->urgency],
             'urgency' => $this->urgency,
-            // 'status' => $status[$this->status],
             'status' => $this->status,
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
+
+            'created_at' => optional($this->created_at)->toDateTimeString(),
+            'updated_at' => optional($this->updated_at)->toDateTimeString(),
         ];
     }
 }

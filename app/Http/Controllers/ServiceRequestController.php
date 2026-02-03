@@ -2853,4 +2853,77 @@ class ServiceRequestController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Update pickup status to received and update product/service request status
+     */
+    public function pickupReceived(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'pickup_id' => 'required|exists:service_request_product_pickups,id',
+            'status' => 'required|in:received',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $pickup = ServiceRequestProductPickup::findOrFail($request->pickup_id);
+
+            // Only allow received action for picked status
+            if ($pickup->status !== 'picked') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Received action can only be performed when pickup status is picked.',
+                ], 422);
+            }
+
+            // Update pickup status to received
+            $pickup->update([
+                'status' => 'received',
+                'received_at' => now(),
+            ]);
+
+            // Update the product status to picked
+            $product = $pickup->serviceRequestProduct;
+            if ($product) {
+                $product->update([
+                    'status' => 'picked',
+                ]);
+            }
+
+            // Update the service request status to picked
+            $serviceRequest = $pickup->serviceRequest;
+            if ($serviceRequest) {
+                $serviceRequest->update([
+                    'status' => 'picked',
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pickup marked as received successfully. Product and Service Request status updated to picked.',
+                'pickup' => $pickup,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Pickup Received Action Failed', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error processing received action: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

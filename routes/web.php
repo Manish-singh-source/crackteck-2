@@ -578,6 +578,7 @@ Route::prefix('/demo')->group(function () {
         // Assign Pickup for Quick Service Request
         Route::post('/crm/service-request/assign-pickup', 'assignPickup')->name('service-request.assign-pickup');
         Route::post('/crm/service-request/pickup-admin-action', 'pickupAdminAction')->name('service-request.pickup-admin-action');
+        Route::post('/crm/service-request/pickup-received', 'pickupReceived')->name('service-request.pickup-received');
 
         // AMC Request CRUD Routes
         // Create AMC Request Page

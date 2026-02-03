@@ -748,6 +748,35 @@
                                                     </tbody>
                                                 </table>
                                             </div>
+
+                                            {{-- Received Status Form - Show when pickup status is picked --}}
+                                            @if (isset($pickups) && $pickups->where('status', 'picked')->count() > 0)
+                                                @foreach ($pickups->where('status', 'picked') as $pickedPickup)
+                                                    <div class="mt-3 p-3 bg-success-subtle border rounded">
+                                                        <h6 class="fw-semibold mb-3">
+                                                            <i class="mdi mdi-check-circle text-success"></i>
+                                                            Mark as Received - {{ $pickedPickup->serviceRequestProduct->name ?? 'N/A' }}
+                                                        </h6>
+                                                        <form id="pickupReceivedForm_{{ $pickedPickup->id }}">
+                                                            @csrf
+                                                            <input type="hidden" name="pickup_id" value="{{ $pickedPickup->id }}">
+                                                            <input type="hidden" name="status" value="received">
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <select name="received_status" class="form-select" style="width: auto;">
+                                                                    <option value="received">Received</option>
+                                                                </select>
+                                                                <button type="submit" class="btn btn-success">
+                                                                    <i class="mdi mdi-check"></i> Confirm Received
+                                                                </button>
+                                                            </div>
+                                                            <small class="text-muted d-block mt-2">
+                                                                <i class="mdi mdi-information"></i>
+                                                                This will update pickup status to received, product status to picked, and service request status to picked.
+                                                            </small>
+                                                        </form>
+                                                    </div>
+                                                @endforeach
+                                            @endif
                                         </div>
                                     </div>
                                 @endif
@@ -1040,6 +1069,44 @@
                         console.error('Pickup Assignment Error:', xhr);
                         const error = xhr.responseJSON?.message ||
                             'Error assigning pickup. Please try again.';
+                        alert(error);
+                    }
+                });
+            });
+
+            // Handle pickup received form submission
+            $('[id^="pickupReceivedForm_"]').on('submit', function(e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+                var submitBtn = $(this).find('button[type="submit"]');
+                var originalBtnText = submitBtn.html();
+
+                if (!confirm('Are you sure you want to mark this pickup as received? This will update the product and service request status to picked.')) {
+                    return;
+                }
+
+                submitBtn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Processing...');
+
+                $.ajax({
+                    url: "{{ route('service-request.pickup-received') }}",
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+
+                        if (response.success) {
+                            alert('Pickup marked as received successfully!');
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+                        console.error('Pickup Received Error:', xhr);
+                        const error = xhr.responseJSON?.message ||
+                            'Error processing received action. Please try again.';
                         alert(error);
                     }
                 });

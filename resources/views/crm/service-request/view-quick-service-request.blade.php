@@ -777,6 +777,82 @@
                                                     </div>
                                                 @endforeach
                                             @endif
+
+                                            {{-- Diagnosis Form - Show when pickup status is received --}}
+                                            @if (isset($pickups) && $pickups->where('status', 'received')->count() > 0)
+                                                @foreach ($pickups->where('status', 'received') as $receivedPickup)
+                                                    @php
+                                                        $product = $receivedPickup->serviceRequestProduct;
+                                                        $hasDiagnosis = $product->where('status', 'picked')->count() > 0;
+                                                    @endphp
+                                                    @if ($hasDiagnosis)
+                                                        <div class="mt-3 p-3 bg-info-subtle border rounded" id="diagnosisFormSection_{{ $receivedPickup->id }}">
+                                                            <h6 class="fw-semibold mb-3">
+                                                                <i class="mdi mdi-clipboard-check text-primary"></i>
+                                                                Submit Diagnosis - {{ $product->name ?? 'N/A' }}
+                                                            </h6>
+                                                            <form id="submitDiagnosisForm_{{ $receivedPickup->id }}">
+                                                                @csrf
+                                                                <input type="hidden" name="service_request_id" value="{{ $request->id }}">
+                                                                <input type="hidden" name="service_request_product_id" value="{{ $product->id }}">
+                                                                <input type="hidden" name="pickup_id" value="{{ $receivedPickup->id }}">
+                                                                
+                                                                {{-- Diagnosis List --}}
+                                                                <div class="mb-3">
+                                                                    <label class="form-label fw-semibold">Diagnosis List</label>
+                                                                    <div id="diagnosisListContainer_{{ $receivedPickup->id }}">
+                                                                        <div class="diagnosis-item mb-2 p-2 border rounded bg-white">
+                                                                            <div class="row g-2">
+                                                                                <div class="col-md-4">
+                                                                                    <input type="text" name="diagnosis_list[0][component]" class="form-control" placeholder="Component Name" required>
+                                                                                </div>
+                                                                                <div class="col-md-5">
+                                                                                    <input type="text" name="diagnosis_list[0][report]" class="form-control" placeholder="Report" required>
+                                                                                </div>
+                                                                                <div class="col-md-3">
+                                                                                    <select name="diagnosis_list[0][status]" class="form-select" required>
+                                                                                        <option value="working">Working</option>
+                                                                                        <option value="not_working">Not Working</option>
+                                                                                        <option value="picking">Picking</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                            </div>
+                                                                            <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removeDiagnosisItem(this)">
+                                                                                <i class="mdi mdi-delete"></i> Remove
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="addDiagnosisItem({{ $receivedPickup->id }})">
+                                                                        <i class="mdi mdi-plus"></i> Add Component
+                                                                    </button>
+                                                                </div>
+
+                                                                {{-- Diagnosis Notes --}}
+                                                                <div class="mb-3">
+                                                                    <label for="diagnosis_notes_{{ $receivedPickup->id }}" class="form-label fw-semibold">Diagnosis Notes</label>
+                                                                    <textarea name="diagnosis_notes" id="diagnosis_notes_{{ $receivedPickup->id }}" class="form-control" rows="3" placeholder="Enter diagnosis notes..."></textarea>
+                                                                </div>
+
+                                                                <button type="submit" class="btn btn-primary">
+                                                                    <i class="mdi mdi-check-all"></i> Submit Diagnosis
+                                                                </button>
+                                                                <small class="text-muted d-block mt-2">
+                                                                    <i class="mdi mdi-information"></i>
+                                                                    Submitting diagnosis will update product status to "Diagnosis Completed".
+                                                                </small>
+                                                            </form>
+                                                        </div>
+                                                    @else
+                                                        <div class="mt-3 p-3 bg-success-subtle border rounded">
+                                                            <h6 class="fw-semibold mb-3">
+                                                                <i class="mdi mdi-check-circle text-success"></i>
+                                                                Diagnosis Already Submitted - {{ $product->name ?? 'N/A' }}
+                                                            </h6>
+                                                            <span class="badge bg-success">Diagnosis Completed</span>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            @endif
                                         </div>
                                     </div>
                                 @endif
@@ -1107,6 +1183,88 @@
                         console.error('Pickup Received Error:', xhr);
                         const error = xhr.responseJSON?.message ||
                             'Error processing received action. Please try again.';
+                        alert(error);
+                    }
+                });
+            });
+        });
+
+        // Function to add new diagnosis item
+        function addDiagnosisItem(pickupId) {
+            const container = document.getElementById('diagnosisListContainer_' + pickupId);
+            const itemCount = container.querySelectorAll('.diagnosis-item').length;
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'diagnosis-item mb-2 p-2 border rounded bg-white';
+            newItem.innerHTML = `
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <input type="text" name="diagnosis_list[${itemCount}][component]" class="form-control" placeholder="Component Name" required>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" name="diagnosis_list[${itemCount}][report]" class="form-control" placeholder="Report" required>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="diagnosis_list[${itemCount}][status]" class="form-select" required>
+                            <option value="working">Working</option>
+                            <option value="not_working">Not Working</option>
+                            <option value="picking">Picking</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removeDiagnosisItem(this)">
+                    <i class="mdi mdi-delete"></i> Remove
+                </button>
+            `;
+            
+            container.appendChild(newItem);
+        }
+
+        // Function to remove diagnosis item
+        function removeDiagnosisItem(button) {
+            const item = button.closest('.diagnosis-item');
+            if (item.parentElement.querySelectorAll('.diagnosis-item').length > 1) {
+                item.remove();
+            } else {
+                alert('You must have at least one diagnosis item.');
+            }
+        }
+
+        // Handle diagnosis form submission
+        $(document).ready(function() {
+            // Handle submit diagnosis form
+            $('[id^="submitDiagnosisForm_"]').on('submit', function(e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+                var submitBtn = $(this).find('button[type="submit"]');
+                var originalBtnText = submitBtn.html();
+
+                if (!confirm('Are you sure you want to submit this diagnosis? This will update the product status to Diagnosis Completed.')) {
+                    return;
+                }
+
+                submitBtn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Processing...');
+
+                $.ajax({
+                    url: "{{ route('service-request.submit-diagnosis') }}",
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+
+                        if (response.success) {
+                            alert('Diagnosis submitted successfully!');
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+                        console.error('Diagnosis Submit Error:', xhr);
+                        const error = xhr.responseJSON?.message ||
+                            'Error submitting diagnosis. Please try again.';
                         alert(error);
                     }
                 });

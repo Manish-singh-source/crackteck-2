@@ -2355,6 +2355,132 @@ class ServiceRequestController extends Controller
         }
     }
 
+    /**
+     * Submit Diagnosis for a picked product
+     */
+    public function submitDiagnosis(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'service_request_id' => 'required|exists:service_requests,id',
+            'service_request_product_id' => 'required|exists:service_request_products,id',
+            'pickup_id' => 'required|exists:service_request_product_pickups,id',
+            'diagnosis_list' => 'required|array|min:1',
+            'diagnosis_list.*.component' => 'required|string',
+            'diagnosis_list.*.report' => 'required|string',
+            'diagnosis_list.*.status' => 'required|string',
+            'diagnosis_notes' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error: ' . $validator->errors()->first(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $serviceRequest = ServiceRequest::findOrFail($request->service_request_id);
+            $product = ServiceRequestProduct::findOrFail($request->service_request_product_id);
+            $pickup = ServiceRequestProductPickup::findOrFail($request->pickup_id);
+
+            // Check if pickup status is received
+            if ($pickup->status !== 'received') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Diagnosis can only be submitted for pickups with received status.',
+                ], 422);
+            }
+
+            // Check if product status is picked
+            if ($product->status !== 'picked') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product status must be picked to submit diagnosis.',
+                ], 422);
+            }
+
+            // Get active assignment to get the assigned engineer
+            $activeAssignment = AssignedEngineer::where('service_request_id', $request->service_request_id)
+                ->where('status', 'active')
+                ->first();
+
+            $engineerId = $activeAssignment->engineer_id ?? null;
+
+            // If no engineer from active assignment, try to get from pickup
+            if (!$engineerId && $pickup->engineer_id) {
+                $engineerId = $pickup->engineer_id;
+            }
+
+            // If still no engineer, use the assigned person if they're an engineer
+            if (!$engineerId && $pickup->assigned_person_type === 'engineer' && $pickup->assigned_person_id) {
+                $engineerId = $pickup->assigned_person_id;
+            }
+
+            // If still no engineer found, use current logged in user or 0 as fallback
+            if (!$engineerId) {
+                $engineerId = Auth::id() ?? 0;
+            }
+
+            // Prepare diagnosis list with all items having status 'working'
+            $diagnosisList = [];
+            foreach ($request->diagnosis_list as $item) {
+                $diagnosisList[] = [
+                    'name' => $item['component'],
+                    'report' => $item['report'],
+                    'status' => $item['status'] ?? 'working', // Default to working
+                ];
+            }
+
+            // Find existing diagnosis detail record
+            $diagnosis = EngineerDiagnosisDetail::where('service_request_id', $request->service_request_id)
+                ->where('service_request_product_id', $request->service_request_product_id)
+                ->first();
+
+            // If no existing diagnosis found, return error
+            if (!$diagnosis) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No existing diagnosis found for this product. Please contact administrator.',
+                ], 422);
+            }
+
+            // Update existing diagnosis record
+            $diagnosis->update([
+                'covered_item_id' => $product->item_code_id,
+                'diagnosis_list' => json_encode($diagnosisList),
+                'diagnosis_notes' => $request->diagnosis_notes,
+                'completed_at' => now(),
+            ]);
+
+            // Refresh the model to get updated values
+            $diagnosis->refresh();
+
+            // Update product status from picked to diagnosis_completed
+            $product->status = 'diagnosis_completed';
+            $product->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Diagnosis submitted successfully.',
+                'data' => [
+                    'diagnosis_id' => $diagnosis->id,
+                    'product_status' => $product->status,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error submitting diagnosis: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function assignQuickServiceEngineer1(Request $request)
     {
         if ($request->assignment_type == 'individual') {

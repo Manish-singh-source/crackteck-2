@@ -529,6 +529,8 @@ Route::prefix('/demo')->group(function () {
         Route::get('/crm/service-request/edit-quick-service-request/{id}', 'editQuickServiceRequest')->name('service-request.edit-quick-service-request');
         // Quick Service Request Update
         Route::put('/crm/service-request/update-quick-service-request/{id}', 'updateQuickServiceRequest')->name('service-request.update-quick-service-request');
+        // Submit Diagnosis for Pickup Product
+        Route::post('/crm/service-request/submit-diagnosis', 'submitDiagnosis')->name('service-request.submit-diagnosis');
 
         
         // Repairing Service Request Create

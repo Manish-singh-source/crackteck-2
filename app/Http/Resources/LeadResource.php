@@ -14,46 +14,14 @@ class LeadResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // $gender = [
-        //     '0' => 'Male',
-        //     '1' => 'Female',    
-        //     '2' => 'Other',
-        //     null => 'Not Specified',
-        // ];
-
-        // $source = [
-        //     '0' => 'Website',
-        //     '1' => 'Referral',
-        //     '2' => 'Call',
-        //     '3' => 'Walk-in',
-        //     '4' => 'Event',
-        //     null => 'Not Specified',
-        // ];
-
-        // $urgency = [
-        //     '0' => 'Low',
-        //     '1' => 'Medium',
-        //     '2' => 'High',
-        //     '3' => 'Critical',
-        //     null => 'Not Specified',
-        // ];
-
-        // $status = [
-        //     '0' => 'New',
-        //     '1' => 'Contacted',
-        //     '2' => 'Qualified',
-        //     '3' => 'Proposal',
-        //     '4' => 'Won',
-        //     '5' => 'Lost',
-        //     '6' => 'Nurture',
-        //     null => 'Not Specified',
-        // ];
 
         $customerInfo = $this->whenLoaded('customer');
 
         return [
             'id' => $this->id,
-            'name' => $customerInfo->first_name.' '.$customerInfo->last_name,
+            'name' => $customerInfo
+                ? trim($customerInfo->first_name . ' ' . $customerInfo->last_name)
+                : null,
             'phone' => $this->phone,
             'email' => $this->email,
             'dob' => $this->dob,

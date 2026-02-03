@@ -47,7 +47,7 @@ class LeadController extends Controller
         $validatedData = $validator->validated();
 
         // Query leads
-        $leads = Lead::where('staff_id', $validatedData['user_id'])->paginate();
+        $leads = Lead::with('customer')->where('staff_id', $validatedData['user_id'])->paginate();
 
         // Return paginated leads as resource collection
         return LeadResource::collection($leads);

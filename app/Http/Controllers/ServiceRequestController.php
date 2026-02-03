@@ -2789,4 +2789,68 @@ class ServiceRequestController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Admin action for pickup (approve/cancel).
+     */
+    public function pickupAdminAction(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'pickup_id' => 'required|exists:service_request_product_pickups,id',
+            'action' => 'required|in:approved,cancelled',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $pickup = ServiceRequestProductPickup::findOrFail($request->pickup_id);
+
+            // Only allow admin action for pending status
+            if ($pickup->status !== 'pending') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Admin action can only be performed when pickup status is pending.',
+                ], 422);
+            }
+
+            // Update pickup status based on action
+            if ($request->action === 'approved') {
+                $pickup->update([
+                    'status' => 'admin_approved',
+                    'approved_at' => now(),
+                ]);
+            } elseif ($request->action === 'cancelled') {
+                $pickup->update([
+                    'status' => 'cancelled',
+                    'cancelled_at' => now(),
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pickup request ' . $request->action . ' successfully.',
+                'pickup' => $pickup,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Pickup Admin Action Failed', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error processing admin action: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

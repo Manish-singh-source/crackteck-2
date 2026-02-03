@@ -577,6 +577,7 @@ Route::prefix('/demo')->group(function () {
 
         // Assign Pickup for Quick Service Request
         Route::post('/crm/service-request/assign-pickup', 'assignPickup')->name('service-request.assign-pickup');
+        Route::post('/crm/service-request/pickup-admin-action', 'pickupAdminAction')->name('service-request.pickup-admin-action');
 
         // AMC Request CRUD Routes
         // Create AMC Request Page
@@ -670,7 +671,7 @@ Route::prefix('/demo')->group(function () {
         // Pickup Requests Page
         Route::get('/crm/pickup-requests', 'index')->name('pickup-requests.index');
         // View Request Page
-        Route::get('/crm/view-pickup-requests/', 'view')->name('pickup-request.view');
+        Route::get('/crm/view-pickup-requests/{id}', 'view')->name('pickup-requests.view');
     });
 
     // ------------------------------------------------------------ View Jobs Page -------------------------------------------------------------

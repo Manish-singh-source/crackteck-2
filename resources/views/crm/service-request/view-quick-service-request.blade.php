@@ -532,7 +532,28 @@
                     @endif
 
                     <!-- Picking Assignment Section -->
-                    @if ($request->status === 'picking')
+                    @php
+                        $pickup = isset($pickups) && $pickups->count() > 0 ? $pickups->first() : null;
+                        $showAssignmentForm = $pickup && ($pickup->status === 'admin_approved' || $pickup->status === 'approved');
+                        $pickingProducts = [];
+                        foreach ($request->products as $product) {
+                            if ($product->diagnosisDetails && $product->diagnosisDetails->count() > 0) {
+                                foreach ($product->diagnosisDetails as $diagnosis) {
+                                    $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
+                                    if (is_array($diagnosisList)) {
+                                        foreach ($diagnosisList as $item) {
+                                            if (isset($item['status']) && $item['status'] === 'picking') {
+                                                $pickingProducts[] = $product;
+                                                break 2;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    @endphp
+                    
+                    @if (count($pickingProducts) > 0 || $pickup)
                         <div class="card mt-3" id="pickingAssignmentCard">
                             <div class="card-header border-bottom-dashed bg-warning-subtle">
                                 <h5 class="card-title mb-0">
@@ -540,171 +561,198 @@
                                 </h5>
                             </div>
                             <div class="card-body">
-                                <form id="assignPickupForm">
-                                    @csrf
-                                    <input type="hidden" name="service_request_id" value="{{ $request->id }}">
+                                
+                                {{-- Step 1: Admin Approval Form (shown when pickup is pending) --}}
+                                @if ($pickup && $pickup->status === 'pending')
+                                    <form id="adminPickupActionForm">
+                                        @csrf
+                                        <input type="hidden" name="pickup_id" value="{{ $pickup->id }}">
+                                        <div class="card bg-light mb-3">
+                                            <div class="card-body">
+                                                <h6 class="fw-semibold mb-3">
+                                                    <i class="mdi mdi-shield-check"></i> Step 1: Admin Action
+                                                </h6>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-semibold">Select Action</label>
+                                                    <select name="action" id="admin_action" class="form-select">
+                                                        <option value="">--Select Action--</option>
+                                                        <option value="approved">Approve</option>
+                                                        <option value="cancelled">Cancel</option>
+                                                    </select>
+                                                </div>
+                                                <small class="text-muted d-block mb-2">
+                                                    <i class="mdi mdi-information"></i>
+                                                    Requested by: 
+                                                    @if ($pickup->assigned_person_type === 'engineer')
+                                                        Engineer: {{ $pickup->assignedPerson->first_name ?? 'N/A' }} {{ $pickup->assignedPerson->last_name ?? '' }}
+                                                    @else
+                                                        Delivery Man: {{ $pickup->assignedPerson->first_name ?? 'N/A' }} {{ $pickup->assignedPerson->last_name ?? '' }}
+                                                    @endif
+                                                </small>
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="mdi mdi-check"></i> Submit
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                @endif
 
-                                    {{-- Display Products with Picking Status --}}
-                                    @php
-                                        $pickingProducts = [];
-                                        foreach ($request->products as $product) {
-                                            if ($product->diagnosisDetails && $product->diagnosisDetails->count() > 0) {
-                                                foreach ($product->diagnosisDetails as $diagnosis) {
-                                                    $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
-                                                    if (is_array($diagnosisList)) {
-                                                        foreach ($diagnosisList as $item) {
-                                                            if (isset($item['status']) && $item['status'] === 'picking') {
-                                                                $pickingProducts[] = $product;
-                                                                break 2;
-                                                            }
-                                                        }
-                                                    }
+                                {{-- Step 2: Pickup Assignment Form (shown after admin approval) --}}
+                                @if (!$pickup || $showAssignmentForm)
+                                    <form id="assignPickupForm">
+                                        @csrf
+                                        <input type="hidden" name="service_request_id" value="{{ $request->id }}">
+                                        @if ($pickup && $pickup->status === 'approved')
+                                            <input type="hidden" name="pickup_id" value="{{ $pickup->id }}">
+                                            <div class="alert alert-info mb-3">
+                                                <i class="mdi mdi-information"></i>
+                                                <strong>Step 2:</strong> Please assign a person for pickup delivery.
+                                            </div>
+                                        @endif
+
+                                        @if (count($pickingProducts) > 0)
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">Products (Picking Status)</label>
+                                                <div class="border rounded p-3 bg-light">
+                                                    @foreach ($pickingProducts as $product)
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <i class="mdi mdi-package-variant-closed text-primary me-2"></i>
+                                                            <span>{{ $product->name }} ({{ $product->model_no ?? 'N/A' }})</span>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        <!-- Assigned Person Type -->
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Assigned Person Type <span class="text-danger">*</span></label>
+                                            <div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="assigned_person_type"
+                                                        id="personTypeDelivery" value="delivery_man">
+                                                    <label class="form-check-label" for="personTypeDelivery">Delivery Man</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="assigned_person_type"
+                                                        id="personTypeEngineer" value="engineer" checked>
+                                                    <label class="form-check-label" for="personTypeEngineer">Engineer</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Delivery Man Selection -->
+                                        <div id="deliveryManSection" style="display: none;">
+                                            <div class="mb-3">
+                                                <label for="assigned_person_id" class="form-label">Select Delivery Man <span class="text-danger">*</span></label>
+                                                <select name="assigned_person_id" id="assigned_person_id" class="form-select">
+                                                    <option value="">--Select Delivery Man--</option>
+                                                    @foreach ($deliveryMen as $deliveryMan)
+                                                        <option value="{{ $deliveryMan->id }}">
+                                                            {{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }} ({{ $deliveryMan->phone }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Engineer Selection -->
+                                        <div id="engineerSection">
+                                            @php
+                                                $assignedEngineerId = null;
+                                                if ($request->activeAssignment && $request->activeAssignment->assignment_type === 'individual') {
+                                                    $assignedEngineerId = $request->activeAssignment->engineer_id;
                                                 }
-                                            }
-                                        }
-                                    @endphp
-
-                                    @if (count($pickingProducts) > 0)
-                                        <div class="mb-3">
-                                            <label class="form-label fw-semibold">Products (Picking Status)</label>
-                                            <div class="border rounded p-3 bg-light">
-                                                @foreach ($pickingProducts as $product)
-                                                    <div class="d-flex align-items-center mb-2">
-                                                        <i class="mdi mdi-package-variant-closed text-primary me-2"></i>
-                                                        <span>{{ $product->name }} ({{ $product->model_no ?? 'N/A' }})</span>
-                                                    </div>
-                                                @endforeach
+                                            @endphp
+                                            <div class="mb-3">
+                                                <label for="engineer_assigned_person_id" class="form-label">Select Engineer <span class="text-danger">*</span></label>
+                                                <select name="assigned_person_id" id="engineer_assigned_person_id" class="form-select">
+                                                    <option value="">--Select Engineer--</option>
+                                                    @foreach ($engineers as $engineer)
+                                                        <option value="{{ $engineer->id }}" {{ $assignedEngineerId == $engineer->id ? 'selected' : '' }}>
+                                                            {{ $engineer->first_name }} {{ $engineer->last_name }} ({{ $engineer->phone }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
-                                    @endif
 
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">Assigned Person Type</label>
-                                        <div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="assigned_person_type"
-                                                    id="personTypeDelivery" value="delivery_man">
-                                                <label class="form-check-label" for="personTypeDelivery">Delivery Man</label>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="assigned_person_type"
-                                                    id="personTypeEngineer" value="engineer" checked>
-                                                <label class="form-check-label" for="personTypeEngineer">Engineer</label>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="mdi mdi-truck-check"></i> Assign Pickup
+                                        </button>
+                                    </form>
+                                @endif
+
+                                <!-- Existing Pickups -->
+                                @if (isset($pickups) && $pickups->count() > 0)
+                                    <div class="card mt-3">
+                                        <div class="card-header border-bottom-dashed bg-light">
+                                            <h5 class="card-title mb-0">
+                                                <i class="mdi mdi-clipboard-list"></i> Pickup Records
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Product</th>
+                                                            <th>Person Type</th>
+                                                            <th>Assigned To</th>
+                                                            <th>Status</th>
+                                                            <th>Assigned At</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($pickups as $pickup)
+                                                            <tr>
+                                                                <td>{{ $pickup->serviceRequestProduct->name ?? 'N/A' }}</td>
+                                                                <td>
+                                                                    @if ($pickup->assigned_person_type === 'delivery_man')
+                                                                        <span class="badge bg-info">Delivery Man</span>
+                                                                    @else
+                                                                        <span class="badge bg-primary">Engineer</span>
+                                                                    @endif
+                                                                </td>
+                                                                <td>{{ $pickup->assignedPerson->first_name ?? 'N/A' }} {{ $pickup->assignedPerson->last_name ?? '' }}</td>
+                                                                <td>
+                                                                    @php
+                                                                        $pickupStatus = [
+                                                                            'pending' => 'Pending',
+                                                                            'assigned' => 'Assigned',
+                                                                            'approved' => 'Approved',
+                                                                            'picked' => 'Picked',
+                                                                            'received' => 'Received',
+                                                                            'cancelled' => 'Cancelled',
+                                                                            'returned' => 'Returned',
+                                                                            'completed' => 'Completed',
+                                                                        ];
+                                                                        $pickupStatusColor = [
+                                                                            'pending' => 'bg-warning',
+                                                                            'assigned' => 'bg-info',
+                                                                            'approved' => 'bg-primary',
+                                                                            'picked' => 'bg-secondary',
+                                                                            'received' => 'bg-success',
+                                                                            'cancelled' => 'bg-danger',
+                                                                            'returned' => 'bg-warning',
+                                                                            'completed' => 'bg-success',
+                                                                        ];
+                                                                    @endphp
+                                                                    <span class="badge {{ $pickupStatusColor[$pickup->status] ?? 'bg-secondary' }}">
+                                                                        {{ $pickupStatus[$pickup->status] ?? ucfirst($pickup->status) }}
+                                                                    </span>
+                                                                </td>
+                                                                <td>{{ $pickup->assigned_at ? $pickup->assigned_at->format('d M Y, h:i A') : 'N/A' }}</td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- Delivery Man Selection -->
-                                    <div id="deliveryManSection" style="display: none;">
-                                        <div class="mb-3">
-                                            <label for="assigned_person_id" class="form-label">Select Delivery Man</label>
-                                            <select name="assigned_person_id" id="assigned_person_id" class="form-select">
-                                                <option value="">--Select Delivery Man--</option>
-                                                @foreach ($deliveryMen as $deliveryMan)
-                                                    <option value="{{ $deliveryMan->id }}">
-                                                        {{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }} ({{ $deliveryMan->phone }})
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <!-- Engineer Selection -->
-                                    <div id="engineerSection">
-                                        @php
-                                            $assignedEngineerId = null;
-                                            if ($request->activeAssignment && $request->activeAssignment->assignment_type === 'individual') {
-                                                $assignedEngineerId = $request->activeAssignment->engineer_id;
-                                            }
-                                        @endphp
-                                        <div class="mb-3">
-                                            <label for="engineer_assigned_person_id" class="form-label">Select Engineer</label>
-                                            <select name="assigned_person_id" id="engineer_assigned_person_id" class="form-select">
-                                                <option value="">--Select Engineer--</option>
-                                                @foreach ($engineers as $engineer)
-                                                    <option value="{{ $engineer->id }}" {{ $assignedEngineerId == $engineer->id ? 'selected' : '' }}>
-                                                        {{ $engineer->first_name }} {{ $engineer->last_name }} ({{ $engineer->phone }})
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="mdi mdi-truck-check"></i> Assign Pickup
-                                    </button>
-                                </form>
+                                @endif
                             </div>
                         </div>
-
-                        <!-- Existing Pickups -->
-                        @if (isset($pickups) && $pickups->count() > 0)
-                            <div class="card mt-3">
-                                <div class="card-header border-bottom-dashed bg-light">
-                                    <h5 class="card-title mb-0">
-                                        <i class="mdi mdi-clipboard-list"></i> Pickup Records
-                                    </h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>Product</th>
-                                                    <th>Person Type</th>
-                                                    <th>Assigned To</th>
-                                                    <th>Status</th>
-                                                    <th>Assigned At</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($pickups as $pickup)
-                                                    <tr>
-                                                        <td>{{ $pickup->serviceRequestProduct->name ?? 'N/A' }}</td>
-                                                        <td>
-                                                            @if ($pickup->assigned_person_type === 'delivery_man')
-                                                                <span class="badge bg-info">Delivery Man</span>
-                                                            @else
-                                                                <span class="badge bg-primary">Engineer</span>
-                                                            @endif
-                                                        </td>
-                                                        <td>{{ $pickup->assignedPerson->first_name ?? 'N/A' }} {{ $pickup->assignedPerson->last_name ?? '' }}</td>
-                                                        <td>
-                                                            @php
-                                                                $pickupStatus = [
-                                                                    'pending' => 'Pending',
-                                                                    'assigned' => 'Assigned',
-                                                                    'approved' => 'Approved',
-                                                                    'picked' => 'Picked',
-                                                                    'received' => 'Received',
-                                                                    'cancelled' => 'Cancelled',
-                                                                    'returned' => 'Returned',
-                                                                    'completed' => 'Completed',
-                                                                ];
-                                                                $pickupStatusColor = [
-                                                                    'pending' => 'bg-warning',
-                                                                    'assigned' => 'bg-info',
-                                                                    'approved' => 'bg-primary',
-                                                                    'picked' => 'bg-secondary',
-                                                                    'received' => 'bg-success',
-                                                                    'cancelled' => 'bg-danger',
-                                                                    'returned' => 'bg-warning',
-                                                                    'completed' => 'bg-success',
-                                                                ];
-                                                            @endphp
-                                                            <span class="badge {{ $pickupStatusColor[$pickup->status] ?? 'bg-secondary' }}">
-                                                                {{ $pickupStatus[$pickup->status] ?? ucfirst($pickup->status) }}
-                                                            </span>
-                                                        </td>
-                                                        <td>{{ $pickup->assigned_at ? $pickup->assigned_at->format('d M Y, h:i A') : 'N/A' }}</td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
                     @endif
 
                     <!-- Previous Assignments History -->
@@ -915,6 +963,47 @@
                 updatePersonTypeSections();
             });
 
+            // Handle admin pickup action form submission
+            $('#adminPickupActionForm').on('submit', function(e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+                var submitBtn = $(this).find('button[type="submit"]');
+                var originalBtnText = submitBtn.html();
+
+                // Validate action is selected
+                var action = $('#admin_action').val();
+                if (!action) {
+                    alert('Please select an action (Approve or Cancel)');
+                    return;
+                }
+
+                submitBtn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Processing...');
+
+                $.ajax({
+                    url: "{{ route('service-request.pickup-admin-action') }}",
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+
+                        if (response.success) {
+                            alert('Action completed successfully!');
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+                        console.error('Admin Action Error:', xhr);
+                        const error = xhr.responseJSON?.message ||
+                            'Error processing admin action. Please try again.';
+                        alert(error);
+                    }
+                });
+            });
+
             // Handle pickup assignment form submission
             $('#assignPickupForm').on('submit', function(e) {
                 e.preventDefault();
@@ -922,6 +1011,13 @@
                 var formData = $(this).serialize();
                 var submitBtn = $(this).find('button[type="submit"]');
                 var originalBtnText = submitBtn.html();
+
+                // Validate assigned_person_type is selected
+                var assignedPersonType = $('input[name="assigned_person_type"]:checked').val();
+                if (!assignedPersonType) {
+                    alert('Please select an Assigned Person Type (Delivery Man or Engineer)');
+                    return;
+                }
 
                 submitBtn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Processing...');
 
@@ -950,4 +1046,5 @@
             });
         });
     </script>
+ @include('crm.service-request.admin-pickup-script')
 @endsection

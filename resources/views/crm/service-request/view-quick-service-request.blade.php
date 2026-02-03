@@ -749,6 +749,64 @@
                                                 </table>
                                             </div>
 
+                                            {{-- Return History Section - Show when pickup status is returned --}}
+                                            @if (isset($pickups) && $pickups->where('status', 'returned')->count() > 0)
+                                                @foreach ($pickups->where('status', 'returned') as $returnedPickup)
+                                                    @php
+                                                        $returnRecord = App\Models\ServiceRequestProductReturn::where('pickups_id', $returnedPickup->id)->first();
+                                                    @endphp
+                                                    @if ($returnRecord)
+                                                        <div class="mt-3 p-3 border rounded">
+                                                            <h6 class="fw-semibold mb-3">
+                                                                <i class="mdi mdi-truck-delivery text-info"></i>
+                                                                Return Delivery History - {{ $returnedPickup->serviceRequestProduct->name ?? 'N/A' }}
+                                                            </h6>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <ul class="list-group list-group-flush">
+                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                            <span class="fw-semibold">Assigned Person Type:</span>
+                                                                            <span>
+                                                                                @if ($returnRecord->assigned_person_type === 'delivery_man')
+                                                                                    <span class="badge bg-info">Delivery Man</span>
+                                                                                @else
+                                                                                    <span class="badge bg-primary">Engineer</span>
+                                                                                @endif
+                                                                            </span>
+                                                                        </li>
+                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                            <span class="fw-semibold">Assigned To:</span>
+                                                                            <span>{{ $returnRecord->assignedPerson->first_name ?? 'N/A' }} {{ $returnRecord->assignedPerson->last_name ?? '' }}</span>
+                                                                        </li>
+                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                            <span class="fw-semibold">Return Status:</span>
+                                                                            <span class="badge bg-success">{{ ucfirst($returnRecord->status) }}</span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <ul class="list-group list-group-flush">
+                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                            <span class="fw-semibold">Assigned At:</span>
+                                                                            <span>{{ $returnRecord->assigned_at ? $returnRecord->assigned_at->format('d M Y, h:i A') : 'N/A' }}</span>
+                                                                        </li>
+                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                            <span class="fw-semibold">Product Returned At:</span>
+                                                                            <span>{{ $returnedPickup->returned_at ? $returnedPickup->returned_at->format('d M Y, h:i A') : 'N/A' }}</span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-2">
+                                                                <span class="badge bg-success-subtle text-success fw-semibold">
+                                                                    <i class="mdi mdi-check-circle"></i> Product assigned for delivery to customer
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            @endif
+
                                             {{-- Received Status Form - Show when pickup status is picked --}}
                                             @if (isset($pickups) && $pickups->where('status', 'picked')->count() > 0)
                                                 @foreach ($pickups->where('status', 'picked') as $pickedPickup)
@@ -855,6 +913,139 @@
                                             @endif
                                         </div>
                                     </div>
+                                @endif
+
+                                
+                                {{-- Return Assignment Section - Show when pickup status is received and product status is diagnosis_completed --}}
+                                @if (isset($pickups) && $pickups->where('status', 'received')->count() > 0)
+                                    @foreach ($pickups->where('status', 'received') as $receivedPickup)
+                                        @php
+                                            $product = $receivedPickup->serviceRequestProduct;
+                                            $hasReturn = $product && $product->status === 'diagnosis_completed';
+                                            $existingReturn = App\Models\ServiceRequestProductReturn::where('pickups_id', $receivedPickup->id)->first();
+                                        @endphp
+                                        @if ($hasReturn && !$existingReturn)
+                                            <div class="mt-3 p-3 bg-warning-subtle border rounded" id="returnAssignmentSection_{{ $receivedPickup->id }}">
+                                                <h6 class="fw-semibold mb-3">
+                                                    <i class="mdi mdi-truck-return text-warning"></i>
+                                                    Assign Return - {{ $product->name ?? 'N/A' }}
+                                                </h6>
+                                                <p class="text-muted small mb-3">
+                                                    <i class="mdi mdi-information"></i>
+                                                    Product diagnosis is completed. Please assign a delivery person to return the product to the customer.
+                                                </p>
+                                                <form id="assignReturnForm_{{ $receivedPickup->id }}">
+                                                    @csrf
+                                                    <input type="hidden" name="request_id" value="{{ $request->id }}">
+                                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                                    <input type="hidden" name="pickups_id" value="{{ $receivedPickup->id }}">
+                                                    
+                                                    <!-- Assigned Person Type -->
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-semibold">Assigned Person Type <span class="text-danger">*</span></label>
+                                                        <div>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input return-person-type" type="radio" 
+                                                                    name="assigned_person_type"
+                                                                    id="returnPersonTypeDelivery_{{ $receivedPickup->id }}" value="delivery_man">
+                                                                <label class="form-check-label" for="returnPersonTypeDelivery_{{ $receivedPickup->id }}">Delivery Man</label>
+                                                            </div>
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input return-person-type" type="radio" 
+                                                                    name="assigned_person_type"
+                                                                    id="returnPersonTypeEngineer_{{ $receivedPickup->id }}" value="engineer" checked>
+                                                                <label class="form-check-label" for="returnPersonTypeEngineer_{{ $receivedPickup->id }}">Engineer</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Delivery Man Selection -->
+                                                    <div id="returnDeliveryManSection_{{ $receivedPickup->id }}" style="display: none;">
+                                                        <div class="mb-3">
+                                                            <label for="return_assigned_person_id_{{ $receivedPickup->id }}" class="form-label">Select Delivery Man <span class="text-danger">*</span></label>
+                                                            <select name="delivery_man_id" id="return_assigned_person_id_{{ $receivedPickup->id }}" class="form-select">
+                                                                <option value="">--Select Delivery Man--</option>
+                                                                @foreach ($deliveryMen as $deliveryMan)
+                                                                    <option value="{{ $deliveryMan->id }}">
+                                                                        {{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }} ({{ $deliveryMan->phone }})
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Engineer Selection -->
+                                                    <div id="returnEngineerSection_{{ $receivedPickup->id }}">
+                                                        @php
+                                                            $assignedEngineerId = null;
+                                                            if ($request->activeAssignment && $request->activeAssignment->assignment_type === 'individual') {
+                                                                $assignedEngineerId = $request->activeAssignment->engineer_id;
+                                                            }
+                                                        @endphp
+                                                        <div class="mb-3">
+                                                            <label for="return_engineer_assigned_person_id_{{ $receivedPickup->id }}" class="form-label">Select Engineer <span class="text-danger">*</span></label>
+                                                            <select name="engineer_id" id="return_engineer_assigned_person_id_{{ $receivedPickup->id }}" class="form-select">
+                                                                <option value="">--Select Engineer--</option>
+                                                                @foreach ($engineers as $engineer)
+                                                                    <option value="{{ $engineer->id }}" {{ $assignedEngineerId == $engineer->id ? 'selected' : '' }}>
+                                                                        {{ $engineer->first_name }} {{ $engineer->last_name }} ({{ $engineer->phone }})
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <button type="submit" class="btn btn-warning">
+                                                        <i class="mdi mdi-truck-check"></i> Assign for Return
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @elseif ($existingReturn)
+                                            <div class="mt-3 p-3 bg-info-subtle border rounded" id="returnAssignedSection_{{ $receivedPickup->id }}">
+                                                <h6 class="fw-semibold mb-3">
+                                                    <i class="mdi mdi-check-circle text-info"></i>
+                                                    Return Assigned - {{ $product->name ?? 'N/A' }}
+                                                </h6>
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <span class="fw-semibold me-2">Assigned To:</span>
+                                                    @if ($existingReturn->assigned_person_type === 'delivery_man')
+                                                        <span class="badge bg-info">Delivery Man</span>
+                                                    @else
+                                                        <span class="badge bg-primary">Engineer</span>
+                                                    @endif
+                                                    <span class="ms-2">{{ $existingReturn->assignedPerson->first_name ?? 'N/A' }} {{ $existingReturn->assignedPerson->last_name ?? '' }}</span>
+                                                </div>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="fw-semibold me-2">Status:</span>
+                                                    @php
+                                                        $returnStatus = [
+                                                            'pending' => 'Pending',
+                                                            'assigned' => 'Assigned',
+                                                            'in_transit' => 'In Transit',
+                                                            'delivered' => 'Delivered',
+                                                            'cancelled' => 'Cancelled',
+                                                            'completed' => 'Completed',
+                                                        ];
+                                                        $returnStatusColor = [
+                                                            'pending' => 'bg-warning',
+                                                            'assigned' => 'bg-info',
+                                                            'in_transit' => 'bg-primary',
+                                                            'delivered' => 'bg-success',
+                                                            'cancelled' => 'bg-danger',
+                                                            'completed' => 'bg-success',
+                                                        ];
+                                                    @endphp
+                                                    <span class="badge {{ $returnStatusColor[$existingReturn->status] ?? 'bg-secondary' }}">
+                                                        {{ $returnStatus[$existingReturn->status] ?? ucfirst($existingReturn->status) }}
+                                                    </span>
+                                                </div>
+                                                <p class="text-muted small mt-2 mb-0">
+                                                    <i class="mdi mdi-clock-outline"></i>
+                                                    Delivery will be done shortly.
+                                                </p>
+                                            </div>
+                                        @endif
+                                    @endforeach
                                 @endif
                             </div>
                         </div>
@@ -1265,6 +1456,96 @@
                         console.error('Diagnosis Submit Error:', xhr);
                         const error = xhr.responseJSON?.message ||
                             'Error submitting diagnosis. Please try again.';
+                        alert(error);
+                    }
+                });
+            });
+        });
+
+        // Return Assignment Form Handling
+        $(document).ready(function() {
+            // Show/hide delivery man or engineer section based on person type selection for returns
+            function updateReturnPersonTypeSections(pickupId) {
+                var selectedType = $('input[name="assigned_person_type"]:checked').val();
+                if (selectedType === 'delivery_man') {
+                    $('#returnDeliveryManSection_' + pickupId).show();
+                    $('#returnEngineerSection_' + pickupId).hide();
+                    $('#return_assigned_person_id_' + pickupId).prop('required', true);
+                    $('#return_engineer_assigned_person_id_' + pickupId).prop('required', false);
+                } else {
+                    $('#returnDeliveryManSection_' + pickupId).hide();
+                    $('#returnEngineerSection_' + pickupId).show();
+                    $('#return_assigned_person_id_' + pickupId).prop('required', false);
+                    $('#return_engineer_assigned_person_id_' + pickupId).prop('required', true);
+                }
+            }
+
+            // Handle person type change for return forms
+            $('.return-person-type').change(function() {
+                var pickupId = $(this).attr('id').split('_').pop();
+                updateReturnPersonTypeSections(pickupId);
+            });
+
+            // Initialize return person type sections on page load
+            @if (isset($pickups) && $pickups->where('status', 'received')->count() > 0)
+                @foreach ($pickups->where('status', 'received') as $receivedPickup)
+                    updateReturnPersonTypeSections('{{ $receivedPickup->id }}');
+                @endforeach
+            @endif
+
+            // Handle return assignment form submission
+            $('[id^="assignReturnForm_"]').on('submit', function(e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+                var submitBtn = $(this).find('button[type="submit"]');
+                var originalBtnText = submitBtn.html();
+                var pickupId = $(this).attr('id').split('_').pop();
+
+                // Validate assigned_person_type is selected
+                var assignedPersonType = $('input[name="assigned_person_type"]:checked').val();
+                if (!assignedPersonType) {
+                    alert('Please select an Assigned Person Type (Delivery Man or Engineer)');
+                    return;
+                }
+
+                // Validate assigned_person_id is selected
+                var assignedPersonId;
+                if (assignedPersonType === 'delivery_man') {
+                    assignedPersonId = $('#return_assigned_person_id_' + pickupId).val();
+                    if (!assignedPersonId) {
+                        alert('Please select a Delivery Man');
+                        return;
+                    }
+                } else {
+                    assignedPersonId = $('#return_engineer_assigned_person_id_' + pickupId).val();
+                    if (!assignedPersonId) {
+                        alert('Please select an Engineer');
+                        return;
+                    }
+                }
+
+                submitBtn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Processing...');
+
+                $.ajax({
+                    url: "{{ route('service-request.assign-return') }}",
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+
+                        if (response.success) {
+                            alert('Return assigned successfully! Delivery will be done shortly.');
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+                        console.error('Return Assignment Error:', xhr);
+                        const error = xhr.responseJSON?.message ||
+                            'Error assigning return. Please try again.';
                         alert(error);
                     }
                 });

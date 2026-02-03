@@ -26,6 +26,7 @@ use App\Models\ParentCategory;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestProductPickup;
+use App\Models\ServiceRequestProductReturn;
 use App\Models\CaseTransferRequest;
 use App\Models\Staff;
 use Illuminate\Http\Request;
@@ -3049,6 +3050,130 @@ class ServiceRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error processing received action: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Assign return for a service request product.
+     */
+    public function assignReturn(Request $request)
+    {
+        // Validate assigned_person_type first
+        $assignedPersonType = $request->assigned_person_type;
+        if (!in_array($assignedPersonType, ['delivery_man', 'engineer'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please select an Assigned Person Type (Delivery Man or Engineer)',
+            ], 422);
+        }
+
+        // Validate assigned person ID based on type
+        if ($assignedPersonType === 'delivery_man') {
+            $validator = Validator::make($request->all(), [
+                'request_id' => 'required|exists:service_requests,id',
+                'product_id' => 'required|exists:service_request_products,id',
+                'pickups_id' => 'required|exists:service_request_product_pickups,id',
+                'assigned_person_type' => 'required|in:delivery_man,engineer',
+                'delivery_man_id' => 'required|exists:staff,id',
+            ]);
+        } else {
+            $validator = Validator::make($request->all(), [
+                'request_id' => 'required|exists:service_requests,id',
+                'product_id' => 'required|exists:service_request_products,id',
+                'pickups_id' => 'required|exists:service_request_product_pickups,id',
+                'assigned_person_type' => 'required|in:delivery_man,engineer',
+                'engineer_id' => 'required|exists:staff,id',
+            ]);
+        }
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $serviceRequest = ServiceRequest::findOrFail($request->request_id);
+            $product = ServiceRequestProduct::findOrFail($request->product_id);
+            $pickup = ServiceRequestProductPickup::findOrFail($request->pickups_id);
+
+            // Get assigned person type and id
+            if ($assignedPersonType === 'delivery_man') {
+                $assignedPersonId = $request->delivery_man_id;
+            } else {
+                $assignedPersonId = $request->engineer_id;
+            }
+
+            if (empty($assignedPersonId)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please select a ' . ($assignedPersonType === 'delivery_man' ? 'Delivery Man' : 'Engineer'),
+                ], 422);
+            }
+
+            // Validate that pickup status is received
+            if ($pickup->status !== 'received') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Return can only be assigned when pickup status is received.',
+                ], 422);
+            }
+
+            // Validate that product status is diagnosis_completed
+            if ($product->status !== 'diagnosis_completed') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Return can only be assigned when product status is diagnosis_completed.',
+                ], 422);
+            }
+
+            // Check if return record already exists for this pickup
+            $existingReturn = ServiceRequestProductReturn::where('pickups_id', $pickup->id)->first();
+            
+            if ($existingReturn) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Return has already been assigned for this pickup.',
+                ], 422);
+            }
+
+            // Create new return record
+            $return = ServiceRequestProductReturn::create([
+                'request_id' => $serviceRequest->id,
+                'product_id' => $product->id,
+                'pickups_id' => $pickup->id,
+                'assigned_person_type' => $assignedPersonType,
+                'assigned_person_id' => $assignedPersonId,
+                'status' => 'assigned',
+            ]);
+
+            // Update pickup status to 'returned'
+            $pickup->update([
+                'status' => 'returned',
+                'returned_at' => now(),
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Return assigned successfully.',
+                'return' => $return,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Return Assignment Failed', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error assigning return: ' . $e->getMessage(),
             ], 500);
         }
     }

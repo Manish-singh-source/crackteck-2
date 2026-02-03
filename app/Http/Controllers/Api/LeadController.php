@@ -36,7 +36,7 @@ class LeadController extends Controller
 
         $roleCheck = Staff::where('id', $request->user_id)->first();
 
-        if($roleCheck->staff_role != '3'){
+        if($roleCheck->staff_role != 'sales_person'){
             return response()->json([
                 'success' => false,
                 'message' => 'User is not a sales person.',

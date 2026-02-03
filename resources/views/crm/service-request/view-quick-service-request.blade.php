@@ -1046,5 +1046,4 @@
             });
         });
     </script>
- @include('crm.service-request.admin-pickup-script')
 @endsection

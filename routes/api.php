@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\StockinHandController;
 use App\Http\Controllers\Api\QuickServiceController;
 use App\Http\Controllers\Api\DeliveryOrderController;
 use App\Http\Controllers\Api\NonAmcServicesController;
+use App\Http\Controllers\PickupRequestController;
 
 // use App\Http\Controllers\AMCRequestController;
 // use App\Http\Controllers\AMCRequestController;
@@ -271,6 +272,25 @@ Route::prefix('v1')->group(function () {
             Route::post('/check-in', 'checkIn');
             Route::post('/check-out', 'checkOut');
         });
+
+        // Pickup Request APIs for Delivery Man and Engineer
+        Route::controller(PickupRequestController::class)->group(function () {
+            // (1) Get pickup requests - check if user is delivery man or engineer and return service requests
+            Route::get('/pickup-requests', 'getPickupRequests');
+            
+            // (2) Get particular pickup request details with product details
+            Route::get('/pickup-request/{id}', 'getPickupRequestDetails');
+            
+            // (3) Accept pickup request - change status to approved for all products in same service
+            Route::post('/pickup-request/{id}/accept', 'acceptPickupRequest');
+            
+            // (4) Send OTP for pickup - generate OTP with 5 min expiry
+            Route::post('/pickup-request/{id}/send-otp', 'sendPickupOtp');
+            
+            // (5) Verify OTP and change status to picked
+            Route::post('/pickup-request/{id}/verify-otp', 'verifyPickupOtp');
+        });
+
     });
 });
 

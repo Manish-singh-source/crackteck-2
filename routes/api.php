@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\QuickServiceController;
 use App\Http\Controllers\Api\DeliveryOrderController;
 use App\Http\Controllers\Api\NonAmcServicesController;
 use App\Http\Controllers\PickupRequestController;
+use App\Http\Controllers\ReturnRequestController;
 
 // use App\Http\Controllers\AMCRequestController;
 // use App\Http\Controllers\AMCRequestController;
@@ -289,6 +290,24 @@ Route::prefix('v1')->group(function () {
             
             // (5) Verify OTP and change status to picked
             Route::post('/pickup-request/{id}/verify-otp', 'verifyPickupOtp');
+        });
+
+        // Return Request APIs for Delivery Man and Engineer
+        Route::controller(ReturnRequestController::class)->group(function () {
+            // (1) Get return requests - check if user is delivery man or engineer and return their assigned return requests
+            Route::get('/return-requests', 'getReturnRequests');
+            
+            // (2) Get particular return request details with product details
+            Route::get('/return-request/{id}', 'getReturnRequestDetails');
+            
+            // (3) Accept return request - change status to accepted
+            Route::post('/return-request/{id}/accept', 'acceptReturnRequest');
+            
+            // (4) Send OTP for return - generate OTP with 5 min expiry (only if status is picked)
+            Route::post('/return-request/{id}/send-otp', 'sendReturnOtp');
+            
+            // (5) Verify OTP and change status to delivered
+            Route::post('/return-request/{id}/verify-otp', 'verifyReturnOtp');
         });
 
     });

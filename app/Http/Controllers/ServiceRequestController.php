@@ -3149,6 +3149,7 @@ class ServiceRequestController extends Controller
                 'assigned_person_type' => $assignedPersonType,
                 'assigned_person_id' => $assignedPersonId,
                 'status' => 'assigned',
+                'assigned_at' => now(),
             ]);
 
             // Update pickup status to 'returned'

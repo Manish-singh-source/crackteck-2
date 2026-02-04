@@ -791,8 +791,16 @@
                                                                             <span>{{ $returnRecord->assigned_at ? $returnRecord->assigned_at->format('d M Y, h:i A') : 'N/A' }}</span>
                                                                         </li>
                                                                         <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
-                                                                            <span class="fw-semibold">Product Returned At:</span>
-                                                                            <span>{{ $returnedPickup->returned_at ? $returnedPickup->returned_at->format('d M Y, h:i A') : 'N/A' }}</span>
+                                                                            <span class="fw-semibold">Accepted At:</span>
+                                                                            <span>{{ $returnRecord->accepted_at ? $returnRecord->accepted_at->format('d M Y, h:i A') : 'N/A' }}</span>
+                                                                        </li>
+                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                            <span class="fw-semibold">Picked At:</span>
+                                                                            <span>{{ $returnRecord->picked_at ? $returnRecord->picked_at->format('d M Y, h:i A') : 'N/A' }}</span>
+                                                                        </li>
+                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                            <span class="fw-semibold">Delivered At:</span>
+                                                                            <span>{{ $returnRecord->delivered_at ? $returnRecord->delivered_at->format('d M Y, h:i A') : 'N/A' }}</span>
                                                                         </li>
                                                                     </ul>
                                                                 </div>

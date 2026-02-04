@@ -451,7 +451,7 @@ class ApiAuthController extends Controller
         if($staffRole == 'customers') {
             $user = Customer::where('phone', $request->phone_number)->first();
         } else {
-            $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
+            $user = Staff::with('vehicleDetails')->where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
         }
 
         if (! $user || $user->otp != $request->otp || now()->gt($user->otp_expiry)) {

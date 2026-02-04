@@ -20,6 +20,7 @@ class ServiceRequestProductPickup extends Model
         'status',
         'otp',
         'otp_expiry',
+        'admin_approved_at',
         'assigned_at',
         'approved_at',
         'picked_at',

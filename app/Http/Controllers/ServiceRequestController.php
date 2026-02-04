@@ -122,8 +122,13 @@ class ServiceRequestController extends Controller
             ->where('request_id', $id)
             ->get();
 
+        // Get existing return records for this service request
+        $returns = ServiceRequestProductReturn::with(['serviceRequestProduct', 'assignedPerson', 'pickup'])
+            ->where('request_id', $id)
+            ->get();
+
         return view('/crm/service-request/view-quick-service-request', 
-            compact('serviceRequest', 'activeAssignment', 'engineers', 'deliveryMen', 'pickups'));
+            compact('serviceRequest', 'activeAssignment', 'engineers', 'deliveryMen', 'pickups', 'returns'));
     }
 
     public function edit()
@@ -2142,7 +2147,8 @@ class ServiceRequestController extends Controller
             ->where('request_id', $id)
             ->get();
 
-        return view('crm/service-request/view-quick-service-request', compact('request', 'engineers', 'deliveryMen', 'pickups'));
+        $returns = ServiceRequestProductReturn::where('status', 'accepted')->get();
+        return view('crm/service-request/view-quick-service-request', compact('request', 'engineers', 'deliveryMen', 'pickups', 'returns'));
     }
 
     public function editQuickServiceRequest($id)
@@ -2939,6 +2945,7 @@ class ServiceRequestController extends Controller
         try {
             $pickup = ServiceRequestProductPickup::findOrFail($request->pickup_id);
 
+            // dd($pickup);
             // Only allow admin action for pending status
             if ($pickup->status !== 'pending') {
                 return response()->json([
@@ -2951,7 +2958,7 @@ class ServiceRequestController extends Controller
             if ($request->action === 'approved') {
                 $pickup->update([
                     'status' => 'admin_approved',
-                    'approved_at' => now(),
+                    'admin_approved_at' => now(),
                 ]);
             } elseif ($request->action === 'cancelled') {
                 $pickup->update([
@@ -3175,6 +3182,63 @@ class ServiceRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error assigning return: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update return status to picked.
+     */
+    public function returnPicked(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'return_id' => 'required|exists:service_request_product_returns,id',
+            'return_status' => 'required|in:picked',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $return = ServiceRequestProductReturn::findOrFail($request->return_id);
+
+            // Only allow picked status update when current status is accepted
+            if ($return->status !== 'accepted') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Return status can only be updated to picked when current status is accepted.',
+                ], 422);
+            }
+
+            // Update return status to picked
+            $return->update([
+                'status' => 'picked',
+                'picked_at' => now(),
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Return status updated to picked successfully.',
+                'return' => $return,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Return Picked Update Failed', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([ 
+                'success' => false,
+                'message' => 'Error updating return status: ' . $e->getMessage(),
             ], 500);
         }
     }

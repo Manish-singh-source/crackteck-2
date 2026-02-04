@@ -112,7 +112,7 @@ class ReturnRequestController extends Controller
             'serviceRequest',
             'serviceRequestProduct',
             'serviceRequest.customer',
-            'serviceRequestProduct.product',
+            // 'serviceRequestProduct.product',
             'assignedPerson',
             'pickup',
         ])->find($id);
@@ -188,10 +188,9 @@ class ReturnRequestController extends Controller
         DB::beginTransaction();
         try {
             // Update the return request status to 'accepted'
-            $returnRequest->update([
-                'status' => 'accepted',
-                'approved_at' => now()
-            ]);
+            $returnRequest->status = 'accepted';
+            $returnRequest->accepted_at = now();
+            $returnRequest->save();
 
             DB::commit();
 
@@ -203,11 +202,16 @@ class ReturnRequestController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error accepting return request: ' . $e->getMessage());
+            Log::error('Error accepting return request: ' . $e->getMessage(), [
+                'return_request_id' => $id,
+                'user_id' => $request->user_id,
+                'role_id' => $request->role_id,
+                'exception' => $e->getTraceAsString()
+            ]);
             
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while accepting the return request.'
+                'message' => 'An error occurred while accepting the return request: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -266,10 +270,9 @@ class ReturnRequestController extends Controller
             $otp = rand(1000, 9999);
             
             // Update return request with OTP and expiry (5 minutes)
-            $returnRequest->update([
-                'otp' => $otp,
-                'otp_expiry' => now()->addMinutes(5)
-            ]);
+            $returnRequest->otp = $otp;
+            $returnRequest->otp_expiry = now()->addMinutes(5);
+            $returnRequest->save();
 
             // Get customer phone number for SMS
             $customer = $returnRequest->serviceRequest->customer;
@@ -289,15 +292,19 @@ class ReturnRequestController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'OTP sent successfully.',
+                'otp' => $otp,
                 'otp_expires_in_seconds' => 300 // 5 minutes
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('Error sending return OTP: ' . $e->getMessage());
+            Log::error('Error sending return OTP: ' . $e->getMessage(), [
+                'return_request_id' => $id,
+                'exception' => $e->getTraceAsString()
+            ]);
             
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while sending OTP.'
+                'message' => 'An error occurred while sending OTP: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -362,12 +369,11 @@ class ReturnRequestController extends Controller
         DB::beginTransaction();
         try {
             // Clear OTP and expiry, update status to 'delivered'
-            $returnRequest->update([
-                'otp' => null,
-                'otp_expiry' => null,
-                'status' => 'delivered',
-                'returned_at' => now()
-            ]);
+            $returnRequest->otp = null;
+            $returnRequest->otp_expiry = null;
+            $returnRequest->status = 'delivered';
+            $returnRequest->delivered_at = now();
+            $returnRequest->save();
 
             DB::commit();
 
@@ -378,11 +384,16 @@ class ReturnRequestController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error verifying return OTP: ' . $e->getMessage());
+            Log::error('Error verifying return OTP: ' . $e->getMessage(), [
+                'return_request_id' => $id,
+                'user_id' => $request->user_id,
+                'role_id' => $request->role_id,
+                'exception' => $e->getTraceAsString()
+            ]);
             
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while verifying OTP.'
+                'message' => 'An error occurred while verifying OTP: ' . $e->getMessage()
             ], 500);
         }
     }

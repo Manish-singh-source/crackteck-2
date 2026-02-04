@@ -307,6 +307,7 @@ class PickupRequestController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'OTP sent successfully.',
+                'otp' => $otp,
                 'otp_expires_in_seconds' => 300 // 5 minutes
             ], 200);
 

@@ -792,15 +792,15 @@
                                                                         </li>
                                                                         <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
                                                                             <span class="fw-semibold">Accepted At:</span>
-                                                                            <span>{{ $returnRecord->accepted_at ? $returnRecord->accepted_at->format('d M Y, h:i A') : 'N/A' }}</span>
+                                                                            <span>{{ $returnRecord->accepted_at ? \Carbon\Carbon::parse($returnRecord->accepted_at)->format('d M Y, h:i A') : 'N/A' }}</span>
                                                                         </li>
                                                                         <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
                                                                             <span class="fw-semibold">Picked At:</span>
-                                                                            <span>{{ $returnRecord->picked_at ? $returnRecord->picked_at->format('d M Y, h:i A') : 'N/A' }}</span>
+                                                                            <span>{{ $returnRecord->picked_at ? \Carbon\Carbon::parse($returnRecord->picked_at)->format('d M Y, h:i A') : 'N/A' }}</span>
                                                                         </li>
                                                                         <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
                                                                             <span class="fw-semibold">Delivered At:</span>
-                                                                            <span>{{ $returnRecord->delivered_at ? $returnRecord->delivered_at->format('d M Y, h:i A') : 'N/A' }}</span>
+                                                                            <span>{{ $returnRecord->delivered_at ? \Carbon\Carbon::parse($returnRecord->delivered_at)->format('d M Y, h:i A') : 'N/A' }}</span>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
@@ -812,6 +812,35 @@
                                                             </div>
                                                         </div>
                                                     @endif
+                                                @endforeach
+                                            @endif
+                                                       
+                                            {{-- {{$returns}} --}}
+                                            {{-- Return Status Update Form - Show when return status is accepted --}}
+                                            @if (isset($returns) && $returns->where('status', 'accepted')->count() > 0)
+                                                @foreach ($returns->where('status', 'accepted') as $acceptedReturn)
+                                                    <div class="mt-3 p-3 bg-info-subtle border rounded">
+                                                        <h6 class="fw-semibold mb-3">
+                                                            <i class="mdi mdi-truck-fast text-info"></i>
+                                                            Mark as Picked - {{ $acceptedReturn->serviceRequestProduct->name ?? 'N/A' }}
+                                                        </h6>
+                                                        <form id="returnPickedForm_{{ $acceptedReturn->id }}">
+                                                            @csrf
+                                                            <input type="hidden" name="return_id" value="{{ $acceptedReturn->id }}">
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <select name="return_status" class="form-select" style="width: auto;">
+                                                                    <option value="picked">Picked</option>
+                                                                </select>
+                                                                <button type="submit" class="btn btn-info">
+                                                                    <i class="mdi mdi-truck-delivery"></i> Confirm Picked
+                                                                </button>
+                                                            </div>
+                                                            <small class="text-muted d-block mt-2">
+                                                                <i class="mdi mdi-information"></i>
+                                                                This will update return status to picked for this product.
+                                                            </small>
+                                                        </form>
+                                                    </div>
                                                 @endforeach
                                             @endif
 
@@ -1382,6 +1411,44 @@
                         console.error('Pickup Received Error:', xhr);
                         const error = xhr.responseJSON?.message ||
                             'Error processing received action. Please try again.';
+                        alert(error);
+                    }
+                });
+            });
+
+            // Handle return picked form submission
+            $('[id^="returnPickedForm_"]').on('submit', function(e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+                var submitBtn = $(this).find('button[type="submit"]');
+                var originalBtnText = submitBtn.html();
+
+                if (!confirm('Are you sure you want to mark this return as picked?')) {
+                    return;
+                }
+
+                submitBtn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Processing...');
+
+                $.ajax({
+                    url: "{{ route('service-request.return-picked') }}",
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+
+                        if (response.success) {
+                            alert('Return marked as picked successfully!');
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+                        console.error('Return Picked Error:', xhr);
+                        const error = xhr.responseJSON?.message ||
+                            'Error processing return picked action. Please try again.';
                         alert(error);
                     }
                 });

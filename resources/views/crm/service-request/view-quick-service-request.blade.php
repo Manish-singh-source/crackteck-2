@@ -958,7 +958,7 @@
                                     @foreach ($pickups->where('status', 'received') as $receivedPickup)
                                         @php
                                             $product = $receivedPickup->serviceRequestProduct;
-                                            $hasReturn = $product && $product->status === 'diagnosis_completed';
+                                            $hasReturn = $product && $product->status === 'completed';
                                             $existingReturn = App\Models\ServiceRequestProductReturn::where('pickups_id', $receivedPickup->id)->first();
                                         @endphp
                                         @if ($hasReturn && !$existingReturn)

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\StatusUpdateHelper;
 use App\Models\Staff;
 use App\Models\ServiceRequestProductReturn;
+use App\Models\ServiceRequestProductPickup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -374,6 +376,18 @@ class ReturnRequestController extends Controller
             $returnRequest->status = 'delivered';
             $returnRequest->delivered_at = now();
             $returnRequest->save();
+
+            // Update the associated pickup status to 'completed' when return is delivered
+            if ($returnRequest->pickups_id) {
+                $pickup = ServiceRequestProductPickup::find($returnRequest->pickups_id);
+                if ($pickup) {
+                    $pickup->status = 'completed';
+                    $pickup->save();
+                }
+            }
+
+            // Check and update service request status based on return/pickup/product conditions
+            StatusUpdateHelper::checkAllStatusConditions($returnRequest->request_id);
 
             DB::commit();
 

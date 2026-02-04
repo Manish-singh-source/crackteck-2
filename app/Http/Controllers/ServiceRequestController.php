@@ -27,6 +27,7 @@ use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestProductPickup;
 use App\Models\ServiceRequestProductReturn;
+use App\Helpers\StatusUpdateHelper;
 use App\Models\CaseTransferRequest;
 use App\Models\Staff;
 use Illuminate\Http\Request;
@@ -2468,6 +2469,10 @@ class ServiceRequestController extends Controller
             $product->status = 'diagnosis_completed';
             $product->save();
 
+            // Check and update all product statuses to completed if all are diagnosis_completed
+            // Also check service request completion conditions
+            StatusUpdateHelper::checkAllStatusConditions($product->service_requests_id);
+
             DB::commit();
 
             return response()->json([
@@ -3131,7 +3136,7 @@ class ServiceRequestController extends Controller
             }
 
             // Validate that product status is diagnosis_completed
-            if ($product->status !== 'diagnosis_completed') {
+            if ($product->status !== 'completed') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Return can only be assigned when product status is diagnosis_completed.',
@@ -3164,6 +3169,9 @@ class ServiceRequestController extends Controller
                 'status' => 'returned',
                 'returned_at' => now(),
             ]);
+
+            // Check and update service request status based on return/pickup/product conditions
+            StatusUpdateHelper::checkAllStatusConditions($pickup->request_id);
 
             DB::commit();
 

@@ -179,7 +179,7 @@
                                                                 </tr>
                                                             @empty
                                                                 <tr>
-                                                                    <td colspan="8" class="text-center">No pickup requests found.</td>
+                                                                    <td colspan="9" class="text-center">No pickup requests found.</td>
                                                                 </tr>
                                                             @endforelse
                                                         </tbody>

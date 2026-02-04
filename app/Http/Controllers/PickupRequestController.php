@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\StatusUpdateHelper;
 use App\Models\Staff;
 use App\Models\Customer;
 use App\Models\DeliveryMan;
@@ -387,6 +388,9 @@ class PickupRequestController extends Controller
                 'status' => 'picked',
                 'picked_at' => now()
             ]);
+
+            // Check and update service request status based on return/pickup/product conditions
+            StatusUpdateHelper::checkAllStatusConditions($pickupRequest->request_id);
 
             DB::commit();
 

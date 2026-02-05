@@ -169,10 +169,19 @@ class AllServicesController extends Controller
 
     public function submitQuickServiceRequest(Request $request)
     {
+        $validated = Validator:: make($request->all(),[
+            'customer_address_id' => 'required',
+        ]);
+
+        if ($validated->fails()){
+            return response()->json(['success' => false, 'message' => 'Please Add Address For the Service']);
+        }
+
         if ($request->service_type == 'amc') {
             $rules = [
                 'role_id' => 'required|in:4',
                 'customer_id' => 'required|integer|exists:customers,id',
+                'customer_address_id' => 'required|integer|exists:customer_address_details,id',
                 'service_type' => 'required|in:amc',
                 'products' => 'required|array|min:1',
                 'products.*.name' => 'required|string',
@@ -191,6 +200,7 @@ class AllServicesController extends Controller
             $rules = [
                 'role_id' => 'required|in:4',
                 'customer_id' => 'required|integer|exists:customers,id',
+                'customer_address_id' => 'required|integer|exists:customer_address_details,id',
                 'service_type' => 'required|in:quick_service,installation,repairing',
                 'products' => 'required|array|min:1',
                 'products.*.service_type_id' => 'required|integer|exists:covered_items,id',
@@ -229,6 +239,7 @@ class AllServicesController extends Controller
                     'request_id' => $serviceRequest,
                     'service_type' => $request->service_type,
                     'customer_id' => $request->customer_id,
+                    'customer_address_id' => $request->customer_address_id,
                     'created_by' => $request->customer_id,
                     'request_date' => now(),
                     'amc_plan_id' => $request->filled('amc_plan_id')

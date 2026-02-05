@@ -472,7 +472,7 @@
                                             <div class="col-xl-4 col-lg-6">
                                                 <div>
                                                     <label class="form-label">Product Type</label>
-                                                    <select name="products[{{ $idx }}][product_type]"
+                                                    {{-- <select name="products[{{ $idx }}][product_type]"
                                                         class="form-select">
                                                         <option value="">--Select Type--</option>
                                                         @foreach ($categories as $id => $name)
@@ -481,14 +481,17 @@
                                                                 {{ $name }}
                                                             </option>
                                                         @endforeach
-                                                    </select>
+                                                    </select> --}}
+                                                    <input type="text" name="products[{{ $idx }}][product_type]"
+                                                        class="form-control" placeholder="Laptop"
+                                                        value="{{ old("products.$idx.product_type", $product->type) }}">
                                                 </div>
                                             </div>
 
                                             <div class="col-xl-4 col-lg-6">
                                                 <div>
                                                     <label class="form-label">Product Brand</label>
-                                                    <select name="products[{{ $idx }}][product_brand]"
+                                                    {{-- <select name="products[{{ $idx }}][product_brand]"
                                                         class="form-select">
                                                         <option value="">--Select Brand--</option>
                                                         @foreach ($brands as $id => $name)
@@ -497,7 +500,10 @@
                                                                 {{ $name }}
                                                             </option>
                                                         @endforeach
-                                                    </select>
+                                                    </select> --}}
+                                                    <input type="text" name="products[{{ $idx }}][product_brand]"
+                                                        class="form-control" placeholder="Dell"
+                                                        value="{{ old("products.$idx.product_brand", $product->brand) }}">
                                                 </div>
                                             </div>
 
@@ -600,6 +606,15 @@
                                         <div class="row">
                                             <div class="col-2">
                                                 <div>
+                                                    <label class="form-label">Visit Date</label>
+                                                    <input type="date"
+                                                        name="visit_date"
+                                                        class="form-control"
+                                                        value="{{ old('visit_date', $request->visit_date) }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-2">
+                                                <div>
                                                     @include('components.form.select', [
                                                         'label' => 'Status',
                                                         'name' => 'status',
@@ -672,23 +687,15 @@
                 <div class="col-xl-4 col-lg-6">
                     <div>
                         <label class="form-label">Product Type</label>
-                        <select name="products[${i}][product_type]" class="form-select">
-                            <option value="">--Select Type--</option>
-                            @foreach ($categories as $id => $name)
-                                <option value="{{ $id }}">{{ $name }}</option>
-                            @endforeach
-                        </select>
+                        <input type="text" name="products[${i}][product_type]" class="form-control"
+                                placeholder="Laptop">
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-6">
                     <div>
                         <label class="form-label">Product Brand</label>
-                        <select name="products[${i}][product_brand]" class="form-select">
-                            <option value="">--Select Brand--</option>
-                            @foreach ($brands as $id => $name)
-                                <option value="{{ $id }}">{{ $name }}</option>
-                            @endforeach
-                        </select>
+                        <input type="text" name="products[${i}][product_brand]" class="form-control"
+                               placeholder="Dell">
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-6">

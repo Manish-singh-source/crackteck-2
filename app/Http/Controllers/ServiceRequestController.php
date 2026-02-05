@@ -2306,6 +2306,7 @@ class ServiceRequestController extends Controller
                 'customer_id' => $customer->id,
                 'service_type' => 'quick_service', // Quick Service
                 'request_source' => 'system',
+                'visit_date' => $request->visit_date,
                 'request_date' => $serviceRequest->request_date ?? now(),
                 'created_by' => $serviceRequest->created_by ?? Auth::id(),
                 'status' => $request->status ?? $serviceRequest->status,

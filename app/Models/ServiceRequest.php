@@ -20,6 +20,8 @@ class ServiceRequest extends Model
         'request_date',
         'request_status',
         'request_source',   
+        'visit_date',
+        'reschedule_date',
         'created_by',   
         'is_engineer_assigned',
         'status',

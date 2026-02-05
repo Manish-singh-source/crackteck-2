@@ -764,7 +764,8 @@
                                                                 <th>Customer Name</th>
                                                                 <th>Request Date</th>
                                                                 <th>Product Name / Model No</th>
-                                                                <th>Request Status</th>
+                                                                <th>Visit Date</th>
+                                                                <th>Reschedule Date</th>
                                                                 <th>Request Source</th>
                                                                 <th>Assign Engineer</th>
                                                                 <th>Status</th>
@@ -793,25 +794,8 @@
                                                                             {{ $request->products->count() }} Product(s)
                                                                         </div>
                                                                     </td>
-                                                                    <td>
-                                                                        @php
-                                                                            $statusClasses = [
-                                                                                'pending' => 'badge bg-warning',
-                                                                                'approved' => 'badge bg-success',
-                                                                                'rejected' => 'badge bg-danger',
-                                                                                'processing' => 'badge bg-info',
-                                                                                'processed' => 'badge bg-primary',
-                                                                                'picking' => 'badge bg-secondary',
-                                                                                'picked' => 'badge bg-dark',
-                                                                                'completed' => 'badge bg-success',
-                                                                            ];
-                                                                        @endphp
-
-                                                                        <span
-                                                                            class="{{ $statusClasses[$request->request_status] ?? 'badge bg-light' }}">
-                                                                            {{ ucfirst($request->request_status) }}
-                                                                        </span>
-                                                                    </td>
+                                                                    <td>{{ $request->visit_date ?? 'N/A' }}</td>
+                                                                    <td>{{ $request->reschedule_date ?? 'N/A' }}</td>
                                                                     <td>
                                                                         @if ($request->request_source == 'customer')
                                                                             <span

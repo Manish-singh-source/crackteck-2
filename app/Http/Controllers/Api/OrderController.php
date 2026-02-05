@@ -239,7 +239,7 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $orders = Order::with('orderItems')->where('customer_id', $request->customer_id)->get();
+            $orders = Order::with('orderItems','orderItems.product')->where('customer_id', $request->customer_id)->get();
 
             return response()->json(['orders' => $orders], 200);
         }
@@ -368,7 +368,7 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $order = Order::with('orderItems')->where('id', $order_id)->first();
+            $order = Order::with('orderItems','orderItems.product')->where('id', $order_id)->first();
 
             if (! $order) {
                 return response()->json(['message' => 'Order not found'], 404);

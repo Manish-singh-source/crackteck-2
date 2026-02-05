@@ -121,15 +121,15 @@
                                             <span>{{ $request->customerPan->pan_number ?? 'N/A' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
-                                            <span class="fw-semibold">Created At:</span>
-                                            <span>{{ $request->created_at->format('d M Y, h:i A') }}</span>
-                                        </li>
-                                        <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">Status:</span>
                                             @php $index = $request->status; @endphp
                                             <span class="badge {{ $statusColor[$index] }} fw-semibold">
                                                 {{ $status[$index] }}
                                             </span>
+                                        </li>
+                                        <li class="list-group-item border-0 d-flex gap-3">
+                                            <span class="fw-semibold">Visit Date:</span>
+                                            <span>{{ $request->visit_date ?? 'N/A' }}</span>
                                         </li>
                                     </ul>
                                 </div>

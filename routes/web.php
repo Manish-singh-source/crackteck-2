@@ -523,6 +523,8 @@ Route::prefix('/demo')->group(function () {
         Route::get('/crm/create-quick-request', 'createQuickServiceRequest')->name('quick-service-requests.create');
         // Quick Service Request Store
         Route::post('/crm/store-quick-request', 'storeQuickServiceRequest')->name('quick-service-requests.store');
+        // Get Customer Addresses by Email (AJAX)
+        Route::get('/crm/get-customer-addresses', 'getCustomerAddresses')->name('customer.addresses');
         // Quick Service Request View
         Route::get('/crm/service-request/view-quick-service-request/{id}', 'viewQuickServiceRequest')->name('service-request.view-quick-service-request');
         // Quick Service Request Edit

@@ -64,7 +64,7 @@
                     <div class="card">
                         <div class="card-header border-bottom-dashed">
                             <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0">Customer Details</h5>
+                                <h5 class="card-title mb-0">Customer Personal Details</h5>
                                 <div>
                                     <span class="fw-bold text-dark">{{ $request->request_id }}</span>
                                 </div>
@@ -130,6 +130,55 @@
                                             <span class="badge {{ $statusColor[$index] }} fw-semibold">
                                                 {{ $status[$index] }}
                                             </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Customer Details Card -->
+                    <div class="card">
+                        <div class="card-header border-bottom-dashed">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Customer Address Details</h5>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item border-0 d-flex gap-3">
+                                            <span class="fw-semibold">Branch Name:</span>
+                                            <span>{{ $request->customerAddress->branch_name ?? 'N/A' }}</span>
+                                        </li>
+                                        <li class="list-group-item border-0 d-flex gap-3">
+                                            <span class="fw-semibold">Address Line 1:</span>
+                                            <span>{{ $request->customerAddress->address1 ?? 'N/A' }}</span>
+                                        </li>
+                                        <li class="list-group-item border-0 d-flex gap-3">
+                                            <span class="fw-semibold">Address Line 2:</span>
+                                            <span>{{ $request->customerAddress->address2 ?? 'N/A' }}</span>
+                                        </li>
+                                        <li class="list-group-item border-0 d-flex gap-3">
+                                            <span class="fw-semibold">State:</span>
+                                            <span>{{ $request->customerAddress->state ?? 'N/A' }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item border-0 d-flex gap-3">
+                                            <span class="fw-semibold">Country:</span>
+                                            <span>{{ $request->customerAddress->country ?? 'N/A' }}</span>
+                                        </li>
+                                        <li class="list-group-item border-0 d-flex gap-3">
+                                            <span class="fw-semibold">City:</span>
+                                            <span>{{ $request->customerAddress->city ?? 'N/A' }}</span>
+                                        </li>
+                                        <li class="list-group-item border-0 d-flex gap-3">
+                                            <span class="fw-semibold">Pin Code:</span>
+                                            <span>{{ $request->customerAddress->pincode ?? 'N/A' }}</span>
                                         </li>
                                     </ul>
                                 </div>

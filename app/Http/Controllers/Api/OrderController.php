@@ -190,8 +190,6 @@ class OrderController extends Controller
                 'is_priority' => false,
                 'requires_signature' => false,
                 'is_gift' => false,
-                'created_by' => $request->customer_id,
-                'updated_by' => $request->customer_id,
             ]);
             
 

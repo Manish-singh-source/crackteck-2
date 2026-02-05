@@ -2021,8 +2021,37 @@ class ServiceRequestController extends Controller
         return $customerCode;
     }
 
+    /**
+     * Get customer addresses by email (AJAX)
+     */
+    public function getCustomerAddresses(Request $request)
+    {
+        $email = $request->email;
+        
+        \Log::info('Fetching customer addresses for email: ' . $email);
+        
+        $customer = Customer::where('email', $email)->first();
+
+        if (!$customer) {
+            \Log::warning('Customer not found for email: ' . $email);
+            return response()->json(['error' => 'Customer not found'], 404);
+        }
+
+        \Log::info('Customer found: ' . $customer->id . ', fetching addresses...');
+        
+        $addresses = CustomerAddressDetail::where('customer_id', $customer->id)->get();
+
+        \Log::info('Addresses found: ' . $addresses->count());
+
+        return response()->json([
+            'customer' => $customer,
+            'addresses' => $addresses
+        ]);
+    }
+
     public function storeQuickServiceRequest(Request $request)
     {
+        // dd($request->all());
         $request->validate([
             'email' => 'required|email',
             'products' => 'required|array',
@@ -2035,6 +2064,8 @@ class ServiceRequestController extends Controller
 
         try {
             DB::beginTransaction();
+            $customerAddressId = null;
+
             if (! $customer) {
                 // Create new customer
                 $customer = Customer::create([
@@ -2048,7 +2079,7 @@ class ServiceRequestController extends Controller
                 ]);
 
                 // Store customer address
-                CustomerAddressDetail::create([
+                $address = CustomerAddressDetail::create([
                     'customer_id' => $customer->id,
                     'branch_name' => $request->branch_name,
                     'address1' => $request->address1,
@@ -2058,6 +2089,7 @@ class ServiceRequestController extends Controller
                     'city' => $request->city,
                     'pincode' => $request->pincode,
                 ]);
+                $customerAddressId = $address->id;
 
                 // Store company details
                 CustomerCompanyDetail::create([
@@ -2072,6 +2104,9 @@ class ServiceRequestController extends Controller
                     'city' => $request->city,
                     'pincode' => $request->pincode,
                 ]);
+            } else {
+                // Customer exists, use the address_id from the form
+                $customerAddressId = $request->customer_address_id;
             }
             // dd($request->service_type);
 
@@ -2080,6 +2115,7 @@ class ServiceRequestController extends Controller
                 'request_id' => $this->generateServiceId(),
                 'service_type' => $request->service_type,
                 'customer_id' => $customer->id,
+                'customer_address_id' => $customerAddressId,
                 'request_date' => now(),
                 'request_status' => 'pending',
                 'request_source' => 'system',

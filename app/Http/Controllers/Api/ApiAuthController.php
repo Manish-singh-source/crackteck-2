@@ -105,6 +105,7 @@ class ApiAuthController extends Controller
                 'email' => 'required|email|unique:customers,email',
                 'dob' => 'nullable',
                 'gender' => 'required',
+                'customer_type' => 'both',
                 'pan_no' => 'nullable|string|max:10',
                 'pan_card_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
                 'pan_card_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',

@@ -353,7 +353,7 @@ class OrderController extends Controller
                     'sku' => $product->warehouseProduct->sku,
                     'brand' => $product->warehouseProduct->brand->name ?? 'N/A',
                     'hsn_code' => $product->warehouseProduct->hsn_code,
-                    'price' => $product->warehouseProduct->selling_price,
+                    'price' => $product->warehouseProduct->final_price,
                     'display' => $product->warehouseProduct->product_name . ' (' . $product->warehouseProduct->sku . ')',
                 ];
             });

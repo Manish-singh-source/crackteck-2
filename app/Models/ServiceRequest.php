@@ -16,6 +16,7 @@ class ServiceRequest extends Model
         // 'item_code_id',
         'service_type',
         'customer_id',
+        'customer_address_id',
         'request_date',
         'request_status',
         'request_source',   

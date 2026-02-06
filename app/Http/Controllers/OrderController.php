@@ -28,8 +28,8 @@ class OrderController extends Controller
         $query = Order::with(['customer', 'orderItems.ecommerceProduct.warehouseProduct']);
 
         // Status filter
-        if ($request->has('order_status') && ! empty($request->order_status)) {
-            $query->where('order_status', $request->order_status);
+        if ($request->has('status') && ! empty($request->status)) {
+            $query->where('status', $request->status);
         }
 
         // Date range filter
@@ -45,9 +45,9 @@ class OrderController extends Controller
         $orders = $query->orderByDesc('created_at')->paginate(10)->withQueryString();
 
         // Efficiently get status counts
-        $statusCounts = Order::selectRaw('order_status, COUNT(*) as count')
-            ->groupBy('order_status')
-            ->pluck('count', 'order_status')
+        $statusCounts = Order::selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status')
             ->toArray();
 
         // Ensure all statuses are represented, including 'all'
@@ -101,10 +101,10 @@ class OrderController extends Controller
                 'discount_amount' => $discountAmount,
                 'coupon_code' => $couponCode,
                 'total_amount' => $totalAmount,
-                'order_status' => $request->order_status,
+                'status' => $request->status,
                 'assigned_person_type' => $request->assigned_person_type,
                 'assigned_person_id' => $request->assigned_person_id,
-                'confirmed_at' => $request->order_status === 'confirmed' ? now() : null,
+                'confirmed_at' => $request->status === 'confirmed' ? now() : null,
             ]);
 
             // Create order items
@@ -407,10 +407,16 @@ class OrderController extends Controller
         try {
             $order = Order::findOrFail($id);
             $order->assigned_person_type = $request->assigned_person_type;
+            
             if ($request->assigned_person_type == 'engineer') {
                 $order->assigned_person_id = $request->engineer_id;
             } else {
                 $order->assigned_person_id = $request->delivery_man_id;
+                // Auto-update status to assigned_delivery_man when delivery man is assigned
+                if ($order->status === 'admin_approved') {
+                    $order->status = 'assigned_delivery_man';
+                    $order->assigned_at = now();
+                }
             }
             $order->save();
 
@@ -443,7 +449,8 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'order_status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled',
+            'status' => 'nullable|in:pending,admin_approved,assigned_delivery_man,order_accepted,product_taken,delivered,cancelled,returned',
+            'expected_delivery_date' => 'nullable|date',
         ]);
 
         if ($validator->fails()) {
@@ -455,18 +462,49 @@ class OrderController extends Controller
 
         try {
             $order = Order::findOrFail($id);
-            $oldStatus = $order->order_status;
-            $newStatus = $request->order_status;
-
-            // Update status with timestamps
-            $order->order_status = $newStatus;
-
-            if ($newStatus === 'confirmed' && $oldStatus !== 'confirmed') {
-                $order->confirmed_at = now();
-            } elseif ($newStatus === 'shipped' && $oldStatus !== 'shipped') {
-                $order->shipped_at = now();
-            } elseif ($newStatus === 'delivered' && $oldStatus !== 'delivered') {
-                $order->delivered_at = now();
+            $oldOrderStatus = $order->status;
+            $oldStatus = $order->status;
+            
+            // Update status only if provided
+            if ($request->has('status') && $request->status) {
+                $newOrderStatus = $request->status;
+                $order->status = $newOrderStatus;
+                
+                // Update status timestamps for status
+                if ($newOrderStatus === 'confirmed' && $oldOrderStatus !== 'confirmed') {
+                    $order->confirmed_at = now();
+                } elseif ($newOrderStatus === 'shipped' && $oldOrderStatus !== 'shipped') {
+                    $order->shipped_at = now();
+                } elseif ($newOrderStatus === 'delivered' && $oldOrderStatus !== 'delivered') {
+                    $order->delivered_at = now();
+                } elseif ($newOrderStatus === 'cancelled' && $oldOrderStatus !== 'cancelled') {
+                    $order->cancelled_at = now();
+                }
+            }
+            
+            // Update new delivery status if provided
+            if ($request->has('status') && $request->status) {
+                $newStatus = $request->status;
+                $order->status = $newStatus;
+                
+                // Update status timestamps
+                if ($newStatus === 'admin_approved' && $oldStatus !== 'admin_approved') {
+                    // admin_approved doesn't have a timestamp field
+                    $order->confirmed_at = now();
+                } elseif ($newStatus === 'assigned_delivery_man' && $oldStatus !== 'assigned_delivery_man') {
+                    $order->assigned_at = now();
+                } elseif ($newStatus === 'order_accepted' && $oldStatus !== 'order_accepted') {
+                    $order->accepted_at = now();
+                } elseif ($newStatus === 'delivered' && $oldStatus !== 'delivered') {
+                    $order->delivered_at = now();
+                } elseif ($newStatus === 'cancelled' && $oldStatus !== 'cancelled') {
+                    $order->cancelled_at = now();
+                }
+            }
+            
+            // Update expected_delivery_date if provided
+            if ($request->has('expected_delivery_date') && $request->expected_delivery_date) {
+                $order->expected_delivery_date = $request->expected_delivery_date;
             }
 
             $order->save();
@@ -482,6 +520,37 @@ class OrderController extends Controller
                 'success' => false,
                 'message' => 'Failed to update order status',
             ], 500);
+        }
+    }
+
+    public function productPickup(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'pickup_confirmation' => 'required|accepted',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->with('error', 'Please confirm product pickup.');
+        }
+
+        try {
+            $order = Order::findOrFail($id);
+
+            // Check if order is in the correct status
+            if ($order->status !== 'order_accepted') {
+                return redirect()->back()->with('error', 'Order must be in order_accepted status to mark as product taken.');
+            }
+
+            // Update status to product_taken and set shipped_at
+            $order->status = 'product_taken';
+            $order->shipped_at = now();
+            $order->save();
+
+            return redirect()->back()->with('success', 'Product pickup confirmed. Order status updated to product_taken.');
+        } catch (\Exception $e) {
+            Log::error('Error updating product pickup: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'Failed to update product pickup.');
         }
     }
 

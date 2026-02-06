@@ -248,30 +248,41 @@
                             </div>
                             <div class="card-body">
                                 <form id="status-update-form">
-                                    @csrf
+                                    @csrf                                    
+                                    <!-- Expected Delivery Date Field -->
                                     <div class="mb-3">
-                                        <label class="form-label">Order Status</label>
-                                        <select class="form-select" name="order_status" id="order-status">
-                                            <option value="pending"
-                                                {{ $order->order_status == 'pending' ? 'selected' : '' }}>
+                                        <label for="expected_delivery_date" class="form-label">Expected Delivery Date</label>
+                                        <input type="date" class="form-control @error('expected_delivery_date') is-invalid @enderror" 
+                                            id="expected_delivery_date" name="expected_delivery_date" 
+                                            value="{{ old('expected_delivery_date', $order->expected_delivery_date ? $order->expected_delivery_date->format('Y-m-d') : '') }}">
+                                        @error('expected_delivery_date')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <!-- New Delivery Status Field -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Status</label>
+                                        <select class="form-select" name="status" id="delivery-status">
+                                            <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>
                                                 Pending</option>
-                                            <option value="confirmed"
-                                                {{ $order->order_status == 'confirmed' ? 'selected' : '' }}>
-                                                Confirmed</option>
-                                            <option value="processing"
-                                                {{ $order->order_status == 'processing' ? 'selected' : '' }}>
-                                                Processing</option>
-                                            <option value="shipped"
-                                                {{ $order->order_status == 'shipped' ? 'selected' : '' }}>
-                                                Shipped</option>
-                                            <option value="delivered"
-                                                {{ $order->order_status == 'delivered' ? 'selected' : '' }}>
+                                            <option value="admin_approved" {{ $order->status == 'admin_approved' ? 'selected' : '' }}>
+                                                Admin Approved</option>
+                                            <option value="assigned_delivery_man" {{ $order->status == 'assigned_delivery_man' ? 'selected' : '' }}>
+                                                Assigned Delivery Man</option>
+                                            <option value="order_accepted" {{ $order->status == 'order_accepted' ? 'selected' : '' }}>
+                                                Order Accepted</option>
+                                            <option value="product_taken" {{ $order->status == 'product_taken' ? 'selected' : '' }}>
+                                                Product Taken</option>
+                                            <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>
                                                 Delivered</option>
-                                            <option value="cancelled"
-                                                {{ $order->order_status == 'cancelled' ? 'selected' : '' }}>
+                                            <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>
                                                 Cancelled</option>
+                                            <option value="returned" {{ $order->status == 'returned' ? 'selected' : '' }}>
+                                                Returned</option>
                                         </select>
                                     </div>
+
                                     <button type="button" class="btn btn-primary w-100" id="update-status-btn">
                                         <i class="fas fa-save me-1"></i> Update Status
                                     </button>
@@ -342,7 +353,8 @@
 
             // Update order status
             $('#update-status-btn').on('click', function() {
-                const newStatus = $('#order-status').val();
+                const newDeliveryStatus = $('#delivery-status').val();
+                const expectedDeliveryDate = $('#expected_delivery_date').val();
                 const button = $(this);
                 const originalText = button.html();
 
@@ -354,7 +366,8 @@
                     url: `/demo/e-commerce/order/${orderId}/update-status`,
                     method: 'POST',
                     data: {
-                        order_status: newStatus,
+                        status: newDeliveryStatus,
+                        expected_delivery_date: expectedDeliveryDate,
                         _token: '{{ csrf_token() }}'
                     },
                     success: function(response) {
@@ -365,9 +378,9 @@
                             } else {
                                 alert(response.message);
                             }
-                            // Reload page to show updated timestamps
+                            // Redirect to view page
                             setTimeout(() => {
-                                location.reload();
+                                window.location.href = '{{ route('order.view', $order->id) }}';
                             }, 1000);
                         } else {
                             if (typeof toastr !== 'undefined') {

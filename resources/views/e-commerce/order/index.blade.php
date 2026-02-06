@@ -30,59 +30,7 @@
                 </div>
             </div>
 
-            <!-- Status Filter Tabs -->
-            {{-- <div class="row mb-3">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body border-bottom">
-                        <ul class="nav nav-tabs nav-tabs-custom" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link {{ request('order_status') == '' ? 'active' : '' }}"
-                                   href="{{ route('order.index') }}">
-                                    All Orders <span class="badge bg-secondary ms-1">{{ $statusCounts['all'] }}</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request('order_status') == 'pending' ? 'active' : '' }}"
-                                   href="{{ route('order.index', ['order_status' => 'pending']) }}">
-                                    Pending <span class="badge bg-warning ms-1">{{ $statusCounts['pending'] }}</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request('order_status') == 'confirmed' ? 'active' : '' }}"
-                                   href="{{ route('order.index', ['order_status' => 'confirmed']) }}">
-                                    Confirmed <span class="badge bg-info ms-1">{{ $statusCounts['confirmed'] }}</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request('order_status') == 'processing' ? 'active' : '' }}"
-                                   href="{{ route('order.index', ['order_status' => 'processing']) }}">
-                                    Processing <span class="badge bg-info ms-1">{{ $statusCounts['processing'] }}</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request('order_status') == 'shipped' ? 'active' : '' }}"
-                                   href="{{ route('order.index', ['order_status' => 'shipped']) }}">
-                                    Shipped <span class="badge bg-primary ms-1">{{ $statusCounts['shipped'] }}</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request('order_status') == 'delivered' ? 'active' : '' }}"
-                                   href="{{ route('order.index', ['order_status' => 'delivered']) }}">
-                                    Delivered <span class="badge bg-success ms-1">{{ $statusCounts['delivered'] }}</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request('order_status') == 'cancelled' ? 'active' : '' }}"
-                                   href="{{ route('order.index', ['order_status' => 'cancelled']) }}">
-                                    Cancelled <span class="badge bg-danger ms-1">{{ $statusCounts['cancelled'] }}</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
+        
 
             <!-- Search and Filter Form -->
             <div class="row">
@@ -160,14 +108,14 @@
                                     ],
                                 ];
 
-                                $currentStatus = request()->get('order_status') ?? 'all';
+                                $currentStatus = request()->get('status') ?? 'all';
                             @endphp
 
                             <ul class="nav nav-underline border-bottom mb-3" id="pills-tab" role="tablist">
                                 @foreach ($statuses as $key => $status)
                                     <li class="nav-item" role="presentation">
                                         <a class="nav-link {{ $currentStatus === $key ? 'active' : '' }} p-2"
-                                            href="{{ $key === 'all' ? route('order.index') : route('order.index', ['order_status' => $key]) }}">
+                                            href="{{ $key === 'all' ? route('order.index') : route('order.index', ['status' => $key]) }}">
                                             <span class="d-block d-sm-none">
                                                 <i class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>
                                             </span>
@@ -286,29 +234,29 @@
                                                                 'cancelled' => 'danger',
                                                             ];
                                                             $statusColor =
-                                                                $statusColors[$order->order_status] ?? 'secondary';
+                                                                $statusColors[$order->status] ?? 'secondary';
                                                         @endphp
                                                         <select class="form-select form-select-sm status-select"
                                                             data-order-id="{{ $order->id }}" style="width: auto;">
                                                             <option value="pending"
-                                                                {{ $order->order_status == 'pending' ? 'selected' : '' }}>
+                                                                {{ $order->status == 'pending' ? 'selected' : '' }}>
                                                                 Pending
                                                             </option>
                                                             <option value="confirmed"
-                                                                {{ $order->order_status == 'confirmed' ? 'selected' : '' }}>
+                                                                {{ $order->status == 'confirmed' ? 'selected' : '' }}>
                                                                 Confirmed</option>
                                                             <option value="processing"
-                                                                {{ $order->order_status == 'processing' ? 'selected' : '' }}>
+                                                                {{ $order->status == 'processing' ? 'selected' : '' }}>
                                                                 Processing</option>
                                                             <option value="shipped"
-                                                                {{ $order->order_status == 'shipped' ? 'selected' : '' }}>
+                                                                {{ $order->status == 'shipped' ? 'selected' : '' }}>
                                                                 Shipped
                                                             </option>
                                                             <option value="delivered"
-                                                                {{ $order->order_status == 'delivered' ? 'selected' : '' }}>
+                                                                {{ $order->status == 'delivered' ? 'selected' : '' }}>
                                                                 Delivered</option>
                                                             <option value="cancelled"
-                                                                {{ $order->order_status == 'cancelled' ? 'selected' : '' }}>
+                                                                {{ $order->status == 'cancelled' ? 'selected' : '' }}>
                                                                 Cancelled</option>
                                                         </select>
                                                     </td>
@@ -454,7 +402,7 @@
                     url: `/demo/e-commerce/order/${orderId}/update-status`,
                     method: 'POST',
                     data: {
-                        order_status: newStatus,
+                        status: newStatus,
                         _token: '{{ csrf_token() }}'
                     },
                     success: function(response) {

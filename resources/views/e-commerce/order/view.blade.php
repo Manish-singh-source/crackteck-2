@@ -74,41 +74,50 @@
                                             <span class="fw-semibold">Total Quantity:</span>
                                             <span>{{ $order->orderItems->sum('quantity') }}</span>
                                         </li>
-                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                            <span class="fw-semibold">Status:</span>
-                                            @php
-                                                // Determine badge color based on status
-                                                $badgeColor = match ($order->order_status) {
-                                                    'pending' => 'warning',
-                                                    'confirmed' => 'info',
-                                                    'processing' => 'primary', // processing
-                                                    'shipped' => 'primary', // shipped
-                                                    'delivered' => 'success',
-                                                    'cancelled' => 'danger',
-                                                    'returned' => 'warning', // returned
-                                                    default => 'secondary',
-                                                };
-                                            @endphp
-                                            <span class="badge bg-{{ $badgeColor }}">
-                                                @if ($order->order_status === 'pending')
-                                                    Pending
-                                                @elseif ($order->order_status === 'confirmed')
-                                                    Confirmed
-                                                @elseif ($order->order_status === 'processing')
-                                                    Processing
-                                                @elseif ($order->order_status === 'shipped')
-                                                    Shipped
-                                                @elseif ($order->order_status === 'delivered')
-                                                    Delivered
-                                                @elseif ($order->order_status === 'cancelled')
-                                                    Cancelled
-                                                @elseif ($order->order_status === 'returned')
-                                                    Returned
-                                                @else
-                                                    Unknown
-                                                @endif
-                                            </span>
-                                        </li>
+                                        <!-- New Delivery Status Display -->
+                                        @if ($order->status)
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Status:</span>
+                                                @php
+                                                    $deliveryStatusBadgeColor = match ($order->status) {
+                                                        'pending' => 'warning',
+                                                        'admin_approved' => 'info',
+                                                        'assigned_delivery_man' => 'primary',
+                                                        'order_accepted' => 'primary',
+                                                        'product_taken' => 'primary',
+                                                        'delivered' => 'success',
+                                                        'cancelled' => 'danger',
+                                                        'returned' => 'warning',
+                                                        default => 'secondary',
+                                                    };
+                                                @endphp
+                                                <span class="badge bg-{{ $deliveryStatusBadgeColor }}">
+                                                    @if ($order->status === 'pending')
+                                                        Pending
+                                                    @elseif ($order->status === 'admin_approved')
+                                                        Admin Approved
+                                                    @elseif ($order->status === 'assigned_delivery_man')
+                                                        Assigned to Delivery Man
+                                                    @elseif ($order->status === 'order_accepted')
+                                                        Order Accepted
+                                                    @elseif ($order->status === 'product_taken')
+                                                        Product Taken
+                                                    @elseif ($order->status === 'delivered')
+                                                        Delivered
+                                                    @elseif ($order->status === 'cancelled')
+                                                        Cancelled
+                                                    @elseif ($order->status === 'returned')
+                                                        Returned
+                                                    @else
+                                                        Unknown
+                                                    @endif
+                                                </span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Expected Delivery Date:</span>
+                                                <span>{{ $order->expected_delivery_date ?? 'N/A' }}</span>
+                                            </li>
+                                        @endif
                                     </ul>
                                 </div>
                                 <div class="col-lg-6">
@@ -125,12 +134,22 @@
                                         </li>
 
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-semibold">Confirmed At:</span>
+                                            <span>{{ $order->confirmed_at ?? 'N/A' }}</span>
+                                        </li>
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Assigned Person:</span>
                                             <span>{{ $assignedPerson ? $assignedPerson->first_name . ' ' . $assignedPerson->last_name : 'N/A' }}</span>
                                         </li>
+
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                            <span class="fw-semibold">Confirmed At:</span>
-                                            <span>{{ $order->confirmed_at ?? 'N/A' }}</span>
+                                            <span class="fw-semibold">Assigned At:</span>
+                                            <span>{{ $order->assigned_at ?? 'N/A' }}</span>
+                                        </li>
+
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-semibold">Accepted At:</span>
+                                            <span>{{ $order->accepted_at ?? 'N/A' }}</span>
                                         </li>
 
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
@@ -142,6 +161,18 @@
                                             <span class="fw-semibold">Delivered At:</span>
                                             <span>{{ $order->delivered_at ?? 'N/A' }}</span>
                                         </li>
+
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-semibold">Cancelled At:</span>
+                                            <span>{{ $order->cancelled_at ?? 'N/A' }}</span>
+                                        </li>
+
+                                        @if ($order->expected_delivery_date)
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Expected Delivery:</span>
+                                                <span>{{ $order->expected_delivery_date->format('d M Y') }}</span>
+                                            </li>
+                                        @endif
 
                                     </ul>
                                 </div>
@@ -183,12 +214,14 @@
                                         <li class="list-group-item border-0">
                                             <span class="fw-semibold">Shipping Address:</span>
                                             <div class="mt-1">
-                                                {{ $order->customer->first_name ?? '' }} {{ $order->customer->last_name ?? '' }}<br>
+                                                {{ $order->customer->first_name ?? '' }}
+                                                {{ $order->customer->last_name ?? '' }}<br>
                                                 {{ $order->shippingAddress->address1 ?? '' }}<br>
                                                 @if ($order->shippingAddress->address2)
                                                     {{ $order->shippingAddress->address2 }}<br>
                                                 @endif
-                                                {{ $order->shippingAddress->city ?? '' }}, {{ $order->shippingAddress->state ?? '' }}
+                                                {{ $order->shippingAddress->city ?? '' }},
+                                                {{ $order->shippingAddress->state ?? '' }}
                                                 {{ $order->shippingAddress->pincode ?? '' }}<br>
                                                 {{ $order->shippingAddress->country ?? '' }}
                                             </div>
@@ -232,7 +265,8 @@
                                                             </div>
                                                         @endif
                                                         <div>
-                                                            <div class="fw-medium">{{ $item->product->product_name }}</div>
+                                                            <div class="fw-medium">{{ $item->product->product_name }}
+                                                            </div>
                                                             <small class="text-muted">Model:
                                                                 {{ $item->product->model_no ?? 'N/A' }}</small>
                                                         </div>
@@ -401,115 +435,123 @@
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-header border-bottom-dashed">
-                            <div class="d-flex">
-                                <h5 class="card-title flex-grow-1 mb-0">
-                                    Assign Delivery Man
+                    <!-- Assign Delivery Man Card - Show only when status is admin_approved -->
+                    @if ($order->status === 'admin_approved')
+                        <div class="card">
+                            <div class="card-header border-bottom-dashed">
+                                <div class="d-flex">
+                                    <h5 class="card-title flex-grow-1 mb-0">
+                                        Assign Person
+                                    </h5>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <form action="{{ route('order.assign-person', $order->id) }}" method="POST"
+                                    id="assign-delivery-man-form">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <div class="mb-3">
+                                        <label for="assigned_person_type" class="form-label">Select Assignment Type</label>
+                                        <select class="form-select @error('assigned_person_type') is-invalid @enderror"
+                                            id="assigned_person_type" name="assigned_person_type" required>
+                                            <option value="" disabled>-- Select Assignment Type --</option>
+                                            <option value="engineer"
+                                                {{ $order->assigned_person_type == 'engineer' ? 'selected' : '' }}>
+                                                Engineer</option>
+                                            <option value="delivery_man"
+                                                {{ $order->assigned_person_type == 'delivery_man' ? 'selected' : '' }}>
+                                                Delivery Man</option>
+                                        </select>
+                                        @error('assigned_person_type')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3" id="deliveryManSection" style="display: {{ $order->assigned_person_type == 'delivery_man' ? 'block' : 'none' }};">
+                                        <label for="delivery_man_id" class="form-label">Select Delivery Man</label>
+                                        <select class="form-select @error('delivery_man_id') is-invalid @enderror"
+                                            id="delivery_man_id" name="delivery_man_id">
+                                            <option value="" selected disabled>-- Select Delivery Man --</option>
+                                            @foreach ($deliveryMen as $deliveryMan)
+                                                <option value="{{ $deliveryMan->id }}"
+                                                    @if ($order->assigned_person_id == $deliveryMan->id) selected @endif>
+                                                    {{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('delivery_man_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3" id="engineerSection" style="display: {{ $order->assigned_person_type == 'engineer' ? 'block' : 'none' }};">
+                                        <label for="engineer_id" class="form-label">Select Engineer</label>
+                                        <select class="form-select @error('engineer_id') is-invalid @enderror"
+                                            id="engineer_id" name="engineer_id">
+                                            <option value="" selected disabled>-- Select Engineer --</option>
+                                            @foreach ($engineers as $engineer)
+                                                <option value="{{ $engineer->id }}"
+                                                    @if ($order->assigned_person_id == $engineer->id) selected @endif>
+                                                    {{ $engineer->first_name }} {{ $engineer->last_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('engineer_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                                        <i class="mdi mdi-check-circle me-2"></i>Assign Person
+                                    </button>
+                                </form>
+                            </div>
+
+                        </div>
+                    @endif
+
+                    <!-- Product Pickup Card - Show only when status is order_accepted -->
+                    @if ($order->status === 'order_accepted')
+                        <div class="card mt-3">
+                            <div class="card-header border-bottom-dashed bg-primary text-white">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-box-open me-2"></i>Product Pickup Confirmation
                                 </h5>
                             </div>
+                            <div class="card-body">
+                                <form action="{{ route('order.product-pickup', $order->id) }}" method="POST"
+                                    id="product-pickup-form">
+                                    @csrf
+                                    @method('POST')
+
+                                    <div class="alert alert-info mb-3">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Please confirm that the product has been picked up from the warehouse.
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="pickup_confirmation" class="form-label">Confirmation</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                id="pickup_confirmation" name="pickup_confirmation" value="1" required>
+                                            <label class="form-check-label" for="pickup_confirmation">
+                                                I confirm that the product has been picked up from the warehouse
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-success" id="submit-btn">
+                                            <i class="fas fa-check me-1"></i>Confirm Product Pickup
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
+                    @endif
 
-                        <div class="card-body">
-                            <form action="{{ route('order.assign-person', $order->id) }}" method="POST">
-                                @csrf
-                                @method('PUT')
-
-                                <div class="mb-3">
-                                    <label for="approval_status" class="form-label">Select Assignment Type</label>
-                                    <select class="form-select @error('assigned_person_type') is-invalid @enderror"
-                                        id="assigned_person_type" name="assigned_person_type" required>
-                                        <option value="" selected disabled>-- Select Assignment Type --</option>
-                                        <option value="engineer"
-                                            {{ $order->assigned_person_type == 'engineer' ? 'selected' : '' }}>
-                                            Engineer</option>
-                                        <option value="delivery_man"
-                                            {{ $order->assigned_person_type == 'delivery_man' ? 'selected' : '' }}>
-                                            Delivery
-                                            Man</option>
-                                    </select>
-                                    @error('assigned_person_type')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="mb-3" id="deliveryManSection" style="display: none;">
-                                    <label for="delivery_man_id" class="form-label">Select Delivery Man</label>
-                                    <select class="form-select @error('delivery_man_id') is-invalid @enderror"
-                                        id="delivery_man_id" name="delivery_man_id">
-                                        <option value="" selected disabled>-- Select Delivery Man --</option>
-                                        @foreach ($deliveryMen as $deliveryMan)
-                                            <option value="{{ $deliveryMan->id }}"
-                                                @if ($order->assigned_person_id == $deliveryMan->id) selected @endif>
-                                                {{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('delivery_man_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="mb-3" id="engineerSection" style="display: none;">
-                                    <label for="engineer_id" class="form-label">Select Engineer</label>
-                                    <select class="form-select @error('engineer_id') is-invalid @enderror"
-                                        id="engineer_id" name="engineer_id">
-                                        <option value="" selected disabled>-- Select Engineer --</option>
-                                        @foreach ($engineers as $engineer)
-                                            <option value="{{ $engineer->id }}"
-                                                @if ($order->assigned_person_id == $engineer->id) selected @endif>
-                                                {{ $engineer->first_name }} {{ $engineer->last_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('engineer_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <button type="submit" class="btn btn-primary w-100 mt-3">
-                                    <i class="mdi mdi-check-circle me-2"></i>Update
-                                </button>
-                            </form>
-                        </div>
-
-                    </div>
-
-                    <!-- Status Management Card -->
-                    <div class="card">
-                        <div class="card-header border-bottom-dashed">
-                            <h5 class="card-title mb-0">Status Management</h5>
-                        </div>
-                        <div class="card-body">
-                            <form id="status-update-form">
-                                @csrf
-                                <div class="mb-3">
-                                    <label class="form-label">Order Status</label>
-                                    <select class="form-select" name="order_status" id="order-status">
-                                        <option value="pending" {{ $order->order_status == 'pending' ? 'selected' : '' }}>
-                                            Pending</option>
-                                        <option value="confirmed"
-                                            {{ $order->order_status == 'confirmed' ? 'selected' : '' }}>
-                                            Confirmed</option>
-                                        <option value="processing"
-                                            {{ $order->order_status == 'processing' ? 'selected' : '' }}>
-                                            Processing</option>
-                                        <option value="shipped" {{ $order->order_status == 'shipped' ? 'selected' : '' }}>
-                                            Shipped</option>
-                                        <option value="delivered"
-                                            {{ $order->order_status == 'delivered' ? 'selected' : '' }}>
-                                            Delivered</option>
-                                        <option value="cancelled"
-                                            {{ $order->order_status == 'cancelled' ? 'selected' : '' }}>
-                                            Cancelled</option>
-                                    </select>
-                                </div>
-                                <button type="button" class="btn btn-primary w-100" id="update-status-btn">
-                                    <i class="fas fa-save me-1"></i> Update Status
-                                </button>
-                            </form>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -538,57 +580,37 @@
         $(document).ready(function() {
             const orderId = {{ $order->id }};
 
-            // Update order status
-            $('#assign-delivery-man-btn').on('click', function() {
-                const deliveryManId = $('#delivery-man').val();
-                const button = $(this);
-                const originalText = button.html();
+            // Handle assigned person type change
+            $('#assigned_person_type').on('change', function() {
+                var selectedValue = $(this).val();
 
-                // Show loading state
-                button.prop('disabled', true).html(
-                    '<i class="fas fa-spinner fa-spin me-1"></i> Assigning...');
-
-                $.ajax({
-                    url: `/demo/e-commerce/order/${orderId}/assign-delivery-man`,
-                    method: 'POST',
-                    data: {
-                        delivery_man_id: deliveryManId,
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            if (typeof toastr !== 'undefined') {
-                                toastr.success(response.message);
-                            } else {
-                                alert(response.message);
-                            }
-                            // Reload page to show updated timestamps
-                            setTimeout(() => {
-                                location.reload();
-                            }, 1000);
-                        } else {
-                            if (typeof toastr !== 'undefined') {
-                                toastr.error(response.message);
-                            } else {
-                                alert(response.message);
-                            }
-                        }
-                    },
-                    error: function(xhr) {
-                        const message = xhr.responseJSON?.message ||
-                            'Failed to assign delivery man';
-                        if (typeof toastr !== 'undefined') {
-                            toastr.error(message);
-                        } else {
-                            alert(message);
-                        }
-                    },
-                    complete: function() {
-                        // Restore button state
-                        button.prop('disabled', false).html(originalText);
-                    }
-                });
+                if (selectedValue === 'engineer') {
+                    $('#deliveryManSection').hide();
+                    $('#engineerSection').show();
+                    $('#delivery_man_id').prop('required', false);
+                    $('#engineer_id').prop('required', true);
+                } else if (selectedValue === 'delivery_man') {
+                    $('#engineerSection').hide();
+                    $('#deliveryManSection').show();
+                    $('#engineer_id').prop('required', false);
+                    $('#delivery_man_id').prop('required', true);
+                } else {
+                    $('#engineerSection').hide();
+                    $('#deliveryManSection').hide();
+                    $('#delivery_man_id').prop('required', false);
+                    $('#engineer_id').prop('required', false);
+                }
             });
+
+            // Initialize required fields based on current selection
+            var currentAssignedPersonType = '{{ $order->assigned_person_type }}';
+            if (currentAssignedPersonType === 'engineer') {
+                $('#engineer_id').prop('required', true);
+                $('#delivery_man_id').prop('required', false);
+            } else if (currentAssignedPersonType === 'delivery_man') {
+                $('#delivery_man_id').prop('required', true);
+                $('#engineer_id').prop('required', false);
+            }
 
             // Update order status
             $('#update-status-btn').on('click', function() {
@@ -610,11 +632,7 @@
                     success: function(response) {
                         console.log('Response:', response);
                         if (response.success) {
-                            if (typeof toastr !== 'undefined') {
-                                toastr.success(response.message);
-                            } else {
-                                alert(response.message);
-                            }
+
                             // Reload page to show updated timestamps
                             setTimeout(() => {
                                 location.reload();
@@ -696,36 +714,49 @@
                     }
                 });
             });
-        });
-    </script>
 
-    <script>
-        $(document).ready(function() {
-            var assignedPersonType = '{{ $order->assigned_person_type }}'; 
-            if (assignedPersonType === 'engineer') {
-                $('#engineerSection').show();
-                $('#deliveryManSection').hide();
-            } else if (assignedPersonType === 'delivery_man') {
-                $('#deliveryManSection').show();
-                $('#engineerSection').hide();
-            }
+            // Handle assign delivery man form submission
+            $('#assign-delivery-man-form').on('submit', function(e) {
+                e.preventDefault();
 
-            $('#assigned_person_type').on('change', function() {
-                var selectedValue = $(this).val();
+                const form = $(this);
+                const button = form.find('button[type="submit"]');
+                const originalText = button.html();
 
-                if (selectedValue === 'engineer') {
-                    $('#deliveryManSection').hide();
-                    $('#engineerSection').show();
-                    $('#assigned_person_id').prop('required', true);
-                } else if (selectedValue === 'delivery_man') {
-                    $('#engineerSection').hide();
-                    $('#deliveryManSection').show();
-                    $('#assigned_person_id').prop('required', true);
-                } else {
-                    $('#engineerSection').hide();
-                    $('#deliveryManSection').hide();
-                    $('#assigned_person_id').prop('required', false);
-                }
+                button.prop('disabled', true).html(
+                    '<i class="fas fa-spinner fa-spin me-1"></i> Assigning...');
+
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+                        }
+                    },
+                    error: function(xhr) {
+                        const message = xhr.responseJSON?.message ||
+                            'Failed to assign delivery man';
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error(message);
+                        } else {
+                            alert(message);
+                        }
+                    },
+                    complete: function() {
+                        button.prop('disabled', false).html(originalText);
+                    }
+                });
             });
         });
     </script>

@@ -8,7 +8,7 @@ use App\Models\DeliveryMan;
 use App\Models\DmAadharDetails;
 use App\Models\DmDrivingLicenseDetails;
 use App\Models\DmPanCardDetails;
-use App\Models\EcommerceOrder;
+use App\Models\Order;
 use App\Models\Engineer;
 use App\Models\SalesPerson;
 use App\Models\VehicalRegistration;
@@ -104,17 +104,17 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man') {
-            $order = EcommerceOrder::where('id', $order_id)->first();
+            $order = Order::where('id', $order_id)->first();
 
             if (! $order) {
                 return response()->json(['message' => 'Order not found'], 404);
             }
 
-            if ($order->delivery_man_id != $request->user_id) {
+            if ($order->assigned_person_id != $request->user_id) {
                 return response()->json(['message' => 'Order already accepted by another delivery man'], 400);
             }
 
-            $order->update(['status' => 'processing']);
+            $order->update(['status' => 'order_accepted', 'accepted_at' => now()]);
             $order->save();
 
             return response()->json(['message' => 'Order accepted successfully'], 200);
@@ -138,7 +138,7 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man') {
-            $orders = EcommerceOrder::with(['orderItems'])->where('delivery_man_id', $request->user_id);
+            $orders = Order::with(['orderItems'])->where('assigned_person_id', $request->user_id);
             if ($request->filled('status')) {
                 $orders->where('status', $request->status);
             }
@@ -167,7 +167,7 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man') {
-            $order = EcommerceOrder::with(['orderItems'])->where('id', $order_id)->first();
+            $order = Order::with(['orderItems'])->where('id', $order_id)->first();
 
             if (! $order) {
                 return response()->json(['message' => 'Order not found'], 404);
@@ -203,7 +203,7 @@ class DeliveryOrderController extends Controller
                 $request->merge(['profile' => 'uploads/e-commerce/orders/profile/'.$filename]);
             }
 
-            $order = EcommerceOrder::where('id', $order_id)->first();
+            $order = Order::where('id', $order_id)->first();
 
             if (! $order) {
                 return response()->json(['message' => 'Order not found'], 404);
@@ -233,7 +233,7 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man') {
-            $order = EcommerceOrder::where('id', $order_id)->first();
+            $order = Order::where('id', $order_id)->first();
 
             if (! $order) {
                 return response()->json(['message' => 'Order not found'], 404);
@@ -255,19 +255,19 @@ class DeliveryOrderController extends Controller
             }
 
             // Send OTP via Fast2SMS DLT
-            $templateId = env('FAST2SMS_TEMPLATE_ID'); // 191040
+            // $templateId = env('FAST2SMS_TEMPLATE_ID'); 
 
-            $success = $this->sendDltSms(
-                $user->phone,           // Phone number
-                $templateId,            // Template ID (191040)
-                $otp                    // OTP value to replace {#var#}
-            );
+            // $success = $this->sendDltSms(
+            //     $user->phone,           // Phone number
+            //     $templateId,            // Template ID (191040)
+            //     $otp                    // OTP value to replace {#var#}
+            // );
 
-            if (! $success) {
-                return response()->json(['message' => 'Failed to send OTP'], 500);
-            }
+            // if (! $success) {
+            //     return response()->json(['message' => 'Failed to send OTP'], 500);
+            // }
 
-            return response()->json(['message' => 'OTP sent successfully'], 200);
+            return response()->json(['message' => 'OTP sent successfully', 'Otp' => $otp], 200);
         }
     }
 
@@ -290,7 +290,7 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man') {
-            $order = EcommerceOrder::where('id', $order_id)->first();
+            $order = Order::where('id', $order_id)->first();
 
             if (! $order) {
                 return response()->json(['message' => 'Order not found'], 404);
@@ -307,6 +307,7 @@ class DeliveryOrderController extends Controller
             $order->otp = null;
             $order->otp_expiry = null;
             $order->status = 'delivered';
+            $order->delivered_at = now();
             $order->save();
 
             return response()->json(['message' => 'OTP verified successfully'], 200);
@@ -331,7 +332,7 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man') {
-            $order = EcommerceOrder::where('id', $order_id)->where('status', 'delivered')->first();
+            $order = Order::where('id', $order_id)->where('status', 'delivered')->first();
 
             if (! $order) {
                 return response()->json(['message' => 'Order not found'], 404);

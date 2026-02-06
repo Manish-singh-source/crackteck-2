@@ -54,6 +54,7 @@ Route::prefix('/demo/e-commerce')->group(function () {
         Route::get('/delivery-men-by-city/{city}', 'getDeliveryMenByCity')->name('order.delivery-men-by-city');
         Route::post('/order/{id}/assign-delivery-man', 'assignDeliveryMan')->name('order.assign-delivery-man');
         Route::post('/order/{id}/update-status', 'updateStatus')->name('order.update-status');
+        Route::post('/order/{id}/product-pickup', 'productPickup')->name('order.product-pickup');
         Route::get('/search-customers', 'searchCustomers')->name('order.search-customers');
         Route::get('/search-products', 'searchProducts')->name('order.search-products');
     });

@@ -17,6 +17,7 @@ use App\Models\EcommerceProduct;
 use App\Models\StockRequestItem;
 use App\Models\EcommerceOrderItem;
 use App\Http\Controllers\Controller;
+use App\Models\OrderPayment;
 use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
@@ -130,6 +131,7 @@ class OrderController extends Controller
             'role_id' => 'required|in:4',
             'quantity' => 'required|integer|min:1',
             'customer_id' => 'required',
+            'shipping_address_id' => 'required',
         ]));
 
         if ($roleValidated->fails()) {
@@ -169,17 +171,17 @@ class OrderController extends Controller
                 'tax_amount' => $product->warehouseProduct->final_price * $product->warehouseProduct->tax / 100,
                 'shipping_charges' => $product->shipping_charges ?? 0,
                 'packaging_charges' => $product->packaging_charges ?? 0,
-                'total_amount' => $total,
+                'total_amount' => $total + $product->shipping_charges,
                 'billing_address_id' => null,
-                'shipping_address_id' => null,
+                'shipping_address_id' => $request->shipping_address_id,
                 'billing_same_as_shipping' => true,
-                'order_status' => "0",
-                'payment_status' => "0",
-                'delivery_status' => "0",
+                'order_status' => "pending",
+                'payment_status' => "pending",
+                'delivery_status' => "pending",
                 'expected_delivery_date' => null,
                 'customer_notes' => null,
                 'admin_notes' => null,
-                'source_platform' => '0',
+                'source_platform' => 'mobile_app',
                 'tracking_number' => null,
                 'tracking_url' => null,
                 'is_returnable' => false,
@@ -190,6 +192,7 @@ class OrderController extends Controller
                 'is_priority' => false,
                 'requires_signature' => false,
                 'is_gift' => false,
+                'assigned_person_type' => 'delivery_man',
             ]);
             
 
@@ -210,12 +213,25 @@ class OrderController extends Controller
                 'item_status' => '0',
             ]);
 
+            OrderPayment::create([
+                'order_id' => $order->id,
+                'payment_id' => 'PMT-' . strtoupper(uniqid()),
+                'transaction_id' => 'TXN-' . strtoupper(uniqid()),
+                'payment_method' => 'online',
+                'payment_gateway' => 'phonepe',
+                'amount' => $total,
+                'currency' => 'INR',
+                'status' => 'Completed',
+                'processed_at' => now(),
+            ]);
+
+
             return response()->json([
                 'success' => true,
                 'order_id' => $order->id,
                 'quantity' => $quantity,
                 'price' => $price,
-                'total' => $total,
+                'total' => $total + $product->shipping_charges,
                 'message' => 'Order placed successfully!',
             ], 200);
         }

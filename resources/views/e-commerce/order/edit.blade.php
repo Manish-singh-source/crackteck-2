@@ -132,7 +132,7 @@
                                         <div class="mb-3">
                                             <label class="form-label">Address Line 1</label>
                                             <input type="text" class="form-control"
-                                                value="{{ $order->shippingAddress->address1 }}" readonly>
+                                                value="{{ $order->shippingAddress->address1 ?? 'N/A' }}" readonly>
                                         </div>
                                     </div>
                                     <div class="col-md-6">

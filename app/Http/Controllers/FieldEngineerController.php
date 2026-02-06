@@ -315,7 +315,7 @@ class FieldEngineerController extends Controller
         $validated = $validated->validated();
 
         $serviceRequest = ServiceRequest::findOrFail($id);
-        $serviceRequest->request_date = $validated['reschedule_date'];
+        $serviceRequest->reschedule_date = $validated['reschedule_date'];
         $serviceRequest->save();
 
         if (!$serviceRequest) {

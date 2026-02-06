@@ -152,7 +152,7 @@ class OrderController extends Controller
 
     public function edit($id)
     {
-        $order = Order::with(['customer', 'orderItems.product.ecommerceProduct'])
+        $order = Order::with(['customer', 'orderItems.product.ecommerceProduct', 'shippingAddress'])
             ->findOrFail($id);
 
         return view('e-commerce.order.edit', compact('order'));

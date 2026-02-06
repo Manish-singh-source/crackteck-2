@@ -53,6 +53,9 @@ class Order extends Model
         'requires_signature',
         'is_gift',
 
+        'assigned_person_type',
+        'assigned_person_id',
+
         'created_by',
         'updated_by',
     ];

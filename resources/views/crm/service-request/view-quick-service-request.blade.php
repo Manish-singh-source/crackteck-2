@@ -129,7 +129,7 @@
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">Visit Date:</span>
-                                            <span>{{ $request->visit_date ?? 'N/A' }}</span>
+                                            <span>{{ $request->reschedule_date ?? $request->visit_date }}</span>
                                         </li>
                                     </ul>
                                 </div>

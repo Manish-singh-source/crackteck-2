@@ -2530,149 +2530,149 @@ class ServiceRequestController extends Controller
         }
     }
 
-    public function assignQuickServiceEngineer1(Request $request)
-    {
-        if ($request->assignment_type == 'individual') {
-            $request->replace($request->except('id'));
-        }
+    // public function assignQuickServiceEngineer1(Request $request)
+    // {
+    //     if ($request->assignment_type == 'individual') {
+    //         $request->replace($request->except('id'));
+    //     }
 
-        $validator = Validator::make($request->all(), [
-            'service_request_id' => 'required|exists:service_requests,id',
-            'assignment_type'    => 'required|in:individual,group',
-            'engineer_id'        => 'required_if:assignment_type,individual|exists:staff,id',
-            'group_name'         => 'required_if:assignment_type,group',
-            'engineer_ids'       => 'required_if:assignment_type,group|array',
-            'engineer_ids.*'     => 'exists:staff,id',
-            'supervisor_id'      => 'required_if:assignment_type,group|exists:staff,id',
-        ]);
+    //     $validator = Validator::make($request->all(), [
+    //         'service_request_id' => 'required|exists:service_requests,id',
+    //         'assignment_type'    => 'required|in:individual,group',
+    //         'engineer_id'        => 'required_if:assignment_type,individual|exists:staff,id',
+    //         'group_name'         => 'required_if:assignment_type,group',
+    //         'engineer_ids'       => 'required_if:assignment_type,group|array',
+    //         'engineer_ids.*'     => 'exists:staff,id',
+    //         'supervisor_id'      => 'required_if:assignment_type,group|exists:staff,id',
+    //     ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error: ' . $validator->errors()->first(),
-            ], 422);
-        }
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Validation error: ' . $validator->errors()->first(),
+    //         ], 422);
+    //     }
 
-        DB::beginTransaction();
+    //     DB::beginTransaction();
 
 
 
-        try {
-            $serviceRequest = ServiceRequest::find($request->service_request_id);
+    //     try {
+    //         $serviceRequest = ServiceRequest::find($request->service_request_id);
 
-            // Check if status is Approved (status = admin_approved)
-            if ($serviceRequest->status != 'admin_approved') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Engineer can only be assigned to Approved requests.',
-                ], 422);
-            }
+    //         // Check if status is Approved (status = admin_approved)
+    //         if ($serviceRequest->status != 'admin_approved') {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Engineer can only be assigned to Approved requests.',
+    //             ], 422);
+    //         }
 
-            // Get previous active assignment
-            $previousAssignment = AssignedEngineer::where('service_request_id', $request->service_request_id)
-                ->where('status', 'active')
-                ->first();
+    //         // Get previous active assignment
+    //         $previousAssignment = AssignedEngineer::where('service_request_id', $request->service_request_id)
+    //             ->where('status', 'active')
+    //             ->first();
 
-            // Update service request status to Assigned (status = 2)
-            $serviceRequest->status = 'assigned_engineer';
-            $serviceRequest->is_engineer_assigned = 'assigned';
-            $serviceRequest->save();
+    //         // Update service request status to Assigned (status = 2)
+    //         $serviceRequest->status = 'assigned_engineer';
+    //         $serviceRequest->is_engineer_assigned = 'assigned';
+    //         $serviceRequest->save();
             
-            // Update all products from approved to processing when engineer is assigned
-            ServiceRequestProduct::where('service_requests_id', $serviceRequest->id)
-                ->where('status', 'approved')
-                ->update(['status' => 'processing']);
+    //         // Update all products from approved to processing when engineer is assigned
+    //         ServiceRequestProduct::where('service_requests_id', $serviceRequest->id)
+    //             ->where('status', 'approved')
+    //             ->update(['status' => 'processing']);
 
-            // Mark previous assignment as inactive
-            if ($previousAssignment) {
-                $previousAssignment->update([
-                    'status' => 'inactive',
-                    'transferred_at' => now(),
-                ]);
-            }
+    //         // Mark previous assignment as inactive
+    //         if ($previousAssignment) {
+    //             $previousAssignment->update([
+    //                 'status' => 'inactive',
+    //                 'transferred_at' => now(),
+    //             ]);
+    //         }
 
-            if ($request->assignment_type == 'individual') {
-                // Individual assignment
-                $assignment = AssignedEngineer::create([
-                    'service_request_id' => $request->service_request_id,
-                    'engineer_id'        => $request->engineer_id,
-                    'assignment_type'    => 'individual',
-                    'assigned_at'        => now(),
-                    'status'             => 'active',
-                ]);
+    //         if ($request->assignment_type == 'individual') {
+    //             // Individual assignment
+    //             $assignment = AssignedEngineer::create([
+    //                 'service_request_id' => $request->service_request_id,
+    //                 'engineer_id'        => $request->engineer_id,
+    //                 'assignment_type'    => 'individual',
+    //                 'assigned_at'        => now(),
+    //                 'status'             => 'active',
+    //             ]);
 
-                // Update transferred_to in previous assignment
-                if ($previousAssignment) {
-                    $previousAssignment->update(['transferred_to' => $request->engineer_id]);
-                }
+    //             // Update transferred_to in previous assignment
+    //             if ($previousAssignment) {
+    //                 $previousAssignment->update(['transferred_to' => $request->engineer_id]);
+    //             }
 
-                $engineer = Staff::where('staff_role', 'engineer')->find($request->engineer_id);
-                $message  = 'Engineer ' . $engineer->first_name . ' ' . $engineer->last_name . ' assigned successfully';
-            } else {
-                // Group assignment
-                $assignment = AssignedEngineer::create([
-                    'service_request_id' => $request->service_request_id,
-                    'engineer_id'        => $request->supervisor_id,
-                    'assignment_type'    => 'group',
-                    'group_name'         => $request->group_name,
-                    'assigned_at'        => now(),
-                    'status'             => 'active',
-                ]);
+    //             $engineer = Staff::where('staff_role', 'engineer')->find($request->engineer_id);
+    //             $message  = 'Engineer ' . $engineer->first_name . ' ' . $engineer->last_name . ' assigned successfully';
+    //         } else {
+    //             // Group assignment
+    //             $assignment = AssignedEngineer::create([
+    //                 'service_request_id' => $request->service_request_id,
+    //                 'engineer_id'        => $request->supervisor_id,
+    //                 'assignment_type'    => 'group',
+    //                 'group_name'         => $request->group_name,
+    //                 'assigned_at'        => now(),
+    //                 'status'             => 'active',
+    //             ]);
 
-                // Add group members to pivot table
-                foreach ($request->engineer_ids as $engineerId) {
-                    $assignment->groupEngineers()->attach($engineerId, [
-                        'is_supervisor' => ($engineerId == $request->supervisor_id),
-                    ]);
-                }
+    //             // Add group members to pivot table
+    //             foreach ($request->engineer_ids as $engineerId) {
+    //                 $assignment->groupEngineers()->attach($engineerId, [
+    //                     'is_supervisor' => ($engineerId == $request->supervisor_id),
+    //                 ]);
+    //             }
 
-                $message = 'Group "' . $request->group_name .
-                    '" assigned successfully with ' . count($request->engineer_ids) . ' engineers';
-            }
+    //             $message = 'Group "' . $request->group_name .
+    //                 '" assigned successfully with ' . count($request->engineer_ids) . ' engineers';
+    //         }
 
-            // Update service request status to Assigned (status = 2)
-            $oldStatus = $serviceRequest->status;
-            $serviceRequest->status = 'assigned_engineer';
-            $serviceRequest->save();
+    //         // Update service request status to Assigned (status = 2)
+    //         $oldStatus = $serviceRequest->status;
+    //         $serviceRequest->status = 'assigned_engineer';
+    //         $serviceRequest->save();
 
-            // Log the status change
-            Log::info('Service Request Status Updated', [
-                'service_request_id' => $serviceRequest->id,
-                'old_status' => $oldStatus,
-                'new_status' => $serviceRequest->status,
-                'assigned_engineer_id' => $assignment->id
-            ]);
+    //         // Log the status change
+    //         Log::info('Service Request Status Updated', [
+    //             'service_request_id' => $serviceRequest->id,
+    //             'old_status' => $oldStatus,
+    //             'new_status' => $serviceRequest->status,
+    //             'assigned_engineer_id' => $assignment->id
+    //         ]);
 
-            // Activity log
-            activity()
-                ->performedOn($serviceRequest)
-                ->causedBy(Auth::user())
-                ->withProperties([
-                    'old_status' => $oldStatus,
-                    'new_status' => 'assigned_engineer',
-                    'assignment_id' => $assignment->id
-                ])
-                ->log('Engineer assigned to service request - Status changed to Assigned');
+    //         // Activity log
+    //         activity()
+    //             ->performedOn($serviceRequest)
+    //             ->causedBy(Auth::user())
+    //             ->withProperties([
+    //                 'old_status' => $oldStatus,
+    //                 'new_status' => 'assigned_engineer',
+    //                 'assignment_id' => $assignment->id
+    //             ])
+    //             ->log('Engineer assigned to service request - Status changed to Assigned');
 
-            DB::commit();
+    //         DB::commit();
 
-            return response()->json([
-                'success'    => true,
-                'message'    => $message,
-                'status_updated' => true,
-                'old_status' => $oldStatus,
-                'new_status' => $serviceRequest->status
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error($e->getMessage());
+    //         return response()->json([
+    //             'success'    => true,
+    //             'message'    => $message,
+    //             'status_updated' => true,
+    //             'old_status' => $oldStatus,
+    //             'new_status' => $serviceRequest->status
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error($e->getMessage());
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Error assigning engineer: ' . $e->getMessage(),
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Error assigning engineer: ' . $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
     public function assignQuickServiceEngineer(Request $request)
     {
@@ -2708,7 +2708,7 @@ class ServiceRequestController extends Controller
             $serviceRequest = ServiceRequest::findOrFail($request->service_request_id);
 
             /** Only approved requests can be assigned */
-            if (!in_array($serviceRequest->status, ['admin_approved', 'engineer_not_approved'])) {
+            if (!in_array($serviceRequest->status, ['admin_approved', 'engineer_not_approved', 'in_transfer'])) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Engineer can only be assigned to approved requests.',

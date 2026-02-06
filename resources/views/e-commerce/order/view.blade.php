@@ -71,6 +71,10 @@
                                             <span>{{ $order->orderItems->count() }} items</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-semibold">Total Quantity:</span>
+                                            <span>{{ $order->orderItems->sum('quantity') }}</span>
+                                        </li>
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Status:</span>
                                             @php
                                                 // Determine badge color based on status
@@ -105,6 +109,10 @@
                                                 @endif
                                             </span>
                                         </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush">
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             @php
                                                 $assignedPersonType = match ($order->assigned_person_type) {
@@ -118,12 +126,8 @@
 
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Assigned Person:</span>
-                                            <span>{{ $assignedPerson->first_name . ' ' . $assignedPerson->last_name ?? 'N/A' }}</span>
+                                            <span>{{ $assignedPerson ? $assignedPerson->first_name . ' ' . $assignedPerson->last_name : 'N/A' }}</span>
                                         </li>
-                                    </ul>
-                                </div>
-                                <div class="col-lg-6">
-                                    <ul class="list-group list-group-flush">
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Confirmed At:</span>
                                             <span>{{ $order->confirmed_at ?? 'N/A' }}</span>
@@ -179,14 +183,14 @@
                                         <li class="list-group-item border-0">
                                             <span class="fw-semibold">Shipping Address:</span>
                                             <div class="mt-1">
-                                                {{ $order->shipping_first_name }} {{ $order->shipping_last_name }}<br>
-                                                {{ $order->shipping_address_line_1 }}<br>
-                                                @if ($order->shipping_address_line_2)
-                                                    {{ $order->shipping_address_line_2 }}<br>
+                                                {{ $order->customer->first_name ?? '' }} {{ $order->customer->last_name ?? '' }}<br>
+                                                {{ $order->shippingAddress->address1 ?? '' }}<br>
+                                                @if ($order->shippingAddress->address2)
+                                                    {{ $order->shippingAddress->address2 }}<br>
                                                 @endif
-                                                {{ $order->shipping_city }}, {{ $order->shipping_state }}
-                                                {{ $order->shipping_zipcode }}<br>
-                                                {{ $order->shipping_country }}
+                                                {{ $order->shippingAddress->city ?? '' }}, {{ $order->shippingAddress->state ?? '' }}
+                                                {{ $order->shippingAddress->pincode ?? '' }}<br>
+                                                {{ $order->shippingAddress->country ?? '' }}
                                             </div>
                                         </li>
                                     </ul>
@@ -360,6 +364,14 @@
                         <div class="card-body">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item border-0 d-flex justify-content-between">
+                                    <span>Total Items:</span>
+                                    <span class="fw-medium">{{ $order->orderItems->count() }}</span>
+                                </li>
+                                <li class="list-group-item border-0 d-flex justify-content-between">
+                                    <span>Total Quantity:</span>
+                                    <span class="fw-medium">{{ $order->orderItems->sum('quantity') }}</span>
+                                </li>
+                                <li class="list-group-item border-0 d-flex justify-content-between">
                                     <span>Subtotal:</span>
                                     <span class="fw-medium">₹{{ number_format($order->subtotal, 2) }}</span>
                                 </li>
@@ -375,10 +387,6 @@
                                 <li class="list-group-item border-0 d-flex justify-content-between">
                                     <span>Shipping Charges:</span>
                                     <span class="fw-medium">₹{{ number_format($order->shipping_charges, 2) }}</span>
-                                </li>
-                                <li class="list-group-item border-0 d-flex justify-content-between">
-                                    <span>Packaging Charges:</span>
-                                    <span class="fw-medium">₹{{ number_format($order->packaging_charges, 2) }}</span>
                                 </li>
                                 <li class="list-group-item border-0 d-flex justify-content-between">
                                     <span>Coupon Applied:</span>

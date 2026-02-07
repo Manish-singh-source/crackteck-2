@@ -23,7 +23,7 @@ class FollowUpController extends Controller
 
         $validated = $validated->validated();
 
-        $followup = FollowUp::with('leadDetails')->where('staff_id', $validated['user_id'])->get();
+        $followup = FollowUp::with('leadDetails.customer')->where('staff_id', $validated['user_id'])->get();
         if ($followup->isEmpty()) {
             return response()->json(['message' => 'No followup found'], 404);
         }

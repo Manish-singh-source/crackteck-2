@@ -21,7 +21,7 @@ class MeetController extends Controller
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
-        $meets = Meet::with('leadDetails')->where('staff_id', $request->user_id)->paginate();
+        $meets = Meet::with('leadDetails.customer')->where('staff_id', $request->user_id)->paginate();
 
         if ($meets->isEmpty()) {
             return response()->json(['message' => 'No meets found'], 404);
@@ -72,7 +72,7 @@ class MeetController extends Controller
             return response()->json(['message' => 'Meet not created'], 500);
         }
 
-        $meet->load('leadDetails');
+        $meet->load('leadDetails.customer');
 
         return new MeetResource($meet);
     }
@@ -88,7 +88,7 @@ class MeetController extends Controller
         }
         $validated = $validated->validated();
 
-        $meets = Meet::where('staff_id', $validated['user_id'])->where('id', $meet_id)->first();
+        $meets = Meet::with('leadDetails.customer')->where('staff_id', $validated['user_id'])->where('id', $meet_id)->first();
 
         if (! $meets) {
             return response()->json(['message' => 'Meet not found'], 404);

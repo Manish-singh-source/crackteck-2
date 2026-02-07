@@ -15,58 +15,7 @@ class MeetResource extends JsonResource
     public function toArray(Request $request): array
     {
         $lead = $this->leadDetails;
-
-
-        // $leadGender = [
-        //     '0' => 'Male',
-        //     '1' => 'Female',
-        //     '2' => 'Other',
-        //     null => 'Not Specified',
-        // ];
-
-        // $leadSource = [
-        //     '0' => 'Website',
-        //     '1' => 'Referral',
-        //     '2' => 'Call',
-        //     '3' => 'Walk-in',
-        //     '4' => 'Event',
-        //     null => 'Not Specified',
-        // ];
-
-        // $leadUrgency = [
-        //     '0' => 'Low',
-        //     '1' => 'Medium',
-        //     '2' => 'High',
-        //     '3' => 'Critical',
-        //     null => 'Not Specified',
-        // ];
-
-        // $leadStatus = [
-        //     '0' => 'New',
-        //     '1' => 'Contacted',
-        //     '2' => 'Qualified',
-        //     '3' => 'Proposal',
-        //     '4' => 'Won',
-        //     '5' => 'Lost',
-        //     '6' => 'Nurture',
-        //     null => 'Not Specified',
-        // ];
-
-        // $meetingType = [
-        //     '0' => 'In Person',
-        //     '1' => 'Virtual',
-        //     '2' => 'Phone',
-        //     null => 'Not Specified',
-        // ];
-
-        // $meetingStatus = [
-        //     '0' => 'Scheduled',
-        //     '1' => 'Confirmed',
-        //     '2' => 'Completed',
-        //     '3' => 'Cancelled',
-        //     '4' => 'Rescheduled',
-        //     null => 'Not Specified',
-        // ];
+        $customer = $lead->customer;
 
         return [
             'id' => $this->id,
@@ -85,9 +34,9 @@ class MeetResource extends JsonResource
             'updated_at' => $this->updated_at->toDateTimeString(),
             'lead' => [
                 'id' => $lead->id,
-                'name' => $lead->first_name . ' ' . $lead->last_name,
-                'phone' => $lead->phone,
-                'email' => $lead->email,
+                'name' => $customer->first_name . ' ' . $customer->last_name,
+                'phone' => $customer->phone,
+                'email' => $customer->email,
                 'company_name' => $lead->company_name,
                 'industry_type' => $lead->industry_type,
                 'designation' => $lead->designation,

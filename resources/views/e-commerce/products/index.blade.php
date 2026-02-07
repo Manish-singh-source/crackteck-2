@@ -125,7 +125,7 @@
                                                                     <td>
                                                                         <div>
                                                                             Regular price:
-                                                                            ₹{{ number_format($product->warehouseProduct->selling_price, 2) }}
+                                                                            ₹{{ number_format($product->warehouseProduct->final_price, 2) }}
                                                                         </div>
                                                                         @if ($product->warehouseProduct->discount_price)
                                                                             <div>

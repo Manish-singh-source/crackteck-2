@@ -29,7 +29,7 @@ class CartController extends Controller
             'ecommerceProduct.warehouseProduct.parentCategorie',
             'ecommerceProduct.warehouseProduct.subCategorie',
         ])
-            ->where('user_id', Auth::id())
+            ->where('customer_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -73,12 +73,12 @@ class CartController extends Controller
 
         $productId = $request->ecommerce_product_id;
         $quantity = $request->quantity ?? 1;
-        $userId = Auth::id();
+        $customerId = Auth::id();
 
         // Check if product exists and is active
         $product = EcommerceProduct::with('warehouseProduct')
             ->where('id', $productId)
-            ->where('ecommerce_status', 'active')
+            ->where('status', 'active')
             ->first();
 
         if (! $product) {
@@ -89,7 +89,7 @@ class CartController extends Controller
         }
 
         // Check if product is already in cart
-        $existingCartItem = Cart::getCartItem($userId, $productId);
+        $existingCartItem = Cart::getCartItem($customerId, $productId);
 
         if ($existingCartItem) {
             // Update quantity
@@ -100,13 +100,13 @@ class CartController extends Controller
                 'success' => true,
                 'message' => 'Product quantity updated in cart.',
                 'action' => 'updated',
-                'cart_count' => Cart::getCartCount($userId),
-                'cart_total' => Cart::getCartTotal($userId),
+                'cart_count' => Cart::getCartCount($customerId),
+                'cart_total' => Cart::getCartTotal($customerId),
             ]);
         } else {
             // Add new item to cart
             Cart::create([
-                'user_id' => $userId,
+                'customer_id' => $customerId,
                 'ecommerce_product_id' => $productId,
                 'quantity' => $quantity,
             ]);
@@ -115,8 +115,8 @@ class CartController extends Controller
                 'success' => true,
                 'message' => 'Product added to cart successfully.',
                 'action' => 'added',
-                'cart_count' => Cart::getCartCount($userId),
-                'cart_total' => Cart::getCartTotal($userId),
+                'cart_count' => Cart::getCartCount($customerId),
+                'cart_total' => Cart::getCartTotal($customerId),
             ]);
         }
     }
@@ -140,7 +140,7 @@ class CartController extends Controller
 
         $cartItem = Cart::with('ecommerceProduct.warehouseProduct')
             ->where('id', $id)
-            ->where('user_id', Auth::id())
+            ->where('customer_id', Auth::id())
             ->first();
 
         if (! $cartItem) {
@@ -161,8 +161,8 @@ class CartController extends Controller
         $cartItem->quantity = $request->quantity;
         $cartItem->save();
 
-        // Get the product price for JavaScript calculation
-        $productPrice = $cartItem->ecommerceProduct->warehouseProduct->selling_price ?? 0;
+        // Get the product price for JavaScript calculation (use final_price like the template)
+        $productPrice = $cartItem->ecommerceProduct->warehouseProduct->final_price ?? $cartItem->ecommerceProduct->warehouseProduct->selling_price ?? 0;
 
         // Ensure price is numeric
         $productPrice = is_numeric($productPrice) ? (float) $productPrice : 0;
@@ -191,7 +191,7 @@ class CartController extends Controller
         }
 
         $cartItem = Cart::where('id', $id)
-            ->where('user_id', Auth::id())
+            ->where('customer_id', Auth::id())
             ->first();
 
         if (! $cartItem) {
@@ -229,13 +229,13 @@ class CartController extends Controller
         $cartItems = Cart::with([
             'ecommerceProduct.warehouseProduct',
         ])
-            ->where('user_id', Auth::id())
+            ->where('customer_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($item) {
                 return [
                     'id' => $item->id,
-                    'product_id' => $item->ecommerce_product_id,
+                    'product_id' => $item->product_id,
                     'product_name' => $item->ecommerceProduct->warehouseProduct->product_name ?? 'Unknown Product',
                     'product_image' => $item->ecommerceProduct->warehouseProduct->main_product_image ?? '',
                     'selling_price' => $item->ecommerceProduct->warehouseProduct->selling_price ?? 0,
@@ -302,7 +302,7 @@ class CartController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'ecommerce_product_id' => 'required|exists:ecommerce_products,id',
+            'product_id' => 'required|exists:ecommerce_products,id',
             'quantity' => 'nullable|integer|min:1|max:100',
         ]);
 
@@ -315,14 +315,14 @@ class CartController extends Controller
 
         DB::beginTransaction();
         try {
-            $productId = $request->ecommerce_product_id;
+            $productId = $request->product_id;
             $quantity = $request->quantity ?? 1;
             $userId = Auth::id();
 
             // Check if product exists and is active
             $product = EcommerceProduct::with('warehouseProduct')
                 ->where('id', $productId)
-                ->where('ecommerce_status', 'active')
+                ->where('status', 'active')
                 ->first();
 
             if (! $product) {
@@ -357,7 +357,7 @@ class CartController extends Controller
             } else {
                 // Add to cart
                 $cartItem = Cart::create([
-                    'user_id' => $userId,
+                    'customer_id' => $userId,
                     'ecommerce_product_id' => $productId,
                     'quantity' => $quantity,
                 ]);
@@ -379,6 +379,86 @@ class CartController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error toggling cart: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Buy Now - Add product to cart and redirect to checkout
+     */
+    public function buyNow(Request $request): JsonResponse
+    {
+        // Check authentication
+        if (! Auth::check()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please login to buy products.',
+                'requires_auth' => true,
+            ], 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:ecommerce_products,id',
+            'quantity' => 'nullable|integer|min:1|max:100',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $productId = $request->product_id;
+            $quantity = $request->quantity ?? 1;
+            $userId = Auth::id();
+
+            // Check if product exists and is active
+            $product = EcommerceProduct::with('warehouseProduct')
+                ->where('id', $productId)
+                ->where('status', 'active')
+                ->first();
+
+            if (! $product) {
+                DB::rollBack();
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product not found or not available.',
+                ], 404);
+            }
+
+            // Check if product is already in cart
+            $existingCartItem = Cart::getCartItem($userId, $productId);
+
+            if ($existingCartItem) {
+                // Update quantity
+                $existingCartItem->quantity += $quantity;
+                $existingCartItem->save();
+            } else {
+                // Add to cart
+                Cart::create([
+                    'customer_id' => $userId,
+                    'ecommerce_product_id' => $productId,
+                    'quantity' => $quantity,
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product added to cart.',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in buy now: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,

@@ -34,7 +34,7 @@ class CouponApplicationController extends Controller
 
         // Get user's cart items
         $cartItems = Cart::with(['ecommerceProduct.warehouseProduct'])
-            ->where('user_id', $userId)
+            ->where('customer_id', $userId)
             ->get();
 
         // Check navigation source to determine if cart validation should be skipped
@@ -116,7 +116,7 @@ class CouponApplicationController extends Controller
 
         $userId = Auth::id();
         $cartItems = Cart::with(['ecommerceProduct.warehouseProduct'])
-            ->where('user_id', $userId)
+            ->where('customer_id', $userId)
             ->get();
 
         return response()->json([

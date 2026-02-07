@@ -106,6 +106,33 @@ class Order extends Model
     ];
 
     /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($order) {
+            // Auto-generate order number if not set
+            if (empty($order->order_number)) {
+                $order->order_number = self::generateOrderNumber();
+            }
+        });
+    }
+
+    /**
+     * Generate a unique order number.
+     */
+    public static function generateOrderNumber()
+    {
+        $prefix = 'ORD';
+        $date = date('Ymd');
+        $random = strtoupper(substr(md5(uniqid()), 0, 6));
+
+        return $prefix . '-' . $date . '-' . $random;
+    }
+
+    /**
      * Get the status display name
      */
     public function getStatusDisplayNameAttribute(): string

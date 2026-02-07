@@ -144,11 +144,72 @@
         // Add to Cart Toggle
         $(document).on('click', '.add-to-cart-btn', handleCartToggle);
 
+        // Buy Now Button
+        $(document).on('click', '.buy-now-btn', handleBuyNow);
+
         // Add to Wishlist Toggle
         $(document).on('click', '.add-to-wishlist-btn', handleWishlistToggle);
 
         // Compare Toggle
         $(document).on('click', '.compare-btn', handleCompareToggle);
+    }
+
+    /**
+     * Handle Buy Now Button
+     */
+    function handleBuyNow(e) {
+        e.preventDefault();
+
+        const $button = $(this);
+        const productId = $button.data('product-id');
+        const productName = $button.data('product-name');
+
+        // Disable button during request
+        $button.prop('disabled', true);
+        const originalIcon = $button.html();
+        $button.html('<i class="icon icon-loading"></i> Processing...');
+
+        $.ajax({
+            url: '/cart/buy-now',
+            method: 'POST',
+            data: {
+                product_id: productId,
+                quantity: 1
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Redirect to checkout
+                    window.location.href = '/checkout';
+                } else {
+                    // Restore button
+                    $button.html(originalIcon);
+                    if (typeof showNotification === 'function') {
+                        showNotification(response.message, 'error');
+                    }
+                }
+            },
+            error: function(xhr) {
+                // Restore button
+                $button.html(originalIcon);
+
+                if (xhr.status === 401 && xhr.responseJSON && xhr.responseJSON.requires_auth) {
+                    if (typeof showLoginModal === 'function') {
+                        showLoginModal();
+                    } else {
+                        if (typeof showNotification === 'function') {
+                            showNotification('Please login to buy products.', 'error');
+                        }
+                    }
+                } else {
+                    if (typeof showNotification === 'function') {
+                        showNotification('Error processing buy now. Please try again.', 'error');
+                    }
+                }
+            },
+            complete: function() {
+                $button.prop('disabled', false);
+            }
+        });
     }
 
     /**
@@ -171,7 +232,7 @@
             url: '/cart/toggle',
             method: 'POST',
             data: {
-                ecommerce_product_id: productId,
+                product_id: productId,
                 quantity: 1
             },
             success: function(response) {

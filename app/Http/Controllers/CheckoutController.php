@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Coupon;
+use App\Models\CustomerAddressDetail;
 use App\Models\EcommerceOrder;
 use App\Models\EcommerceOrderItem;
 use App\Models\EcommerceProduct;
 use App\Models\InventoryUpdateLog;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\UserAddress;
 use Illuminate\Http\JsonResponse;
@@ -43,7 +46,10 @@ class CheckoutController extends Controller
         Session::put('checkout_navigation_source', $source);
 
         // Get user's saved addresses
-        $userAddresses = UserAddress::getUserAddresses($user->id);
+        $userAddresses = CustomerAddressDetail::with('customer')
+            ->where('customer_id', $user->id)
+            ->get();
+        // dd($userAddresses);
 
         // Calculate totals
         $totals = $this->calculateTotals($checkoutData['items']);
@@ -75,7 +81,7 @@ class CheckoutController extends Controller
 
             $product = EcommerceProduct::with('warehouseProduct')
                 ->where('id', $productId)
-                ->where('ecommerce_status', 'active')
+                ->where('status', 'active')
                 ->first();
 
             if (! $product) {
@@ -84,7 +90,7 @@ class CheckoutController extends Controller
 
             // Create a cart-like structure for consistency
             $item = (object) [
-                'id' => 'buy_now_'.$productId,
+                'id' => 'buy_now_' . $productId,
                 'ecommerce_product_id' => $product->id,
                 'quantity' => $quantity,
                 'ecommerceProduct' => $product,
@@ -103,7 +109,7 @@ class CheckoutController extends Controller
                 'ecommerceProduct.warehouseProduct.parentCategorie',
                 'ecommerceProduct.warehouseProduct.subCategorie',
             ])
-                ->where('user_id', $userId)
+                ->where('customer_id', $userId)
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -129,7 +135,9 @@ class CheckoutController extends Controller
             $product = $item->ecommerceProduct;
             $warehouseProduct = $product->warehouseProduct;
 
-            $itemTotal = $warehouseProduct->selling_price * $item->quantity;
+            // Use final_price for consistency with the view
+            $itemPrice = $warehouseProduct->final_price ?? $warehouseProduct->selling_price ?? 0;
+            $itemTotal = $itemPrice * $item->quantity;
             $subtotal += $itemTotal;
 
             // Calculate shipping for this item
@@ -173,14 +181,14 @@ class CheckoutController extends Controller
             ], 401);
         }
 
-        $addresses = UserAddress::getUserAddresses(Auth::id());
+        $addresses = CustomerAddressDetail::getUserAddresses(Auth::id());
 
         return response()->json([
             'success' => true,
             'addresses' => $addresses->map(function ($address) {
                 return [
                     'id' => $address->id,
-                    'label' => $address->label ?? 'Address '.$address->id,
+                    'label' => $address->label ?? 'Address ' . $address->id,
                     'full_name' => $address->full_name,
                     'formatted_address' => $address->formatted_address,
                     'first_name' => $address->first_name,
@@ -226,6 +234,9 @@ class CheckoutController extends Controller
             'shipping_address_line_2' => 'nullable|string',
             'shipping_phone' => 'required|string|max:20',
 
+            'previous_address' => 'required|integer',
+
+
             // Billing address
             'billing_same_as_shipping' => 'boolean',
             'billing_first_name' => 'nullable|string|max:255',
@@ -264,7 +275,7 @@ class CheckoutController extends Controller
             $totals = $this->calculateTotals($checkoutData['items']);
 
             // Create order
-            $order = $this->createOrder($validated, $totals, $checkoutData['source']);
+            $order = $this->createOrder($validated, $totals, $checkoutData['source'], $checkoutData);
 
             // Create order items
             $this->createOrderItems($order, $checkoutData);
@@ -288,7 +299,7 @@ class CheckoutController extends Controller
 
             // Clear cart if checkout from cart
             if ($checkoutData['source'] === 'cart') {
-                Cart::where('user_id', Auth::id())->delete();
+                Cart::where('customer_id', Auth::id())->delete();
             }
 
             // Clear checkout navigation source from session
@@ -302,20 +313,19 @@ class CheckoutController extends Controller
                 'order_number' => $order->order_number,
                 'redirect' => route('order-details', ['orderNumber' => $order->order_number]),
             ]);
-
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Checkout error: '.$e->getMessage(), [
-                'user_id' => Auth::id(),
+            Log::error('Checkout error: ' . $e->getMessage(), [
+                'customer_id' => Auth::id(),
                 'request_data' => $request->all(),
             ]);
 
-            dd($e->getMessage());
+            // dd($e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'error' => $e->getMessage(),
-                'message' => 'An error occurred while processing your order. Please try again.',
+                'message' => $e->getMessage(),
+                'error' => 'An error occurred while processing your order. Please try again.',
             ], 500);
         }
     }
@@ -323,23 +333,39 @@ class CheckoutController extends Controller
     /**
      * Create order record.
      */
-    private function createOrder($validated, $totals, $source)
+    private function createOrder($validated, $totals, $source, $checkoutData)
     {
+        // Get first item for tax calculation
+        $firstItem = $checkoutData['items']->first();
+        $warehouseProduct = $firstItem->ecommerceProduct->warehouseProduct ?? null;
+        $taxAmount = 0;
+
+        if ($warehouseProduct) {
+            $itemPrice = $warehouseProduct->final_price ?? $warehouseProduct->selling_price ?? 0;
+            $taxAmount = $itemPrice * ($warehouseProduct->tax ?? 0) / 100;
+        }
+
+        // Calculate total items
+        $totalItems = $checkoutData['items']->sum('quantity');
+
         $orderData = [
-            'user_id' => Auth::id(),
+            'customer_id' => Auth::id(),
             'order_source' => $source,
             'email' => $validated['email'],
 
+            // Totals
+            'total_items' => $totalItems,
+            'subtotal' => $totals['subtotal'],
+            'tax_amount' => $taxAmount * $totalItems,
+            'discount_amount' => $totals['discount_amount'],
+            'coupon_code' => $totals['applied_coupon']['code'] ?? null,
+            'coupon_id' => $totals['applied_coupon']['id'] ?? null,
+            'shipping_charges' => $totals['shipping_charges'],
+            'packaging_charges' => 0,
+            'total_amount' => $totals['total'],
+
             // Shipping address
-            'shipping_first_name' => $validated['shipping_first_name'],
-            'shipping_last_name' => $validated['shipping_last_name'],
-            'shipping_country' => $validated['shipping_country'],
-            'shipping_state' => $validated['shipping_state'],
-            'shipping_city' => $validated['shipping_city'],
-            'shipping_zipcode' => $validated['shipping_zipcode'],
-            'shipping_address_line_1' => $validated['shipping_address_line_1'],
-            'shipping_address_line_2' => $validated['shipping_address_line_2'],
-            'shipping_phone' => $validated['shipping_phone'],
+            'shipping_address_id' => $validated['previous_address'],
 
             // Billing address
             'billing_same_as_shipping' => $validated['billing_same_as_shipping'],
@@ -347,19 +373,32 @@ class CheckoutController extends Controller
             // Payment
             'payment_method' => $validated['payment_method'],
 
-            // Totals
-            'subtotal' => $totals['subtotal'],
-            'shipping_charges' => $totals['shipping_charges'],
-            'discount_amount' => $totals['discount_amount'],
-            'coupon_code' => $totals['applied_coupon']['code'] ?? null,
-            'coupon_id' => $totals['applied_coupon']['id'] ?? null,
-            'total_amount' => $totals['total'],
-
+            // Status
             'status' => 'pending',
+            'payment_status' => 'pending',
+
+            // Additional fields
+            'expected_delivery_date' => null,
+            'customer_notes' => null,
+            'admin_notes' => null,
+            'source_platform' => 'website',
+            'tracking_number' => null,
+            'tracking_url' => null,
+            'is_returnable' => false,
+            'return_days' => 0,
+            'return_status' => null,
+            'refund_amount' => 0,
+            'refund_status' => null,
+            'is_priority' => false,
+            'requires_signature' => false,
+            'is_gift' => false,
+            'assigned_person_type' => 'delivery_man',
+            'assigned_person_id' => null,
+            'billing_address_id' => null,
         ];
 
         // Add billing address if different from shipping
-        if (! ($validated['billing_same_as_shipping'])) {
+        if (! ($validated['billing_same_as_shipping'] ?? true)) {
             $orderData = array_merge($orderData, [
                 'billing_first_name' => $validated['billing_first_name'],
                 'billing_last_name' => $validated['billing_last_name'],
@@ -389,12 +428,12 @@ class CheckoutController extends Controller
         if ($validated['payment_method'] === 'mastercard') {
             $orderData = array_merge($orderData, [
                 'card_name' => $validated['card_name'],
-                'card_last_four' => substr($validated['card_number'], -4),
+                'card_last_four' => substr($validated['card_number'] ?? '', -4),
                 'card_expiry' => $validated['card_expiry'],
             ]);
         }
 
-        return EcommerceOrder::create($orderData);
+        return Order::create($orderData);
     }
 
     /**
@@ -404,13 +443,13 @@ class CheckoutController extends Controller
     {
         foreach ($checkoutData['items'] as $item) {
             if ($checkoutData['source'] === 'buy_now') {
-                EcommerceOrderItem::createFromProduct(
+                OrderItem::createFromProduct(
                     $item->ecommerceProduct,
                     $item->quantity,
                     $order->id
                 );
             } else {
-                EcommerceOrderItem::createFromCartItem($item, $order->id);
+                OrderItem::createFromCartItem($item, $order->id);
             }
         }
     }
@@ -452,7 +491,7 @@ class CheckoutController extends Controller
                 'new_quantity' => $newQuantity,
                 'order_number' => $order->order_number,
                 'update_type' => 'order_placed',
-                'notes' => "Order placed by user ID: {$order->user_id}",
+                'notes' => "Order placed by user ID: {$order->customer_id}",
             ]);
 
             Log::info('Product quantity updated', [
@@ -494,8 +533,8 @@ class CheckoutController extends Controller
         ]);
 
         try {
-            $validated['user_id'] = Auth::id();
-            $address = UserAddress::create($validated);
+            $validated['customer_id'] = Auth::id();
+            $address = CustomerAddressDetail::create($validated);
 
             if ($validated['is_default'] ?? false) {
                 $address->setAsDefault();
@@ -506,13 +545,12 @@ class CheckoutController extends Controller
                 'message' => 'Address saved successfully!',
                 'address' => [
                     'id' => $address->id,
-                    'label' => $address->label ?? 'Address '.$address->id,
+                    'label' => $address->label ?? 'Address ' . $address->id,
                     'formatted_address' => $address->formatted_address,
                 ],
             ]);
-
         } catch (\Exception $e) {
-            Log::error('Address save error: '.$e->getMessage());
+            Log::error('Address save error: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -531,10 +569,11 @@ class CheckoutController extends Controller
         }
 
         // Find order by order number and ensure it belongs to the authenticated user
-        $order = EcommerceOrder::with(['orderItems.ecommerceProduct.warehouseProduct', 'user'])
+        $order = Order::with(['orderItems.ecommerceProduct.warehouseProduct', 'customer.addressDetails',])
             ->where('order_number', $orderNumber)
-            ->where('user_id', Auth::id())
+            ->where('customer_id', Auth::id())
             ->first();
+        // dd($order);
 
         if (! $order) {
             return redirect()->route('my-account-orders')->with('error', 'Order not found.');
@@ -585,51 +624,73 @@ class CheckoutController extends Controller
         }
 
         $words = [
-            0 => '', 1 => 'One', 2 => 'Two', 3 => 'Three', 4 => 'Four', 5 => 'Five',
-            6 => 'Six', 7 => 'Seven', 8 => 'Eight', 9 => 'Nine', 10 => 'Ten',
-            11 => 'Eleven', 12 => 'Twelve', 13 => 'Thirteen', 14 => 'Fourteen', 15 => 'Fifteen',
-            16 => 'Sixteen', 17 => 'Seventeen', 18 => 'Eighteen', 19 => 'Nineteen', 20 => 'Twenty',
-            30 => 'Thirty', 40 => 'Forty', 50 => 'Fifty', 60 => 'Sixty', 70 => 'Seventy',
-            80 => 'Eighty', 90 => 'Ninety',
+            0 => '',
+            1 => 'One',
+            2 => 'Two',
+            3 => 'Three',
+            4 => 'Four',
+            5 => 'Five',
+            6 => 'Six',
+            7 => 'Seven',
+            8 => 'Eight',
+            9 => 'Nine',
+            10 => 'Ten',
+            11 => 'Eleven',
+            12 => 'Twelve',
+            13 => 'Thirteen',
+            14 => 'Fourteen',
+            15 => 'Fifteen',
+            16 => 'Sixteen',
+            17 => 'Seventeen',
+            18 => 'Eighteen',
+            19 => 'Nineteen',
+            20 => 'Twenty',
+            30 => 'Thirty',
+            40 => 'Forty',
+            50 => 'Fifty',
+            60 => 'Sixty',
+            70 => 'Seventy',
+            80 => 'Eighty',
+            90 => 'Ninety',
         ];
 
         $result = '';
 
         if ($number >= 10000000) { // Crores
             $crores = (int) ($number / 10000000);
-            $result .= $this->convertNumberToWords($crores).' Crore ';
+            $result .= $this->convertNumberToWords($crores) . ' Crore ';
             $number %= 10000000;
         }
 
         if ($number >= 100000) { // Lakhs
             $lakhs = (int) ($number / 100000);
-            $result .= $this->convertNumberToWords($lakhs).' Lakh ';
+            $result .= $this->convertNumberToWords($lakhs) . ' Lakh ';
             $number %= 100000;
         }
 
         if ($number >= 1000) { // Thousands
             $thousands = (int) ($number / 1000);
-            $result .= $this->convertNumberToWords($thousands).' Thousand ';
+            $result .= $this->convertNumberToWords($thousands) . ' Thousand ';
             $number %= 1000;
         }
 
         if ($number >= 100) { // Hundreds
             $hundreds = (int) ($number / 100);
-            $result .= $words[$hundreds].' Hundred ';
+            $result .= $words[$hundreds] . ' Hundred ';
             $number %= 100;
         }
 
         if ($number >= 20) {
             $tens = (int) ($number / 10) * 10;
-            $result .= $words[$tens].' ';
+            $result .= $words[$tens] . ' ';
             $number %= 10;
         }
 
         if ($number > 0) {
-            $result .= $words[$number].' ';
+            $result .= $words[$number] . ' ';
         }
 
-        return trim($result).' Rupees Only';
+        return trim($result) . ' Rupees Only';
     }
 
     /**
@@ -642,7 +703,7 @@ class CheckoutController extends Controller
         }
 
         // Get user's orders with pagination
-        $orders = EcommerceOrder::with(['orderItems'])
+        $orders = Order::with(['orderItems'])
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->paginate(10);

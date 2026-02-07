@@ -86,17 +86,23 @@
                                             <select id="previous-address-select" name="previous_address">
                                                 <option value="">Select your previous address</option>
                                                 @foreach ($userAddresses as $address)
+                                                    @if (!$address)
+                                                        @continue
+                                                    @endif
+
                                                     <option value="{{ $address->id }}"
-                                                        data-first-name="{{ $address->first_name }}"
-                                                        data-last-name="{{ $address->last_name }}"
+                                                        data-first-name="{{ $address->customer->first_name ?? '' }}"
+                                                        data-last-name="{{ $address->customer->last_name ?? '' }}"
                                                         data-country="{{ $address->country }}"
                                                         data-state="{{ $address->state }}" data-city="{{ $address->city }}"
-                                                        data-zipcode="{{ $address->zipcode }}"
-                                                        data-address-line-1="{{ $address->address_line_1 }}"
-                                                        data-address-line-2="{{ $address->address_line_2 }}"
-                                                        data-phone="{{ $address->phone }}">
+                                                        data-zipcode="{{ $address->pincode }}"
+                                                        data-address-line-1="{{ $address->address1 }}"
+                                                        data-address-line-2="{{ $address->address2 }}"
+                                                        data-phone="{{ $address->customer->phone ?? '' }}">
                                                         {{ $address->label ?? 'Address ' . $address->id }} -
-                                                        {{ $address->formatted_address }}
+                                                        {{ $address->address1 }}, {{ $address->city }},
+                                                        {{ $address->state }}, {{ $address->country }} -
+                                                        {{ $address->pincode }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -308,11 +314,13 @@
 
                         <!-- Product List -->
                         <ul class="list-product">
+                            @php $lastItem = null; @endphp
                             @foreach ($checkoutData['items'] as $item)
                                 @php
                                     $product = $item->ecommerceProduct;
                                     $warehouseProduct = $product->warehouseProduct;
-                                    $itemTotal = $warehouseProduct->selling_price * $item->quantity;
+                                    $itemTotal = $warehouseProduct->final_price * $item->quantity;
+                                    $lastItem = $item;
                                 @endphp
                                 <li class="item-product {{ !$loop->last ? 'border-bottom pb-2' : 'pb-2' }}">
                                     <a href="{{ route('product.detail', $product->id) }}" class="img-product">
@@ -325,7 +333,7 @@
                                             {{ Str::limit($warehouseProduct->product_name, 60) }}
                                         </a>
                                         <p class="price-quantity price-text fw-semibold">
-                                            ₹{{ number_format($warehouseProduct->selling_price, 2) }}
+                                            ₹{{ number_format($warehouseProduct->final_price, 2) }}
                                             <span class="body-md-2 text-main-2 fw-normal">X{{ $item->quantity }}</span>
                                         </p>
                                         @if ($warehouseProduct->color)
@@ -334,6 +342,10 @@
                                     </div>
                                 </li>
                             @endforeach
+                            @php
+                                // Get last item's warehouse product for tax display
+                                $lastWarehouseProduct = $lastItem ? $lastItem->ecommerceProduct->warehouseProduct : null;
+                            @endphp
                         </ul>
 
                         <!-- Discount Code Section -->
@@ -341,19 +353,21 @@
                             <p class="body-md-2 fw-semibold sub-type">Discount code</p>
                             <div class="ip-discount-code style-2">
                                 <div class="d-flex gap-2">
-                                    <input type="text" id="coupon_code" class="def" placeholder="Enter coupon code"
-                                           value="{{ session('applied_coupon.code') ?? '' }}">
+                                    <input type="text" id="coupon_code" class="def"
+                                        placeholder="Enter coupon code"
+                                        value="{{ session('applied_coupon.code') ?? '' }}">
                                     <button type="button" id="apply_coupon" class="tf-btn btn-primary">
                                         <span>Apply</span>
                                     </button>
                                 </div>
-                                @if(session('applied_coupon'))
+                                @if (session('applied_coupon'))
                                     <div class="mt-2">
                                         <small class="text-success">
                                             <i class="icon-check"></i>
                                             Coupon "{{ session('applied_coupon.code') }}" applied successfully!
                                         </small>
-                                        <button type="button" id="remove_coupon" class="btn btn-sm btn-outline-danger ms-2">
+                                        <button type="button" id="remove_coupon"
+                                            class="btn btn-sm btn-outline-danger ms-2">
                                             Remove
                                         </button>
                                     </div>
@@ -370,6 +384,10 @@
                                     id="subtotal-amount">₹{{ number_format($totals['subtotal'], 2) }}</span>
                             </li>
                             <li>
+                                <span class="body-text-3">Tax</span>
+                                <span class="body-text-3">{{ $lastWarehouseProduct->tax ?? 0 }}%</span>
+                            </li>
+                            <li>
                                 <span class="body-text-3">Shipping</span>
                                 <span class="body-text-3" id="shipping-amount">
                                     @if ($totals['has_free_shipping'])
@@ -379,9 +397,10 @@
                                     @endif
                                 </span>
                             </li>
-                            @if(session('applied_coupon'))
+                            @if (session('applied_coupon'))
                                 <li>
-                                    <span class="body-text-3 text-success">Discount ({{ session('applied_coupon.code') }})</span>
+                                    <span class="body-text-3 text-success">Discount
+                                        ({{ session('applied_coupon.code') }})</span>
                                     <span class="body-text-3 text-success" id="discount-amount">
                                         -₹{{ number_format(session('applied_coupon.discount_amount'), 2) }}
                                     </span>
@@ -519,7 +538,7 @@
                 }
 
                 $.ajax({
-                    url: '{{ route("cart.apply-coupon") }}',
+                    url: '{{ route('cart.apply-coupon') }}',
                     method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
@@ -548,7 +567,7 @@
 
             $('#remove_coupon').on('click', function() {
                 $.ajax({
-                    url: '{{ route("cart.remove-coupon") }}',
+                    url: '{{ route('cart.remove-coupon') }}',
                     method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}'
@@ -621,16 +640,24 @@
                         }
                     },
                     error: function(xhr) {
-                        console.log(xhr.responseJSON.message);
-                        alert(xhr.responseJSON.message);
                         let errorMessage = 'An error occurred while processing your order.';
 
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            const errors = xhr.responseJSON.errors;
-                            errorMessage = Object.values(errors).flat().join('<br>');
+                        if (xhr.responseJSON) {
+                            if (xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+
+                            if (xhr.responseJSON.errors) {
+                                const errors = Object.values(xhr.responseJSON.errors).flat();
+                                errorMessage = errors.join('<br>');
+                            }
+                        } else if (xhr.responseText) {
+                            // sometimes server sends plain text or html
+                            errorMessage = xhr.responseText;
                         }
+
+                        console.log('AJAX ERROR:', xhr.responseJSON);
+                        alert(errorMessage);
 
                         $('#error-message').html(errorMessage).show();
                         $('#checkout-messages').show();

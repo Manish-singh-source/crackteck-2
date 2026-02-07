@@ -15,7 +15,7 @@ class LeadResource extends JsonResource
     public function toArray(Request $request): array
     {
         $customer = $this->whenLoaded('customer');
-        $company  = $customer?->companyDetails;
+        $company  = $this->whenLoaded('companyDetails');
 
         return [
             'id' => $this->id,

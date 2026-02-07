@@ -72,6 +72,8 @@ class MeetController extends Controller
             return response()->json(['message' => 'Meet not created'], 500);
         }
 
+        $meet->load('leadDetails');
+
         return new MeetResource($meet);
     }
 

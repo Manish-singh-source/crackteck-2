@@ -126,7 +126,7 @@ class LeadController extends Controller
 
         $validated = $validated->validated();
 
-        $lead = Lead::with('companyDetails')->where('staff_id', $validated['user_id'])->where('id', $lead_id)->first();
+        $lead = Lead::with('customer', 'companyDetails')->where('staff_id', $validated['user_id'])->where('id', $lead_id)->first();
         if (! $lead) {
             return response()->json(['message' => 'Lead not found'], 404);
         }

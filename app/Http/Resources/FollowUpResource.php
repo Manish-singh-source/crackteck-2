@@ -55,7 +55,7 @@ class FollowUpResource extends JsonResource
         $status = [
             '0' => 'Pending',
             '1' => 'Completed',
-            '2' => 'Rescheduled',
+            'rescheduled' => 'Rescheduled',
             '3' => 'Cancelled',
         ];
 

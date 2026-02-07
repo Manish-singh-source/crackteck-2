@@ -64,7 +64,7 @@
             <ul class="order-overview-list">
                 <li>Order number: <strong>{{ $order->order_number }}</strong></li>
                 <li>Date: <strong>{{ $order->created_at->format('F j, Y') }}</strong></li>
-                <li>Total: <strong>₹{{ number_format($totals['rounded_total'], 2) }}</strong></li>
+                <li>Total: <strong>{{ number_format($order->orderItems->sum('line_total') + $totals['shipping_charges'], 2) }}</strong></li>
                 <li>Payment method: <strong>{{ $order->payment_method === 'mastercard' ? 'Credit Card' : 'Cash on Delivery' }}</strong></li>
             </ul>
             <div class="order-detail-wrap">
@@ -88,12 +88,12 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $item->product_name }}</td>
-                                <td>{{ $item->hsn_sac_code }}</td>
+                                <td>{{ $item->hsn_code }}</td>
                                 <td>{{ $item->quantity }}</td>
                                 <td>₹{{ number_format($item->unit_price, 2) }}</td>
-                                <td>₹{{ number_format($item->taxable_value, 2) }} ({{ $item->tax_percentage }}%)</td>
+                                <td>{{ number_format($item->tax_per_unit, 2) }} %</td>
                                 <td>₹{{ number_format($item->igst_amount, 2) }}</td>
-                                <td>₹{{ number_format($item->final_amount, 2) }}</td>
+                                <td>₹{{ number_format($item->line_total, 2) }}</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -101,10 +101,10 @@
                             <tr>
                                 <td colspan="3"><strong>Total</strong></td>
                                 <td><strong>{{ $order->orderItems->sum('quantity') }}</strong></td>
-                                <td><strong>₹{{ number_format($order->orderItems->sum('total_price'), 2) }}</strong></td>
-                                <td><strong>₹{{ number_format($totals['subtotal'], 2) }}</strong></td>
+                                <td><strong>₹{{ number_format($order->orderItems->sum('line_total'), 2) }}</strong></td>
+                                <td><strong>{{ number_format($order->orderItems->avg('tax_per_unit'), 2) }} %</strong></td>
                                 <td><strong>₹{{ number_format($totals['total_tax'], 2) }}</strong></td>
-                                <td><strong>₹{{ number_format($totals['total_amount'], 2) }}</strong></td>
+                                <td><strong>₹{{ number_format($item->line_total, 2) }}</strong></td>
                             </tr>
                         </tfoot>
                     </table>                    
@@ -137,12 +137,13 @@
                             <h6 class="fw-bold mb-3">Total Price</h6>
                             <div class="d-flex justify-content-between align-items-center border-bottom mb-2 pe-3">
                                 <p class="mb-0">Total Taxable Value</p>
-                                <p class="text-dark fw-medium mb-2">₹{{ number_format($totals['subtotal'], 2) }}</p>
+                                {{-- <p class="text-dark fw-medium mb-2">₹{{ number_format($totals['subtotal'], 2) }}</p> --}}
+                                <p class="text-dark fw-medium mb-2">{{ number_format($order->orderItems->avg('tax_per_unit'), 2) }} %</p>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center border-bottom mb-2 pe-3">
+                            {{-- <div class="d-flex justify-content-between align-items-center border-bottom mb-2 pe-3">
                                 <p class="mb-0">Total Tax Amount</p>
                                 <p class="text-dark fw-medium mb-2">₹{{ number_format($totals['total_tax'], 2) }}</p>
-                            </div>
+                            </div> --}}
                             @if($totals['shipping_charges'] > 0)
                             <div class="d-flex justify-content-between align-items-center border-bottom mb-2 pe-3">
                                 <p class="mb-0">Shipping Charges</p>
@@ -151,16 +152,17 @@
                             @endif
                             <div class="d-flex justify-content-between align-items-center mb-2 pe-3">
                                 <p class="mb-0">Rounded Off</p>
+                                {{-- <p class="text-dark fw-medium mb-2">{{ $totals['rounding_off'] >= 0 ? '+' : '' }}{{ number_format($totals['rounding_off'], 2) }}</p> --}}
                                 <p class="text-dark fw-medium mb-2">{{ $totals['rounding_off'] >= 0 ? '+' : '' }}{{ number_format($totals['rounding_off'], 2) }}</p>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mb-2 pe-3">
                                 <p class="mb-0">Total Value (in figure)</p>
-                                <p class="text-dark fw-medium mb-2">₹{{ number_format($totals['rounded_total'], 2) }}</p>
+                                <p class="text-dark fw-medium mb-2">₹{{ number_format($item->unit_price + $totals['shipping_charges'], 2) }}</p>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center mb-2 pe-3">
+                            {{-- <div class="d-flex justify-content-between align-items-center mb-2 pe-3">
                                 <p class="mb-0">Total Value (in Word)</p>
                                 <p class="text-dark fw-medium mb-2">{{ $totals['total_in_words'] }}</p>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
             </div>
@@ -169,19 +171,19 @@
                     <div class="order-detail-wrap">
                         <h5 class="fw-bold">Billing Address</h5>
                         <div class="billing-info">
-                            <p>{{ $order->billing_first_name }} {{ $order->billing_last_name }}</p>
-                            <p>{{ $order->user->email }}</p>
+                            <p>{{ $order->customer->first_name }} {{ $order->customer->last_name }}</p>
+                            <p>{{ $order->customer->email }}</p>
                             @if($order->billing_company)
                                 <p>{{ $order->billing_company }}</p>
                             @endif
-                            <p>{{ $order->billing_address_line_1 }}</p>
-                            @if($order->billing_address_line_2)
-                                <p>{{ $order->billing_address_line_2 }}</p>
+                            <p>{{ $order->customer->addressDetails[0]->address1 }}</p>
+                            @if($order->customer->addressDetails[0]->address2)
+                                <p>{{ $order->customer->addressDetails[0]->address2 }}</p>
                             @endif
-                            <p>{{ $order->billing_city }}, {{ $order->billing_state }}</p>
-                            <p>{{ $order->billing_country }} - {{ $order->billing_postal_code }}</p>
-                            @if($order->billing_phone)
-                                <p>{{ $order->billing_phone }}</p>
+                            <p>{{ $order->customer->addressDetails[0]->city }}, {{ $order->customer->addressDetails[0]->state }}</p>
+                            <p>{{ $order->customer->addressDetails[0]->country }} - {{ $order->customer->addressDetails[0]->postal_code }}</p>
+                            @if($order->customer->phone)
+                                <p>{{ $order->customer->phone }}</p>
                             @endif
                         </div>
                     </div>
@@ -190,19 +192,19 @@
                     <div class="order-detail-wrap">
                         <h5 class="fw-bold">Shipping Address</h5>
                         <div class="billing-info">
-                            <p>{{ $order->shipping_first_name }} {{ $order->shipping_last_name }}</p>
-                            <p>{{ $order->user->email }}</p>
+                            <p>{{ $order->customer->first_name }} {{ $order->customer->last_name }}</p>
+                            <p>{{ $order->customer->email }}</p>
                             @if($order->shipping_company)
                                 <p>{{ $order->shipping_company }}</p>
                             @endif
-                            <p>{{ $order->shipping_address_line_1 }}</p>
-                            @if($order->shipping_address_line_2)
-                                <p>{{ $order->shipping_address_line_2 }}</p>
+                            <p>{{ $order->customer->addressDetails[0]->address1 }}</p>
+                            @if($order->customer->addressDetails[0]->address2)
+                                <p>{{ $order->customer->addressDetails[0]->address2 }}</p>
                             @endif
-                            <p>{{ $order->shipping_city }}, {{ $order->shipping_state }}</p>
-                            <p>{{ $order->shipping_country }} - {{ $order->shipping_postal_code }}</p>
-                            @if($order->shipping_phone)
-                                <p>{{ $order->shipping_phone }}</p>
+                            <p>{{ $order->customer->addressDetails[0]->city }}, {{ $order->customer->addressDetails[0]->state }}</p>
+                            <p>{{ $order->customer->addressDetails[0]->country }} - {{ $order->customer->addressDetails[0]->postal_code }}</p>
+                            @if($order->customer->phone)
+                                <p>{{ $order->customer->phone }}</p>
                             @endif
                         </div>
                     </div>

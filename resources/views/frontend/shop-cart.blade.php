@@ -61,12 +61,13 @@
                                     @php
                                         $product = $item->ecommerceProduct;
                                         $warehouseProduct = $product->warehouseProduct ?? null;
+                                        $tax = $warehouseProduct ? $warehouseProduct->tax : 0;
 
                                         // Ensure price is numeric and not null
                                         $price = 0;
-                                        if ($warehouseProduct && isset($warehouseProduct->selling_price)) {
-                                            $price = is_numeric($warehouseProduct->selling_price)
-                                                ? (float) $warehouseProduct->selling_price
+                                        if ($warehouseProduct && isset($warehouseProduct->final_price)) {
+                                            $price = is_numeric($warehouseProduct->final_price)
+                                                ? (float) $warehouseProduct->final_price
                                                 : 0;
                                         }
 
@@ -80,7 +81,7 @@
 
                                         // Get product image safely
                                         $productImage = asset('frontend-assets/images/new-products/default.png');
-                                        if ($warehouseProduct && $warehouseProduct->main_product_image) {
+                                        if ($warehouseProduct && $warehouseProduct->main_product_image  ) {
                                             $productImage = $warehouseProduct->main_product_image;
                                         }
 
@@ -97,7 +98,7 @@
                                     <tr class="tf-cart-item" data-cart-id="{{ $item->id }}">
                                         <td class="tf-cart-item_product">
                                             <a href="#" class="img-box">
-                                                <img src="{{ $productImage }}" alt="{{ $productName }}">
+                                                <img src="/{{ $productImage }}" alt="{{ $productName }}">
                                             </a>
                                             <div class="cart-info">
                                                 <a href="#" class="cart-title body-md-2 fw-semibold link">
@@ -169,6 +170,10 @@
                                     <span>Subtotal:</span>
                                     <span id="cart_subtotal">₹{{ number_format($subtotal ?? 0, 2) }}</span>
                                 </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Tax:</span>
+                                    <span>{{ $tax }}%</span>
+                                </div>
                                 <div id="discount_row" class="d-flex justify-content-between mb-2 text-success"
                                     style="display: none;">
                                     <span>Discount:</span>
@@ -201,7 +206,7 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
-            // Check for applied coupon on page load
+            // Check for applied coupon on page load1
             checkAppliedCoupon();
 
             // Apply coupon functionality
@@ -366,7 +371,7 @@
 @section('script')
     <script>
         $(document).ready(function() {
-            // CSRF token setup for AJAX requests
+            // CSRF token setup for AJAX requests2
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -476,9 +481,12 @@
                             const price = parseFloat(response.item_price) || 0;
                             const total = price * quantity;
 
+                            // Ensure total is a valid number
+                            const safeTotal = (isNaN(total) || !isFinite(total)) ? 0 : total;
+
                             // Update the data attribute and display text
-                            $row.find('.total-price').attr('data-total', total.toFixed(2));
-                            $row.find('.total-price').text('₹' + total.toLocaleString('en-IN', {
+                            $row.find('.total-price').attr('data-total', safeTotal.toFixed(2));
+                            $row.find('.total-price').text('₹' + safeTotal.toLocaleString('en-IN', {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2
                             }));
@@ -488,12 +496,14 @@
 
                             showNotification('Cart updated successfully', 'success');
                         } else {
+                            alert('Error updating cart not found 1');
                             showNotification(response.message || 'Error updating cart', 'error');
                             // Reset input to original value
                             $input.val($input.data('original-value') || 1);
                         }
                     },
                     error: function(xhr) {
+                        alert('Error updating cart not found 2');
                         let errorMessage = 'Error updating cart';
                         if (xhr.responseJSON && xhr.responseJSON.message) {
                             errorMessage = xhr.responseJSON.message;
@@ -510,19 +520,35 @@
                 let total = 0;
 
                 $('.total-price').each(function() {
-                    // Use data attribute if available, otherwise parse text
+                    // Get data attribute first, fallback to text
                     let priceValue = $(this).attr('data-total');
-                    if (priceValue) {
-                        total += parseFloat(priceValue) || 0;
+                    
+                    if (priceValue !== undefined && priceValue !== null && priceValue !== '') {
+                        // Clean and parse the value
+                        let cleanedValue = priceValue.toString().replace(/[^0-9.-]/g, '');
+                        let parsedValue = parseFloat(cleanedValue);
+                        
+                        if (!isNaN(parsedValue) && isFinite(parsedValue)) {
+                            total += parsedValue;
+                        }
                     } else {
                         // Fallback to parsing text
                         let priceText = $(this).text().replace(/₹|,|\s/g, '').trim();
-                        total += parseFloat(priceText) || 0;
+                        let parsedText = parseFloat(priceText);
+                        
+                        if (!isNaN(parsedText) && isFinite(parsedText)) {
+                            total += parsedText;
+                        }
                     }
                 });
 
+                // Ensure total is a valid number
+                if (isNaN(total) || !isFinite(total)) {
+                    total = 0;
+                }
+
                 // Update grand total with ₹ and proper decimal formatting
-                $('.last-total-price').text('Total: ₹' + total.toLocaleString('en-IN', {
+                $('#cart_total').text('₹' + total.toLocaleString('en-IN', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 }));
@@ -554,8 +580,16 @@
                 $(this).data('original-value', $(this).val());
             });
 
-            // Initialize cart total calculation on page load
-            updateCartTotal();
+            // Initialize cart total calculation on page load with a small delay to ensure DOM is ready
+            setTimeout(function() {
+                updateCartTotal();
+                // Also update the cart_total element specifically
+                let currentTotal = $('#cart_total').text().replace(/₹|,|\s/g, '').trim();
+                if (currentTotal === 'NaN' || currentTotal === '') {
+                    // Recalculate from individual totals
+                    updateCartTotal();
+                }
+            }, 100);
         });
     </script>
 @endsection

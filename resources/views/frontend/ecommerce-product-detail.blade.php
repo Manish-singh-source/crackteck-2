@@ -285,7 +285,7 @@
                                             <li>
                                                 <p class="body-md-2 fw-semibold">Brand</p>
                                                 <span
-                                                    class="body-text-3">{{ $product->warehouseProduct->brand->brand_title }}</span>
+                                                    class="body-text-3">{{ $product->warehouseProduct->brand->name }}</span>
                                             </li>
                                         @endif
 
@@ -418,7 +418,7 @@
                                                 @if ($product->warehouseProduct && $product->warehouseProduct->brand)
                                                     <li class="feature-item d-flex align-items-start mb-3">
                                                         <i class="icon-check text-success me-3 mt-1"></i>
-                                                        <span>Genuine {{ $product->warehouseProduct->brand->brand_title }}
+                                                        <span>Genuine {{ $product->warehouseProduct->brand->name }}
                                                             product with
                                                             authentic warranty</span>
                                                     </li>
@@ -513,7 +513,7 @@
                                                 @if ($product->warehouseProduct && $product->warehouseProduct->brand)
                                                     <tr>
                                                         <td class="fw-semibold" style="width: 30%;">Brand</td>
-                                                        <td>{{ $product->warehouseProduct->brand->brand_title }}</td>
+                                                        <td>{{ $product->warehouseProduct->brand->name }}</td>
                                                     </tr>
                                                 @endif
                                                 @if ($product->warehouseProduct && $product->warehouseProduct->model_no)
@@ -558,8 +558,7 @@
                                                         <td>
                                                             {{ $product->warehouseProduct->parentCategorie->parent_categories }}
                                                             @if ($product->warehouseProduct->subCategorie)
-                                                                >
-                                                                {{ $product->warehouseProduct->subCategorie->sub_categorie }}
+                                                                {{ $product->warehouseProduct->subCategorie->name }}
                                                             @endif
                                                         </td>
                                                     </tr>
@@ -1264,6 +1263,7 @@
                         if (xhr.status === 401 && xhr.responseJSON && xhr.responseJSON.requires_auth) {
                             showLoginModal();
                         } else {
+                            console.log(xhr.responseText);
                             showNotification('Error adding product to cart. Please try again.', 'error');
                             // Reset button state
                             $button.html(originalText);

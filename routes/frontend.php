@@ -111,6 +111,7 @@ Route::prefix('demo')->group(function () {
         Route::middleware('auth')->group(function () {
             Route::post('/cart/add', 'store')->name('cart.add');
             Route::post('/cart/toggle', 'toggleCart')->name('cart.toggle');
+            Route::post('/cart/buy-now', 'buyNow')->name('cart.buy-now');
             Route::put('/cart/update/{id}', 'update')->name('cart.update');
             Route::delete('/cart/remove/{id}', 'destroy')->name('cart.remove');
             Route::get('/cart/data', 'getCartData')->name('cart.data');

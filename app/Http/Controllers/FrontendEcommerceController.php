@@ -22,23 +22,23 @@ class FrontendEcommerceController extends Controller
             'warehouseProduct.parentCategorie',
             'warehouseProduct.subCategorie',
             ])
-            ->where('status', "1")
+            ->where('status', "active")
             ->get();
 
-        $categories = ParentCategory::where('status_ecommerce', "1")
+        $categories = ParentCategory::where('status_ecommerce', "active")
             ->whereHas('products', function ($query) {
                 $query->whereHas('ecommerceProduct', function ($q) {
-                    $q->where('status_ecommerce', "1")
+                    $q->where('status_ecommerce', "active")
                         ->whereNull('deleted_at');
                 });
             })
             ->orderBy('sort_order', 'asc')
             ->get(['id', 'name', 'image']);
 
-        $brands = Brand::where('status', "1")
+        $brands = Brand::where('status', "active")
             ->whereHas('products', function ($query) {
                 $query->whereHas('ecommerceProduct', function ($q) {
-                    $q->where('status_ecommerce', "1")
+                    $q->where('status_ecommerce', "active")
                         ->whereNull('deleted_at');
                 });
             })
@@ -62,7 +62,7 @@ class FrontendEcommerceController extends Controller
             'warehouseProduct.parentCategorie',
             'warehouseProduct.subCategorie',
         ])
-            ->where('status', "1")
+            ->where('status', "active")
             ->findOrFail($id);
 
             // dd($product);
@@ -151,7 +151,7 @@ class FrontendEcommerceController extends Controller
             'warehouseProduct.subCategorie',
         ])
             ->where('id', '!=', $product->id)
-            ->where('status', "1");
+            ->where('status', "active");
 
         // First try to get products from same sub-category
         if ($product->warehouseProduct && $product->warehouseProduct->sub_category_id) {
@@ -256,7 +256,7 @@ class FrontendEcommerceController extends Controller
     {
         try {
             // Get active brands that have e-commerce products
-            $brands = Brand::where('status', '1')
+            $brands = Brand::where('status', 'active')
                 ->whereHas('products', function ($query) {
                     $query->whereHas('ecommerceProduct', function ($q) {
                         $q->where('ecommerce_status', 'active');

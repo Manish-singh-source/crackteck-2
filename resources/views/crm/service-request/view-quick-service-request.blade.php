@@ -294,30 +294,30 @@
                                                     <ul class="list-group list-group-flush">
                                                         <li class="list-group-item border-0 px-0 py-1">
                                                             <span class="fw-semibold">Service Request ID:</span>
-                                                            <span class="text-muted">{{ $diagnosis->service_request_id }}</span>
+                                                            <span class="text-muted">{{ $request->request_id }}</span>
                                                         </li>
                                                         <li class="list-group-item border-0 px-0 py-1">
-                                                            <span class="fw-semibold">Product ID:</span>
-                                                            <span class="text-muted">{{ $diagnosis->service_request_product_id }}</span>
+                                                            <span class="fw-semibold">Product Name:</span>
+                                                            <span class="text-muted">{{ $product->name }}</span>
                                                         </li>
                                                         <li class="list-group-item border-0 px-0 py-1">
                                                             <span class="fw-semibold">Assigned Engineer:</span>
                                                             <span class="text-muted">
-                                                                {{ $diagnosis->engineer->first_name ?? 'N/A' }} 
-                                                                {{ $diagnosis->engineer->last_name ?? '' }}
+                                                                {{ $diagnosis->assignedEngineer->engineer->first_name ?? 'N/A' }} 
+                                                                {{ $diagnosis->assignedEngineer->engineer->last_name ?? '' }}
                                                             </span>
                                                         </li>
                                                         <li class="list-group-item border-0 px-0 py-1">
-                                                            <span class="fw-semibold">Covered Item ID:</span>
-                                                            <span class="text-muted">{{ $diagnosis->covered_item_id ?? 'N/A' }}</span>
+                                                            <span class="fw-semibold">Covered Item Service Name:</span>
+                                                            <span class="text-muted">{{ $diagnosis->coveredItem->service_name ?? 'N/A' }}</span>
                                                         </li>
                                                         <li class="list-group-item border-0 px-0 py-1">
                                                             <span class="fw-semibold">Diagnosis Status:</span>
-                                                            <span class="badge bg-primary">{{ $diagnosis->diagnosis_status ?? 'N/A' }}</span>
+                                                            <span class="badge bg-primary">{{ $product->status ?? 'N/A' }}</span>
                                                         </li>
                                                         <li class="list-group-item border-0 px-0 py-1">
                                                             <span class="fw-semibold">Estimated Cost:</span>
-                                                            <span class="text-muted">₹{{ number_format($diagnosis->estimated_cost ?? 0, 2) }}</span>
+                                                            <span class="text-muted">₹{{ number_format($product->service_charge ?? 0, 2) }}</span>
                                                         </li>
                                                         <li class="list-group-item border-0 px-0 py-1">
                                                             <span class="fw-semibold">Completed At:</span>

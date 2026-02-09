@@ -37,7 +37,7 @@
 
             <div class="row">
                 <div class="col-12">
-                    <form action="{{ route('service-request.update-quick-service-request', $request->id) }}" method="POST"
+                    <form action="{{ route('service-request.update-quick-service-request', [$request->id, $service_type]) }}" method="POST"
                         enctype="multipart/form-data" id="nonAmcForm">
                         @csrf
                         @method('PUT')

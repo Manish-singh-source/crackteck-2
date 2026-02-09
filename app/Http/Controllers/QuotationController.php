@@ -36,7 +36,7 @@ class QuotationController extends Controller
 
     public function index()
     {
-        $quotations = Quotation::with('lead')->get();
+        $quotations = Quotation::with('leadDetails')->get();
 
         // dd($quotations);
         // return view('/crm/meets/index', compact('meet'));

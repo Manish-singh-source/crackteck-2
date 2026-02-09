@@ -57,7 +57,8 @@ class FieldEngineerController extends Controller
         ])->findOrFail($id);
 
         // Get active assignment
-        $activeAssignment = AssignedEngineer::with(['engineer', 'groupEngineers'])
+        // $activeAssignment = AssignedEngineer::with(['engineer', 'groupEngineers'])
+        $activeAssignment = AssignedEngineer::with(['engineer'])
             ->where('service_request_id', $id)
             ->where('status', 'active')
             ->first();

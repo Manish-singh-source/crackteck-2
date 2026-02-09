@@ -56,13 +56,13 @@
                                                                 <tr>
                                                                     <td>
                                                                         <a href="">
-                                                                            {{ $quotation->lead_id }}
+                                                                            {{ $quotation->leadDetails->lead_number }}
                                                                         </a>
                                                                     </td>
                                                                     <td>{{ $quotation->quote_id }}</td>
-                                                                    <td>{{ $quotation->lead->first_name }}
-                                                                        {{ $quotation->lead->last_name }}</td>
-                                                                    <td>{{ $quotation->lead->status }}</td>
+                                                                    <td>{{ $quotation->leadDetails->customer->first_name }}
+                                                                        {{ $quotation->leadDetails->customer->last_name }}</td>
+                                                                    <td>{{ $quotation->leadDetails->status }}</td>
                                                                     <td>{{ $quotation->created_at->format('d M Y') }}</td>
                                                                     <td>{{ $quotation->updated_at->format('d M Y') }}</td>
                                                                     <td>

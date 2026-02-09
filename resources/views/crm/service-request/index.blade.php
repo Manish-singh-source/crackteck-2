@@ -672,7 +672,7 @@
                                                                                 class="mdi mdi-eye-outline fs-14 text-primary"></i>
                                                                         </a>
                                                                         <a aria-label="anchor"
-                                                                            href="{{ route('service-request.edit-quick-service-request', $request->id, 'repair') }}"
+                                                                            href="{{ route('service-request.edit-quick-service-request', [$request->id, 'repair']) }}"
                                                                             class="btn btn-icon btn-sm bg-warning-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="Edit">

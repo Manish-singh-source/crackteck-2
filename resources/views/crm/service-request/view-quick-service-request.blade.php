@@ -291,35 +291,35 @@
                                         <div class="border rounded p-3 mb-3 bg-light">
                                             <div class="row">
                                                 <div class="col-md-4">
-                                                    <ul class="list-group list-group-flush">
-                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                    <ul class="list-group list-group-flush p-3">
+                                                        <li class="list-group-item border-0">
                                                             <span class="fw-semibold">Service Request ID:</span>
                                                             <span class="text-muted">{{ $request->request_id }}</span>
                                                         </li>
-                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                        <li class="list-group-item border-0">
                                                             <span class="fw-semibold">Product Name:</span>
                                                             <span class="text-muted">{{ $product->name }}</span>
                                                         </li>
-                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                        <li class="list-group-item border-0">
                                                             <span class="fw-semibold">Assigned Engineer:</span>
                                                             <span class="text-muted">
                                                                 {{ $diagnosis->assignedEngineer->engineer->first_name ?? 'N/A' }} 
                                                                 {{ $diagnosis->assignedEngineer->engineer->last_name ?? '' }}
                                                             </span>
                                                         </li>
-                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                        <li class="list-group-item border-0">
                                                             <span class="fw-semibold">Covered Item Service Name:</span>
                                                             <span class="text-muted">{{ $diagnosis->coveredItem->service_name ?? 'N/A' }}</span>
                                                         </li>
-                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                        <li class="list-group-item border-0">
                                                             <span class="fw-semibold">Diagnosis Status:</span>
                                                             <span class="badge bg-primary">{{ $product->status ?? 'N/A' }}</span>
                                                         </li>
-                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                        <li class="list-group-item border-0">
                                                             <span class="fw-semibold">Estimated Cost:</span>
                                                             <span class="text-muted">₹{{ number_format($product->service_charge ?? 0, 2) }}</span>
                                                         </li>
-                                                        <li class="list-group-item border-0 px-0 py-1">
+                                                        <li class="list-group-item border-0">
                                                             <span class="fw-semibold">Completed At:</span>
                                                             <span class="text-muted">{{ $diagnosis->completed_at ? $diagnosis->completed_at : 'N/A' }}</span>
                                                         </li>

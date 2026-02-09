@@ -36,7 +36,7 @@ class LeadController extends Controller
 
         $roleCheck = Staff::where('id', $request->user_id)->first();
 
-        if($roleCheck->staff_role != 'sales_person'){
+        if ($roleCheck->staff_role != 'sales_person') {
             return response()->json([
                 'success' => false,
                 'message' => 'User is not a sales person.',
@@ -58,22 +58,12 @@ class LeadController extends Controller
         $validated = Validator::make($request->all(), ([
             // validation rules if any
             'user_id' => 'required',
-            'name' => 'required',
-            'company_name' => 'nullable',
-            'designation' => 'nullable',
-            'phone' => 'required',
-            'email' => 'required|email',
-
-            'dob' => 'nullable|date',
-            'gender' => 'nullable',
-
-            'address' => 'nullable',
+            'customer_id' => 'required',
+            'customer_address_id' => 'required',
 
             'budget_range' => 'required',
-            'source' => 'required',
             'urgency' => 'required',
             'requirement_type' => 'required',
-            'industry_type' => 'required',
             'status' => 'required',
 
             'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
@@ -85,19 +75,19 @@ class LeadController extends Controller
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $filename = time().'.'.$file->getClientOriginalExtension();
+            $filename = time() . '.' . $file->getClientOriginalExtension();
 
             $file->move(public_path('uploads/crm/lead/file'), $filename);
-            $validated['file'] = 'uploads/crm/lead/file/'.$filename;
+            $validated['file'] = 'uploads/crm/lead/file/' . $filename;
         }
 
-        if ($request->name) {
-            $full_name = explode(' ', $request->name);
-            $request->merge(['first_name' => $full_name[0]]);
-            $request->merge(['last_name' => $full_name[1]]);
+        // if ($request->name) {
+        //     $full_name = explode(' ', $request->name);
+        //     $request->merge(['first_name' => $full_name[0]]);
+        //     $request->merge(['last_name' => $full_name[1]]);
 
-            unset($request['name']);
-        }
+        //     unset($request['name']);
+        // }
 
         $request->merge(['staff_id' => $request->user_id]);
         unset($request['user_id']);
@@ -147,22 +137,16 @@ class LeadController extends Controller
 
         $validated = $validated->validated();
 
-        if ($request->full_name) {
-            $full_name = explode(' ', $request->full_name);
-            $request->merge(['first_name' => $full_name[0]]);
-            $request->merge(['last_name' => $full_name[1]]);
-
-            unset($request['full_name']);
-        }
-
         $lead = Lead::where('staff_id', $validated['user_id'])->find($lead_id);
 
         if (! $lead) {
             return response()->json(['message' => 'Lead not found'], 404);
         }
-
+        
         $lead->update($request->all());
 
+        $lead->load('customer', 'companyDetails');
+        
         return new LeadResource($lead);
     }
 

@@ -101,6 +101,8 @@ class LeadController extends Controller
             return response()->json(['message' => 'Lead not created'], 500);
         }
 
+        $lead->load('customer', 'companyDetails');
+
         return new LeadResource($lead);
     }
 

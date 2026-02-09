@@ -148,7 +148,7 @@ class LeadController extends Controller
                     ->orWhere('email', 'LIKE', "%{$query}%")
                     ->orWhere('phone', 'LIKE', "%{$query}%");
             })
-            ->where('is_lead', true)
+            // ->where('is_lead', true)
             ->select('id', 'first_name', 'last_name', 'email', 'phone')
             ->get();
 

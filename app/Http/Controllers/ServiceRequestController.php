@@ -2167,10 +2167,10 @@ class ServiceRequestController extends Controller
             'products.pickups',
             'parentCategorie',
             'activeAssignment.engineer',
-            'activeAssignment.groupEngineers',
+            // 'activeAssignment.groupEngineers',
             'activeAssignment.transferredTo',
             'inactiveAssignments.engineer',
-            'inactiveAssignments.groupEngineers',
+            // 'inactiveAssignments.groupEngineers',
             'inactiveAssignments.transferredTo',
         ])->findOrFail($id);
         

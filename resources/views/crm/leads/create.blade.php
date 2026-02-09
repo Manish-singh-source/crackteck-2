@@ -344,6 +344,8 @@
             $('#customer_search').on('input', function() {
                 const query = $(this).val().trim();
 
+                console.log('Searching for customers with query:', query);
+
                 if (query.length >= 2) {
                     $.ajax({
                         url: '{{ route('leads.search-customers') }}',

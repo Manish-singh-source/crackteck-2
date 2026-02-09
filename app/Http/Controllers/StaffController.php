@@ -250,17 +250,17 @@ class StaffController extends Controller
         $assignedTasks = AssignedEngineer::with([
             'serviceRequest.customer',
             'serviceRequest.customerAddress',
-            'groupEngineers'
+            // 'groupEngineers'
         ])
             ->where(function ($query) use ($id) {
                 // Individual assignments
                 $query->where('engineer_id', $id)
                     ->where('assignment_type', 'individual');
             })
-            ->orWhereHas('groupEngineers', function ($query) use ($id) {
-                // Group assignments where this engineer is a member
-                $query->where('engineer_id', $id);
-            })
+            // ->orWhereHas('groupEngineers', function ($query) use ($id) {
+            //     // Group assignments where this engineer is a member
+            //     $query->where('engineer_id', $id);
+            // })
             ->where('status', 'active') // Active assignments only
             ->orderBy('assigned_at', 'desc')
             ->get();

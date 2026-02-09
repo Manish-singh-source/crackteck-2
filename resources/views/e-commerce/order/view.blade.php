@@ -455,15 +455,10 @@
                                     <div class="mb-3">
                                         <label for="assigned_person_type" class="form-label">Select Assignment Type</label>
                                         <select class="form-select @error('assigned_person_type') is-invalid @enderror"
-                                            id="assigned_person_type" name="assigned_person_type" required>
-                                            <option value="" disabled>-- Select Assignment Type --</option>
-                                            <option value="engineer"
-                                                {{ $order->assigned_person_type == 'engineer' ? 'selected' : '' }}>
-                                                Engineer</option>
-                                            <option value="delivery_man"
-                                                {{ $order->assigned_person_type == 'delivery_man' ? 'selected' : '' }}>
-                                                Delivery Man</option>
+                                            id="assigned_person_type" name="assigned_person_type" required disabled>
+                                            <option value="delivery_man" selected>Delivery Man</option>
                                         </select>
+                                        <input type="hidden" name="assigned_person_type" value="delivery_man">
                                         @error('assigned_person_type')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror

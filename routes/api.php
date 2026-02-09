@@ -160,7 +160,7 @@ Route::prefix('v1')->group(function () {
         // Delivery Man APIs
         Route::controller(DeliveryOrderController::class)->group(function () {
             Route::get('/orders', 'allOrders');
-            Route::get('/order/{order_id}', 'orderDetails');
+            Route::get('/orders/{order_id}', 'orderDetails');
             // Route::post('/orders', 'store');
 
             Route::get('/accept-order/{order_id}', 'acceptOrder');

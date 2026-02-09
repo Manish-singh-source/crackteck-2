@@ -21,15 +21,15 @@ class DeliveryOrderController extends Controller
 {
     //
 
-    protected function getModelByRoleId($roleId)
-    {
-        return [
-            1 => Engineer::class,
-            2 => DeliveryMan::class,
-            3 => SalesPerson::class,
-            4 => Customer::class,
-        ][$roleId] ?? null;
-    }
+    // protected function getModelByRoleId($roleId)
+    // {
+    //     return [
+    //         1 => Engineer::class,
+    //         2 => DeliveryMan::class,
+    //         3 => SalesPerson::class,
+    //         4 => Customer::class,
+    //     ][$roleId] ?? null;
+    // }
 
     protected function getRoleId($roleId)
     {
@@ -153,7 +153,6 @@ class DeliveryOrderController extends Controller
         $roleValidated = Validator::make($request->all(), ([
             'role_id' => 'required|in:2',
             'user_id' => 'required',
-            'order_id' => 'required',
         ]));
 
         if ($roleValidated->fails()) {
@@ -161,7 +160,6 @@ class DeliveryOrderController extends Controller
         }
 
         $staffRole = $this->getRoleId($request->role_id);
-
         if (! $staffRole) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }

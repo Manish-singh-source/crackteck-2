@@ -91,51 +91,51 @@ class ServiceRequestController extends Controller
     //     return view('/crm/service-request/create-servies');
     // }
 
-    public function view()
-    {
-        return view('/crm/service-request/view-service');
-    }
+    // public function view()
+    // {
+    //     return view('/crm/service-request/view-service');
+    // }
 
-    public function viewServiceRequest($id)
-    {
-        $serviceRequest = ServiceRequest::with([
-            'customer',
-            'customerAddress',
-            'customerCompany',
-            'products' => function ($query) {
-                $query->with(['diagnosisDetails.engineer', 'pickups']);
-            },
-        ])->findOrFail($id);
+    // public function viewServiceRequest($id)
+    // {
+    //     $serviceRequest = ServiceRequest::with([
+    //         'customer',
+    //         'customerAddress',
+    //         'customerCompany',
+    //         'products' => function ($query) {
+    //             $query->with(['diagnosisDetails.engineer', 'pickups']);
+    //         },
+    //     ])->findOrFail($id);
 
-        // Get active assignment
-        $activeAssignment = AssignedEngineer::with(['engineer', 'groupEngineers'])
-            ->where('service_request_id', $id)
-            ->where('status', '0')
-            ->first();
+    //     // Get active assignment
+    //     $activeAssignment = AssignedEngineer::with(['engineer', 'groupEngineers'])
+    //         ->where('service_request_id', $id)
+    //         ->where('status', '0')
+    //         ->first();
 
-        $engineers = Staff::where('staff_role', '1')->get();
+    //     $engineers = Staff::where('staff_role', '1')->get();
         
-        // Get active delivery men
-        $deliveryMen = Staff::where('staff_role', 'delivery_man')->where('status', 'active')->get();
+    //     // Get active delivery men
+    //     $deliveryMen = Staff::where('staff_role', 'delivery_man')->where('status', 'active')->get();
 
-        // Get existing pickup records for this service request
-        $pickups = ServiceRequestProductPickup::with(['serviceRequestProduct', 'assignedPerson'])
-            ->where('request_id', $id)
-            ->get();
+    //     // Get existing pickup records for this service request
+    //     $pickups = ServiceRequestProductPickup::with(['serviceRequestProduct', 'assignedPerson'])
+    //         ->where('request_id', $id)
+    //         ->get();
 
-        // Get existing return records for this service request
-        $returns = ServiceRequestProductReturn::with(['serviceRequestProduct', 'assignedPerson', 'pickup'])
-            ->where('request_id', $id)
-            ->get();
+    //     // Get existing return records for this service request
+    //     $returns = ServiceRequestProductReturn::with(['serviceRequestProduct', 'assignedPerson', 'pickup'])
+    //         ->where('request_id', $id)
+    //         ->get();
 
-        return view('/crm/service-request/view-quick-service-request', 
-            compact('serviceRequest', 'activeAssignment', 'engineers', 'deliveryMen', 'pickups', 'returns'));
-    }
+    //     return view('/crm/service-request/view-quick-service-request', 
+    //         compact('serviceRequest', 'activeAssignment', 'engineers', 'deliveryMen', 'pickups', 'returns'));
+    // }
 
-    public function edit()
-    {
-        return view('/crm/service-request/edit-service');
-    }
+    // public function edit()
+    // {
+    //     return view('/crm/service-request/edit-service');
+    // }
 
     public function create_amc()
     {
@@ -2163,7 +2163,8 @@ class ServiceRequestController extends Controller
             'customerCompany',
             'customerPan',
             'products.itemCode',
-            'products.diagnosisDetails.engineer',
+            'products.diagnosisDetails.assignedEngineer.engineer',
+            'products.diagnosisDetails.coveredItem',
             'products.pickups',
             'parentCategorie',
             'activeAssignment.engineer',
@@ -2173,7 +2174,7 @@ class ServiceRequestController extends Controller
             // 'inactiveAssignments.groupEngineers',
             'inactiveAssignments.transferredTo',
         ])->findOrFail($id);
-        
+
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
         
         // Get active delivery men
@@ -2188,7 +2189,7 @@ class ServiceRequestController extends Controller
         return view('crm/service-request/view-quick-service-request', compact('request', 'engineers', 'deliveryMen', 'pickups', 'returns'));
     }
 
-    public function editQuickServiceRequest($id)
+    public function editQuickServiceRequest($id, $service_type)
     {
         try {
             $request = ServiceRequest::with([
@@ -2200,8 +2201,10 @@ class ServiceRequestController extends Controller
             ])->findOrFail($id);
             // dd($request);
 
+            $service_type = $service_type;
+
             // same data as create
-            $quickService = CoveredItem::where('service_type', 'quick_service')->get(); // Collection
+            $quickService = CoveredItem::where('service_type', $service_type)->get(); // Collection
             $quickServiceOptions = $quickService
                 ->pluck('service_name', 'id', 'service_charge')
                 ->prepend('--Select Quick Service--', 0);
@@ -2224,7 +2227,8 @@ class ServiceRequestController extends Controller
                 'quickServicePrices',
                 'customers',
                 'categories',
-                'brands'
+                'brands', 
+                'service_type'
             ));
         } catch (\Exception $e) {
             return redirect()
@@ -2233,7 +2237,7 @@ class ServiceRequestController extends Controller
         }
     }
 
-    public function updateQuickServiceRequest(Request $request, $id)
+    public function updateQuickServiceRequest(Request $request, $id, $service_type)
     {
         // Basic validation – extend as needed
         $request->validate([
@@ -2304,7 +2308,7 @@ class ServiceRequestController extends Controller
             */
             $serviceRequest->update([
                 'customer_id' => $customer->id,
-                'service_type' => 'quick_service', // Quick Service
+                'service_type' => $service_type, // Quick Service
                 'request_source' => 'system',
                 'visit_date' => $request->visit_date,
                 'request_date' => $serviceRequest->request_date ?? now(),
@@ -2530,149 +2534,6 @@ class ServiceRequestController extends Controller
         }
     }
 
-    // public function assignQuickServiceEngineer1(Request $request)
-    // {
-    //     if ($request->assignment_type == 'individual') {
-    //         $request->replace($request->except('id'));
-    //     }
-
-    //     $validator = Validator::make($request->all(), [
-    //         'service_request_id' => 'required|exists:service_requests,id',
-    //         'assignment_type'    => 'required|in:individual,group',
-    //         'engineer_id'        => 'required_if:assignment_type,individual|exists:staff,id',
-    //         'group_name'         => 'required_if:assignment_type,group',
-    //         'engineer_ids'       => 'required_if:assignment_type,group|array',
-    //         'engineer_ids.*'     => 'exists:staff,id',
-    //         'supervisor_id'      => 'required_if:assignment_type,group|exists:staff,id',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Validation error: ' . $validator->errors()->first(),
-    //         ], 422);
-    //     }
-
-    //     DB::beginTransaction();
-
-
-
-    //     try {
-    //         $serviceRequest = ServiceRequest::find($request->service_request_id);
-
-    //         // Check if status is Approved (status = admin_approved)
-    //         if ($serviceRequest->status != 'admin_approved') {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'Engineer can only be assigned to Approved requests.',
-    //             ], 422);
-    //         }
-
-    //         // Get previous active assignment
-    //         $previousAssignment = AssignedEngineer::where('service_request_id', $request->service_request_id)
-    //             ->where('status', 'active')
-    //             ->first();
-
-    //         // Update service request status to Assigned (status = 2)
-    //         $serviceRequest->status = 'assigned_engineer';
-    //         $serviceRequest->is_engineer_assigned = 'assigned';
-    //         $serviceRequest->save();
-            
-    //         // Update all products from approved to processing when engineer is assigned
-    //         ServiceRequestProduct::where('service_requests_id', $serviceRequest->id)
-    //             ->where('status', 'approved')
-    //             ->update(['status' => 'processing']);
-
-    //         // Mark previous assignment as inactive
-    //         if ($previousAssignment) {
-    //             $previousAssignment->update([
-    //                 'status' => 'inactive',
-    //                 'transferred_at' => now(),
-    //             ]);
-    //         }
-
-    //         if ($request->assignment_type == 'individual') {
-    //             // Individual assignment
-    //             $assignment = AssignedEngineer::create([
-    //                 'service_request_id' => $request->service_request_id,
-    //                 'engineer_id'        => $request->engineer_id,
-    //                 'assignment_type'    => 'individual',
-    //                 'assigned_at'        => now(),
-    //                 'status'             => 'active',
-    //             ]);
-
-    //             // Update transferred_to in previous assignment
-    //             if ($previousAssignment) {
-    //                 $previousAssignment->update(['transferred_to' => $request->engineer_id]);
-    //             }
-
-    //             $engineer = Staff::where('staff_role', 'engineer')->find($request->engineer_id);
-    //             $message  = 'Engineer ' . $engineer->first_name . ' ' . $engineer->last_name . ' assigned successfully';
-    //         } else {
-    //             // Group assignment
-    //             $assignment = AssignedEngineer::create([
-    //                 'service_request_id' => $request->service_request_id,
-    //                 'engineer_id'        => $request->supervisor_id,
-    //                 'assignment_type'    => 'group',
-    //                 'group_name'         => $request->group_name,
-    //                 'assigned_at'        => now(),
-    //                 'status'             => 'active',
-    //             ]);
-
-    //             // Add group members to pivot table
-    //             foreach ($request->engineer_ids as $engineerId) {
-    //                 $assignment->groupEngineers()->attach($engineerId, [
-    //                     'is_supervisor' => ($engineerId == $request->supervisor_id),
-    //                 ]);
-    //             }
-
-    //             $message = 'Group "' . $request->group_name .
-    //                 '" assigned successfully with ' . count($request->engineer_ids) . ' engineers';
-    //         }
-
-    //         // Update service request status to Assigned (status = 2)
-    //         $oldStatus = $serviceRequest->status;
-    //         $serviceRequest->status = 'assigned_engineer';
-    //         $serviceRequest->save();
-
-    //         // Log the status change
-    //         Log::info('Service Request Status Updated', [
-    //             'service_request_id' => $serviceRequest->id,
-    //             'old_status' => $oldStatus,
-    //             'new_status' => $serviceRequest->status,
-    //             'assigned_engineer_id' => $assignment->id
-    //         ]);
-
-    //         // Activity log
-    //         activity()
-    //             ->performedOn($serviceRequest)
-    //             ->causedBy(Auth::user())
-    //             ->withProperties([
-    //                 'old_status' => $oldStatus,
-    //                 'new_status' => 'assigned_engineer',
-    //                 'assignment_id' => $assignment->id
-    //             ])
-    //             ->log('Engineer assigned to service request - Status changed to Assigned');
-
-    //         DB::commit();
-
-    //         return response()->json([
-    //             'success'    => true,
-    //             'message'    => $message,
-    //             'status_updated' => true,
-    //             'old_status' => $oldStatus,
-    //             'new_status' => $serviceRequest->status
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         Log::error($e->getMessage());
-
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Error assigning engineer: ' . $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
 
     public function assignQuickServiceEngineer(Request $request)
     {

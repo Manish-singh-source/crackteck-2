@@ -39,7 +39,7 @@ class StaffSeeder extends Seeder
         $marital = ['unmarried', 'married', 'divorced'];
         $employment = ['full_time', 'part_time', 'contractual'];
         $statuses = ['active', 'inactive', 'resigned', 'terminated', 'blocked', 'suspended', 'pending'];
-
+        $phoneNumbers = [''];
         $i = 1;
 
         foreach ($roles as $roleId => $roleName) {
@@ -57,7 +57,8 @@ class StaffSeeder extends Seeder
                     'employment_type' => $employment[array_rand($employment)],
                     'joining_date' => fake()->date(),
                     'assigned_area' => $areas[array_rand($areas)],
-                    'status' => $statuses[array_rand($statuses)],
+                    // 'status' => $statuses[array_rand($statuses)],
+                    'status' => 'active',
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ];

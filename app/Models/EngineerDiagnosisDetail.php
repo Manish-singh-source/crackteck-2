@@ -32,4 +32,14 @@ class EngineerDiagnosisDetail extends Model
     {
         return $this->belongsTo(Staff::class, 'assigned_engineer_id');
     }
+    
+    public function assignedEngineer()
+    {
+        return $this->belongsTo(AssignedEngineer::class, 'assigned_engineer_id');
+    }
+
+    public function coveredItem()
+    {
+        return $this->belongsTo(CoveredItem::class, 'covered_item_id');
+    }
 }

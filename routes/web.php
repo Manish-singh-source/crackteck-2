@@ -512,51 +512,72 @@ Route::prefix('/demo')->group(function () {
         Route::get('/crm/service-request', 'index')->name('service-request.index');
 
         // Create Service Request Page
-        Route::get('/crm/create-service-request', 'create')->name('service-request.create-servies');
+        // Route::get('/crm/create-service-request', 'create')->name('service-request.create-servies');
         // View Service Request Page
-        Route::get('/crm/view-service-request/{id}', 'viewServiceRequest')->name('service-request.view');
-        Route::get('/crm/view-service-request-old', 'view')->name('service-request.view-service');
+        // Route::get('/crm/view-service-request/{id}', 'viewServiceRequest')->name('service-request.view');
+        // Route::get('/crm/view-service-request-old', 'view')->name('service-request.view-service');
         // Edit Service Request Page
-        Route::get('/crm/edit-service-request', 'edit')->name('service-request.edit-service');
+        // Route::get('/crm/edit-service-request', 'edit')->name('service-request.edit-service');
 
         // Quick Service Request Create
-        Route::get('/crm/create-quick-request', 'createQuickServiceRequest')->name('quick-service-requests.create');
+        Route::get('/crm/create-request', 'createQuickServiceRequest')->name('quick-service-requests.create');
         // Quick Service Request Store
-        Route::post('/crm/store-quick-request', 'storeQuickServiceRequest')->name('quick-service-requests.store');
+        Route::post('/crm/store-request', 'storeQuickServiceRequest')->name('quick-service-requests.store');
         // Get Customer Addresses by Email (AJAX)
         Route::get('/crm/get-customer-addresses', 'getCustomerAddresses')->name('customer.addresses');
         // Quick Service Request View
-        Route::get('/crm/service-request/view-quick-service-request/{id}', 'viewQuickServiceRequest')->name('service-request.view-quick-service-request');
+        Route::get('/crm/service-request/view-service-request/{id}', 'viewQuickServiceRequest')->name('service-request.view-quick-service-request');
         // Quick Service Request Edit
-        Route::get('/crm/service-request/edit-quick-service-request/{id}', 'editQuickServiceRequest')->name('service-request.edit-quick-service-request');
+        Route::get('/crm/service-request/edit-service-request/{id}/{service_type}', 'editQuickServiceRequest')->name('service-request.edit-quick-service-request');
         // Quick Service Request Update
-        Route::put('/crm/service-request/update-quick-service-request/{id}', 'updateQuickServiceRequest')->name('service-request.update-quick-service-request');
+        Route::put('/crm/service-request/update-service-request/{id}/{service_type}', 'updateQuickServiceRequest')->name('service-request.update-quick-service-request');
         // Submit Diagnosis for Pickup Product
         Route::post('/crm/service-request/submit-diagnosis', 'submitDiagnosis')->name('service-request.submit-diagnosis');
 
-        
-        // Repairing Service Request Create
-        Route::get('/crm/create-repairing-request', 'createRepairingServiceRequest')->name('repairing-service-requests.create');
-        // Repairing Service Request Store
-        Route::post('/crm/store-repairing-request', 'storeRepairingServiceRequest')->name('repairing-service-requests.store');
-        // Repairing Service Request View
-        Route::get('/crm/service-request/view-repairing-service-request/{id}', 'viewRepairingServiceRequest')->name('service-request.view-repairing-service-request');
-        // Repairing Service Request Edit
-        Route::get('/crm/service-request/edit-repairing-service-request/{id}', 'editRepairingServiceRequest')->name('service-request.edit-repairing-service-request');
-        // Repairing Service Request Update
-        Route::put('/crm/service-request/update-repairing-service-request/{id}', 'updateRepairingServiceRequest')->name('service-request.update-repairing-service-request');
+        // Delete Section For All the Service Request
+        Route::delete('/crm/service-request/destroy-service-request/{id}', 'destroyQuickServiceRequest')->name('service-request.destroy-quick-service-request');
+
+        // 
+        Route::post('/crm/service-request/assign-quick-service-engineer', 'assignQuickServiceEngineer')->name('service-request.assign-quick-service-engineer');
+        Route::post('/crm/service-request/assign-non-amc-engineer', 'assignNonAmcEngineer')->name('service-request.assign-non-amc-engineer');      /// need to check
+
+        // Assign Pickup for Quick Service Request
+        Route::post('/crm/service-request/assign-pickup', 'assignPickup')->name('service-request.assign-pickup');
+        Route::post('/crm/service-request/pickup-admin-action', 'pickupAdminAction')->name('service-request.pickup-admin-action');
+        Route::post('/crm/service-request/pickup-received', 'pickupReceived')->name('service-request.pickup-received');
+        Route::post('/crm/service-request/assign-return', 'assignReturn')->name('service-request.assign-return');
+        Route::post('/crm/service-request/return-picked', 'returnPicked')->name('service-request.return-picked');
 
         
-        // Installation Service Request Create
-        Route::get('/crm/create-installation-request', 'createInstallationServiceRequest')->name('installation-service-requests.create');
-        // Installation Service Request Store
-        Route::post('/crm/store-installation-request', 'storeInstallationServiceRequest')->name('installation-service-requests.store');
-        // Installation Service Request View
-        Route::get('/crm/service-request/view-installation-service-request/{id}', 'viewInstallationServiceRequest')->name('service-request.view-installation-service-request');
-        // Installation Service Request Edit
-        Route::get('/crm/service-request/edit-installation-service-request/{id}', 'editInstallationServiceRequest')->name('service-request.edit-installation-service-request');
-        // Installation Service Request Update
-        Route::put('/crm/service-request/update-installation-service-request/{id}', 'updateInstallationServiceRequest')->name('service-request.update-installation-service-request');
+
+
+
+
+
+
+
+        // // Repairing Service Request Create
+        // Route::get('/crm/create-repairing-request', 'createRepairingServiceRequest')->name('repairing-service-requests.create');
+        // // Repairing Service Request Store
+        // Route::post('/crm/store-repairing-request', 'storeRepairingServiceRequest')->name('repairing-service-requests.store');
+        // // Repairing Service Request View
+        // Route::get('/crm/service-request/view-repairing-service-request/{id}', 'viewRepairingServiceRequest')->name('service-request.view-repairing-service-request');
+        // // Repairing Service Request Edit
+        // Route::get('/crm/service-request/edit-repairing-service-request/{id}', 'editRepairingServiceRequest')->name('service-request.edit-repairing-service-request');
+        // // Repairing Service Request Update
+        // Route::put('/crm/service-request/update-repairing-service-request/{id}', 'updateRepairingServiceRequest')->name('service-request.update-repairing-service-request');
+
+        
+        // // Installation Service Request Create
+        // Route::get('/crm/create-installation-request', 'createInstallationServiceRequest')->name('installation-service-requests.create');
+        // // Installation Service Request Store
+        // Route::post('/crm/store-installation-request', 'storeInstallationServiceRequest')->name('installation-service-requests.store');
+        // // Installation Service Request View
+        // Route::get('/crm/service-request/view-installation-service-request/{id}', 'viewInstallationServiceRequest')->name('service-request.view-installation-service-request');
+        // // Installation Service Request Edit
+        // Route::get('/crm/service-request/edit-installation-service-request/{id}', 'editInstallationServiceRequest')->name('service-request.edit-installation-service-request');
+        // // Installation Service Request Update
+        // Route::put('/crm/service-request/update-installation-service-request/{id}', 'updateInstallationServiceRequest')->name('service-request.update-installation-service-request');
 
 
         // Amc Service Request Create
@@ -571,20 +592,6 @@ Route::prefix('/demo')->group(function () {
         Route::put('/crm/service-request/update-amc-service-request/{id}', 'updateAmcServiceRequest')->name('service-request.update-amc-service-request');
 
 
-
-        // Delete Section For All the Service Request
-        Route::delete('/crm/service-request/destroy-quick-service-request/{id}', 'destroyQuickServiceRequest')->name('service-request.destroy-quick-service-request');
-
-        // Need To Check
-        Route::post('/crm/service-request/assign-quick-service-engineer', 'assignQuickServiceEngineer')->name('service-request.assign-quick-service-engineer');
-        Route::post('/crm/service-request/assign-non-amc-engineer', 'assignNonAmcEngineer')->name('service-request.assign-non-amc-engineer');
-
-        // Assign Pickup for Quick Service Request
-        Route::post('/crm/service-request/assign-pickup', 'assignPickup')->name('service-request.assign-pickup');
-        Route::post('/crm/service-request/pickup-admin-action', 'pickupAdminAction')->name('service-request.pickup-admin-action');
-        Route::post('/crm/service-request/pickup-received', 'pickupReceived')->name('service-request.pickup-received');
-        Route::post('/crm/service-request/assign-return', 'assignReturn')->name('service-request.assign-return');
-        Route::post('/crm/service-request/return-picked', 'returnPicked')->name('service-request.return-picked');
 
         // AMC Request CRUD Routes
         // Create AMC Request Page

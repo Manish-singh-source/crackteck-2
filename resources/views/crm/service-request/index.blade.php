@@ -314,7 +314,7 @@
                                                                 <option value="completed">Completed</option>
                                                             </select>
                                                         </div>
-                                                        <a href="{{ route('installation-service-requests.create') }}" class="btn btn-primary">Create Installation</a>
+                                                        <a href="{{ route('quick-service-requests.create') }}" class="btn btn-primary">Create Installation</a>
                                                     </div>
                                                     <table
                                                         class="table table-striped table-borderless nowrap service-datatable">
@@ -444,7 +444,7 @@
                                                                     </td>
                                                                     <td>
                                                                         <a aria-label="anchor"
-                                                                            href="{{ route('service-request.view-installation-service-request', $request->id) }}"
+                                                                            href="{{ route('service-request.view-quick-service-request', $request->id) }}"
                                                                             class="btn btn-icon btn-sm bg-primary-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="View">
@@ -452,7 +452,7 @@
                                                                                 class="mdi mdi-eye-outline fs-14 text-primary"></i>
                                                                         </a>
                                                                         <a aria-label="anchor"
-                                                                            href="{{ route('service-request.edit-installation-service-request', $request->id) }}"
+                                                                            href="{{ route('service-request.edit-quick-service-request', [$request->id, 'installation']) }}"
                                                                             class="btn btn-icon btn-sm bg-warning-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="Edit">
@@ -534,7 +534,7 @@
                                                                 <option value="completed">Completed</option>
                                                             </select>
                                                         </div>
-                                                        <a href="{{ route('repairing-service-requests.create') }}" class="btn btn-primary">Create Repairing</a>
+                                                        <a href="{{ route('quick-service-requests.create') }}" class="btn btn-primary">Create Repairing</a>
                                                     </div>
                                                     <table
                                                         class="table table-striped table-borderless nowrap service-datatable">
@@ -664,7 +664,7 @@
                                                                     </td>
                                                                     <td>
                                                                         <a aria-label="anchor"
-                                                                            href="{{ route('service-request.view-repairing-service-request', $request->id) }}"
+                                                                            href="{{ route('service-request.view-quick-service-request', $request->id) }}"
                                                                             class="btn btn-icon btn-sm bg-primary-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="View">
@@ -672,7 +672,7 @@
                                                                                 class="mdi mdi-eye-outline fs-14 text-primary"></i>
                                                                         </a>
                                                                         <a aria-label="anchor"
-                                                                            href="{{ route('service-request.edit-repairing-service-request', $request->id) }}"
+                                                                            href="{{ route('service-request.edit-quick-service-request', $request->id, 'repair') }}"
                                                                             class="btn btn-icon btn-sm bg-warning-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="Edit">
@@ -876,7 +876,7 @@
                                                                                 class="mdi mdi-eye-outline fs-14 text-primary"></i>
                                                                         </a>
                                                                         <a aria-label="anchor"
-                                                                            href="{{ route('service-request.edit-quick-service-request', $request->id) }}"
+                                                                            href="{{ route('service-request.edit-quick-service-request', [$request->id, 'quick_service']) }}"
                                                                             class="btn btn-icon btn-sm bg-warning-subtle me-1"
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-original-title="Edit">

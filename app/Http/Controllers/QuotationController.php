@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AMC;
+use App\Models\AmcPlan;
 use App\Models\Engineer;
 use App\Models\Lead;
 use App\Models\Quotation;
@@ -46,7 +47,7 @@ class QuotationController extends Controller
     {
         $leads = Lead::all();
         $quoteId = $this->generateServiceId();
-        $amcPlans = AMC::where('status', 'Active')->get();
+        $amcPlans = AmcPlan::where('status', 'Active')->get();
 
         return view('/crm/quotation/create', compact('leads', 'quoteId', 'amcPlans'));
     }

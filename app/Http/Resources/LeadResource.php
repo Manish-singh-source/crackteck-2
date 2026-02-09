@@ -19,6 +19,7 @@ class LeadResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'lead_number' => $this->lead_number,
 
             'name' => $customer
                 ? trim($customer->first_name . ' ' . $customer->last_name)

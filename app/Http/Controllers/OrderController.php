@@ -398,11 +398,19 @@ class OrderController extends Controller
 
     public function assignPerson(Request $request, $id)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'assigned_person_type' => 'required|in:engineer,delivery_man',
             'delivery_man_id' => 'nullable|exists:staff,id',
             'engineer_id' => 'nullable|exists:staff,id',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
 
         try {
             $order = Order::findOrFail($id);
@@ -420,11 +428,17 @@ class OrderController extends Controller
             }
             $order->save();
 
-            return redirect()->back()->with('success', 'Person assigned successfully');
+            return response()->json([
+                'success' => true,
+                'message' => 'Person assigned successfully',
+            ]);
         } catch (\Exception $e) {
             Log::error('Error assigning person: ' . $e->getMessage());
 
-            return redirect()->back()->with('error', 'Failed to assign person');
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to assign person',
+            ], 500);
         }
     }
 

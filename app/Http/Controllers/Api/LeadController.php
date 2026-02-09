@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\LeadResource;
+use App\Models\Customer;
+use App\Models\CustomerAddressDetail;
 use App\Models\Lead;
 use App\Models\Staff;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class LeadController extends Controller
@@ -55,55 +58,110 @@ class LeadController extends Controller
 
     public function store(Request $request)
     {
-        $validated = Validator::make($request->all(), ([
-            // validation rules if any
+        $validator = Validator::make($request->all(), [
+            // Customer fields
             'user_id' => 'required',
-            'customer_id' => 'required',
-            'customer_address_id' => 'required',
+            'first_name' => 'required|string|max:50',
+            'last_name' => 'required|string|max:50',
+            'phone' => 'required|string|max:10',
+            'email' => 'required|email',
 
-            'budget_range' => 'required',
-            'urgency' => 'required',
-            'requirement_type' => 'required',
-            'status' => 'required',
+            // Address fields
+            'address1' => 'required|string',
+            'address2' => 'nullable|string',
+            'city' => 'required|string',
+            'state' => 'required|string',
+            'country' => 'nullable|string',
+            'pincode' => 'required|string',
 
-            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
-        ]));
+            // Lead fields
+            'requirement_type' => 'required|string',
+            'budget_range' => 'required|string',
+            'urgency' => 'required|in:low,medium,high,critical',
+            'notes' => 'nullable|string',
+            // 'status' => 'nullable|in:new,contacted,qualified,proposal,won,lost,nurture',
+        ]);
 
-        if ($validated->fails()) {
-            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validator->errors()], 422);
         }
 
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
+        try {
+            DB::beginTransaction();
 
-            $file->move(public_path('uploads/crm/lead/file'), $filename);
-            $validated['file'] = 'uploads/crm/lead/file/' . $filename;
+            // Generate customer code in incremental format
+            $lastCustomer = Customer::orderBy('id', 'desc')->first();
+            $lastCustomerCode = $lastCustomer?->customer_code ?? 'CUST0000';
+            $customerCode = str_replace('CUST', '', $lastCustomerCode);
+            $customerCode = (int) $customerCode + 1;
+            $customerCode = 'CUST' . str_pad($customerCode, 4, '0', STR_PAD_LEFT);
+
+            // 1. Create or find customer
+            $customer = Customer::firstOrCreate(
+                ['phone' => $request->phone],
+                [
+                    'customer_code' => $customerCode,
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'email' => $request->email,
+                    'customer_type' => 'both',
+                    'source_type' => 'lead',
+                    'is_lead' => true,
+                    'created_by' => $request->user_id,
+                ]
+            );
+
+            // 2. Create customer address
+            $customerAddress = CustomerAddressDetail::create([
+                'customer_id' => $customer->id,
+                'branch_name' => 'Lead Address',
+                'address1' => $request->address1,
+                'address2' => $request->address2,
+                'city' => $request->city,
+                'state' => $request->state,
+                'country' => $request->country ?? 'India',
+                'pincode' => $request->pincode,
+                'is_primary' => 'yes',
+            ]);
+
+            // Handle file upload
+            $filePath = null;
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/crm/lead/file'), $filename);
+                $filePath = 'uploads/crm/lead/file/' . $filename;
+            }
+
+            // 3. Create lead with customer_id and customer_address_id
+            $leadNumber = 'LD-' . date('YmdHis') . '-' . $request->user_id;
+
+            $lead = Lead::create([
+                'customer_id' => $customer->id,
+                'staff_id' => $request->user_id,
+                'customer_address_id' => $customerAddress->id,
+                'lead_number' => $leadNumber,
+                'requirement_type' => $request->requirement_type,
+                'budget_range' => $request->budget_range,
+                'urgency' => $request->urgency,
+                'status' => $request->status ?? 'new',
+                'notes' => $request->notes,
+            ]);
+
+            DB::commit();
+
+            if (! $lead) {
+                return response()->json(['message' => 'Lead not created'], 500);
+            }
+
+            $lead->load('customer', 'companyDetails');
+
+            return new LeadResource($lead);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Failed to create lead.', 'error' => $e->getMessage()], 500);
         }
-
-        // if ($request->name) {
-        //     $full_name = explode(' ', $request->name);
-        //     $request->merge(['first_name' => $full_name[0]]);
-        //     $request->merge(['last_name' => $full_name[1]]);
-
-        //     unset($request['name']);
-        // }
-
-        $request->merge(['staff_id' => $request->user_id]);
-        unset($request['user_id']);
-
-        $leadNumber = 'LD-' . date('YmdHis') . '-' . $request->staff_id;;
-        $request->merge(['lead_number' => $leadNumber]);
-
-        $lead = Lead::create($request->all());
-
-        if (! $lead) {
-            return response()->json(['message' => 'Lead not created'], 500);
-        }
-
-        $lead->load('customer', 'companyDetails');
-
-        return new LeadResource($lead);
     }
 
     public function show(Request $request, $lead_id)

@@ -118,19 +118,7 @@
                                                                     </td>
                                                                     <td>{{ $lead->customer->industry_type ?? 'N/A' }}</td>
                                                                     <td>
-                                                                        @php
-                                                                            $requirementTypes = [
-                                                                                'servers' => 'Servers',
-                                                                                'cctv' => 'CCTV',
-                                                                                'biometric' => 'Biometric',
-                                                                                'networking' => 'Networking',
-                                                                                'laptops' => 'Laptops',
-                                                                                'desktops' => 'Desktops',
-                                                                                'accessories' => 'Accessories',
-                                                                                'other' => 'Other',
-                                                                            ];
-                                                                        @endphp
-                                                                        {{ $requirementTypes[$lead->requirement_type] }}
+                                                                        {{ ucwords($lead->requirement_type) }}
                                                                     </td>
                                                                     <td>{{ $lead->budget_range }}</td>
                                                                     <td>

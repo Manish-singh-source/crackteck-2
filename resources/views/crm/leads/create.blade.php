@@ -222,20 +222,11 @@
                                         <div class="row g-3">
 
                                             <div class="col-3">
-                                                @include('components.form.select', [
+                                                @include('components.form.input', [
                                                     'label' => 'Requirement Type',
                                                     'name' => 'requirement_type',
-                                                    'options' => [
-                                                        '' => '--Select Requirement--',
-                                                        'servers' => 'Servers',
-                                                        'cctv' => 'CCTV',
-                                                        'biometric' => 'Biometric',
-                                                        'networking' => 'Networking',
-                                                        'laptops' => 'Laptops',
-                                                        'desktops' => 'Desktops',
-                                                        'accessories' => 'Accessories',
-                                                        'other' => 'Other',
-                                                    ],
+                                                    'type' => 'text',
+                                                    'placeholder' => 'Laptop, Server, etc.',
                                                 ])
                                             </div>
 

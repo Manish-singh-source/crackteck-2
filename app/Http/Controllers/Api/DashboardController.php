@@ -92,12 +92,12 @@ class DashboardController extends Controller
         }
         $validated = $validated->validated();
 
-        $newLeads = Lead::where('staff_id', $validated['user_id'])->where('status', '0')->count();
-        $contactedLeads = Lead::where('staff_id', $validated['user_id'])->where('status', '1')->count();
-        $qualifiedLeads = Lead::where('staff_id', $validated['user_id'])->where('status', '2')->count();
+        $newLeads = Lead::where('staff_id', $validated['user_id'])->where('status', 'new')->count();
+        $contactedLeads = Lead::where('staff_id', $validated['user_id'])->where('status', 'contacted')->count();
+        $qualifiedLeads = Lead::where('staff_id', $validated['user_id'])->where('status', 'qualified')->count();
         // replaced quoted with won
-        $quotedLeads = Lead::where('staff_id', $validated['user_id'])->where('status', '4')->count();
-        $lostLeads = Lead::where('staff_id', $validated['user_id'])->where('status', '5')->count();
+        $quotedLeads = Lead::where('staff_id', $validated['user_id'])->where('status', 'won')->count();
+        $lostLeads = Lead::where('staff_id', $validated['user_id'])->where('status', 'lost')->count();
 
         return response()->json(['lost_leads' => $lostLeads, 'new_leads' => $newLeads, 'contacted_leads' => $contactedLeads, 'qualified_leads' => $qualifiedLeads, 'quoted_leads' => $quotedLeads], 200);
     }

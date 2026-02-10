@@ -43,7 +43,10 @@
 
                                                             <tr>
                                                                 <th>Lead ID</th>
+                                                                <th>Staff ID</th>
                                                                 <th>Quotation ID</th>
+                                                                <th>Quotation Date</th>
+                                                                <th>Expiry Date</th>
                                                                 <th>Client Name</th>
                                                                 <th>Status</th>
                                                                 <th>Created Date</th>
@@ -59,7 +62,10 @@
                                                                             {{ $quotation->leadDetails->lead_number }}
                                                                         </a>
                                                                     </td>
+                                                                    <td>{{ $quotation->leadDetails->staff->first_name ?? 'N/A' }} {{ $quotation->leadDetails->staff->last_name}}</td>
                                                                     <td>{{ $quotation->quote_id }}</td>
+                                                                    <td>{{ $quotation->quote_date }}</td>
+                                                                    <td>{{ $quotation->expiry_date }}</td>
                                                                     <td>{{ $quotation->leadDetails->customer->first_name }}
                                                                         {{ $quotation->leadDetails->customer->last_name }}</td>
                                                                     <td>{{ $quotation->leadDetails->status }}</td>

@@ -30,7 +30,7 @@ class Quotation extends Model
         'accepted_at',
         'quote_document_path',
     ];
-    
+
     public function leadDetails()
     {
         return $this->belongsTo(Lead::class, 'lead_id', 'id');
@@ -39,5 +39,10 @@ class Quotation extends Model
     public function products()
     {
         return $this->hasMany(QuotationProduct::class, 'quotation_id', 'id');
+    }
+
+    public function amcDetail()
+    {
+        return $this->hasMany(AmcPlan::class, 'plan_code', 'id');
     }
 }

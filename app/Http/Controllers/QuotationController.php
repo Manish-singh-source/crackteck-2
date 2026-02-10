@@ -11,6 +11,7 @@ use App\Models\QuotationAmcDetail;
 use App\Models\QuotationEngineerAssignment;
 use App\Models\QuotationGroupEngineer;
 use App\Models\QuotationProduct;
+use App\Models\Staff;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -239,15 +240,15 @@ class QuotationController extends Controller
     public function view($id)
     {
         $quotation = Quotation::with([
-            'lead.branches',
+            'leadDetails',
             'products',
             'amcDetail.amcPlan',
-            'activeAssignment.engineer',
-            'activeAssignment.supervisor',
-            'activeAssignment.groupEngineers',
+            // 'activeAssignment.engineer',
+            // 'activeAssignment.supervisor',
+            // 'activeAssignment.groupEngineers',
         ])->findOrFail($id);
 
-        $engineers = Engineer::all();
+        $engineers = Staff::where('staff_id', 3)->all();
 
         return view('/crm/quotation/view', compact('quotation', 'engineers'));
     }
@@ -255,13 +256,13 @@ class QuotationController extends Controller
     public function edit($id)
     {
         $quotation = Quotation::with([
-            'lead',
+            'leadDetails',
             'products',
             'amcDetail.amcPlan',
         ])->findOrFail($id);
 
         $leads = Lead::all();
-        $amcPlans = AMC::where('status', 'Active')->get();
+        $amcPlans = AmcPlan::where('status', 'Active')->get();
 
         return view('/crm/quotation/edit', compact('quotation', 'leads', 'amcPlans'));
     }

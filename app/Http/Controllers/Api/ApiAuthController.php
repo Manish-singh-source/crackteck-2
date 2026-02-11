@@ -478,7 +478,7 @@ class ApiAuthController extends Controller
         if ($staffRole == 'customers') {
             $guard = 'customers';
         } else {
-            $guard = 'staffs';
+            $guard = 'staff';
         }
         $token = auth($guard)->login($user); // if guard mapping in config/auth.php
 
@@ -500,9 +500,7 @@ class ApiAuthController extends Controller
 
         try {
             $guard = match ($request->role_id) {
-                1 => 'staffs',
-                2 => 'staffs',
-                3 => 'staffs',
+                1, 2, 3 => 'staff',
                 4 => 'customers',
                 default => 'api',
             };
@@ -534,7 +532,7 @@ class ApiAuthController extends Controller
 
         $validated = $validated->validated();
 
-        $guard = $guards['staffs'] ?? 'api';
+        $guard = $guards['staff'] ?? 'api';
 
         try {
             $newToken = auth($guard)->refresh();

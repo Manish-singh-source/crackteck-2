@@ -27,15 +27,7 @@ class StoreOrderRequest extends FormRequest
             'email' => 'required|email',
             'customer_id' => 'required|integer',
             'shipping_address_id' => 'required|integer',
-            'shipping_first_name' => 'required|string|max:255',
-            'shipping_last_name' => 'required|string|max:255',
-            'shipping_phone' => 'required|string|max:20',
-            'shipping_address1' => 'required|string|max:255',
-            'shipping_address2' => 'nullable|string|max:255',
-            'shipping_city' => 'required|string|max:100',
-            'shipping_state' => 'required|string|max:100',
-            'shipping_pincode' => 'required|string|max:20',
-            'shipping_country' => 'required|string|max:100',
+            
             'payment_status' => 'required|in:pending,partial,completed,failed,refunded',
             'payment_method' => 'required|in:online,cod',
 
@@ -47,7 +39,7 @@ class StoreOrderRequest extends FormRequest
             'assigned_person_type' => 'nullable|in:delivery_man,engineer',
             'assigned_person_id' => 'nullable|integer',
 
-            'order_status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled,returned',
+            'status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled,returned',
 
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|integer',

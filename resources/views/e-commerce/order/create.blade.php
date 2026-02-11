@@ -388,32 +388,35 @@
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
-                                    <label for="order_status" class="form-label">Initial Status</label>
-                                    <select class="form-select @error('order_status') is-invalid @enderror"
-                                        id="order_status" name="order_status">
+                                    <label for="status" class="form-label">Initial Status</label>
+                                    <select class="form-select @error('status') is-invalid @enderror"
+                                        id="status" name="status">
                                         <option value="pending"
-                                            {{ old('order_status', 'pending') == 'pending' ? 'selected' : '' }}>Pending
+                                            {{ old('status', 'pending') == 'pending' ? 'selected' : '' }}>Pending
                                         </option>
-                                        <option value="confirmed"
-                                            {{ old('order_status') == 'confirmed' ? 'selected' : '' }}>
-                                            Confirmed</option>
-                                        <option value="processing"
-                                            {{ old('order_status') == 'processing' ? 'selected' : '' }}>
-                                            Processing</option>
-                                        <option value="shipped" 
-                                            {{ old('order_status') == 'shipped' ? 'selected' : '' }}>
-                                            Shipped</option>
+                                        <option value="admin_approved"
+                                            {{ old('status') == 'admin_approved' ? 'selected' : '' }}>
+                                            Admin Approved</option>
+                                        <option value="assigned_delivery_man"
+                                            {{ old('status') == 'assigned_delivery_man' ? 'selected' : '' }}>
+                                            Assigned Delivery Man</option>
+                                        <option value="order_accepted" 
+                                            {{ old('status') == 'order_accepted' ? 'selected' : '' }}>
+                                            Order Accepted</option>
+                                        <option value="product_taken"
+                                            {{ old('status') == 'product_taken' ? 'selected' : '' }}>
+                                            Product Taken</option>
                                         <option value="delivered"
-                                            {{ old('order_status') == 'delivered' ? 'selected' : '' }}>
+                                            {{ old('status') == 'delivered' ? 'selected' : '' }}>
                                             Delivered</option>
                                         <option value="cancelled"
-                                            {{ old('order_status') == 'cancelled' ? 'selected' : '' }}>
+                                            {{ old('status') == 'cancelled' ? 'selected' : '' }}>
                                             Cancelled</option>
                                         <option value="returned"
-                                            {{ old('order_status') == 'returned' ? 'selected' : '' }}>
+                                            {{ old('status') == 'returned' ? 'selected' : '' }}>
                                             Returned</option>
                                     </select>
-                                    @error('order_status')
+                                    @error('status')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>

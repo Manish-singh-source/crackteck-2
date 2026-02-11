@@ -58,21 +58,21 @@ class DashboardController extends Controller
             ];
         } elseif ($staffRole == 'delivery_man') {
             $total_orders = Order::where('assigned_person_id', $validated['user_id'])->count();
-            $pending_orders = Order::where('assigned_person_id', $validated['user_id'])->where('order_status', '0')->orderBy('updated_at', 'desc')->count();
-            $new_orders = Order::where('assigned_person_id', $validated['user_id'])->where('order_status', '1')->orderBy('updated_at', 'desc')->get();
-            $processing_orders = Order::where('assigned_person_id', $validated['user_id'])->where('order_status', '2')->orderBy('updated_at', 'desc')->count();
-            $shipped_orders = Order::where('assigned_person_id', $validated['user_id'])->where('order_status', '3')->orderBy('updated_at', 'desc')->count();
-            $delivered_orders = Order::where('assigned_person_id', $validated['user_id'])->where('order_status', '4')->orderBy('updated_at', 'desc')->count();
-            $cancelled_orders = Order::where('assigned_person_id', $validated['user_id'])->where('order_status', '5')->orderBy('updated_at', 'desc')->count();
+            $pending_orders = Order::where('assigned_person_id', $validated['user_id'])->where('status', 'order_accepted')->orderBy('updated_at', 'desc')->count();
+            $new_orders = Order::where('assigned_person_id', $validated['user_id'])->where('status', 'assigned_delivery_man')->orderBy('updated_at', 'desc')->count();
+            $shipped_orders = Order::where('assigned_person_id', $validated['user_id'])->where('status', 'product_taken')->orderBy('updated_at', 'desc')->count();
+            $delivered_orders = Order::where('assigned_person_id', $validated['user_id'])->where('status', 'delivered')->orderBy('updated_at', 'desc')->count();
+            $cancelled_orders = Order::where('assigned_person_id', $validated['user_id'])->where('status', 'cancelled')->orderBy('updated_at', 'desc')->count();
+            $returned_orders = Order::where('assigned_person_id', $validated['user_id'])->where('status', 'returned')->orderBy('updated_at', 'desc')->count();
 
             $data = [
                 'total_orders' => $total_orders,
                 'pending_orders' => $pending_orders,
                 'new_orders' => $new_orders,
-                'processing_orders' => $processing_orders,
                 'shipped_orders' => $shipped_orders,
                 'delivered_orders' => $delivered_orders,
                 'cancelled_orders' => $cancelled_orders,
+                'returned_orders' => $returned_orders,
             ];
         }
 

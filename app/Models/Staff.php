@@ -6,10 +6,13 @@ use Spatie\Permission\Models\Role;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable;
+use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 
 class Staff extends Authenticatable implements JWTSubject
 {
-    use HasFactory;
+    use HasFactory, AuthenticationLoggable, Notifiable;  
+
     protected $fillable = [
         'staff_code',
         'staff_role',

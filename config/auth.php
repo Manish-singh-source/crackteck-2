@@ -48,9 +48,9 @@ return [
             'driver' => 'jwt',
             'provider' => 'customers',
         ],
-        'staffs' => [
+        'staff' => [
             'driver' => 'jwt',
-            'provider' => 'staffs',
+            'provider' => 'staff',
         ],  
     ],
 
@@ -80,7 +80,7 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_CUSTOMER_MODEL', App\Models\Customer::class),
         ],
-        'staffs' => [
+        'staff' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_STAFF_MODEL', App\Models\Staff::class),
         ],

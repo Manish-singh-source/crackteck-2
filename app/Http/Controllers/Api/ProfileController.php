@@ -69,8 +69,6 @@ class ProfileController extends Controller
             'user_id' => 'required',
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:10',
-            'email' => 'nullable|email',
             'dob' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',
         ]);
@@ -94,7 +92,6 @@ class ProfileController extends Controller
             $user = Customer::findOrFail($validated['user_id']);
             $user->first_name = $request->first_name;
             $user->last_name = $request->last_name;
-            $user->email = $request->email;
             $user->dob = $request->dob;
             $user->gender = $request->gender;
             $user->save();
@@ -114,15 +111,12 @@ class ProfileController extends Controller
 
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
-        $user->phone = $request->phone;
-        $user->email = $request->email;
         $user->dob = $request->dob;
         $user->gender = $request->gender;
         $user->employment_type = $request->employment_type;
         $user->joining_date = $request->joining_date;
         $user->marital_status = $request->marital_status;
         $user->assigned_area = $request->assigned_area;
-        $user->status = $request->status;
         $user->save();
 
         if (! $user) {

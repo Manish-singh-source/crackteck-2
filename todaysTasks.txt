@@ -1,0 +1,58 @@
+
+
+Completed Tasks:
+
+Admin Panel: 
+    1. Warehouse Module
+    2. E-commerce Module 
+    
+APIs: 
+    1. Customer 
+
+Working Tasks: 
+
+Admin Panel: 
+    1. CRM Module 
+
+APIs:
+    1. Engineer
+    2. Sales Person 
+    3. Delivery Man 
+
+
+
+
+#Roshan
+
+Completed Tasks:
+
+    APIs: 
+        1. Sales Person Tested Leads, Follow Ups, Meets APIs
+    
+    Maheshandco: 
+        1. Task completed. Images Pending from client side. 
+
+Working Tasks: 
+
+    APIs: 
+        1. Delivery Man Tesing All APIs 
+
+
+
+
+
+
+
+#Saurabh
+
+Completed Tasks:
+    APIs: 
+        1. Engineer Service Request Flow corrected and tested.
+    
+    Headquater: 
+        1. Testing Completed and updated on live. Client side testing pending.
+
+Working Tasks: 
+
+    APIs: 
+        1. Sales Person Fixing Issues in All APIs 

@@ -43,6 +43,6 @@ class Quotation extends Model
 
     public function amcDetail()
     {
-        return $this->hasMany(AmcPlan::class, 'plan_code', 'id');
+        return $this->hasMany(QuotationAmcDetail::class, 'quotation_id', 'id');
     }
 }

@@ -104,21 +104,31 @@ class QuotationController extends Controller
 
             $quotation = new Quotation;
             $quotation->lead_id = $request->lead_id;
+            $quotation->staff_id = auth()->id(); // Assuming the logged-in user is creating the quotation
             $quotation->quote_id = $request->quote_id;
+            $quotation->quote_number = $request->quote_id;
             $quotation->quote_date = $request->quote_date;
             $quotation->expiry_date = $request->expiry_date;
+            $quotation->total_items = count($request->products);
+            $quotation->currency = 'INR'; // Assuming currency is INR, this can be made dynamic if needed
+            $quotation->subtotal = collect($request->products)->sum('total_amount');
+            $quotation->discount_amount = 0; // Assuming no discount for now, this can be updated to accept discount from request
+            $quotation->tax_amount = collect($request->products)->sum('tax');
+            $quotation->total_amount = 0; // This will be calculated after saving products and AMC details
             $quotation->save();
 
             foreach ($request->products as $productData) {
                 $quotationProduct = new QuotationProduct;
                 $quotationProduct->quotation_id = $quotation->id;
-                $quotationProduct->product_name = $productData['product_name'];
-                $quotationProduct->hsn_code = $productData['hsn_code'];
-                $quotationProduct->sku = $productData['sku'];
-                $quotationProduct->price = $productData['price'];
-                $quotationProduct->quantity = $productData['quantity'];
-                $quotationProduct->tax = $productData['tax'];
-                $quotationProduct->total = $productData['total'];
+                $quotationProduct->product_name = $productData['product_name'] ?? null;
+                $quotationProduct->hsn_code = $productData['hsn_code'] ?? null;
+                $quotationProduct->sku = $productData['sku'] ?? null;
+                $quotationProduct->product_description = $productData['product_description'] ?? null;
+                $quotationProduct->quantity = $productData['quantity'] ?? 1;
+                $quotationProduct->unit_price = $productData['price'] ?? 0;
+                $quotationProduct->discount_per_unit = $productData['discount_per_unit'] ?? 0;
+                $quotationProduct->tax_rate = $productData['tax'] ?? 0;
+                $quotationProduct->line_total = $productData['total'] ?? 0;
                 $quotationProduct->save();
             }
 
@@ -135,6 +145,10 @@ class QuotationController extends Controller
                 $amcDetail->additional_notes = $request->additional_notes;
                 $amcDetail->save();
             }
+
+            
+            $quotation->total_amount = $quotation->subtotal + $quotation->tax_amount - $quotation->discount_amount;
+            $quotation->save();
 
             DB::commit();
 
@@ -154,93 +168,11 @@ class QuotationController extends Controller
         }
     }
 
-    // public function store(Request $request)
-    // {
-    //     // return response()->json($request->all());
-    //     $validator = Validator::make($request->all(), [
-    //         'lead_id' => 'required',
-    //         'quote_id' => 'required',
-    //         'quote_date' => 'required',
-    //         'expiry_date' => 'required',
-
-    //         'products' => 'required|array|min:1',
-    //         'products.*.product_name' => 'required|string',
-    //         'products.*.hsn_code' => 'required|string',
-    //         'products.*.sku' => 'required|string',
-    //         'products.*.price' => 'required|numeric|min:0',
-    //         'products.*.quantity' => 'required|integer|min:1',
-    //         'products.*.tax' => 'required|numeric|min:0',
-    //         'products.*.total' => 'required|numeric|min:0',
-
-    //         'amc_plan_id' => 'nullable|string',
-    //         'plan_duration' => 'nullable|min:0',
-    //         'plan_start_date' => 'nullable|date',
-    //         'total_amount' => 'nullable|numeric|min:0',
-    //         'priority_level' => 'nullable|string',
-    //         'additional_notes' => 'nullable|string',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Validation failed',
-    //             'errors' => $validator->errors()
-    //         ], 422);
-    //     }
-
-    //     $quotation = new Quotation();
-    //     $quotation->lead_id = $request->lead_id;
-    //     $quotation->quote_id = $request->quote_id;
-    //     $quotation->quote_date = $request->quote_date;
-    //     $quotation->expiry_date = $request->expiry_date;
-    //     $quotation->save();
-
-    //     // Save Quotation Products
-    //     foreach ($request->products as $productData) {
-    //         $quotationProduct = new QuotationProduct();
-    //         $quotationProduct->quotation_id = $quotation->id;
-    //         $quotationProduct->product_name = $productData['product_name'];
-    //         $quotationProduct->hsn_code = $productData['hsn_code'];
-    //         $quotationProduct->sku = $productData['sku'];
-    //         $quotationProduct->price = $productData['price'];
-    //         $quotationProduct->quantity = $productData['quantity'];
-    //         $quotationProduct->tax = $productData['tax'];
-    //         $quotationProduct->total = $productData['total'];
-    //         $quotationProduct->save();
-    //     }
-
-    //     // Save AMC Details if provided
-    //     if ($request->filled('amc_plan_id')) {
-    //         $amcDetail = new QuotationAmcDetail();
-    //         $amcDetail->quotation_id = $quotation->id;
-    //         $amcDetail->amc_plan_id = $request->amc_plan_id;
-    //         $amcDetail->plan_duration = $request->plan_duration;
-    //         $amcDetail->plan_start_date = $request->plan_start_date;
-    //         $amcDetail->plan_end_date = $request->plan_start_date->addMonths($request->plan_duration);
-    //         $amcDetail->total_amount = $request->total_amount;
-    //         $amcDetail->priority_level = $request->priority_level;
-    //         $amcDetail->additional_notes = $request->additional_notes;
-    //         $amcDetail->save();
-    //     }
-
-    //     if (!$quotation) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Something went wrong.',
-    //             'error' => $validator->errors()
-    //         ], 500);
-    //     }
-    //     return response()->json([
-    //         'success' => true,
-    //         'quotation_id' => $quotation->id,
-    //         'message' => 'Quotation added successfully.'
-    //     ]);
-    // }
-
     public function view($id)
     {
         $quotation = Quotation::with([
             'leadDetails',
+            'leadDetails.customerAddress',
             'products',
             'amcDetail.amcPlan',
             // 'activeAssignment.engineer',
@@ -248,7 +180,8 @@ class QuotationController extends Controller
             // 'activeAssignment.groupEngineers',
         ])->findOrFail($id);
 
-        $engineers = Staff::where('staff_id', 3)->all();
+        // dd($quotation->leadDetails);
+        $engineers = Staff::where('staff_role', 'engineer')->get();
 
         return view('/crm/quotation/view', compact('quotation', 'engineers'));
     }
@@ -261,9 +194,9 @@ class QuotationController extends Controller
             'amcDetail.amcPlan',
         ])->findOrFail($id);
 
-        $leads = Lead::all();
+        $leads = Lead::with('customer')->get();
         $amcPlans = AmcPlan::where('status', 'Active')->get();
-
+        // dd($leads);
         return view('/crm/quotation/edit', compact('quotation', 'leads', 'amcPlans'));
     }
 
@@ -465,10 +398,10 @@ class QuotationController extends Controller
             'product_name' => 'required|string',
             'hsn_code' => 'required|string',
             'sku' => 'required|string',
-            'price' => 'required|numeric|min:0',
+            'unit_price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:1',
-            'tax' => 'required|numeric|min:0',
-            'total' => 'required|numeric|min:0',
+            'tax_rate' => 'required|numeric|min:0',
+            'line_total' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -485,10 +418,10 @@ class QuotationController extends Controller
                 'product_name' => $request->product_name,
                 'hsn_code' => $request->hsn_code,
                 'sku' => $request->sku,
-                'price' => $request->price,
+                'unit_price' => $request->unit_price,
                 'quantity' => $request->quantity,
-                'tax' => $request->tax,
-                'total' => $request->total,
+                'tax_rate' => $request->tax_rate,
+                'line_total' => $request->line_total,
             ]);
 
             return response()->json([
@@ -513,10 +446,10 @@ class QuotationController extends Controller
             'product_name' => 'required|string',
             'hsn_code' => 'required|string',
             'sku' => 'required|string',
-            'price' => 'required|numeric|min:0',
+            'unit_price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:1',
-            'tax' => 'required|numeric|min:0',
-            'total' => 'required|numeric|min:0',
+            'tax_rate' => 'required|numeric|min:0',
+            'line_total' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -533,10 +466,10 @@ class QuotationController extends Controller
                 'product_name' => $request->product_name,
                 'hsn_code' => $request->hsn_code,
                 'sku' => $request->sku,
-                'price' => $request->price,
+                'unit_price' => $request->unit_price,
                 'quantity' => $request->quantity,
-                'tax' => $request->tax,
-                'total' => $request->total,
+                'tax_rate' => $request->tax_rate,
+                'line_total' => $request->line_total,
             ]);
 
             return response()->json([

@@ -649,7 +649,7 @@
                                                                                             class="{{ $isOverdue ? 'table-warning' : '' }}">
                                                                                             <td>
                                                                                                 <a
-                                                                                                    href="{{ route('service-request.view', $task->service_request_id) }}">
+                                                                                                    href="{{ route('service-request.view-quick-service-request', $task->service_request_id) }}">
                                                                                                     {{ $task->serviceRequest->request_id ?? 'N/A' }}
                                                                                                 </a>
                                                                                                 @if ($isOverdue)
@@ -701,7 +701,7 @@
                                                                                                 @endif
                                                                                             </td>
                                                                                             <td>
-                                                                                                <a href="{{ route('service-request.view', $task->service_request_id) }}"
+                                                                                                <a href="{{ route('service-request.view-quick-service-request', $task->service_request_id) }}"
                                                                                                     class="btn btn-sm btn-info"
                                                                                                     data-bs-toggle="tooltip"
                                                                                                     title="View Details">

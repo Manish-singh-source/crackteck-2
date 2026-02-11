@@ -68,7 +68,7 @@
                                                     @foreach ($leads as $lead)
                                                         <option value="{{ $lead->id }}"
                                                             {{ old('lead_id') == $lead->id ? 'selected' : '' }}>
-                                                            {{ $lead->id . ' - ' . $lead->first_name . ' ' . $lead->last_name }}
+                                                            {{ $lead->id . ' - ' . $lead->customer->first_name . ' ' . $lead->customer->last_name }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -302,12 +302,13 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                {{-- 
                                 <div class="text-start mb-3">
                                     <button type="submit" class="btn btn-success w-sm waves ripple-light">
                                         Submit
                                     </button>
-                                </div>
+                                </div> 
+                                --}}
 
                             </form>
                         </div>

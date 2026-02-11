@@ -11,7 +11,8 @@
     'autofocus' => true,
     'class' => 'custom-class',
     id => 'custom-id',
-    'value' => $value
+    'value' => $value, 
+    readonly => true
 ]) 
 --}}
 

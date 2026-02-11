@@ -81,6 +81,113 @@
                                 </div>
                             </div>
 
+
+                            <!-- AMC Details Section -->
+                            <form action="{{ route('quotation.update.amc.plan') }}" method="POST">
+                                @csrf
+                                @method('POST')
+                                <div class="card mt-3">
+                                    <div
+                                        class="card-header border-bottom-dashed d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            AMC Details
+                                        </h5>
+
+                                        <button type="button" class="btn btn-primary" id="updateAMCBtn">
+                                            Update
+                                        </button>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="row g-3 pb-3">
+                                            {{-- <input type="hidden" name="amc_plan_id" id="amc_plan_id" class="form-control"
+                                                value="{{ $quotation->amcDetail[0]->id }}"> --}}
+
+                                            <div class="col-4">
+                                                <label for="amc_plan_id" class="form-label">Select Plan <span
+                                                        class="text-danger">*</span></label>
+                                                <select name="amc_plan_id" id="amc_plan_id" class="form-select">
+                                                    <option value="">--Select Plan--</option>
+                                                    @foreach ($amcPlans as $plan)
+                                                        <option value="{{ $plan->id }}"
+                                                            data-cost="{{ $plan->total_cost }}"
+                                                            data-duration="{{ $plan->duration }}"
+                                                            @if ($quotation->amcDetail[0]->id == $plan->id) selected @endif>
+                                                            {{ $plan->plan_name }} - AMC
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="col-4">
+                                                <label for="plan_duration" class="form-label">Plan Duration</label>
+                                                <input type="text" name="plan_duration" id="plan_duration"
+                                                    class="form-control" readonly placeholder="Auto-filled"
+                                                    value="{{ $quotation->amcDetail[0]->plan_duration }}">
+                                            </div>
+
+                                            <div class="col-xl-4 col-lg-6">
+                                                <div>
+                                                    @include('components.form.input', [
+                                                        'label' => 'Preferred Start Date',
+                                                        'name' => 'plan_start_date',
+                                                        'type' => 'date',
+                                                        'placeholder' => 'Enter Start Date',
+                                                        'model' => $quotation->amcDetail[0] ?? null,
+                                                        'readonly' => true,
+                                                    ])
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xl-4 col-lg-6">
+                                                <label for="total_amount" class="form-label">Total Amount</label>
+                                                <input type="number" name="total_amount" id="total_amount"
+                                                    class="form-control" step="0.01" readonly
+                                                    placeholder="Auto-filled"
+                                                    value="{{ $quotation->amcDetail[0]->total_amount }}">
+                                            </div>
+
+                                            <div class="col-xl-4 col-lg-6">
+                                                <label for="priority_level" class="form-label">Priority Level<span
+                                                        class="text-danger">*</span></label>
+                                                <select name="priority_level" id="priority_level" class="form-select">
+                                                    <option value="">--Select Plan--</option>
+                                                    {{-- @foreach ($amcPlans as $plan) --}}
+                                                        <option value="High"
+                                                            @if ($quotation->amcDetail[0]->priority_level == 'High') selected @endif>High</option>
+                                                        <option value="Medium"
+                                                            @if ($quotation->amcDetail[0]->priority_level == 'Medium') selected @endif>Medium
+                                                        </option>
+                                                        <option value="Low"
+                                                            @if ($quotation->amcDetail[0]->priority_level == 'Low') selected @endif>Low</option>
+                                                    {{-- @endforeach --}}
+                                                </select>
+                                            </div>
+                                            <div class="col-xl-4 col-lg-6">
+                                                <div>
+                                                    @include('components.form.input', [
+                                                        'label' => 'Additional Notes',
+                                                        'name' => 'additional_notes',
+                                                        'type' => 'text',
+                                                        'placeholder' => 'Enter Additional Notes',
+                                                        'model' => $quotation->amcDetail[0] ?? null,
+                                                        'readonly' => true,
+                                                    ])
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12" id="updateAmcPlanDiv">
+                                                <div class="text-start">
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="mdi mdi-content-save"></i> Update AMC Plan
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+
                             <div class="card branch-section">
                                 <div
                                     class="card-header border-bottom-dashed d-flex justify-content-between align-items-center">
@@ -258,7 +365,8 @@
                 $('input[name="line_total"]').val(total.toFixed(2));
             }
 
-            $('input[name="unit_price"], input[name="quantity"], input[name="tax_rate"]').on('input', calculateTotal);
+            $('input[name="unit_price"], input[name="quantity"], input[name="tax_rate"]').on('input',
+                calculateTotal);
 
             // Save Product Button Click (Add or Update)
             $('#save-product-btn').on('click', function(e) {
@@ -300,7 +408,7 @@
                     data: productData,
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },      
+                    },
                     success: function(response) {
                         if (response.success) {
                             alert(response.message);
@@ -421,6 +529,22 @@
             // Add Product Button Click
             $('#addBranchBtn').on('click', function() {
                 $('#edit-product-section').slideDown();
+            });
+            $("#updateAmcPlanDiv").hide();
+
+
+            $("#updateAMCBtn").on("click", function() {
+                // remove readonly from amc form and add update button 
+                $("#amc_plan_id").removeAttr("readonly");
+                $("#plan_duration").removeAttr("readonly");
+                $("#plan_start_date").removeAttr("readonly");
+                $("#total_amount").removeAttr("readonly");
+                $("#priority_level").removeAttr("readonly");
+                $("#additional_notes").removeAttr("readonly");
+
+                $("#updateAmcPlanDiv").show();
+                $('#updateAMCBtn').hide();
+
             });
         });
     </script>

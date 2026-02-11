@@ -32,7 +32,7 @@ class QuotationController extends Controller
 
         $nextNumber = $lastService ? (intval(substr($lastService->id, -4)) + 1) : 1;
 
-        return 'SRV-'.$year.'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        return 'SRV-' . $year . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     public function index()
@@ -146,7 +146,7 @@ class QuotationController extends Controller
                 $amcDetail->save();
             }
 
-            
+
             $quotation->total_amount = $quotation->subtotal + $quotation->tax_amount - $quotation->discount_amount;
             $quotation->save();
 
@@ -196,7 +196,7 @@ class QuotationController extends Controller
 
         $leads = Lead::with('customer')->get();
         $amcPlans = AmcPlan::where('status', 'Active')->get();
-        // dd($leads);
+        // dd($quotation);
         return view('/crm/quotation/edit', compact('quotation', 'leads', 'amcPlans'));
     }
 
@@ -297,6 +297,37 @@ class QuotationController extends Controller
         return redirect()->route('quotation.index')->with('success', 'Quotation deleted successfully.');
     }
 
+    public function storeOrUpdateAmcDetail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'amc_plan_id' => 'required|string',
+            'plan_duration' => 'required|integer|min:0',
+            'plan_start_date' => 'required|date',
+            'total_amount' => 'required|numeric|min:0',
+            'priority_level' => 'required|string',
+            'additional_notes' => 'required|string',
+        ]);
+        
+        if ($validator->fails()) {
+            return redirect()->back()->with('error', $validator->errors());
+        }
+
+        $amcPlanDetail = QuotationAmcDetail::where('id', $request->amc_plan_id)->first();
+
+        if (!$amcPlanDetail) {
+            return redirect()->back()->with('error', 'AMC details not found.');
+        }
+
+        $amcPlanDetail->plan_duration = $request->plan_duration;
+        $amcPlanDetail->plan_start_date = $request->plan_start_date;
+        $amcPlanDetail->total_amount = $request->total_amount;
+        $amcPlanDetail->priority_level = $request->priority_level;
+        $amcPlanDetail->additional_notes = $request->additional_notes;
+        $amcPlanDetail->save();
+
+        return redirect()->back()->with('success', 'AMC details updated successfully.');
+    }
+
     /**
      * Assign engineer(s) to quotation
      */
@@ -344,7 +375,7 @@ class QuotationController extends Controller
                 ]);
 
                 $engineer = Engineer::find($request->engineer_id);
-                $message = 'Engineer '.$engineer->first_name.' '.$engineer->last_name.' assigned successfully';
+                $message = 'Engineer ' . $engineer->first_name . ' ' . $engineer->last_name . ' assigned successfully';
             } else {
                 // Group assignment
                 $assignment = QuotationEngineerAssignment::create([
@@ -365,7 +396,7 @@ class QuotationController extends Controller
                     ]);
                 }
 
-                $message = 'Group "'.$request->group_name.'" assigned successfully with '.count($request->engineer_ids).' engineers';
+                $message = 'Group "' . $request->group_name . '" assigned successfully with ' . count($request->engineer_ids) . ' engineers';
             }
 
             DB::commit();
@@ -383,7 +414,7 @@ class QuotationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error assigning engineer: '.$e->getMessage(),
+                'message' => 'Error assigning engineer: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -432,7 +463,7 @@ class QuotationController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error adding product: '.$e->getMessage(),
+                'message' => 'Error adding product: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -480,7 +511,7 @@ class QuotationController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating product: '.$e->getMessage(),
+                'message' => 'Error updating product: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -501,7 +532,7 @@ class QuotationController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error deleting product: '.$e->getMessage(),
+                'message' => 'Error deleting product: ' . $e->getMessage(),
             ], 500);
         }
     }

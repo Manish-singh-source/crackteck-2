@@ -455,9 +455,9 @@ Route::prefix('/demo')->group(function () {
         Route::put('/crm/quotation/products/{id}', 'updateProduct')->name('quotation.products.update');
         Route::delete('/crm/quotation/products/{id}', 'deleteProduct')->name('quotation.products.delete');
         Route::get('/crm/quotation/{quotationId}/products', 'getProducts')->name('quotation.products.get');
+        Route::post('/crm/quotation/update-amc-plan', 'storeOrUpdateAmcDetail')->name('quotation.update.amc.plan');
 
         // AMC Details Management Routes
-        Route::post('/crm/quotation/amc/store', 'storeOrUpdateAmcDetail')->name('quotation.amc.store');
         Route::get('/crm/quotation/{quotationId}/amc', 'getAmcDetail')->name('quotation.amc.get');
 
         // Engineer Assignment Routes

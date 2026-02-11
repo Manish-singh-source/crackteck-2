@@ -29,6 +29,7 @@
     <select id="{{ $name }}" name="{{ $name }}" class="form-select w-100 {{ $class ?? '' }}"
         @if($required ?? false) required @endif
         @if($disabled ?? false) disabled @endif
+        @if($readonly ?? false) readonly @endif
     >
         @foreach($options as $key => $option)
             <option value="{{ $key }}"

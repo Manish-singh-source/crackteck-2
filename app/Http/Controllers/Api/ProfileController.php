@@ -66,10 +66,10 @@ class ProfileController extends Controller
         $validated = Validator::make($request->all(), [
             // validation rules if any
             'role_id' => 'required|in:1,2,3,4',
-            'user_id' => 'required|exists:customers,id',
+            'user_id' => 'required',
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:10',
             'email' => 'nullable|email',
             'dob' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',

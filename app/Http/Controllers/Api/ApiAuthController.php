@@ -112,7 +112,7 @@ class ApiAuthController extends Controller
                 'aadhar_number' => 'nullable|digits:12',
                 'aadhar_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
                 'aadhar_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
-                
+
                 'branch_name' => 'nullable',
                 'company_name' => 'nullable',
                 'company_addr' => 'nullable',
@@ -211,7 +211,7 @@ class ApiAuthController extends Controller
                     'aadhar_number' => $request->aadhar_number,
                     'aadhar_front_path' => $aadharFront ?? null,
                     'aadhar_back_path' => $aadharBack ?? null,
-                ]); 
+                ]);
 
                 if (! $customer) {
                     return response()->json(['success' => false, 'message' => 'Failed to create Aadhar card details.'], 500);
@@ -378,7 +378,7 @@ class ApiAuthController extends Controller
                 return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
             }
 
-            if($staffRole == 'customers') {
+            if ($staffRole == 'customers') {
                 $user = Customer::where('phone', $request->phone_number)->first();
             } else {
                 $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
@@ -449,10 +449,21 @@ class ApiAuthController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        if($staffRole == 'customers') {
+        if ($staffRole == 'customers') {
             $user = Customer::where('phone', $request->phone_number)->first();
         } else {
-            $user = Staff::with('vehicleDetails')->where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
+
+            if ($staffRole == 'delivery_man') {
+
+
+                $user = Staff::with('vehicleDetails')->where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
+
+                if (!$user->vehicleDetails) {
+                    return response()->json(['error' => 'Vehical Details Not Found']);
+                }
+            } else {
+                $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
+            }
         }
 
         if (! $user || $user->otp != $request->otp || now()->gt($user->otp_expiry)) {
@@ -544,5 +555,5 @@ class ApiAuthController extends Controller
         $lastId = $lastCustomer ? intval(substr($lastCustomer->customer_code, 3)) : 0;
         $newId = $lastId + 1;
         return 'CST' . str_pad($newId, 6, '0', STR_PAD_LEFT);
-    }   
+    }
 }

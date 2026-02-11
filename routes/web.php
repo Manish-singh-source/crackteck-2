@@ -514,7 +514,7 @@ Route::prefix('/demo')->group(function () {
         // Create Service Request Page
         // Route::get('/crm/create-service-request', 'create')->name('service-request.create-servies');
         // View Service Request Page
-        // Route::get('/crm/view-service-request/{id}', 'viewServiceRequest')->name('service-request.view');
+        // Route::get('/crm/view-service-request/{id}', 'viewServiceRequest')->name('service-request.view-quick-service-request);
         // Route::get('/crm/view-service-request-old', 'view')->name('service-request.view-service');
         // Edit Service Request Page
         // Route::get('/crm/edit-service-request', 'edit')->name('service-request.edit-service');
@@ -548,7 +548,7 @@ Route::prefix('/demo')->group(function () {
         Route::post('/crm/service-request/assign-return', 'assignReturn')->name('service-request.assign-return');
         Route::post('/crm/service-request/return-picked', 'returnPicked')->name('service-request.return-picked');
 
-        
+
 
 
 
@@ -567,7 +567,7 @@ Route::prefix('/demo')->group(function () {
         // // Repairing Service Request Update
         // Route::put('/crm/service-request/update-repairing-service-request/{id}', 'updateRepairingServiceRequest')->name('service-request.update-repairing-service-request');
 
-        
+
         // // Installation Service Request Create
         // Route::get('/crm/create-installation-request', 'createInstallationServiceRequest')->name('installation-service-requests.create');
         // // Installation Service Request Store

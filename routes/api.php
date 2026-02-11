@@ -140,7 +140,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::controller(AttendanceController::class)->group(function () {
-            Route::get('/attendance', 'index');
+            Route::get('/attendance-dm', 'index');
             Route::post('/attendance-login', 'store');
             Route::post('/attendance-logout', 'logout');
         });

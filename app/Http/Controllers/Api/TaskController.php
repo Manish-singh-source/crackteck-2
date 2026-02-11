@@ -22,8 +22,10 @@ class TaskController extends Controller
             return response()->json(['message' => 'User ID is required'], 400);
         }
 
-        $meets = Meet::where('staff_id', $validated['user_id'])->where('date', today())->get();
-        $followup = FollowUp::where('staff_id', $validated['user_id'])->where('followup_date', today())->get();
+        // $meets = Meet::where('staff_id', $validated['user_id'])->where('date', today())->get();
+        $meets = Meet::where('staff_id', $validated['user_id'])->get();
+        $followup = FollowUp::where('staff_id', $validated['user_id'])->get();
+        // $followup = FollowUp::where('staff_id', $validated['user_id'])->where('followup_date', today())->get();
 
         return response()->json(['meets' => $meets, 'followup' => $followup], 200);
     }

@@ -11,6 +11,10 @@ use App\Models\DmPanCardDetails;
 use App\Models\Order;
 use App\Models\Engineer;
 use App\Models\SalesPerson;
+use App\Models\Staff;
+use App\Models\StaffAadharDetail;
+use App\Models\StaffPanCardDetail;
+use App\Models\StaffVehicleDetail;
 use App\Models\VehicalRegistration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -80,7 +84,7 @@ class DeliveryOrderController extends Controller
 
             return false;
         } catch (\Exception $e) {
-            Log::error('Fast2SMS Exception: '.$e->getMessage());
+            Log::error('Fast2SMS Exception: ' . $e->getMessage());
 
             return false;
         }
@@ -196,9 +200,9 @@ class DeliveryOrderController extends Controller
         if ($staffRole == 'delivery_man') {
             if ($request->hasFile('profile')) {
                 $file = $request->file('profile');
-                $filename = time().'.'.$file->getClientOriginalExtension();
+                $filename = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/orders/profile'), $filename);
-                $request->merge(['profile' => 'uploads/e-commerce/orders/profile/'.$filename]);
+                $request->merge(['profile' => 'uploads/e-commerce/orders/profile/' . $filename]);
             }
 
             $order = Order::where('id', $order_id)->first();
@@ -358,7 +362,7 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man') {
-            $vehicleDetails = VehicalRegistration::where('delivery_man_id', $request->user_id)->first();
+            $vehicleDetails = StaffVehicleDetail::where('staff_id', $request->user_id)->first();
 
             if (! $vehicleDetails) {
                 return response()->json(['message' => 'Vehicle details not found'], 404);
@@ -373,12 +377,11 @@ class DeliveryOrderController extends Controller
         $roleValidated = Validator::make($request->all(), ([
             'role_id' => 'required|in:2',
             'user_id' => 'required',
-            'brand' => 'required|string',
-            'model' => 'required|string',
+            'vehicle_type' => 'required|string',
             'vehicle_number' => 'required|string',
-            'fuel_type' => 'required|string',
-            'license_document_back_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'license_document_front_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'driving_license_no' => 'required|string',
+            'driving_license_back_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'driving_license_front_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]));
 
         if ($roleValidated->fails()) {
@@ -392,38 +395,49 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man') {
-            if ($request->hasFile('license_document_front_path')) {
-                $file = $request->file('license_document_front_path');
-                $filename = time().'.'.$file->getClientOriginalExtension();
+            if ($request->hasFile('driving_license_front_path')) {
+                $file = $request->file('driving_license_front_path');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/vehicles'), $filename);
-                $request->merge(['license_document_front_path' => 'uploads/e-commerce/delivery/vehicles/'.$filename]);
+                $request->merge(['driving_license_front_path' => 'uploads/e-commerce/delivery/vehicles/' . $filename]);
+                $driving_license_front_path = 'uploads/e-commerce/delivery/vehicles/' . $filename;
             }
 
-            if ($request->hasFile('license_document_back_path')) {
-                $file = $request->file('license_document_back_path');
-                $filename = time().'_back.'.$file->getClientOriginalExtension();
+            if ($request->hasFile('driving_license_back_path')) {
+                $file = $request->file('driving_license_back_path');
+                $filename = time() . '_back.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/vehicles'), $filename);
-                $request->merge(['license_document_back_path' => 'uploads/e-commerce/delivery/vehicles/'.$filename]);
+                $request->merge(['driving_license_back_path' => 'uploads/e-commerce/delivery/vehicles/' . $filename]);
+                $driving_license_back_path = 'uploads/e-commerce/delivery/vehicles/' . $filename;
             }
 
-            $deliveryMan = DeliveryMan::where('id', $request->user_id)->first();
+            $deliveryMan = Staff::where('id', $request->user_id)->first();
             if (! $deliveryMan) {
                 return response()->json(['message' => 'Delivery man not found'], 404);
             }
 
-            $vehicalRegistration = new VehicalRegistration;
-            $vehicalRegistration->delivery_man_id = $request->user_id;
-            $vehicalRegistration->brand = $request->brand;
-            $vehicalRegistration->model = $request->model;
-            $vehicalRegistration->vehical_no = $request->vehicle_number;
-            $vehicalRegistration->fuel_type = $request->fuel_type;
-            if ($request->hasFile('license_document_front_path')) {
-                $vehicalRegistration->license_document_front_path = $request->license_document_front_path;
+            $alreadyExists = StaffVehicleDetail::where('staff_id', $request->user_id)->exists();
+
+            if ($alreadyExists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You can not add more than one vehicle detail.'
+                ], 409);
             }
-            if ($request->hasFile('license_document_back_path')) {
-                $vehicalRegistration->license_document_back_path = $request->license_document_back_path;
+
+            $vehicalRegistration = new StaffVehicleDetail();
+            $vehicalRegistration->staff_id = $request->user_id;
+            $vehicalRegistration->vehicle_type = $request->vehicle_type;
+            $vehicalRegistration->vehicle_number = $request->vehicle_number;
+            $vehicalRegistration->driving_license_no = $request->driving_license_no;
+
+            $vehicalRegistration->driving_license_back_path = $request->driving_license_back_path;
+            if ($request->hasFile('driving_license_front_path')) {
+                $vehicalRegistration->driving_license_front_path = $driving_license_front_path;
             }
-            $vehicalRegistration->created_by = $request->user_id;
+            if ($request->hasFile('driving_license_back_path')) {
+                $vehicalRegistration->driving_license_back_path = $driving_license_back_path;
+            }
             $vehicalRegistration->save();
 
             return response()->json(['message' => 'Vehicle registered successfully'], 200);
@@ -435,12 +449,11 @@ class DeliveryOrderController extends Controller
         $roleValidated = Validator::make($request->all(), ([
             'role_id' => 'required|in:2',
             'user_id' => 'required',
-            'brand' => 'required|string',
-            'model' => 'required|string',
+            'vehicle_type' => 'required|string',
             'vehicle_number' => 'required|string',
-            'fuel_type' => 'required|string',
-            'license_document_back_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'license_document_front_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'driving_license_no' => 'required|string',
+            'driving_license_back_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'driving_license_front_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]));
 
         if ($roleValidated->fails()) {
@@ -454,28 +467,29 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man') {
-            $vehicalRegistration = VehicalRegistration::where('delivery_man_id', $request->user_id)->first();
+            $vehicalRegistration = StaffVehicleDetail::where('staff_id', $request->user_id)->first();
             if (! $vehicalRegistration) {
                 return response()->json(['message' => 'Vehicle registration not found'], 404);
             }
 
-            $vehicalRegistration->brand = $request->brand;
-            $vehicalRegistration->model = $request->model;
-            $vehicalRegistration->vehical_no = $request->vehicle_number;
-            $vehicalRegistration->fuel_type = $request->fuel_type;
+            $vehicalRegistration->vehicle_type = $request->vehicle_type;
+            $vehicalRegistration->vehicle_number = $request->vehicle_number;
+            $vehicalRegistration->driving_license_no = $request->driving_license_no;
 
-            if ($request->hasFile('license_document_front_path')) {
-                $file = $request->file('license_document_front_path');
-                $filename = time().'.'.$file->getClientOriginalExtension();
+            if ($request->hasFile('driving_license_front_path')) {
+                $file = $request->file('driving_license_front_path');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/vehicles'), $filename);
-                $vehicalRegistration->license_document_front_path = 'uploads/e-commerce/delivery/vehicles/'.$filename;
+                $request->merge(['driving_license_front_path' => 'uploads/e-commerce/delivery/vehicles/' . $filename]);
+                $driving_license_front_path = 'uploads/e-commerce/delivery/vehicles/' . $filename;
             }
 
-            if ($request->hasFile('license_document_back_path')) {
-                $file = $request->file('license_document_back_path');
-                $filename = time().'_back.'.$file->getClientOriginalExtension();
+            if ($request->hasFile('driving_license_back_path')) {
+                $file = $request->file('driving_license_back_path');
+                $filename = time() . '_back.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/vehicles'), $filename);
-                $vehicalRegistration->license_document_back_path = 'uploads/e-commerce/delivery/vehicles/'.$filename;
+                $request->merge(['driving_license_back_path' => 'uploads/e-commerce/delivery/vehicles/' . $filename]);
+                $driving_license_back_path = 'uploads/e-commerce/delivery/vehicles/' . $filename;
             }
 
             $vehicalRegistration->save();
@@ -502,13 +516,13 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man') {
-            $deliveryMan = DeliveryMan::where('id', $request->user_id)->first();
+            $deliveryMan = Staff::where('id', $request->user_id)->first();
 
             if (! $deliveryMan) {
                 return response()->json(['message' => 'Delivery man not found'], 404);
             }
 
-            $aadharDetails = DmAadharDetails::where('delivery_man_id', $request->user_id)->first();
+            $aadharDetails = StaffAadharDetail::where('staff_id', $request->user_id)->first();
 
             if (! $aadharDetails) {
                 return response()->json(['message' => 'Aadhar details not found'], 404);
@@ -541,29 +555,43 @@ class DeliveryOrderController extends Controller
         if ($staffRole == 'delivery_man') {
             if ($request->hasFile('aadhar_front_path')) {
                 $file = $request->file('aadhar_front_path');
-                $frontFile = time().'.'.$file->getClientOriginalExtension();
+                $frontFile = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/aadhar'), $frontFile);
-                $request->merge(['aadhar_front_path' => 'uploads/e-commerce/delivery/aadhar/'.$frontFile]);
+                $request->merge(['aadhar_front_path' => 'uploads/e-commerce/delivery/aadhar/' . $frontFile]);
+                $aadhar_front_path = 'uploads/e-commerce/delivery/aadhar/' . $frontFile;
             }
 
             if ($request->hasFile('aadhar_back_path')) {
                 $file = $request->file('aadhar_back_path');
-                $backFile = time().'_back.'.$file->getClientOriginalExtension();
+                $backFile = time() . '_back.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/aadhar'), $backFile);
-                $request->merge(['aadhar_back_path' => 'uploads/e-commerce/delivery/aadhar/'.$backFile]);
+                $request->merge(['aadhar_back_path' => 'uploads/e-commerce/delivery/aadhar/' . $backFile]);
+                $aadhar_back_path = 'uploads/e-commerce/delivery/aadhar/' . $backFile;
             }
 
-            $deliveryMan = DeliveryMan::where('id', $request->user_id)->first();
+            $deliveryMan = Staff::where('id', $request->user_id)->first();
             if (! $deliveryMan) {
                 return response()->json(['message' => 'Delivery man not found'], 404);
             }
 
-            $aadharDetails = new DmAadharDetails;
-            $aadharDetails->delivery_man_id = $request->user_id;
+            $alreadyExists = StaffAadharDetail::where('staff_id', $request->user_id)->exists();
+
+            if ($alreadyExists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You can not add more than one Aadhar detail.'
+                ], 409);
+            }
+
+            $aadharDetails = new StaffAadharDetail();
+            $aadharDetails->staff_id = $request->user_id;
             $aadharDetails->aadhar_number = $request->aadhar_number;
-            $aadharDetails->aadhar_front_path = 'uploads/e-commerce/delivery/aadhar/'.$frontFile;
-            $aadharDetails->aadhar_back_path = 'uploads/e-commerce/delivery/aadhar/'.$backFile;
-            $aadharDetails->created_by = $request->user_id;
+            if ($request->hasFile('aadhar_front_path')) {
+                $aadharDetails->aadhar_front_path = $aadhar_front_path;
+            }
+            if ($request->hasFile('aadhar_back_path')) {
+                $aadharDetails->aadhar_back_path = $aadhar_back_path;
+            }
             $aadharDetails->save();
 
             return response()->json(['message' => 'Aadhar details added successfully'], 200);
@@ -591,7 +619,7 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man') {
-            $aadharDetails = DmAadharDetails::where('delivery_man_id', $request->user_id)->first();
+            $aadharDetails = StaffAadharDetail::where('staff_id', $request->user_id)->first();
             if (! $aadharDetails) {
                 return response()->json(['message' => 'Aadhar details not found'], 404);
             }
@@ -600,16 +628,16 @@ class DeliveryOrderController extends Controller
 
             if ($request->hasFile('aadhar_front_path')) {
                 $file = $request->file('aadhar_front_path');
-                $frontFile = time().'.'.$file->getClientOriginalExtension();
+                $frontFile = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/aadhar'), $frontFile);
-                $aadharDetails->aadhar_front_path = 'uploads/e-commerce/delivery/aadhar/'.$frontFile;
+                $aadharDetails->aadhar_front_path = 'uploads/e-commerce/delivery/aadhar/' . $frontFile;
             }
 
             if ($request->hasFile('aadhar_back_path')) {
                 $file = $request->file('aadhar_back_path');
-                $backFile = time().'_back.'.$file->getClientOriginalExtension();
+                $backFile = time() . '_back.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/aadhar'), $backFile);
-                $aadharDetails->aadhar_back_path = 'uploads/e-commerce/delivery/aadhar/'.$backFile;
+                $aadharDetails->aadhar_back_path = 'uploads/e-commerce/delivery/aadhar/' . $backFile;
             }
 
             $aadharDetails->save();
@@ -637,13 +665,13 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man') {
-            $deliveryMan = DeliveryMan::where('id', $request->user_id)->first();
+            $deliveryMan = Staff::where('id', $request->user_id)->first();
 
             if (! $deliveryMan) {
                 return response()->json(['message' => 'Delivery man not found'], 404);
             }
 
-            $panCardDetails = DmPanCardDetails::where('delivery_man_id', $request->user_id)->first();
+            $panCardDetails = StaffPanCardDetail::where('staff_id', $request->user_id)->first();
 
             if (! $panCardDetails) {
                 return response()->json(['message' => 'PAN card details not found'], 404);
@@ -677,30 +705,39 @@ class DeliveryOrderController extends Controller
         if ($staffRole == 'delivery_man') {
             if ($request->hasFile('pan_card_front_path')) {
                 $file = $request->file('pan_card_front_path');
-                $panFrontFile = time().'_front.'.$file->getClientOriginalExtension();
+                $panFrontFile = time() . '_front.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/pan'), $panFrontFile);
-                $request->merge(['pan_card_front_path' => 'uploads/e-commerce/delivery/pan/'.$panFrontFile]);
+                $request->merge(['pan_card_front_path' => 'uploads/e-commerce/delivery/pan/' . $panFrontFile]);
+                $pan_card_front_path = 'uploads/e-commerce/delivery/pan/' . $panFrontFile;
             }
 
             if ($request->hasFile('pan_card_back_path')) {
                 $file = $request->file('pan_card_back_path');
-                $panBackFile = time().'_back.'.$file->getClientOriginalExtension();
+                $panBackFile = time() . '_back.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/pan'), $panBackFile);
-                $request->merge(['pan_card_back_path' => 'uploads/e-commerce/delivery/pan/'.$panBackFile]);
+                $request->merge(['pan_card_back_path' => 'uploads/e-commerce/delivery/pan/' . $panBackFile]);
+                $pan_card_back_path = 'uploads/e-commerce/delivery/pan/' . $panBackFile;
             }
 
-            $deliveryMan = DeliveryMan::where('id', $request->user_id)->first();
+            $deliveryMan = Staff::where('id', $request->user_id)->first();
             if (! $deliveryMan) {
                 return response()->json(['message' => 'Delivery man not found'], 404);
             }
 
-            $panCardDetails = new DmPanCardDetails;
-            $panCardDetails->delivery_man_id = $request->user_id;
+            $alreadyExists = StaffPanCardDetail::where('staff_id', $request->user_id)->exists();
+
+            if ($alreadyExists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You can not add more than one Pan Detail.'
+                ], 409);
+            }
+
+            $panCardDetails = new StaffPanCardDetail();
+            $panCardDetails->staff_id = $request->user_id;
             $panCardDetails->pan_number = $request->pan_number;
-            $panCardDetails->pan_card_front_path = 'uploads/e-commerce/delivery/pan/'.$panFrontFile;
-            $panCardDetails->pan_card_back_path = 'uploads/e-commerce/delivery/pan/'.$panBackFile;
-            $panCardDetails->created_by = $request->user_id;
-            $panCardDetails->updated_by = $request->user_id;
+            $panCardDetails->pan_card_front_path = 'uploads/e-commerce/delivery/pan/' . $panFrontFile;
+            $panCardDetails->pan_card_back_path = 'uploads/e-commerce/delivery/pan/' . $panBackFile;
             $panCardDetails->save();
 
             return response()->json(['message' => 'PAN card details added successfully'], 200);
@@ -728,165 +765,29 @@ class DeliveryOrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
         if ($staffRole == 'delivery_man') {
-            $panCardDetails = DmPanCardDetails::where('delivery_man_id', $request->user_id)->first();
+            $panCardDetails = StaffPanCardDetail::where('staff_id', $request->user_id)->first();
             if (! $panCardDetails) {
                 return response()->json(['message' => 'PAN card details not found'], 404);
             }
 
             $panCardDetails->pan_number = $request->pan_number;
-            $panCardDetails->updated_by = $request->user_id;
             if ($request->hasFile('pan_card_front_path')) {
                 $file = $request->file('pan_card_front_path');
-                $panFrontFile = time().'_front.'.$file->getClientOriginalExtension();
+                $panFrontFile = time() . '_front.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/pan'), $panFrontFile);
-                $panCardDetails->pan_card_front_path = 'uploads/e-commerce/delivery/pan/'.$panFrontFile;
+                $panCardDetails->pan_card_front_path = 'uploads/e-commerce/delivery/pan/' . $panFrontFile;
             }
 
             if ($request->hasFile('pan_card_back_path')) {
                 $file = $request->file('pan_card_back_path');
-                $panBackFile = time().'_back.'.$file->getClientOriginalExtension();
+                $panBackFile = time() . '_back.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/pan'), $panBackFile);
-                $panCardDetails->pan_card_back_path = 'uploads/e-commerce/delivery/pan/'.$panBackFile;
+                $panCardDetails->pan_card_back_path = 'uploads/e-commerce/delivery/pan/' . $panBackFile;
             }
 
             $panCardDetails->save();
 
             return response()->json(['message' => 'PAN card details updated successfully'], 200);
-        }
-    }
-
-    public function getDrivingLicenseDetails(Request $request)
-    {
-        //
-        $roleValidated = Validator::make($request->all(), ([
-            'role_id' => 'required|in:2',
-            'user_id' => 'required',
-        ]));
-        if ($roleValidated->fails()) {
-            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
-        }
-        $staffRole = $this->getRoleId($request->role_id);
-        if (! $staffRole) {
-            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
-        }
-        if ($staffRole == 'delivery_man') {
-            // Implementation for fetching driving license details goes here
-            $deliveryMan = DeliveryMan::where('id', $request->user_id)->first();
-            if (! $deliveryMan) {
-                return response()->json(['message' => 'Delivery man not found'], 404);
-            }
-            $drivingLicenseDetails = DmDrivingLicenseDetails::where('delivery_man_id', $request->user_id)->first();
-            if (! $drivingLicenseDetails) {
-                return response()->json(['message' => 'Driving license details not found'], 404);
-            }
-
-            return response()->json(['driving_license_details' => $drivingLicenseDetails], 200);
-        }
-
-        return response()->json(['message' => 'Method not implemented'], 501);
-    }
-
-    public function storeDrivingLicense(Request $request)
-    {
-        //
-        $roleValidated = Validator::make($request->all(), ([
-            'role_id' => 'required|in:2',
-            'user_id' => 'required',
-            'license_number' => 'required|string',
-            'issue_date' => 'required|date',
-            'expiry_date' => 'required|date',
-            'license_front_path' => 'required|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-            'license_back_path' => 'required|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-        ]));
-
-        if ($roleValidated->fails()) {
-            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
-        }
-
-        $staffRole = $this->getRoleId($request->role_id);
-        if (! $staffRole) {
-            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
-        }
-        if ($staffRole == 'delivery_man') {
-            if ($request->hasFile('license_front_path')) {
-                $file = $request->file('license_front_path');
-                $licenseFrontFile = time().'_front.'.$file->getClientOriginalExtension();
-                $file->move(public_path('uploads/e-commerce/delivery/driving_license'), $licenseFrontFile);
-                $request->merge(['license_front_path' => 'uploads/e-commerce/delivery/driving_license/'.$licenseFrontFile]);
-            }
-
-            if ($request->hasFile('license_back_path')) {
-                $file = $request->file('license_back_path');
-                $licenseBackFile = time().'_back.'.$file->getClientOriginalExtension();
-                $file->move(public_path('uploads/e-commerce/delivery/driving_license'), $licenseBackFile);
-                $request->merge(['license_back_path' => 'uploads/e-commerce/delivery/driving_license/'.$licenseBackFile]);
-            }
-
-            $deliveryMan = DeliveryMan::where('id', $request->user_id)->first();
-            if (! $deliveryMan) {
-                return response()->json(['message' => 'Delivery man not found'], 404);
-            }
-
-            $drivingLicenseDetails = new DmDrivingLicenseDetails;
-            $drivingLicenseDetails->delivery_man_id = $request->user_id;
-            $drivingLicenseDetails->license_number = $request->license_number;
-            $drivingLicenseDetails->issue_date = $request->issue_date;
-            $drivingLicenseDetails->expiry_date = $request->expiry_date;
-            $drivingLicenseDetails->license_front_path = 'uploads/e-commerce/delivery/driving_license/'.$licenseFrontFile;
-            $drivingLicenseDetails->license_back_path = 'uploads/e-commerce/delivery/driving_license/'.$licenseBackFile;
-            $drivingLicenseDetails->created_by = $request->user_id;
-            $drivingLicenseDetails->updated_by = $request->user_id;
-            $drivingLicenseDetails->save();
-
-            return response()->json(['message' => 'Driving license details added successfully'], 200);
-        }
-    }
-
-    public function updateDrivingLicense(Request $request)
-    {
-        //
-        $roleValidated = Validator::make($request->all(), ([
-            'role_id' => 'required|in:2',
-            'user_id' => 'required',
-            'license_number' => 'required|string',
-            'issue_date' => 'required|date',
-            'expiry_date' => 'required|date',
-            'license_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-            'license_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-        ]));
-
-        if ($roleValidated->fails()) {
-            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
-        }
-
-        $staffRole = $this->getRoleId($request->role_id);
-        if (! $staffRole) {
-            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
-        }
-        if ($staffRole == 'delivery_man') {
-            $drivingLicenseDetails = DmDrivingLicenseDetails::where('delivery_man_id', $request->user_id)->first();
-            if (! $drivingLicenseDetails) {
-                return response()->json(['message' => 'Driving license details not found'], 404);
-            }
-            $drivingLicenseDetails->license_number = $request->license_number;
-            $drivingLicenseDetails->issue_date = $request->issue_date;
-            $drivingLicenseDetails->expiry_date = $request->expiry_date;
-            $drivingLicenseDetails->updated_by = $request->user_id;
-            if ($request->hasFile('license_front_path')) {
-                $file = $request->file('license_front_path');
-                $licenseFrontFile = time().'_front.'.$file->getClientOriginalExtension();
-                $file->move(public_path('uploads/e-commerce/delivery/driving_license'), $licenseFrontFile);
-                $drivingLicenseDetails->license_front_path = 'uploads/e-commerce/delivery/driving_license/'.$licenseFrontFile;
-            }
-            if ($request->hasFile('license_back_path')) {
-                $file = $request->file('license_back_path');
-                $licenseBackFile = time().'_back.'.$file->getClientOriginalExtension();
-                $file->move(public_path('uploads/e-commerce/delivery/driving_license'), $licenseBackFile);
-                $drivingLicenseDetails->license_back_path = 'uploads/e-commerce/delivery/driving_license/'.$licenseBackFile;
-            }
-            $drivingLicenseDetails->save();
-
-            return response()->json(['message' => 'Driving license details updated successfully'], 200);
         }
     }
 }

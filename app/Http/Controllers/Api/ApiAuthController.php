@@ -8,6 +8,13 @@ use App\Models\DeliveryMan;
 use App\Models\Engineer;
 use App\Models\SalesPerson;
 use App\Models\Staff;
+use App\Models\StaffAddress;
+use App\Models\StaffAadharDetail;
+use App\Models\StaffBankDetail;
+use App\Models\StaffPanCardDetail;
+use App\Models\StaffPoliceVerification;
+use App\Models\StaffVehicleDetail;
+use App\Models\StaffWorkSkill;
 use App\Services\Fast2smsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -287,53 +294,128 @@ class ApiAuthController extends Controller
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
-        // Handle file uploads
+        // // Handle file uploads for Aadhar
+        // if ($request->hasFile('aadhar_front_path')) {
+        //     $file = $request->file('aadhar_front_path');
+        //     $filename = time() . '_aadhar_front.' . $file->getClientOriginalExtension();
+        //     $file->move(public_path('uploads/aadhar_card'), $filename);
+        //     $request->merge(['aadhar_front_path' => 'uploads/aadhar_card/' . $filename]);
+        // }
+
+        // if ($request->hasFile('aadhar_back_path')) {
+        //     $file = $request->file('aadhar_back_path');
+        //     $filename = time() . '_aadhar_back.' . $file->getClientOriginalExtension();
+        //     $file->move(public_path('uploads/aadhar_card'), $filename);
+        //     $request->merge(['aadhar_back_path' => 'uploads/aadhar_card/' . $filename]);
+        // }
+
+        // // Handle file uploads for PAN Card
+        // if ($request->hasFile('pan_card_front_path')) {
+        //     $file = $request->file('pan_card_front_path');
+        //     $filename = time() . '_pan_front.' . $file->getClientOriginalExtension();
+        //     $file->move(public_path('uploads/pan_card'), $filename);
+        //     $request->merge(['pan_card_front_path' => 'uploads/pan_card/' . $filename]);
+        // }
+
+        // if ($request->hasFile('pan_card_back_path')) {
+        //     $file = $request->file('pan_card_back_path');
+        //     $filename = time() . '_pan_back.' . $file->getClientOriginalExtension();
+        //     $file->move(public_path('uploads/pan_card'), $filename);
+        //     $request->merge(['pan_card_back_path' => 'uploads/pan_card/' . $filename]);
+        // }
+
+        // // Handle file uploads for Driving License
+        // $drivingLicenseFront = null;
+        // if ($request->hasFile('driving_license_front_path')) {
+        //     $file = $request->file('driving_license_front_path');
+        //     $filename = time() . '_driving_license_front.' . $file->getClientOriginalExtension();
+        //     $file->move(public_path('uploads/driving_license'), $filename);
+        //     $drivingLicenseFront = 'uploads/driving_license/' . $filename;
+        // }
+
+        // $drivingLicenseBack = null;
+        // if ($request->hasFile('driving_license_back_path')) {
+        //     $file = $request->file('driving_license_back_path');
+        //     $filename = time() . '_driving_license_back.' . $file->getClientOriginalExtension();
+        //     $file->move(public_path('uploads/driving_license'), $filename);
+        //     $drivingLicenseBack = 'uploads/driving_license/' . $filename;
+        // }
+
+        // // Handle file uploads for Police Certificate
+        // $policeCertificate = null;
+        // if ($request->hasFile('police_certificate')) {
+        //     $file = $request->file('police_certificate');
+        //     $filename = time() . '_police_certificate.' . $file->getClientOriginalExtension();
+        //     $file->move(public_path('uploads/police_certificate'), $filename);
+        //     $policeCertificate = 'uploads/police_certificate/' . $filename;
+        // }
+
+        // // Handle file uploads for Passbook
+        // $passbookPic = null;
+        // if ($request->hasFile('passbook_pic')) {
+        //     $file = $request->file('passbook_pic');
+        //     $filename = time() . '_passbook.' . $file->getClientOriginalExtension();
+        //     $file->move(public_path('uploads/passbook'), $filename);
+        //     $passbookPic = 'uploads/passbook/' . $filename;
+        // }
+
         if ($request->hasFile('aadhar_front_path')) {
             $file = $request->file('aadhar_front_path');
             $filename = time() . '_aadhar_front.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/aadhar_card'), $filename);
-            $request->merge(['aadhar_front_path' => 'uploads/aadhar_card/' . $filename]);
+            $file->move(public_path('uploads/crm/staff/aadhar'), $filename);
+            $aadharFrontPath = 'uploads/crm/staff/aadhar/' . $filename;
         }
 
         if ($request->hasFile('aadhar_back_path')) {
             $file = $request->file('aadhar_back_path');
             $filename = time() . '_aadhar_back.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/aadhar_card'), $filename);
-            $request->merge(['aadhar_back_path' => 'uploads/aadhar_card/' . $filename]);
+            $file->move(public_path('uploads/crm/staff/aadhar'), $filename);
+            $aadharBackPath = 'uploads/crm/staff/aadhar/' . $filename;
         }
 
         if ($request->hasFile('pan_card_front_path')) {
             $file = $request->file('pan_card_front_path');
-            $filename = time() . '_pan_front.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/pan_card'), $filename);
-            $request->merge(['pan_card_front_path' => 'uploads/pan_card/' . $filename]);
+            $filename = time() . 'pan_front.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/crm/staff/pan'), $filename);
+            $panFrontPath = 'uploads/crm/staff/pan/' . $filename;
         }
 
         if ($request->hasFile('pan_card_back_path')) {
             $file = $request->file('pan_card_back_path');
-            $filename = time() . '_pan_back.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/pan_card'), $filename);
-            $request->merge(['pan_card_back_path' => 'uploads/pan_card/' . $filename]);
+            $filename = time() . 'pan_back.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/crm/staff/pan'), $filename);
+            $panBackPath = 'uploads/crm/staff/pan/' . $filename;
         }
 
-
-        $aadharPicPath = null;
-        if ($request->hasFile('aadhar_pic')) {
-            $file = $request->file('aadhar_pic');
-            $filename = time() . '_aadhar.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/aadhar_card'), $filename);
-            $aadharPicPath = 'uploads/aadhar_card/' . $filename;
+        if ($request->hasFile('driving_license_front_path')) {
+            $file = $request->file('driving_license_front_path');
+            $filename = time() . 'driving_license_front.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/crm/staff/drivingLicense'), $filename);
+            $drivingLicenseFrontPath = 'uploads/crm/staff/drivingLicense/' . $filename;
         }
 
-        $panCardName = null;
-        if ($request->hasFile('pan_card')) {
-            $file = $request->file('pan_card');
-            $filename = time() . '_pan.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/pan_card'), $filename);
-            $panCardName = 'uploads/pan_card/' . $filename;
+        if ($request->hasFile('driving_license_back_path')) {
+            $file = $request->file('driving_license_back_path');
+            $filename = time() . 'driving_license_back.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/crm/staff/drivingLicense'), $filename);
+            $drivingLicenseBackPath = 'uploads/crm/staff/drivingLicense/' . $filename;
         }
 
+        if ($request->hasFile('passbook_pic')) {
+            $file = $request->file('passbook_pic');
+            $filename = time() . 'passbook_pic.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/crm/staff/passbookPic'), $filename);
+            $passbookPic = 'uploads/crm/staff/passbookPic/' . $filename;
+        }
 
+        if ($request->hasFile('police_certificate')) {
+            $file = $request->file('police_certificate');
+            $filename = time() . 'police_certificate.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/crm/staff/policeCertificate'), $filename);
+            $policeCertificate = 'uploads/crm/staff/policeCertificate/' . $filename;
+        }
+
+        // Create Staff
         $staff = Staff::create([
             'staff_code' => 'STF' . time() . rand(100, 999),
             'staff_role' => $staffRole,
@@ -341,18 +423,96 @@ class ApiAuthController extends Controller
             'last_name' => $request->last_name,
             'phone' => $request->phone,
             'email' => $request->email,
-            'current_address' => $request->current_address,
-            'pan_no' => $request->pan_no,
-            'aadhar_no' => $request->aadhar_no,
-            'pan_card' => $panCardName,
-            'aadhar_card' => $aadharPicPath,
+            'dob' => $request->dob,
+            'gender' => $request->gender,
+            'marital_status' => $request->marital_status ?? 'unmarried',
+            'employment_type' => $request->employment_type ?? 'full_time',
+            'joining_date' => $request->joining_date,
+            'assigned_area' => $request->assigned_area,
+            'status' => 'pending',
         ]);
 
         if (! $staff) {
             return response()->json(['success' => false, 'message' => 'Failed to create staff.'], 500);
         }
 
-        return response()->json(['success' => true, 'message' => 'Staff created successfully.']);
+        // Store Staff Address
+        StaffAddress::create([
+            'staff_id' => $staff->id,
+            'address1' => $request->address1,
+            'address2' => $request->address2,
+            'city' => $request->city,
+            'state' => $request->state,
+            'country' => $request->country,
+            'pincode' => $request->pincode,
+        ]);
+
+        // Store Aadhar Details
+        if ($request->filled('aadhar_number')) {
+            StaffAadharDetail::create([
+                'staff_id' => $staff->id,
+                'aadhar_number' => $request->aadhar_number,
+                'aadhar_front_path' => $aadharFrontPath,
+                'aadhar_back_path' => $aadharBackPath,
+            ]);
+        }
+
+        // Store PAN Card Details
+        if ($request->filled('pan_number')) {
+            StaffPanCardDetail::create([
+                'staff_id' => $staff->id,
+                'pan_number' => $request->pan_number,
+                'pan_card_front_path' => $panFrontPath,
+                'pan_card_back_path' => $panBackPath,
+            ]);
+        }
+
+        // Store Vehicle Details
+        if ($request->filled('vehicle_type') || $request->filled('vehicle_number')) {
+            StaffVehicleDetail::create([
+                'staff_id' => $staff->id,
+                'vehicle_type' => $request->vehicle_type,
+                'vehicle_number' => $request->vehicle_number,
+                'driving_license_no' => $request->driving_license_no,
+                'driving_license_front_path' => $drivingLicenseFrontPath,
+                'driving_license_back_path' => $drivingLicenseBackPath,
+            ]);
+        }
+
+        // Store Bank Details
+        if ($request->filled('bank_acc_number')) {
+            StaffBankDetail::create([
+                'staff_id' => $staff->id,
+                'bank_acc_holder_name' => $request->bank_acc_holder_name,
+                'bank_acc_number' => $request->bank_acc_number,
+                'bank_name' => $request->bank_name,
+                'ifsc_code' => $request->ifsc_code,
+                'passbook_pic' => $passbookPic,
+            ]);
+        }
+
+        // Store Work Skills
+        if ($request->filled('primary_skills') || $request->filled('experience')) {
+            StaffWorkSkill::create([
+                'staff_id' => $staff->id,
+                'primary_skills' => $request->primary_skills,
+                'certifications' => $request->certifications,
+                'experience' => $request->experience,
+                'languages_known' => $request->languages_known,
+            ]);
+        }
+
+        // Store Police Verification
+        if ($request->filled('police_verifications')) {
+            StaffPoliceVerification::create([
+                'staff_id' => $staff->id,
+                'police_verification' => $request->police_verifications,
+                'police_verification_status' => $request->police_verification_status,
+                'police_certificate' => $policeCertificate,
+            ]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Staff created successfully.', 'staff_id' => $staff->id]);
     }
 
     /**
@@ -496,62 +656,41 @@ class ApiAuthController extends Controller
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
-        // $guard = $guards['staffs'] ?? 'api';
+        $staffRole = $this->getRoleId($request->role_id);
 
-        try {
-            $guard = match ($request->role_id) {
-                1, 2, 3 => 'staff',
-                4 => 'customers',
-                default => 'api',
-            };
-
-            auth($guard)->logout();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Successfully logged out'
-            ]);
-        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to logout'
-            ], 500);
+        if ($staffRole == 'customers') {
+            auth()->guard('customers')->logout();
+        } else {
+            auth()->guard('staff')->logout();
         }
+
+        return response()->json(['success' => true, 'message' => 'User logged out successfully']);
     }
 
-    public function refreshToken(Request $request)
+    public function updateToken(Request $request)
     {
-        $validated = Validator::make($request->all(), [
-            'user_id' => 'required',
-            'role_id' => 'required|in:1,2,3,4',
-        ]);
-
-        if ($validated->fails()) {
-            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        $user = auth()->guard('staff')->user();
+        if (!$user) {
+            $user = auth()->guard('customers')->user();
+        }
+        if ($user) {
+            $user->device_token = $request->token;
+            $user->save();
         }
 
-        $validated = $validated->validated();
-
-        $guard = $guards['staff'] ?? 'api';
-
-        try {
-            $newToken = auth($guard)->refresh();
-
-            return response()->json([
-                'access_token' => $newToken,
-                'token_type' => 'bearer',
-                'expires_in' => auth($guard)->factory()->getTTL() * 60,
-            ]);
-        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-            return response()->json(['error' => 'Failed to refresh token'], 401);
-        }
+        return response()->json(['success' => true, 'message' => 'Token updated']);
     }
 
     public function generateCustomerCode()
     {
-        $lastCustomer = Customer::orderBy('id', 'desc')->first();
-        $lastId = $lastCustomer ? intval(substr($lastCustomer->customer_code, 3)) : 0;
-        $newId = $lastId + 1;
-        return 'CST' . str_pad($newId, 6, '0', STR_PAD_LEFT);
+        $latestCustomer = Customer::orderBy('id', 'DESC')->first();
+
+        if ($latestCustomer) {
+            $number = (int) str_replace('CST-', '', $latestCustomer->customer_code) + 1;
+        } else {
+            $number = 1;
+        }
+
+        return 'CST-' . str_pad($number, 6, '0', STR_PAD_LEFT);
     }
 }

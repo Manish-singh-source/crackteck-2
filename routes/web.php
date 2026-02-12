@@ -456,7 +456,8 @@ Route::prefix('/demo')->group(function () {
         Route::delete('/crm/quotation/products/{id}', 'deleteProduct')->name('quotation.products.delete');
         Route::get('/crm/quotation/{quotationId}/products', 'getProducts')->name('quotation.products.get');
         Route::post('/crm/quotation/update-amc-plan', 'storeOrUpdateAmcDetail')->name('quotation.update.amc.plan');
-
+        
+        Route::post('/crm/quotation/amc/store', 'storeOrUpdateAmcDetail')->name('quotation.amc.store');
         // AMC Details Management Routes
         Route::get('/crm/quotation/{quotationId}/amc', 'getAmcDetail')->name('quotation.amc.get');
 

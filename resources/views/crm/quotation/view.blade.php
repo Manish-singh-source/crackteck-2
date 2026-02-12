@@ -161,6 +161,113 @@
                         <div class="card-header border-bottom-dashed">
                             <div class="d-flex">
                                 <h5 class="card-title flex-grow-1 mb-0">
+                                    Quotation Details
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            @if ($quotation)
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <ul class="list-group list-group-flush">
+                                            <li
+                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                                <span class="fw-semibold text-break">Quotation No. :
+                                                </span>
+                                                <span>
+                                                    {{ $quotation->quote_number ?? 'N/A' }}
+                                                </span>
+                                            </li>
+
+                                            <li
+                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                                <span class="fw-semibold text-break">Quotation Date :
+                                                </span>
+                                                <span>
+                                                    {{ $quotation->quote_date ?? 'N/A' }}
+                                                </span>
+                                            </li>
+
+                                            <li
+                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                                <span class="fw-semibold text-break">Expiry Date:
+                                                </span>
+                                                <span>
+                                                    {{ $quotation->expiry_date ? \Carbon\Carbon::parse($quotation->expiry_date)->format('Y-m-d h:i A') : 'N/A' }}
+                                                </span>
+                                            </li>
+                                            <li
+                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                                <span class="fw-semibold text-break">Total Items :
+                                                </span>
+                                                <span>
+                                                    {{ $quotation->total_items ?? 'N/A' }}
+                                                </span>
+                                            </li>
+                                            <li
+                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                                <span class="fw-semibold text-break">Currency :
+                                                </span>
+                                                <span>
+                                                    {{ $quotation->currency ?? 'N/A' }}
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <ul class="list-group list-group-flush">
+
+                                            <li
+                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                                <span class="fw-semibold text-break">Subtotal :
+                                                </span>
+                                                <span>
+                                                    ₹{{ number_format($quotation->subtotal ?? 0, 2) }}
+                                                </span>
+                                            </li>
+
+                                            <li
+                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                                <span class="fw-semibold text-break">Discount Amount :
+                                                </span>
+                                                <span>
+                                                    ₹{{ number_format($quotation->discount_amount ?? 0, 2) }}
+                                                </span>
+                                            </li>
+                                            <li
+                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                                <span class="fw-semibold text-break">Tax Amount :
+                                                </span>
+                                                <span>
+                                                    ₹{{ number_format($quotation->tax_amount ?? 0, 2) }}
+                                                </span>
+                                            </li>
+                                            <li
+                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                                <span class="fw-semibold text-break">Total Amount :
+                                                </span>
+                                                <span>
+                                                    {{ $quotation->total_amount ?? 'N/A' }}
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p class="text-muted">No Quotation Details Available.</p>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header border-bottom-dashed">
+                            <div class="d-flex">
+                                <h5 class="card-title flex-grow-1 mb-0">
                                     AMC Details
                                 </h5>
                             </div>
@@ -273,8 +380,6 @@
                                 </div>
                             @endif
                         </div>
-
-
                     </div>
 
                     <div class="card">
@@ -340,8 +445,52 @@
                             </table>
                         </div>
 
-                    </div>
+                        {{-- 
+                        <div class="card-footer">
+                            @if ($quotation->products && $quotation->products->count() > 0)
+                                @php
+                                    $totalQty = $quotation->products->sum('quantity');
 
+                                    $subTotal = $quotation->products->sum(function ($product) {
+                                        return $product->unit_price * $product->quantity;
+                                    });
+
+                                    $taxTotal = $quotation->products->sum(function ($product) {
+                                        $lineSub = $product->unit_price * $product->quantity;
+                                        return ($lineSub * $product->tax_rate) / 100;
+                                    });
+
+                                    $grandTotal = $quotation->products->sum('line_total');
+                                @endphp
+
+                                <div class="row">
+                                    <div class="col-md-6"></div>
+
+                                    <div class="col-md-6">
+                                        <table class="table table-borderless mb-0">
+                                            <tr>
+                                                <th>Total Quantity</th>
+                                                <td class="text-end">{{ $totalQty }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Subtotal</th>
+                                                <td class="text-end">₹{{ number_format($subTotal, 2) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Total Tax</th>
+                                                <td class="text-end">₹{{ number_format($taxTotal, 2) }}</td>
+                                            </tr>
+                                            <tr class="border-top">
+                                                <th>Grand Total</th>
+                                                <th class="text-end">₹{{ number_format($grandTotal, 2) }}</th>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            @endif
+                        </div> 
+                        --}}
+                    </div>
                 </div>
             </div>
         </div>

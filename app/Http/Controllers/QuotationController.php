@@ -117,6 +117,12 @@ class QuotationController extends Controller
             $quotation->total_amount = 0; // This will be calculated after saving products and AMC details
             $quotation->save();
 
+            $subtotal = 0; 
+            $taxAmount = 0; 
+            $discount = 0;
+            $total = 0;
+
+            // Save Quotation Products
             foreach ($request->products as $productData) {
                 $quotationProduct = new QuotationProduct;
                 $quotationProduct->quotation_id = $quotation->id;
@@ -130,6 +136,11 @@ class QuotationController extends Controller
                 $quotationProduct->tax_rate = $productData['tax'] ?? 0;
                 $quotationProduct->line_total = $productData['total'] ?? 0;
                 $quotationProduct->save();
+
+                $subtotal += $quotationProduct->unit_price * $quotationProduct->quantity;
+                $taxAmount += $quotationProduct->tax_rate * $quotationProduct->quantity;
+                $discount += $quotationProduct->discount_per_unit;
+                $total += $quotationProduct->line_total;
             }
 
             if ($request->filled('amc_plan_id')) {
@@ -147,7 +158,10 @@ class QuotationController extends Controller
             }
 
 
-            $quotation->total_amount = $quotation->subtotal + $quotation->tax_amount - $quotation->discount_amount;
+            $quotation->subtotal = $subtotal;
+            $quotation->tax_amount = $taxAmount;
+            $quotation->discount_amount = $discount;
+            $quotation->total_amount = $total;
             $quotation->save();
 
             DB::commit();

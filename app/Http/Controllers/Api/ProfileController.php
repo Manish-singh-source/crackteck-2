@@ -48,9 +48,15 @@ class ProfileController extends Controller
 
         if ($validated['role_id'] == 4) {
             $user = Customer::where('id', $validated['user_id'])->first();
+            if ($user->id !== auth()->id()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+            }
             unset($user->otp, $user->otp_expiry, $user->password, $user->created_by, $user->created_at);
         } else {
             $user = Staff::where('id', $validated['user_id'])->first();
+            if ($user->id !== auth()->id()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+            }
             unset($user->otp, $user->otp_expiry, $user->password);
         }
 

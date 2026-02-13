@@ -2,23 +2,27 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Customer;
-use App\Models\Engineer;
-use App\Models\Feedback;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\QuotationDetailResource;
+use App\Http\Resources\QuotationResource;
 use App\Models\AmcService;
 use App\Models\CoveredItem;
+use App\Models\Customer;
 use App\Models\DeliveryMan;
-use App\Models\SalesPerson;
+use App\Models\Engineer;
+use App\Models\Feedback;
 use App\Models\GiveFeedback;
-use Illuminate\Http\Request;
+use App\Models\Lead;
 use App\Models\NonAmcService;
-use App\Models\ServiceRequest;
-use Illuminate\Support\Facades\DB;
 use App\Models\QuickServiceRequest;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\File;
+use App\Models\Quotation;
+use App\Models\SalesPerson;
+use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestQuotation;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
 class AllServicesController extends Controller
@@ -169,11 +173,11 @@ class AllServicesController extends Controller
 
     public function submitQuickServiceRequest(Request $request)
     {
-        $validated = Validator:: make($request->all(),[
+        $validated = Validator::make($request->all(), [
             'customer_address_id' => 'required',
         ]);
 
-        if ($validated->fails()){
+        if ($validated->fails()) {
             return response()->json(['success' => false, 'message' => 'Please Add Address For the Service']);
         }
 
@@ -229,7 +233,7 @@ class AllServicesController extends Controller
         if (! $staffRole) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
-        
+
         try {
             DB::beginTransaction();
             if ($staffRole == 'customers') {
@@ -450,6 +454,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
+            'user_id' => 'required|integer|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
@@ -464,10 +469,20 @@ class AllServicesController extends Controller
         }
 
         // Pending to implement quotation list logic
-        $serviceRequestQuotations = ServiceRequestQuotation::with('serviceRequest', 'serviceRequestPart')->orderBy('created_at', 'desc')->get();
+        // $serviceRequestQuotations = ServiceRequestQuotation::with('serviceRequest', 'serviceRequestPart')->orderBy('created_at', 'desc')->get();
         // $serviceRequestQuotations = ServiceRequest::with('quotations')->orderBy('created_at', 'desc')->get();
+        $leadQuotations = Lead::with(['quotation' => function ($query) {
+            $query->where('status', '!=', 'draft');
+        }])
+            ->where('customer_id', $validated['user_id'])
+            ->whereHas('quotation', function ($query) {
+                $query->where('status', '!=', 'draft');
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+        $data = QuotationResource::collection($leadQuotations);
 
-        return response()->json(['quotations' => $serviceRequestQuotations], 200);
+        return response()->json(['data' => $data, 'success' => true], 200);
     }
 
     public function serviceRequestQuotationDetails(Request $request, $id)
@@ -490,18 +505,78 @@ class AllServicesController extends Controller
 
         // Pending to implement quotation details logic
         // Current (works fine)
-        $serviceRequestQuotation = ServiceRequestQuotation::with('serviceRequest', 'serviceRequestPart')
-            ->whereHas('serviceRequest', function ($query) use ($validated) {
-                $query->where('customer_id', $validated['user_id']);
-            })
-            ->where('id', $id)
-            ->first();
+        $quotationDetails = Quotation::with('leadDetails', 'amcDetail', 'products')->where('id', $id)->first();
+
+        if (! $quotationDetails) {
+            return response()->json(['success' => false, 'message' => 'Quotation not found.'], 404);
+        }
+
+        $data = new QuotationDetailResource ($quotationDetails);
+
+        return response()->json(['success' => true, 'data' => $data], 200);
+    }
+
+    public function acceptQuotation(Request $request, $id)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'user_id' => 'required|integer|exists:customers,id',
+        ]);
+
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        // Find the service request quotation
+        $serviceRequestQuotation = Quotation::where('id', $id)->first();
 
         if (! $serviceRequestQuotation) {
             return response()->json(['success' => false, 'message' => 'Quotation not found.'], 404);
         }
 
-        return response()->json(['quotation_details' => $serviceRequestQuotation], 200);
+        // Update the quotation status to accepted
+        $serviceRequestQuotation->update(['status' => 'accepted']);
+
+        return response()->json(['success' => true, 'message' => 'Quotation accepted successfully.'], 200);
+    }
+
+    public function rejectQuotation(Request $request, $id)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'user_id' => 'required|integer|exists:customers,id',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        // Find the service request quotation
+        $serviceRequestQuotation = Quotation::where('id', $id)->first();
+
+        if (! $serviceRequestQuotation) {
+            return response()->json(['success' => false, 'message' => 'Quotation not found.'], 404);
+        }
+
+        // Update the quotation status to rejected
+        $serviceRequestQuotation->update(['status' => 'rejected']);
+
+        return response()->json(['success' => true, 'message' => 'Quotation rejected successfully.'], 200);
     }
 
     // Give Feedback APIs only for that services who status is completed

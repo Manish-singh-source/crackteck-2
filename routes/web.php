@@ -450,13 +450,16 @@ Route::prefix('/demo')->group(function () {
         // Delete Quotation Page
         Route::delete('/crm/delete-quotation/{id}', 'delete')->name('quotation.delete');
 
+        // Update Status
+        Route::put('/crm/quotation/{id}/update-status', 'updateStatus')->name('quotation.updateStatus');
+
         // Product Management Routes
         Route::post('/crm/quotation/products/store', 'storeProduct')->name('quotation.products.store');
         Route::put('/crm/quotation/products/{id}', 'updateProduct')->name('quotation.products.update');
         Route::delete('/crm/quotation/products/{id}', 'deleteProduct')->name('quotation.products.delete');
         Route::get('/crm/quotation/{quotationId}/products', 'getProducts')->name('quotation.products.get');
         Route::post('/crm/quotation/update-amc-plan', 'storeOrUpdateAmcDetail')->name('quotation.update.amc.plan');
-        
+
         Route::post('/crm/quotation/amc/store', 'storeOrUpdateAmcDetail')->name('quotation.amc.store');
         // AMC Details Management Routes
         Route::get('/crm/quotation/{quotationId}/amc', 'getAmcDetail')->name('quotation.amc.get');

@@ -161,6 +161,53 @@
                         <div class="card-header border-bottom-dashed">
                             <div class="d-flex">
                                 <h5 class="card-title flex-grow-1 mb-0">
+                                    Quotation Status
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                @if($quotation->status !== 'accepted' && $quotation->status !== 'rejected' && $quotation->status !== 'expired')
+                                <div class="col-lg-6">
+                                    <div class="mb-3">
+                                        <label for="quotationStatus" class="form-label fw-semibold">Update Status:</label>
+                                        <div class="d-flex gap-2">
+                                            <select id="quotationStatus" class="form-select form-select-sm"
+                                                style="max-width: 200px;">
+                                                <option value="">-- Select Status --</option>
+                                                <option value="draft"
+                                                    {{ $quotation->status === 'draft' ? 'selected' : '' }}>Draft</option>
+                                                <option value="sent"
+                                                    {{ $quotation->status === 'sent' ? 'selected' : '' }}>Sent
+                                                </option>
+                                                <option value="converted"
+                                                    {{ $quotation->status === 'converted' ? 'selected' : '' }}>Converted
+                                                </option>
+                                            </select>
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                id="updateStatusBtn">Update Status</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif 
+                                <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Current Status:</span>
+                                            <span>
+                                                <span class="badge bg-info">{{ ucfirst($quotation->status) ?? 'N/A' }}</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header border-bottom-dashed">
+                            <div class="d-flex">
+                                <h5 class="card-title flex-grow-1 mb-0">
                                     Quotation Details
                                 </h5>
                             </div>
@@ -499,7 +546,37 @@
 
 @section('scripts')
     <script>
-        $(document).ready(function() {
+        $(document).ready(function() { // Update Quotation Status
+            $('#updateStatusBtn').click(function() {
+                const selectedStatus = $('#quotationStatus').val();
+
+                if (!selectedStatus) {
+                    alert('Please select a status');
+                    return;
+                }
+
+                $.ajax({
+                    url: '{{ route('quotation.updateStatus', $quotation->id) }}',
+                    method: 'PUT',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        status: selectedStatus,
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON?.message ||
+                            'Error updating status. Please try again.';
+                        alert(error);
+                    }
+                });
+            });
             // Toggle between Individual and Group sections
             $('input[name="assignment_type"]').change(function() {
                 if ($(this).val() === 'Individual') {

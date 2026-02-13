@@ -224,6 +224,10 @@ Route::prefix('v1')->group(function () {
             Route::get('/service-request-quotation-details/{id}', 'serviceRequestQuotationDetails');
 
 
+            // accept or reject quotation
+            Route::post('/service-request-quotations/{id}/accept', 'acceptQuotation');
+            Route::post('/service-request-quotations/{id}/reject', 'rejectQuotation');
+
             // Give Feedback APIs
             Route::post('/give-feedback', 'giveFeedback');
             Route::get('/get-all-feedback', 'getAllFeedback');

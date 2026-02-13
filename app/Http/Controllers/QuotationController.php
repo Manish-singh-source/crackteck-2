@@ -117,8 +117,8 @@ class QuotationController extends Controller
             $quotation->total_amount = 0; // This will be calculated after saving products and AMC details
             $quotation->save();
 
-            $subtotal = 0; 
-            $taxAmount = 0; 
+            $subtotal = 0;
+            $taxAmount = 0;
             $discount = 0;
             $total = 0;
 
@@ -321,7 +321,7 @@ class QuotationController extends Controller
             'priority_level' => 'required|string',
             'additional_notes' => 'required|string',
         ]);
-        
+
         if ($validator->fails()) {
             return redirect()->back()->with('error', $validator->errors());
         }
@@ -547,6 +547,42 @@ class QuotationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error deleting product: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update quotation status
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|in:draft,sent,converted',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $quotation = Quotation::findOrFail($id);
+            $oldStatus = $quotation->status;
+            $quotation->status = $request->status;
+            $quotation->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Quotation status updated from ' . $oldStatus . ' to ' . $request->status . ' successfully',
+                'status' => $quotation->status,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating status: ' . $e->getMessage(),
             ], 500);
         }
     }

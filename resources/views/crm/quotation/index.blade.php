@@ -48,7 +48,8 @@
                                                                 <th>Quotation Date</th>
                                                                 <th>Expiry Date</th>
                                                                 <th>Client Name</th>
-                                                                <th>Status</th>
+                                                                <th>Lead Status</th>
+                                                                <th>Quotation Status</th>
                                                                 <th>Created Date</th>
                                                                 <th>Updated Date</th>
                                                                 <th>Action</th>
@@ -69,6 +70,7 @@
                                                                     <td>{{ $quotation->leadDetails->customer->first_name }}
                                                                         {{ $quotation->leadDetails->customer->last_name }}</td>
                                                                     <td>{{ $quotation->leadDetails->status }}</td>
+                                                                    <td>{{ $quotation->status }}</td>
                                                                     <td>{{ $quotation->created_at->format('d M Y') }}</td>
                                                                     <td>{{ $quotation->updated_at->format('d M Y') }}</td>
                                                                     <td>

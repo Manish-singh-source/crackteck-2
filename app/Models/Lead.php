@@ -43,4 +43,9 @@ class Lead extends Model
     {
         return $this->belongsTo(CustomerCompanyDetail::class, 'customer_id');
     }
+
+    public function quotation()
+    {
+        return $this->hasOne(Quotation::class, 'lead_id');
+    }
 }

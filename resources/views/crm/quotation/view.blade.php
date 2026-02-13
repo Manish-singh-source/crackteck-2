@@ -161,56 +161,242 @@
                         <div class="card-header border-bottom-dashed">
                             <div class="d-flex">
                                 <h5 class="card-title flex-grow-1 mb-0">
-                                    Quotation Details
+                                    Quotation Status
                                 </h5>
                             </div>
                         </div>
-
                         <div class="card-body">
-                            @if ($quotation)
+                            <div class="row">
+                                @if ($quotation->status !== 'accepted' && $quotation->status !== 'rejected' && $quotation->status !== 'expired')
+                                    <div class="col-lg-6">
+                                        <div class="mb-3">
+                                            <label for="quotationStatus" class="form-label fw-semibold">Update
+                                                Status:</label>
+                                            <div class="d-flex gap-2">
+                                                <select id="quotationStatus" class="form-select form-select-sm"
+                                                    style="max-width: 200px;">
+                                                    <option value="">-- Select Status --</option>
+                                                    <option value="draft"
+                                                        {{ $quotation->status === 'draft' ? 'selected' : '' }}>Draft
+                                                    </option>
+                                                    <option value="sent"
+                                                        {{ $quotation->status === 'sent' ? 'selected' : '' }}>Sent
+                                                    </option>
+                                                    <option value="converted"
+                                                        {{ $quotation->status === 'converted' ? 'selected' : '' }}>
+                                                        Converted
+                                                    </option>
+                                                </select>
+                                                <button type="button" class="btn btn-primary btn-sm"
+                                                    id="updateStatusBtn">Update Status</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                                <div class="col-lg-6">
+                                    <div class="mt-2">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                                <span class="fw-semibold text-break">Current Status:</span>
+                                                <span>
+                                                    <span
+                                                        class="badge bg-info">{{ ucfirst($quotation->status) ?? 'N/A' }}</span>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                @if (isset($invoice))
+                                    @if ($invoice->status === 'draft')
+                                        <div class="col-lg-6">
+                                            <div class="mt-2">
+                                                <a href="{{ route('quotation.editInvoice', $quotation->id) }}"
+                                                    class="btn btn-warning btn-sm">Edit Invoice</a>
+                                            </div>
+                                        </div>
+                                    @elseif($invoice->status === 'sent')
+                                        <div class="col-lg-6">
+                                            <div class="mt-2">
+                                                <a href="{{ route('quotation.viewInvoice', $quotation->id) }}"
+                                                    class="btn btn-primary btn-sm">View Invoice</a>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @elseif ($quotation->status === 'accepted')
+                                    <div class="col-lg-6">
+                                        <div class="mt-2">
+                                            <a href="{{ route('quotation.generateInvoice', $quotation->id) }}"
+                                                class="btn btn-success btn-sm">Generate Invoice</a>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header border-bottom-dashed">
+                        <div class="d-flex">
+                            <h5 class="card-title flex-grow-1 mb-0">
+                                Quotation Details
+                            </h5>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        @if ($quotation)
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush">
+                                        <li
+                                            class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Quotation No. :
+                                            </span>
+                                            <span>
+                                                {{ $quotation->quote_number ?? 'N/A' }}
+                                            </span>
+                                        </li>
+
+                                        <li
+                                            class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Quotation Date :
+                                            </span>
+                                            <span>
+                                                {{ $quotation->quote_date ?? 'N/A' }}
+                                            </span>
+                                        </li>
+
+                                        <li
+                                            class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Expiry Date:
+                                            </span>
+                                            <span>
+                                                {{ $quotation->expiry_date ? \Carbon\Carbon::parse($quotation->expiry_date)->format('Y-m-d h:i A') : 'N/A' }}
+                                            </span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Total Items :
+                                            </span>
+                                            <span>
+                                                {{ $quotation->total_items ?? 'N/A' }}
+                                            </span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Currency :
+                                            </span>
+                                            <span>
+                                                {{ $quotation->currency ?? 'N/A' }}
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush">
+
+                                        <li
+                                            class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Subtotal :
+                                            </span>
+                                            <span>
+                                                ₹{{ number_format($quotation->subtotal ?? 0, 2) }}
+                                            </span>
+                                        </li>
+
+                                        <li
+                                            class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Discount Amount :
+                                            </span>
+                                            <span>
+                                                ₹{{ number_format($quotation->discount_amount ?? 0, 2) }}
+                                            </span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Tax Amount :
+                                            </span>
+                                            <span>
+                                                ₹{{ number_format($quotation->tax_amount ?? 0, 2) }}
+                                            </span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Total Amount :
+                                            </span>
+                                            <span>
+                                                {{ $quotation->total_amount ?? 'N/A' }}
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        @else
+                            <div class="row">
+                                <div class="col-12">
+                                    <p class="text-muted">No Quotation Details Available.</p>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header border-bottom-dashed">
+                        <div class="d-flex">
+                            <h5 class="card-title flex-grow-1 mb-0">
+                                AMC Details
+                            </h5>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        @if ($quotation->amcDetail)
+                            @foreach ($quotation->amcDetail as $amcDetail)
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <ul class="list-group list-group-flush">
                                             <li
                                                 class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                <span class="fw-semibold text-break">Quotation No. :
+                                                <span class="fw-semibold text-break">Plan Name:
                                                 </span>
                                                 <span>
-                                                    {{ $quotation->quote_number ?? 'N/A' }}
+                                                    {{ $amcDetail->amcPlan->plan_name ?? 'N/A' }}
                                                 </span>
                                             </li>
 
                                             <li
                                                 class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                <span class="fw-semibold text-break">Quotation Date :
+                                                <span class="fw-semibold text-break">Duration (Months) :
                                                 </span>
                                                 <span>
-                                                    {{ $quotation->quote_date ?? 'N/A' }}
+                                                    {{ $amcDetail->plan_duration ?? 'N/A' }}
                                                 </span>
                                             </li>
 
                                             <li
                                                 class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                <span class="fw-semibold text-break">Expiry Date:
+                                                <span class="fw-semibold text-break">Start From :
                                                 </span>
                                                 <span>
-                                                    {{ $quotation->expiry_date ? \Carbon\Carbon::parse($quotation->expiry_date)->format('Y-m-d h:i A') : 'N/A' }}
+                                                    {{ $amcDetail->plan_start_date ? \Carbon\Carbon::parse($amcDetail->plan_start_date)->format('Y-m-d h:i A') : 'N/A' }}
                                                 </span>
                                             </li>
                                             <li
                                                 class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                <span class="fw-semibold text-break">Total Items :
+                                                <span class="fw-semibold text-break">Total Visits :
                                                 </span>
                                                 <span>
-                                                    {{ $quotation->total_items ?? 'N/A' }}
+                                                    {{ $amcDetail->amcPlan->total_visits ?? 'N/A' }}
                                                 </span>
                                             </li>
                                             <li
                                                 class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                <span class="fw-semibold text-break">Currency :
+                                                <span class="fw-semibold text-break">Priority Level :
                                                 </span>
                                                 <span>
-                                                    {{ $quotation->currency ?? 'N/A' }}
+                                                    {{ $amcDetail->priority_level ?? 'N/A' }}
                                                 </span>
                                             </li>
                                         </ul>
@@ -220,27 +406,28 @@
 
                                             <li
                                                 class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                <span class="fw-semibold text-break">Subtotal :
+                                                <span class="fw-semibold text-break">Plan Type :
                                                 </span>
                                                 <span>
-                                                    ₹{{ number_format($quotation->subtotal ?? 0, 2) }}
+                                                    AMC
                                                 </span>
                                             </li>
 
                                             <li
                                                 class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                <span class="fw-semibold text-break">Discount Amount :
+                                                <span class="fw-semibold text-break">Description :
                                                 </span>
                                                 <span>
-                                                    ₹{{ number_format($quotation->discount_amount ?? 0, 2) }}
+                                                    {{ $amcDetail->amcPlan->description ?? 'N/A' }}
                                                 </span>
                                             </li>
+
                                             <li
                                                 class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                <span class="fw-semibold text-break">Tax Amount :
+                                                <span class="fw-semibold text-break">End From :
                                                 </span>
                                                 <span>
-                                                    ₹{{ number_format($quotation->tax_amount ?? 0, 2) }}
+                                                    {{ $amcDetail->plan_end_date ? \Carbon\Carbon::parse($amcDetail->plan_end_date)->format('Y-m-d h:i A') : 'N/A' }}
                                                 </span>
                                             </li>
                                             <li
@@ -248,204 +435,95 @@
                                                 <span class="fw-semibold text-break">Total Amount :
                                                 </span>
                                                 <span>
-                                                    {{ $quotation->total_amount ?? 'N/A' }}
+                                                    ₹{{ number_format($amcDetail->total_amount ?? 0, 2) }}
+                                                </span>
+                                            </li>
+                                            <li
+                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                                <span class="fw-semibold text-break">Additional Notes :
+                                                </span>
+                                                <span>
+                                                    {{ $amcDetail->additional_notes ?? 'N/A' }}
                                                 </span>
                                             </li>
                                         </ul>
                                     </div>
                                 </div>
-                            @else
-                                <div class="row">
-                                    <div class="col-12">
-                                        <p class="text-muted">No Quotation Details Available.</p>
-                                    </div>
+                            @endforeach
+                        @else
+                            <div class="row">
+                                <div class="col-12">
+                                    <p class="text-muted">No AMC details available.</p>
                                 </div>
-                            @endif
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header border-bottom-dashed">
+                        <div class="d-flex">
+                            <h5 class="card-title flex-grow-1 mb-0">
+                                Product Details
+                            </h5>
                         </div>
                     </div>
-
-                    <div class="card">
-                        <div class="card-header border-bottom-dashed">
-                            <div class="d-flex">
-                                <h5 class="card-title flex-grow-1 mb-0">
-                                    AMC Details
-                                </h5>
-                            </div>
-                        </div>
-
-                        <div class="card-body">
-                            @if ($quotation->amcDetail)
-                                @foreach ($quotation->amcDetail as $amcDetail)
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <ul class="list-group list-group-flush">
-                                                <li
-                                                    class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                    <span class="fw-semibold text-break">Plan Name:
-                                                    </span>
-                                                    <span>
-                                                        {{ $amcDetail->amcPlan->plan_name ?? 'N/A' }}
-                                                    </span>
-                                                </li>
-
-                                                <li
-                                                    class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                    <span class="fw-semibold text-break">Duration (Months) :
-                                                    </span>
-                                                    <span>
-                                                        {{ $amcDetail->plan_duration ?? 'N/A' }}
-                                                    </span>
-                                                </li>
-
-                                                <li
-                                                    class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                    <span class="fw-semibold text-break">Start From :
-                                                    </span>
-                                                    <span>
-                                                        {{ $amcDetail->plan_start_date ? \Carbon\Carbon::parse($amcDetail->plan_start_date)->format('Y-m-d h:i A') : 'N/A' }}
-                                                    </span>
-                                                </li>
-                                                <li
-                                                    class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                    <span class="fw-semibold text-break">Total Visits :
-                                                    </span>
-                                                    <span>
-                                                        {{ $amcDetail->amcPlan->total_visits ?? 'N/A' }}
-                                                    </span>
-                                                </li>
-                                                <li
-                                                    class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                    <span class="fw-semibold text-break">Priority Level :
-                                                    </span>
-                                                    <span>
-                                                        {{ $amcDetail->priority_level ?? 'N/A' }}
-                                                    </span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <ul class="list-group list-group-flush">
-
-                                                <li
-                                                    class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                    <span class="fw-semibold text-break">Plan Type :
-                                                    </span>
-                                                    <span>
-                                                        AMC
-                                                    </span>
-                                                </li>
-
-                                                <li
-                                                    class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                    <span class="fw-semibold text-break">Description :
-                                                    </span>
-                                                    <span>
-                                                        {{ $amcDetail->amcPlan->description ?? 'N/A' }}
-                                                    </span>
-                                                </li>
-
-                                                <li
-                                                    class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                    <span class="fw-semibold text-break">End From :
-                                                    </span>
-                                                    <span>
-                                                        {{ $amcDetail->plan_end_date ? \Carbon\Carbon::parse($amcDetail->plan_end_date)->format('Y-m-d h:i A') : 'N/A' }}
-                                                    </span>
-                                                </li>
-                                                <li
-                                                    class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                    <span class="fw-semibold text-break">Total Amount :
-                                                    </span>
-                                                    <span>
-                                                        ₹{{ number_format($amcDetail->total_amount ?? 0, 2) }}
-                                                    </span>
-                                                </li>
-                                                <li
-                                                    class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                    <span class="fw-semibold text-break">Additional Notes :
-                                                    </span>
-                                                    <span>
-                                                        {{ $amcDetail->additional_notes ?? 'N/A' }}
-                                                    </span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            @else
-                                <div class="row">
-                                    <div class="col-12">
-                                        <p class="text-muted">No AMC details available.</p>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header border-bottom-dashed">
-                            <div class="d-flex">
-                                <h5 class="card-title flex-grow-1 mb-0">
-                                    Product Details
-                                </h5>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-striped table-borderless dt-responsive nowrap">
-                                <thead>
-                                    <tr>
-                                        <th>Product Name</th>
-                                        <th>HSN Code</th>
-                                        <th>SKU</th>
-                                        <th>Price</th>
-                                        <th>Quantity</th>
-                                        <th>Sub Total</th>
-                                        <th>Tax (%)</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if ($quotation->products && $quotation->products->count() > 0)
-                                        @foreach ($quotation->products as $product)
-                                            <tr class="align-middle">
-                                                <td>
-                                                    <div>
-                                                        {{ $product->product_name }}
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    {{ $product->hsn_code ?? 'N/A' }}
-                                                </td>
-                                                <td>
-                                                    {{ $product->sku ?? 'N/A' }}
-                                                </td>
-                                                <td>
-                                                    ₹{{ number_format($product->unit_price, 2) }}
-                                                </td>
-                                                <td>
-                                                    {{ $product->quantity }}
-                                                </td>
-                                                <td>
-                                                    ₹{{ number_format($product->unit_price * $product->quantity, 2) }}
-                                                </td>
-                                                <td>
-                                                    {{ $product->tax_rate }}%
-                                                </td>
-                                                <td>
-                                                    ₹{{ number_format($product->line_total, 2) }}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    @else
-                                        <tr>
-                                            <td colspan="8" class="text-center text-muted">No products available.</td>
+                    <div class="card-body">
+                        <table class="table table-striped table-borderless dt-responsive nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>HSN Code</th>
+                                    <th>SKU</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Sub Total</th>
+                                    <th>Tax (%)</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if ($quotation->products && $quotation->products->count() > 0)
+                                    @foreach ($quotation->products as $product)
+                                        <tr class="align-middle">
+                                            <td>
+                                                <div>
+                                                    {{ $product->product_name }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {{ $product->hsn_code ?? 'N/A' }}
+                                            </td>
+                                            <td>
+                                                {{ $product->sku ?? 'N/A' }}
+                                            </td>
+                                            <td>
+                                                ₹{{ number_format($product->unit_price, 2) }}
+                                            </td>
+                                            <td>
+                                                {{ $product->quantity }}
+                                            </td>
+                                            <td>
+                                                ₹{{ number_format($product->unit_price * $product->quantity, 2) }}
+                                            </td>
+                                            <td>
+                                                {{ $product->tax_rate }}%
+                                            </td>
+                                            <td>
+                                                ₹{{ number_format($product->line_total, 2) }}
+                                            </td>
                                         </tr>
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
+                                    @endforeach
+                                @else
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted">No products available.</td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
 
-                        {{-- 
+                    {{-- 
                         <div class="card-footer">
                             @if ($quotation->products && $quotation->products->count() > 0)
                                 @php
@@ -490,16 +568,46 @@
                             @endif
                         </div> 
                         --}}
-                    </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 @endsection
 
 @section('scripts')
     <script>
-        $(document).ready(function() {
+        $(document).ready(function() { // Update Quotation Status
+            $('#updateStatusBtn').click(function() {
+                const selectedStatus = $('#quotationStatus').val();
+
+                if (!selectedStatus) {
+                    alert('Please select a status');
+                    return;
+                }
+
+                $.ajax({
+                    url: '{{ route('quotation.updateStatus', $quotation->id) }}',
+                    method: 'PUT',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        status: selectedStatus,
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON?.message ||
+                            'Error updating status. Please try again.';
+                        alert(error);
+                    }
+                });
+            });
             // Toggle between Individual and Group sections
             $('input[name="assignment_type"]').change(function() {
                 if ($(this).val() === 'Individual') {

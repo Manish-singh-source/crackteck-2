@@ -56,3 +56,14 @@ Working Tasks:
 
     APIs: 
         1. Sales Person Fixing Issues in All APIs 
+
+
+
+
+
+
+
+status update from crm 
+accept quotation from customer 
+send invoice for customer 
+quotation invoice 

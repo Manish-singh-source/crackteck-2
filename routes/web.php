@@ -450,19 +450,27 @@ Route::prefix('/demo')->group(function () {
         // Delete Quotation Page
         Route::delete('/crm/delete-quotation/{id}', 'delete')->name('quotation.delete');
 
+        // Update Status
+        Route::put('/crm/quotation/{id}/update-status', 'updateStatus')->name('quotation.updateStatus');
+
         // Product Management Routes
         Route::post('/crm/quotation/products/store', 'storeProduct')->name('quotation.products.store');
         Route::put('/crm/quotation/products/{id}', 'updateProduct')->name('quotation.products.update');
         Route::delete('/crm/quotation/products/{id}', 'deleteProduct')->name('quotation.products.delete');
         Route::get('/crm/quotation/{quotationId}/products', 'getProducts')->name('quotation.products.get');
         Route::post('/crm/quotation/update-amc-plan', 'storeOrUpdateAmcDetail')->name('quotation.update.amc.plan');
-        
+
         Route::post('/crm/quotation/amc/store', 'storeOrUpdateAmcDetail')->name('quotation.amc.store');
         // AMC Details Management Routes
         Route::get('/crm/quotation/{quotationId}/amc', 'getAmcDetail')->name('quotation.amc.get');
 
         // Engineer Assignment Routes
         Route::post('/crm/quotation/assign-engineer', 'assignEngineer')->name('quotation.assign-engineer');
+        // Generate Invoice from Quotation
+        Route::get('/crm/quotation/{id}/generate-invoice', 'generateInvoice')->name('quotation.generateInvoice');
+        Route::post('/crm/quotation/{id}/store-invoice', 'storeInvoice')->name('quotation.storeInvoice');
+        Route::get('/crm/quotation/{id}/edit-invoice', 'generateInvoice')->name('quotation.editInvoice');
+        Route::get('/crm/quotation/{id}/view-invoice', 'viewInvoice')->name('quotation.viewInvoice');
     });
 
     Route::prefix('/crm')->group(function () {

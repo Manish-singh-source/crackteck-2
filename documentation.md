@@ -1430,7 +1430,7 @@ etc.
             $table->decimal('discount_per_unit', 15, 2)->default(0);
             $table->decimal('tax_rate', 5, 2)->default(0);
             $table->decimal('line_total', 15, 2);
-            $table->integer('sort_order')->default(0);
+            $table->integer('sort_order')->default(0); 
             $table->timestamps();
             $table->softDeletes();
         });

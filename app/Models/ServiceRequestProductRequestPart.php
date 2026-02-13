@@ -10,11 +10,15 @@ class ServiceRequestProductRequestPart extends Model
     //
     use SoftDeletes;
     
+    protected $table = 'service_request_product_request_parts';
+    
     protected $fillable = [
-        'service_request_id',
-        'service_request_product_id',
-        'assigned_engineer_id',
-        'requested_part_id',
+        'request_id',
+        'product_id',
+        'engineer_id',
+        'part_id',
+        'requested_quantity',
+        'reason',
         'request_type',
 
         'assigned_person_type',
@@ -25,9 +29,13 @@ class ServiceRequestProductRequestPart extends Model
         'otp',
         'otp_expiry',
         
+        'admin_approved_at',
+        'admin_rejected_at',
         'assigned_at',
-        'approved_at',
-        'rejected_at',
+        'assigned_approved_at',
+        'assigned_rejected_at',
+        'warehouse_approved_at',
+        'warehouse_rejected_at',
         'customer_approved_at',
         'customer_rejected_at',
         'picked_at',
@@ -47,29 +55,23 @@ class ServiceRequestProductRequestPart extends Model
         return $this->belongsTo(ServiceRequestProduct::class, 'product_id');
     }
 
-    public function fromEngineer()
+    public function engineer()
     {
         return $this->belongsTo(Staff::class, 'engineer_id');
     }
-
 
     public function assignedEngineer()
     {
         return $this->belongsTo(Staff::class, 'assigned_person_id');
     }
 
-    // public function requestedPart()
-    // {
-    //     return $this->belongsTo(Product::class, 'part_id');
-    // }
-
     public function requestedPart()
     {
-    return $this->belongsTo(ProductSerial::class, 'part_id');
+        return $this->belongsTo(ProductSerial::class, 'part_id');
     }
 
     public function product()
     {
-    return $this->belongsTo(Product::class, 'part_id');
+        return $this->belongsTo(Product::class, 'part_id');
     }
 }

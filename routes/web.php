@@ -762,6 +762,12 @@ Route::prefix('/demo')->group(function () {
         Route::get('/crm/spare-parts-requests', 'index')->name('spare-parts-requests.index');
         // View Parts Requests Page
         Route::get('/crm/spare-parts-requests/{id}', 'view')->name('spare-parts-requests.view');
+        // Admin Approval/Rejection
+        Route::put('/crm/spare-parts-requests/{id}/admin-approval', 'adminApproval')->name('spare-parts.admin-approval');
+        // Warehouse Approval/Rejection
+        Route::put('/crm/spare-parts-requests/{id}/warehouse-approval', 'warehouseApproval')->name('spare-parts.warehouse-approval');
+        // Picked by Engineer
+        Route::put('/crm/spare-parts-requests/{id}/picked', 'picked')->name('spare-parts.picked');
     });
 
     // ------------------------------------------------------------ Assign Products Page -------------------------------------------------------------

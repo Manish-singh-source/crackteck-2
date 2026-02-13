@@ -313,85 +313,102 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <!-- Warehouse Approval/Rejection Section -->
+                    <div class="card mt-3">
                         <div class="card-header border-bottom-dashed">
                             <div class="d-flex">
                                 <h5 class="card-title flex-grow-1 mb-0">
-                                    Assign Delivery Man
+                                    Warehouse Approval
                                 </h5>
                             </div>
                         </div>
 
                         <div class="card-body">
-                            <form action="{{ route('spare-parts.assign-person', $stockRequests->id) }}" method="POST">
-                                @csrf
-                                @method('PUT')
-
-                                <div class="mb-3">
-                                    <label for="approval_status" class="form-label">Quantity</label>
-                                    <input type="number" class="form-control" id="quantity" name="quantity"
-                                        value="{{ $stockRequests->requested_quantity }}" required>
+                            @if (in_array($stockRequests->status, ['warehouse_approved', 'warehouse_rejected', 'picked']))
+                                <div class="text-center">
+                                    <div class="mb-2">
+                                        @if ($stockRequests->status === 'warehouse_approved' || $stockRequests->status === 'picked')
+                                            <span class="badge bg-success-subtle text-success fs-5 px-3 py-2">
+                                                <i class="mdi mdi-check-circle me-1"></i>Warehouse Approved
+                                            </span>
+                                        @else
+                                            <span class="badge bg-danger-subtle text-danger fs-5 px-3 py-2">
+                                                <i class="mdi mdi-close-circle me-1"></i>Warehouse Rejected
+                                            </span>
+                                        @endif
+                                    </div>
+                                    @if ($stockRequests->warehouse_approved_at)
+                                        <small class="text-muted d-block">Approved on: {{ $stockRequests->warehouse_approved_at->format('d M Y, h:i A') }}</small>
+                                    @elseif ($stockRequests->warehouse_rejected_at)
+                                        <small class="text-muted d-block">Rejected on: {{ $stockRequests->warehouse_rejected_at->format('d M Y, h:i A') }}</small>
+                                    @endif
                                 </div>
+                            @else
+                                <form action="{{ route('spare-parts.warehouse-approval', $stockRequests->id) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
 
-                                <div class="mb-3">
-                                    <label for="approval_status" class="form-label">Select Assignment Type</label>
-                                    <select class="form-select @error('assigned_person_type') is-invalid @enderror"
-                                        id="assigned_person_type" name="assigned_person_type" required>
-                                        <option value="" selected disabled>-- Select Assignment Type --</option>
-                                        <option value="engineer"
-                                            {{ $stockRequests->assigned_person_type == 'engineer' ? 'selected' : '' }}>
-                                            Engineer</option>
-                                        <option value="delivery_man"
-                                            {{ $stockRequests->assigned_person_type == 'delivery_man' ? 'selected' : '' }}>
-                                            Delivery
-                                            Man</option>
-                                    </select>
-                                    @error('assigned_person_type')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                                    <div class="mb-3">
+                                        <label for="warehouse_status" class="form-label">Select Action</label>
+                                        <select class="form-select @error('warehouse_status') is-invalid @enderror"
+                                            id="warehouse_status" name="warehouse_status" required>
+                                            <option value="" selected disabled>-- Select Action --</option>
+                                            <option value="warehouse_approved">Approve</option>
+                                            <option value="warehouse_rejected">Reject</option>
+                                        </select>
+                                        @error('warehouse_status')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
 
-                                <div class="mb-3" id="deliveryManSection" style="display: none;">
-                                    <label for="delivery_man_id" class="form-label">Select Delivery Man</label>
-                                    <select class="form-select @error('delivery_man_id') is-invalid @enderror"
-                                        id="delivery_man_id" name="delivery_man_id">
-                                        <option value="" selected disabled>-- Select Delivery Man --</option>
-                                        @foreach ($deliveryMen as $deliveryMan)
-                                            <option value="{{ $deliveryMan->id }}"
-                                                @if ($stockRequests->assigned_person_id == $deliveryMan->id) selected @endif>
-                                                {{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('delivery_man_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="mb-3" id="engineerSection" style="display: none;">
-                                    <label for="engineer_id" class="form-label">Select Engineer</label>
-                                    <select class="form-select @error('engineer_id') is-invalid @enderror"
-                                        id="engineer_id" name="engineer_id">
-                                        <option value="" selected disabled>-- Select Engineer --</option>
-                                        @foreach ($engineers as $engineer)
-                                            <option value="{{ $engineer->id }}"
-                                                @if ($stockRequests->assigned_person_id == $engineer->id) selected @endif>
-                                                {{ $engineer->first_name }} {{ $engineer->last_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('engineer_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <button type="submit" class="btn btn-primary w-100 mt-3">
-                                    <i class="mdi mdi-check-circle me-2"></i>Update
-                                </button>
-                            </form>
+                                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                                        <i class="mdi mdi-check-circle me-2"></i>Submit
+                                    </button>
+                                </form>
+                            @endif
                         </div>
-
                     </div>
+
+                    <!-- Picked by Engineer Section -->
+                    @if ($stockRequests->request_type === 'stock_in_hand' && in_array($stockRequests->status, ['warehouse_approved', 'picked']))
+                        <div class="card mt-3">
+                            <div class="card-header border-bottom-dashed">
+                                <div class="d-flex">
+                                    <h5 class="card-title flex-grow-1 mb-0">
+                                        Picked by Engineer
+                                    </h5>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                @if ($stockRequests->status === 'picked')
+                                    <div class="text-center">
+                                        <div class="mb-2">
+                                            <span class="badge bg-success-subtle text-success fs-5 px-3 py-2">
+                                                <i class="mdi mdi-check-circle me-1"></i>Picked
+                                            </span>
+                                        </div>
+                                        @if ($stockRequests->picked_at)
+                                            <small class="text-muted d-block">Picked on: {{ $stockRequests->picked_at->format('d M Y, h:i A') }}</small>
+                                        @endif
+                                    </div>
+                                @else
+                                    <form action="{{ route('spare-parts.picked', $stockRequests->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+
+                                        <div class="mb-3">
+                                            <p class="text-muted">Mark this product as picked by the engineer from warehouse.</p>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-success w-100 mt-3">
+                                            <i class="mdi mdi-package-variant-closed me-2"></i>Mark as Picked
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
 
                 </div>
             </div>

@@ -539,9 +539,13 @@ class ApiAuthController extends Controller
             }
 
             if ($staffRole == 'customers') {
-                $user = Customer::where('phone', $request->phone_number)->first();
+                $user = Customer::where('phone', $request->phone_number)
+                ->where('status', 'active')
+                ->first();
             } else {
-                $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
+                $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)
+                ->where('status', 'active')
+                ->first();
             }
             if (! $user) {
                 return response()->json(['success' => false, 'message' => 'User not found with the provided phone number and role.'], 404);

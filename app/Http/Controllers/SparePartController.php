@@ -36,7 +36,7 @@ class SparePartController extends Controller
             ->with([
                 'serviceRequest',
                 'serviceRequestProduct',
-                'fromEngineer',
+                // 'fromEngineer',
                 'assignedEngineer',
                 'requestedPart',
             ])
@@ -83,14 +83,14 @@ class SparePartController extends Controller
             'serviceRequest.customer',
             'serviceRequest.customer.primaryAddress',
             'serviceRequestProduct',
-            'fromEngineer',
+            // 'fromEngineer',
             'assignedEngineer',
             'requestedPart.product',
             'requestedPart.product.parentCategorie',
             'requestedPart.product.brand',
             'requestedPart.product.subCategorie',
         ])->findOrFail($id);
-
+        // dd($stockRequests);
         $deliveryMen = Staff::where('staff_role', 'delivery_man')->get();
         $engineers   = Staff::where('staff_role', 'engineer')->get();
 
@@ -133,7 +133,83 @@ class SparePartController extends Controller
         $sparePartRequest = ServiceRequestProductRequestPart::findOrFail($id);
         $sparePartRequest->update($data);
 
-        return redirect()->route('spare-parts.index', $id)
+        return redirect()->route('spare-parts-requests.view', $id)
             ->with('success', 'Person assigned successfully.');
+    }
+
+    /**
+     * Handle admin approval/rejection for stock_in_hand requests
+     */
+    public function adminApproval(Request $request, $id)
+    {
+        $request->validate([
+            'admin_status' => 'required|in:admin_approved,admin_rejected',
+        ]);
+
+        $sparePartRequest = ServiceRequestProductRequestPart::findOrFail($id);
+
+        if ($request->admin_status === 'admin_approved') {
+            $data = [
+                'status' => 'admin_approved',
+                'admin_approved_at' => now(),
+            ];
+        } else {
+            $data = [
+                'status' => 'admin_rejected',
+                'admin_rejected_at' => now(),
+            ];
+        }
+
+        $sparePartRequest->update($data);
+
+        return redirect()->route('spare-parts-requests.view', $id)
+            ->with('success', 'Request ' . str_replace('_', ' ', $request->admin_status) . ' successfully.');
+    }
+
+    /**
+     * Handle warehouse approval/rejection for stock_in_hand requests
+     */
+    public function warehouseApproval(Request $request, $id)
+    {
+        $request->validate([
+            'warehouse_status' => 'required|in:warehouse_approved,warehouse_rejected',
+        ]);
+
+        $sparePartRequest = ServiceRequestProductRequestPart::findOrFail($id);
+
+        if ($request->warehouse_status === 'warehouse_approved') {
+            $data = [
+                'status' => 'warehouse_approved',
+                'warehouse_approved_at' => now(),
+            ];
+        } else {
+            $data = [
+                'status' => 'warehouse_rejected',
+                'warehouse_rejected_at' => now(),
+            ];
+        }
+
+        $sparePartRequest->update($data);
+
+        return redirect()->route('spare-parts-requests.view', $id)
+            ->with('success', 'Request ' . str_replace('_', ' ', $request->warehouse_status) . ' successfully.');
+    }
+
+    /**
+     * Handle picked status for stock_in_hand requests
+     */
+    public function picked(Request $request, $id)
+    {
+        $sparePartRequest = ServiceRequestProductRequestPart::findOrFail($id);
+
+        $data = [
+            'status' => 'picked',
+            'picked_at' => now(),
+        ];
+
+        $sparePartRequest->update($data);
+
+        return redirect()->route('spare-parts-requests.view', $id)
+            ->with('success', 'Request marked as picked successfully.');
     }
 }

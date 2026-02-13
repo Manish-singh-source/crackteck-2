@@ -16,6 +16,7 @@ use App\Models\Lead;
 use App\Models\NonAmcService;
 use App\Models\QuickServiceRequest;
 use App\Models\Quotation;
+use App\Models\QuotationInvoice;
 use App\Models\SalesPerson;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
@@ -369,12 +370,6 @@ class AllServicesController extends Controller
         }
     }
 
-    // first i want to check service_type is 0 then this is amc service 
-    // and if service_type is 1,2,3 then this is other service 
-    // if service_type is 0 then check amc_plan_id 
-    // if amc_plan_id is not null then check amc_plans table in that fetch covered_items then go to covered_items table fetch diagnosis_list according to that amc_plan_id covered_items
-    // else check service_requests_products table in that fetch item_code_id it will fetch covered_items table in that table fetch diagnosis_list
-
     public function serviceRequestProductDiagnostics(Request $request, $id, $product_id)
     {
         $validated = Validator::make($request->all(), [
@@ -420,35 +415,6 @@ class AllServicesController extends Controller
             return response()->json(['product_diagnostics' => $productDiagnostics], 200);
         }
     }
-
-    // public function serviceRequestProductDiagnostics(Request $request, $id)
-    // {
-    //     $validated = Validator::make($request->all(), [
-    //         'role_id' => 'required|in:4',
-    //         'customer_id' => 'required|integer|exists:customers,id',
-    //     ]);
-
-    //     if ($validated->fails()) {
-    //         return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
-    //     }
-
-    //     $validated = $validated->validated();
-    //     $staffRole = $this->getRoleId($validated['role_id']);
-
-    //     if (! $staffRole) {
-    //         return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
-    //     }
-
-    //     if ($staffRole == 'customers') {
-    //         $productDiagnostics = ServiceRequestProduct::where('service_requests_id', $id)
-    //             ->whereHas('serviceRequest', function ($query) use ($validated) {
-    //                 $query->where('customer_id', $validated['customer_id']);
-    //             })
-    //             ->get();
-
-    //         return response()->json(['product_diagnostics' => $productDiagnostics], 200);
-    //     }
-    // }
 
     public function serviceRequestQuotations(Request $request)
     {
@@ -577,6 +543,35 @@ class AllServicesController extends Controller
         $serviceRequestQuotation->update(['status' => 'rejected']);
 
         return response()->json(['success' => true, 'message' => 'Quotation rejected successfully.'], 200);
+    }
+
+    // display invoice to the customer according to quotation id 
+    public function serviceRequestInvoice(Request $request, $id)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'user_id' => 'required|integer|exists:customers,id',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        // Find the quotation invoice according to quotation id
+        $invoice = QuotationInvoice::with('items')->where('quote_id', $id)->first();
+
+        if (! $invoice) {
+            return response()->json(['success' => false, 'message' => 'Invoice not found.'], 404);
+        }
+
+        return response()->json(['success' => true, 'data' => $invoice], 200);
     }
 
     // Give Feedback APIs only for that services who status is completed

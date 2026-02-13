@@ -466,6 +466,11 @@ Route::prefix('/demo')->group(function () {
 
         // Engineer Assignment Routes
         Route::post('/crm/quotation/assign-engineer', 'assignEngineer')->name('quotation.assign-engineer');
+        // Generate Invoice from Quotation
+        Route::get('/crm/quotation/{id}/generate-invoice', 'generateInvoice')->name('quotation.generateInvoice');
+        Route::post('/crm/quotation/{id}/store-invoice', 'storeInvoice')->name('quotation.storeInvoice');
+        Route::get('/crm/quotation/{id}/edit-invoice', 'generateInvoice')->name('quotation.editInvoice');
+        Route::get('/crm/quotation/{id}/view-invoice', 'viewInvoice')->name('quotation.viewInvoice');
     });
 
     Route::prefix('/crm')->group(function () {

@@ -12,6 +12,8 @@ use App\Models\QuotationEngineerAssignment;
 use App\Models\QuotationGroupEngineer;
 use App\Models\QuotationProduct;
 use App\Models\Staff;
+use App\Models\QuotationInvoice;
+use App\Models\QuotationInvoiceItem;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -189,15 +191,16 @@ class QuotationController extends Controller
             'leadDetails.customerAddress',
             'products',
             'amcDetail.amcPlan',
-            // 'activeAssignment.engineer',
-            // 'activeAssignment.supervisor',
-            // 'activeAssignment.groupEngineers',
         ])->findOrFail($id);
 
-        // dd($quotation->leadDetails);
         $engineers = Staff::where('staff_role', 'engineer')->get();
 
-        return view('/crm/quotation/view', compact('quotation', 'engineers'));
+        $invoice = QuotationInvoice::with(['quoteDetails.leadDetails', 'quoteDetails.leadDetails.customerAddress', 'items'])
+            ->where('quote_id', $id)
+            ->latest()
+            ->first();
+
+        return view('/crm/quotation/view', compact('quotation', 'engineers', 'invoice'));
     }
 
     public function edit($id)
@@ -585,5 +588,123 @@ class QuotationController extends Controller
                 'message' => 'Error updating status: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Show generate invoice form prefilled from quotation
+     */
+    public function generateInvoice($id)
+    {
+        $quotation = Quotation::with(['leadDetails', 'leadDetails.customerAddress', 'products', 'amcDetail'])->findOrFail($id);
+
+        // if invoice exists, pass it to the view for editing
+        $invoice = QuotationInvoice::where('quote_id', $id)->latest()->first();
+
+        return view('/crm/quotation/generate_invoice', compact('quotation', 'invoice'));
+    }
+
+    /**
+     * View invoice page
+     */
+    public function viewInvoice($id)
+    {
+        $invoice = QuotationInvoice::with(['quoteDetails.leadDetails', 'quoteDetails.leadDetails.customerAddress', 'items'])
+            ->where('quote_id', $id)
+            ->first();
+
+        if (! $invoice) {
+            return redirect()->route('quotation.view', $id)->with('error', 'Invoice not found.');
+        }
+
+        return view('/crm/quotation/view_invoice', compact('invoice'));
+    }
+
+    /**
+     * Store generated invoice (draft or sent)
+     */
+    public function storeInvoice(Request $request, $id)
+    {
+        $quotation = Quotation::with(['leadDetails', 'leadDetails.customerAddress', 'products'])->findOrFail($id);
+        $validator = Validator::make($request->all(), [
+            'invoice_number' => 'nullable|string',
+            'invoice_date' => 'required|date',
+            'due_date' => 'required|date',
+            'billing_address' => 'nullable|string',
+            'shipping_address' => 'nullable|string',
+            'payment_method' => 'nullable|string',
+            'status' => 'nullable|in:draft,sent',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // check if invoice already exists for this quotation
+        $existing = QuotationInvoice::where('quote_id', $quotation->id)->latest()->first();
+
+        // Generate invoice number if not provided
+        $invoiceNumber = $request->input('invoice_number') ?: ($existing->invoice_number ?? 'INV-' . time());
+
+        if ($existing) {
+            $invoice = $existing;
+        } else {
+            $invoice = new QuotationInvoice();
+        }
+
+        $invoice->invoice_number = $invoiceNumber;
+        $invoice->invoice_date = $request->invoice_date;
+        $invoice->due_date = $request->due_date;
+        $invoice->quote_id = $quotation->id;
+        $invoice->customer_id = $quotation->leadDetails->customer->id ?? null;
+        $invoice->staff_id = $quotation->staff_id ?? auth()->id();
+        $invoice->amc_plan_id = $quotation->amcDetail->first()->amc_plan_id ?? null;
+        $invoice->total_items = $quotation->products->count();
+        $invoice->subtotal = $quotation->subtotal ?? 0;
+        $invoice->total_discount = $quotation->discount_amount ?? 0;
+        $invoice->total_tax = $quotation->tax_amount ?? 0;
+        $invoice->round_off = 0;
+        $invoice->grand_total = $quotation->total_amount ?? 0;
+        $invoice->currency = $quotation->currency ?? 'INR';
+        $invoice->status = $request->status ?: 'draft';
+        $invoice->notes = $request->notes ?? null;
+        $invoice->terms_and_conditions = $request->terms_and_conditions ? true : false;
+        $invoice->paid_amount = 0;
+        $invoice->payment_status = 'unpaid';
+        $invoice->payment_method = $request->payment_method ?? null;
+        $invoice->billing_address = $request->billing_address ?? ($quotation->leadDetails->customerAddress ? json_encode($quotation->leadDetails->customerAddress) : null);
+        $invoice->shipping_address = $request->shipping_address ?? ($quotation->leadDetails->customerAddress ? json_encode($quotation->leadDetails->customerAddress) : null);
+        $invoice->paid_at = null;
+        $invoice->save();
+        // remove existing items if updating
+        if ($existing) {
+            QuotationInvoiceItem::where('quotation_invoice_id', $existing->id)->delete();
+        }
+
+        // Create invoice items from quotation products
+        foreach ($quotation->products as $product) {
+            $unitPrice = $product->unit_price ?? $product->price ?? 0;
+            $discountPerUnit = $product->discount_per_unit ?? 0;
+            $taxRate = $product->tax_rate ?? $product->tax ?? 0;
+            $quantity = $product->quantity ?? 1;
+
+            $lineSubtotal = ($unitPrice - $discountPerUnit) * $quantity;
+            $taxAmount = ($lineSubtotal * $taxRate) / 100;
+            $lineTotal = $lineSubtotal + $taxAmount;
+
+            QuotationInvoiceItem::create([
+                'quotation_invoice_id' => $invoice->id,
+                'quotation_products_id' => $product->id ?? null,
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice,
+                'discount_per_unit' => $discountPerUnit,
+                'tax_rate' => $taxRate,
+                'tax_amount' => $taxAmount,
+                'line_subtotal' => $lineSubtotal,
+                'line_total' => $lineTotal,
+            ]);
+        }
+
+        // redirect back to quotation view so buttons update
+        return redirect()->route('quotation.view', $quotation->id)->with('success', 'Invoice has been ' . ($invoice->status === 'sent' ? 'sent' : 'saved as draft'));
     }
 }

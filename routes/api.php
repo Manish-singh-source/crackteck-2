@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
 use App\Http\Controllers\Api\AllServicesController;
 use App\Http\Controllers\Api\AmcServicesController;
 use App\Http\Controllers\Api\StockinHandController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\QuickServiceController;
 use App\Http\Controllers\Api\DeliveryOrderController;
 use App\Http\Controllers\Api\NonAmcServicesController;
@@ -275,9 +276,6 @@ Route::prefix('v1')->group(function () {
             // Stock In Hand Products APIs 
             Route::get('/stock-in-hand', 'stockInHand');
 
-            // Products List 
-            // same as customer and sales person 
-
             // Request Part 
             Route::post('/service-request/{id}/{product_id}/request-part', 'requestPart');
 
@@ -287,20 +285,33 @@ Route::prefix('v1')->group(function () {
             Route::post('/check-out', 'checkOut');
         });
 
+        // 1. Products List of all the product avialble in warehouse how status is active ( Basic Details )
+        // 2. Products Detail Page ( In Details )
+        // 3. Request New Product For Stock In Hand ( Product Id, quantity, user_is, role_id )
+        // 4. List Of stock in hand product ( Product Id, quantity, status )
+
+        // Product APIs
+        Route::controller(ProductController::class)->group(function () {
+            Route::get('/products', 'listProducts');
+            Route::get('/products/{product_id}', 'productDetail');
+            Route::get('/stock-in-hand/list', 'listStockInHand'); // List stock in hand
+            Route::post('/stock-in-hand/request', 'requestStockInHand'); // Request new product
+        });
+
         // Pickup Request APIs for Delivery Man and Engineer
         Route::controller(PickupRequestController::class)->group(function () {
             // (1) Get pickup requests - check if user is delivery man or engineer and return service requests
             Route::get('/pickup-requests', 'getPickupRequests');
-            
+
             // (2) Get particular pickup request details with product details
             Route::get('/pickup-request/{id}', 'getPickupRequestDetails');
-            
+
             // (3) Accept pickup request - change status to approved for all products in same service
             Route::post('/pickup-request/{id}/accept', 'acceptPickupRequest');
-            
+
             // (4) Send OTP for pickup - generate OTP with 5 min expiry
             Route::post('/pickup-request/{id}/send-otp', 'sendPickupOtp');
-            
+
             // (5) Verify OTP and change status to picked
             Route::post('/pickup-request/{id}/verify-otp', 'verifyPickupOtp');
         });
@@ -309,20 +320,19 @@ Route::prefix('v1')->group(function () {
         Route::controller(ReturnRequestController::class)->group(function () {
             // (1) Get return requests - check if user is delivery man or engineer and return their assigned return requests
             Route::get('/return-requests', 'getReturnRequests');
-            
+
             // (2) Get particular return request details with product details
             Route::get('/return-request/{id}', 'getReturnRequestDetails');
-            
+
             // (3) Accept return request - change status to accepted
             Route::post('/return-request/{id}/accept', 'acceptReturnRequest');
-            
+
             // (4) Send OTP for return - generate OTP with 5 min expiry (only if status is picked)
             Route::post('/return-request/{id}/send-otp', 'sendReturnOtp');
-            
+
             // (5) Verify OTP and change status to delivered
             Route::post('/return-request/{id}/verify-otp', 'verifyReturnOtp');
         });
-
     });
 });
 

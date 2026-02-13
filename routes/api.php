@@ -229,7 +229,13 @@ Route::prefix('v1')->group(function () {
             Route::post('/service-request-quotations/{id}/reject', 'rejectQuotation');
 
             // display invoice to the customer 
+            Route::get('/service-request-invoices', 'serviceRequestInvoicesList');
             Route::get('/service-request-invoice/{id}', 'serviceRequestInvoice');
+            Route::post('/service-request-invoice/{id}/accept', 'acceptInvoice');
+            Route::post('/service-request-invoice/{id}/reject', 'rejectInvoice');
+
+            // invoice payment 
+            Route::post('/invoice-payment/{id}', 'payInvoice');
 
             // Give Feedback APIs
             Route::post('/give-feedback', 'giveFeedback');

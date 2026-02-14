@@ -332,12 +332,18 @@
                                                     @php
                                                         $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
                                                         $hasStockInHand = false;
+                                                        $hasRequestPart = false;
                                                         $stockInHandItems = [];
+                                                        $requestPartItems = [];
                                                         if ($diagnosisList && is_array($diagnosisList)) {
                                                             foreach ($diagnosisList as $item) {
                                                                 if (($item['status'] ?? '') === 'stock_in_hand') {
                                                                     $hasStockInHand = true;
                                                                     $stockInHandItems[] = $item;
+                                                                }
+                                                                if (($item['status'] ?? '') === 'request_part') {
+                                                                    $hasRequestPart = true;
+                                                                    $requestPartItems[] = $item;
                                                                 }
                                                             }
                                                         }
@@ -363,7 +369,7 @@
                                                                                     @php
                                                                                         $diagStatus = $item['status'] ?? '';
                                                                                         $diagStatusClass = $diagStatus === 'working' ? 'bg-success' : ($diagStatus === 'not_working' ? 'bg-danger' : 'bg-warning');
-                                                                                        $diagStatusLabel = $diagStatus === 'working' ? 'Working' : ($diagStatus === 'not_working' ? 'Not Working' : ($diagStatus === 'picking' ? 'Picking' : ($diagStatus === 'stock_in_hand' ? 'Stock In Hand' : ucfirst($diagStatus))));
+                                                                                        $diagStatusLabel = $diagStatus === 'working' ? 'Working' : ($diagStatus === 'not_working' ? 'Not Working' : ($diagStatus === 'picking' ? 'Picking' : ($diagStatus === 'stock_in_hand' ? 'Stock In Hand' : ($diagStatus === 'request_part' ? 'Request Part' : ucfirst($diagStatus)))));
                                                                                     @endphp
                                                                                     <span class="badge {{ $diagStatusClass }}">{{ $diagStatusLabel }}</span>
                                                                                 </td>
@@ -463,6 +469,15 @@
                                                                                     @if($requestPart->customer_rejected_at)
                                                                                         <li><span class="text-danger">Customer Rejected:</span> {{ $requestPart->customer_rejected_at }}</li>
                                                                                     @endif
+                                                                                    @if($requestPart->assigned_at)
+                                                                                        <li><span class="text-success">Assigned:</span> {{ $requestPart->assigned_at }}</li>
+                                                                                    @endif
+                                                                                    @if($requestPart->assigned_approved_at)
+                                                                                        <li><span class="text-success">Assigned Approved:</span> {{ $requestPart->assigned_approved_at }}</li>
+                                                                                    @endif
+                                                                                    @if($requestPart->assigned_rejected_at)
+                                                                                        <li><span class="text-danger">Assigned Rejected:</span> {{ $requestPart->assigned_rejected_at }}</li>
+                                                                                    @endif
                                                                                     @if($requestPart->picked_at)
                                                                                         <li><span class="text-info">Picked:</span> {{ $requestPart->picked_at }}</li>
                                                                                     @endif
@@ -481,6 +496,7 @@
                                                                                     <input type="hidden" name="engineer_id" value="{{ $requestPart->engineer_id }}">
                                                                                     <input type="hidden" name="part_id" value="{{ $requestPart->part_id }}">
                                                                                     <input type="hidden" name="quantity" value="{{ $requestPart->requested_quantity ?? 1 }}">
+                                                                                    <input type="hidden" name="request_type" value="{{ $requestPart->request_type ?? 'stock_in_hand' }}">
                                                                                     <select name="admin_action" class="form-select form-select-sm" style="width: auto;" required>
                                                                                         <option value="">-- Select Action --</option>
                                                                                         <option value="admin_approved">Admin Approved</option>
@@ -488,6 +504,31 @@
                                                                                     </select>
                                                                                     <button type="submit" class="btn btn-sm btn-primary">Submit</button>
                                                                                 </form>
+                                                                            @endif
+                                                                            
+                                                                            {{-- Feature 4: Assignment option after customer approval for request_part type --}}
+                                                                            @if($status === 'customer_approved' && $requestPart->request_type === 'request_part')
+                                                                                <div class="mt-2">
+                                                                                    <span class="fw-semibold small">Assign To:</span>
+                                                                                    <form action="{{ route('service-request.assign-part-to-person') }}" method="POST" class="d-flex gap-2 align-items-center mt-1">
+                                                                                        @csrf
+                                                                                        <input type="hidden" name="request_id" value="{{ $request->id }}">
+                                                                                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                                                                        <input type="hidden" name="request_part_id" value="{{ $requestPart->id }}">
+                                                                                        <div class="form-check form-check-inline">
+                                                                                            <input class="form-check-input assign-type-radio" type="radio" name="assigned_person_type" id="type_engineer_{{ $requestPart->id }}" value="engineer" checked onchange="updatePersonDropdown('{{ $requestPart->id }}', 'engineer')">
+                                                                                            <label class="form-check-label" for="type_engineer_{{ $requestPart->id }}">Engineer</label>
+                                                                                        </div>
+                                                                                        <div class="form-check form-check-inline">
+                                                                                            <input class="form-check-input assign-type-radio" type="radio" name="assigned_person_type" id="type_delivery_{{ $requestPart->id }}" value="delivery_man" onchange="updatePersonDropdown('{{ $requestPart->id }}', 'delivery_man')">
+                                                                                            <label class="form-check-label" for="type_delivery_{{ $requestPart->id }}">Delivery Man</label>
+                                                                                        </div>
+                                                                                        <select name="assigned_person_id" id="person_select_{{ $requestPart->id }}" class="form-select form-select-sm person-select" style="width: auto;" data-engineers='{{ json_encode($engineers->map(fn($e) => ["id" => $e->id, "name" => $e->first_name . " " . $e->last_name])) }}' data-delivery-men='{{ json_encode($deliveryMen->map(fn($d) => ["id" => $d->id, "name" => $d->first_name . " " . $d->last_name])) }}' required>
+                                                                                            <option value="">-- Select Person --</option>
+                                                                                        </select>
+                                                                                        <button type="submit" class="btn btn-sm btn-success">Assign</button>
+                                                                                    </form>
+                                                                                </div>
                                                                             @endif
                                                                         </div>
                                                                     </div>
@@ -545,12 +586,13 @@
                                                                                 <input type="hidden" name="engineer_id" value="{{ $engineerId }}">
                                                                                 <input type="hidden" name="part_id" value="{{ $partId }}">
                                                                                 <input type="hidden" name="quantity" value="{{ $quantity }}">
+                                                                                <input type="hidden" name="request_type" value="stock_in_hand">
                                                                                 <select name="admin_action" class="form-select form-select-sm" style="width: auto;" required>
                                                                                     <option value="">-- Select Action --</option>
                                                                                     <option value="admin_approved">Admin Approved</option>
                                                                                     <option value="admin_rejected">Admin Rejected</option>
                                                                                 </select>
-                                                                                <button type="submit" class="btn btnsm btn-primary">Submit</button>
+                                                                                <button type="submit" class="btn btn-sm btn-primary">Submit</button>
                                                                             </form>
                                                                         @endif
                                                                     </div>
@@ -1931,6 +1973,48 @@
                         alert(error);
                     }
                 });
+            });
+        });
+
+        // Function to update person dropdown based on selected type (engineer or delivery man)
+        function updatePersonDropdown(requestPartId, type) {
+            const selectElement = document.getElementById('person_select_' + requestPartId);
+            if (!selectElement) return;
+            
+            // Clear existing options
+            selectElement.innerHTML = '<option value="">-- Select Person --</option>';
+            
+            // Get the appropriate data based on type
+            let people = [];
+            if (type === 'engineer') {
+                try {
+                    people = JSON.parse(selectElement.getAttribute('data-engineers'));
+                } catch (e) {
+                    console.error('Error parsing engineers data:', e);
+                }
+            } else if (type === 'delivery_man') {
+                try {
+                    people = JSON.parse(selectElement.getAttribute('data-delivery-men'));
+                } catch (e) {
+                    console.error('Error parsing delivery men data:', e);
+                }
+            }
+            
+            // Add options to dropdown
+            people.forEach(function(person) {
+                const option = document.createElement('option');
+                option.value = person.id;
+                option.textContent = person.name;
+                selectElement.appendChild(option);
+            });
+        }
+
+        // Initialize dropdown with engineers on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.person-select').forEach(function(select) {
+                const requestPartId = select.id.replace('person_select_', '');
+                // Default to engineers on page load
+                updatePersonDropdown(requestPartId, 'engineer');
             });
         });
     </script>

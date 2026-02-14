@@ -2079,24 +2079,32 @@ class ServiceRequestController extends Controller
     }
 
     /**
-     * Handle admin approval/rejection for stock_in_hand requests from diagnosis details
+     * Handle admin approval/rejection for stock_in_hand and request_part requests from diagnosis details
      */
     public function adminStockInHandApproval(Request $request)
     {
-        $request->validate([
+        $validated=Validator::make($request->all(),[
             'request_id' => 'required|exists:service_requests,id',
             'product_id' => 'required|exists:service_request_products,id',
             'engineer_id' => 'required|exists:staff,id',
-            'part_id' => 'required|exists:product_serials,id',
+            'part_id' => 'required',
             'admin_action' => 'required|in:admin_approved,admin_rejected',
+            'request_type' => 'nullable|in:stock_in_hand,request_part',
         ]);
+
+        if($validated->fails()){
+            dd($validated->errors());
+        }
+
+        // Determine request type - default to stock_in_hand if not provided
+        $requestType = $request->request_type ?? 'stock_in_hand';
 
         try {
             // Find the service_request_product_request_parts record
             // that matches the engineer_id (staff ID), part_id and has pending/requested status
             $requestPart = ServiceRequestProductRequestPart::where('engineer_id', $request->engineer_id)
                 ->where('part_id', $request->part_id)
-                ->where('request_type', 'stock_in_hand')
+                ->where('request_type', $requestType)
                 ->whereIn('status', ['pending', 'requested'])
                 ->first();
 
@@ -2105,7 +2113,7 @@ class ServiceRequestController extends Controller
                 // Check if there's any record at all for this engineer and part
                 $existingRecord = ServiceRequestProductRequestPart::where('engineer_id', $request->engineer_id)
                     ->where('part_id', $request->part_id)
-                    ->where('request_type', 'stock_in_hand')
+                    ->where('request_type', $requestType)
                     ->first();
                 
                 if ($existingRecord) {
@@ -2119,7 +2127,7 @@ class ServiceRequestController extends Controller
                         'engineer_id' => $request->engineer_id,
                         'part_id' => $request->part_id,
                         'requested_quantity' => $request->quantity ?? 1,
-                        'request_type' => 'stock_in_hand',
+                        'request_type' => $requestType,
                         'assigned_person_type' => 'engineer',
                         'assigned_person_id' => $request->engineer_id,
                         'status' => 'pending',
@@ -2142,7 +2150,7 @@ class ServiceRequestController extends Controller
                 }
                 
                 $requestPart->update($updateData);
-                $message = 'Stock in hand request approved successfully.';
+                $message = 'Request approved successfully.';
             } else {
                 // Update status to 'admin_rejected' when admin rejects
                 $requestPart->update([
@@ -2151,14 +2159,56 @@ class ServiceRequestController extends Controller
                     'status' => 'admin_rejected',
                     'admin_rejected_at' => now(),
                 ]);
-                $message = 'Stock in hand request rejected successfully.';
+                $message = 'Request rejected successfully.';
             }
+
 
             return redirect()->route('service-request.view-quick-service-request', $request->request_id)
                 ->with('success', $message);
         } catch (\Exception $e) {
             return redirect()->route('service-request.view-quick-service-request', $request->request_id)
                 ->with('error', 'Error processing request: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Assign part to engineer or delivery man after customer approval
+     */
+    public function assignPartToPerson(Request $request)
+    {
+        $request->validate([
+            'request_id' => 'required|exists:service_requests,id',
+            'product_id' => 'required|exists:service_request_products,id',
+            'request_part_id' => 'required|exists:service_request_product_request_parts,id',
+            'assigned_person_type' => 'required|in:engineer,delivery_man',
+            'assigned_person_id' => 'required|exists:staff,id',
+        ]);
+
+        try {
+            $requestPart = ServiceRequestProductRequestPart::find($request->request_part_id);
+            
+            if (!$requestPart) {
+                throw new \Exception('Request part not found.');
+            }
+
+            // Check if the part is customer approved
+            if ($requestPart->status !== 'customer_approved') {
+                throw new \Exception('Part must be customer approved before assignment.');
+            }
+
+            // Update the request part with assignment details
+            $requestPart->update([
+                'assigned_person_type' => $request->assigned_person_type,
+                'assigned_person_id' => $request->assigned_person_id,
+                'assigned_at' => now(),
+                'status' => 'assigned',
+            ]);
+
+            return redirect()->route('service-request.view-quick-service-request', $request->request_id)
+                ->with('success', 'Part assigned successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('service-request.view-quick-service-request', $request->request_id)
+                ->with('error', 'Error assigning part: ' . $e->getMessage());
         }
     }
 

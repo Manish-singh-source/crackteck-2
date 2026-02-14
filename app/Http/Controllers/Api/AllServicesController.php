@@ -460,8 +460,9 @@ class AllServicesController extends Controller
             'customer_id' => 'required|integer|exists:customers,id',
             'service_request_id' => 'required|integer|exists:service_requests,id',
             'product_id' => 'required|integer|exists:service_request_products,id',
-            'part_id' => 'required|integer|exists:product_serials,id',
+            'part_id' => 'required|integer',
             'action' => 'required|in:customer_approved,customer_rejected',
+            'request_type' => 'nullable|in:stock_in_hand,request_part',
         ]);
 
         if ($validated->fails()) {
@@ -484,11 +485,8 @@ class AllServicesController extends Controller
             if (!$serviceRequest) {
                 return response()->json(['success' => false, 'message' => 'Service request not found or does not belong to this customer.'], 404);
             }
-
-            // Find the request part
-            $requestPart = ServiceRequestProductRequestPart::where('id', $request->part_id)
-                ->where('request_id', $validated['service_request_id'])
-                ->where('product_id', $validated['product_id'])
+            
+            $requestPart = ServiceRequestProductRequestPart::where('id', $validated['part_id'])
                 ->first();
 
             if (!$requestPart) {

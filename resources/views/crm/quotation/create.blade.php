@@ -115,7 +115,7 @@
                                             <div class="col-6">
                                                 @include('components.form.input', [
                                                     'label' => 'Product Name',
-                                                    'name' => 'product_name',
+                                                    'name' => 'name',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Product Name',
                                                 ])
@@ -123,10 +123,28 @@
 
                                             <div class="col-6">
                                                 @include('components.form.input', [
-                                                    'label' => 'HSN Code',
-                                                    'name' => 'hsn_code',
+                                                    'label' => 'Type',
+                                                    'name' => 'type',
                                                     'type' => 'text',
-                                                    'placeholder' => 'Enter HSN Code',
+                                                    'placeholder' => 'E.g., Equipment, Service, etc.',
+                                                ])
+                                            </div>
+
+                                            <div class="col-6">
+                                                @include('components.form.input', [
+                                                    'label' => 'Brand',
+                                                    'name' => 'brand',
+                                                    'type' => 'text',
+                                                    'placeholder' => 'Enter Brand Name',
+                                                ])
+                                            </div>
+
+                                            <div class="col-6">
+                                                @include('components.form.input', [
+                                                    'label' => 'Model No.',
+                                                    'name' => 'model_no',
+                                                    'type' => 'text',
+                                                    'placeholder' => 'Enter Model Number',
                                                 ])
                                             </div>
 
@@ -141,10 +159,20 @@
 
                                             <div class="col-6">
                                                 @include('components.form.input', [
-                                                    'label' => 'Price',
-                                                    'name' => 'price',
+                                                    'label' => 'HSN Code',
+                                                    'name' => 'hsn',
+                                                    'type' => 'text',
+                                                    'placeholder' => 'Enter HSN Code',
+                                                ])
+                                            </div>
+
+                                            <div class="col-6">
+                                                @include('components.form.input', [
+                                                    'label' => 'Unit Price',
+                                                    'name' => 'unit_price',
                                                     'type' => 'number',
-                                                    'placeholder' => 'Enter Price',
+                                                    'placeholder' => 'Enter Unit Price',
+                                                    'step' => '0.01',
                                                 ])
                                             </div>
 
@@ -159,20 +187,50 @@
 
                                             <div class="col-6">
                                                 @include('components.form.input', [
-                                                    'label' => 'Tax (%)',
-                                                    'name' => 'tax',
+                                                    'label' => 'Discount Per Unit',
+                                                    'name' => 'discount_per_unit',
                                                     'type' => 'number',
-                                                    'placeholder' => 'Enter Tax Percentage',
+                                                    'placeholder' => 'Enter Discount',
+                                                    'step' => '0.01',
                                                 ])
                                             </div>
 
                                             <div class="col-6">
                                                 @include('components.form.input', [
-                                                    'label' => 'Total',
-                                                    'name' => 'total',
+                                                    'label' => 'Tax Rate (%)',
+                                                    'name' => 'tax_rate',
+                                                    'type' => 'number',
+                                                    'placeholder' => 'Enter Tax Percentage',
+                                                    'step' => '0.01',
+                                                ])
+                                            </div>
+
+                                            <div class="col-6">
+                                                @include('components.form.input', [
+                                                    'label' => 'Purchase Date',
+                                                    'name' => 'purchase_date',
+                                                    'type' => 'date',
+                                                ])
+                                            </div>
+
+                                            <div class="col-12">
+                                                @include('components.form.input', [
+                                                    'label' => 'Description',
+                                                    'name' => 'description',
+                                                    'type' => 'textarea',
+                                                    'placeholder' => 'Enter Product Description',
+                                                    'rows' => 3,
+                                                ])
+                                            </div>
+
+                                            <div class="col-6">
+                                                @include('components.form.input', [
+                                                    'label' => 'Line Total',
+                                                    'name' => 'line_total',
                                                     'type' => 'number',
                                                     'placeholder' => 'Auto Calculated',
                                                     'readonly' => true,
+                                                    'step' => '0.01',
                                                 ])
                                             </div>
 
@@ -197,13 +255,16 @@
                                         <table class="table table-striped table-borderless dt-responsive nowrap">
                                             <thead>
                                                 <tr>
-                                                    <th>Product Name</th>
-                                                    <th>HSN Code</th>
+                                                    <th>Name</th>
+                                                    <th>Type</th>
+                                                    <th>Brand</th>
                                                     <th>SKU</th>
-                                                    <th>Price</th>
-                                                    <th>Quantity</th>
-                                                    <th>Tax (%)</th>
-                                                    <th>Total</th>
+                                                    <th>HSN</th>
+                                                    <th>Unit Price</th>
+                                                    <th>Qty</th>
+                                                    <th>Discount</th>
+                                                    <th>Tax %</th>
+                                                    <th>Line Total</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -325,35 +386,43 @@
             let quotationId = null;
             let products = [];
 
-            // Calculate total when price, quantity, or tax changes
+            // Calculate total when unit_price, quantity, discount, or tax_rate changes
             function calculateTotal() {
-                const price = parseFloat($('input[name="price"]').val()) || 0;
+                const unit_price = parseFloat($('input[name="unit_price"]').val()) || 0;
                 const quantity = parseInt($('input[name="quantity"]').val()) || 0;
-                const tax = parseFloat($('input[name="tax"]').val()) || 0;
+                const discount_per_unit = parseFloat($('input[name="discount_per_unit"]').val()) || 0;
+                const tax_rate = parseFloat($('input[name="tax_rate"]').val()) || 0;
 
-                const subtotal = price * quantity;
-                const taxAmount = (subtotal * tax) / 100;
-                const total = subtotal + taxAmount;
+                const priceAfterDiscount = (unit_price - discount_per_unit) * quantity;
+                const taxAmount = (priceAfterDiscount * tax_rate) / 100;
+                const total = priceAfterDiscount + taxAmount;
 
-                $('input[name="total"]').val(total.toFixed(2));
+                $('input[name="line_total"]').val(total.toFixed(2));
             }
 
-            $('input[name="price"], input[name="quantity"], input[name="tax"]').on('input', calculateTotal);
+            $('input[name="unit_price"], input[name="quantity"], input[name="discount_per_unit"], input[name="tax_rate"]')
+                .on('input', calculateTotal);
 
             // Add product to temporary array
             $('#add-product-btn').on('click', function() {
                 const productData = {
-                    product_name: $('input[name="product_name"]').val(),
-                    hsn_code: $('input[name="hsn_code"]').val(),
+                    name: $('input[name="name"]').val(),
+                    type: $('input[name="type"]').val(),
+                    brand: $('input[name="brand"]').val(),
+                    model_no: $('input[name="model_no"]').val(),
                     sku: $('input[name="sku"]').val(),
-                    price: parseFloat($('input[name="price"]').val()) || 0,
+                    hsn: $('input[name="hsn"]').val(),
+                    unit_price: parseFloat($('input[name="unit_price"]').val()) || 0,
                     quantity: parseInt($('input[name="quantity"]').val()) || 0,
-                    tax: parseFloat($('input[name="tax"]').val()) || 0,
-                    total: parseFloat($('input[name="total"]').val()) || 0
+                    discount_per_unit: parseFloat($('input[name="discount_per_unit"]').val()) || 0,
+                    tax_rate: parseFloat($('input[name="tax_rate"]').val()) || 0,
+                    purchase_date: $('input[name="purchase_date"]').val(),
+                    description: $('textarea[name="description"]').val(),
+                    line_total: parseFloat($('input[name="line_total"]').val()) || 0
                 };
 
                 // Validate required fields
-                if (!productData.product_name || productData.price <= 0 || productData.quantity <= 0) {
+                if (!productData.name || productData.unit_price <= 0 || productData.quantity <= 0) {
                     alert('Please fill all product fields correctly');
                     return;
                 }
@@ -380,13 +449,16 @@
             function addProductToTable(product, index) {
                 const row = `
                     <tr>
-                        <td>${product.product_name}</td>
-                        <td>${product.hsn_code}</td>
+                        <td>${product.name}</td>
+                        <td>${product.type || '-'}</td>
+                        <td>${product.brand || '-'}</td>
                         <td>${product.sku}</td>
-                        <td>${product.price.toFixed(2)}</td>
+                        <td>${product.hsn || '-'}</td>
+                        <td>${product.unit_price.toFixed(2)}</td>
                         <td>${product.quantity}</td>
-                        <td>${product.tax}%</td>
-                        <td>${product.total.toFixed(2)}</td>
+                        <td>${product.discount_per_unit.toFixed(2)}</td>
+                        <td>${product.tax_rate}%</td>
+                        <td>${product.line_total.toFixed(2)}</td>
                         <td>
                             <button type="button" class="btn btn-icon btn-sm bg-danger-subtle delete-product-temp" data-index="${index}">
                                 <i class="mdi mdi-delete fs-14 text-danger"></i>
@@ -422,41 +494,48 @@
 
             // Clear product form
             function clearProductForm() {
-                $('input[name="product_name"]').val('');
-                $('input[name="hsn_code"]').val('');
+                $('input[name="name"]').val('');
+                $('input[name="type"]').val('');
+                $('input[name="brand"]').val('');
+                $('input[name="model_no"]').val('');
                 $('input[name="sku"]').val('');
-                $('input[name="price"]').val('');
+                $('input[name="hsn"]').val('');
+                $('input[name="unit_price"]').val('');
                 $('input[name="quantity"]').val('');
-                $('input[name="tax"]').val('');
-                $('input[name="total"]').val('');
+                $('input[name="discount_per_unit"]').val('');
+                $('input[name="tax_rate"]').val('');
+                $('input[name="purchase_date"]').val('');
+                $('textarea[name="description"]').val('');
+                $('input[name="line_total"]').val('');
             }
 
             // Intercept form submission
             $('form').on('submit', function(e) {
                 e.preventDefault();
-                
-                // Get all products from the table
-                const tableProducts = [];
-                $('#products-table-body tr').each(function() {
-                    const cells = $(this).find('td');
-                    const product = {
-                        product_name: cells.eq(0).text(),
-                        hsn_code: cells.eq(1).text(),
-                        sku: cells.eq(2).text(),
-                        price: parseFloat(cells.eq(3).text()),
-                        quantity: parseInt(cells.eq(4).text()),
-                        tax: parseFloat(cells.eq(5).text()),
-                        total: parseFloat(cells.eq(6).text())
-                    };
-                    tableProducts.push(product);
-                });
+
+                // Validate at least one product is added
+                if (products.length === 0) {
+                    alert('Please add at least one product to the quotation');
+                    return;
+                }
+
+                // Validate all products have valid data
+                const invalidProducts = products.filter(p =>
+                    !p.name || isNaN(p.unit_price) || isNaN(p.quantity) || isNaN(p.line_total)
+                );
+
+                if (invalidProducts.length > 0) {
+                    alert('Some products have invalid data. Please check the products table.');
+                    console.log('Invalid products:', invalidProducts);
+                    return;
+                }
 
                 // Create FormData object
                 const form = $(this);
                 const formData = new FormData(this);
-                
-                // Add products array to formData
-                formData.append('products', JSON.stringify(tableProducts));
+
+                // Add products array to formData - use the products array directly instead of re-parsing from table
+                formData.append('products', JSON.stringify(products));
 
                 // Add AMC details to formData
                 const amcData = {
@@ -470,7 +549,7 @@
                 formData.append('amc_details', JSON.stringify(amcData));
 
                 console.log('AMC data:', amcData);
-                console.log('Form data:', tableProducts);
+                console.log('Form data:', products);
                 // Submit the form with all data
                 $.ajax({
                     url: form.attr('action'),

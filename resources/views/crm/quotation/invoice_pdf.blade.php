@@ -210,10 +210,17 @@
             <tbody>
                 @forelse($invoice->items as $item)
                     <tr>
-                        <td>{{ $item->product_name ?? 'Item' }}</td>
+                        <td>
+                            {{ $item->name ?? ($item->product_name ?? 'Item') }}
+                            @if ($item->type || $item->brand)
+                                <div style="font-size:11px;color:#666;">
+                                    {{ trim(($item->type ?? '') . ' ' . ($item->brand ?? '')) }}</div>
+                            @endif
+                        </td>
                         <td class="text-right">{{ $item->quantity }}</td>
                         <td class="text-right">₹{{ number_format($item->unit_price, 2) }}</td>
-                        <td class="text-right">₹{{ number_format($item->tax_amount, 2) }}</td>
+                        <td class="text-right">₹{{ number_format($item->tax_amount, 2) }} ({{ $item->tax_rate }}%)
+                        </td>
                         <td class="text-right">₹{{ number_format($item->line_total, 2) }}</td>
                     </tr>
                 @empty

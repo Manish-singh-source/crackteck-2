@@ -8,8 +8,15 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">Invoice #{{ $invoice->invoice_number }}</h5>
-                            <div>
-                                <a href="{{ route('quotation.view', $invoice->quote_id) }}" class="btn btn-light btn-sm">Back
+                            <div class="btn-group" role="group">
+                                @if ($invoice->invoice_pdf)
+                                    <a href="{{ asset('storage/' . $invoice->invoice_pdf) }}" class="btn btn-success btn-sm"
+                                        target="_blank">
+                                        <i class="fas fa-file-pdf me-1"></i>Download PDF
+                                    </a>
+                                @endif
+                                <a href="{{ route('quotation.view', $invoice->quote_id) }}"
+                                    class="btn btn-light btn-sm">Back
                                     to Quotation</a>
                             </div>
                         </div>

@@ -18,6 +18,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class QuotationController extends Controller
 {
@@ -704,7 +706,37 @@ class QuotationController extends Controller
             ]);
         }
 
+        // Generate PDF if status is 'sent'
+        if ($invoice->status === 'sent' && !$invoice->invoice_pdf) {
+            $pdfPath = $this->generateInvoicePdf($invoice);
+            $invoice->invoice_pdf = $pdfPath;
+            $invoice->save();
+        }
+
         // redirect back to quotation view so buttons update
         return redirect()->route('quotation.view', $quotation->id)->with('success', 'Invoice has been ' . ($invoice->status === 'sent' ? 'sent' : 'saved as draft'));
+    }
+
+    /**
+     * Generate PDF for an invoice and store it
+     */
+    private function generateInvoicePdf($invoice)
+    {
+        // Reload with relationships for PDF generation
+        $invoice->load(['quoteDetails.leadDetails.customerAddress', 'items']);
+
+        // Create PDF
+        $pdf = Pdf::loadView('crm.quotation.invoice_pdf', ['invoice' => $invoice])
+            ->setPaper('a4', 'portrait');
+
+        // Define storage path
+        $filename = 'invoices/' . $invoice->invoice_number . '_' . time() . '.pdf';
+        $storagePath = 'public/' . $filename;
+
+        // Store PDF file
+        Storage::put($storagePath, $pdf->output());
+
+        // Return the path to store in database
+        return $filename;
     }
 }

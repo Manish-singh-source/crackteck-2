@@ -661,7 +661,77 @@ class AllServicesController extends Controller
         return response()->json(['success' => true, 'message' => 'Quotation rejected successfully.'], 200);
     }
 
+    public function payInvoice(Request $request, $id)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'user_id' => 'required|integer|exists:customers,id',
+            'amount' => 'required|numeric|min:0',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        // Find the quotation invoice
+        $invoice = QuotationInvoice::where('id', $id)->first();
+
+        if (! $invoice) {
+            return response()->json(['success' => false, 'message' => 'Invoice not found.'], 404);
+        }
+
+        // Update the invoice status to paid
+        $invoice->update([
+            'paid_amount' => $validated['amount'],
+            'payment_method' => 'online', // Assuming payment method is online, you can modify as needed
+            'payment_status' => 'paid',
+            'paid_at' => now(),
+        ]);
+
+        if( $invoice->quoteDetails && $invoice->quoteDetails->leadDetails) {
+            $invoice->quoteDetails->leadDetails->update(['status' => 'won']);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Invoice paid successfully.'], 200);
+    }
+
     // display invoice to the customer according to quotation id 
+    public function serviceRequestInvoicesList(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'user_id' => 'required|integer|exists:customers,id',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        // Find all quotation invoices for the customer
+        $invoices = QuotationInvoice::with('quoteDetails.leadDetails')
+            ->whereHas('quoteDetails.leadDetails', function ($query) use ($validated) {
+                $query->where('customer_id', $validated['user_id']);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json(['success' => true, 'data' => $invoices], 200);
+    }
+
     public function serviceRequestInvoice(Request $request, $id)
     {
         $validated = Validator::make($request->all(), [
@@ -689,6 +759,69 @@ class AllServicesController extends Controller
 
         return response()->json(['success' => true, 'data' => $invoice], 200);
     }
+
+    public function acceptInvoice(Request $request, $id)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'user_id' => 'required|integer|exists:customers,id',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        // Find the quotation invoice
+        $invoice = QuotationInvoice::where('id', $id)->first();
+
+        if (! $invoice) {
+            return response()->json(['success' => false, 'message' => 'Invoice not found.'], 404);
+        }
+
+        // Update the invoice status to accepted
+        $invoice->update(['status' => 'accepted']);
+
+        return response()->json(['success' => true, 'message' => 'Invoice accepted successfully.'], 200);
+    }
+
+    public function rejectInvoice(Request $request, $id)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'user_id' => 'required|integer|exists:customers,id',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        // Find the quotation invoice
+        $invoice = QuotationInvoice::where('id', $id)->first();
+
+        if (! $invoice) {
+            return response()->json(['success' => false, 'message' => 'Invoice not found.'], 404);
+        }
+
+        // Update the invoice status to rejected
+        $invoice->update(['status' => 'rejected']);
+
+        return response()->json(['success' => true, 'message' => 'Invoice rejected successfully.'], 200);
+    }
+
 
     // Give Feedback APIs only for that services who status is completed
     public function giveFeedback(Request $request)

@@ -206,23 +206,7 @@
                                         </ul>
                                     </div>
                                 </div>
-                                @if (isset($invoice))
-                                    @if ($invoice->status === 'draft')
-                                        <div class="col-lg-6">
-                                            <div class="mt-2">
-                                                <a href="{{ route('quotation.editInvoice', $quotation->id) }}"
-                                                    class="btn btn-warning btn-sm">Edit Invoice</a>
-                                            </div>
-                                        </div>
-                                    @elseif($invoice->status === 'sent')
-                                        <div class="col-lg-6">
-                                            <div class="mt-2">
-                                                <a href="{{ route('quotation.viewInvoice', $quotation->id) }}"
-                                                    class="btn btn-primary btn-sm">View Invoice</a>
-                                            </div>
-                                        </div>
-                                    @endif
-                                @elseif ($quotation->status === 'accepted')
+                                @if ($quotation->status === 'accepted' && !$invoice)
                                     <div class="col-lg-6">
                                         <div class="mt-2">
                                             <a href="{{ route('quotation.generateInvoice', $quotation->id) }}"
@@ -233,6 +217,60 @@
                             </div>
                         </div>
                     </div>
+
+                    @if (isset($invoice))
+                        <div class="card">
+                            <div class="card-header border-bottom-dashed">
+                                <div class="d-flex">
+                                    <h5 class="card-title flex-grow-1 mb-0">
+                                        Invoice Status
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="mt-2">
+                                            <ul class="list-group list-group-flush">
+                                                <li
+                                                    class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                                    <span class="fw-semibold text-break">Current Status:</span>
+                                                    <span>
+                                                        <span
+                                                            class="badge bg-info">{{ ucfirst($invoice->status ?? 'N/A') }}</span>
+                                                    </span>
+                                                </li>
+                                                <li
+                                                    class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                                    <span class="fw-semibold text-break">Payment Status:</span>
+                                                    <span>
+                                                        <span
+                                                            class="badge bg-info">{{ ucfirst($invoice->payment_status ?? 'N/A') }}</span>
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    @if ($invoice->status === 'draft')
+                                        <div class="col-lg-6">
+                                            <div class="mt-2">
+                                                <a href="{{ route('quotation.editInvoice', $quotation->id) }}"
+                                                    class="btn btn-warning btn-sm">Edit Invoice</a>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="col-lg-6">
+                                            <div class="mt-2">
+                                                <a href="{{ route('quotation.viewInvoice', $quotation->id) }}"
+                                                    class="btn btn-primary btn-sm">View Invoice</a>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="card">
@@ -241,6 +279,10 @@
                             <h5 class="card-title flex-grow-1 mb-0">
                                 Quotation Details
                             </h5>
+
+                            <div>
+                                {{ $quotation->lead_id }}
+                            </div>
                         </div>
                     </div>
 

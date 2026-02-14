@@ -85,58 +85,6 @@ class ServiceRequestController extends Controller
         ));
     }
 
-
-    // public function create()
-    // {
-    //     return view('/crm/service-request/create-servies');
-    // }
-
-    // public function view()
-    // {
-    //     return view('/crm/service-request/view-service');
-    // }
-
-    // public function viewServiceRequest($id)
-    // {
-    //     $serviceRequest = ServiceRequest::with([
-    //         'customer',
-    //         'customerAddress',
-    //         'customerCompany',
-    //         'products' => function ($query) {
-    //             $query->with(['diagnosisDetails.engineer', 'pickups']);
-    //         },
-    //     ])->findOrFail($id);
-
-    //     // Get active assignment
-    //     $activeAssignment = AssignedEngineer::with(['engineer', 'groupEngineers'])
-    //         ->where('service_request_id', $id)
-    //         ->where('status', '0')
-    //         ->first();
-
-    //     $engineers = Staff::where('staff_role', '1')->get();
-        
-    //     // Get active delivery men
-    //     $deliveryMen = Staff::where('staff_role', 'delivery_man')->where('status', 'active')->get();
-
-    //     // Get existing pickup records for this service request
-    //     $pickups = ServiceRequestProductPickup::with(['serviceRequestProduct', 'assignedPerson'])
-    //         ->where('request_id', $id)
-    //         ->get();
-
-    //     // Get existing return records for this service request
-    //     $returns = ServiceRequestProductReturn::with(['serviceRequestProduct', 'assignedPerson', 'pickup'])
-    //         ->where('request_id', $id)
-    //         ->get();
-
-    //     return view('/crm/service-request/view-quick-service-request', 
-    //         compact('serviceRequest', 'activeAssignment', 'engineers', 'deliveryMen', 'pickups', 'returns'));
-    // }
-
-    // public function edit()
-    // {
-    //     return view('/crm/service-request/edit-service');
-    // }
-
     public function create_amc()
     {
         $amcPlans = AmcPlan::where('status', 'Active')->get();
@@ -784,78 +732,6 @@ class ServiceRequestController extends Controller
         return view('/crm/service-request/view-non-amc', compact('service', 'engineers'));
     }
 
-    /**
-     * Assign engineer to NON AMC service (single engineer only)
-     */
-    // public function assignNonAmcEngineer(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'non_amc_service_id' => 'required|exists:non_amc_services,id',
-    //         'engineer_id' => 'required|exists:engineers,id',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => $validator->errors()->first(),
-    //         ], 422);
-    //     }
-
-    //     DB::beginTransaction();
-    //     try {
-    //         $nonAmcService = NonAmcService::findOrFail($request->non_amc_service_id);
-
-    //         // Check if status is pending
-    //         if (! $nonAmcService->canAssignEngineer()) {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'Engineer cannot be assigned while status is Pending. Please change the status first.',
-    //             ], 422);
-    //         }
-
-    //         // Deactivate previous assignments
-    //         NonAmcEngineerAssignment::where('non_amc_service_id', $request->non_amc_service_id)
-    //             ->where('status', 'Active')
-    //             ->update(['status' => 'Inactive']);
-
-    //         // Create new assignment (Individual only, no group support for NON AMC)
-    //         $assignment = NonAmcEngineerAssignment::create([
-    //             'non_amc_service_id' => $request->non_amc_service_id,
-    //             'assignment_type' => 'Individual',
-    //             'engineer_id' => $request->engineer_id,
-    //             'status' => 'Active',
-    //             'assigned_at' => now(),
-    //         ]);
-
-    //         // Update the service with assigned engineer
-    //         $nonAmcService->assigned_engineer_id = $request->engineer_id;
-    //         $nonAmcService->save();
-
-    //         DB::commit();
-
-    //         // Load relationships for response
-    //         $assignment->load('engineer');
-
-    //         activity()->performedOn($assignment)->causedBy(Auth::user())->log('Engineer assigned to NON AMC service');
-
-    //         $engineer = Engineer::find($request->engineer_id);
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Engineer '.$engineer->first_name.' '.$engineer->last_name.' assigned successfully',
-    //             'assignment' => $assignment,
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         Log::error($e->getMessage());
-
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Error assigning engineer: '.$e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
-
     public function edit_non_amc($id)
     {
         $service = NonAmcService::with(['products'])->findOrFail($id);
@@ -1284,7 +1160,7 @@ class ServiceRequestController extends Controller
         return view('crm/service-request/view-amc-service-request', compact('request', 'engineers'));
     }
 
-    public function editAmcServiceRequest($id)
+    public function editAmcServiceRequest($id, $service_type)
     {
         try {
             $request = ServiceRequest::with([
@@ -1296,13 +1172,22 @@ class ServiceRequestController extends Controller
             ])->findOrFail($id);
             // dd($request);
 
-            // same data as create
-            $amcService = AmcPlan::where('status', 'active')->get(); // Collection
-            $amcServiceOptions = $amcService
-                ->pluck('plan_name', 'id')
-                ->prepend('--Select Amc Service--', '');
+            $service_type = $service_type;
 
-            $amcServicePrices = $amcService->pluck('service_charge', 'id');
+            // same data as create
+            if ($service_type != 'amc') {
+                $quickService = CoveredItem::where('service_type', $service_type)->get(); // Collection
+                $quickServiceOptions = $quickService
+                    ->pluck('service_name', 'id', 'service_charge')
+                    ->prepend('--Select Quick Service--', 0);
+            }else {
+                $quickService = AmcPlan::where('status', 'active')->get(); // Collection
+                $quickServiceOptions = $quickService
+                    ->pluck('plan_name', 'id', 'price')
+                    ->prepend('--Select AMC Service--', 0);
+            }
+
+            $quickServicePrices = $quickService->pluck('service_charge', 'id');
             // dd($quickServicePrices, $quickServiceOptions);
 
             $categories = ParentCategory::where('status', 'active')
@@ -1313,22 +1198,22 @@ class ServiceRequestController extends Controller
 
             $customers = Customer::all();
 
-            return view('crm/service-request/edit-amc-service-request', compact(
+            return view('crm/service-request/edit-quick-service-request', compact(
                 'request',
-                'amcService',
-                'amcServiceOptions',
-                'amcServicePrices',
+                'quickService',
+                'quickServiceOptions',
+                'quickServicePrices',
                 'customers',
                 'categories',
-                'brands'
+                'brands',
+                'service_type'
             ));
         } catch (\Exception $e) {
             return redirect()
                 ->route('service-request.index')
-                ->with('error', 'Installation Service Request not found: ' . $e->getMessage());
+                ->with('error', 'Quick Service Request not found: ' . $e->getMessage());
         }
     }
-
     public function updateAmcServiceRequest(Request $request, $id)
     {
         // Basic validation
@@ -2027,9 +1912,9 @@ class ServiceRequestController extends Controller
     public function getCustomerAddresses(Request $request)
     {
         $email = $request->email;
-        
+
         \Log::info('Fetching customer addresses for email: ' . $email);
-        
+
         $customer = Customer::where('email', $email)->first();
 
         if (!$customer) {
@@ -2038,7 +1923,7 @@ class ServiceRequestController extends Controller
         }
 
         \Log::info('Customer found: ' . $customer->id . ', fetching addresses...');
-        
+
         $addresses = CustomerAddressDetail::where('customer_id', $customer->id)->get();
 
         \Log::info('Addresses found: ' . $addresses->count());
@@ -2176,7 +2061,7 @@ class ServiceRequestController extends Controller
         ])->findOrFail($id);
 
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
-        
+
         // Get active delivery men
         $deliveryMen = Staff::where('staff_role', 'delivery_man')->where('status', 'active')->get();
 
@@ -2227,7 +2112,7 @@ class ServiceRequestController extends Controller
                 'quickServicePrices',
                 'customers',
                 'categories',
-                'brands', 
+                'brands',
                 'service_type'
             ));
         } catch (\Exception $e) {
@@ -2349,10 +2234,10 @@ class ServiceRequestController extends Controller
                     'status' => 'pending', // Set initial status as pending
                 ]);
 
-            // Update all products from pending to approved after successful update
-            ServiceRequestProduct::where('service_requests_id', $serviceRequest->id)
-                ->where('status', 'pending')
-                ->update(['status' => 'approved']);
+                // Update all products from pending to approved after successful update
+                ServiceRequestProduct::where('service_requests_id', $serviceRequest->id)
+                    ->where('status', 'pending')
+                    ->update(['status' => 'approved']);
             }
 
             DB::commit();
@@ -2749,7 +2634,7 @@ class ServiceRequestController extends Controller
             $reason = '';
             $diagnosisDetails = EngineerDiagnosisDetail::where('service_request_id', $serviceRequest->id)
                 ->get();
-            
+
             foreach ($diagnosisDetails as $diagnosis) {
                 if ($diagnosis->diagnosis_list) {
                     $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
@@ -2764,7 +2649,7 @@ class ServiceRequestController extends Controller
                     }
                 }
             }
-            
+
             if (!empty($reasonParts)) {
                 $reason = implode('; ', $reasonParts);
             }
@@ -2783,9 +2668,8 @@ class ServiceRequestController extends Controller
                 ]);
             } else {
                 // Create new pickup record - use first picking product or first product
-                $productId = !empty($pickingProductIds) ? $pickingProductIds[0] : 
-                    ($serviceRequest->products->first()->id ?? null);
-                
+                $productId = !empty($pickingProductIds) ? $pickingProductIds[0] : ($serviceRequest->products->first()->id ?? null);
+
                 if (!$productId) {
                     return response()->json([
                         'success' => false,
@@ -3043,7 +2927,7 @@ class ServiceRequestController extends Controller
 
             // Check if return record already exists for this pickup
             $existingReturn = ServiceRequestProductReturn::where('pickups_id', $pickup->id)->first();
-            
+
             if ($existingReturn) {
                 return response()->json([
                     'success' => false,
@@ -3142,7 +3026,7 @@ class ServiceRequestController extends Controller
                 'error' => $e->getMessage()
             ]);
 
-            return response()->json([ 
+            return response()->json([
                 'success' => false,
                 'message' => 'Error updating return status: ' . $e->getMessage(),
             ], 500);

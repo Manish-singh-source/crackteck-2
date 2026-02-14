@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
                 <div class="flex-grow-1">
-                    <h4 class="fs-18 fw-semibold m-0">Edit Quick Service Request</h4>
+                    <h4 class="fs-18 fw-semibold m-0">Edit Amc Service Request</h4>
                 </div>
             </div>
 
@@ -37,8 +37,8 @@
 
             <div class="row">
                 <div class="col-12">
-                    <form action="{{ route('service-request.update-quick-service-request', [$request->id, $service_type]) }}" method="POST"
-                        enctype="multipart/form-data" id="nonAmcForm">
+                    <form action="{{ route('service-request.update-amc-service-request', $request->id) }}"
+                        method="POST" enctype="multipart/form-data" id="nonAmcForm">
                         @csrf
                         @method('PUT')
 
@@ -75,8 +75,8 @@
                             <div class="card-body">
                                 <div class="row g-3 pb-3">
 
-                                    {{-- hidden service_type = 1 (Quick Service) --}}
-                                    <input type="hidden" name="service_type" value="quick_service">
+                                    {{-- hidden service_type = amc --}}
+                                    <input type="hidden" name="service_type" value="amc">
 
                                     <div class="col-xl-4 col-lg-6">
                                         <div>
@@ -115,7 +115,7 @@
                                                 'placeholder' => 'Enter Your First Name',
                                                 'value' => old('first_name', $request->customer->first_name ?? ''),
                                                 'model' => $request->customer,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -129,7 +129,7 @@
                                                 'placeholder' => 'Enter Your Last Name',
                                                 'value' => old('last_name', $request->customer->last_name ?? ''),
                                                 'model' => $request->customer,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -143,7 +143,7 @@
                                                 'placeholder' => '+91 000 000 XXXX',
                                                 'value' => old('phone', $request->customer->phone ?? ''),
                                                 'model' => $request->customer,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -156,7 +156,7 @@
                                                 'type' => 'date',
                                                 'value' => old('dob', $request->customer->dob ?? ''),
                                                 'model' => $request->customer,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -174,7 +174,7 @@
                                                 ],
                                                 'value' => old('gender', $request->customer->gender ?? ''),
                                                 'model' => $request->customer,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -191,7 +191,7 @@
                                                 'placeholder' => 'Enter Your Branch Name',
                                                 'value' => old('branch_name', $addr->branch_name ?? ''),
                                                 'model' => $request->customerAddress,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -205,7 +205,7 @@
                                                 'placeholder' => 'Enter Your Address',
                                                 'value' => old('address1', $addr->address1 ?? ''),
                                                 'model' => $request->customerAddress,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -219,7 +219,7 @@
                                                 'placeholder' => 'Enter Your Address 2',
                                                 'value' => old('address2', $addr->address2 ?? ''),
                                                 'model' => $request->customerAddress,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -233,7 +233,7 @@
                                                 'placeholder' => 'Enter Your Country',
                                                 'value' => old('country', $addr->country ?? ''),
                                                 'model' => $request->customerAddress,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -247,7 +247,7 @@
                                                 'placeholder' => 'Enter Your State',
                                                 'value' => old('state', $addr->state ?? ''),
                                                 'model' => $request->customerAddress,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -261,7 +261,7 @@
                                                 'placeholder' => 'Enter Your City',
                                                 'value' => old('city', $addr->city ?? ''),
                                                 'model' => $request->customerAddress,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -275,7 +275,35 @@
                                                 'placeholder' => 'Enter Your Pin Code',
                                                 'value' => old('pincode', $addr->pincode ?? ''),
                                                 'model' => $request->customerAddress,
-                                                'readonly' => true
+                                                'readonly' => true,
+                                            ])
+                                        </div>
+                                    </div>
+
+                                    {{-- AMC Service Selection --}}
+                                    <div class="col-xl-4 col-lg-6">
+                                        <div>
+                                            @include('components.form.select', [
+                                                'class' => 'amc-service-select',
+                                                'label' => 'Amc Service',
+                                                'name' => 'amc_plan_id',
+                                                'options' => $amcServiceOptions,
+                                                'value' => old('amc_plan_id', $request->amc_plan_id),
+                                                'required' => true,
+                                            ])
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-4 col-lg-6">
+                                        <div>
+                                            @include('components.form.input', [
+                                                'class' => 'amc-service-price',
+                                                'label' => 'Amc Service Price',
+                                                'name' => 'price',
+                                                'type' => 'text',
+                                                'readonly' => true,
+                                                'value' => old('price', $request->price),
+                                                'required' => true,
                                             ])
                                         </div>
                                     </div>
@@ -299,7 +327,7 @@
                                                 'placeholder' => 'Enter Your Company Name',
                                                 'value' => old('company_name', $comp->company_name ?? ''),
                                                 'model' => $request->customerCompany,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -313,7 +341,7 @@
                                                 'placeholder' => 'Enter Your GST Number',
                                                 'value' => old('gst_no', $comp->gst_no ?? ''),
                                                 'model' => $request->customerCompany,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -327,9 +355,10 @@
                                                 'placeholder' => 'Enter Your PAN Number',
                                                 'value' => old(
                                                     'pan_number',
-                                                    optional($request->customer->panCardDetails)->pan_number ?? ''),
+                                                    optional($request->customer->panCardDetails)->pan_number ??
+                                                        ''),
                                                 'model' => $request->customer->panCardDetails,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -344,9 +373,10 @@
                                                 'placeholder' => 'Enter Your Address',
                                                 'value' => old(
                                                     'comp_address1',
-                                                    optional($request->customer->companyDetails)->comp_address1 ?? ''),
+                                                    optional($request->customer->companyDetails)->comp_address1 ??
+                                                        ''),
                                                 'model' => $request->customer->companyDetails,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -360,10 +390,11 @@
                                                 'placeholder' => 'Enter Your Address 2',
                                                 'value' => old(
                                                     'comp_address2',
-                                                    optional($request->customer->companyDetails)->comp_address2 ?? ''),
+                                                    optional($request->customer->companyDetails)->comp_address2 ??
+                                                        ''),
                                                 'model' => $request->customer->companyDetails,
                                                 'model' => $request->customerCompany,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -377,10 +408,11 @@
                                                 'placeholder' => 'Enter Your Country',
                                                 'value' => old(
                                                     'comp_country',
-                                                    optional($request->customer->companyDetails)->comp_country ?? ''),
+                                                    optional($request->customer->companyDetails)->comp_country ??
+                                                        ''),
                                                 'model' => $request->customer->companyDetails,
                                                 'model' => $request->customerCompany,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -394,10 +426,11 @@
                                                 'placeholder' => 'Enter Your State',
                                                 'value' => old(
                                                     'comp_state',
-                                                    optional($request->customer->companyDetails)->comp_state ?? ''),
+                                                    optional($request->customer->companyDetails)->comp_state ??
+                                                        ''),
                                                 'model' => $request->customer->companyDetails,
                                                 'model' => $request->customerCompany,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -414,7 +447,7 @@
                                                     optional($request->customer->companyDetails)->comp_city ?? ''),
                                                 'model' => $request->customer->companyDetails,
                                                 'model' => $request->customerCompany,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
@@ -428,13 +461,15 @@
                                                 'placeholder' => 'Enter Your Pin Code',
                                                 'value' => old(
                                                     'comp_pincode',
-                                                    optional($request->customer->companyDetails)->comp_pincode ?? ''),
+                                                    optional($request->customer->companyDetails)->comp_pincode ??
+                                                        ''),
                                                 'model' => $request->customer->companyDetails,
                                                 'model' => $request->customerCompany,
-                                                'readonly' => true
+                                                'readonly' => true,
                                             ])
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -472,7 +507,7 @@
                                             <div class="col-xl-4 col-lg-6">
                                                 <div>
                                                     <label class="form-label">Product Type</label>
-                                                    {{-- <select name="products[{{ $idx }}][product_type]"
+                                                    <select name="products[{{ $idx }}][product_type]"
                                                         class="form-select">
                                                         <option value="">--Select Type--</option>
                                                         @foreach ($categories as $id => $name)
@@ -481,17 +516,14 @@
                                                                 {{ $name }}
                                                             </option>
                                                         @endforeach
-                                                    </select> --}}
-                                                    <input type="text" name="products[{{ $idx }}][product_type]"
-                                                        class="form-control" placeholder="Laptop"
-                                                        value="{{ old("products.$idx.product_type", $product->type) }}">
+                                                    </select>
                                                 </div>
                                             </div>
 
                                             <div class="col-xl-4 col-lg-6">
                                                 <div>
                                                     <label class="form-label">Product Brand</label>
-                                                    {{-- <select name="products[{{ $idx }}][product_brand]"
+                                                    <select name="products[{{ $idx }}][product_brand]"
                                                         class="form-select">
                                                         <option value="">--Select Brand--</option>
                                                         @foreach ($brands as $id => $name)
@@ -500,10 +532,7 @@
                                                                 {{ $name }}
                                                             </option>
                                                         @endforeach
-                                                    </select> --}}
-                                                    <input type="text" name="products[{{ $idx }}][product_brand]"
-                                                        class="form-control" placeholder="Dell"
-                                                        value="{{ old("products.$idx.product_brand", $product->brand) }}">
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -548,37 +577,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-xl-4 col-lg-6">
-                                                <div>
-                                                    @include('components.form.select', [
-                                                        'class' => 'quick-service-select',
-                                                        'label' => 'Quick Service',
-                                                        'name' => "products[$idx][quick_service_id]",
-                                                        'options' => $quickServiceOptions,
-                                                        'value' => old(
-                                                            "products.$idx.quick_service_id",
-                                                            $product->item_code_id),
-                                                    ])
-                                                </div>
-                                            </div>
-
-                                            <div class="col-xl-4 col-lg-6">
-                                                <div>
-                                                    @include('components.form.input', [
-                                                        'class' => 'quick-service-price',
-                                                        'label' => 'Quick Service Price',
-                                                        'name' => "products[$idx][price]",
-                                                        'type' => 'text',
-                                                        'readonly' => true,
-                                                        'value' => old(
-                                                            "products.$idx.price",
-                                                            $product->service_charge),
-                                                        'model' => $product->service_charge,
-                                                    ])
-                                                </div>
-                                            </div>
-
-                                            <div class="col-12">
+                                            <div class="col-6">
                                                 <div>
                                                     <label class="form-label">Issue Description</label>
                                                     <textarea name="products[{{ $idx }}][issue_description]" class="form-control" rows="3"
@@ -604,15 +603,6 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-2">
-                                                <div>
-                                                    <label class="form-label">Visit Date</label>
-                                                    <input type="date"
-                                                        name="visit_date"
-                                                        class="form-control"
-                                                        value="{{ old('visit_date', $request->visit_date) }}">
-                                                </div>
-                                            </div>
                                             <div class="col-2">
                                                 <div>
                                                     @include('components.form.select', [
@@ -645,7 +635,7 @@
                         {{-- ACTION BUTTONS --}}
                         <div class="col-lg-12">
                             <div class="text-start mb-3 mt-3">
-                                <a href="{{ route('service-request.view-quick-service-request', $request->id) }}"
+                                <a href="{{ route('service-request.view-installation-service-request', $request->id) }}"
                                     class="btn btn-secondary w-sm waves ripple-light">
                                     <i class="mdi mdi-arrow-left"></i> Cancel
                                 </a>
@@ -687,15 +677,23 @@
                 <div class="col-xl-4 col-lg-6">
                     <div>
                         <label class="form-label">Product Type</label>
-                        <input type="text" name="products[${i}][product_type]" class="form-control"
-                                placeholder="Laptop">
+                        <select name="products[${i}][product_type]" class="form-select">
+                            <option value="">--Select Type--</option>
+                            @foreach ($categories as $id => $name)
+                                <option value="{{ $id }}">{{ $name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-6">
                     <div>
                         <label class="form-label">Product Brand</label>
-                        <input type="text" name="products[${i}][product_brand]" class="form-control"
-                               placeholder="Dell">
+                        <select name="products[${i}][product_brand]" class="form-select">
+                            <option value="">--Select Brand--</option>
+                            @foreach ($brands as $id => $name)
+                                <option value="{{ $id }}">{{ $name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-6">
@@ -720,27 +718,6 @@
                     <div>
                         <label class="form-label">Product Image</label>
                         <input type="file" name="products[${i}][product_image]" class="form-control" accept="image/*">
-                    </div>
-                </div>
-                <div class="col-xl-4 col-lg-6">
-                    <div>
-                        @include('components.form.select', [
-                            'class' => 'quick-service-select',
-                            'label' => 'Quick Service',
-                            'name' => 'products[__IDX__][quick_service_id]',
-                            'options' => $quickServiceOptions,
-                        ])
-                    </div>
-                </div>
-                <div class="col-xl-4 col-lg-6">
-                    <div>
-                        @include('components.form.input', [
-                            'class' => 'quick-service-price',
-                            'label' => 'Quick Service Price',
-                            'name' => 'products[__IDX__][price]',
-                            'type' => 'text',
-                            'readonly' => true,
-                        ])
                     </div>
                 </div>
                 <div class="col-12">
@@ -869,22 +846,29 @@
     </script>
 
     <script>
-        // Quick service price mapping (same as create)
+        // AMC service price mapping (same as create)
         $(document).ready(function() {
-            const quickServicePrices = @json($quickService->pluck('service_charge', 'id'));
+            const amcServicePrices = @json($amcService->pluck('total_cost', 'id'));
 
-            $(document).on('change', '.quick-service-select', function() {
-                const id = $(this).val();
-                const priceInput = $(this)
-                    .closest('.product-entry')
-                    .find('.quick-service-price');
+            // Function to update price
+            function updateAmcPrice() {
+                const id = $('.amc-service-select').val();
+                const priceInput = $('.amc-service-price');
 
-                if (quickServicePrices[id]) {
-                    priceInput.val(quickServicePrices[id]);
+                if (amcServicePrices[id]) {
+                    priceInput.val(amcServicePrices[id]);
                 } else {
                     priceInput.val('');
                 }
+            }
+
+            // Update price on change
+            $(document).on('change', '.amc-service-select', function() {
+                updateAmcPrice();
             });
+
+            // Update price on page load if value is already selected
+            updateAmcPrice();
         });
     </script>
 @endsection

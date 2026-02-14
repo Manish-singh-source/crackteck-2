@@ -251,7 +251,7 @@
                                             </ul>
                                         </div>
                                     </div>
-                                    
+
                                     @if ($invoice->status === 'draft')
                                         <div class="col-lg-6">
                                             <div class="mt-2">
@@ -514,14 +514,17 @@
                         <table class="table table-striped table-borderless dt-responsive nowrap">
                             <thead>
                                 <tr>
-                                    <th>Product Name</th>
-                                    <th>HSN Code</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Brand</th>
+                                    <th>Model No.</th>
                                     <th>SKU</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th>Sub Total</th>
-                                    <th>Tax (%)</th>
-                                    <th>Total</th>
+                                    <th>HSN</th>
+                                    <th>Unit Price</th>
+                                    <th>Qty</th>
+                                    <th>Discount</th>
+                                    <th>Tax %</th>
+                                    <th>Line Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -530,14 +533,23 @@
                                         <tr class="align-middle">
                                             <td>
                                                 <div>
-                                                    {{ $product->product_name }}
+                                                    {{ $product->name ?? 'N/A' }}
                                                 </div>
                                             </td>
                                             <td>
-                                                {{ $product->hsn_code ?? 'N/A' }}
+                                                {{ $product->type ?? 'N/A' }}
+                                            </td>
+                                            <td>
+                                                {{ $product->brand ?? 'N/A' }}
+                                            </td>
+                                            <td>
+                                                {{ $product->model_no ?? 'N/A' }}
                                             </td>
                                             <td>
                                                 {{ $product->sku ?? 'N/A' }}
+                                            </td>
+                                            <td>
+                                                {{ $product->hsn ?? 'N/A' }}
                                             </td>
                                             <td>
                                                 ₹{{ number_format($product->unit_price, 2) }}
@@ -546,10 +558,10 @@
                                                 {{ $product->quantity }}
                                             </td>
                                             <td>
-                                                ₹{{ number_format($product->unit_price * $product->quantity, 2) }}
+                                                ₹{{ number_format($product->discount_per_unit, 2) }}
                                             </td>
                                             <td>
-                                                {{ $product->tax_rate }}%
+                                                {{ $product->tax_rate ?? 0 }}%
                                             </td>
                                             <td>
                                                 ₹{{ number_format($product->line_total, 2) }}
@@ -558,58 +570,65 @@
                                     @endforeach
                                 @else
                                     <tr>
-                                        <td colspan="8" class="text-center text-muted">No products available.</td>
+                                        <td colspan="11" class="text-center text-muted">No products available.</td>
                                     </tr>
                                 @endif
                             </tbody>
                         </table>
                     </div>
 
-                    {{-- 
-                        <div class="card-footer">
-                            @if ($quotation->products && $quotation->products->count() > 0)
-                                @php
-                                    $totalQty = $quotation->products->sum('quantity');
+                    <div class="card-footer">
+                        @if ($quotation->products && $quotation->products->count() > 0)
+                            @php
+                                $totalQty = $quotation->products->sum('quantity');
 
-                                    $subTotal = $quotation->products->sum(function ($product) {
-                                        return $product->unit_price * $product->quantity;
-                                    });
+                                $subTotal = $quotation->products->sum(function ($product) {
+                                    return $product->unit_price * $product->quantity;
+                                });
 
-                                    $taxTotal = $quotation->products->sum(function ($product) {
-                                        $lineSub = $product->unit_price * $product->quantity;
-                                        return ($lineSub * $product->tax_rate) / 100;
-                                    });
+                                $totalDiscount = $quotation->products->sum(function ($product) {
+                                    return $product->discount_per_unit * $product->quantity;
+                                });
 
-                                    $grandTotal = $quotation->products->sum('line_total');
-                                @endphp
+                                $taxTotal = $quotation->products->sum(function ($product) {
+                                    $lineSub = $product->unit_price * $product->quantity;
+                                    return ($lineSub * $product->tax_rate) / 100;
+                                });
 
-                                <div class="row">
-                                    <div class="col-md-6"></div>
+                                $grandTotal = $quotation->products->sum('line_total');
+                            @endphp
 
-                                    <div class="col-md-6">
-                                        <table class="table table-borderless mb-0">
-                                            <tr>
-                                                <th>Total Quantity</th>
-                                                <td class="text-end">{{ $totalQty }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Subtotal</th>
-                                                <td class="text-end">₹{{ number_format($subTotal, 2) }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Total Tax</th>
-                                                <td class="text-end">₹{{ number_format($taxTotal, 2) }}</td>
-                                            </tr>
-                                            <tr class="border-top">
-                                                <th>Grand Total</th>
-                                                <th class="text-end">₹{{ number_format($grandTotal, 2) }}</th>
-                                            </tr>
-                                        </table>
-                                    </div>
+                            <div class="row">
+                                <div class="col-md-6"></div>
+
+                                <div class="col-md-6">
+                                    <table class="table table-borderless mb-0">
+                                        <tr>
+                                            <td class="fw-semibold">Total Quantity:</td>
+                                            <td class="text-end fw-semibold">{{ $totalQty }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-semibold">Subtotal:</td>
+                                            <td class="text-end fw-semibold">₹{{ number_format($subTotal, 2) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-semibold">Total Discount:</td>
+                                            <td class="text-end fw-semibold">₹{{ number_format($totalDiscount, 2) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-semibold">Total Tax:</td>
+                                            <td class="text-end fw-semibold">₹{{ number_format($taxTotal, 2) }}</td>
+                                        </tr>
+                                        <tr class="border-top">
+                                            <td class="fw-semibold">Grand Total:</td>
+                                            <td class="text-end fw-semibold text-success">
+                                                ₹{{ number_format($grandTotal, 2) }}</td>
+                                        </tr>
+                                    </table>
                                 </div>
-                            @endif
-                        </div> 
-                        --}}
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

@@ -596,7 +596,7 @@ Route::prefix('/demo')->group(function () {
         // Amc Service Request View
         Route::get('/crm/service-request/view-amc-service-request/{id}', 'viewAmcServiceRequest')->name('service-request.view-amc-service-request');
         // Amc Service Request Edit
-        Route::get('/crm/service-request/edit-amc-service-request/{id}', 'editAmcServiceRequest')->name('service-request.edit-amc-service-request');
+        Route::get('/crm/service-request/edit-amc-service-request/{id}/{service_type}', 'editAmcServiceRequest')->name('service-request.edit-amc-service-request');
         // Amc Service Request Update
         Route::put('/crm/service-request/update-amc-service-request/{id}', 'updateAmcServiceRequest')->name('service-request.update-amc-service-request');
 

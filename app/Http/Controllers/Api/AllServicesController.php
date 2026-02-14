@@ -564,26 +564,63 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        // Find the quotation invoice
-        $invoice = QuotationInvoice::where('id', $id)->first();
+        try {
 
-        if (! $invoice) {
-            return response()->json(['success' => false, 'message' => 'Invoice not found.'], 404);
+            // Find the quotation invoice
+            $invoice = QuotationInvoice::with(['quoteDetails.products', 'quoteDetails.amcDetail'])->where('id', $id)->first();
+
+            if (! $invoice) {
+                return response()->json(['success' => false, 'message' => 'Invoice not found.'], 404);
+            }
+
+            // Update the invoice status to paid
+            $invoice->update([
+                'paid_amount' => $validated['amount'],
+                'payment_method' => 'online', // Assuming payment method is online, you can modify as needed
+                'payment_status' => 'paid',
+                'paid_at' => now(),
+            ]);
+
+            if ($invoice->quoteDetails && $invoice->quoteDetails->leadDetails) {
+                $invoice->quoteDetails->leadDetails->update(['status' => 'won']);
+            }
+
+            $serviceRequest = new ServiceRequest();
+            $serviceRequest->request_id = uniqid();
+            $serviceRequest->service_type = 'amc';
+            $serviceRequest->customer_id = $invoice->customer_id ?? null;
+            $serviceRequest->customer_address_id = $invoice->quoteDetails->leadDetails->customer_address_id ?? null;
+            $serviceRequest->request_date = now();
+            $serviceRequest->request_source = 'lead_won'; // lead_won
+            $serviceRequest->visit_date = now()->addDays(5); // after 5 days of current date
+            $serviceRequest->reschedule_date = null;
+            $serviceRequest->created_by = $invoice->staff_id ?? null;
+            $serviceRequest->is_engineer_assigned = 'not_assigned';
+            $serviceRequest->status = 'active';
+            $serviceRequest->amc_plan_id = $invoice->amc_plan_id ?? null;
+            $serviceRequest->save();
+
+            // add service request products according to quotation products
+            foreach ($invoice->items as $item) {
+                $serviceRequest->products()->create([
+                    'service_requests_id' => $serviceRequest->id,
+                    'item_code_id' => $item->item_code_id ?? null,
+                    'name' => $item->name ?? 'N/A',
+                    'type' => $item->type ?? 'N/A',
+                    'model_no' => $item->model_no ?? 'N/A',
+                    'sku' => $item->sku ?? 'N/A',
+                    'hsn' => $item->hsn ?? 'N/A',
+                    'purchase_date' => $item->purchase_date ?? 'N/A',
+                    'brand' => $item->brand ?? 'N/A',
+                    'description' => $item->description ?? 'N/A',
+                    'service_charge' => $item->service_charge ?? '100',
+                ]);
+            }
+
+            return response()->json(['success' => true, 'message' => 'Invoice paid successfully.'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Payment processing failed.', 'errors' => $e->getMessage()], 500);
         }
-
-        // Update the invoice status to paid
-        $invoice->update([
-            'paid_amount' => $validated['amount'],
-            'payment_method' => 'online', // Assuming payment method is online, you can modify as needed
-            'payment_status' => 'paid',
-            'paid_at' => now(),
-        ]);
-
-        if( $invoice->quoteDetails && $invoice->quoteDetails->leadDetails) {
-            $invoice->quoteDetails->leadDetails->update(['status' => 'won']);
-        }
-
-        return response()->json(['success' => true, 'message' => 'Invoice paid successfully.'], 200);
     }
 
     // display invoice to the customer according to quotation id 
@@ -606,7 +643,7 @@ class AllServicesController extends Controller
         }
 
         // Find all quotation invoices for the customer
-        $invoices = QuotationInvoice::with('quoteDetails.leadDetails')
+        $invoices = QuotationInvoice::with('quoteDetails.leadDetails', 'items')
             ->whereHas('quoteDetails.leadDetails', function ($query) use ($validated) {
                 $query->where('customer_id', $validated['user_id']);
             })

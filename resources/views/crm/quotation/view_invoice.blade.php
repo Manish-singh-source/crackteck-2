@@ -63,6 +63,7 @@
                                     <thead>
                                         <tr>
                                             <th>Product</th>
+                                            <th>SKU</th>
                                             <th>Qty</th>
                                             <th>Unit Price</th>
                                             <th>Tax</th>
@@ -72,7 +73,13 @@
                                     <tbody>
                                         @foreach ($invoice->items as $item)
                                             <tr>
-                                                <td>{{ $item->product_name ?? 'Item' }}</td>
+                                                <td>{{ $item->name ?? ($item->product_name ?? 'Item') }}
+                                                    @if ($item->type || $item->brand)
+                                                        <div class="text-muted small">{{ $item->type ?? '' }}
+                                                            {{ $item->brand ? '- ' . $item->brand : '' }}</div>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $item->sku ?? '-' }}</td>
                                                 <td>{{ $item->quantity }}</td>
                                                 <td>₹{{ number_format($item->unit_price, 2) }}</td>
                                                 <td>₹{{ number_format($item->tax_amount, 2) }} ({{ $item->tax_rate }}%)

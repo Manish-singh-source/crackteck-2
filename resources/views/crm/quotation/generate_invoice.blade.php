@@ -14,14 +14,14 @@
                                 id="invoiceForm">
                                 @csrf
                                 <div class="row g-3">
-                                        <div class="col-md-4">
-                                            <label class="form-label">Invoice Number</label>
-                                            <input type="text" name="invoice_number" class="form-control"
-                                                value="{{ $invoice->invoice_number ?? 'INV-' . time() }}">
-                                            @if(isset($invoice))
-                                                <input type="hidden" name="invoice_id" value="{{ $invoice->id }}">
-                                            @endif
-                                        </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Invoice Number</label>
+                                        <input type="text" name="invoice_number" class="form-control"
+                                            value="{{ $invoice->invoice_number ?? 'INV-' . time() }}">
+                                        @if (isset($invoice))
+                                            <input type="hidden" name="invoice_id" value="{{ $invoice->id }}">
+                                        @endif
+                                    </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Invoice Date</label>
                                         <input type="date" name="invoice_date" class="form-control"
@@ -48,10 +48,15 @@
                                         <table class="table">
                                             <thead>
                                                 <tr>
-                                                    <th>Product</th>
+                                                    <th>Name</th>
+                                                    <th>Type</th>
+                                                    <th>Brand</th>
+                                                    <th>Model</th>
                                                     <th>SKU</th>
+                                                    <th>HSN</th>
                                                     <th>Unit Price</th>
                                                     <th>Qty</th>
+                                                    <th>Discount</th>
                                                     <th>Tax %</th>
                                                     <th>Total</th>
                                                 </tr>
@@ -59,11 +64,16 @@
                                             <tbody>
                                                 @foreach ($quotation->products as $product)
                                                     <tr>
-                                                        <td>{{ $product->product_name }}</td>
-                                                        <td>{{ $product->sku }}</td>
+                                                        <td>{{ $product->name ?? ($product->product_name ?? 'Item') }}</td>
+                                                        <td>{{ $product->type ?? '-' }}</td>
+                                                        <td>{{ $product->brand ?? '-' }}</td>
+                                                        <td>{{ $product->model_no ?? '-' }}</td>
+                                                        <td>{{ $product->sku ?? '-' }}</td>
+                                                        <td>{{ $product->hsn ?? ($product->hsn_code ?? '-') }}</td>
                                                         <td>₹{{ number_format($product->unit_price ?? ($product->price ?? 0), 2) }}
                                                         </td>
-                                                        <td>{{ $product->quantity }}</td>
+                                                        <td>{{ $product->quantity ?? 1 }}</td>
+                                                        <td>₹{{ number_format($product->discount_per_unit ?? 0, 2) }}</td>
                                                         <td>{{ $product->tax_rate ?? ($product->tax ?? 0) }}%</td>
                                                         <td>₹{{ number_format($product->line_total ?? $product->quantity * ($product->unit_price ?? ($product->price ?? 0)), 2) }}
                                                         </td>
@@ -89,14 +99,16 @@
                                             value="₹{{ number_format($quotation->total_amount ?? 0, 2) }}">
                                     </div>
 
-                                    <input type="hidden" name="status" id="invoice_status" value="{{ $invoice->status ?? 'draft' }}">
+                                    <input type="hidden" name="status" id="invoice_status"
+                                        value="{{ $invoice->status ?? 'draft' }}">
 
                                     <div class="col-12 mt-3">
                                         <button type="button" class="btn btn-secondary" id="saveDraftBtn">Save as
                                             Draft</button>
                                         <button type="button" class="btn btn-primary" id="sendBtn">Save & Send</button>
-                                        @if(isset($invoice) && $invoice->status === 'sent')
-                                            <a href="{{ route('quotation.viewInvoice', $quotation->id) }}" class="btn btn-outline-primary">View Invoice</a>
+                                        @if (isset($invoice) && $invoice->status === 'sent')
+                                            <a href="{{ route('quotation.viewInvoice', $quotation->id) }}"
+                                                class="btn btn-outline-primary">View Invoice</a>
                                         @endif
                                         <a href="{{ route('quotation.view', $quotation->id) }}"
                                             class="btn btn-light">Back</a>

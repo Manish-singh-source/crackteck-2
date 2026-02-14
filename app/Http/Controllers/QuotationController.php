@@ -59,7 +59,6 @@ class QuotationController extends Controller
 
     public function store(Request $request)
     {
-
         // Convert JSON string to array for products
         if ($request->has('products')) {
             $request->merge([
@@ -80,13 +79,19 @@ class QuotationController extends Controller
             'quote_date' => 'required|date',
             'expiry_date' => 'required|date',
             'products' => 'required|array|min:1',
-            'products.*.product_name' => 'required|string',
-            'products.*.hsn_code' => 'required|string',
-            'products.*.sku' => 'required|string',
-            'products.*.price' => 'required|numeric|min:0',
+            'products.*.name' => 'required|string',
+            'products.*.type' => 'nullable|string',
+            'products.*.brand' => 'nullable|string',
+            'products.*.model_no' => 'nullable|string',
+            'products.*.sku' => 'nullable|string',
+            'products.*.hsn' => 'nullable|string',
+            'products.*.unit_price' => 'required|numeric|min:0',
             'products.*.quantity' => 'required|integer|min:1',
-            'products.*.tax' => 'required|numeric|min:0',
-            'products.*.total' => 'required|numeric|min:0',
+            'products.*.discount_per_unit' => 'nullable|numeric|min:0',
+            'products.*.tax_rate' => 'nullable|numeric|min:0',
+            'products.*.purchase_date' => 'nullable|date',
+            'products.*.description' => 'nullable|string',
+            'products.*.line_total' => 'required|numeric|min:0',
             'amc_plan_id' => 'nullable|string',
             'plan_duration' => 'nullable|integer|min:0',
             'plan_start_date' => 'nullable|date',
@@ -115,9 +120,9 @@ class QuotationController extends Controller
             $quotation->expiry_date = $request->expiry_date;
             $quotation->total_items = count($request->products);
             $quotation->currency = 'INR'; // Assuming currency is INR, this can be made dynamic if needed
-            $quotation->subtotal = collect($request->products)->sum('total_amount');
-            $quotation->discount_amount = 0; // Assuming no discount for now, this can be updated to accept discount from request
-            $quotation->tax_amount = collect($request->products)->sum('tax');
+            $quotation->subtotal = 0; // Will be calculated in the loop
+            $quotation->discount_amount = 0; // Will be calculated in the loop
+            $quotation->tax_amount = 0; // Will be calculated in the loop
             $quotation->total_amount = 0; // This will be calculated after saving products and AMC details
             $quotation->save();
 
@@ -130,20 +135,25 @@ class QuotationController extends Controller
             foreach ($request->products as $productData) {
                 $quotationProduct = new QuotationProduct;
                 $quotationProduct->quotation_id = $quotation->id;
-                $quotationProduct->product_name = $productData['product_name'] ?? null;
-                $quotationProduct->hsn_code = $productData['hsn_code'] ?? null;
+                $quotationProduct->name = $productData['name'] ?? null;
+                $quotationProduct->type = $productData['type'] ?? null;
+                $quotationProduct->model_no = $productData['model_no'] ?? null;
                 $quotationProduct->sku = $productData['sku'] ?? null;
-                $quotationProduct->product_description = $productData['product_description'] ?? null;
+                $quotationProduct->hsn = $productData['hsn'] ?? null;
+                $quotationProduct->purchase_date = $productData['purchase_date'] ?? null;
+                $quotationProduct->brand = $productData['brand'] ?? null;
+                $quotationProduct->description = $productData['description'] ?? null;
+
                 $quotationProduct->quantity = $productData['quantity'] ?? 1;
-                $quotationProduct->unit_price = $productData['price'] ?? 0;
+                $quotationProduct->unit_price = $productData['unit_price'] ?? 0;
                 $quotationProduct->discount_per_unit = $productData['discount_per_unit'] ?? 0;
-                $quotationProduct->tax_rate = $productData['tax'] ?? 0;
-                $quotationProduct->line_total = $productData['total'] ?? 0;
+                $quotationProduct->tax_rate = $productData['tax_rate'] ?? 0;
+                $quotationProduct->line_total = $productData['line_total'] ?? 0;
                 $quotationProduct->save();
 
                 $subtotal += $quotationProduct->unit_price * $quotationProduct->quantity;
-                $taxAmount += $quotationProduct->tax_rate * $quotationProduct->quantity;
-                $discount += $quotationProduct->discount_per_unit;
+                $taxAmount += ($quotationProduct->unit_price * $quotationProduct->quantity * $quotationProduct->tax_rate) / 100;
+                $discount += $quotationProduct->discount_per_unit * $quotationProduct->quantity;
                 $total += $quotationProduct->line_total;
             }
 
@@ -228,13 +238,19 @@ class QuotationController extends Controller
             'expiry_date' => 'required',
 
             'products' => 'required|min:1',
-            'products.*.product_name' => 'required|string',
-            'products.*.hsn_code' => 'required|string',
-            'products.*.sku' => 'required|string',
-            'products.*.price' => 'required|numeric|min:0',
+            'products.*.name' => 'required|string',
+            'products.*.type' => 'nullable|string',
+            'products.*.brand' => 'nullable|string',
+            'products.*.model_no' => 'nullable|string',
+            'products.*.sku' => 'nullable|string',
+            'products.*.hsn' => 'nullable|string',
+            'products.*.unit_price' => 'required|numeric|min:0',
             'products.*.quantity' => 'required|integer|min:1',
-            'products.*.tax' => 'required|numeric|min:0',
-            'products.*.total' => 'required|numeric|min:0',
+            'products.*.discount_per_unit' => 'nullable|numeric|min:0',
+            'products.*.tax_rate' => 'nullable|numeric|min:0',
+            'products.*.purchase_date' => 'nullable|date',
+            'products.*.description' => 'nullable|string',
+            'products.*.line_total' => 'required|numeric|min:0',
 
             'amc_plan_id' => 'nullable|string',
             'plan_duration' => 'nullable|min:0',
@@ -266,13 +282,19 @@ class QuotationController extends Controller
         foreach ($request->products as $productData) {
             $quotationProduct = new QuotationProduct;
             $quotationProduct->quotation_id = $quotation->id;
-            $quotationProduct->product_name = $productData['product_name'];
-            $quotationProduct->hsn_code = $productData['hsn_code'];
-            $quotationProduct->sku = $productData['sku'];
-            $quotationProduct->price = $productData['price'];
-            $quotationProduct->quantity = $productData['quantity'];
-            $quotationProduct->tax = $productData['tax'];
-            $quotationProduct->total = $productData['total'];
+            $quotationProduct->name = $productData['name'] ?? null;
+            $quotationProduct->type = $productData['type'] ?? null;
+            $quotationProduct->brand = $productData['brand'] ?? null;
+            $quotationProduct->model_no = $productData['model_no'] ?? null;
+            $quotationProduct->sku = $productData['sku'] ?? null;
+            $quotationProduct->hsn = $productData['hsn'] ?? null;
+            $quotationProduct->description = $productData['description'] ?? null;
+            $quotationProduct->purchase_date = $productData['purchase_date'] ?? null;
+            $quotationProduct->quantity = $productData['quantity'] ?? 1;
+            $quotationProduct->unit_price = $productData['unit_price'] ?? 0;
+            $quotationProduct->discount_per_unit = $productData['discount_per_unit'] ?? 0;
+            $quotationProduct->tax_rate = $productData['tax_rate'] ?? 0;
+            $quotationProduct->line_total = $productData['line_total'] ?? 0;
             $quotationProduct->save();
         }
 
@@ -445,12 +467,18 @@ class QuotationController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'quotation_id' => 'required|exists:quotations,id',
-            'product_name' => 'required|string',
-            'hsn_code' => 'required|string',
-            'sku' => 'required|string',
+            'name' => 'required|string',
+            'type' => 'nullable|string',
+            'brand' => 'nullable|string',
+            'model_no' => 'nullable|string',
+            'sku' => 'nullable|string',
+            'hsn' => 'nullable|string',
             'unit_price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:1',
+            'discount_per_unit' => 'nullable|numeric|min:0',
             'tax_rate' => 'required|numeric|min:0',
+            'purchase_date' => 'nullable|date',
+            'description' => 'nullable|string',
             'line_total' => 'required|numeric|min:0',
         ]);
 
@@ -465,12 +493,18 @@ class QuotationController extends Controller
         try {
             $product = QuotationProduct::create([
                 'quotation_id' => $request->quotation_id,
-                'product_name' => $request->product_name,
-                'hsn_code' => $request->hsn_code,
+                'name' => $request->name,
+                'type' => $request->type,
+                'brand' => $request->brand,
+                'model_no' => $request->model_no,
                 'sku' => $request->sku,
+                'hsn' => $request->hsn,
                 'unit_price' => $request->unit_price,
                 'quantity' => $request->quantity,
+                'discount_per_unit' => $request->discount_per_unit,
                 'tax_rate' => $request->tax_rate,
+                'purchase_date' => $request->purchase_date,
+                'description' => $request->description,
                 'line_total' => $request->line_total,
             ]);
 
@@ -493,12 +527,18 @@ class QuotationController extends Controller
     public function updateProduct(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'product_name' => 'required|string',
-            'hsn_code' => 'required|string',
-            'sku' => 'required|string',
+            'name' => 'required|string',
+            'type' => 'nullable|string',
+            'brand' => 'nullable|string',
+            'model_no' => 'nullable|string',
+            'sku' => 'nullable|string',
+            'hsn' => 'nullable|string',
             'unit_price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:1',
+            'discount_per_unit' => 'nullable|numeric|min:0',
             'tax_rate' => 'required|numeric|min:0',
+            'purchase_date' => 'nullable|date',
+            'description' => 'nullable|string',
             'line_total' => 'required|numeric|min:0',
         ]);
 
@@ -513,12 +553,18 @@ class QuotationController extends Controller
         try {
             $product = QuotationProduct::findOrFail($id);
             $product->update([
-                'product_name' => $request->product_name,
-                'hsn_code' => $request->hsn_code,
+                'name' => $request->name,
+                'type' => $request->type,
+                'brand' => $request->brand,
+                'model_no' => $request->model_no,
                 'sku' => $request->sku,
+                'hsn' => $request->hsn,
                 'unit_price' => $request->unit_price,
                 'quantity' => $request->quantity,
+                'discount_per_unit' => $request->discount_per_unit,
                 'tax_rate' => $request->tax_rate,
+                'purchase_date' => $request->purchase_date,
+                'description' => $request->description,
                 'line_total' => $request->line_total,
             ]);
 
@@ -696,6 +742,16 @@ class QuotationController extends Controller
             QuotationInvoiceItem::create([
                 'quotation_invoice_id' => $invoice->id,
                 'quotation_products_id' => $product->id ?? null,
+                // Snapshot product fields (new schema)
+                'name' => $product->name ?? $product->product_name ?? null,
+                'type' => $product->type ?? null,
+                'brand' => $product->brand ?? null,
+                'model_no' => $product->model_no ?? null,
+                'sku' => $product->sku ?? null,
+                'hsn' => $product->hsn ?? $product->hsn_code ?? null,
+                'purchase_date' => $product->purchase_date ?? null,
+                'description' => $product->description ?? $product->product_description ?? null,
+
                 'quantity' => $quantity,
                 'unit_price' => $unitPrice,
                 'discount_per_unit' => $discountPerUnit,

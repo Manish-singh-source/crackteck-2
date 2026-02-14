@@ -544,6 +544,8 @@ Route::prefix('/demo')->group(function () {
         Route::post('/crm/service-request/submit-diagnosis', 'submitDiagnosis')->name('service-request.submit-diagnosis');
         // Admin Stock In Hand Approval
         Route::post('/crm/service-request/admin-stock-in-hand-approval', 'adminStockInHandApproval')->name('service-request.admin-stock-in-hand-approval');
+        // Assign Part To Person (Engineer/Delivery Man)
+        Route::post('/crm/service-request/assign-part-to-person', 'assignPartToPerson')->name('service-request.assign-part-to-person');
 
         // Delete Section For All the Service Request
         Route::delete('/crm/service-request/destroy-service-request/{id}', 'destroyQuickServiceRequest')->name('service-request.destroy-quick-service-request');

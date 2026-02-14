@@ -594,6 +594,27 @@ class FieldEngineerController extends Controller
                 } elseif ($diagnosis['status'] === 'request_part') {
                     $hasRequestPart = true;
                     $allWorking = false;
+                    
+                    // Feature 1: Create new record in service_request_product_request_parts when status is request_part
+                    if (isset($diagnosis['part_id'])) {
+                        $existingRequestPart = ServiceRequestProductRequestPart::where('request_id', $service_request_id)
+                            ->where('product_id', $product_id)
+                            ->where('part_id', $diagnosis['part_id'])
+                            ->where('request_type', 'request_part')
+                            ->first();
+                        
+                        if (!$existingRequestPart) {
+                            ServiceRequestProductRequestPart::create([
+                                'request_id' => $service_request_id,
+                                'product_id' => $product_id,
+                                'engineer_id' => $assignedEngineer->engineer_id, // Use assigned_engineer id
+                                'part_id' => $diagnosis['part_id'],
+                                'requested_quantity' => $diagnosis['quantity'] ?? 1,
+                                'request_type' => 'request_part',
+                                'status' => 'pending',
+                            ]);
+                        }
+                    }
                 } elseif ($diagnosis['status'] === 'used') {
                     // Part is marked as used - this is like completion
                     $allWorking = false;

@@ -107,4 +107,9 @@ class ServiceRequest extends Model
     {
         return $this->hasMany(ServiceRequestProductReturn::class, 'request_id');
     }
+
+    //  
+    public function amcScheduleMeetings() {
+        return $this->hasMany(AmcScheduleMeeting::class, 'service_request_id');
+    }
 }

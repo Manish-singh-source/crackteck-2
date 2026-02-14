@@ -230,6 +230,8 @@
                                                             'processed' => 'Processed',
                                                             'picking' => 'Picking',
                                                             'picked' => 'Picked',
+                                                            'stock_in_hand' => 'Stock In Hand',
+                                                            'request_part' => 'Request Part',
                                                             'completed' => 'Completed',
                                                         ];
 
@@ -329,6 +331,16 @@
                                                     {{-- Diagnosis List --}}
                                                     @php
                                                         $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
+                                                        $hasStockInHand = false;
+                                                        $stockInHandItems = [];
+                                                        if ($diagnosisList && is_array($diagnosisList)) {
+                                                            foreach ($diagnosisList as $item) {
+                                                                if (($item['status'] ?? '') === 'stock_in_hand') {
+                                                                    $hasStockInHand = true;
+                                                                    $stockInHandItems[] = $item;
+                                                                }
+                                                            }
+                                                        }
                                                     @endphp
                                                     @if ($diagnosisList && is_array($diagnosisList))
                                                         <div class="mb-3">
@@ -351,7 +363,7 @@
                                                                                     @php
                                                                                         $diagStatus = $item['status'] ?? '';
                                                                                         $diagStatusClass = $diagStatus === 'working' ? 'bg-success' : ($diagStatus === 'not_working' ? 'bg-danger' : 'bg-warning');
-                                                                                        $diagStatusLabel = $diagStatus === 'working' ? 'Working' : ($diagStatus === 'not_working' ? 'Not Working' : ($diagStatus === 'picking' ? 'Picking' : ucfirst($diagStatus)));
+                                                                                        $diagStatusLabel = $diagStatus === 'working' ? 'Working' : ($diagStatus === 'not_working' ? 'Not Working' : ($diagStatus === 'picking' ? 'Picking' : ($diagStatus === 'stock_in_hand' ? 'Stock In Hand' : ucfirst($diagStatus))));
                                                                                     @endphp
                                                                                     <span class="badge {{ $diagStatusClass }}">{{ $diagStatusLabel }}</span>
                                                                                 </td>
@@ -360,6 +372,252 @@
                                                                     </tbody>
                                                                 </table>
                                                             </div>
+                                                        </div>
+                                                    @endif
+
+                                                    {{-- Requested Parts Section - Shows all stock_in_hand and part_request --}}
+                                                    @php
+                                                        // Get all request parts for this product
+                                                        $requestParts = $product->requestParts ?? collect();
+                                                    @endphp
+                                                    @if($requestParts && $requestParts->count() > 0)
+                                                        <div class="mb-3">
+                                                            <h6 class="fw-semibold mb-2">Requested Parts Details</h6>
+                                                            @foreach($requestParts as $requestPart)
+                                                                @php
+                                                                    $partDetails = $requestPart->product;
+                                                                    $partSerial = $requestPart->requestedPart;
+                                                                    $status = $requestPart->status;
+                                                                    
+                                                                    // Status colors and labels
+                                                                    $statusLabels = [
+                                                                        'pending' => 'Pending',
+                                                                        'admin_approved' => 'Admin Approved',
+                                                                        'admin_rejected' => 'Admin Rejected',
+                                                                        'customer_approved' => 'Customer Approved',
+                                                                        'customer_rejected' => 'Customer Rejected',
+                                                                        'warehouse_approved' => 'Warehouse Approved',
+                                                                        'warehouse_rejected' => 'Warehouse Rejected',
+                                                                        'assigned' => 'Assigned',
+                                                                        'ap_approved' => 'AP Approved',
+                                                                        'ap_rejected' => 'AP Rejected',
+                                                                        'picked' => 'Picked',
+                                                                        'in_transit' => 'In Transit',
+                                                                        'delivered' => 'Delivered',
+                                                                        'used' => 'Used',
+                                                                    ];
+                                                                    
+                                                                    $statusColors = [
+                                                                        'pending' => 'bg-warning',
+                                                                        'admin_approved' => 'bg-success',
+                                                                        'admin_rejected' => 'bg-danger',
+                                                                        'customer_approved' => 'bg-success',
+                                                                        'customer_rejected' => 'bg-danger',
+                                                                        'warehouse_approved' => 'bg-info',
+                                                                        'warehouse_rejected' => 'bg-danger',
+                                                                        'assigned' => 'bg-primary',
+                                                                        'ap_approved' => 'bg-info',
+                                                                        'ap_rejected' => 'bg-danger',
+                                                                        'picked' => 'bg-success',
+                                                                        'in_transit' => 'bg-info',
+                                                                        'delivered' => 'bg-success',
+                                                                        'used' => 'bg-success',
+                                                                    ];
+                                                                    
+                                                                    $requestTypeLabels = [
+                                                                        'stock_in_hand' => 'Stock In Hand',
+                                                                        'part_request' => 'Part Request',
+                                                                    ];
+                                                                @endphp
+                                                                <div class="border rounded p-3 mb-2 bg-white">
+                                                                    <div class="row">
+                                                                        <div class="col-md-12">
+                                                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                                                <div>
+                                                                                    <span class="fw-semibold">Part Name:</span> {{ $partDetails->name ?? 'N/A' }}<br>
+                                                                                    <span class="text-muted small">
+                                                                                        Part ID: {{ $requestPart->part_id ?? 'N/A' }} | 
+                                                                                        Request Type: {{ $requestTypeLabels[$requestPart->request_type] ?? $requestPart->request_type }} | 
+                                                                                        Qty: {{ $requestPart->requested_quantity ?? 1 }}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <span class="badge {{ $statusColors[$status] ?? 'bg-secondary' }}">
+                                                                                    {{ $statusLabels[$status] ?? ucfirst($status) }}
+                                                                                </span>
+                                                                            </div>
+                                                                            
+                                                                            {{-- Status Timeline --}}
+                                                                            <div class="mb-2">
+                                                                                <span class="fw-semibold small">Timeline:</span>
+                                                                                <ul class="list-unstyled mb-0 small">
+                                                                                    <li><span class="text-muted">Requested:</span> {{ $requestPart->created_at ? $requestPart->created_at : 'N/A' }}</li>
+                                                                                    @if($requestPart->admin_approved_at)
+                                                                                        <li><span class="text-success">Admin Approved:</span> {{ $requestPart->admin_approved_at }}</li>
+                                                                                    @endif
+                                                                                    @if($requestPart->admin_rejected_at)
+                                                                                        <li><span class="text-danger">Admin Rejected:</span> {{ $requestPart->admin_rejected_at }}</li>
+                                                                                    @endif
+                                                                                    @if($requestPart->customer_approved_at)
+                                                                                        <li><span class="text-success">Customer Approved:</span> {{ $requestPart->customer_approved_at }}</li>
+                                                                                    @endif
+                                                                                    @if($requestPart->customer_rejected_at)
+                                                                                        <li><span class="text-danger">Customer Rejected:</span> {{ $requestPart->customer_rejected_at }}</li>
+                                                                                    @endif
+                                                                                    @if($requestPart->picked_at)
+                                                                                        <li><span class="text-info">Picked:</span> {{ $requestPart->picked_at }}</li>
+                                                                                    @endif
+                                                                                    @if($requestPart->delivered_at)
+                                                                                        <li><span class="text-success">Delivered:</span> {{ $requestPart->delivered_at }}</li>
+                                                                                    @endif
+                                                                                </ul>
+                                                                            </div>
+                                                                            
+                                                                            {{-- Admin Action for pending items --}}
+                                                                            @if(in_array($status, ['pending']))
+                                                                                <form action="{{ route('service-request.admin-stock-in-hand-approval') }}" method="POST" class="d-flex gap-2 align-items-center">
+                                                                                    @csrf
+                                                                                    <input type="hidden" name="request_id" value="{{ $request->id }}">
+                                                                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                                                                    <input type="hidden" name="engineer_id" value="{{ $requestPart->engineer_id }}">
+                                                                                    <input type="hidden" name="part_id" value="{{ $requestPart->part_id }}">
+                                                                                    <input type="hidden" name="quantity" value="{{ $requestPart->requested_quantity ?? 1 }}">
+                                                                                    <select name="admin_action" class="form-select form-select-sm" style="width: auto;" required>
+                                                                                        <option value="">-- Select Action --</option>
+                                                                                        <option value="admin_approved">Admin Approved</option>
+                                                                                        <option value="admin_rejected">Admin Rejected</option>
+                                                                                    </select>
+                                                                                    <button type="submit" class="btn btn-sm btn-primary">Submit</button>
+                                                                                </form>
+                                                                            @endif
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    @elseif($hasStockInHand)
+                                                        {{-- Fallback: Show stock_in_hand items from diagnosis list if no request parts exist --}}
+                                                        <div class="mb-3">
+                                                            <h6 class="fw-semibold mb-2">Admin Action</h6>
+                                                            @php
+                                                                // Get the engineer_id from assigned_engineers table (staff ID)
+                                                                $engineerId = $diagnosis->assignedEngineer->engineer_id ?? null;
+                                                                $productId = $product->id;
+                                                                $requestId = $request->id;
+                                                            @endphp
+                                                            @foreach($stockInHandItems as $stockItem)
+                                                                @php
+                                                                    $partId = $stockItem['part_id'] ?? null;
+                                                                    $partName = $stockItem['name'] ?? 'N/A';
+                                                                    $quantity = $stockItem['quantity'] ?? 1;
+                                                                     
+                                                                    // Check if there's an existing request part record
+                                                                    $requestPart = \App\Models\ServiceRequestProductRequestPart::where('engineer_id', $engineerId)
+                                                                        ->where('part_id', $partId)
+                                                                        ->where('request_type', 'stock_in_hand')
+                                                                        ->first();
+                                                                    
+                                                                    $currentStatus = $requestPart ? $requestPart->status : 'pending';
+                                                                    $isProcessed = in_array($currentStatus, ['admin_approved', 'admin_rejected', 'customer_approved', 'customer_rejected']);
+                                                                @endphp
+                                                                @if($partId)
+                                                                    <div class="d-flex gap-2 align-items-center mb-2 p-2 border rounded bg-white">
+                                                                        <div class="me-3">
+                                                                            <span class="fw-semibold">Part:</span> {{ $partName }}<br>
+                                                                            <span class="text-muted small">Part ID: {{ $partId }} | Qty: {{ $quantity }}</span>
+                                                                        </div>
+                                                                        @if($isProcessed)
+                                                                            <div class="ms-auto">
+                                                                                @if($currentStatus === 'admin_approved')
+                                                                                    <span class="badge bg-success">Admin Approved</span>
+                                                                                @elseif($currentStatus === 'admin_rejected')
+                                                                                    <span class="badge bg-danger">Admin Rejected</span>
+                                                                                @elseif($currentStatus === 'customer_approved')
+                                                                                    <span class="badge bg-success">Customer Approved</span>
+                                                                                @elseif($currentStatus === 'customer_rejected')
+                                                                                    <span class="badge bg-danger">Customer Rejected</span>
+                                                                                @endif
+                                                                            </div>
+                                                                        @else
+                                                                            <form action="{{ route('service-request.admin-stock-in-hand-approval') }}" method="POST" class="d-flex gap-2 align-items-center ms-auto">
+                                                                                @csrf
+                                                                                <input type="hidden" name="request_id" value="{{ $requestId }}">
+                                                                                <input type="hidden" name="product_id" value="{{ $productId }}">
+                                                                                <input type="hidden" name="engineer_id" value="{{ $engineerId }}">
+                                                                                <input type="hidden" name="part_id" value="{{ $partId }}">
+                                                                                <input type="hidden" name="quantity" value="{{ $quantity }}">
+                                                                                <select name="admin_action" class="form-select form-select-sm" style="width: auto;" required>
+                                                                                    <option value="">-- Select Action --</option>
+                                                                                    <option value="admin_approved">Admin Approved</option>
+                                                                                    <option value="admin_rejected">Admin Rejected</option>
+                                                                                </select>
+                                                                                <button type="submit" class="btn btnsm btn-primary">Submit</button>
+                                                                            </form>
+                                                                        @endif
+                                                                    </div>
+                                                                @endif
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
+
+                                                    {{-- Return Diagnosis Section --}}
+                                                    @php
+                                                        // Get return diagnosis for this product
+                                                        $productReturns = $request->productReturns->where('product_id', $product->id);
+                                                    @endphp
+                                                    @if($productReturns && $productReturns->count() > 0)
+                                                        <div class="mb-3">
+                                                            <h6 class="fw-semibold mb-2">Return Diagnosis Details</h6>
+                                                            @foreach($productReturns as $return)
+                                                                @php
+                                                                    $returnStatusLabels = [
+                                                                        'pending' => 'Pending',
+                                                                        'accepted' => 'Accepted',
+                                                                        'rejected' => 'Rejected',
+                                                                        'picked' => 'Picked',
+                                                                        'received' => 'Received',
+                                                                    ];
+                                                                    
+                                                                    $returnStatusColors = [
+                                                                        'pending' => 'bg-warning',
+                                                                        'accepted' => 'bg-success',
+                                                                        'rejected' => 'bg-danger',
+                                                                        'picked' => 'bg-info',
+                                                                        'received' => 'bg-success',
+                                                                    ];
+                                                                @endphp
+                                                                <div class="border rounded p-3 mb-2 bg-light">
+                                                                    <div class="d-flex justify-content-between align-items-start">
+                                                                        <div>
+                                                                            <span class="fw-semibold">Return ID:</span> {{ $return->id }}<br>
+                                                                            <span class="text-muted small">
+                                                                                Status: <span class="badge {{ $returnStatusColors[$return->status] ?? 'bg-secondary' }}">
+                                                                                    {{ $returnStatusLabels[$return->status] ?? ucfirst($return->status) }}
+                                                                                </span>
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <ul class="list-unstyled mb-0 small mt-2">
+                                                                        @if($return->admin_approved_at)
+                                                                            <li><span class="text-success">Admin Approved:</span> {{ $return->admin_approved_at->format('d-m-Y H:i') }}</li>
+                                                                        @endif
+                                                                        @if($return->assigned_at)
+                                                                            <li><span class="text-info">Assigned:</span> {{ $return->assigned_at->format('d-m-Y H:i') }}</li>
+                                                                        @endif
+                                                                        @if($return->approved_at)
+                                                                            <li><span class="text-success">Approved:</span> {{ $return->approved_at->format('d-m-Y H:i') }}</li>
+                                                                        @endif
+                                                                        @if($return->picked_at)
+                                                                            <li><span class="text-info">Picked:</span> {{ $return->picked_at->format('d-m-Y H:i') }}</li>
+                                                                        @endif
+                                                                        @if($return->received_at)
+                                                                            <li><span class="text-success">Received:</span> {{ $return->received_at->format('d-m-Y H:i') }}</li>
+                                                                        @endif
+                                                                        @if($return->returned_at)
+                                                                            <li><span class="text-success">Returned:</span> {{ $return->returned_at->format('d-m-Y H:i') }}</li>
+                                                                        @endif
+                                                                    </ul>
+                                                                </div>
+                                                            @endforeach
                                                         </div>
                                                     @endif
 

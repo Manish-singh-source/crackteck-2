@@ -26,6 +26,7 @@ use App\Models\ParentCategory;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestProductPickup;
+use App\Models\ServiceRequestProductRequestPart;
 use App\Models\ServiceRequestProductReturn;
 use App\Helpers\StatusUpdateHelper;
 use App\Models\CaseTransferRequest;
@@ -2051,6 +2052,7 @@ class ServiceRequestController extends Controller
             'products.diagnosisDetails.assignedEngineer.engineer',
             'products.diagnosisDetails.coveredItem',
             'products.pickups',
+            'products.requestParts', // Load request parts for each product
             'parentCategorie',
             'activeAssignment.engineer',
             // 'activeAssignment.groupEngineers',
@@ -2058,6 +2060,7 @@ class ServiceRequestController extends Controller
             'inactiveAssignments.engineer',
             // 'inactiveAssignments.groupEngineers',
             'inactiveAssignments.transferredTo',
+            'productReturns', // Load return diagnosis data
         ])->findOrFail($id);
 
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
@@ -2072,6 +2075,90 @@ class ServiceRequestController extends Controller
 
         $returns = ServiceRequestProductReturn::where('status', 'accepted')->get();
         return view('crm/service-request/view-quick-service-request', compact('request', 'engineers', 'deliveryMen', 'pickups', 'returns'));
+    }
+
+    /**
+     * Handle admin approval/rejection for stock_in_hand requests from diagnosis details
+     */
+    public function adminStockInHandApproval(Request $request)
+    {
+        $request->validate([
+            'request_id' => 'required|exists:service_requests,id',
+            'product_id' => 'required|exists:service_request_products,id',
+            'engineer_id' => 'required|exists:staff,id',
+            'part_id' => 'required|exists:product_serials,id',
+            'admin_action' => 'required|in:admin_approved,admin_rejected',
+        ]);
+
+        try {
+            // Find the service_request_product_request_parts record
+            // that matches the engineer_id (staff ID), part_id and has pending/requested status
+            $requestPart = ServiceRequestProductRequestPart::where('engineer_id', $request->engineer_id)
+                ->where('part_id', $request->part_id)
+                ->where('request_type', 'stock_in_hand')
+                ->whereIn('status', ['pending', 'requested'])
+                ->first();
+
+            // If no record exists, create a new one
+            if (!$requestPart) {
+                // Check if there's any record at all for this engineer and part
+                $existingRecord = ServiceRequestProductRequestPart::where('engineer_id', $request->engineer_id)
+                    ->where('part_id', $request->part_id)
+                    ->where('request_type', 'stock_in_hand')
+                    ->first();
+                
+                if ($existingRecord) {
+                    // Record exists but with different status, use it
+                    $requestPart = $existingRecord;
+                } else {
+                    // Create new record
+                    $requestPart = ServiceRequestProductRequestPart::create([
+                        'request_id' => $request->request_id,
+                        'product_id' => $request->product_id,
+                        'engineer_id' => $request->engineer_id,
+                        'part_id' => $request->part_id,
+                        'requested_quantity' => $request->quantity ?? 1,
+                        'request_type' => 'stock_in_hand',
+                        'assigned_person_type' => 'engineer',
+                        'assigned_person_id' => $request->engineer_id,
+                        'status' => 'pending',
+                    ]);
+                }
+            }
+
+            if ($request->admin_action === 'admin_approved') {
+                // Update status to 'admin_approved' when admin approves
+                $updateData = [
+                    'request_id' => $request->request_id,
+                    'product_id' => $request->product_id,
+                    'status' => 'admin_approved',
+                    'admin_approved_at' => now(),
+                ];
+                
+                // Update quantity if provided
+                if ($request->has('quantity') && $request->quantity > 0) {
+                    $updateData['requested_quantity'] = $request->quantity;
+                }
+                
+                $requestPart->update($updateData);
+                $message = 'Stock in hand request approved successfully.';
+            } else {
+                // Update status to 'admin_rejected' when admin rejects
+                $requestPart->update([
+                    'request_id' => $request->request_id,
+                    'product_id' => $request->product_id,
+                    'status' => 'admin_rejected',
+                    'admin_rejected_at' => now(),
+                ]);
+                $message = 'Stock in hand request rejected successfully.';
+            }
+
+            return redirect()->route('service-request.view-quick-service-request', $request->request_id)
+                ->with('success', $message);
+        } catch (\Exception $e) {
+            return redirect()->route('service-request.view-quick-service-request', $request->request_id)
+                ->with('error', 'Error processing request: ' . $e->getMessage());
+        }
     }
 
     public function editQuickServiceRequest($id, $service_type)

@@ -20,7 +20,9 @@ use App\Models\QuotationInvoice;
 use App\Models\SalesPerson;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
+use App\Models\ServiceRequestProductRequestPart;
 use App\Models\ServiceRequestQuotation;
+use App\Models\EngineerDiagnosisDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -76,8 +78,11 @@ class AllServicesController extends Controller
             ]
         ];
 
-        if ($services->isEmpty()) {
-            return response()->json(['success' => false, 'message' => 'No services found.'], 404);
+        if (empty($services)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No services found.'
+            ], 404);
         }
 
         return response()->json(['services' => $services], 200);
@@ -403,16 +408,127 @@ class AllServicesController extends Controller
                 ->where('service_requests_id', $id)
                 ->first();
 
-            $coveredItem = CoveredItem::find($serviceRequestProduct->item_code_id);
-            if ($coveredItem && !empty($coveredItem->diagnosis_list)) {
-                $productDiagnostics[] = [
-                    'product_id' => $serviceRequestProduct->id,
-                    'product_name' => $serviceRequestProduct->name,
-                    'diagnostics' => $coveredItem->diagnosis_list,
+            if (!$serviceRequestProduct) {
+                return response()->json(['success' => false, 'message' => 'Product not found.'], 404);
+            }
+
+            // Get diagnosis details from engineer_diagnosis_details table
+            $diagnosisDetails = EngineerDiagnosisDetail::where('service_request_id', $id)
+                ->where('service_request_product_id', $product_id)
+                ->get();
+
+            $diagnoses = [];
+            foreach ($diagnosisDetails as $diagnosis) {
+                $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
+                $diagnoses[] = [
+                    'diagnosis_id' => $diagnosis->id,
+                    'assigned_engineer_id' => $diagnosis->assigned_engineer_id,
+                    'diagnosis_list' => $diagnosisList ?? [],
+                    'diagnosis_notes' => $diagnosis->diagnosis_notes,
+                    'completed_at' => $diagnosis->completed_at,
                 ];
             }
 
-            return response()->json(['product_diagnostics' => $productDiagnostics], 200);
+            // Get request parts for this product
+            $requestParts = ServiceRequestProductRequestPart::where('product_id', $product_id)
+                ->where('request_id', $id)
+                ->get();
+
+            $parts = [];
+            foreach ($requestParts as $part) {
+                $parts[] = [
+                    'id' => $part->id,
+                    'part_id' => $part->part_id,
+                    'requested_quantity' => $part->requested_quantity,
+                    'request_type' => $part->request_type,
+                    'status' => $part->status,
+                    'requires_customer_action' => in_array($part->status, ['admin_approved', 'warehouse_approved']),
+                ];
+            }
+
+            return response()->json([
+                'product' => [
+                    'id' => $serviceRequestProduct->id,
+                    'name' => $serviceRequestProduct->name,
+                    'status' => $serviceRequestProduct->status,
+                ],
+                'diagnoses' => $diagnoses,
+                'request_parts' => $parts,
+            ], 200);
+        }
+    }
+
+    /**
+     * Customer approve or reject for picked, stock_in_hand, request_part status
+     */
+    public function customerApproveRejectPart(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'customer_id' => 'required|integer|exists:customers,id',
+            'service_request_id' => 'required|integer|exists:service_requests,id',
+            'product_id' => 'required|integer|exists:service_request_products,id',
+            'part_id' => 'required|integer|exists:product_serials,id',
+            'action' => 'required|in:customer_approved,customer_rejected',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'customers') {
+            // Verify the service request belongs to this customer
+            $serviceRequest = ServiceRequest::where('id', $validated['service_request_id'])
+                ->where('customer_id', $validated['customer_id'])
+                ->first();
+
+            if (!$serviceRequest) {
+                return response()->json(['success' => false, 'message' => 'Service request not found or does not belong to this customer.'], 404);
+            }
+
+            // Find the request part
+            $requestPart = ServiceRequestProductRequestPart::where('id', $request->part_id)
+                ->where('request_id', $validated['service_request_id'])
+                ->where('product_id', $validated['product_id'])
+                ->first();
+
+            if (!$requestPart) {
+                return response()->json(['success' => false, 'message' => 'Request part not found.'], 404);
+            }
+
+            // Check if customer action is allowed (only for admin_approved or warehouse_approved status)
+            if (!in_array($requestPart->status, ['admin_approved', 'warehouse_approved'])) {
+                return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: ' . $requestPart->status], 400);
+            }
+
+            // Update the status based on customer action
+            if ($validated['action'] === 'customer_approved') {
+                $requestPart->update([
+                    'status' => 'customer_approved',
+                    'customer_approved_at' => now(),
+                ]);
+                $message = 'Part approved successfully.';
+            } else {
+                $requestPart->update([
+                    'status' => 'customer_rejected',
+                    'customer_rejected_at' => now(),
+                ]);
+                $message = 'Part rejected successfully.';
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'part_id' => $requestPart->id,
+                'status' => $requestPart->status,
+            ], 200);
         }
     }
 

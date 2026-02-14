@@ -99,4 +99,12 @@ class ServiceRequest extends Model
     {
         return $this->hasMany(ServiceRequestQuotation::class, 'request_id');
     }
+
+    /**
+     * Get the product returns for this service request.
+     */
+    public function productReturns()
+    {
+        return $this->hasMany(ServiceRequestProductReturn::class, 'request_id');
+    }
 }

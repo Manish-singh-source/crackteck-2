@@ -12,10 +12,21 @@ use Illuminate\Support\Facades\File;
 use App\Models\ServiceRequestProduct;
 use App\Models\EngineerDiagnosisDetail;
 use App\Models\ServiceRequestProductPickup;
+use App\Models\ServiceRequestProductRequestPart;
 use Illuminate\Support\Facades\{Auth, DB, Log, Storage, Validator};
 
 class FieldEngineerController extends Controller
 {
+    protected function getRoleId($roleId)
+    {
+        return [
+            1 => 'engineer',
+            2 => 'delivery_man',
+            3 => 'sales_person',
+            4 => 'customers',
+        ][$roleId] ?? null;
+    }
+
     public function serviceRequests(Request $request)
     {
         $validated = Validator::make($request->all(), [
@@ -326,6 +337,32 @@ class FieldEngineerController extends Controller
         return response()->json(['message' => 'Service request rescheduled successfully.'], 200);
     }
 
+    // public function diagnosisList1(Request $request, $id, $product_id)
+    // {
+    //     $validated = Validator::make($request->all(), [
+    //         'role_id' => 'required|in:1',
+    //         'user_id' => 'required|integer|exists:staff,id',
+    //     ]);
+
+    //     if ($validated->fails()) {
+    //         return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+    //     }
+
+    //     $validated = $validated->validated();
+
+    //     $serviceRequestProduct = ServiceRequestProduct::with(['itemCode'])
+    //         ->where('service_requests_id', $id)
+    //         ->where('id', $product_id)
+    //         ->first();
+
+    //     $diagnosisList = $serviceRequestProduct->itemCode->diagnosis_list;
+
+    //     return response()->json(['diagnosisList' => $diagnosisList], 200);
+    // }
+
+    /**
+     * Get diagnosis list with full details for a specific product
+     */
     public function diagnosisList(Request $request, $id, $product_id)
     {
         $validated = Validator::make($request->all(), [
@@ -338,15 +375,128 @@ class FieldEngineerController extends Controller
         }
 
         $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
 
-        $serviceRequestProduct = ServiceRequestProduct::with(['itemCode'])
-            ->where('service_requests_id', $id)
-            ->where('id', $product_id)
-            ->first();
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
 
-        $diagnosisList = $serviceRequestProduct->itemCode->diagnosis_list;
+        if ($staffRole == 'engineer') {
+            // Verify the service request is assigned to this engineer
+            $assignedEngineer = AssignedEngineer::where('service_request_id', $id)
+                ->where('engineer_id', $validated['user_id'])
+                ->where('status', 'active')
+                ->first();
 
-        return response()->json(['diagnosisList' => $diagnosisList], 200);
+            if (!$assignedEngineer) {
+                return response()->json(['success' => false, 'message' => 'Service request not found or not assigned to this engineer.'], 404);
+            }
+
+            $serviceRequest = ServiceRequest::find($id);
+
+            // Get the product
+            $serviceRequestProduct = ServiceRequestProduct::where('id', $product_id)
+                ->where('service_requests_id', $id)
+                ->first();
+
+            if (!$serviceRequestProduct) {
+                return response()->json(['success' => false, 'message' => 'Product not found.'], 404);
+            }
+
+            // Get diagnosis details
+            $diagnosisDetails = EngineerDiagnosisDetail::where('service_request_id', $id)
+                ->where('service_request_product_id', $product_id)
+                ->get();
+
+            $diagnoses = [];
+            foreach ($diagnosisDetails as $diagnosis) {
+                $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
+                
+                // Process each diagnosis item
+                $processedList = [];
+                if ($diagnosisList && is_array($diagnosisList)) {
+                    foreach ($diagnosisList as $item) {
+                        $itemStatus = $item['status'] ?? '';
+                        $itemData = [
+                            'name' => $item['name'] ?? 'N/A',
+                            'report' => $item['report'] ?? 'N/A',
+                            'status' => $itemStatus,
+                            'status_label' => $this->getStatusLabel($itemStatus),
+                        ];
+                        
+                        // If status is stock_in_hand or request_part, add part details
+                        if (in_array($itemStatus, ['stock_in_hand', 'request_part'])) {
+                            $itemData['part_id'] = $item['part_id'] ?? null;
+                            $itemData['quantity'] = $item['quantity'] ?? 1;
+                            
+                            // Get the part request status from service_request_product_request_parts
+                            if (isset($item['part_id'])) {
+                                $partRequest = ServiceRequestProductRequestPart::where('request_id', $id)
+                                    ->where('product_id', $product_id)
+                                    ->where('part_id', $item['part_id'])
+                                    ->first();
+                                $itemData['part_status'] = $partRequest ? $partRequest->status : 'pending';
+                            }
+                        }
+                        
+                        $processedList[] = $itemData;
+                    }
+                }
+
+                $diagnoses[] = [
+                    'diagnosis_id' => $diagnosis->id,
+                    'assigned_engineer_id' => $diagnosis->assigned_engineer_id,
+                    'covered_item_id' => $diagnosis->covered_item_id,
+                    'diagnosis_list' => $processedList,
+                    'diagnosis_notes' => $diagnosis->diagnosis_notes,
+                    'before_photos' => json_decode($diagnosis->before_photos, true),
+                    'after_photos' => json_decode($diagnosis->after_photos, true),
+                    'completed_at' => $diagnosis->completed_at,
+                ];
+            }
+
+            return response()->json([
+                'service_request' => [
+                    'id' => $serviceRequest->id,
+                    'request_id' => $serviceRequest->request_id,
+                    'status' => $serviceRequest->status,
+                ],
+                'product' => [
+                    'id' => $serviceRequestProduct->id,
+                    'name' => $serviceRequestProduct->name,
+                    'status' => $serviceRequestProduct->status,
+                    'status_label' => $this->getStatusLabel($serviceRequestProduct->status),
+                ],
+                'diagnoses' => $diagnoses,
+            ], 200);
+        }
+    }
+
+    /**
+     * Helper function to get status label
+     */
+    private function getStatusLabel($status)
+    {
+        $labels = [
+            'pending' => 'Pending',
+            'working' => 'Working',
+            'not_working' => 'Not Working',
+            'picking' => 'Picking',
+            'picked' => 'Picked',
+            'stock_in_hand' => 'Stock In Hand',
+            'request_part' => 'Request Part',
+            'admin_approved' => 'Admin Approved',
+            'admin_rejected' => 'Admin Rejected',
+            'customer_approved' => 'Customer Approved',
+            'customer_rejected' => 'Customer Rejected',
+            'warehouse_approved' => 'Warehouse Approved',
+            'warehouse_rejected' => 'Warehouse Rejected',
+            'diagnosis_completed' => 'Diagnosis Completed',
+            'in_progress' => 'In Progress',
+            'completed' => 'Completed',
+        ];
+
+        return $labels[$status] ?? ucfirst($status);
     }
 
     public function submitDiagnosis(Request $request, $service_request_id, $product_id)
@@ -364,7 +514,10 @@ class FieldEngineerController extends Controller
             'diagnosis_list' => 'required|array|min:1|max:10',
             'diagnosis_list.*.name' => 'required|string|max:255',
             'diagnosis_list.*.report' => 'required|string|max:5000',
-            'diagnosis_list.*.status' => 'required|in:working,not_working,picking',
+            'diagnosis_list.*.status' => 'required|in:working,not_working,picking,stock_in_hand,request_part,used',
+            'diagnosis_list.*.part_id' => 'required_if:diagnosis_list.*.status,stock_in_hand,request_part',
+            'diagnosis_list.*.quantity' => 'required_if:diagnosis_list.*.status,stock_in_hand,request_part',
+            'diagnosis_list.*.part_status' => 'nullable|in:pending,admin_approved,admin_rejected,customer_approved,customer_rejected,used,picked,delivered',
             'diagnosis_list.*.images' => 'nullable|array',
             'diagnosis_list.*.images.*' => 'nullable|file|mimes:jpeg,jpg,png|max:10240',
         ]);
@@ -425,6 +578,8 @@ class FieldEngineerController extends Controller
             $allWorking = true;
             $hasPicking = false;
             $hasNotWorking = false;
+            $hasStockInHand = false;
+            $hasRequestPart = false;
 
             foreach ($diagnosisList as $i => &$diagnosis) {
                 if ($diagnosis['status'] === 'picking') {
@@ -433,8 +588,32 @@ class FieldEngineerController extends Controller
                 } elseif ($diagnosis['status'] === 'not_working') {
                     $hasNotWorking = true;
                     $allWorking = false;
+                } elseif ($diagnosis['status'] === 'stock_in_hand') {
+                    $hasStockInHand = true;
+                    $allWorking = false;
+                } elseif ($diagnosis['status'] === 'request_part') {
+                    $hasRequestPart = true;
+                    $allWorking = false;
+                } elseif ($diagnosis['status'] === 'used') {
+                    // Part is marked as used - this is like completion
+                    $allWorking = false;
                 } elseif ($diagnosis['status'] !== 'working') {
                     $allWorking = false;
+                }
+
+                // Check if part_status is 'used' and update the request part status
+                if (isset($diagnosis['part_id']) && isset($diagnosis['part_status']) && $diagnosis['part_status'] === 'used') {
+                    $requestPart = ServiceRequestProductRequestPart::where('request_id', $service_request_id)
+                        ->where('product_id', $product_id)
+                        ->where('part_id', $diagnosis['part_id'])
+                        ->first();
+                    
+                    if ($requestPart) {
+                        $requestPart->update([
+                            'status' => 'used',
+                            'used_at' => now()
+                        ]);
+                    }
                 }
 
                 if (!empty($diagnosis['images'])) {
@@ -487,34 +666,38 @@ class FieldEngineerController extends Controller
                 $productStatus = 'picking';
             } elseif ($hasNotWorking) {
                 $productStatus = 'on_hold';
+            } elseif ($hasStockInHand) {
+                $productStatus = 'stock_in_hand';
+            } elseif ($hasRequestPart) {
+                $productStatus = 'request_part';
             } elseif ($allWorking) {
                 $productStatus = 'diagnosis_completed';
             } else {
                 $productStatus = 'diagnosis_submitted';
             }
-            
+
             // Update the service request product status
             $serviceRequestProduct->update(['status' => $productStatus]);
 
             /** ---------------- UPDATE SERVICE REQUEST STATUS BASED ON ALL PRODUCTS ---------------- */
             // Get all products for this service request
             $allProducts = ServiceRequestProduct::where('service_requests_id', $service_request_id)->get();
-            
+
             // Check if all products are diagnosis_completed
             $allCompleted = $allProducts->every(function ($product) {
                 return $product->status === 'diagnosis_completed';
             });
-            
+
             // Check if any product has picking status
             $anyPicking = $allProducts->contains(function ($product) {
                 return $product->status === 'picking';
             });
-            
+
             // Check if any product has on_hold status
             $anyOnHold = $allProducts->contains(function ($product) {
                 return $product->status === 'on_hold';
             });
-            
+
             // Update service request status based on product statuses
             $newServiceStatus = null;
             if ($allCompleted) {
@@ -524,7 +707,7 @@ class FieldEngineerController extends Controller
             } elseif ($anyOnHold) {
                 $newServiceStatus = 'in_progress';
             }
-            
+
             if ($newServiceStatus) {
                 ServiceRequest::where('id', $service_request_id)
                     ->update(['status' => $newServiceStatus]);

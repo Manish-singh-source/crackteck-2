@@ -50,4 +50,12 @@ class ServiceRequestProduct extends Model
         return $this->hasMany(ServiceRequestProductPickup::class, 'product_id');
     }
 
+    /**
+     * Get the request parts for this service request product.
+     */
+    public function requestParts()
+    {
+        return $this->hasMany(ServiceRequestProductRequestPart::class, 'product_id');
+    }
+
 }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('type')->nullable();
             $table->string('model_no')->nullable();
-            $table->string('sku')->nullable();
+            // $table->string('sku')->nullable();
             $table->string('hsn')->nullable();
             $table->date('purchase_date')->nullable();
             $table->string('brand')->nullable();

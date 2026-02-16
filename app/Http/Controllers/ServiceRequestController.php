@@ -28,6 +28,7 @@ use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestProductPickup;
 use App\Models\ServiceRequestProductRequestPart;
 use App\Models\ServiceRequestProductReturn;
+use App\Models\Warehouse;
 use App\Helpers\StatusUpdateHelper;
 use App\Models\CaseTransferRequest;
 use App\Models\Staff;
@@ -2074,7 +2075,13 @@ class ServiceRequestController extends Controller
             ->get();
 
         $returns = ServiceRequestProductReturn::where('status', 'accepted')->get();
-        return view('crm/service-request/view-quick-service-request', compact('request', 'engineers', 'deliveryMen', 'pickups', 'returns'));
+
+        // Get warehouses with products for picking feature
+        $warehouses = Warehouse::with(['products' => function($query) {
+            $query->where('stock_quantity', '>', 0);
+        }])->where('status', 'active')->get();
+
+        return view('crm/service-request/view-quick-service-request', compact('request', 'engineers', 'deliveryMen', 'pickups', 'returns', 'warehouses'));
     }
 
     /**
@@ -3167,6 +3174,59 @@ class ServiceRequestController extends Controller
                 'success' => false,
                 'message' => 'Error updating return status: ' . $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Mark part as picked from warehouse and update status.
+     */
+    public function partPicked(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'request_part_id' => 'required|exists:service_request_product_request_parts,id',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->back()
+                ->with('error', $validator->errors()->first());
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $requestPart = ServiceRequestProductRequestPart::findOrFail($request->request_part_id);
+
+            // Check if status allows picking (should be after assigned or ap_approved)
+            $allowedStatuses = ['assigned', 'ap_approved', 'warehouse_approved'];
+            if (!in_array($requestPart->status, $allowedStatuses)) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'Part cannot be picked in current status: ' . $requestPart->status);
+            }
+
+            // Update status to picked and set picked_at timestamp
+            $requestPart->update([
+                'status' => 'picked',
+                'picked_at' => now(),
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->back()
+                ->with('success', 'Part marked as picked successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Part Picked Update Failed', [
+                'error' => $e->getMessage(),
+                'request_part_id' => $request->request_part_id
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'Error updating part status: ' . $e->getMessage());
         }
     }
 }

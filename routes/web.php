@@ -561,6 +561,9 @@ Route::prefix('/demo')->group(function () {
         Route::post('/crm/service-request/assign-return', 'assignReturn')->name('service-request.assign-return');
         Route::post('/crm/service-request/return-picked', 'returnPicked')->name('service-request.return-picked');
 
+        // Mark part as picked from warehouse
+        Route::post('/crm/service-request/part-picked', 'partPicked')->name('service-request.part-picked');
+
 
 
 

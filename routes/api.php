@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\DeliveryOrderController;
 use App\Http\Controllers\Api\NonAmcServicesController;
 use App\Http\Controllers\PickupRequestController;
 use App\Http\Controllers\ReturnRequestController;
+use App\Http\Controllers\PartRequestController;
 
 // use App\Http\Controllers\AMCRequestController;
 // use App\Http\Controllers\AMCRequestController;
@@ -337,6 +338,24 @@ Route::prefix('v1')->group(function () {
 
             // (5) Verify OTP and change status to delivered
             Route::post('/return-request/{id}/verify-otp', 'verifyReturnOtp');
+        });
+
+        // Part Request APIs for Delivery Man and Engineer
+        Route::controller(PartRequestController::class)->group(function () {
+            // (1) Get part requests - check if user is delivery man or engineer and return their assigned part requests
+            Route::get('/part-requests', 'getPartRequests');
+
+            // (2) Get particular part request details with product details
+            Route::get('/part-request/{id}', 'getPartRequestDetails');
+
+            // (3) Accept part request - change status to ap_approved
+            Route::post('/part-request/{id}/accept', 'acceptPartRequest');
+
+            // (4) Send OTP for part delivery - generate OTP with 5 min expiry (only if status is picked)
+            Route::post('/part-request/{id}/send-otp', 'sendPartRequestOtp');
+
+            // (5) Verify OTP and change status to delivered
+            Route::post('/part-request/{id}/verify-otp', 'verifyPartRequestOtp');
         });
     });
 });

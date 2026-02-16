@@ -56,7 +56,7 @@ class AttendanceController extends Controller
     {
         $validated = $request->validate([
             'user_id' => 'required',
-            'role_id' => 'required|in:1,2,3,4',
+            'role_id' => 'required|in:1,2,3',
         ]);
 
         $user = Staff::findOrFail($validated['user_id']);

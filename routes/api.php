@@ -286,9 +286,9 @@ Route::prefix('v1')->group(function () {
             Route::post('/service-request/{id}/{product_id}/request-part', 'requestPart');
 
             // Attendance APIs 
-            Route::get('/attendance', 'attendance');
-            Route::post('/check-in', 'checkIn');
-            Route::post('/check-out', 'checkOut');
+            Route::get('/attendance', 'index');
+            Route::post('/check-in', 'store');
+            Route::post('/check-out', 'logout');
         });
 
         // 1. Products List of all the product avialble in warehouse how status is active ( Basic Details )

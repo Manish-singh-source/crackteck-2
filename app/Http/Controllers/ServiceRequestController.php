@@ -1216,6 +1216,7 @@ class ServiceRequestController extends Controller
                 ->with('error', 'Quick Service Request not found: ' . $e->getMessage());
         }
     }
+    
     public function updateAmcServiceRequest(Request $request, $id)
     {
         // Basic validation

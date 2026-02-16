@@ -194,6 +194,231 @@
                         </div>
                     </div>
 
+                    <div class="card">
+                    <div class="card-header border-bottom-dashed">
+                        <div class="d-flex flex-row justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title flex-grow-1 mb-0">
+                                    Service History Details
+                                </h5>
+                            </div>
+                            <div class="d-flex flex-row justify-content-between align-items-center gap-2">
+                                <div>
+                                    <span>
+                                        Next Visit Date:
+                                    </span>
+                                    <span class="p-1 rounded bg-warning-subtle text-warning fw-semibold">2025-07-16</span>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addVisitModal2">Add Visit</button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="addVisitModal2" tabindex="-1" aria-labelledby="addVisitModalLabel2" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form action="#">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="addVisitModalLabel2">Reschedule Appointment</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+
+                                                    <div class="modal-body p-2">
+                                                        <div class="card">
+                                                            <div class="card-header border-bottom-dashed">
+                                                                <div class="d-flex">
+                                                                    <h5 class="card-title flex-grow-1 mb-0">
+                                                                        Engineer Location
+                                                                    </h5>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="card-body">
+                                                                <div>
+                                                                    <select required name="eng-location2" id="eng-location2" class="form-select w-100">
+                                                                        <option value="0" selected disabled>---- Select Location ----</option>
+                                                                        <option value="0">Mumbai</option>
+                                                                        <option value="0">Delhi</option>
+                                                                        <option value="0">Kolkata</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="card hide-assign-eng-section2" id="mySection2">
+                                                            <div class="card-header border-bottom-dashed">
+                                                                <div class="d-flex pb-3">
+                                                                    <h5 class="card-title flex-grow-1 mb-0">Assign Engineer</h5>
+                                                                </div>
+                                                                <div class="col-sm-10 d-flex gap-2">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input eng-assign2" type="radio" name="gridRadios2" id="individualRadio2" value="individual" checked>
+                                                                        <label class="form-check-label" for="individualRadio2">
+                                                                            Individual Engineer
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input eng-assign2" type="radio" name="gridRadios2" id="groupRadio2" value="group">
+                                                                        <label class="form-check-label" for="groupRadio2">
+                                                                            Group Engineer
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="card-body">
+                                                                <!-- Individual Engineer Dropdown -->
+                                                                <div id="individualDropdown2">
+                                                                    <select required name="status2" class="form-select w-100">
+                                                                        <option value="" selected disabled>---- Select Individual Engineer ----</option>
+                                                                        <option value="engineer1">Engineer 1</option>
+                                                                        <option value="engineer2">Engineer 2</option>
+                                                                        <option value="engineer3">Engineer 3</option>
+                                                                    </select>
+                                                                </div>
+
+                                                                <!-- Group Engineer Dropdown -->
+                                                                <div id="groupDropdown2" style="display: none;">
+                                                                    <select id="groupDropdownSelect2" class="form-select w-100">
+                                                                        <option value="" selected disabled>---- Select Group Engineer ----</option>
+                                                                        <option value="group1">Engineer 1</option>
+                                                                        <option value="group2">Engineer 2</option>
+                                                                        <option value="group3">Engineer 3</option>
+                                                                    </select>
+
+                                                                    <!-- Button to display selected options -->
+                                                                    <button class="btn btn-primary mt-2 add-engineer2">Add Engineer</button>
+
+                                                                    <!-- Table to display selected values with checkboxes -->
+                                                                    <table class="table mt-4" id="selectedTable2">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Group Name</th>
+                                                                                <th>Admin</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <!-- Selected values will appear here -->
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-success">Submit</button>
+                                                    </div>
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <table
+                            class="table table-striped table-borderless dt-responsive nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Sr. No.</th>
+                                    <th>Engineer Name</th>
+                                    <th>Visit Date</th>
+                                    <th>Issue Type</th>
+                                    <th>Report</th>
+                                    <th>Status</th>
+                                    <th>Action </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr class="align-middle">
+                                    <td>
+                                        1
+                                    </td>
+                                    <td>
+                                        Chris Doe
+                                    </td>
+                                    <td>2025-07-16 12:09 PM</td>
+                                    <td>
+                                        Maintanance
+                                    </td>
+                                    <td>
+                                        NA
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning-subtle text-warning fw-semibold">Upcoming</span>
+                                    </td>
+                                    <td>
+                                        <!-- Re-Scheduled Button -->
+                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#rescheduleModal">
+                                            Re-Scheduled
+                                        </button>
+
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <form action="#">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="rescheduleModalLabel">Reschedule Appointment</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+
+                                                        <div class="modal-body p-2">
+                                                            <p>Please enter new schedule date:</p>
+                                                            <input type="date" id="newSchedule" class="form-control" placeholder="Enter new date/time">
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-success">Submit</button>
+                                                        </div>
+                                                    </form>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </td>
+                                </tr>
+
+                                <tr class="align-middle">
+                                    <td>
+                                        2
+                                    </td>
+                                    <td>
+                                        John Doe
+                                    </td>
+                                    <td>2025-04-04 06:09 PM</td>
+                                    <td>
+                                        Maintanance
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-sm btn-primary" href="./view-detailed-service-history.php">View Report</a>
+                                        <!-- <div id="popupOverlay">
+                                            <span class="closeBtn hide-report">&times;</span>
+                                            <img id="popupImage" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRevxmRXifnbO19nrfkzha4QLipReqGMcM33g&s" alt="Popup Image">
+                                        </div> -->
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success-subtle text-success fw-semibold">Completed</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary disabled">Re-Scheduled</button>
+
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
                     {{-- Product Details Card --}}
                     <div class="card mt-3">
                         <div class="card-header border-bottom-dashed">

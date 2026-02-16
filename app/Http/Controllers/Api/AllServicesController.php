@@ -5,27 +5,19 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\QuotationDetailResource;
 use App\Http\Resources\QuotationResource;
-use App\Models\AmcService;
+use App\Models\AmcPlan;
 use App\Models\CoveredItem;
-use App\Models\Customer;
-use App\Models\DeliveryMan;
-use App\Models\Engineer;
+use App\Models\EngineerDiagnosisDetail;
 use App\Models\Feedback;
-use App\Models\GiveFeedback;
 use App\Models\Lead;
-use App\Models\NonAmcService;
-use App\Models\QuickServiceRequest;
 use App\Models\Quotation;
 use App\Models\QuotationInvoice;
-use App\Models\SalesPerson;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestProductRequestPart;
 use App\Models\ServiceRequestQuotation;
-use App\Models\EngineerDiagnosisDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
 class AllServicesController extends Controller
@@ -680,6 +672,7 @@ class AllServicesController extends Controller
 
         try {
 
+            
             // Find the quotation invoice
             $invoice = QuotationInvoice::with(['quoteDetails.products', 'quoteDetails.amcDetail'])->where('id', $id)->first();
 
@@ -712,7 +705,31 @@ class AllServicesController extends Controller
             $serviceRequest->is_engineer_assigned = 'not_assigned';
             $serviceRequest->status = 'active';
             $serviceRequest->amc_plan_id = $invoice->amc_plan_id ?? null;
-            $serviceRequest->save();
+            $serviceRequest->save();           
+
+
+            $amcPlan = AmcPlan::where('id', $invoice->amc_plan_id)->first(); 
+
+            $monthGap = $amcPlan->duration / $amcPlan->total_visits; // Calculate the month gap between visits 
+            $startVisitDate = $serviceRequest->visit_date; // Start visit date is the initial visit date of the service request
+            $nextVisitDate = $startVisitDate->addMonths($monthGap); // Set the next visit date based on the month gap
+            
+            foreach(range(1, $amcPlan->total_visits) as $visitNumber) {
+                // Create a service request visit for each visit
+                // service_request_id	scheduled_at	completed_at	remarks	report	visits_count	status	created_at	updated_at
+                $serviceRequest->amcScheduleMeetings()->create([
+                    'service_request_id' => $serviceRequest->id,
+                    'scheduled_at' => $nextVisitDate,
+                    'completed_at' => null,
+                    'remarks' => null,
+                    'report' => null,
+                    'visits_count' => $visitNumber,
+                    'status' => 'scheduled',
+                ]);
+
+                // Update the next visit date for the next iteration
+                $nextVisitDate = $nextVisitDate->addMonths($monthGap);
+            }
 
             // add service request products according to quotation products
             foreach ($invoice->items as $item) {

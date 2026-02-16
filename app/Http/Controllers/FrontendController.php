@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AMC;
+use App\Models\AmcPlan;
 use App\Models\Brand;
 use App\Models\Collection;
 use App\Models\Contact;
@@ -100,18 +101,10 @@ class FrontendController extends Controller
      */
     public function amcPlans()
     {
-        // Get active AMC plans grouped by plan type
-        $monthlyPlans = AMC::where('status', 'Active')
-            ->where('plan_type', 'Monthly')
+        $annualPlans = AmcPlan::where('status', 'Active')
             ->get();
 
-        // dd($monthlyPlans);
-
-        $annualPlans = AMC::where('status', 'Active')
-            ->where('plan_type', 'Annually')
-            ->get();
-
-        return view('frontend.amc', compact('monthlyPlans', 'annualPlans'));
+        return view('frontend.amc', compact('annualPlans'));
     }
 
     /**
@@ -119,7 +112,7 @@ class FrontendController extends Controller
      */
     public function getProductCategories()
     {
-        $categories = ParentCategorie::where('status', '1')
+        $categories = ParentCategory::where('status', '1')
             ->select('id', 'parent_categories as name')
             ->orderBy('parent_categories')
             ->get();
@@ -150,7 +143,7 @@ class FrontendController extends Controller
      */
     public function getAmcPlansData()
     {
-        $plans = AMC::where('status', 'Active')
+        $plans = AmcPlan::where('status', 'Active')
             ->select('id', 'plan_name', 'plan_type', 'duration', 'total_cost', 'description')
             ->orderBy('plan_type')
             ->orderBy('plan_name')
@@ -246,7 +239,7 @@ class FrontendController extends Controller
             $amcService->plan_end_date = $this->calculateEndDate($startDate, $request->plan_duration);
 
             // Get plan cost for total amount
-            $amcPlan = AMC::find($request->amc_plan_id);
+            $amcPlan = AmcPlan::find($request->amc_plan_id);
             $amcService->total_amount = $amcPlan ? $amcPlan->total_cost : 0;
 
             $amcService->save();

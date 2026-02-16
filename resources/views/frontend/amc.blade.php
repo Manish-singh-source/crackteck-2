@@ -301,6 +301,221 @@
     </style>
 
     <style>
+        .amc-plan-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e8e8e8;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .amc-plan-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(25, 135, 255, 0.25);
+            border-color: #1987FF;
+        }
+
+        .amc-plan-card.recommended {
+            border: 2px solid #1987FF;
+            background: linear-gradient(180deg, #fff 0%, #f0f7ff 100%);
+        }
+
+        .amc-plan-card.recommended::before {
+            content: "BEST VALUE";
+            position: absolute;
+            top: 18px;
+            right: -28px;
+            background: linear-gradient(135deg, #1987FF 0%, #00d4ff 100%);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 5px 35px;
+            transform: rotate(45deg);
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 10px rgba(25, 135, 255, 0.3);
+        }
+
+        .plan-header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+
+        .plan-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .plan-code {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+
+        .plan-price {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1987FF 0%, #00d4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .plan-price .currency {
+            font-size: 18px;
+            vertical-align: top;
+            margin-right: 2px;
+        }
+
+        .plan-price .period {
+            font-size: 13px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        .plan-details {
+            flex: 1;
+        }
+
+        .plan-detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .plan-detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #666;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #1a1a1a;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .covered-items-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            padding: 12px;
+            margin: 12px 0;
+        }
+
+        .covered-items-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .covered-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .covered-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .covered-item i {
+            color: #27ae60;
+            font-size: 12px;
+        }
+
+        .plan-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .plan-action {
+            margin-top: 15px;
+        }
+
+        .plan-action .btn {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .plan-action .btn-primary {
+            background: linear-gradient(135deg, #1987FF 0%, #00d4ff 100%);
+            border: none;
+            box-shadow: 0 4px 15px rgba(25, 135, 255, 0.3);
+        }
+
+        .plan-action .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(25, 135, 255, 0.4);
+        }
+
+        .pay-terms {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        .no-plans {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .no-plans h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .amc-plan-card {
+                padding: 20px 18px;
+            }
+
+            .plan-price {
+                font-size: 28px;
+            }
+
+            .plan-name {
+                font-size: 18px;
+            }
+        }
+    </style>
+
+    <style>
         .non-amc-section {
             background: linear-gradient(90deg, #7a6fff 70%, #a18aff 100%);
             border-radius: 2rem;
@@ -438,103 +653,116 @@
             <p>Choose the perfect AMC plan for your business needs. All plans include professional support and maintenance
                 services.</p>
 
-            <div class="toggle-buttons">
-                <button class="active" id="monthlyBtn">Monthly</button>
-                <button id="annuallyBtn">Annually</button>
-            </div>
-
-            <!-- Monthly Plans Section -->
-            <div id="monthlyPlans" class="pricing-plans-section">
-                @if ($monthlyPlans->count() > 0)
-                    <h4 class="mt-4 mb-4">Monthly Plans</h4>
-                    <div class="row g-4 md-mt-3 align-items-center justify-content-center">
-                        @foreach ($monthlyPlans as $index => $plan)
-                            <div class="col-md-6 col-lg-3">
-                                <div class="price-card h-100 {{ $index == 1 ? 'recommended' : '' }}">
-                                    <h4>{{ $plan->plan_name }}</h4>
-                                    <div class="price">₹ {{ number_format($plan->total_cost, 0) }} <small
-                                            class="text-muted">/mo</small></div>
-                                    <div class="pricing-features">
-                                        <h6 class="text-primary my-3">{{ $plan->description }}</h6>
-                                        <div class="feature">Duration<span>{{ $plan->duration }}</span></div>
-                                        <div class="feature">Plan Cost<span>₹
-                                                {{ number_format($plan->plan_cost, 0) }}</span></div>
-                                        <div class="feature">Tax ({{ $plan->tax }}%)<span>₹
-                                                {{ number_format(($plan->plan_cost * $plan->tax) / 100, 0) }}</span></div>
-                                        <div class="feature">Total Visits<span>{{ $plan->total_visits }} visits</span>
-                                        </div>
-                                        <div class="feature">Support Type<span>{{ $plan->support_type }}</span></div>
-                                        @if ($plan->items)
-                                            @php
-                                                $items = json_decode($plan->items);
-                                            @endphp
-                                            @if (is_array($items) && count($items) > 0)
-                                                <div class="feature">Services<span>{{ count($items) }} services
-                                                        included</span></div>
-                                            @endif
-                                        @endif
+            @if($annualPlans && $annualPlans->count() > 0)
+                <div class="row g-4 justify-content-center mt-4">
+                    @foreach($annualPlans as $index => $plan)
+                        <div class="col-lg-4 col-md-6 col-12">
+                            <div class="amc-plan-card {{ $index === 1 ? 'recommended' : '' }}">
+                                <div class="plan-header">
+                                    <h4 class="plan-name">{{ $plan->plan_name }}</h4>
+                                    {{-- <span class="plan-code">{{ $plan->plan_code }}</span> --}}
+                                    <div class="plan-price">
+                                        <span class="currency">₹</span>{{ number_format($plan->total_cost) }}
+                                        <span class="period">/ {{ $plan->duration }}</span>
                                     </div>
-                                    {{-- <button class="btn btn-outline-dark w-100">Get Started</button> --}}
+                                    @if($plan->pay_terms)
+                                        <div class="pay-terms">{{ $plan->pay_terms }}</div>
+                                    @endif
                                 </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="alert alert-info mt-4">
-                        <h5>No Monthly Plans Available</h5>
-                        <p>Currently, there are no monthly AMC plans available. Please check our annual plans or contact us
-                            for custom solutions.</p>
-                    </div>
-                @endif
-            </div>
-            {{-- {{ dd($monthlyPlans) }} --}}
 
-            <!-- Annual Plans Section -->
-            <div id="annualPlans" class="pricing-plans-section" style="display: none;">
-                @if ($annualPlans->count() > 0)
-                    <h4 class="mt-4 mb-4">Annual Plans</h4>
-                    <div class="row g-4 md-mt-3 align-items-center justify-content-center">
-                        @foreach ($annualPlans as $index => $plan)
-                            <div class="col-md-6 col-lg-3">
-                                <div class="price-card h-100 {{ $index == 1 ? 'recommended' : '' }}">
-                                    <h4>{{ $plan->plan_name }}</h4>
-                                    <div class="price">₹ {{ number_format($plan->total_cost, 0) }} <small
-                                            class="text-muted">/year</small></div>
-                                    <div class="pricing-features">
-                                        <h6 class="text-primary my-3">{{ $plan->description }}</h6>
-                                        <div class="feature">Duration<span>{{ $plan->duration }}</span></div>
-                                        <div class="feature">Plan Cost<span>₹
-                                                {{ number_format($plan->plan_cost, 0) }}</span></div>
-                                        <div class="feature">Tax ({{ $plan->tax }}%)<span>₹
-                                                {{ number_format(($plan->plan_cost * $plan->tax) / 100, 0) }}</span></div>
-                                        <div class="feature">Total Visits<span>{{ $plan->total_visits }} visits</span>
-                                        </div>
-                                        <div class="feature">Support Type<span>{{ $plan->support_type }}</span></div>
-                                        @if ($plan->items)
-                                            @php
-                                                $items = json_decode($plan->items);
-                                            @endphp
-                                            @if (is_array($items) && count($items) > 0)
-                                                <div class="feature">Services<span>{{ count($items) }} services
-                                                        included</span></div>
-                                            @endif
-                                        @endif
+                                <div class="plan-details">
+                                    @if($plan->description)
+                                        <p class="plan-description">{{ $plan->description }}</p>
+                                    @endif
+
+                                    <div class="plan-detail-item">
+                                        <span class="detail-label">Plan Code</span>
+                                        <span class="detail-value">{{ $plan->plan_code }}</span>
                                     </div>
-                                    {{-- <button class="btn btn-outline-dark w-100">Get Started</button> --}}
+                                    <div class="plan-detail-item">
+                                        <span class="detail-label">Duration</span>
+                                        <span class="detail-value">{{ $plan->duration }} Months</span>
+                                    </div>
+                                    <div class="plan-detail-item">
+                                        <span class="detail-label">Total Visits</span>
+                                        <span class="detail-value">{{ $plan->total_visits }}</span>
+                                    </div>
+                                    <div class="plan-detail-item">
+                                        <span class="detail-label">Plan Cost</span>
+                                        <span class="detail-value">₹{{ number_format($plan->plan_cost) }}</span>
+                                    </div>
+                                    @if($plan->tax)
+                                    <div class="plan-detail-item">
+                                        <span class="detail-label">Tax</span>
+                                        <span class="detail-value">₹{{ number_format($plan->tax) }}</span>
+                                    </div>
+                                    @endif
+
+                                    @php $coveredItems = $plan->coveredItems()->get(); @endphp
+                                    @if($coveredItems && $coveredItems->count() > 0)
+                                        <div class="covered-items-section">
+                                            <div class="covered-items-title">
+                                                <i class="fas fa-shield-alt me-2"></i> Covered Items
+                                            </div>
+                                            @foreach($coveredItems as $item)
+                                                <div class="covered-item">
+                                                    <i class="fas fa-check-circle" style="color: #27ae60;"></i>
+                                                    <span>{{ $item->service_name }}</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
+
+                                {{-- <div class="plan-action">
+                                    <button class="btn btn-primary" onclick="selectPlan({{ $plan->id }}, '{{ $plan->plan_name }}')">
+                                        Select Plan
+                                    </button>
+                                </div> --}}
                             </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="alert alert-info mt-4">
-                        <h5>No Annual Plans Available</h5>
-                        <p>Currently, there are no annual AMC plans available. Please check our monthly plans or contact us
-                            for custom solutions.</p>
-                    </div>
-                @endif
-            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="no-plans">
+                    <h4>No AMC Plans Available</h4>
+                    <p>Please check back later or contact us for custom AMC solutions.</p>
+                </div>
+            @endif
+
         </div>
     </section>
+
+    <script>
+        function selectPlan(planId, planName) {
+            // Scroll to the form section
+            const formSection = document.querySelector('.container-contact-form');
+            if (formSection) {
+                formSection.scrollIntoView({ behavior: 'smooth' });
+            }
+            // You can also set the selected plan in a hidden field
+            console.log('Selected plan: ' + planName + ' (ID: ' + planId + ')');
+        }
+
+        function updatePlanDetails() {
+            const planSelect = document.getElementById('amc_plan_id');
+            const durationInput = document.getElementById('plan_duration');
+            const costInput = document.getElementById('plan_cost_display');
+            
+            const selectedOption = planSelect.options[planSelect.selectedIndex];
+            
+            if (selectedOption && selectedOption.value) {
+                const duration = selectedOption.getAttribute('data-duration');
+                const cost = selectedOption.getAttribute('data-cost');
+                
+                durationInput.value = duration || '';
+                costInput.value = cost ? '₹ ' + parseInt(cost).toLocaleString('en-IN') : '';
+            } else {
+                durationInput.value = '';
+                costInput.value = '';
+            }
+        }
+    </script>
 
     <h4 class="d-flex d-md-none justify-content-center align-item-center">AMC Service Request Form</h4>
 
@@ -679,15 +907,13 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Product Type</label>
-                                        <select class="form-select form-control-lg product-type" required>
-                                            <option value="">Select Product Type</option>
-                                        </select>
+                                        <input type="text" class="form-control form-control-lg product-type"
+                                            placeholder="Product Type" required>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Brand Name</label>
-                                        <select class="form-select form-control-lg product-brand" required>
-                                            <option value="">Select Brand</option>
-                                        </select>
+                                        <input type="text" class="form-control form-control-lg product-brand"
+                                            placeholder="Brand Name" required>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Model Number</label>
@@ -714,44 +940,37 @@
                 <div class="form-section" id="section4">
                     <h3 class="mb-5">AMC Plan Selection</h3>
                     <div class="row g-3">
-                        <div class="col-md-12">
-                            <label class="form-label">Select Plan Type:</label><br>
-                            <div class="form-check form-check-inline align-item-center">
-                                <input class="form-check-input" type="radio" name="plan_type" id="monthly"
-                                    value="Monthly" required>
-                                <label class="form-check-label ms-2" for="monthly">Monthly</label>
-                            </div>
-                            <div class="form-check form-check-inline align-item-center">
-                                <input class="form-check-input" type="radio" name="plan_type" id="annually"
-                                    value="Annually">
-                                <label class="form-check-label ms-2" for="annually">Annually</label>
-                            </div>
-                        </div>
-
                         <div class="col-md-6">
                             <label for="amc_plan_id" class="form-label">AMC Plan</label>
-                            <select class="form-select form-control-lg" id="amc_plan_id" name="amc_plan_id" required>
+                            <select class="form-select form-control-lg" id="amc_plan_id" name="amc_plan_id" required onchange="updatePlanDetails()">
                                 <option value="">Select AMC Plan</option>
-                                <!-- Options will be loaded dynamically based on plan type -->
+                                @if($annualPlans && $annualPlans->count() > 0)
+                                    @foreach($annualPlans as $plan)
+                                        <option value="{{ $plan->id }}" 
+                                            data-duration="{{ $plan->duration }}" 
+                                            data-cost="{{ $plan->total_cost }}"
+                                            data-pay-terms="{{ $plan->pay_terms }}">
+                                            {{ $plan->plan_name }} ({{ $plan->plan_code }})
+                                        </option>
+                                    @endforeach
+                                @endif
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label for="plan_duration" class="form-label">Plan Duration</label>
-                            <select class="form-select form-control-lg" id="plan_duration" name="plan_duration" required>
-                                <option value="">Select Duration</option>
-                                <!-- Options will be loaded dynamically based on selected plan -->
-                            </select>
+                            <input type="text" class="form-control form-control-lg" id="plan_duration" name="plan_duration" placeholder="Duration will be auto-filled" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="plan_cost_display" class="form-label">Plan Cost (₹)</label>
+                            <input type="text" class="form-control form-control-lg" id="plan_cost_display" name="plan_cost"
+                                placeholder="Cost will be auto-filled" readonly>
                         </div>
                         <div class="col-md-6">
                             <label for="preferred_start_date" class="form-label">Preferred Start Date</label>
                             <input type="date" class="form-control form-control-lg" id="preferred_start_date"
                                 name="preferred_start_date" required>
                         </div>
-                        <div class="col-md-6">
-                            <label for="plan_cost_display" class="form-label">Plan Cost</label>
-                            <input type="text" class="form-control form-control-lg" id="plan_cost_display"
-                                placeholder="Select a plan to see cost" readonly>
-                        </div>
+                        
                     </div>
                 </div>
 

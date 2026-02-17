@@ -24,7 +24,7 @@ class MyAccountController extends Controller
 
         // Debug: Check what Auth::id() returns
         $customerId = Auth::id();
-        
+
         // If using Customer model, get the actual customer ID
         $customer = Auth::user();
         if ($customer instanceof \App\Models\Customer) {
@@ -94,10 +94,9 @@ class MyAccountController extends Controller
                 'message' => 'Address added successfully!',
                 'address' => $address,
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error adding address: '.$e->getMessage());
+            Log::error('Error adding address: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -204,10 +203,9 @@ class MyAccountController extends Controller
                 'message' => 'Address updated successfully!',
                 'address' => $address->fresh(),
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error updating address: '.$e->getMessage());
+            Log::error('Error updating address: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -249,9 +247,8 @@ class MyAccountController extends Controller
                 'success' => true,
                 'message' => 'Address deleted successfully!',
             ]);
-
         } catch (\Exception $e) {
-            Log::error('Error deleting address: '.$e->getMessage());
+            Log::error('Error deleting address: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -268,8 +265,8 @@ class MyAccountController extends Controller
         $customer = Auth::user();
         $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
         $primaryAddress = CustomerAddressDetail::where('is_primary', 'yes')
-        ->where('customer_id', $customerId)
-        ->first();
+            ->where('customer_id', $customerId)
+            ->first();
         // dd($customer,$primaryAddress);
 
         return view('frontend.my-account-edit', compact('customer', 'primaryAddress'));
@@ -322,7 +319,7 @@ class MyAccountController extends Controller
 
             return view('frontend.my-account-amc-view', compact('amcService'));
         } catch (\Exception $e) {
-            Log::error('Error viewing AMC service: '.$e->getMessage());
+            Log::error('Error viewing AMC service: ' . $e->getMessage());
 
             return redirect()->route('my-account-amc')->with('error', 'Error loading AMC service details.');
         }
@@ -356,7 +353,7 @@ class MyAccountController extends Controller
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,'.Auth::id(),
+            'email' => 'required|email|unique:users,email,' . Auth::id(),
             'phone' => 'nullable|string|max:20',
         ]);
 
@@ -366,7 +363,7 @@ class MyAccountController extends Controller
             $user->update([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
-                'name' => $request->first_name.' '.$request->last_name, // Update full name
+                'name' => $request->first_name . ' ' . $request->last_name, // Update full name
                 'email' => $request->email,
                 'phone' => $request->phone,
             ]);
@@ -375,13 +372,12 @@ class MyAccountController extends Controller
                 'success' => true,
                 'message' => 'Profile updated successfully.',
             ]);
-
         } catch (\Exception $e) {
-            Log::error('Error updating profile: '.$e->getMessage());
+            Log::error('Error updating profile: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating profile: '.$e->getMessage(),
+                'message' => 'Error updating profile: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -435,13 +431,16 @@ class MyAccountController extends Controller
                 'password' => Hash::make($request->new_password),
             ]);
 
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Password updated successfully. Please login again with your new password.',
             ]);
-
         } catch (\Exception $e) {
-            Log::error('Error updating password: '.$e->getMessage());
+            Log::error('Error updating password: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,

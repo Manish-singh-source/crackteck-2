@@ -24,7 +24,8 @@
 
             <div class="row">
                 <div class="col-12">
-                    <form action="{{ route('covered-items.update', $coveredItem->id) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('covered-items.update', $coveredItem->id) }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -128,46 +129,36 @@
                                                 </div> --}}
 
                                                 <div>
-                                                    <a href="{{ asset($coveredItem->image) }}" target="_blank">View Image</a>
+                                                    <a href="{{ asset($coveredItem->image) }}" target="_blank">View
+                                                        Image</a>
                                                 </div>
                                             </div>
 
-                                            {{-- Diagnosis List (JSON) --}}
-                                            <div class="col-md-12">
-                                                <label class="form-label" for="diagnosis_input">
-                                                    Diagnosis List
+                                            {{-- Diagnosis List deviceSpecificDiagnosis --}}
+                                            <div class="col-md-4">
+                                                <label class="form-label" for="device_specific_diagnosis_id">
+                                                    Device Specific Diagnosis
                                                 </label>
-                                                <div class="input-group mb-2">
-                                                    <input type="text" class="form-control" id="diagnosis_input"
-                                                        placeholder="Enter a diagnosis and click Add">
-                                                    <button type="button" class="btn btn-outline-primary"
-                                                        id="add_diagnosis_btn">
-                                                        Add
-                                                    </button>
-                                                </div>
-
-                                                <div id="diagnosis_list" class="border rounded p-2"
-                                                    style="min-height: 40px;">
-                                                </div>
-
-                                                @php
-                                                    $oldDiagnosis = old('diagnosis_list');
-                                                    if (is_string($oldDiagnosis)) {
-                                                        // from validation error, still JSON string
-                                                        $diagnosisInitial = $oldDiagnosis;
-                                                    } else {
-                                                        // from model cast array
-                                                        $diagnosisInitial = json_encode(
-                                                            $coveredItem->diagnosis_list ?? [],
-                                                        );
-                                                    }
-                                                @endphp
-
-                                                <input type="hidden" name="diagnosis_list" id="diagnosis_list_json"
-                                                    value='{{ $diagnosisInitial }}'>
-                                                @error('diagnosis_list')
-                                                    <div class="text-danger small">{{ $message }}</div>
+                                                <select name="device_specific_diagnosis_id"
+                                                    id="device_specific_diagnosis_id"
+                                                    class="form-select @error('device_specific_diagnosis_id') is-invalid @enderror">
+                                                    <option value="">Select Diagnosis</option>
+                                                    @foreach ($deviceSpecificDiagnosis as $item)
+                                                        <option value="{{ $item->id }}"
+                                                            {{ old('device_specific_diagnosis_id', $coveredItem->device_specific_diagnosis_id) == $item->id ? 'selected' : '' }}>
+                                                            {{ $item->device_type }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('device_specific_diagnosis_id')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
+                                            </div>
+
+                                            <div class="col-md-12">
+                                                <div id="diagnosis_list" class="mb-2"></div>
+                                                <input type="hidden" name="diagnosis_list" id="diagnosis_list_json"
+                                                    value="{{ old('diagnosis_list', json_encode($coveredItem->diagnosis_list ?? [])) }}">
                                             </div>
 
                                         </div>
@@ -196,108 +187,76 @@
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Service charge required toggle (AMC = 0)
-            const typeSelect = document.getElementById('service_type');
-            const chargeInput = document.getElementById('service_charge');
+            const deviceDiagnosisSelect = document.getElementById('device_specific_diagnosis_id');
+            const diagnosisList = document.getElementById('diagnosis_list');
+            const diagnosisListJson = document.getElementById('diagnosis_list_json');
 
-            function toggleServiceChargeRequired() {
-                if (typeSelect.value === '0') {
-                    chargeInput.removeAttribute('required');
-                } else {
-                    chargeInput.setAttribute('required', 'required');
-                }
-            }
-            if (typeSelect && chargeInput) {
-                typeSelect.addEventListener('change', toggleServiceChargeRequired);
-                toggleServiceChargeRequired();
-            }
+            // Listen for changes on device diagnosis select
+            deviceDiagnosisSelect.addEventListener('change', function() {
+                const deviceId = this.value;
 
-            // Diagnosis list tag manager
-            const diagInput = document.getElementById('diagnosis_input');
-            const addDiagBtn = document.getElementById('add_diagnosis_btn');
-            const listDiv = document.getElementById('diagnosis_list');
-            const jsonField = document.getElementById('diagnosis_list_json');
+                // Clear previous diagnoses
+                diagnosisList.innerHTML = '';
+                diagnosisListJson.value = '';
 
-            if (!diagInput || !addDiagBtn || !listDiv || !jsonField) {
-                return;
-            }
-
-            let items = [];
-
-            // Load existing (old or model) values
-            try {
-                const existing = jsonField.value ? JSON.parse(jsonField.value) : [];
-                if (Array.isArray(existing)) {
-                    items = existing;
-                }
-            } catch (e) {
-                items = [];
-            }
-
-            function renderDiagnosis() {
-                listDiv.innerHTML = '';
-
-                if (!items.length) {
-                    listDiv.innerHTML =
-                        '<span class="text-muted small">No diagnosis added yet.</span>';
+                if (!deviceId) {
+                    return;
                 }
 
-                items.forEach((item, index) => {
-                    const id = 'diag_' + index;
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'form-check form-check-inline me-3 mb-1';
+                // Fetch diagnosis list via AJAX
+                fetch(`{{ route('get-diagnosis-list', '') }}/${deviceId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.diagnosis_list && data.diagnosis_list.length > 0) {
+                            displayDiagnoses(data.diagnosis_list);
+                        } else {
+                            diagnosisList.innerHTML =
+                                '<p class="text-muted">No diagnoses available for this device type</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching diagnoses:', error);
+                        diagnosisList.innerHTML = '<p class="text-danger">Error loading diagnoses</p>';
+                    });
+            });
 
-                    wrapper.innerHTML = `
-                <input class="form-check-input diagnosis-checkbox"
-                       type="checkbox"
-                       id="${id}"
-                       data-index="${index}"
-                       checked>
-                <label class="form-check-label" for="${id}">
-                    ${item}
-                </label>
-            `;
+            // Function to display diagnoses as checkboxes
+            function displayDiagnoses(diagnoses) {
+                const checkboxesHtml = diagnoses.map((diagnosis, index) => {
+                    return `
+                        <div class="form-check">
+                            <input class="form-check-input diagnosis-checkbox" type="checkbox" 
+                                   value="${diagnosis}" id="diagnosis_${index}" checked>
+                            <label class="form-check-label" for="diagnosis_${index}">
+                                ${diagnosis}
+                            </label>
+                        </div>
+                    `;
+                }).join('');
 
-                    listDiv.appendChild(wrapper);
+                diagnosisList.innerHTML = checkboxesHtml;
+
+                // Add change listeners to checkboxes
+                document.querySelectorAll('.diagnosis-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', updateDiagnosisJson);
                 });
 
-                jsonField.value = JSON.stringify(items);
+                // Auto-select all checkboxes and update the hidden field
+                updateDiagnosisJson();
             }
 
-            function addDiagnosisFromInput() {
-                const value = diagInput.value.trim();
-                if (!value) return;
+            // Function to update the hidden JSON field with selected diagnoses
+            function updateDiagnosisJson() {
+                const selectedDiagnoses = Array.from(document.querySelectorAll('.diagnosis-checkbox:checked'))
+                    .map(checkbox => checkbox.value);
 
-                const exists = items.some(t => t.toLowerCase() === value.toLowerCase());
-                if (!exists) {
-                    items.push(value);
-                    renderDiagnosis();
-                }
-                diagInput.value = '';
-                diagInput.focus();
+                diagnosisListJson.value = JSON.stringify(selectedDiagnoses);
             }
 
-            addDiagBtn.addEventListener('click', addDiagnosisFromInput);
-
-            diagInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addDiagnosisFromInput();
-                }
-            });
-
-            listDiv.addEventListener('change', function(e) {
-                if (!e.target.classList.contains('diagnosis-checkbox')) return;
-                const index = parseInt(e.target.getAttribute('data-index'), 10);
-                if (!isNaN(index) && items[index] !== undefined) {
-                    if (!e.target.checked) {
-                        items.splice(index, 1);
-                        renderDiagnosis();
-                    }
-                }
-            });
-
-            renderDiagnosis();
+            // Trigger change event if device is already selected (on page load)
+            if (deviceDiagnosisSelect.value) {
+                deviceDiagnosisSelect.dispatchEvent(new Event('change'));
+            }
         });
     </script>
 @endsection

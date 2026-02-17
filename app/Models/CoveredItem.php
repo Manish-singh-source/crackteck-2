@@ -18,6 +18,7 @@ class CoveredItem extends Model
         'service_charge',
         'status',
         'diagnosis_list',
+        'device_specific_diagnosis_id',
     ];
 
     protected $casts = [

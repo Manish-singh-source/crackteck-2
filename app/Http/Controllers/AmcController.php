@@ -223,7 +223,10 @@ class AmcController extends Controller
 
     public function createCoveredItems()
     {
-        return view('/crm/amc-plans/covered-items/create');
+        $deviceSpecificDiagnosis = DeviceSpecificDiagnosis::where('status', 'active')
+            ->orderBy('device_type')
+            ->get();
+        return view('/crm/amc-plans/covered-items/create', compact('deviceSpecificDiagnosis'));
     }
 
     public function storeCoveredItems(Request $request)
@@ -237,6 +240,7 @@ class AmcController extends Controller
             'service_charge' => 'nullable|numeric|min:0|required_unless:service_type,0',
             'status' => 'nullable|in:active,inactive',
             'diagnosis_list' => 'nullable|string', // JSON string from hidden field
+            'device_specific_diagnosis_id' => 'nullable|exists:device_specific_diagnoses,id',
         ]);
 
         try {
@@ -279,6 +283,7 @@ class AmcController extends Controller
                     : ($data['service_charge'] ?? null),
                 'status' => $data['status'],                 // 0/1
                 'diagnosis_list' => $diagnosis,                      // array, casted as JSON
+                'device_specific_diagnosis_id' => $data['device_specific_diagnosis_id'] ?? null,
             ]);
 
             if (!$coveredItem) {
@@ -314,7 +319,10 @@ class AmcController extends Controller
     public function editCoveredItems($id)
     {
         $coveredItem = CoveredItem::findOrFail($id);
-        return view('/crm/amc-plans/covered-items/edit', compact('coveredItem'));
+        $deviceSpecificDiagnosis = DeviceSpecificDiagnosis::where('status', 'active')
+            ->orderBy('device_type')
+            ->get();
+        return view('/crm/amc-plans/covered-items/edit', compact('coveredItem', 'deviceSpecificDiagnosis'));
     }
 
     public function updateCoveredItems(Request $request, $id)
@@ -327,6 +335,7 @@ class AmcController extends Controller
             'service_charge' => 'nullable|numeric|min:0|required_unless:service_type,0',
             'status' => 'nullable|in:active,inactive',
             'diagnosis_list' => 'nullable|string',
+            'device_specific_diagnosis_id' => 'nullable|exists:device_specific_diagnoses,id',
         ]);
 
         $coveredItem = CoveredItem::findOrFail($id);
@@ -334,6 +343,7 @@ class AmcController extends Controller
         $data = $validated;
         $data['status'] = $request->input('status', 'active');
 
+        // Decode diagnosis_list JSON to array and clean it
         $diagnosis = [];
         if ($request->filled('diagnosis_list')) {
             $raw = $request->input('diagnosis_list');
@@ -344,7 +354,7 @@ class AmcController extends Controller
         }
 
         // Handle image upload
-        $filePath = null;
+        $filePath = $coveredItem->image; // keep existing if no new upload
         if ($request->hasFile('image')) {
             if ($coveredItem->image && File::exists(public_path($coveredItem->image))) {
                 File::delete(public_path($coveredItem->image));
@@ -365,6 +375,7 @@ class AmcController extends Controller
                 : ($data['service_charge'] ?? null),
             'status' => $data['status'],
             'diagnosis_list' => $diagnosis,
+            'device_specific_diagnosis_id' => $data['device_specific_diagnosis_id'] ?? null,
         ]);
 
         return redirect()
@@ -481,5 +492,26 @@ class AmcController extends Controller
         return redirect()
             ->route('device-specific-diagnosis.index')
             ->with('success', 'Diagnosis deleted successfully.');
+    }
+
+    /**
+     * Fetch diagnoses for a specific device type via AJAX
+     */
+    public function getDiagnosisList($id)
+    {
+        try {
+            $deviceDiagnosis = DeviceSpecificDiagnosis::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'device_type' => $deviceDiagnosis->device_type,
+                'diagnosis_list' => $deviceDiagnosis->diagnosis_list ?? [],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Device diagnosis not found',
+            ], 404);
+        }
     }
 }

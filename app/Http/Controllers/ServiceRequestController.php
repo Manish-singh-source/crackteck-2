@@ -1042,7 +1042,6 @@ class ServiceRequestController extends Controller
 
     public function storeAmcServiceRequest(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'email' => 'required|email',
             'amc_plan_id' => 'required',
@@ -1050,10 +1049,11 @@ class ServiceRequestController extends Controller
             'products.*.product_name' => 'required|string',
         ]);
 
-        // 1. Check if customer exists
-        $customer = Customer::where('email', $request->email)->first();
-
         try {
+
+            // 1. Check if customer exists
+            $customer = Customer::where('email', $request->email)->first();
+
             DB::beginTransaction();
             if (! $customer) {
                 // Create new customer
@@ -1068,7 +1068,7 @@ class ServiceRequestController extends Controller
                 ]);
 
                 // Store customer address
-                CustomerAddressDetail::create([
+                $customerAddress = CustomerAddressDetail::create([
                     'customer_id' => $customer->id,
                     'branch_name' => $request->branch_name,
                     'address1' => $request->address1,
@@ -1085,47 +1085,77 @@ class ServiceRequestController extends Controller
                     'company_name' => $request->company_name,
                     'gst_no' => $request->gst_no,
                     'pan_no' => $request->pan_no,
-                    'address1' => $request->address1,
-                    'address2' => $request->address2,
-                    'country' => $request->country,
-                    'state' => $request->state,
-                    'city' => $request->city,
-                    'pincode' => $request->pincode,
+                    'address1' => $request->comp_address1,
+                    'address2' => $request->comp_address2,
+                    'country' => $request->comp_country,
+                    'state' => $request->comp_state,
+                    'city' => $request->comp_city,
+                    'pincode' => $request->comp_pincode,
                 ]);
             }
-            // dd($request->service_type);
 
             // 2. Store service request
             $serviceRequest = ServiceRequest::create([
-                'request_id' => $this->generateServiceId(),
+                'request_id' => uniqid(),
                 'service_type' => $request->service_type,
-                'amc_plan_id' => $request->amc_plan_id,
-                'price' => $request->price,
                 'customer_id' => $customer->id,
-                'request_date' => now(),
+                'customer_address_id' => $customerAddress->id ?? null,
+                'request_date' => now()->addDays(5), // after 5 days of current date 
                 'request_source' => 'system',
+                'visit_date' => $request->visit_date,
+                'reschedule_date' => null,
                 'created_by' => Auth::id(),
+                'is_engineer_assigned' => 'not_assigned',
+                'status' => 'active',
+                'amc_status' => 'active',
+                'amc_plan_id' => $request->amc_plan_id,
             ]);
+
+            $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
+
+            // Calculate the month gap between visits as an integer (avoid fractional months)
+            $monthGapFloat = intval($amcPlan->duration) / max(1, intval($amcPlan->total_visits));
+            $monthGap = (int) round($monthGapFloat);
+
+            // Ensure we have a Carbon instance for dates
+            $startVisitDate = $serviceRequest->visit_date ? \Carbon\Carbon::parse($serviceRequest->visit_date) : \Carbon\Carbon::now();
+
+            // Start from the next visit after the initial visit date
+            $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
+
+            foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
+                // Create a service request visit for each visit
+                $serviceRequest->amcScheduleMeetings()->create([
+                    'service_request_id' => $serviceRequest->id,
+                    'scheduled_at' => $nextVisitDate,
+                    'completed_at' => null,
+                    'remarks' => null,
+                    'report' => null,
+                    'visits_count' => $visitNumber,
+                    'status' => 'scheduled',
+                ]);
+
+                // Update the next visit date for the next iteration
+                $nextVisitDate = $nextVisitDate->addMonths($monthGap);
+            }
 
             // 3. Store products
             foreach ($request->products as $product) {
-                $imagePath = null;
-                if (isset($product['product_image']) && $product['product_image'] instanceof \Illuminate\Http\UploadedFile) {
-                    $imagePath = $product['product_image']->store('service-request-images', 'public');
-                }
 
-                ServiceRequestProduct::create([
+                $serviceRequest->products()->create([
                     'service_requests_id' => $serviceRequest->id,
-                    'name' => $product['product_name'],
-                    'type' => $product['product_type'],
-                    'brand' => $product['product_brand'],
-                    'model_no' => $product['model_no'] ?? null,
-                    'hsn' => $product['hsn'] ?? null,
-                    'purchase_date' => $product['purchase_date'] ?? null,
-                    'item_code_id' => $product['amc_service_id'] ?? null,
-                    'service_charge' => $product['price'] ?? null,
-                    'description' => $product['issue_description'] ?? null,
-                    'images' => $imagePath ?? null,
+                    'item_code_id' => $request->amc_plan_id ?? null,
+
+                    'name' => $product['product_name'] ?? 'N/A',
+                    'type' => $product['product_type'] ?? 'N/A',
+                    'model_no' => $product['model_no'] ?? 'N/A',
+                    'sku' => $product['sku'] ?? 'N/A',
+                    'hsn' => $product['hsn'] ?? 'N/A',
+
+                    'purchase_date' => $product['purchase_date'] ?? 'N/A',
+                    'brand' => $product['product_brand'] ?? 'N/A',
+                    'description' => $product['issue_description'] ?? 'N/A',
+                    'service_charge' => $product['price'] ?? '100',
                 ]);
             }
 
@@ -1183,7 +1213,7 @@ class ServiceRequestController extends Controller
                 $quickServiceOptions = $quickService
                     ->pluck('service_name', 'id', 'service_charge')
                     ->prepend('--Select Quick Service--', 0);
-            }else {
+            } else {
                 $quickService = AmcPlan::where('status', 'active')->get(); // Collection
                 $quickServiceOptions = $quickService
                     ->pluck('plan_name', 'id', 'price')
@@ -1217,7 +1247,7 @@ class ServiceRequestController extends Controller
                 ->with('error', 'Quick Service Request not found: ' . $e->getMessage());
         }
     }
-    
+
     public function updateAmcServiceRequest(Request $request, $id)
     {
         // Basic validation
@@ -2079,7 +2109,7 @@ class ServiceRequestController extends Controller
         $returns = ServiceRequestProductReturn::where('status', 'accepted')->get();
 
         // Get warehouses with products for picking feature
-        $warehouses = Warehouse::with(['products' => function($query) {
+        $warehouses = Warehouse::with(['products' => function ($query) {
             $query->where('stock_quantity', '>', 0);
         }])->where('status', 'active')->get();
 
@@ -2091,7 +2121,7 @@ class ServiceRequestController extends Controller
      */
     public function adminStockInHandApproval(Request $request)
     {
-        $validated=Validator::make($request->all(),[
+        $validated = Validator::make($request->all(), [
             'request_id' => 'required|exists:service_requests,id',
             'product_id' => 'required|exists:service_request_products,id',
             'engineer_id' => 'required|exists:staff,id',
@@ -2100,7 +2130,7 @@ class ServiceRequestController extends Controller
             'request_type' => 'nullable|in:stock_in_hand,request_part',
         ]);
 
-        if($validated->fails()){
+        if ($validated->fails()) {
             dd($validated->errors());
         }
 
@@ -2123,7 +2153,7 @@ class ServiceRequestController extends Controller
                     ->where('part_id', $request->part_id)
                     ->where('request_type', $requestType)
                     ->first();
-                
+
                 if ($existingRecord) {
                     // Record exists but with different status, use it
                     $requestPart = $existingRecord;
@@ -2151,12 +2181,12 @@ class ServiceRequestController extends Controller
                     'status' => 'admin_approved',
                     'admin_approved_at' => now(),
                 ];
-                
+
                 // Update quantity if provided
                 if ($request->has('quantity') && $request->quantity > 0) {
                     $updateData['requested_quantity'] = $request->quantity;
                 }
-                
+
                 $requestPart->update($updateData);
                 $message = 'Request approved successfully.';
             } else {
@@ -2194,7 +2224,7 @@ class ServiceRequestController extends Controller
 
         try {
             $requestPart = ServiceRequestProductRequestPart::find($request->request_part_id);
-            
+
             if (!$requestPart) {
                 throw new \Exception('Request part not found.');
             }

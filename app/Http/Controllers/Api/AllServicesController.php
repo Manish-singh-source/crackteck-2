@@ -15,7 +15,6 @@ use App\Models\QuotationInvoice;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestProductRequestPart;
-use App\Models\ServiceRequestQuotation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -249,11 +248,41 @@ class AllServicesController extends Controller
                         : null,
                     // 'request_status' => 'pending',
                     // 'request_source' => 'mobile_app',
-                    // 'is_engineer_assigned' => '0',
-                    // 'status' => '1',
+                    // 'is_engineer_assigned' => '0',   
+                    'status' => $request->service_type == 'amc' ? 'active' : 'pending',
                 ]);
 
                 if ($servicesRequest) {
+                    if ($request->service_type == 'amc') {
+                        $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
+
+                        // Calculate the month gap between visits as an integer (avoid fractional months)
+                        $monthGapFloat = intval($amcPlan->duration) / max(1, intval($amcPlan->total_visits));
+                        $monthGap = (int) round($monthGapFloat);
+
+                        // Ensure we have a Carbon instance for dates
+                        $startVisitDate = $servicesRequest->visit_date ? \Carbon\Carbon::parse($servicesRequest->visit_date) : \Carbon\Carbon::now();
+
+                        // Start from the next visit after the initial visit date
+                        $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
+
+                        foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
+                            // Create a service request visit for each visit
+                            $servicesRequest->amcScheduleMeetings()->create([
+                                'service_request_id' => $servicesRequest->id,
+                                'scheduled_at' => $nextVisitDate,
+                                'completed_at' => null,
+                                'remarks' => null,
+                                'report' => null,
+                                'visits_count' => $visitNumber,
+                                'status' => 'scheduled',
+                            ]);
+
+                            // Update the next visit date for the next iteration
+                            $nextVisitDate = $nextVisitDate->addMonths($monthGap);
+                        }
+                    }
+
                     foreach ($request->products as $product) {
 
                         if ($request->service_type != 'amc') {
@@ -485,7 +514,7 @@ class AllServicesController extends Controller
             if (!$serviceRequest) {
                 return response()->json(['success' => false, 'message' => 'Service request not found or does not belong to this customer.'], 404);
             }
-            
+
             $requestPart = ServiceRequestProductRequestPart::where('id', $validated['part_id'])
                 ->first();
 
@@ -672,7 +701,7 @@ class AllServicesController extends Controller
 
         try {
 
-            
+
             // Find the quotation invoice
             $invoice = QuotationInvoice::with(['quoteDetails.products', 'quoteDetails.amcDetail'])->where('id', $id)->first();
 
@@ -705,16 +734,16 @@ class AllServicesController extends Controller
             $serviceRequest->is_engineer_assigned = 'not_assigned';
             $serviceRequest->status = 'active';
             $serviceRequest->amc_plan_id = $invoice->amc_plan_id ?? null;
-            $serviceRequest->save();           
+            $serviceRequest->save();
 
 
-            $amcPlan = AmcPlan::where('id', $invoice->amc_plan_id)->first(); 
+            $amcPlan = AmcPlan::where('id', $invoice->amc_plan_id)->first();
 
             $monthGap = $amcPlan->duration / $amcPlan->total_visits; // Calculate the month gap between visits 
             $startVisitDate = $serviceRequest->visit_date; // Start visit date is the initial visit date of the service request
             $nextVisitDate = $startVisitDate->addMonths($monthGap); // Set the next visit date based on the month gap
-            
-            foreach(range(1, $amcPlan->total_visits) as $visitNumber) {
+
+            foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
                 // Create a service request visit for each visit
                 // service_request_id	scheduled_at	completed_at	remarks	report	visits_count	status	created_at	updated_at
                 $serviceRequest->amcScheduleMeetings()->create([

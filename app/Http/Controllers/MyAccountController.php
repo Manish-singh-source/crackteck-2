@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\UserAddress;
+use App\Models\CustomerAddressDetail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,11 +19,19 @@ class MyAccountController extends Controller
     public function addresses()
     {
         if (! Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please login to access your account.');
+            return redirect()->route('login')->with('error', 'Please login to view your orders.');
         }
 
-        $addresses = UserAddress::where('user_id', Auth::id())
-            ->orderBy('is_default', 'desc')
+        // Debug: Check what Auth::id() returns
+        $customerId = Auth::id();
+        
+        // If using Customer model, get the actual customer ID
+        $customer = Auth::user();
+        if ($customer instanceof \App\Models\Customer) {
+            $customerId = $customer->id;
+        }
+
+        $addresses = CustomerAddressDetail::where('customer_id', $customerId)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -43,43 +50,41 @@ class MyAccountController extends Controller
             ], 401);
         }
 
-        $request->merge(['is_default' => $request->has('is_default') ? true : false]);
+        // Get customer ID from authenticated user
+        $customer = Auth::user();
+        $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
 
         $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'country' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'address1' => 'required|string|max:500',
+            'address2' => 'nullable|string|max:500',
             'state' => 'required|string|max:255',
             'city' => 'required|string|max:255',
-            'zipcode' => 'required|string|max:10',
-            'address_line_1' => 'required|string|max:500',
-            'address_line_2' => 'nullable|string|max:500',
-            'is_default' => 'boolean',
+            'country' => 'required|string|max:255',
+            'pincode' => 'required|string|max:10',
         ]);
 
         try {
             DB::beginTransaction();
 
+            // Check if this address should be set as default (is_primary = 'yes')
+            $isPrimary = $request->has('is_default') ? 'yes' : 'no';
+
             // If this address is being set as default, remove default from others
-            if ($request->is_default) {
-                UserAddress::where('user_id', Auth::id())
-                    ->update(['is_default' => false]);
+            if ($isPrimary === 'yes') {
+                CustomerAddressDetail::where('customer_id', $customerId)
+                    ->update(['is_primary' => 'no']);
             }
 
-            $address = UserAddress::create([
-                'user_id' => Auth::id(),
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'country' => $request->country,
-                'phone' => $request->phone,
+            $address = CustomerAddressDetail::create([
+                'customer_id' => $customerId,
+                'branch_name' => $request->input('branch_name', 'Primary'),
+                'address1' => $request->address1,
+                'address2' => $request->address2,
                 'state' => $request->state,
                 'city' => $request->city,
-                'zipcode' => $request->zipcode,
-                'address_line_1' => $request->address_line_1,
-                'address_line_2' => $request->address_line_2,
-                'is_default' => $request->is_default ?? false,
-                'address_type' => 'both', // Default to both shipping and billing
+                'country' => $request->country,
+                'pincode' => $request->pincode,
+                'is_primary' => $isPrimary,
             ]);
 
             DB::commit();
@@ -113,8 +118,11 @@ class MyAccountController extends Controller
             ], 401);
         }
 
-        $address = UserAddress::where('id', $id)
-            ->where('user_id', Auth::id())
+        $customer = Auth::user();
+        $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
+
+        $address = CustomerAddressDetail::where('id', $id)
+            ->where('customer_id', $customerId)
             ->first();
 
         if (! $address) {
@@ -142,8 +150,11 @@ class MyAccountController extends Controller
             ], 401);
         }
 
-        $address = UserAddress::where('id', $id)
-            ->where('user_id', Auth::id())
+        $customer = Auth::user();
+        $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
+
+        $address = CustomerAddressDetail::where('id', $id)
+            ->where('customer_id', $customerId)
             ->first();
 
         if (! $address) {
@@ -153,42 +164,37 @@ class MyAccountController extends Controller
             ], 404);
         }
 
-        $request->merge(['is_default' => $request->has('is_default') ? true : false]);
-
         $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'country' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'address1' => 'required|string|max:500',
+            'address2' => 'nullable|string|max:500',
             'state' => 'required|string|max:255',
             'city' => 'required|string|max:255',
-            'zipcode' => 'required|string|max:10',
-            'address_line_1' => 'required|string|max:500',
-            'address_line_2' => 'nullable|string|max:500',
-            'is_default' => 'boolean',
+            'country' => 'required|string|max:255',
+            'pincode' => 'required|string|max:10',
         ]);
 
         try {
             DB::beginTransaction();
 
+            // Check if this address should be set as default (is_primary = 'yes')
+            $isPrimary = $request->has('is_default') ? 'yes' : 'no';
+
             // If this address is being set as default, remove default from others
-            if ($request->is_default && ! $address->is_default) {
-                UserAddress::where('user_id', Auth::id())
+            if ($isPrimary === 'yes' && $address->is_primary !== 'yes') {
+                CustomerAddressDetail::where('customer_id', $customerId)
                     ->where('id', '!=', $id)
-                    ->update(['is_default' => false]);
+                    ->update(['is_primary' => 'no']);
             }
 
             $address->update([
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'country' => $request->country,
-                'phone' => $request->phone,
+                'branch_name' => $request->input('branch_name', $address->branch_name),
+                'address1' => $request->address1,
+                'address2' => $request->address2,
                 'state' => $request->state,
                 'city' => $request->city,
-                'zipcode' => $request->zipcode,
-                'address_line_1' => $request->address_line_1,
-                'address_line_2' => $request->address_line_2,
-                'is_default' => $request->is_default ?? false,
+                'country' => $request->country,
+                'pincode' => $request->pincode,
+                'is_primary' => $isPrimary,
             ]);
 
             DB::commit();
@@ -222,8 +228,11 @@ class MyAccountController extends Controller
             ], 401);
         }
 
-        $address = UserAddress::where('id', $id)
-            ->where('user_id', Auth::id())
+        $customer = Auth::user();
+        $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
+
+        $address = CustomerAddressDetail::where('id', $id)
+            ->where('customer_id', $customerId)
             ->first();
 
         if (! $address) {

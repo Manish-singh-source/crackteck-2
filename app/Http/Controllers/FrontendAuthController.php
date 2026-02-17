@@ -15,27 +15,34 @@ class FrontendAuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'email' => 'required|string|email|unique:customers',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
+        $lastCustomer = Customer::orderBy('id', 'desc')->first();
+        $lastCustomerCode = $lastCustomer?->customer_code ?? 'CUST0000';
+        $customerCode = str_replace('CUST', '', $lastCustomerCode);
+        $customerCode = (int) $customerCode + 1;
+
+        $customerCode = 'CUST' . str_pad($customerCode, 4, '0', STR_PAD_LEFT);
+
+        // Create customer directly in customers table
+        $customer = Customer::create([
+            'customer_code' => $customerCode,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'phone' => $request->phone,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'customer_type' => 'ecommerce',
+            'source_type' => 'ecommerce',
+            'status' => 'active',
         ]);
 
-        // Create corresponding customer record for e-commerce customer
-        $this->createEcommerceCustomer($user, $request);
-
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            $request->session()->regenerate();
-
-            return redirect()->intended('demo/');
-        }
-
-        return redirect()->back()->with('success', 'Registration successful.');
+        return redirect()->route('website')->with('success', 'Registration successful. Please login.');
     }
 
     public function login(Request $request)
@@ -173,19 +180,14 @@ class FrontendAuthController extends Controller
      */
     private function createEcommerceCustomer(User $user, Request $request)
     {
-        // Split name into first and last name
-        $nameParts = explode(' ', $user->name, 2);
-        $firstName = $nameParts[0];
-        $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
-
         Customer::create([
             'user_id' => $user->id,
-            'first_name' => $firstName,
-            'last_name' => $lastName,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
             'email' => $user->email,
+            'phone' => $request->phone,
             'customer_type' => 'E-commerce Customer',
             'status' => 'active',
-            // All other fields will be nullable and filled later when user updates profile or places order
         ]);
     }
 }

@@ -138,7 +138,7 @@ $(document).ready(function() {
         $('#password-text').text('Updating...');
 
         $.ajax({
-            url: '/my-account/password',
+            url: 'my-account/password',
             method: 'PUT',
             data: formData,
             success: function(response) {

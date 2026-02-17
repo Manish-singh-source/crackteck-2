@@ -129,6 +129,15 @@
                                             ])
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Address Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3 pb-3">
                                     <div class="col-xl-4 col-lg-6">
                                         <div>
                                             @include('components.form.input', [
@@ -200,37 +209,13 @@
                                             ])
                                         </div>
                                     </div>
-                                    <div class="col-xl-4 col-lg-6">
-                                        <div>
-                                            @include('components.form.select', [
-                                                'class' => 'amc-service-select',
-                                                'label' => 'Amc Service',
-                                                'name' => 'amc_plan_id',
-                                                'options' => $amcServiceOptions,
-                                                'required' => true,
-                                            ])
-                                        </div>
-                                    </div>
-
-                                    <div class="col-xl-4 col-lg-6">
-                                        <div>
-                                            @include('components.form.input', [
-                                                'class' => 'amc-service-price',
-                                                'label' => 'Amc Service Price',
-                                                'name' => 'price',
-                                                'type' => 'text',
-                                                'readonly' => true,
-                                            ])
-                                        </div>
-                                    </div>
-
-                                    {{-- Source Type --}}
-                                    <div class="col-xl-4 col-lg-6">
-                                        <div>
-                                            <input type="hidden" name="request_source" value="system" readonly>
-                                        </div>
-                                    </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Company Details</h5>
                             </div>
                             <div class="card-body">
                                 <div class="row g-3 pb-3">
@@ -331,6 +316,56 @@
                         </div>
 
                         <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">AMC Service Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3 pb-3">
+                                    <div class="col-xl-4 col-lg-6">
+                                        <div>
+                                            @include('components.form.select', [
+                                                'class' => 'amc-service-select',
+                                                'label' => 'Amc Service',
+                                                'name' => 'amc_plan_id',
+                                                'options' => $amcServiceOptions,
+                                                'required' => true,
+                                            ])
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-4 col-lg-6">
+                                        <div>
+                                            @include('components.form.input', [
+                                                'class' => 'amc-service-price',
+                                                'label' => 'Amc Service Price',
+                                                'name' => 'price',
+                                                'type' => 'text',
+                                                'readonly' => true,
+                                            ])
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-4 col-lg-6">
+                                        <div>
+                                            <div>
+                                                <label class="form-label">Visit Date</label>
+                                                <input type="date" name="visit_date" class="form-control"
+                                                    value="{{ old('visit_date') }}">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Source Type --}}
+                                    <div>
+                                        <div>
+                                            <input type="hidden" name="request_source" value="system" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h5 class="card-title mb-0">Product Details</h5>
                                 <button type="button" class="btn btn-sm btn-primary" id="addProductBtn">
@@ -342,10 +377,11 @@
                                     <div class="row g-3 pb-3">
                                         <div class="col-xl-4 col-lg-6">
                                             <div>
-                                                <label for="products[0][product_name]" class="form-label">Product Name <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="text" name="products[0][product_name]" class="form-control"
-                                                    placeholder="Dell Inspiron 15 Laptop Windows 11" required>
+                                                <label for="products[0][product_name]" class="form-label">Product
+                                                    Name <span class="text-danger">*</span></label>
+                                                <input type="text" name="products[0][product_name]"
+                                                    class="form-control" placeholder="Dell Inspiron 15 Laptop Windows 11"
+                                                    required>
                                             </div>
                                         </div>
 
@@ -356,7 +392,8 @@
                                                 <select name="products[0][product_type]" class="form-select">
                                                     <option value="">--Select Type--</option>
                                                     @foreach ($categories as $id => $name)
-                                                        <option value="{{ $id }}">{{ $name }}</option>
+                                                        <option value="{{ $id }}">{{ $name }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -369,7 +406,8 @@
                                                 <select name="products[0][product_brand]" class="form-select">
                                                     <option value="">--Select Brand--</option>
                                                     @foreach ($brands as $id => $name)
-                                                        <option value="{{ $id }}">{{ $name }}</option>
+                                                        <option value="{{ $id }}">{{ $name }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -377,7 +415,8 @@
 
                                         <div class="col-xl-4 col-lg-6">
                                             <div>
-                                                <label for="products[0][model_no]" class="form-label">Model Number</label>
+                                                <label for="products[0][model_no]" class="form-label">Model
+                                                    Number</label>
                                                 <input type="text" name="products[0][model_no]" class="form-control"
                                                     placeholder="Inspiron 3511">
                                             </div>
@@ -585,7 +624,7 @@
                             hideBox();
                             // Show customer not found message
                             console.log(data);
-                            alert('Customer not found for the entered email address.');
+                            // alert('Customer not found for the entered email address.');
                         }
                     })
                     .catch(() => {

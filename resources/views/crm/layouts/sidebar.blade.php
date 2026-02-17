@@ -206,6 +206,7 @@
                     </a>
                 </li>
 
+                <li class="menu-title mt-2">Services</li>
                 <li>
                     <a class='tp-link' href="{{ route('service-request.index') }}">
                         <i class="fas fa-clipboard-list"></i>
@@ -307,6 +308,7 @@
                     </a>
                 </li>
 
+                {{-- 
                 <li class="menu-title mt-2">App UI Settings</li>
 
                 <li>
@@ -325,7 +327,8 @@
                             </li>
                         </ul>
                     </div>
-                </li>
+                </li> 
+                --}}
 
 
             </ul>

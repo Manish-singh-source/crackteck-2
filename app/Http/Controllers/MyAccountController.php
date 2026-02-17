@@ -265,10 +265,14 @@ class MyAccountController extends Controller
      */
     public function accountDetails()
     {
-        $user = Auth::user();
-        $primaryAddress = $user->addresses()->where('is_default', true)->first();
+        $customer = Auth::user();
+        $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
+        $primaryAddress = CustomerAddressDetail::where('is_primary', 'yes')
+        ->where('customer_id', $customerId)
+        ->first();
+        // dd($customer,$primaryAddress);
 
-        return view('frontend.my-account-edit', compact('user', 'primaryAddress'));
+        return view('frontend.my-account-edit', compact('customer', 'primaryAddress'));
     }
 
     /**

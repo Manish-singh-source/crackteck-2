@@ -2262,3 +2262,43 @@ feedbacks - done
 3. my orders - profile
 4. my services
 5. work progress tracker (selected service details)
+
+
+
+
+
+
+AMC Service Request Form
+
+ka layout as it is rahega
+
+but fields change hoga
+1. Customer Details
+2. Company Details
+3. Product Information
+4. AMC Plan Selection
+5. Additional Information
+6. Review & Submit
+
+ye sub mera old form section hai
+
+but mujhe laga chahiye
+
+first check karo hi email mere customer me already avaliable hai ki nahi 
+
+agar customer naya hoga to new customer create hoga, already available hoga to new customer create nahi hoga bus service request aur baki sub table me add hoga
+
+1. Customer Details
+customer_code (auto generate hoga ) first_name,last_name,phone,email,customer_type (both) (hidden input) ,source_type (ecommerce) (hidden input), 
+
+2. Customer Address
+agar customer 
+branch_name,address1,address2,city,state,country,pincode
+
+3. Company Details (option)
+agar customer me company detail fill kiya to customer_company_details table me data store hoga (company_name,comp_address1,comp_address2,comp_city,comp_state,comp_country,comp_pincode,gst_no) nahi kiya to skip ka button se next step par jayega
+
+3. Product Information
+4. AMC Plan Selection
+5. Additional Information
+6. Review & Submit

@@ -530,6 +530,19 @@
                                                                                     </form>
                                                                                 </div>
                                                                             @endif
+
+                                                                            {{-- Feature: Mark product as picked --}}
+                                                                            @if(in_array($status, ['assigned', 'ap_approved', 'warehouse_approved']))
+                                                                                <div class="mt-2 p-2 border rounded bg-light">
+                                                                                    <form action="{{ route('service-request.part-picked') }}" method="POST" class="d-flex gap-2 align-items-center">
+                                                                                        @csrf
+                                                                                        <input type="hidden" name="request_part_id" value="{{ $requestPart->id }}">
+                                                                                        <button type="submit" class="btn btn-sm btn-success">
+                                                                                            <i class="mdi mdi-check-circle"></i> Mark as Picked
+                                                                                        </button>
+                                                                                    </form>
+                                                                                </div>
+                                                                            @endif
                                                                         </div>
                                                                     </div>
                                                                 </div>

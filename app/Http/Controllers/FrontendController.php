@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AMC;
+use App\Models\AmcPlan;
 use App\Models\Brand;
 use App\Models\Collection;
 use App\Models\Contact;
@@ -100,18 +101,10 @@ class FrontendController extends Controller
      */
     public function amcPlans()
     {
-        // Get active AMC plans grouped by plan type
-        $monthlyPlans = AMC::where('status', 'Active')
-            ->where('plan_type', 'Monthly')
+        $annualPlans = AmcPlan::where('status', 'Active')
             ->get();
 
-        // dd($monthlyPlans);
-
-        $annualPlans = AMC::where('status', 'Active')
-            ->where('plan_type', 'Annually')
-            ->get();
-
-        return view('frontend.amc', compact('monthlyPlans', 'annualPlans'));
+        return view('frontend.amc', compact('annualPlans'));
     }
 
     /**
@@ -119,7 +112,7 @@ class FrontendController extends Controller
      */
     public function getProductCategories()
     {
-        $categories = ParentCategorie::where('status', '1')
+        $categories = ParentCategory::where('status', '1')
             ->select('id', 'parent_categories as name')
             ->orderBy('parent_categories')
             ->get();
@@ -150,7 +143,7 @@ class FrontendController extends Controller
      */
     public function getAmcPlansData()
     {
-        $plans = AMC::where('status', 'Active')
+        $plans = AmcPlan::where('status', 'Active')
             ->select('id', 'plan_name', 'plan_type', 'duration', 'total_cost', 'description')
             ->orderBy('plan_type')
             ->orderBy('plan_name')
@@ -168,6 +161,7 @@ class FrontendController extends Controller
      */
     public function submitAmcRequest(Request $request)
     {
+        dd($request->all());
         $validator = Validator::make($request->all(), [
             // Step 1: Customer Details
             'first_name' => 'required|string|max:255',
@@ -198,8 +192,7 @@ class FrontendController extends Controller
             'products.*.purchase_date' => 'required|date',
 
             // Step 4: AMC Plan Selection
-            'plan_type' => 'required|in:Monthly,Annually',
-            'amc_plan_id' => 'required|exists:a_m_c_s,id',
+            'amc_plan_id' => 'required|exists:amc_plans,id',
             'plan_duration' => 'required|string',
             'preferred_start_date' => 'required|date',
 
@@ -217,73 +210,88 @@ class FrontendController extends Controller
         }
 
         try {
+            // Check if customer exists or create new one
+            $customer = \App\Models\Customer::where('email', $request->email)->first();
+            
+            if (!$customer) {
+                $customer = \App\Models\Customer::create([
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'phone' => $request->phone,
+                    'email' => $request->email,
+                    'pan_no' => $request->pan_no,
+                    'customer_type' => $request->customer_type,
+                ]);
+            }
+
+            // Create customer address if not exists
+            $customerAddress = \App\Models\CustomerAddressDetail::where('customer_id', $customer->id)->first();
+            if (!$customerAddress && $request->filled('address_line1')) {
+                $customerAddress = \App\Models\CustomerAddressDetail::create([
+                    'customer_id' => $customer->id,
+                    'branch_name' => $request->branch_name ?? 'Primary',
+                    'address1' => $request->address_line1,
+                    'address2' => $request->address_line2,
+                    'country' => $request->country ?? 'India',
+                    'state' => $request->state,
+                    'city' => $request->city,
+                    'pincode' => $request->pin_code,
+                ]);
+            }
+
+            // Create customer company details if not exists
+            $customerCompany = \App\Models\CustomerCompanyDetail::where('customer_id', $customer->id)->first();
+            if (!$customerCompany && $request->filled('company_name')) {
+                $customerCompany = \App\Models\CustomerCompanyDetail::create([
+                    'customer_id' => $customer->id,
+                    'company_name' => $request->company_name,
+                    'gst_no' => $request->gst_no,
+                    'pan_no' => $request->pan_no,
+                    'address1' => $request->address_line1,
+                    'address2' => $request->address_line2,
+                    'country' => $request->country ?? 'India',
+                    'state' => $request->state,
+                    'city' => $request->city,
+                    'pincode' => $request->pin_code,
+                ]);
+            }
+
+            // Get AMC plan details
+            $amcPlan = \App\Models\AmcPlan::find($request->amc_plan_id);
+
             // Generate unique service ID
             $serviceId = $this->generateServiceId();
 
-            // Create AMC Service
-            $amcService = new \App\Models\AmcService;
-            $amcService->service_id = $serviceId;
-            $amcService->first_name = $request->first_name;
-            $amcService->last_name = $request->last_name;
-            $amcService->phone = $request->phone;
-            $amcService->email = $request->email;
-            $amcService->customer_type = $request->customer_type;
-            $amcService->company_name = $request->company_name;
-            $amcService->gst_no = $request->gst_no;
-            $amcService->pan_no = $request->pan_no;
+            // Create Service Request in service_requests table
+            $serviceRequest = \App\Models\ServiceRequest::create([
+                'request_id' => $serviceId,
+                'service_type' => 'AMC',
+                'customer_id' => $customer->id,
+                'amc_plan_id' => $request->amc_plan_id,
+                'request_date' => now(),
+                'request_status' => 'Pending',
+                'request_source' => $request->source_type_label ?? 'website',
+            ]);
 
-            $amcService->plan_type = $request->plan_type;
-            $amcService->amc_plan_id = $request->amc_plan_id;
-            $amcService->plan_duration = $request->plan_duration;
-            $amcService->plan_start_date = $request->preferred_start_date;
-            $amcService->additional_notes = $request->additional_notes;
-            $amcService->terms_agreed = $request->terms_agreed;
-            $amcService->status = 'Pending';
-            $amcService->source_type = $request->source_type_label;
-
-            // Calculate plan end date based on duration
-            $startDate = \Carbon\Carbon::parse($request->preferred_start_date);
-            $amcService->plan_end_date = $this->calculateEndDate($startDate, $request->plan_duration);
-
-            // Get plan cost for total amount
-            $amcPlan = AMC::find($request->amc_plan_id);
-            $amcService->total_amount = $amcPlan ? $amcPlan->total_cost : 0;
-
-            $amcService->save();
-
-            // Create company/branch details if provided
-            if ($request->filled('company_name')) {
-                $branch = new \App\Models\AmcBranch;
-                $branch->amc_service_id = $amcService->id;
-                $branch->branch_name = $request->branch_name;
-                $branch->address_line1 = $request->address_line1 ?? '';
-                $branch->address_line2 = $request->address_line2 ?? '';
-                $branch->city = $request->city ?? '';
-                $branch->state = $request->state ?? '';
-                $branch->country = $request->country ?? 'India';
-                $branch->pincode = $request->pin_code ?? '';
-                $branch->save();
-            }
-
-            // Create multiple product details
+            // Create Service Request Products in service_request_products table
             $products = $request->input('products', []);
             foreach ($products as $productData) {
-                $product = new \App\Models\AmcProduct;
-                $product->amc_service_id = $amcService->id;
-                $product->product_name = $productData['product_name'];
-                $product->product_type = $productData['product_type'];
-                $product->product_brand = $productData['brand_name'];
-                $product->model_no = $productData['model_number'];
-                $product->serial_no = $productData['serial_number'];
-                $product->purchase_date = $productData['purchase_date'];
-                $product->save();
+                \App\Models\ServiceRequestProduct::create([
+                    'service_requests_id' => $serviceRequest->id,
+                    'name' => $productData['product_name'],
+                    'type' => $productData['product_type'],
+                    'brand' => $productData['brand_name'],
+                    'model_no' => $productData['model_number'],
+                    'serial_no' => $productData['serial_number'],
+                    'purchase_date' => $productData['purchase_date'],
+                ]);
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'AMC service request submitted successfully!',
                 'service_id' => $serviceId,
-                'data' => $amcService,
+                'data' => $serviceRequest,
                 'products_count' => count($products),
             ]);
 

@@ -32,6 +32,11 @@ class ServiceRequestProduct extends Model
         return $this->belongsTo(ServiceRequest::class, 'service_requests_id');
     }
 
+    public function amcPlan()
+    {
+        return $this->hasOne(AmcPlan::class, 'service_request_product_id');
+    }
+
     public function itemCode()
     {
         return $this->belongsTo(CoveredItem::class, 'item_code_id');

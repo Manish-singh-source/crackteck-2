@@ -40,7 +40,7 @@
             </option>
         @endforeach
     </select>
-
+    
     {{-- Error message --}}
     @if($errors->has($name))
         <div class="text-neg text-small">

@@ -1102,7 +1102,6 @@ class ServiceRequestController extends Controller
                 'price' => $request->price,
                 'customer_id' => $customer->id,
                 'request_date' => now(),
-                'request_status' => 'pending',
                 'request_source' => 'system',
                 'created_by' => Auth::id(),
             ]);
@@ -1151,13 +1150,15 @@ class ServiceRequestController extends Controller
             'parentCategorie',
             'amcPlan',
             'activeAssignment.engineer',
-            'activeAssignment.groupEngineers',
+            // 'activeAssignment.groupEngineers',
             'activeAssignment.transferredTo',
             'inactiveAssignments.engineer',
-            'inactiveAssignments.groupEngineers',
+            // 'inactiveAssignments.groupEngineers',
             'inactiveAssignments.transferredTo',
+            'amcScheduleMeetings.activeAssignment.engineer',
         ])->findOrFail($id);
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
+
         return view('crm/service-request/view-amc-service-request', compact('request', 'engineers'));
     }
 
@@ -2233,7 +2234,7 @@ class ServiceRequestController extends Controller
                 ->prepend('--Select Quick Service--', 0);
 
             $quickServicePrices = $quickService->pluck('service_charge', 'id');
-            // dd($quickServicePrices, $quickServiceOptions);
+            // dd($quickServiceOptions);
 
             $categories = ParentCategory::where('status', 'active')
                 ->pluck('name', 'id');
@@ -2592,7 +2593,7 @@ class ServiceRequestController extends Controller
             $serviceRequest = ServiceRequest::findOrFail($request->service_request_id);
 
             /** Only approved requests can be assigned */
-            if (!in_array($serviceRequest->status, ['admin_approved', 'engineer_not_approved', 'in_transfer'])) {
+            if (!in_array($serviceRequest->status, ['active', 'admin_approved', 'engineer_not_approved', 'in_transfer'])) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Engineer can only be assigned to approved requests.',

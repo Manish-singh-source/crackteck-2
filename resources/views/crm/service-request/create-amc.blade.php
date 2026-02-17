@@ -529,8 +529,6 @@
     </script>
 
     <script>
-        // existing product JS yahan already hai ...
-
         // ===== Customer search & autofill =====
         document.addEventListener('DOMContentLoaded', function() {
             const emailInput = document.querySelector('input[name="email"]'); // Changed to email input
@@ -586,6 +584,7 @@
                         } else {
                             hideBox();
                             // Show customer not found message
+                            console.log(data);
                             alert('Customer not found for the entered email address.');
                         }
                     })

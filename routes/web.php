@@ -490,6 +490,14 @@ Route::prefix('/demo')->group(function () {
             Route::get('/crm/edit-covered-items/{id}', 'editCoveredItems')->name('covered-items.edit');
             Route::put('/crm/update-covered-items/{id}', 'updateCoveredItems')->name('covered-items.update');
             Route::delete('/crm/delete-covered-items/{id}', 'deleteCoveredItems')->name('covered-items.delete');
+            
+            // Covered Items Page
+            Route::get('/crm/device-specific-diagnosis', 'deviceSpecificDiagnosis')->name('device-specific-diagnosis.index');
+            Route::get('/crm/create-device-specific-diagnosis', 'createDeviceSpecificDiagnosis')->name('device-specific-diagnosis.create');
+            Route::post('/crm/store-device-specific-diagnosis', 'storeDeviceSpecificDiagnosis')->name('device-specific-diagnosis.store');
+            Route::get('/crm/edit-device-specific-diagnosis/{id}', 'editDeviceSpecificDiagnosis')->name('device-specific-diagnosis.edit');
+            Route::put('/crm/update-device-specific-diagnosis/{id}', 'updateDeviceSpecificDiagnosis')->name('device-specific-diagnosis.update');
+            Route::delete('/crm/delete-device-specific-diagnosis/{id}', 'deleteDeviceSpecificDiagnosis')->name('device-specific-diagnosis.delete');
         });
     });
 
@@ -560,38 +568,6 @@ Route::prefix('/demo')->group(function () {
         Route::post('/crm/service-request/pickup-received', 'pickupReceived')->name('service-request.pickup-received');
         Route::post('/crm/service-request/assign-return', 'assignReturn')->name('service-request.assign-return');
         Route::post('/crm/service-request/return-picked', 'returnPicked')->name('service-request.return-picked');
-
-
-
-
-
-
-
-
-
-        // // Repairing Service Request Create
-        // Route::get('/crm/create-repairing-request', 'createRepairingServiceRequest')->name('repairing-service-requests.create');
-        // // Repairing Service Request Store
-        // Route::post('/crm/store-repairing-request', 'storeRepairingServiceRequest')->name('repairing-service-requests.store');
-        // // Repairing Service Request View
-        // Route::get('/crm/service-request/view-repairing-service-request/{id}', 'viewRepairingServiceRequest')->name('service-request.view-repairing-service-request');
-        // // Repairing Service Request Edit
-        // Route::get('/crm/service-request/edit-repairing-service-request/{id}', 'editRepairingServiceRequest')->name('service-request.edit-repairing-service-request');
-        // // Repairing Service Request Update
-        // Route::put('/crm/service-request/update-repairing-service-request/{id}', 'updateRepairingServiceRequest')->name('service-request.update-repairing-service-request');
-
-
-        // // Installation Service Request Create
-        // Route::get('/crm/create-installation-request', 'createInstallationServiceRequest')->name('installation-service-requests.create');
-        // // Installation Service Request Store
-        // Route::post('/crm/store-installation-request', 'storeInstallationServiceRequest')->name('installation-service-requests.store');
-        // // Installation Service Request View
-        // Route::get('/crm/service-request/view-installation-service-request/{id}', 'viewInstallationServiceRequest')->name('service-request.view-installation-service-request');
-        // // Installation Service Request Edit
-        // Route::get('/crm/service-request/edit-installation-service-request/{id}', 'editInstallationServiceRequest')->name('service-request.edit-installation-service-request');
-        // // Installation Service Request Update
-        // Route::put('/crm/service-request/update-installation-service-request/{id}', 'updateInstallationServiceRequest')->name('service-request.update-installation-service-request');
-
 
         // Amc Service Request Create
         Route::get('/crm/create-amc-request', 'createAmcServiceRequest')->name('amc-service-requests.create');

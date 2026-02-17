@@ -21,7 +21,7 @@
     @php
         $status = [
             'pending' => 'Pending',
-             'active' => 'Active',
+            'active' => 'Active',
             'inactive' => 'Inactive',
             'expired' => 'Expired',
             'cancelled' => 'Cancelled',
@@ -63,7 +63,7 @@
             <div class="row py-3">
                 <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
                     <div class="flex-grow-1">
-                        <h4 class="fs-18 fw-semibold m-0">View Quick Service Request</h4>
+                        <h4 class="fs-18 fw-semibold m-0">View AMC Service Request</h4>
                     </div>
                 </div>
                 <div class="col-xl-8 mx-auto">
@@ -195,186 +195,131 @@
                     </div>
 
                     <div class="card">
-                    <div class="card-header border-bottom-dashed">
-                        <div class="d-flex flex-row justify-content-between align-items-center">
-                            <div>
-                                <h5 class="card-title flex-grow-1 mb-0">
-                                    Service History Details
-                                </h5>
-                            </div>
-                            <div class="d-flex flex-row justify-content-between align-items-center gap-2">
+                        <div class="card-header border-bottom-dashed">
+                            <div class="d-flex flex-row justify-content-between align-items-center">
                                 <div>
-                                    <span>
-                                        Next Visit Date:
-                                    </span>
-                                    <span class="p-1 rounded bg-warning-subtle text-warning fw-semibold">2025-07-16</span>
+                                    <h5 class="card-title flex-grow-1 mb-0">
+                                        Service History Details
+                                    </h5>
                                 </div>
-                                <div>
-                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addVisitModal2">Add Visit</button>
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="addVisitModal2" tabindex="-1" aria-labelledby="addVisitModalLabel2" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <form action="#">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="addVisitModalLabel2">Reschedule Appointment</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-
-                                                    <div class="modal-body p-2">
-                                                        <div class="card">
-                                                            <div class="card-header border-bottom-dashed">
-                                                                <div class="d-flex">
-                                                                    <h5 class="card-title flex-grow-1 mb-0">
-                                                                        Engineer Location
-                                                                    </h5>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="card-body">
-                                                                <div>
-                                                                    <select required name="eng-location2" id="eng-location2" class="form-select w-100">
-                                                                        <option value="0" selected disabled>---- Select Location ----</option>
-                                                                        <option value="0">Mumbai</option>
-                                                                        <option value="0">Delhi</option>
-                                                                        <option value="0">Kolkata</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="card hide-assign-eng-section2" id="mySection2">
-                                                            <div class="card-header border-bottom-dashed">
-                                                                <div class="d-flex pb-3">
-                                                                    <h5 class="card-title flex-grow-1 mb-0">Assign Engineer</h5>
-                                                                </div>
-                                                                <div class="col-sm-10 d-flex gap-2">
-                                                                    <div class="form-check">
-                                                                        <input class="form-check-input eng-assign2" type="radio" name="gridRadios2" id="individualRadio2" value="individual" checked>
-                                                                        <label class="form-check-label" for="individualRadio2">
-                                                                            Individual Engineer
-                                                                        </label>
-                                                                    </div>
-                                                                    <div class="form-check">
-                                                                        <input class="form-check-input eng-assign2" type="radio" name="gridRadios2" id="groupRadio2" value="group">
-                                                                        <label class="form-check-label" for="groupRadio2">
-                                                                            Group Engineer
-                                                                        </label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="card-body">
-                                                                <!-- Individual Engineer Dropdown -->
-                                                                <div id="individualDropdown2">
-                                                                    <select required name="status2" class="form-select w-100">
-                                                                        <option value="" selected disabled>---- Select Individual Engineer ----</option>
-                                                                        <option value="engineer1">Engineer 1</option>
-                                                                        <option value="engineer2">Engineer 2</option>
-                                                                        <option value="engineer3">Engineer 3</option>
-                                                                    </select>
-                                                                </div>
-
-                                                                <!-- Group Engineer Dropdown -->
-                                                                <div id="groupDropdown2" style="display: none;">
-                                                                    <select id="groupDropdownSelect2" class="form-select w-100">
-                                                                        <option value="" selected disabled>---- Select Group Engineer ----</option>
-                                                                        <option value="group1">Engineer 1</option>
-                                                                        <option value="group2">Engineer 2</option>
-                                                                        <option value="group3">Engineer 3</option>
-                                                                    </select>
-
-                                                                    <!-- Button to display selected options -->
-                                                                    <button class="btn btn-primary mt-2 add-engineer2">Add Engineer</button>
-
-                                                                    <!-- Table to display selected values with checkboxes -->
-                                                                    <table class="table mt-4" id="selectedTable2">
-                                                                        <thead>
-                                                                            <tr>
-                                                                                <th>Group Name</th>
-                                                                                <th>Admin</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            <!-- Selected values will appear here -->
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
-
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-success">Submit</button>
-                                                    </div>
-                                                </form>
-
-                                            </div>
-                                        </div>
+                                <div class="d-flex flex-row justify-content-between align-items-center gap-2">
+                                    <div>
+                                        <span>
+                                            Next Visit Date:
+                                        </span>
+                                        <span
+                                            class="p-1 rounded bg-warning-subtle text-warning fw-semibold">{{ $request->amcScheduleMeetings->first()?->scheduled_at ? \Carbon\Carbon::parse($request->amcScheduleMeetings->first()->scheduled_at)->format('d M Y') : 'N/A' }}</span>
                                     </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        <table
-                            class="table table-striped table-borderless dt-responsive nowrap">
-                            <thead>
-                                <tr>
-                                    <th>Sr. No.</th>
-                                    <th>Engineer Name</th>
-                                    <th>Visit Date</th>
-                                    <th>Issue Type</th>
-                                    <th>Report</th>
-                                    <th>Status</th>
-                                    <th>Action </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                                <tr class="align-middle">
-                                    <td>
-                                        1
-                                    </td>
-                                    <td>
-                                        Chris Doe
-                                    </td>
-                                    <td>2025-07-16 12:09 PM</td>
-                                    <td>
-                                        Maintanance
-                                    </td>
-                                    <td>
-                                        NA
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-warning-subtle text-warning fw-semibold">Upcoming</span>
-                                    </td>
-                                    <td>
-                                        <!-- Re-Scheduled Button -->
-                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#rescheduleModal">
-                                            Re-Scheduled
-                                        </button>
-
+                                    <div>
+                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#addVisitModal2">Assign Engineer</button>
                                         <!-- Modal -->
-                                        <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel" aria-hidden="true">
+
+                                        <div class="modal fade" id="addVisitModal2" tabindex="-1"
+                                            aria-labelledby="addVisitModalLabel2" aria-hidden="true">
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
-                                                    <form action="#">
+                                                    <form id="assignEngineerModalForm">
+                                                        @csrf
+
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title" id="rescheduleModalLabel">Reschedule Appointment</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            <h5 class="modal-title" id="addVisitModalLabel2">Assign
+                                                                Engineer</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
                                                         </div>
 
                                                         <div class="modal-body p-2">
-                                                            <p>Please enter new schedule date:</p>
-                                                            <input type="date" id="newSchedule" class="form-control" placeholder="Enter new date/time">
+                                                            <input type="hidden" name="service_request_id"
+                                                                value="{{ $request->id }}">
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-semibold">Assignment Type</label>
+                                                                <div>
+                                                                    <div class="form-check form-check-inline">
+                                                                        <input class="form-check-input" type="radio"
+                                                                            name="assignment_type"
+                                                                            id="typeIndividualModal" value="individual"
+                                                                            checked>
+                                                                        <label class="form-check-label"
+                                                                            for="typeIndividualModal">Individual</label>
+                                                                    </div>
+                                                                    <div class="form-check form-check-inline">
+                                                                        <input class="form-check-input" type="radio"
+                                                                            name="assignment_type"
+                                                                            id="typeGroupModal" value="group">
+                                                                        <label class="form-check-label"
+                                                                            for="typeGroupModal">Group</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Individual Assignment -->
+                                                            <div id="individualSectionModal">
+                                                                <div class="mb-3">
+                                                                    <label for="engineer_id_modal"
+                                                                        class="form-label">Select Engineer</label>
+                                                                    <select name="engineer_id" id="engineer_id_modal"
+                                                                        class="form-select">
+                                                                        <option value="">--Select Engineer--</option>
+                                                                        @foreach ($engineers as $engineer)
+                                                                            <option value="{{ $engineer->id }}">
+                                                                                {{ $engineer->first_name }}
+                                                                                {{ $engineer->last_name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Group Assignment -->
+                                                            <div id="groupSectionModal" style="display: none;">
+                                                                <div class="mb-3">
+                                                                    <label for="group_name_modal" class="form-label">Group
+                                                                        Name</label>
+                                                                    <input type="text" name="group_name"
+                                                                        id="group_name_modal" class="form-control"
+                                                                        placeholder="Enter Group Name">
+                                                                </div>
+
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Select Engineers</label>
+                                                                    <div class="border rounded p-3"
+                                                                        style="max-height: 300px; overflow-y: auto;">
+                                                                        @foreach ($engineers as $engineer)
+                                                                            <div class="form-check mb-2">
+                                                                                <input
+                                                                                    class="form-check-input engineer-checkbox-modal"
+                                                                                    type="checkbox" name="engineer_ids[]"
+                                                                                    value="{{ $engineer->id }}"
+                                                                                    id="eng_modal_{{ $engineer->id }}">
+                                                                                <label class="form-check-label"
+                                                                                    for="eng_modal_{{ $engineer->id }}">
+                                                                                    {{ $engineer->first_name }}
+                                                                                    {{ $engineer->last_name }}
+                                                                                </label>
+                                                                                <input class="form-check-input ms-3"
+                                                                                    type="radio" name="supervisor_id"
+                                                                                    value="{{ $engineer->id }}"
+                                                                                    id="sup_modal_{{ $engineer->id }}">
+                                                                                <label
+                                                                                    class="form-check-label small text-muted"
+                                                                                    for="sup_modal_{{ $engineer->id }}">
+                                                                                    (Supervisor)
+                                                                                </label>
+                                                                            </div>
+                                                                        @endforeach
+                                                                    </div>
+                                                                    <small class="text-muted">Check engineers to add to
+                                                                        group, select one as
+                                                                        supervisor</small>
+                                                                </div>
+                                                            </div>
+
                                                         </div>
 
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-success">Submit</button>
+                                                            <button type="submit" class="btn btn-success">Assign</button>
                                                         </div>
                                                     </form>
 
@@ -382,42 +327,85 @@
                                             </div>
                                         </div>
 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                                    </td>
-                                </tr>
+                        <div class="card-body">
+                            <table class="table table-striped table-borderless dt-responsive nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>Sr. No.</th>
+                                        <th>Engineer Name</th>
+                                        <th>Visit Date</th>
+                                        <th>Issue Type</th>
+                                        <th>Report</th>
+                                        <th>Status</th>
+                                        <th>Action </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
 
-                                <tr class="align-middle">
-                                    <td>
-                                        2
-                                    </td>
-                                    <td>
-                                        John Doe
-                                    </td>
-                                    <td>2025-04-04 06:09 PM</td>
-                                    <td>
-                                        Maintanance
-                                    </td>
-                                    <td>
-                                        <a class="btn btn-sm btn-primary" href="./view-detailed-service-history.php">View Report</a>
-                                        <!-- <div id="popupOverlay">
-                                            <span class="closeBtn hide-report">&times;</span>
-                                            <img id="popupImage" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRevxmRXifnbO19nrfkzha4QLipReqGMcM33g&s" alt="Popup Image">
-                                        </div> -->
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-success-subtle text-success fw-semibold">Completed</span>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary disabled">Re-Scheduled</button>
-
-                                    </td>
-                                </tr>
-
-                            </tbody>
-                        </table>
-
+                                    @foreach ($request->amcScheduleMeetings as $index => $meeting)
+                                        <tr class="align-middle">
+                                            <td>
+                                                {{ $index + 1 }}
+                                            </td>
+                                            <td>
+                                                {{ $meeting->activeAssignment->engineer->first_name ?? 'N/A' }}
+                                            </td>
+                                            <td>{{ \Carbon\Carbon::parse($meeting->scheduled_at)->format('d M Y') }}</td>
+                                            <td>
+                                                Maintanance
+                                            </td>
+                                            <td>
+                                                NA
+                                            </td>
+                                            <td>
+                                                <span
+                                                    class="badge bg-warning-subtle text-warning fw-semibold">{{ $meeting->status ?? 'N/A' }}</span>
+                                            </td>
+                                            <td>
+                                                <!-- Re-Scheduled Button -->
+                                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                                    data-bs-target="#rescheduleModal">
+                                                    Re-Scheduled
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form action="#">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="rescheduleModalLabel">
+                                            Reschedule Appointment</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+
+                                    <div class="modal-body p-2">
+                                        <p>Please enter new schedule date:</p>
+                                        <input type="date" id="newSchedule" class="form-control"
+                                            placeholder="Enter new date/time">
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
 
                     {{-- Product Details Card --}}
                     <div class="card mt-3">
@@ -435,9 +423,9 @@
                                             <th>Model No</th>
                                             <th>HSN</th>
                                             <th>Brand</th>
-                                            <th>Status</th>
-                                            <th>Service Type</th>
-                                            <th>Service Price</th>
+                                            {{-- <th>Status</th> --}}
+                                            {{-- <th>Service Type</th> --}}
+                                            {{-- <th>Service Price</th> --}}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -449,6 +437,7 @@
                                                 <td>{{ $product->model_no ?? '-' }}</td>
                                                 <td>{{ $product->hsn ?? '-' }}</td>
                                                 <td>{{ $product->brand ?? '-' }}</td>
+                                                {{-- 
                                                 <td>
                                                     @php
                                                         $status = [
@@ -467,7 +456,7 @@
                                                         ];
 
                                                         $statusColor = [
-                                                            // i want all unique status colors here 
+                                                            // i want all unique status colors here
                                                             'pending' => 'bg-warning-subtle text-warning',
                                                             'approved' => 'bg-success-subtle text-success',
                                                             'rejected' => 'bg-danger-subtle text-danger',
@@ -481,10 +470,11 @@
                                                             'completed' => 'bg-success-subtle text-success',
                                                         ];
                                                     @endphp
-                                                    <span class="badge {{ $statusColor[$product->status ?? '-'] ?? 'bg-secondary-subtle text-secondary' }}">{{ $status[$product->status ?? '-'] ?? '-' }}</span>
+                                                    <span
+                                                        class="badge {{ $statusColor[$product->status ?? '-'] ?? 'bg-secondary-subtle text-secondary' }}">{{ $status[$product->status ?? '-'] ?? '-' }}</span>
                                                 </td>
                                                 <td>
-                                                    @php 
+                                                    @php
                                                         $serviceType = [
                                                             'amc' => 'AMC',
                                                             'quick_service' => 'Quick Service',
@@ -494,16 +484,18 @@
                                                     @endphp
                                                     {{ $serviceType[$product->itemCode->service_type ?? '-'] ?? '-' }}
                                                 </td>
-                                                <td>{{ $product->service_charge ?? '-' }}</td>
+                                                <td>{{ $product->service_charge ?? '-' }}</td> --}}
                                             </tr>
                                         @endforeach
                                     </tbody>
+                                    {{-- 
                                     <tfoot>
                                         <tr>
                                             <td colspan="8" class="text-end"><strong>Total</strong></td>
                                             <td><strong>{{ $request->products->sum('service_charge') }}</strong></td>
                                         </tr>
-                                    </tfoot>
+                                    </tfoot> 
+                                    --}}
                                 </table>
                             </div>
                         </div>
@@ -536,25 +528,29 @@
                                                         <li class="list-group-item border-0">
                                                             <span class="fw-semibold">Assigned Engineer:</span>
                                                             <span class="text-muted">
-                                                                {{ $diagnosis->assignedEngineer->engineer->first_name ?? 'N/A' }} 
+                                                                {{ $diagnosis->assignedEngineer->engineer->first_name ?? 'N/A' }}
                                                                 {{ $diagnosis->assignedEngineer->engineer->last_name ?? '' }}
                                                             </span>
                                                         </li>
                                                         <li class="list-group-item border-0">
                                                             <span class="fw-semibold">Covered Item Service Name:</span>
-                                                            <span class="text-muted">{{ $diagnosis->coveredItem->service_name ?? 'N/A' }}</span>
+                                                            <span
+                                                                class="text-muted">{{ $diagnosis->coveredItem->service_name ?? 'N/A' }}</span>
                                                         </li>
                                                         <li class="list-group-item border-0">
                                                             <span class="fw-semibold">Diagnosis Status:</span>
-                                                            <span class="badge bg-primary">{{ $product->status ?? 'N/A' }}</span>
+                                                            <span
+                                                                class="badge bg-primary">{{ $product->status ?? 'N/A' }}</span>
                                                         </li>
                                                         <li class="list-group-item border-0">
                                                             <span class="fw-semibold">Estimated Cost:</span>
-                                                            <span class="text-muted">₹{{ number_format($product->service_charge ?? 0, 2) }}</span>
+                                                            <span
+                                                                class="text-muted">₹{{ number_format($product->service_charge ?? 0, 2) }}</span>
                                                         </li>
                                                         <li class="list-group-item border-0">
                                                             <span class="fw-semibold">Completed At:</span>
-                                                            <span class="text-muted">{{ $diagnosis->completed_at ? $diagnosis->completed_at : 'N/A' }}</span>
+                                                            <span
+                                                                class="text-muted">{{ $diagnosis->completed_at ? $diagnosis->completed_at : 'N/A' }}</span>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -582,11 +578,30 @@
                                                                                 <td>{{ $item['report'] ?? 'N/A' }}</td>
                                                                                 <td>
                                                                                     @php
-                                                                                        $diagStatus = $item['status'] ?? '';
-                                                                                        $diagStatusClass = $diagStatus === 'working' ? 'bg-success' : ($diagStatus === 'not_working' ? 'bg-danger' : 'bg-warning');
-                                                                                        $diagStatusLabel = $diagStatus === 'working' ? 'Working' : ($diagStatus === 'not_working' ? 'Not Working' : ($diagStatus === 'picking' ? 'Picking' : ucfirst($diagStatus)));
+                                                                                        $diagStatus =
+                                                                                            $item['status'] ?? '';
+                                                                                        $diagStatusClass =
+                                                                                            $diagStatus === 'working'
+                                                                                                ? 'bg-success'
+                                                                                                : ($diagStatus ===
+                                                                                                'not_working'
+                                                                                                    ? 'bg-danger'
+                                                                                                    : 'bg-warning');
+                                                                                        $diagStatusLabel =
+                                                                                            $diagStatus === 'working'
+                                                                                                ? 'Working'
+                                                                                                : ($diagStatus ===
+                                                                                                'not_working'
+                                                                                                    ? 'Not Working'
+                                                                                                    : ($diagStatus ===
+                                                                                                    'picking'
+                                                                                                        ? 'Picking'
+                                                                                                        : ucfirst(
+                                                                                                            $diagStatus,
+                                                                                                        )));
                                                                                     @endphp
-                                                                                    <span class="badge {{ $diagStatusClass }}">{{ $diagStatusLabel }}</span>
+                                                                                    <span
+                                                                                        class="badge {{ $diagStatusClass }}">{{ $diagStatusLabel }}</span>
                                                                                 </td>
                                                                             </tr>
                                                                         @endforeach
@@ -605,9 +620,11 @@
                                                             <h6 class="fw-semibold mb-2">Before Photos</h6>
                                                             <div class="d-flex flex-wrap gap-2">
                                                                 @foreach ($beforePhotos as $photo)
-                                                                    <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="glightbox">
-                                                                        <img src="{{ asset('storage/' . $photo) }}" alt="Before Photo" 
-                                                                             class="rounded" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #ddd;">
+                                                                    <a href="{{ asset('storage/' . $photo) }}"
+                                                                        target="_blank" class="glightbox">
+                                                                        <img src="{{ asset('storage/' . $photo) }}"
+                                                                            alt="Before Photo" class="rounded"
+                                                                            style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #ddd;">
                                                                     </a>
                                                                 @endforeach
                                                             </div>
@@ -623,9 +640,11 @@
                                                             <h6 class="fw-semibold mb-2">After Photos</h6>
                                                             <div class="d-flex flex-wrap gap-2">
                                                                 @foreach ($afterPhotos as $photo)
-                                                                    <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="glightbox">
-                                                                        <img src="{{ asset('storage/' . $photo) }}" alt="After Photo" 
-                                                                             class="rounded" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #ddd;">
+                                                                    <a href="{{ asset('storage/' . $photo) }}"
+                                                                        target="_blank" class="glightbox">
+                                                                        <img src="{{ asset('storage/' . $photo) }}"
+                                                                            alt="After Photo" class="rounded"
+                                                                            style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #ddd;">
                                                                     </a>
                                                                 @endforeach
                                                             </div>
@@ -636,7 +655,8 @@
                                                     @if ($diagnosis->diagnosis_notes)
                                                         <div class="mb-2">
                                                             <h6 class="fw-semibold mb-1">Notes</h6>
-                                                            <p class="text-muted mb-0">{{ $diagnosis->diagnosis_notes }}</p>
+                                                            <p class="text-muted mb-0">{{ $diagnosis->diagnosis_notes }}
+                                                            </p>
                                                         </div>
                                                     @endif
                                                 </div>
@@ -653,7 +673,10 @@
                 <div class="col-xl-4">
 
                     <!-- Assign Engineer Card -->
-                    @if ($request->status === 'admin_approved' || $request->status === 'in_transfer' || $request->status === 'engineer_not_approved')
+                    @if (
+                        $request->status === 'admin_approved' ||
+                            $request->status === 'in_transfer' ||
+                            $request->status === 'engineer_not_approved')
                         <div class="card">
                             <div class="card-header border-bottom-dashed">
                                 <h5 class="card-title mb-0">Assign Engineer</h5>
@@ -816,7 +839,8 @@
                     <!-- Picking Assignment Section -->
                     @php
                         $pickup = isset($pickups) && $pickups->count() > 0 ? $pickups->first() : null;
-                        $showAssignmentForm = $pickup && ($pickup->status === 'admin_approved' || $pickup->status === 'approved');
+                        $showAssignmentForm =
+                            $pickup && ($pickup->status === 'admin_approved' || $pickup->status === 'approved');
                         $pickingProducts = [];
                         foreach ($request->products as $product) {
                             if ($product->diagnosisDetails && $product->diagnosisDetails->count() > 0) {
@@ -834,7 +858,7 @@
                             }
                         }
                     @endphp
-                    
+
                     @if (count($pickingProducts) > 0 || $pickup)
                         <div class="card mt-3" id="pickingAssignmentCard">
                             <div class="card-header border-bottom-dashed bg-warning-subtle">
@@ -843,7 +867,7 @@
                                 </h5>
                             </div>
                             <div class="card-body">
-                                
+
                                 {{-- Step 1: Admin Approval Form (shown when pickup is pending) --}}
                                 @if ($pickup && $pickup->status === 'pending')
                                     <form id="adminPickupActionForm">
@@ -864,11 +888,13 @@
                                                 </div>
                                                 <small class="text-muted d-block mb-2">
                                                     <i class="mdi mdi-information"></i>
-                                                    Requested by: 
+                                                    Requested by:
                                                     @if ($pickup->assigned_person_type === 'engineer')
-                                                        Engineer: {{ $pickup->assignedPerson->first_name ?? 'N/A' }} {{ $pickup->assignedPerson->last_name ?? '' }}
+                                                        Engineer: {{ $pickup->assignedPerson->first_name ?? 'N/A' }}
+                                                        {{ $pickup->assignedPerson->last_name ?? '' }}
                                                     @else
-                                                        Delivery Man: {{ $pickup->assignedPerson->first_name ?? 'N/A' }} {{ $pickup->assignedPerson->last_name ?? '' }}
+                                                        Delivery Man: {{ $pickup->assignedPerson->first_name ?? 'N/A' }}
+                                                        {{ $pickup->assignedPerson->last_name ?? '' }}
                                                     @endif
                                                 </small>
                                                 <button type="submit" class="btn btn-primary">
@@ -898,8 +924,11 @@
                                                 <div class="border rounded p-3 bg-light">
                                                     @foreach ($pickingProducts as $product)
                                                         <div class="d-flex align-items-center mb-2">
-                                                            <i class="mdi mdi-package-variant-closed text-primary me-2"></i>
-                                                            <span>{{ $product->name }} ({{ $product->model_no ?? 'N/A' }})</span>
+                                                            <i
+                                                                class="mdi mdi-package-variant-closed text-primary me-2"></i>
+                                                            <span>{{ $product->name }}
+                                                                ({{ $product->model_no ?? 'N/A' }})
+                                                            </span>
                                                         </div>
                                                     @endforeach
                                                 </div>
@@ -908,17 +937,22 @@
 
                                         <!-- Assigned Person Type -->
                                         <div class="mb-3">
-                                            <label class="form-label fw-semibold">Assigned Person Type <span class="text-danger">*</span></label>
+                                            <label class="form-label fw-semibold">Assigned Person Type <span
+                                                    class="text-danger">*</span></label>
                                             <div>
                                                 <div class="form-check form-check-inline">
-                                                    <input class="form-check-input" type="radio" name="assigned_person_type"
-                                                        id="personTypeDelivery" value="delivery_man">
-                                                    <label class="form-check-label" for="personTypeDelivery">Delivery Man</label>
+                                                    <input class="form-check-input" type="radio"
+                                                        name="assigned_person_type" id="personTypeDelivery"
+                                                        value="delivery_man">
+                                                    <label class="form-check-label" for="personTypeDelivery">Delivery
+                                                        Man</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
-                                                    <input class="form-check-input" type="radio" name="assigned_person_type"
-                                                        id="personTypeEngineer" value="engineer" checked>
-                                                    <label class="form-check-label" for="personTypeEngineer">Engineer</label>
+                                                    <input class="form-check-input" type="radio"
+                                                        name="assigned_person_type" id="personTypeEngineer"
+                                                        value="engineer" checked>
+                                                    <label class="form-check-label"
+                                                        for="personTypeEngineer">Engineer</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -926,12 +960,15 @@
                                         <!-- Delivery Man Selection -->
                                         <div id="deliveryManSection" style="display: none;">
                                             <div class="mb-3">
-                                                <label for="assigned_person_id" class="form-label">Select Delivery Man <span class="text-danger">*</span></label>
-                                                <select name="assigned_person_id" id="assigned_person_id" class="form-select">
+                                                <label for="assigned_person_id" class="form-label">Select Delivery Man
+                                                    <span class="text-danger">*</span></label>
+                                                <select name="assigned_person_id" id="assigned_person_id"
+                                                    class="form-select">
                                                     <option value="">--Select Delivery Man--</option>
                                                     @foreach ($deliveryMen as $deliveryMan)
                                                         <option value="{{ $deliveryMan->id }}">
-                                                            {{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }} ({{ $deliveryMan->phone }})
+                                                            {{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }}
+                                                            ({{ $deliveryMan->phone }})
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -942,17 +979,24 @@
                                         <div id="engineerSection">
                                             @php
                                                 $assignedEngineerId = null;
-                                                if ($request->activeAssignment && $request->activeAssignment->assignment_type === 'individual') {
+                                                if (
+                                                    $request->activeAssignment &&
+                                                    $request->activeAssignment->assignment_type === 'individual'
+                                                ) {
                                                     $assignedEngineerId = $request->activeAssignment->engineer_id;
                                                 }
                                             @endphp
                                             <div class="mb-3">
-                                                <label for="engineer_assigned_person_id" class="form-label">Select Engineer <span class="text-danger">*</span></label>
-                                                <select name="assigned_person_id" id="engineer_assigned_person_id" class="form-select">
+                                                <label for="engineer_assigned_person_id" class="form-label">Select
+                                                    Engineer <span class="text-danger">*</span></label>
+                                                <select name="assigned_person_id" id="engineer_assigned_person_id"
+                                                    class="form-select">
                                                     <option value="">--Select Engineer--</option>
                                                     @foreach ($engineers as $engineer)
-                                                        <option value="{{ $engineer->id }}" {{ $assignedEngineerId == $engineer->id ? 'selected' : '' }}>
-                                                            {{ $engineer->first_name }} {{ $engineer->last_name }} ({{ $engineer->phone }})
+                                                        <option value="{{ $engineer->id }}"
+                                                            {{ $assignedEngineerId == $engineer->id ? 'selected' : '' }}>
+                                                            {{ $engineer->first_name }} {{ $engineer->last_name }}
+                                                            ({{ $engineer->phone }})
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -988,7 +1032,8 @@
                                                     <tbody>
                                                         @foreach ($pickups as $pickup)
                                                             <tr>
-                                                                <td>{{ $pickup->serviceRequestProduct->name ?? 'N/A' }}</td>
+                                                                <td>{{ $pickup->serviceRequestProduct->name ?? 'N/A' }}
+                                                                </td>
                                                                 <td>
                                                                     @if ($pickup->assigned_person_type === 'delivery_man')
                                                                         <span class="badge bg-info">Delivery Man</span>
@@ -996,7 +1041,8 @@
                                                                         <span class="badge bg-primary">Engineer</span>
                                                                     @endif
                                                                 </td>
-                                                                <td>{{ $pickup->assignedPerson->first_name ?? 'N/A' }} {{ $pickup->assignedPerson->last_name ?? '' }}</td>
+                                                                <td>{{ $pickup->assignedPerson->first_name ?? 'N/A' }}
+                                                                    {{ $pickup->assignedPerson->last_name ?? '' }}</td>
                                                                 <td>
                                                                     @php
                                                                         $pickupStatus = [
@@ -1020,11 +1066,13 @@
                                                                             'completed' => 'bg-success',
                                                                         ];
                                                                     @endphp
-                                                                    <span class="badge {{ $pickupStatusColor[$pickup->status] ?? 'bg-secondary' }}">
+                                                                    <span
+                                                                        class="badge {{ $pickupStatusColor[$pickup->status] ?? 'bg-secondary' }}">
                                                                         {{ $pickupStatus[$pickup->status] ?? ucfirst($pickup->status) }}
                                                                     </span>
                                                                 </td>
-                                                                <td>{{ $pickup->assigned_at ? $pickup->assigned_at->format('d M Y, h:i A') : 'N/A' }}</td>
+                                                                <td>{{ $pickup->assigned_at ? $pickup->assigned_at->format('d M Y, h:i A') : 'N/A' }}
+                                                                </td>
                                                             </tr>
                                                         @endforeach
                                                     </tbody>
@@ -1035,52 +1083,68 @@
                                             @if (isset($pickups) && $pickups->where('status', 'returned')->count() > 0)
                                                 @foreach ($pickups->where('status', 'returned') as $returnedPickup)
                                                     @php
-                                                        $returnRecord = App\Models\ServiceRequestProductReturn::where('pickups_id', $returnedPickup->id)->first();
+                                                        $returnRecord = App\Models\ServiceRequestProductReturn::where(
+                                                            'pickups_id',
+                                                            $returnedPickup->id,
+                                                        )->first();
                                                     @endphp
                                                     @if ($returnRecord)
                                                         <div class="mt-3 p-3 border rounded">
                                                             <h6 class="fw-semibold mb-3">
                                                                 <i class="mdi mdi-truck-delivery text-info"></i>
-                                                                Return Delivery History - {{ $returnedPickup->serviceRequestProduct->name ?? 'N/A' }}
+                                                                Return Delivery History -
+                                                                {{ $returnedPickup->serviceRequestProduct->name ?? 'N/A' }}
                                                             </h6>
                                                             <div class="row">
                                                                 <div class="col-md-12">
                                                                     <ul class="list-group list-group-flush">
-                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
-                                                                            <span class="fw-semibold">Assigned Person Type:</span>
+                                                                        <li
+                                                                            class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                            <span class="fw-semibold">Assigned Person
+                                                                                Type:</span>
                                                                             <span>
                                                                                 @if ($returnRecord->assigned_person_type === 'delivery_man')
-                                                                                    <span class="badge bg-info">Delivery Man</span>
+                                                                                    <span class="badge bg-info">Delivery
+                                                                                        Man</span>
                                                                                 @else
-                                                                                    <span class="badge bg-primary">Engineer</span>
+                                                                                    <span
+                                                                                        class="badge bg-primary">Engineer</span>
                                                                                 @endif
                                                                             </span>
                                                                         </li>
-                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                        <li
+                                                                            class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
                                                                             <span class="fw-semibold">Assigned To:</span>
-                                                                            <span>{{ $returnRecord->assignedPerson->first_name ?? 'N/A' }} {{ $returnRecord->assignedPerson->last_name ?? '' }}</span>
+                                                                            <span>{{ $returnRecord->assignedPerson->first_name ?? 'N/A' }}
+                                                                                {{ $returnRecord->assignedPerson->last_name ?? '' }}</span>
                                                                         </li>
-                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                        <li
+                                                                            class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
                                                                             <span class="fw-semibold">Return Status:</span>
-                                                                            <span class="badge bg-success">{{ ucfirst($returnRecord->status) }}</span>
+                                                                            <span
+                                                                                class="badge bg-success">{{ ucfirst($returnRecord->status) }}</span>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                                 <div class="col-md-12">
                                                                     <ul class="list-group list-group-flush">
-                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                        <li
+                                                                            class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
                                                                             <span class="fw-semibold">Assigned At:</span>
                                                                             <span>{{ $returnRecord->assigned_at ? $returnRecord->assigned_at->format('d M Y, h:i A') : 'N/A' }}</span>
                                                                         </li>
-                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                        <li
+                                                                            class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
                                                                             <span class="fw-semibold">Accepted At:</span>
                                                                             <span>{{ $returnRecord->accepted_at ? \Carbon\Carbon::parse($returnRecord->accepted_at)->format('d M Y, h:i A') : 'N/A' }}</span>
                                                                         </li>
-                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                        <li
+                                                                            class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
                                                                             <span class="fw-semibold">Picked At:</span>
                                                                             <span>{{ $returnRecord->picked_at ? \Carbon\Carbon::parse($returnRecord->picked_at)->format('d M Y, h:i A') : 'N/A' }}</span>
                                                                         </li>
-                                                                        <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                                                                        <li
+                                                                            class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
                                                                             <span class="fw-semibold">Delivered At:</span>
                                                                             <span>{{ $returnRecord->delivered_at ? \Carbon\Carbon::parse($returnRecord->delivered_at)->format('d M Y, h:i A') : 'N/A' }}</span>
                                                                         </li>
@@ -1088,15 +1152,17 @@
                                                                 </div>
                                                             </div>
                                                             <div class="mt-2">
-                                                                <span class="badge bg-success-subtle text-success fw-semibold">
-                                                                    <i class="mdi mdi-check-circle"></i> Product assigned for delivery to customer
+                                                                <span
+                                                                    class="badge bg-success-subtle text-success fw-semibold">
+                                                                    <i class="mdi mdi-check-circle"></i> Product assigned
+                                                                    for delivery to customer
                                                                 </span>
                                                             </div>
                                                         </div>
                                                     @endif
                                                 @endforeach
                                             @endif
-                                                       
+
                                             {{-- {{$returns}} --}}
                                             {{-- Return Status Update Form - Show when return status is accepted --}}
                                             @if (isset($returns) && $returns->where('status', 'accepted')->count() > 0)
@@ -1104,13 +1170,16 @@
                                                     <div class="mt-3 p-3 bg-info-subtle border rounded">
                                                         <h6 class="fw-semibold mb-3">
                                                             <i class="mdi mdi-truck-fast text-info"></i>
-                                                            Mark as Picked - {{ $acceptedReturn->serviceRequestProduct->name ?? 'N/A' }}
+                                                            Mark as Picked -
+                                                            {{ $acceptedReturn->serviceRequestProduct->name ?? 'N/A' }}
                                                         </h6>
                                                         <form id="returnPickedForm_{{ $acceptedReturn->id }}">
                                                             @csrf
-                                                            <input type="hidden" name="return_id" value="{{ $acceptedReturn->id }}">
+                                                            <input type="hidden" name="return_id"
+                                                                value="{{ $acceptedReturn->id }}">
                                                             <div class="d-flex align-items-center gap-2">
-                                                                <select name="return_status" class="form-select" style="width: auto;">
+                                                                <select name="return_status" class="form-select"
+                                                                    style="width: auto;">
                                                                     <option value="picked">Picked</option>
                                                                 </select>
                                                                 <button type="submit" class="btn btn-info">
@@ -1132,14 +1201,17 @@
                                                     <div class="mt-3 p-3 bg-success-subtle border rounded">
                                                         <h6 class="fw-semibold mb-3">
                                                             <i class="mdi mdi-check-circle text-success"></i>
-                                                            Mark as Received - {{ $pickedPickup->serviceRequestProduct->name ?? 'N/A' }}
+                                                            Mark as Received -
+                                                            {{ $pickedPickup->serviceRequestProduct->name ?? 'N/A' }}
                                                         </h6>
                                                         <form id="pickupReceivedForm_{{ $pickedPickup->id }}">
                                                             @csrf
-                                                            <input type="hidden" name="pickup_id" value="{{ $pickedPickup->id }}">
+                                                            <input type="hidden" name="pickup_id"
+                                                                value="{{ $pickedPickup->id }}">
                                                             <input type="hidden" name="status" value="received">
                                                             <div class="d-flex align-items-center gap-2">
-                                                                <select name="received_status" class="form-select" style="width: auto;">
+                                                                <select name="received_status" class="form-select"
+                                                                    style="width: auto;">
                                                                     <option value="received">Received</option>
                                                                 </select>
                                                                 <button type="submit" class="btn btn-success">
@@ -1148,7 +1220,8 @@
                                                             </div>
                                                             <small class="text-muted d-block mt-2">
                                                                 <i class="mdi mdi-information"></i>
-                                                                This will update pickup status to received, product status to picked, and service request status to picked.
+                                                                This will update pickup status to received, product status
+                                                                to picked, and service request status to picked.
                                                             </small>
                                                         </form>
                                                     </div>
@@ -1160,54 +1233,82 @@
                                                 @foreach ($pickups->where('status', 'received') as $receivedPickup)
                                                     @php
                                                         $product = $receivedPickup->serviceRequestProduct;
-                                                        $hasDiagnosis = $product->where('status', 'picked')->count() > 0;
+                                                        $hasDiagnosis =
+                                                            $product->where('status', 'picked')->count() > 0;
                                                     @endphp
                                                     @if ($hasDiagnosis)
-                                                        <div class="mt-3 p-3 bg-info-subtle border rounded" id="diagnosisFormSection_{{ $receivedPickup->id }}">
+                                                        <div class="mt-3 p-3 bg-info-subtle border rounded"
+                                                            id="diagnosisFormSection_{{ $receivedPickup->id }}">
                                                             <h6 class="fw-semibold mb-3">
                                                                 <i class="mdi mdi-clipboard-check text-primary"></i>
                                                                 Submit Diagnosis - {{ $product->name ?? 'N/A' }}
                                                             </h6>
                                                             <form id="submitDiagnosisForm_{{ $receivedPickup->id }}">
                                                                 @csrf
-                                                                <input type="hidden" name="service_request_id" value="{{ $request->id }}">
-                                                                <input type="hidden" name="service_request_product_id" value="{{ $product->id }}">
-                                                                <input type="hidden" name="pickup_id" value="{{ $receivedPickup->id }}">
-                                                                
+                                                                <input type="hidden" name="service_request_id"
+                                                                    value="{{ $request->id }}">
+                                                                <input type="hidden" name="service_request_product_id"
+                                                                    value="{{ $product->id }}">
+                                                                <input type="hidden" name="pickup_id"
+                                                                    value="{{ $receivedPickup->id }}">
+
                                                                 {{-- Diagnosis List --}}
                                                                 <div class="mb-3">
-                                                                    <label class="form-label fw-semibold">Diagnosis List</label>
-                                                                    <div id="diagnosisListContainer_{{ $receivedPickup->id }}">
-                                                                        <div class="diagnosis-item mb-2 p-2 border rounded bg-white">
+                                                                    <label class="form-label fw-semibold">Diagnosis
+                                                                        List</label>
+                                                                    <div
+                                                                        id="diagnosisListContainer_{{ $receivedPickup->id }}">
+                                                                        <div
+                                                                            class="diagnosis-item mb-2 p-2 border rounded bg-white">
                                                                             <div class="row g-2">
                                                                                 <div class="col-md-4">
-                                                                                    <input type="text" name="diagnosis_list[0][component]" class="form-control" placeholder="Component Name" required>
+                                                                                    <input type="text"
+                                                                                        name="diagnosis_list[0][component]"
+                                                                                        class="form-control"
+                                                                                        placeholder="Component Name"
+                                                                                        required>
                                                                                 </div>
                                                                                 <div class="col-md-5">
-                                                                                    <input type="text" name="diagnosis_list[0][report]" class="form-control" placeholder="Report" required>
+                                                                                    <input type="text"
+                                                                                        name="diagnosis_list[0][report]"
+                                                                                        class="form-control"
+                                                                                        placeholder="Report" required>
                                                                                 </div>
                                                                                 <div class="col-md-3">
-                                                                                    <select name="diagnosis_list[0][status]" class="form-select" required>
-                                                                                        <option value="working">Working</option>
-                                                                                        <option value="not_working">Not Working</option>
-                                                                                        <option value="picking">Picking</option>
+                                                                                    <select
+                                                                                        name="diagnosis_list[0][status]"
+                                                                                        class="form-select" required>
+                                                                                        <option value="working">Working
+                                                                                        </option>
+                                                                                        <option value="not_working">Not
+                                                                                            Working</option>
+                                                                                        <option value="picking">Picking
+                                                                                        </option>
                                                                                     </select>
                                                                                 </div>
                                                                             </div>
-                                                                            <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removeDiagnosisItem(this)">
+                                                                            <button type="button"
+                                                                                class="btn btn-sm btn-danger mt-2"
+                                                                                onclick="removeDiagnosisItem(this)">
                                                                                 <i class="mdi mdi-delete"></i> Remove
                                                                             </button>
                                                                         </div>
                                                                     </div>
-                                                                    <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="addDiagnosisItem({{ $receivedPickup->id }})">
+                                                                    <button type="button"
+                                                                        class="btn btn-sm btn-secondary mt-2"
+                                                                        onclick="addDiagnosisItem({{ $receivedPickup->id }})">
                                                                         <i class="mdi mdi-plus"></i> Add Component
                                                                     </button>
                                                                 </div>
 
                                                                 {{-- Diagnosis Notes --}}
                                                                 <div class="mb-3">
-                                                                    <label for="diagnosis_notes_{{ $receivedPickup->id }}" class="form-label fw-semibold">Diagnosis Notes</label>
-                                                                    <textarea name="diagnosis_notes" id="diagnosis_notes_{{ $receivedPickup->id }}" class="form-control" rows="3" placeholder="Enter diagnosis notes..."></textarea>
+                                                                    <label
+                                                                        for="diagnosis_notes_{{ $receivedPickup->id }}"
+                                                                        class="form-label fw-semibold">Diagnosis
+                                                                        Notes</label>
+                                                                    <textarea name="diagnosis_notes" id="diagnosis_notes_{{ $receivedPickup->id }}" class="form-control"
+                                                                        rows="3" placeholder="Enter diagnosis notes..."></textarea>
                                                                 </div>
 
                                                                 <button type="submit" class="btn btn-primary">
@@ -1215,7 +1316,8 @@
                                                                 </button>
                                                                 <small class="text-muted d-block mt-2">
                                                                     <i class="mdi mdi-information"></i>
-                                                                    Submitting diagnosis will update product status to "Diagnosis Completed".
+                                                                    Submitting diagnosis will update product status to
+                                                                    "Diagnosis Completed".
                                                                 </small>
                                                             </form>
                                                         </div>
@@ -1223,7 +1325,8 @@
                                                         <div class="mt-3 p-3 bg-success-subtle border rounded">
                                                             <h6 class="fw-semibold mb-3">
                                                                 <i class="mdi mdi-check-circle text-success"></i>
-                                                                Diagnosis Already Submitted - {{ $product->name ?? 'N/A' }}
+                                                                Diagnosis Already Submitted -
+                                                                {{ $product->name ?? 'N/A' }}
                                                             </h6>
                                                             <span class="badge bg-success">Diagnosis Completed</span>
                                                         </div>
@@ -1234,93 +1337,129 @@
                                     </div>
                                 @endif
 
-                                
+
                                 {{-- Return Assignment Section - Show when pickup status is received and product status is diagnosis_completed --}}
                                 @if (isset($pickups) && $pickups->where('status', 'received')->count() > 0)
                                     @foreach ($pickups->where('status', 'received') as $receivedPickup)
                                         @php
                                             $product = $receivedPickup->serviceRequestProduct;
                                             $hasReturn = $product && $product->status === 'completed';
-                                            $existingReturn = App\Models\ServiceRequestProductReturn::where('pickups_id', $receivedPickup->id)->first();
+                                            $existingReturn = App\Models\ServiceRequestProductReturn::where(
+                                                'pickups_id',
+                                                $receivedPickup->id,
+                                            )->first();
                                         @endphp
                                         @if ($hasReturn && !$existingReturn)
-                                            <div class="mt-3 p-3 bg-warning-subtle border rounded" id="returnAssignmentSection_{{ $receivedPickup->id }}">
+                                            <div class="mt-3 p-3 bg-warning-subtle border rounded"
+                                                id="returnAssignmentSection_{{ $receivedPickup->id }}">
                                                 <h6 class="fw-semibold mb-3">
                                                     <i class="mdi mdi-truck-return text-warning"></i>
                                                     Assign Return - {{ $product->name ?? 'N/A' }}
                                                 </h6>
                                                 <p class="text-muted small mb-3">
                                                     <i class="mdi mdi-information"></i>
-                                                    Product diagnosis is completed. Please assign a delivery person to return the product to the customer.
+                                                    Product diagnosis is completed. Please assign a delivery person to
+                                                    return the product to the customer.
                                                 </p>
                                                 <form id="assignReturnForm_{{ $receivedPickup->id }}">
                                                     @csrf
-                                                    <input type="hidden" name="request_id" value="{{ $request->id }}">
-                                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                                    <input type="hidden" name="pickups_id" value="{{ $receivedPickup->id }}">
-                                                    
+                                                    <input type="hidden" name="request_id"
+                                                        value="{{ $request->id }}">
+                                                    <input type="hidden" name="product_id"
+                                                        value="{{ $product->id }}">
+                                                    <input type="hidden" name="pickups_id"
+                                                        value="{{ $receivedPickup->id }}">
+
                                                     <!-- Assigned Person Type -->
                                                     <div class="mb-3">
-                                                        <label class="form-label fw-semibold">Assigned Person Type <span class="text-danger">*</span></label>
+                                                        <label class="form-label fw-semibold">Assigned Person Type <span
+                                                                class="text-danger">*</span></label>
                                                         <div>
                                                             <div class="form-check form-check-inline">
-                                                                <input class="form-check-input return-person-type" type="radio" 
-                                                                    name="assigned_person_type"
-                                                                    id="returnPersonTypeDelivery_{{ $receivedPickup->id }}" value="delivery_man">
-                                                                <label class="form-check-label" for="returnPersonTypeDelivery_{{ $receivedPickup->id }}">Delivery Man</label>
+                                                                <input class="form-check-input return-person-type"
+                                                                    type="radio" name="assigned_person_type"
+                                                                    id="returnPersonTypeDelivery_{{ $receivedPickup->id }}"
+                                                                    value="delivery_man">
+                                                                <label class="form-check-label"
+                                                                    for="returnPersonTypeDelivery_{{ $receivedPickup->id }}">Delivery
+                                                                    Man</label>
                                                             </div>
                                                             <div class="form-check form-check-inline">
-                                                                <input class="form-check-input return-person-type" type="radio" 
-                                                                    name="assigned_person_type"
-                                                                    id="returnPersonTypeEngineer_{{ $receivedPickup->id }}" value="engineer" checked>
-                                                                <label class="form-check-label" for="returnPersonTypeEngineer_{{ $receivedPickup->id }}">Engineer</label>
+                                                                <input class="form-check-input return-person-type"
+                                                                    type="radio" name="assigned_person_type"
+                                                                    id="returnPersonTypeEngineer_{{ $receivedPickup->id }}"
+                                                                    value="engineer" checked>
+                                                                <label class="form-check-label"
+                                                                    for="returnPersonTypeEngineer_{{ $receivedPickup->id }}">Engineer</label>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    
+
                                                     <!-- Delivery Man Selection -->
-                                                    <div id="returnDeliveryManSection_{{ $receivedPickup->id }}" style="display: none;">
+                                                    <div id="returnDeliveryManSection_{{ $receivedPickup->id }}"
+                                                        style="display: none;">
                                                         <div class="mb-3">
-                                                            <label for="return_assigned_person_id_{{ $receivedPickup->id }}" class="form-label">Select Delivery Man <span class="text-danger">*</span></label>
-                                                            <select name="delivery_man_id" id="return_assigned_person_id_{{ $receivedPickup->id }}" class="form-select">
+                                                            <label
+                                                                for="return_assigned_person_id_{{ $receivedPickup->id }}"
+                                                                class="form-label">Select Delivery Man <span
+                                                                    class="text-danger">*</span></label>
+                                                            <select name="delivery_man_id"
+                                                                id="return_assigned_person_id_{{ $receivedPickup->id }}"
+                                                                class="form-select">
                                                                 <option value="">--Select Delivery Man--</option>
                                                                 @foreach ($deliveryMen as $deliveryMan)
                                                                     <option value="{{ $deliveryMan->id }}">
-                                                                        {{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }} ({{ $deliveryMan->phone }})
+                                                                        {{ $deliveryMan->first_name }}
+                                                                        {{ $deliveryMan->last_name }}
+                                                                        ({{ $deliveryMan->phone }})
                                                                     </option>
                                                                 @endforeach
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    
+
                                                     <!-- Engineer Selection -->
                                                     <div id="returnEngineerSection_{{ $receivedPickup->id }}">
                                                         @php
                                                             $assignedEngineerId = null;
-                                                            if ($request->activeAssignment && $request->activeAssignment->assignment_type === 'individual') {
-                                                                $assignedEngineerId = $request->activeAssignment->engineer_id;
+                                                            if (
+                                                                $request->activeAssignment &&
+                                                                $request->activeAssignment->assignment_type ===
+                                                                    'individual'
+                                                            ) {
+                                                                $assignedEngineerId =
+                                                                    $request->activeAssignment->engineer_id;
                                                             }
                                                         @endphp
                                                         <div class="mb-3">
-                                                            <label for="return_engineer_assigned_person_id_{{ $receivedPickup->id }}" class="form-label">Select Engineer <span class="text-danger">*</span></label>
-                                                            <select name="engineer_id" id="return_engineer_assigned_person_id_{{ $receivedPickup->id }}" class="form-select">
+                                                            <label
+                                                                for="return_engineer_assigned_person_id_{{ $receivedPickup->id }}"
+                                                                class="form-label">Select Engineer <span
+                                                                    class="text-danger">*</span></label>
+                                                            <select name="engineer_id"
+                                                                id="return_engineer_assigned_person_id_{{ $receivedPickup->id }}"
+                                                                class="form-select">
                                                                 <option value="">--Select Engineer--</option>
                                                                 @foreach ($engineers as $engineer)
-                                                                    <option value="{{ $engineer->id }}" {{ $assignedEngineerId == $engineer->id ? 'selected' : '' }}>
-                                                                        {{ $engineer->first_name }} {{ $engineer->last_name }} ({{ $engineer->phone }})
+                                                                    <option value="{{ $engineer->id }}"
+                                                                        {{ $assignedEngineerId == $engineer->id ? 'selected' : '' }}>
+                                                                        {{ $engineer->first_name }}
+                                                                        {{ $engineer->last_name }}
+                                                                        ({{ $engineer->phone }})
                                                                     </option>
                                                                 @endforeach
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    
+
                                                     <button type="submit" class="btn btn-warning">
                                                         <i class="mdi mdi-truck-check"></i> Assign for Return
                                                     </button>
                                                 </form>
                                             </div>
                                         @elseif ($existingReturn)
-                                            <div class="mt-3 p-3 bg-info-subtle border rounded" id="returnAssignedSection_{{ $receivedPickup->id }}">
+                                            <div class="mt-3 p-3 bg-info-subtle border rounded"
+                                                id="returnAssignedSection_{{ $receivedPickup->id }}">
                                                 <h6 class="fw-semibold mb-3">
                                                     <i class="mdi mdi-check-circle text-info"></i>
                                                     Return Assigned - {{ $product->name ?? 'N/A' }}
@@ -1332,7 +1471,9 @@
                                                     @else
                                                         <span class="badge bg-primary">Engineer</span>
                                                     @endif
-                                                    <span class="ms-2">{{ $existingReturn->assignedPerson->first_name ?? 'N/A' }} {{ $existingReturn->assignedPerson->last_name ?? '' }}</span>
+                                                    <span
+                                                        class="ms-2">{{ $existingReturn->assignedPerson->first_name ?? 'N/A' }}
+                                                        {{ $existingReturn->assignedPerson->last_name ?? '' }}</span>
                                                 </div>
                                                 <div class="d-flex align-items-center">
                                                     <span class="fw-semibold me-2">Status:</span>
@@ -1354,7 +1495,8 @@
                                                             'completed' => 'bg-success',
                                                         ];
                                                     @endphp
-                                                    <span class="badge {{ $returnStatusColor[$existingReturn->status] ?? 'bg-secondary' }}">
+                                                    <span
+                                                        class="badge {{ $returnStatusColor[$existingReturn->status] ?? 'bg-secondary' }}">
                                                         {{ $returnStatus[$existingReturn->status] ?? ucfirst($existingReturn->status) }}
                                                     </span>
                                                 </div>
@@ -1411,7 +1553,8 @@
                                         @else
                                             <!-- Group Assignment -->
                                             <h6 class="mb-2 fw-semibold">
-                                                <i class="mdi mdi-account-group"></i> Group: {{ $assignment->group_name }}
+                                                <i class="mdi mdi-account-group"></i> Group:
+                                                {{ $assignment->group_name }}
                                             </h6>
                                             <p class="mb-2 text-muted small">
                                                 <i class="mdi mdi-clock-outline"></i>
@@ -1550,6 +1693,98 @@
                     }
                 });
             });
+
+            // Modal Assign Engineer Form Handling (AMC modal)
+            // Toggle between Individual and Group sections inside modal
+            $('input[name="assignment_type_modal"]').change(function() {
+                if ($(this).val() === 'individual') {
+                    $('#individualSectionModal').show();
+                    $('#groupSectionModal').hide();
+                    // Clear group fields
+                    $('#group_name_modal').val('');
+                    $('.engineer-checkbox-modal').prop('checked', false);
+                    $('input[name="supervisor_id"]').prop('checked', false);
+                } else {
+                    $('#individualSectionModal').hide();
+                    $('#groupSectionModal').show();
+                    // Clear individual field
+                    $('#engineer_id_modal').val('');
+                }
+            });
+
+            // Sync checkbox with supervisor radio (modal)
+            $(document).on('change', '.engineer-checkbox-modal', function() {
+                const engineerId = $(this).val();
+                const supervisorRadio = $('input[name="supervisor_id"][value="' + engineerId + '"]');
+
+                if (!$(this).is(':checked')) {
+                    supervisorRadio.prop('checked', false);
+                }
+            });
+
+            // Ensure supervisor is also checked as engineer (modal)
+            $(document).on('change', 'input[name="supervisor_id"]', function() {
+                const engineerId = $(this).val();
+                const engineerCheckbox = $('.engineer-checkbox-modal[value="' + engineerId + '"]');
+
+                if (!engineerCheckbox.is(':checked')) {
+                    engineerCheckbox.prop('checked', true);
+                }
+            });
+
+            // Modal form submission
+            $('#assignEngineerModalForm').submit(function(e) {
+                e.preventDefault();
+
+                const assignmentType = $('input[name="assignment_type_modal"]:checked').val();
+
+                // Validation
+                if (assignmentType === 'individual') {
+                    if (!$('#engineer_id_modal').val()) {
+                        alert('Please select an engineer');
+                        return;
+                    }
+                } else if (assignmentType === 'group') {
+                    if (!$('#group_name_modal').val()) {
+                        alert('Please enter group name');
+                        return;
+                    }
+
+                    const checkedEngineers = $('.engineer-checkbox-modal:checked').length;
+                    if (checkedEngineers === 0) {
+                        alert('Please select at least one engineer');
+                        return;
+                    }
+
+                    if (!$('input[name="supervisor_id"]:checked').val()) {
+                        alert('Please select a supervisor');
+                        return;
+                    }
+                }
+
+                // Submit via AJAX
+                const formData = $(this).serialize();
+
+                $.ajax({
+                    url: '{{ route('service-request.assign-quick-service-engineer') }}',
+                    method: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Assignment Error:', xhr);
+                        const error = xhr.responseJSON?.message ||
+                            'Error assigning engineer. Please try again.';
+                        alert(error);
+                    }
+                });
+            });
         });
 
         // Pickup Assignment Form Handling
@@ -1593,7 +1828,8 @@
                     return;
                 }
 
-                submitBtn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Processing...');
+                submitBtn.prop('disabled', true).html(
+                    '<i class="mdi mdi-loading mdi-spin"></i> Processing...');
 
                 $.ajax({
                     url: "{{ route('service-request.pickup-admin-action') }}",
@@ -1634,7 +1870,8 @@
                     return;
                 }
 
-                submitBtn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Processing...');
+                submitBtn.prop('disabled', true).html(
+                    '<i class="mdi mdi-loading mdi-spin"></i> Processing...');
 
                 $.ajax({
                     url: "{{ route('service-request.assign-pickup') }}",
@@ -1668,11 +1905,14 @@
                 var submitBtn = $(this).find('button[type="submit"]');
                 var originalBtnText = submitBtn.html();
 
-                if (!confirm('Are you sure you want to mark this pickup as received? This will update the product and service request status to picked.')) {
+                if (!confirm(
+                        'Are you sure you want to mark this pickup as received? This will update the product and service request status to picked.'
+                    )) {
                     return;
                 }
 
-                submitBtn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Processing...');
+                submitBtn.prop('disabled', true).html(
+                    '<i class="mdi mdi-loading mdi-spin"></i> Processing...');
 
                 $.ajax({
                     url: "{{ route('service-request.pickup-received') }}",
@@ -1710,7 +1950,8 @@
                     return;
                 }
 
-                submitBtn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Processing...');
+                submitBtn.prop('disabled', true).html(
+                    '<i class="mdi mdi-loading mdi-spin"></i> Processing...');
 
                 $.ajax({
                     url: "{{ route('service-request.return-picked') }}",
@@ -1741,7 +1982,7 @@
         function addDiagnosisItem(pickupId) {
             const container = document.getElementById('diagnosisListContainer_' + pickupId);
             const itemCount = container.querySelectorAll('.diagnosis-item').length;
-            
+
             const newItem = document.createElement('div');
             newItem.className = 'diagnosis-item mb-2 p-2 border rounded bg-white';
             newItem.innerHTML = `
@@ -1764,7 +2005,7 @@
                     <i class="mdi mdi-delete"></i> Remove
                 </button>
             `;
-            
+
             container.appendChild(newItem);
         }
 
@@ -1788,11 +2029,14 @@
                 var submitBtn = $(this).find('button[type="submit"]');
                 var originalBtnText = submitBtn.html();
 
-                if (!confirm('Are you sure you want to submit this diagnosis? This will update the product status to Diagnosis Completed.')) {
+                if (!confirm(
+                        'Are you sure you want to submit this diagnosis? This will update the product status to Diagnosis Completed.'
+                    )) {
                     return;
                 }
 
-                submitBtn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Processing...');
+                submitBtn.prop('disabled', true).html(
+                    '<i class="mdi mdi-loading mdi-spin"></i> Processing...');
 
                 $.ajax({
                     url: "{{ route('service-request.submit-diagnosis') }}",
@@ -1882,7 +2126,8 @@
                     }
                 }
 
-                submitBtn.prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin"></i> Processing...');
+                submitBtn.prop('disabled', true).html(
+                    '<i class="mdi mdi-loading mdi-spin"></i> Processing...');
 
                 $.ajax({
                     url: "{{ route('service-request.assign-return') }}",
@@ -1892,7 +2137,9 @@
                         submitBtn.prop('disabled', false).html(originalBtnText);
 
                         if (response.success) {
-                            alert('Return assigned successfully! Delivery will be done shortly.');
+                            alert(
+                                'Return assigned successfully! Delivery will be done shortly.'
+                            );
                             location.reload();
                         } else {
                             alert('Error: ' + response.message);

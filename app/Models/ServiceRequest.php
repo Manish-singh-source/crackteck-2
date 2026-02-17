@@ -110,6 +110,7 @@ class ServiceRequest extends Model
 
     //  
     public function amcScheduleMeetings() {
-        return $this->hasMany(AmcScheduleMeeting::class, 'service_request_id');
+        return $this->hasMany(AmcScheduleMeeting::class, 'service_request_id')->orderBy('scheduled_at', 'desc');
     }
 }
+    

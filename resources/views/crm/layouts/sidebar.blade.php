@@ -197,6 +197,14 @@
                         <span class="ps-1">Covered Items </span>
                     </a>
                 </li>
+                
+                <li>
+                    <a class='tp-link' href="{{ route('device-specific-diagnosis.index') }}">
+                        <i class="fas fa-project-diagram"></i>
+
+                        <span class="ps-1">Device Specific Diagnosis </span>
+                    </a>
+                </li>
 
                 <li>
                     <a class='tp-link' href="{{ route('service-request.index') }}">

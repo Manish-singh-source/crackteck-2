@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AMC;
 use App\Models\AmcPlan;
 use App\Models\CoveredItem;
+use App\Models\DeviceSpecificDiagnosis;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class AmcController extends Controller
@@ -378,5 +378,108 @@ class AmcController extends Controller
         $coveredItem->delete();
 
         return redirect()->route('covered-items.index')->with('success', 'Covered Item deleted successfully.');
+    }
+
+
+    // Device Specific Diagnosis methods will be similar to Covered Items, but using DeviceSpecificDiagnosis model and views
+    public function deviceSpecificDiagnosis()
+    {
+        $query = DeviceSpecificDiagnosis::query();
+
+        if ($status = request()->get('status')) {
+            if (in_array($status, ['active', 'inactive'])) {
+                $query->where('status', $status);
+            }
+        }
+
+        $diagnosis = $query->get();
+
+        return view('/crm/amc-plans/device-specific-diagnosis/index', compact('diagnosis'));
+    }
+
+    public function createDeviceSpecificDiagnosis()
+    {
+        return view('/crm/amc-plans/device-specific-diagnosis/create');
+    }
+
+    public function storeDeviceSpecificDiagnosis(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'device_type' => 'required|string|max:255',
+            'status' => 'nullable|in:active,inactive',
+            'diagnosis_list' => 'nullable|string',
+        ]);
+
+        if ($validated->fails()) {
+            return redirect()
+                ->back()
+                ->withErrors($validated)
+                ->withInput();
+        }
+
+        $validated = $validated->validated();
+
+        $diagnosis = DeviceSpecificDiagnosis::create([
+            'device_type' => $validated['device_type'],
+            'status' => $request->input('status', 'active'),
+            'diagnosis_list' => $request->input('diagnosis_list') ? json_decode($request->input('diagnosis_list'), true) : [],
+        ]);
+
+        if (!$diagnosis) {
+            return redirect()
+                ->back()
+                ->with('error', 'An error occurred while creating the diagnosis.')
+                ->withInput();
+        }
+
+        return redirect()
+            ->route('device-specific-diagnosis.index')
+            ->with('success', 'Diagnosis created successfully.');
+    }
+
+    public function editDeviceSpecificDiagnosis($id)
+    {
+        $diagnosis = DeviceSpecificDiagnosis::findOrFail($id);
+        return view('/crm/amc-plans/device-specific-diagnosis/edit', compact('diagnosis'));
+    }
+
+    public function updateDeviceSpecificDiagnosis(Request $request, $id)
+    {
+        $validated = Validator::make($request->all(), [
+            'device_type' => 'required|string|max:255',
+            'status' => 'nullable|in:active,inactive',
+            'diagnosis_list' => 'nullable|string',
+        ]);
+
+        if ($validated->fails()) {
+            return redirect()
+                ->back()
+                ->withErrors($validated)
+                ->withInput();
+        }
+
+        $validated = $validated->validated();
+
+        $diagnosis = DeviceSpecificDiagnosis::findOrFail($id);
+
+        $diagnosis->update([
+            'device_type' => $validated['device_type'],
+            'status' => $request->input('status', 'active'),
+            'diagnosis_list' => $request->input('diagnosis_list') ? json_decode($request->input('diagnosis_list'), true) : [],
+        ]);
+
+        return redirect()
+            ->route('device-specific-diagnosis.index')
+            ->with('success', 'Diagnosis updated successfully.');
+    }
+
+    public function deleteDeviceSpecificDiagnosis($id)
+    {
+        $diagnosis = DeviceSpecificDiagnosis::findOrFail($id);
+        $diagnosis->delete();
+
+        return redirect()
+            ->route('device-specific-diagnosis.index')
+            ->with('success', 'Diagnosis deleted successfully.');
     }
 }

@@ -104,9 +104,8 @@
                                                                 <th>Customer Name</th>
                                                                 <th>Request Date</th>
                                                                 <th>Product Name / Model No</th>
-                                                                <th>Request Status</th>
                                                                 <th>Request Source</th>
-                                                                <th>Assign Engineer</th>
+                                                                {{-- <th>Assign Engineer</th> --}}
                                                                 <th>Status</th>
                                                                 <th>Action</th>
                                                             </tr>
@@ -133,25 +132,18 @@
                                                                             {{ $request->products->count() }} Product(s)
                                                                         </div>
                                                                     </td>
-                                                                    <td>
-                                                                        @php
-                                                                            $statusClasses = [
-                                                                                'pending' => 'badge bg-warning',
-                                                                                'approved' => 'badge bg-success',
-                                                                                'rejected' => 'badge bg-danger',
-                                                                                'processing' => 'badge bg-info',
-                                                                                'processed' => 'badge bg-primary',
-                                                                                'picking' => 'badge bg-secondary',
-                                                                                'picked' => 'badge bg-dark',
-                                                                                'completed' => 'badge bg-success',
-                                                                            ];
-                                                                        @endphp
-
-                                                                        <span
-                                                                            class="{{ $statusClasses[$request->request_status] ?? 'badge bg-light' }}">
-                                                                            {{ ucfirst($request->request_status) }}
-                                                                        </span>
-                                                                    </td>
+                                                                    @php
+                                                                        $statusClasses = [
+                                                                            'pending' => 'badge bg-warning',
+                                                                            'approved' => 'badge bg-success',
+                                                                            'rejected' => 'badge bg-danger',
+                                                                            'processing' => 'badge bg-info',
+                                                                            'processed' => 'badge bg-primary',
+                                                                            'picking' => 'badge bg-secondary',
+                                                                            'picked' => 'badge bg-dark',
+                                                                            'completed' => 'badge bg-success',
+                                                                        ];
+                                                                    @endphp
                                                                     <td>
                                                                         @if ($request->request_source == 'customer')
                                                                             <span
@@ -159,6 +151,9 @@
                                                                         @elseif($request->request_source == 'system')
                                                                             <span
                                                                                 class="badge bg-secondary-subtle text-secondary fw-semibold">System</span>
+                                                                        @elseif($request->request_source == 'lead_won')
+                                                                            <span
+                                                                                class="badge bg-info-subtle text-info fw-semibold">Lead Won</span>
                                                                         @endif
                                                                         <div class="text-muted small">
                                                                             {{ $request->created_at->diffForHumans() }}
@@ -168,6 +163,10 @@
                                                                     @php
                                                                         $statuses = [
                                                                             'pending' => ['Pending', 'warning'],
+                                                                            'active' => ['Active', 'success'],
+                                                                            'inactive' => ['Inactive', 'danger'],
+                                                                            'expired' => ['Expired', 'secondary'],
+                                                                            'cancelled' => ['Cancelled', 'dark'],
                                                                             'admin_approved' => [
                                                                                 'Admin Approved',
                                                                                 'info',
@@ -205,6 +204,7 @@
                                                                         ];
                                                                     @endphp
 
+                                                                    {{-- 
                                                                     <td>
                                                                         @if ($request->is_engineer_assigned == 'assigned')
                                                                             <span
@@ -214,7 +214,7 @@
                                                                                 class="badge bg-secondary-subtle text-secondary fw-semibold">Not
                                                                                 Assigned</span>
                                                                         @endif
-                                                                    </td>
+                                                                    </td> --}}
 
                                                                     <td>
                                                                         <span

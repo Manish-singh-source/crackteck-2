@@ -383,7 +383,7 @@ class CustomerController extends Controller
         }
 
         $customer = \App\Models\Customer::with('addressDetails', 'companyDetails', 'panCardDetails')
-            ->where('email', $email)
+            ->where('email', 'LIKE', "%$email%")
             ->first();
 
         if (! $customer) {

@@ -490,6 +490,14 @@ Route::prefix('/demo')->group(function () {
             Route::get('/crm/edit-covered-items/{id}', 'editCoveredItems')->name('covered-items.edit');
             Route::put('/crm/update-covered-items/{id}', 'updateCoveredItems')->name('covered-items.update');
             Route::delete('/crm/delete-covered-items/{id}', 'deleteCoveredItems')->name('covered-items.delete');
+            
+            // Covered Items Page
+            Route::get('/crm/device-specific-diagnosis', 'deviceSpecificDiagnosis')->name('device-specific-diagnosis.index');
+            Route::get('/crm/create-device-specific-diagnosis', 'createDeviceSpecificDiagnosis')->name('device-specific-diagnosis.create');
+            Route::post('/crm/store-device-specific-diagnosis', 'storeDeviceSpecificDiagnosis')->name('device-specific-diagnosis.store');
+            Route::get('/crm/edit-device-specific-diagnosis/{id}', 'editDeviceSpecificDiagnosis')->name('device-specific-diagnosis.edit');
+            Route::put('/crm/update-device-specific-diagnosis/{id}', 'updateDeviceSpecificDiagnosis')->name('device-specific-diagnosis.update');
+            Route::delete('/crm/delete-device-specific-diagnosis/{id}', 'deleteDeviceSpecificDiagnosis')->name('device-specific-diagnosis.delete');
         });
     });
 

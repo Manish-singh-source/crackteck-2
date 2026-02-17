@@ -521,10 +521,33 @@ class FieldEngineerController extends Controller
                 ->where('service_request_product_id', $product_id)
                 ->get();
 
+            if ($diagnosisDetails->isEmpty()) {
+                if ($serviceRequest->service_type == 'amc') {
+                    $diagnosisDetails = $serviceRequest->amcPlan;
+                } else {
+                    $diagnosisDetails = $serviceRequestProduct->itemCode->diagnosis_list;
+                }
+
+                return response()->json([
+                    'service_request' => [
+                        'id' => $serviceRequest->id,
+                        'request_id' => $serviceRequest->request_id,
+                        'status' => $serviceRequest->status,
+                    ],
+                    'product' => [
+                        'id' => $serviceRequestProduct->id,
+                        'name' => $serviceRequestProduct->name,
+                        'status' => $serviceRequestProduct->status,
+                        'status_label' => $this->getStatusLabel($serviceRequestProduct->status),
+                    ],
+                    'diagnosis' => $diagnosisDetails,
+                ], 200);
+            }
+
             $diagnoses = [];
             foreach ($diagnosisDetails as $diagnosis) {
                 $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
-                
+
                 // Process each diagnosis item
                 $processedList = [];
                 if ($diagnosisList && is_array($diagnosisList)) {
@@ -536,12 +559,12 @@ class FieldEngineerController extends Controller
                             'status' => $itemStatus,
                             'status_label' => $this->getStatusLabel($itemStatus),
                         ];
-                        
+
                         // If status is stock_in_hand or request_part, add part details
                         if (in_array($itemStatus, ['stock_in_hand', 'request_part'])) {
                             $itemData['part_id'] = $item['part_id'] ?? null;
                             $itemData['quantity'] = $item['quantity'] ?? 1;
-                            
+
                             // Get the part request status from service_request_product_request_parts
                             if (isset($item['part_id'])) {
                                 $partRequest = ServiceRequestProductRequestPart::where('request_id', $id)
@@ -551,7 +574,7 @@ class FieldEngineerController extends Controller
                                 $itemData['part_status'] = $partRequest ? $partRequest->status : 'pending';
                             }
                         }
-                        
+
                         $processedList[] = $itemData;
                     }
                 }
@@ -580,7 +603,7 @@ class FieldEngineerController extends Controller
                     'status' => $serviceRequestProduct->status,
                     'status_label' => $this->getStatusLabel($serviceRequestProduct->status),
                 ],
-                'diagnoses' => $diagnoses,
+                'diagnosis' => $diagnoses,
             ], 200);
         }
     }
@@ -646,6 +669,7 @@ class FieldEngineerController extends Controller
         DB::beginTransaction();
 
         try {
+            $serviceRequest = ServiceRequest::find($service_request_id);
             $serviceRequestProduct = ServiceRequestProduct::where('service_requests_id', $service_request_id)
                 ->find($product_id);
 
@@ -661,7 +685,11 @@ class FieldEngineerController extends Controller
                 throw new \Exception('Assigned engineer not found.');
             }
 
-            $coveredItemId = $serviceRequestProduct->item_code_id;
+            if($serviceRequest->service_type != 'amc') {
+                $coveredItemId = $serviceRequestProduct->item_code_id;
+            } else {
+                $coveredItemId = null;
+            }
 
             /** ---------------- Upload Photos ---------------- */
             $beforePhotos = [];
@@ -707,7 +735,7 @@ class FieldEngineerController extends Controller
                 } elseif ($diagnosis['status'] === 'request_part') {
                     $hasRequestPart = true;
                     $allWorking = false;
-                    
+
                     // Feature 1: Create new record in service_request_product_request_parts when status is request_part
                     if (isset($diagnosis['part_id'])) {
                         $existingRequestPart = ServiceRequestProductRequestPart::where('request_id', $service_request_id)
@@ -715,7 +743,7 @@ class FieldEngineerController extends Controller
                             ->where('part_id', $diagnosis['part_id'])
                             ->where('request_type', 'request_part')
                             ->first();
-                        
+
                         if (!$existingRequestPart) {
                             ServiceRequestProductRequestPart::create([
                                 'request_id' => $service_request_id,
@@ -741,7 +769,7 @@ class FieldEngineerController extends Controller
                         ->where('product_id', $product_id)
                         ->where('part_id', $diagnosis['part_id'])
                         ->first();
-                    
+
                     if ($requestPart) {
                         $requestPart->update([
                             'status' => 'used',
@@ -790,7 +818,7 @@ class FieldEngineerController extends Controller
                     'service_request_id' => $service_request_id,
                     'service_request_product_id' => $serviceRequestProduct->id,
                     'assigned_engineer_id' => $assignedEngineer->id,
-                    'covered_item_id' => $coveredItemId,
+                    'covered_item_id' => $coveredItemId ?? 1,
                 ]));
             }
 

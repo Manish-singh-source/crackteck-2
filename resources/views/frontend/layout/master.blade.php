@@ -872,9 +872,23 @@
                         <div class="form-content">
                             <fieldset>
                                 <label class="fw-semibold body-md-2">
-                                    Name
+                                    First Name
                                 </label>
-                                <input type="text" name="name" placeholder="Enter Your Name"
+                                <input type="text" name="first_name" placeholder="Enter First Name"
+                                    autocomplete="off" required>
+                            </fieldset>
+                            <fieldset>
+                                <label class="fw-semibold body-md-2">
+                                    Last Name
+                                </label>
+                                <input type="text" name="last_name" placeholder="Enter Last Name"
+                                    autocomplete="off" required>
+                            </fieldset>
+                            <fieldset>
+                                <label class="fw-semibold body-md-2">
+                                    Phone Number
+                                </label>
+                                <input type="tel" name="phone" placeholder="Enter Phone Number"
                                     autocomplete="off" required>
                             </fieldset>
                             <fieldset>

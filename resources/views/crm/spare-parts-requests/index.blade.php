@@ -131,7 +131,7 @@
                                                                     <td>{{ $request->fromEngineer->first_name ?? 'N/A' }}
                                                                         {{ $request->fromEngineer->last_name ?? 'N/A' }}
                                                                     </td>
-                                                                    <td>{{ $request->created_at->format('Y-m-d') }}</td>
+                                                                    <td>{{ $request->created_at }}</td>
                                                                     <td>{{ $request->product->product_name }}</td>
                                                                     <td>{{ $request?->requested_quantity ?? '0' }}</td>
                                                                     <td>

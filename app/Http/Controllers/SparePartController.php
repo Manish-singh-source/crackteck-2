@@ -40,6 +40,7 @@ class SparePartController extends Controller
                 'assignedEngineer',
                 'requestedPart',
             ])
+            // ->where('request_type', 'stock_in_hand')
             ->orderByDesc('created_at')
             ->get();
 

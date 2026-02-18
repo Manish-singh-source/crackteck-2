@@ -162,7 +162,7 @@ class ProductController extends Controller
         }
 
         // Build query based on role
-        $query = StockInHand::query();
+        $query = ServiceRequestProductRequestPart::query();
 
         if ($request->role_id == 1) {
             $query->where('engineer_id', $request->user_id);
@@ -175,28 +175,27 @@ class ProductController extends Controller
             ], 400);
         }
 
-        $stockInHandItems = $query->with(['products.product'])
+        $stockInHandItems = $query->with(['serviceRequest', 'serviceRequestProduct', 'product'])
+            ->where('request_type', 'stock_in_hand')
             ->orderBy('created_at', 'desc')
             ->get();
 
         $formattedItems = $stockInHandItems->map(function ($item) {
             return [
                 'stock_in_hand_id' => $item->id,
-                'stock_in_hand_reference' => $item->stock_in_hand_id,
                 'status' => $item->status,
-                'requested_date' => $item->requested_date,
-                'delivered_date' => $item->delivered_at,
-                'products' => $item->products->map(function ($product) {
-                    return [
-                        'product_id' => $product->product_id,
-                        'product_name' => $product->product->product_name ?? null,
-                        'quantity' => $product->requested_quantity,
-                        'delivered_quantity' => $product->delivered_quantity,
-                        'unit_price' => $product->unit_price,
-                        'status' => $product->status,
-                    ];
-                }),
-                'total_requested_quantity' => $item->products->sum('requested_quantity'),
+                'products' => $item->product,
+                // ->map(function ($product) {
+                //     return [
+                //         'product_id' => $product->product_id,
+                //         'product_name' => $product->product->product_name ?? null,
+                //         'quantity' => $product->requested_quantity,
+                //         'delivered_quantity' => $product->delivered_quantity,
+                //         'unit_price' => $product->unit_price,
+                //         'status' => $product->status,
+                //     ];
+                // }),
+                'total_requested_quantity' => $item->sum('requested_quantity'),
             ];
         });
 

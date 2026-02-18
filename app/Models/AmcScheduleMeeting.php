@@ -24,7 +24,7 @@ class AmcScheduleMeeting extends Model
 
     public function activeAssignment()
     {
-        return $this->hasOne(AssignedEngineer::class, 'service_request_id', 'service_request_id')
+        return $this->hasOne(AssignedEngineer::class, 'amc_schedule_meeting_id')
             ->where('status', 'active');
     }
 }

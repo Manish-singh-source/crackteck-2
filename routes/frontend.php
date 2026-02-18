@@ -63,8 +63,13 @@ Route::prefix('demo')->group(function () {
     Route::get('/api/amc/categories', [FrontendController::class, 'getProductCategories'])->name('amc.categories');
     Route::get('/api/amc/brands', [FrontendController::class, 'getBrands'])->name('amc.brands');
     Route::get('/api/amc/plans', [FrontendController::class, 'getAmcPlansData'])->name('amc.plans');
+    Route::post('/api/amc/check-email', [FrontendController::class, 'checkCustomerEmail'])->name('amc.check-email');
+    Route::post('/api/amc/get-customer-data', [FrontendController::class, 'getCustomerData'])->name('amc.get-customer-data');
     Route::post('/api/amc/submit', [FrontendController::class, 'submitAmcRequest'])->name('amc.submit');
     Route::post('/api/non-amc/submit', [FrontendController::class, 'submitNonAmcRequest'])->name('non-amc.submit');
+    
+    // Customer Check Login API Route
+    Route::get('/api/customer/check-login', [FrontendController::class, 'checkCustomerLogin'])->name('customer.check-login');
 
     // Contact US
     Route::get('/contact-us', function () {

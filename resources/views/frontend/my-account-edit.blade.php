@@ -60,30 +60,30 @@
                                         <fieldset>
                                             <label for="first-name">First Name *</label>
                                             <input type="text" id="first-name" name="first_name" placeholder="First Name"
-                                                   value="{{ $user->first_name ?? '' }}" required>
+                                                   value="{{ $customer->first_name ?? '' }}" required>
                                         </fieldset>
                                         <fieldset>
                                             <label for="last-name">Last Name *</label>
                                             <input type="text" id="last-name" name="last_name" placeholder="Last Name"
-                                                   value="{{ $user->last_name ?? '' }}" required>
+                                                   value="{{ $customer->last_name ?? '' }}" required>
                                         </fieldset>
                                     </div>
                                     <div class="cols">
                                         <fieldset>
                                             <label for="email">Email *</label>
                                             <input type="email" id="email" name="email" placeholder="Email"
-                                                   value="{{ $user->email }}" required>
+                                                   value="{{ $customer->email }}" required>
                                         </fieldset>
                                         <fieldset>
                                             <label for="phone">Phone Number</label>
                                             <input type="text" id="phone" name="phone" placeholder="Phone Number"
-                                                   value="{{ $user->phone ?? '' }}">
+                                                   value="{{ $customer->phone ?? '' }}">
                                         </fieldset>
                                     </div>
                                     <fieldset>
                                         <label for="primary-address">Primary Address</label>
                                         <input type="text" id="primary-address" placeholder="Primary Address"
-                                               value="{{ $primaryAddress ? $primaryAddress->address_line_1 . ', ' . $primaryAddress->city . ', ' . $primaryAddress->state . ' - ' . $primaryAddress->zipcode : 'No primary address set' }}"
+                                               value="{{ $primaryAddress ? $primaryAddress->address1 . ', ' . $primaryAddress->city . ', ' . $primaryAddress->state . ' - ' . $primaryAddress->pincode : 'No primary address set' }}"
                                                readonly>
                                         <small class="text-muted">
                                             <a href="{{ route('my-account-address') }}" class="link text-secondary">
@@ -134,7 +134,7 @@ $(document).ready(function() {
         $('#update-text').text('Updating...');
 
         $.ajax({
-            url: '/my-account/profile',
+            url: 'my-account/profile',
             method: 'PUT',
             data: formData,
             success: function(response) {

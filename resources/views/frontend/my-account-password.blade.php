@@ -138,7 +138,7 @@ $(document).ready(function() {
         $('#password-text').text('Updating...');
 
         $.ajax({
-            url: '/my-account/password',
+            url: 'my-account/password',
             method: 'PUT',
             data: formData,
             success: function(response) {
@@ -151,7 +151,7 @@ $(document).ready(function() {
                     // Optional: Redirect to login after password change
                     setTimeout(function() {
                         if (confirm('Password updated successfully! You will be logged out for security. Click OK to continue.')) {
-                            window.location.href = '/frontend/logout';
+                            window.location.href = '/demo';
                         }
                     }, 2000);
                 } else {

@@ -161,15 +161,15 @@ class FrontendController extends Controller
      */
     public function checkCustomerLogin()
     {
-        if (Auth::check()) {
-            $customer = Auth::user();
-            
+        if (Auth::guard('customer_web')->check()) {
+            $customer = Auth::guard('customer_web')->user();
+
             // Get customer addresses
             $addresses = \App\Models\CustomerAddressDetail::where('customer_id', $customer->id)->get();
-            
+
             // Get customer company details
             $companyDetails = \App\Models\CustomerCompanyDetail::where('customer_id', $customer->id)->first();
-            
+
             return response()->json([
                 'logged_in' => true,
                 'customer' => [
@@ -185,7 +185,7 @@ class FrontendController extends Controller
                 'company_details' => $companyDetails,
             ]);
         }
-        
+
         return response()->json([
             'logged_in' => false,
         ]);
@@ -197,9 +197,9 @@ class FrontendController extends Controller
     public function checkCustomerEmail(Request $request)
     {
         $email = $request->email;
-        
+
         $customer = \App\Models\Customer::where('email', $email)->first();
-        
+
         if ($customer) {
             return response()->json([
                 'success' => true,
@@ -207,7 +207,7 @@ class FrontendController extends Controller
                 'message' => 'Email already exists in our system. Please login to continue.',
             ]);
         }
-        
+
         return response()->json([
             'success' => true,
             'exists' => false,
@@ -221,22 +221,22 @@ class FrontendController extends Controller
     public function getCustomerData(Request $request)
     {
         $email = $request->email;
-        
+
         $customer = \App\Models\Customer::where('email', $email)->first();
-        
+
         if (!$customer) {
             return response()->json([
                 'success' => false,
                 'message' => 'Customer not found.',
             ]);
         }
-        
+
         // Get customer address
         $addresses = \App\Models\CustomerAddressDetail::where('customer_id', $customer->id)->get();
-        
+
         // Get customer company details
         $companyDetails = \App\Models\CustomerCompanyDetail::where('customer_id', $customer->id)->first();
-        
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -309,11 +309,11 @@ class FrontendController extends Controller
         try {
             // Check if customer exists or create new one
             $customer = \App\Models\Customer::where('email', $request->email)->first();
-            
+
             if (!$customer) {
                 // Generate customer code
                 $customerCode = 'CUST-' . strtoupper(uniqid());
-                
+
                 $customer = \App\Models\Customer::create([
                     'customer_code' => $customerCode,
                     'first_name' => $request->first_name,
@@ -328,12 +328,12 @@ class FrontendController extends Controller
             // Create or update customer address
             $customerAddress = null;
             $selectedAddressId = $request->input('selected_address_id');
-            
+
             if ($selectedAddressId) {
                 // Use existing address if selected
                 $customerAddress = \App\Models\CustomerAddressDetail::find($selectedAddressId);
             }
-            
+
             if (!$customerAddress) {
                 // Create new address only if no existing address selected
                 $customerAddress = \App\Models\CustomerAddressDetail::create([
@@ -380,10 +380,38 @@ class FrontendController extends Controller
                 'customer_address_id' => $customerAddress->id,
                 'amc_plan_id' => $request->amc_plan_id,
                 'request_date' => now(),
-                'status' => 'pending',
+                'status' => 'active',
                 'request_source' => $request->source_type ?? 'customer',
                 'visit_date' => $request->preferred_start_date,
             ]);
+
+            $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
+
+            // Calculate the month gap between visits as an integer (avoid fractional months)
+            $monthGapFloat = intval($amcPlan->duration) / max(1, intval($amcPlan->total_visits));
+            $monthGap = (int) round($monthGapFloat);
+
+            // Ensure we have a Carbon instance for dates
+            $startVisitDate = $serviceRequest->visit_date ? \Carbon\Carbon::parse($serviceRequest->visit_date) : \Carbon\Carbon::now();
+
+            // Start from the next visit after the initial visit date
+            $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
+
+            foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
+                // Create a service request visit for each visit
+                $serviceRequest->amcScheduleMeetings()->create([
+                    'service_request_id' => $serviceRequest->id,
+                    'scheduled_at' => $nextVisitDate,
+                    'completed_at' => null,
+                    'remarks' => null,
+                    'report' => null,
+                    'visits_count' => $visitNumber,
+                    'status' => 'scheduled',
+                ]);
+
+                // Update the next visit date for the next iteration
+                $nextVisitDate = $nextVisitDate->addMonths($monthGap);
+            }
 
             // Create Service Request Products in service_request_products table
             $products = $request->input('products', []);
@@ -409,7 +437,6 @@ class FrontendController extends Controller
                 'selected_address_id' => $request->selected_address_id,
                 'products_count' => count($products),
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -510,7 +537,6 @@ class FrontendController extends Controller
                 'data' => $nonAmcService,
                 'products_count' => count($products),
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -533,7 +559,7 @@ class FrontendController extends Controller
 
         $nextNumber = $lastService ? (intval(substr($lastService->request_id, -4)) + 1) : 1;
 
-        return 'SRV-'.$year.'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        return 'SRV-' . $year . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -610,7 +636,6 @@ class FrontendController extends Controller
             }
 
             return back()->with('success', 'Thank you for contacting us! We will get back to you within 24 hours.');
-
         } catch (\Exception $e) {
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([

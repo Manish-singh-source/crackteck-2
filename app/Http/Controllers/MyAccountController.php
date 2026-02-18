@@ -278,13 +278,20 @@ class MyAccountController extends Controller
     public function amcServices()
     {
         if (! Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please login to access your account.');
+            return redirect()->route('login')->with('error', 'Please login to view your orders.');
         }
 
-        $user = Auth::user();
+        // Debug: Check what Auth::id() returns
+        $customerId = Auth::id();
+
+        // If using Customer model, get the actual customer ID
+        $customer = Auth::user();
+        if ($customer instanceof \App\Models\Customer) {
+            $customerId = $customer->id;
+        }
 
         // Get AMC services for the logged-in user (by email)
-        $amcServices = \App\Models\AmcService::with(['amcPlan', 'products', 'branches'])
+        $amcServices = \App\Models\AmcPlan::where('plan_name','plan_code')
             ->orderBy('created_at', 'desc')
             ->get();
 

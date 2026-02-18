@@ -56,8 +56,9 @@
                     <div class="my-account-content account-dashboard">
                         <div class="d-flex justify-content-between align-items-center mb-20">
                             <h4 class="fw-semibold mb-0">AMC Service Requests</h4>
-                            <a href="{{ route('amc') }}" class="tf-btn btn-small">
-                                <i class="fas fa-plus me-2"></i>New Request
+                            <a href="{{ route('amc') }}" class="bg-primary text-white tf-btn btn-small d-inline-flex">
+                                {{-- <i class="fas fa-plus me-2"></i> --}}
+                                New Request
                             </a>
                         </div>
 
@@ -85,9 +86,9 @@
                                         @foreach($amcServices as $index => $service)
                                             <tr class="td-order-item">
                                                 <td class="body-text-3">{{ $service->service_id }}</td>
-                                                <td class="body-text-3">
+                                                {{-- <td class="body-text-3">
                                                     <span class="badge bg-primary">{{ $service->products->count() }} Product(s)</span>
-                                                </td>
+                                                </td> --}}
                                                 <td class="body-text-3">{{ $service->amcPlan->plan_name ?? 'N/A' }}</td>
                                                 <td class="body-text-3">{{ $service->plan_start_date ? $service->plan_start_date->format('d M Y') : 'N/A' }}</td>
                                                 <td class="body-text-3">{{ $service->plan_end_date ? $service->plan_end_date->format('d M Y') : 'N/A' }}</td>

@@ -13,6 +13,7 @@ use App\Models\ProductDeal;
 use App\Models\WebsiteBanner;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class FrontendController extends Controller
@@ -157,55 +158,153 @@ class FrontendController extends Controller
     }
 
     /**
+     * Check if customer is logged in
+     */
+    public function checkCustomerLogin()
+    {
+        if (Auth::check()) {
+            $customer = Auth::user();
+            
+            // Get customer addresses
+            $addresses = \App\Models\CustomerAddressDetail::where('customer_id', $customer->id)->get();
+            
+            // Get customer company details
+            $companyDetails = \App\Models\CustomerCompanyDetail::where('customer_id', $customer->id)->first();
+            
+            return response()->json([
+                'logged_in' => true,
+                'customer' => [
+                    'id' => $customer->id,
+                    'customer_code' => $customer->customer_code,
+                    'first_name' => $customer->first_name,
+                    'last_name' => $customer->last_name,
+                    'phone' => $customer->phone,
+                    'email' => $customer->email,
+                    'customer_type' => $customer->customer_type,
+                ],
+                'addresses' => $addresses,
+                'company_details' => $companyDetails,
+            ]);
+        }
+        
+        return response()->json([
+            'logged_in' => false,
+        ]);
+    }
+
+    /**
+     * Check if email already exists in database
+     */
+    public function checkCustomerEmail(Request $request)
+    {
+        $email = $request->email;
+        
+        $customer = \App\Models\Customer::where('email', $email)->first();
+        
+        if ($customer) {
+            return response()->json([
+                'success' => true,
+                'exists' => true,
+                'message' => 'Email already exists in our system. Please login to continue.',
+            ]);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'exists' => false,
+            'message' => 'Email is available.',
+        ]);
+    }
+
+    /**
+     * Get customer data by email (for logged in users or after email verification)
+     */
+    public function getCustomerData(Request $request)
+    {
+        $email = $request->email;
+        
+        $customer = \App\Models\Customer::where('email', $email)->first();
+        
+        if (!$customer) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer not found.',
+            ]);
+        }
+        
+        // Get customer address
+        $addresses = \App\Models\CustomerAddressDetail::where('customer_id', $customer->id)->get();
+        
+        // Get customer company details
+        $companyDetails = \App\Models\CustomerCompanyDetail::where('customer_id', $customer->id)->first();
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'customer' => $customer,
+                'addresses' => $addresses,
+                'company_details' => $companyDetails,
+            ],
+        ]);
+    }
+
+    /**
      * Submit AMC service request form
      */
     public function submitAmcRequest(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             // Step 1: Customer Details
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:15',
             'email' => 'required|email|max:255',
-            'pan_no' => 'required|string|max:20',
-            'customer_type' => 'required|string',
+            'customer_type' => 'nullable',
+            'source_type' => 'nullable|string',
 
-            // Step 2: Company/Branch Details (if applicable)
-            'company_name' => 'nullable|string|max:255',
-            'branch_name' => 'nullable|string|max:255',
-            'address_line1' => 'nullable|string|max:255',
-            'address_line2' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:100',
-            'state' => 'nullable|string|max:100',
+            // Step 2: Customer Address
+            'branch_name' => 'required|string|max:255',
+            'address1' => 'required|string|max:255',
+            'address2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:100',
+            'state' => 'required|string|max:100',
             'country' => 'nullable|string|max:100',
-            'pin_code' => 'nullable|string|max:20',
+            'pincode' => 'required|string|max:20',
+
+            // Step 3: Company Details (Optional)
+            'company_name' => 'nullable|string|max:255',
+            'comp_address1' => 'nullable|string|max:255',
+            'comp_address2' => 'nullable|string|max:255',
+            'comp_city' => 'nullable|string|max:100',
+            'comp_state' => 'nullable|string|max:100',
+            'comp_country' => 'nullable|string|max:100',
+            'comp_pincode' => 'nullable|string|max:20',
             'gst_no' => 'nullable|string|max:20',
 
-            // Step 3: Product Information (Multiple Products)
+            // Step 4: AMC Plan Selection
+            'amc_plan_id' => 'required|integer|min:1',
+            'preferred_start_date' => 'required|date',
+
+            // Step 5: Product Information (Multiple Products)
             'products' => 'required|array|min:1',
             'products.*.product_name' => 'required|string|max:255',
             'products.*.product_type' => 'required|string',
             'products.*.brand_name' => 'required|string',
             'products.*.model_number' => 'required|string|max:255',
-            'products.*.serial_number' => 'required|string|max:255',
+            'products.*.serial_number' => 'nullable|string|max:255',
             'products.*.purchase_date' => 'required|date',
 
-            // Step 4: AMC Plan Selection
-            'amc_plan_id' => 'required|exists:amc_plans,id',
-            'plan_duration' => 'required|string',
-            'preferred_start_date' => 'required|date',
-
-            // Step 5: Additional Information
+            // Step 6: Additional Information
             'additional_notes' => 'nullable|string',
-            'terms_agreed' => 'required|accepted',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors(),
+                'debug' => 'Validator failed',
+                'errors' => $validator->errors()->toArray(),
             ], 422);
         }
 
@@ -214,46 +313,48 @@ class FrontendController extends Controller
             $customer = \App\Models\Customer::where('email', $request->email)->first();
             
             if (!$customer) {
+                // Generate customer code
+                $customerCode = 'CUST-' . strtoupper(uniqid());
+                
                 $customer = \App\Models\Customer::create([
+                    'customer_code' => $customerCode,
                     'first_name' => $request->first_name,
                     'last_name' => $request->last_name,
                     'phone' => $request->phone,
                     'email' => $request->email,
-                    'pan_no' => $request->pan_no,
                     'customer_type' => $request->customer_type,
+                    'source_type' => $request->source_type ?? 'ecommerce',
                 ]);
             }
 
-            // Create customer address if not exists
-            $customerAddress = \App\Models\CustomerAddressDetail::where('customer_id', $customer->id)->first();
-            if (!$customerAddress && $request->filled('address_line1')) {
-                $customerAddress = \App\Models\CustomerAddressDetail::create([
-                    'customer_id' => $customer->id,
-                    'branch_name' => $request->branch_name ?? 'Primary',
-                    'address1' => $request->address_line1,
-                    'address2' => $request->address_line2,
-                    'country' => $request->country ?? 'India',
-                    'state' => $request->state,
-                    'city' => $request->city,
-                    'pincode' => $request->pin_code,
-                ]);
-            }
+            // Create or update customer address
+            $customerAddress = \App\Models\CustomerAddressDetail::create([
+                'customer_id' => $customer->id,
+                'branch_name' => $request->branch_name ?? 'Primary',
+                'address1' => $request->address1,
+                'address2' => $request->address2,
+                'country' => $request->country ?? 'India',
+                'state' => $request->state,
+                'city' => $request->city,
+                'pincode' => $request->pincode,
+                'is_primary' => 'yes',
+            ]);
 
-            // Create customer company details if not exists
-            $customerCompany = \App\Models\CustomerCompanyDetail::where('customer_id', $customer->id)->first();
-            if (!$customerCompany && $request->filled('company_name')) {
-                $customerCompany = \App\Models\CustomerCompanyDetail::create([
-                    'customer_id' => $customer->id,
-                    'company_name' => $request->company_name,
-                    'gst_no' => $request->gst_no,
-                    'pan_no' => $request->pan_no,
-                    'address1' => $request->address_line1,
-                    'address2' => $request->address_line2,
-                    'country' => $request->country ?? 'India',
-                    'state' => $request->state,
-                    'city' => $request->city,
-                    'pincode' => $request->pin_code,
-                ]);
+            // Create customer company details if company name is provided
+            if ($request->filled('company_name')) {
+                \App\Models\CustomerCompanyDetail::updateOrCreate(
+                    ['customer_id' => $customer->id],
+                    [
+                        'company_name' => $request->company_name,
+                        'gst_no' => $request->gst_no,
+                        'address1' => $request->comp_address1,
+                        'address2' => $request->comp_address2,
+                        'country' => $request->comp_country ?? 'India',
+                        'state' => $request->comp_state,
+                        'city' => $request->comp_city,
+                        'pincode' => $request->comp_pincode,
+                    ]
+                );
             }
 
             // Get AMC plan details
@@ -264,13 +365,15 @@ class FrontendController extends Controller
 
             // Create Service Request in service_requests table
             $serviceRequest = \App\Models\ServiceRequest::create([
-                'request_id' => $serviceId,
+                'request_id' => uniqid(),
                 'service_type' => 'AMC',
                 'customer_id' => $customer->id,
+                'customer_address_id' => $customerAddress->id,
                 'amc_plan_id' => $request->amc_plan_id,
                 'request_date' => now(),
-                'request_status' => 'Pending',
-                'request_source' => $request->source_type_label ?? 'website',
+                'status' => 'pending',
+                'request_source' => $request->source_type ?? 'customer',
+                'visit_date' => $request->preferred_start_date,
             ]);
 
             // Create Service Request Products in service_request_products table
@@ -282,8 +385,11 @@ class FrontendController extends Controller
                     'type' => $productData['product_type'],
                     'brand' => $productData['brand_name'],
                     'model_no' => $productData['model_number'],
-                    'serial_no' => $productData['serial_number'],
+                    'serial_no' => $productData['serial_number'] ?? null,
                     'purchase_date' => $productData['purchase_date'],
+                    'sku' => $productData['sku'] ?? null,
+                    'hsn' => $productData['hsn'] ?? null,
+                    'status' => 'Pending',
                 ]);
             }
 
@@ -299,7 +405,9 @@ class FrontendController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong. Please try again.',
-                'error' => $e->getMessage(),
+                'debug' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ], 500);
         }
     }
@@ -409,11 +517,12 @@ class FrontendController extends Controller
     private function generateServiceId()
     {
         $year = date('Y');
-        $lastService = \App\Models\AmcService::whereYear('created_at', $year)
+        $lastService = \App\Models\ServiceRequest::whereYear('created_at', $year)
+            ->where('service_type', 'AMC')
             ->orderBy('id', 'desc')
             ->first();
 
-        $nextNumber = $lastService ? (intval(substr($lastService->service_id, -4)) + 1) : 1;
+        $nextNumber = $lastService ? (intval(substr($lastService->request_id, -4)) + 1) : 1;
 
         return 'SRV-'.$year.'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }

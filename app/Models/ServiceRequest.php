@@ -27,7 +27,9 @@ class ServiceRequest extends Model
         'status',
         'amc_plan_id',
         'otp',
-        'otp_expiry'
+        'otp_expiry',
+        'preferred_start_date',
+        'additional_notes',
     ];
 
     public function customer()

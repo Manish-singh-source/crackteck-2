@@ -2086,7 +2086,7 @@ class ServiceRequestController extends Controller
             'products.diagnosisDetails.assignedEngineer.engineer',
             'products.diagnosisDetails.coveredItem',
             'products.pickups',
-            'products.requestParts', // Load request parts for each product
+            'products.requestParts.product', // Load request parts for each product
             'parentCategorie',
             'activeAssignment.engineer',
             // 'activeAssignment.groupEngineers',

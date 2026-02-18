@@ -205,9 +205,9 @@ class FieldEngineerController extends Controller
         $validated = $validated->validated();
 
         // return response()->json(['success' => false, 'message' => 'Unauthorized.', 'id' => auth()->id()], 401);
-        if ($validated['user_id'] != auth()->id()) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
-        }
+        // if ($validated['user_id'] != auth()->guard('staff_api')->id()) {
+        //     return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        // }   
 
         $serviceRequestProduct = ServiceRequestProduct::with(['itemCode'])
             ->where('service_requests_id', $id)
@@ -576,17 +576,19 @@ class FieldEngineerController extends Controller
                         ];
 
                         // If status is stock_in_hand or request_part, add part details
-                        if (in_array($itemStatus, ['stock_in_hand', 'request_part'])) {
+                        if (in_array($itemStatus, ['stock_in_hand', 'request_part', 'used', 'working'])) {
                             $itemData['part_id'] = $item['part_id'] ?? null;
-                            $itemData['quantity'] = $item['quantity'] ?? 1;
+                            if ($item['part_id']) {
+                                $itemData['quantity'] = $item['quantity'] ?? 1;
 
-                            // Get the part request status from service_request_product_request_parts
-                            if (isset($item['part_id'])) {
-                                $partRequest = ServiceRequestProductRequestPart::where('request_id', $id)
-                                    ->where('product_id', $product_id)
-                                    ->where('part_id', $item['part_id'])
-                                    ->first();
-                                $itemData['part_status'] = $partRequest ? $partRequest->status : 'pending';
+                                // Get the part request status from service_request_product_request_parts
+                                if (isset($item['part_id'])) {
+                                    $partRequest = ServiceRequestProductRequestPart::where('request_id', $id)
+                                        ->where('product_id', $product_id)
+                                        ->where('part_id', $item['part_id'])
+                                        ->first();
+                                    $itemData['part_status'] = $partRequest ? $partRequest->status : 'pending';
+                                }
                             }
                         }
 
@@ -664,8 +666,8 @@ class FieldEngineerController extends Controller
             'after_photos.*' => 'nullable|file|mimes:jpeg,jpg,png|max:10240',
             'diagnosis_list' => 'required|array|min:1|max:10',
             'diagnosis_list.*.name' => 'required|string|max:255',
-            'diagnosis_list.*.report' => 'required|string|max:5000',
-            'diagnosis_list.*.status' => 'required|in:working,not_working,picking,stock_in_hand,request_part,used',
+            'diagnosis_list.*.report' => 'nullable|string|max:5000',
+            'diagnosis_list.*.status' => 'nullable|in:working,not_working,picking,stock_in_hand,request_part,used',
             'diagnosis_list.*.part_id' => 'required_if:diagnosis_list.*.status,stock_in_hand,request_part',
             'diagnosis_list.*.quantity' => 'required_if:diagnosis_list.*.status,stock_in_hand,request_part',
             'diagnosis_list.*.part_status' => 'nullable|in:pending,admin_approved,admin_rejected,customer_approved,customer_rejected,used,picked,delivered',

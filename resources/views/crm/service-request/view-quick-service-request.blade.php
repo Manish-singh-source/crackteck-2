@@ -440,7 +440,7 @@
                                                                         <div class="col-md-12">
                                                                             <div class="d-flex justify-content-between align-items-start mb-2">
                                                                                 <div>
-                                                                                    <span class="fw-semibold">Part Name:</span> {{ $partDetails->name ?? 'N/A' }}<br>
+                                                                                    <span class="fw-semibold">Part Name:</span> {{ $partDetails->product_name ?? 'N/A' }}<br>
                                                                                     <span class="text-muted small">
                                                                                         Part ID: {{ $requestPart->part_id ?? 'N/A' }} | 
                                                                                         Request Type: {{ $requestTypeLabels[$requestPart->request_type] ?? $requestPart->request_type }} | 

@@ -90,10 +90,10 @@ Route::prefix('demo')->group(function () {
     // Wishlist Routes
     Route::controller(WishlistController::class)->group(function () {
         // Display wishlist page (requires authentication)
-        Route::get('/wishlist', 'index')->name('wishlist')->middleware('auth');
+        Route::get('/wishlist', 'index')->name('wishlist')->middleware('auth:customer_web');
 
         // AJAX routes for wishlist operations (require authentication)
-        Route::middleware('auth')->group(function () {
+        Route::middleware('auth:customer_web')->group(function () {
             Route::post('/wishlist/add', 'store')->name('wishlist.add');
             Route::post('/wishlist/toggle', 'toggleWishlist')->name('wishlist.toggle');
             Route::delete('/wishlist/{id}', 'destroy')->name('wishlist.remove');
@@ -110,10 +110,10 @@ Route::prefix('demo')->group(function () {
     // Cart Routes
     Route::controller(CartController::class)->group(function () {
         // Display cart page (requires authentication)
-        Route::get('/shop-cart', 'index')->name('shop-cart')->middleware('auth');
+        Route::get('/shop-cart', 'index')->name('shop-cart')->middleware('auth:customer_web');
 
         // AJAX routes for cart operations (require authentication)
-        Route::middleware('auth')->group(function () {
+        Route::middleware('auth:customer_web')->group(function () {
             Route::post('/cart/add', 'store')->name('cart.add');
             Route::post('/cart/toggle', 'toggleCart')->name('cart.toggle');
             Route::post('/cart/buy-now', 'buyNow')->name('cart.buy-now');
@@ -125,7 +125,7 @@ Route::prefix('demo')->group(function () {
     });
 
     // Coupon Application Routes
-    Route::controller(App\Http\Controllers\CouponApplicationController::class)->middleware('auth')->group(function () {
+    Route::controller(App\Http\Controllers\CouponApplicationController::class)->middleware('auth:customer_web')->group(function () {
         Route::post('/cart/apply-coupon', 'applyCoupon')->name('cart.apply-coupon');
         Route::post('/cart/remove-coupon', 'removeCoupon')->name('cart.remove-coupon');
         Route::get('/cart/applied-coupon', 'getAppliedCoupon')->name('cart.applied-coupon');
@@ -176,17 +176,17 @@ Route::prefix('demo')->group(function () {
     // Checkout Routes
     Route::controller(CheckoutController::class)->group(function () {
         // Display checkout page (requires authentication)
-        Route::get('/checkout', 'index')->name('checkout')->middleware('auth');
+        Route::get('/checkout', 'index')->name('checkout')->middleware('auth:customer_web');
 
         // AJAX routes for checkout operations (require authentication)
-        Route::middleware('auth')->group(function () {
+        Route::middleware('auth:customer_web')->group(function () {
             Route::post('/checkout/place-order', 'store')->name('checkout.store');
             Route::get('/checkout/addresses', 'getUserAddresses')->name('checkout.addresses');
             Route::post('/checkout/save-address', 'saveAddress')->name('checkout.save-address');
         });
 
         // Order details page (requires authentication)
-        Route::get('/order-details/{orderNumber}', 'orderDetails')->name('order-details')->middleware('auth');
+        Route::get('/order-details/{orderNumber}', 'orderDetails')->name('order-details')->middleware('auth:customer_web');
     });
 
     // Product Detail
@@ -202,14 +202,14 @@ Route::prefix('demo')->group(function () {
 
     // My Account order
     Route::get('/my-account-orders', [CheckoutController::class, 'myAccountOrders'])
-        ->name('my-account-orders')->middleware('auth');
+        ->name('my-account-orders')->middleware('auth:customer_web');
 
     // My Account Address
     Route::get('/my-account-address', [MyAccountController::class, 'addresses'])
-        ->name('my-account-address')->middleware('auth');
+        ->name('my-account-address')->middleware('auth:customer_web');
 
     // My Account Address AJAX Routes
-    Route::middleware('auth')->group(function () {
+    Route::middleware('auth:customer_web')->group(function () {
         Route::post('/my-account/address', [MyAccountController::class, 'storeAddress'])->name('my-account.address.store');
         Route::get('/my-account/address/{id}', [MyAccountController::class, 'getAddress'])->name('my-account.address.get');
         Route::put('/my-account/address/{id}', [MyAccountController::class, 'updateAddress'])->name('my-account.address.update');
@@ -224,23 +224,23 @@ Route::prefix('demo')->group(function () {
 
     // My Account Edit
     Route::get('/my-account-edit', [MyAccountController::class, 'accountDetails'])
-        ->name('my-account-edit')->middleware('auth');
+        ->name('my-account-edit')->middleware('auth:customer_web');
 
     // My Account Password
     Route::get('/my-account-password', [MyAccountController::class, 'changePassword'])
-        ->name('my-account-password')->middleware('auth');
+        ->name('my-account-password')->middleware('auth:customer_web');
 
     // My Account AMC
     Route::get('/my-account-amc', [MyAccountController::class, 'amcServices'])
-        ->name('my-account-amc')->middleware('auth');
+        ->name('my-account-amc')->middleware('auth:customer_web');
 
     // My Account AMC Service Details
     Route::get('/my-account-amc/{id}', [MyAccountController::class, 'viewAmcService'])
-        ->name('my-account-amc.view')->middleware('auth');
+        ->name('my-account-amc.view')->middleware('auth:customer_web');
 
     // My Account Non-AMC
     Route::get('/my-account-non-amc', [MyAccountController::class, 'nonAmcServices'])
-        ->name('my-account-non-amc')->middleware('auth');
+        ->name('my-account-non-amc')->middleware('auth:customer_web');
 
     // My Account
     Route::get('/my-account', function () {

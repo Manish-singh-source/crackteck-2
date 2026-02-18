@@ -18,7 +18,7 @@ class MyAccountController extends Controller
      */
     public function addresses()
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return redirect()->route('login')->with('error', 'Please login to view your orders.');
         }
 
@@ -43,7 +43,7 @@ class MyAccountController extends Controller
      */
     public function storeAddress(Request $request): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to add addresses.',
@@ -110,7 +110,7 @@ class MyAccountController extends Controller
      */
     public function getAddress($id): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to access addresses.',
@@ -142,7 +142,7 @@ class MyAccountController extends Controller
      */
     public function updateAddress(Request $request, $id): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to update addresses.',
@@ -219,7 +219,7 @@ class MyAccountController extends Controller
      */
     public function deleteAddress($id): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to delete addresses.',
@@ -277,8 +277,8 @@ class MyAccountController extends Controller
      */
     public function amcServices()
     {
-        if (! Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please login to view your orders.');
+        if (! Auth::guard('customer_web')->check()) {
+            return redirect()->route('login')->with('error', 'Please login to access your account.');
         }
 
         // Debug: Check what Auth::id() returns
@@ -303,7 +303,7 @@ class MyAccountController extends Controller
      */
     public function viewAmcService($id)
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return redirect()->route('login')->with('error', 'Please login to access your account.');
         }
 
@@ -337,7 +337,7 @@ class MyAccountController extends Controller
      */
     public function nonAmcServices()
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return redirect()->route('login')->with('error', 'Please login to access your account.');
         }
 

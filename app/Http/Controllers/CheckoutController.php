@@ -28,7 +28,7 @@ class CheckoutController extends Controller
     public function index(Request $request)
     {
         // Check if user is authenticated
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return redirect()->route('login')->with('error', 'Please login to proceed with checkout.');
         }
 
@@ -174,7 +174,7 @@ class CheckoutController extends Controller
      */
     public function getUserAddresses(): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Authentication required',
@@ -210,7 +210,7 @@ class CheckoutController extends Controller
      */
     public function store(Request $request)
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Authentication required',
@@ -510,7 +510,7 @@ class CheckoutController extends Controller
      */
     public function saveAddress(Request $request): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Authentication required',
@@ -564,7 +564,7 @@ class CheckoutController extends Controller
      */
     public function orderDetails($orderNumber)
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return redirect()->route('login')->with('error', 'Please login to view order details.');
         }
 
@@ -698,7 +698,7 @@ class CheckoutController extends Controller
      */
     public function myAccountOrders()
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return redirect()->route('login')->with('error', 'Please login to view your orders.');
         }
 

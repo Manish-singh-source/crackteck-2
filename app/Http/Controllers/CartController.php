@@ -19,7 +19,7 @@ class CartController extends Controller
     public function index()
     {
         // Check if user is authenticated
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return redirect()->route('login')->with('error', 'Please login to view your cart.');
         }
 
@@ -58,7 +58,7 @@ class CartController extends Controller
     public function store(Request $request): JsonResponse
     {
         // Check authentication
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to add items to cart.',
@@ -126,7 +126,7 @@ class CartController extends Controller
      */
     public function update(Request $request, $id): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to update cart.',
@@ -182,7 +182,7 @@ class CartController extends Controller
      */
     public function destroy($id): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to remove items from cart.',
@@ -216,7 +216,7 @@ class CartController extends Controller
      */
     public function getCartData(): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'cart_items' => [],
@@ -257,7 +257,7 @@ class CartController extends Controller
      */
     public function getCartCount(): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'cart_count' => 0,
             ]);
@@ -273,7 +273,7 @@ class CartController extends Controller
      */
     public function checkCartStatus(Request $request): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'in_cart' => false,
             ]);
@@ -293,7 +293,7 @@ class CartController extends Controller
     public function toggleCart(Request $request): JsonResponse
     {
         // Check authentication
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to manage your cart.',
@@ -393,7 +393,7 @@ class CartController extends Controller
     public function buyNow(Request $request): JsonResponse
     {
         // Check authentication
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to buy products.',

@@ -53,7 +53,6 @@ class FrontendController extends Controller
         //     ->get();
 
         $products = Product::with(['brand', 'parentCategorie', 'subCategorie'])->get();
-        // dd($products);
 
         return view('frontend.index', compact('banners', 'categories', 'products', 'collections'));
     }

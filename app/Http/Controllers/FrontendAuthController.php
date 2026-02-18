@@ -54,11 +54,12 @@ class FrontendAuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials)) {
+        // Use the 'customer_web' guard
+        if (Auth::guard('customer_web')->attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->intended('demo/');
-        }   
+            return redirect()->intended('demo/'); // customer dashboard
+        }
 
         return back()->withErrors([
             'email' => 'The provided credentials do not match.',

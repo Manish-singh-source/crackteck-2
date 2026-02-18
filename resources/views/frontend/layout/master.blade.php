@@ -93,7 +93,7 @@
                                     </select>
                                 </div>
                             </div> -->
-                            @if (Auth::check())
+                            @if (Auth::guard('customer_web')->check())
                                 <a href="{{ route('my-account') }}" class="tf-cur-item link">My
                                     Account</a>
                             @else
@@ -102,7 +102,7 @@
                                     <i class="fa-solid fa-user" style="color: #1987ff;"></i>
                                     {{-- <i class="fa-solid fa-user" style="color: #BCFE09;"></i> --}}
                                     <span class="body-small text-black">My Account:
-                                        {{ Auth::user()->name ?? 'Guest' }}</span>
+                                        {{ Auth::guard('customer_web')->user()->name ?? 'Guest' }}</span>
                                     <i class="icon-arrow-down" style="color:rgb(0, 0, 0);"></i>
                                 </a>
                             @endif

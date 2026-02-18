@@ -149,11 +149,11 @@ Route::prefix('demo/warehouse')->group(function () {
         // Assign Delivery Man/Engineer
         Route::put('/assign-person/{id}', 'assignPerson')->name('spare-parts.assign-person');
         // Admin Approval/Rejection
-        Route::put('/spare-parts/{id}/admin-approval', 'adminApproval')->name('spare-parts.admin-approval');
+        // Route::put('/spare-parts/{id}/admin-approval', 'adminApproval')->name('spare-parts.admin-approval');
         // Warehouse Approval/Rejection
-        Route::put('/spare-parts/{id}/warehouse-approval', 'warehouseApproval')->name('spare-parts.warehouse-approval');
+        // Route::put('/spare-parts/{id}/warehouse-approval', 'warehouseApproval')->name('spare-parts.warehouse-approval');
         // Picked by Engineer
-        Route::put('/spare-parts/{id}/picked', 'picked')->name('spare-parts.picked');
+        // Route::put('/spare-parts/{id}/picked', 'picked')->name('spare-parts.picked');
     });
 
     // ------------------------------------------------------------ Stock Requests Page -------------------------------------------------------------

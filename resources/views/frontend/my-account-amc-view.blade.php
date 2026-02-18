@@ -54,7 +54,7 @@
                             <li><span class="my-account-nav-item active">AMC</span></li>
                             <li><a href="{{ route('my-account-non-amc') }}" class="my-account-nav-item">NON AMC</a></li>
                             <li><a href="{{ route('wishlist') }}" class="my-account-nav-item">Wishlist</a></li>
-                            @if (Auth::check())
+                            @if (Auth::guard('customer_web')->check())
                                 <form method="POST" action="{{ route('frontend.logout') }}">
                                     @csrf
                                     <button type="submit" class="btn btn-primary w-100">Logout</button>

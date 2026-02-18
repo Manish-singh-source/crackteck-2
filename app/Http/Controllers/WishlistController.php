@@ -20,7 +20,7 @@ class WishlistController extends Controller
     public function index()
     {
         // Check if user is authenticated
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return redirect()->route('login')->with('error', 'Please login to view your wishlist.');
         }
 
@@ -174,7 +174,7 @@ class WishlistController extends Controller
     public function getWishlistCount(): JsonResponse
     {
         try {
-            if (! Auth::check()) {
+            if (! Auth::guard('customer_web')->check()) {
                 return response()->json(['count' => 0]);
             }
 
@@ -194,7 +194,7 @@ class WishlistController extends Controller
      */
     public function checkWishlistStatus(Request $request): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json(['in_wishlist' => false]);
         }
 
@@ -217,7 +217,7 @@ class WishlistController extends Controller
     public function toggleWishlist(Request $request): JsonResponse
     {
         // Check authentication
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to manage your wishlist.',

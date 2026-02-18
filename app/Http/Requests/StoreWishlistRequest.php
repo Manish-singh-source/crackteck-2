@@ -14,7 +14,7 @@ class StoreWishlistRequest extends FormRequest
     public function authorize(): bool
     {
         // Only authenticated users can add to wishlist
-        return Auth::check();
+        return Auth::guard('customer_web')->check();
     }
 
     /**

@@ -13,6 +13,7 @@ use App\Models\ProductDeal;
 use App\Models\WebsiteBanner;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class FrontendController extends Controller
@@ -52,7 +53,6 @@ class FrontendController extends Controller
         //     ->get();
 
         $products = Product::with(['brand', 'parentCategorie', 'subCategorie'])->get();
-        // dd($products);
 
         return view('frontend.index', compact('banners', 'categories', 'products', 'collections'));
     }

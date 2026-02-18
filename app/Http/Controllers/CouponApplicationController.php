@@ -18,7 +18,7 @@ class CouponApplicationController extends Controller
      */
     public function applyCoupon(Request $request): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to apply coupons.',
@@ -105,7 +105,7 @@ class CouponApplicationController extends Controller
      */
     public function removeCoupon(): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to manage coupons.',
@@ -131,7 +131,7 @@ class CouponApplicationController extends Controller
      */
     public function getAppliedCoupon(): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
                 'applied_coupon' => null,
@@ -251,7 +251,7 @@ class CouponApplicationController extends Controller
 
     public function getCartCount(): JsonResponse
     {
-        if (! Auth::check()) {
+        if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'cart_count' => 0,
             ]);

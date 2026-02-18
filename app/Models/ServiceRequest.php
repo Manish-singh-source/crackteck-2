@@ -8,7 +8,7 @@ class ServiceRequest extends Model
 {
     //
     protected $casts = [
-        'request_date' => 'date',
+        // 'request_date' => 'date',
     ];
 
     protected $fillable = [
@@ -110,7 +110,7 @@ class ServiceRequest extends Model
 
     //  
     public function amcScheduleMeetings() {
-        return $this->hasMany(AmcScheduleMeeting::class, 'service_request_id')->orderBy('scheduled_at', 'desc');
+        return $this->hasMany(AmcScheduleMeeting::class, 'service_request_id')->orderBy('visits_count', 'asc');
     }
 }
     

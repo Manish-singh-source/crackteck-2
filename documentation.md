@@ -2302,3 +2302,54 @@ agar customer me company detail fill kiya to customer_company_details table me d
 4. AMC Plan Selection
 5. Additional Information
 6. Review & Submit
+
+
+
+
+
+
+
+
+AMC Service Request Form
+
+ka layout as it is rahega
+
+but fields change hoga
+1. Customer Details
+2. Customer Address
+3. Company Details
+4. AMC Plan Selection
+5. Product Information
+6. Additional Information
+7. Review & Submit
+
+first check karo ki customer login hai ki nahi agar login hoga to above section ka jitan bhi data hoga wo sub detail har ek fields me aajayega
+aur agar login nahi wo to inputs prefilled nahi rahega
+data fill karene ke baad next par click karne ke baad agar email hamare database me hoga to email is already avliable please login first popup ya section display hoga 
+aur otherwise aage proceed hoga 
+
+agar customer naya hoga to new customer create hoga, already available hoga to new customer create nahi hoga bus service request aur baki sub table me add hoga data
+
+1. Customer Details
+customer_code (auto generate hoga ) first_name,last_name,phone,email,customer_type (both) (hidden input) ,source_type (ecommerce) (hidden input), 
+
+2. Customer Address
+agar customer login hoga aur uska address hamare database me hoga to direct data fetch hoga aur login nahi hoga to address ka detail customer fill karega 
+branch_name,address1,address2,city,state,country,pincode
+
+3. Company Details (optional)
+agar customer ka company detail hoga to data fetch hoga nahi to customer fill karega 
+agar customer me company detail fill kiya to customer_company_details table me data store hoga (company_name,comp_address1,comp_address2,comp_city,comp_state,comp_country,comp_pincode,gst_no) nahi kiya to skip ka button se next step par jayega
+
+4. AMC Plan Selection
+AMC Plan (dropdown select),Plan Duration(auto fetch),Plan Cost (₹) (auto fetch),Preferred Start Date
+
+5. Product Information ( multiple products )
+product detail aane ke baad pahele mujhe ek service_requests banana hai 
+service_requests table
+request_id (auto generate hoga),service_type (amc),customer_id ( jis customer me form fill kiya tha),request_date(current date),request_source(customer),created_by(customer_id),status(pending),amc_plan_id (selected in AMC Plan Selection ),customer_address_id (from Customer Address table)
+
+service_request_products table
+service_requests_id (service_requests table id),name,type,model_no,sku,hsn,purchase_date,brand,status(pending)
+
+

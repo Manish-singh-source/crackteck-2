@@ -38,24 +38,30 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'customers',
+            'provider' => 'users',
         ],
-        'customers' => [
+        'customer_web' => [
             'driver' => 'session',
             'provider' => 'customers',
         ],
+        'staff_web' => [
+            'driver' => 'session',
+            'provider' => 'staff',
+        ],
+
+         // API guards (JWT token based)
         'api' => [
             'driver' => 'jwt',
             'provider' => 'users',
         ],
-        'customers' => [
+        'customer_api' => [
             'driver' => 'jwt',
             'provider' => 'customers',
         ],
-        'staff' => [
+        'staff_api' => [
             'driver' => 'jwt',
             'provider' => 'staff',
-        ],  
+        ],
     ],
 
     /*
@@ -78,7 +84,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\Customer::class),
+            'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
         'customers' => [
             'driver' => 'eloquent',
@@ -89,10 +95,6 @@ return [
             'model' => env('AUTH_STAFF_MODEL', App\Models\Staff::class),
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
     ],
 
     /*
@@ -117,6 +119,18 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'customers' => [
+            'provider' => 'customers',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'staff' => [
+            'provider' => 'staff',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
             'throttle' => 60,

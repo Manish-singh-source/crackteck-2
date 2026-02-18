@@ -350,7 +350,7 @@
                                     @foreach ($request->amcScheduleMeetings as $index => $meeting)
                                         <tr class="align-middle">
                                             <td>
-                                                {{ $index + 1 }}
+                                                {{ $index + 1 }}    
                                             </td>
                                             <td>
                                                 {{ $meeting->activeAssignment->engineer->first_name ?? 'N/A' }}
@@ -1775,7 +1775,7 @@
                             location.reload();
                         } else {
                             alert('Error: ' + response.message);
-                        }
+                        }   
                     },
                     error: function(xhr) {
                         console.error('Assignment Error:', xhr);

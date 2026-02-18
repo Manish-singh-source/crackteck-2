@@ -255,7 +255,7 @@ Route::prefix('v1')->group(function () {
         // Feild Engineer APIs 
         Route::controller(FieldEngineerController::class)->group(function () {
             // List of services 
-            Route::get('/service-requests', 'serviceRequests');
+            Route::get('/service-requests', 'serviceRequests'); 
             // Service details and List of products in this service
             Route::get('/service-request/{id}', 'serviceRequestDetails');
             // Product details of selected service and it's product

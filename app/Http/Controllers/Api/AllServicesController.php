@@ -112,7 +112,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'service_type' => 'required|in:amc,quick_service,installation,repairing',
+            'service_type' => 'required|in:amc,quick_service,installation,repair',
         ]);
 
         if ($validated->fails()) {
@@ -247,7 +247,7 @@ class AllServicesController extends Controller
                         ? $request->amc_plan_id
                         : null,
                     // 'request_status' => 'pending',
-                    // 'request_source' => 'mobile_app',
+                    'request_source' => 'customer',
                     // 'is_engineer_assigned' => '0',   
                     'status' => $request->service_type == 'amc' ? 'active' : 'pending',
                 ]);

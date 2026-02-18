@@ -33,7 +33,7 @@
                             <li><span class="my-account-nav-item active">Account Details</span></li>
                             <li><a href="{{ route('my-account-password') }}" class="my-account-nav-item">Change Password</a></li>
                             <li><a href="{{ route('my-account-amc') }}" class="my-account-nav-item">AMC</a></li>
-                            <li><a href="{{ route('my-account-non-amc') }}" class="my-account-nav-item">NON AMC</a>
+                            {{-- <li><a href="{{ route('my-account-non-amc') }}" class="my-account-nav-item">NON AMC</a> --}}
                             </li>
                             <li><a href="{{ route('wishlist') }}" class="my-account-nav-item">Wishlist</a></li>
                             @if (Auth::guard('customer_web')->check())

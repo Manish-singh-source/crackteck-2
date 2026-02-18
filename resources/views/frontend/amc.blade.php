@@ -1125,7 +1125,7 @@
         </div>
     </div>
 
-    <div class="container my-5">
+    {{-- <div class="container my-5 d-none">
         <div class="row justify-content-center">
             <div class="col-12 non-amc-section">
                 <!-- Left Side: Headline -->
@@ -1154,7 +1154,7 @@
                 <span class="non-amc-circle"></span>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Login Required Modal -->
     <div class="modal fade" id="loginRequiredModal" tabindex="-1" aria-labelledby="loginRequiredModalLabel"

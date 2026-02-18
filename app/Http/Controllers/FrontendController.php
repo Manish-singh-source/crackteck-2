@@ -292,7 +292,6 @@ class FrontendController extends Controller
             'products.*.product_type' => 'required|string',
             'products.*.brand_name' => 'required|string',
             'products.*.model_number' => 'required|string|max:255',
-            'products.*.serial_number' => 'nullable|string|max:255',
             'products.*.purchase_date' => 'required|date',
 
             // Step 6: Additional Information
@@ -328,17 +327,28 @@ class FrontendController extends Controller
             }
 
             // Create or update customer address
-            $customerAddress = \App\Models\CustomerAddressDetail::create([
-                'customer_id' => $customer->id,
-                'branch_name' => $request->branch_name ?? 'Primary',
-                'address1' => $request->address1,
-                'address2' => $request->address2,
-                'country' => $request->country ?? 'India',
-                'state' => $request->state,
-                'city' => $request->city,
-                'pincode' => $request->pincode,
-                'is_primary' => 'yes',
-            ]);
+            $customerAddress = null;
+            $selectedAddressId = $request->input('selected_address_id');
+            
+            if ($selectedAddressId) {
+                // Use existing address if selected
+                $customerAddress = \App\Models\CustomerAddressDetail::find($selectedAddressId);
+            }
+            
+            if (!$customerAddress) {
+                // Create new address only if no existing address selected
+                $customerAddress = \App\Models\CustomerAddressDetail::create([
+                    'customer_id' => $customer->id,
+                    'branch_name' => $request->branch_name ?? 'Primary',
+                    'address1' => $request->address1,
+                    'address2' => $request->address2,
+                    'country' => $request->country ?? 'India',
+                    'state' => $request->state,
+                    'city' => $request->city,
+                    'pincode' => $request->pincode,
+                    'is_primary' => 'yes',
+                ]);
+            }
 
             // Create customer company details if company name is provided
             if ($request->filled('company_name')) {
@@ -347,12 +357,12 @@ class FrontendController extends Controller
                     [
                         'company_name' => $request->company_name,
                         'gst_no' => $request->gst_no,
-                        'address1' => $request->comp_address1,
-                        'address2' => $request->comp_address2,
-                        'country' => $request->comp_country ?? 'India',
-                        'state' => $request->comp_state,
-                        'city' => $request->comp_city,
-                        'pincode' => $request->comp_pincode,
+                        'comp_address1' => $request->comp_address1,
+                        'comp_address2' => $request->comp_address2,
+                        'comp_country' => $request->comp_country ?? 'India',
+                        'comp_state' => $request->comp_state,
+                        'comp_city' => $request->comp_city,
+                        'comp_pincode' => $request->comp_pincode,
                     ]
                 );
             }
@@ -385,7 +395,6 @@ class FrontendController extends Controller
                     'type' => $productData['product_type'],
                     'brand' => $productData['brand_name'],
                     'model_no' => $productData['model_number'],
-                    'serial_no' => $productData['serial_number'] ?? null,
                     'purchase_date' => $productData['purchase_date'],
                     'sku' => $productData['sku'] ?? null,
                     'hsn' => $productData['hsn'] ?? null,
@@ -398,6 +407,7 @@ class FrontendController extends Controller
                 'message' => 'AMC service request submitted successfully!',
                 'service_id' => $serviceId,
                 'data' => $serviceRequest,
+                'selected_address_id' => $request->selected_address_id,
                 'products_count' => count($products),
             ]);
 

@@ -786,6 +786,7 @@
                 <!-- Hidden field for logged in customer -->
                 <input type="hidden" id="is_logged_in" name="is_logged_in" value="0">
                 <input type="hidden" id="customer_id" name="customer_id" value="">
+                <input type="hidden" id="selected_address_id" name="selected_address_id" value="">
                 <input type="hidden" id="source_type" name="source_type" value="ecommerce">
 
                 <!-- Step 1: Customer Details -->
@@ -827,40 +828,51 @@
                 <div class="form-section" id="section2">
                     <h3 class="mb-3">Customer Address</h3>
                     <p class="text-muted mb-4">Please provide the service address for AMC.</p>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="branch_name" class="form-label">Branch Name <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-lg" id="branch_name"
-                                name="branch_name" placeholder="Branch Name" required>
+                    
+                    <!-- Address Dropdown for logged in users with multiple addresses -->
+                    <div class="row g-3" id="address-selection-row" style="display: none;">
+                        <div class="col-12">
+                            <label for="address_selector" class="form-label">Select Address</label>
+                            <select class="form-select form-control-lg" id="address_selector">
+                                <option value="">Select an address</option>
+                            </select>
                         </div>
-                        <div class="col-md-6">
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-4">
                             <label for="address1" class="form-label">Address Line 1 <span
                                     class="text-danger">*</span></label>
                             <input type="text" class="form-control form-control-lg" id="address1" name="address1"
                                 placeholder="Address Line 1" required>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="address2" class="form-label">Address Line 2</label>
                             <input type="text" class="form-control form-control-lg" id="address2" name="address2"
                                 placeholder="Address Line 2">
                         </div>
                         <div class="col-md-4">
+                            <label for="branch_name" class="form-label">Branch Name <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg" id="branch_name"
+                                name="branch_name" placeholder="Branch Name" required>
+                        </div>
+                        <div class="col-md-3">
                             <label for="city" class="form-label">City <span class="text-danger">*</span></label>
                             <input type="text" class="form-control form-control-lg" id="city" name="city"
                                 placeholder="City" required>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="state" class="form-label">State <span class="text-danger">*</span></label>
                             <input type="text" class="form-control form-control-lg" id="state" name="state"
                                 placeholder="State" required>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="country" class="form-label">Country <span class="text-danger">*</span></label>
                             <input type="text" class="form-control form-control-lg" id="country" name="country"
                                 placeholder="Country" value="India" required>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label for="pincode" class="form-label">Pin Code <span class="text-danger">*</span></label>
                             <input type="text" class="form-control form-control-lg" id="pincode" name="pincode"
                                 placeholder="Pin Code" required>
@@ -880,6 +892,11 @@
                                 name="company_name" placeholder="Company Name">
                         </div>
                         <div class="col-md-6">
+                            <label for="gst_no" class="form-label">GST No</label>
+                            <input type="text" class="form-control form-control-lg" id="gst_no" name="gst_no"
+                                placeholder="GST Number">
+                        </div>
+                        <div class="col-md-6">
                             <label for="comp_address1" class="form-label">Company Address Line 1</label>
                             <input type="text" class="form-control form-control-lg" id="comp_address1"
                                 name="comp_address1" placeholder="Company Address Line 1">
@@ -889,30 +906,25 @@
                             <input type="text" class="form-control form-control-lg" id="comp_address2"
                                 name="comp_address2" placeholder="Company Address Line 2">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="comp_city" class="form-label">Company City</label>
                             <input type="text" class="form-control form-control-lg" id="comp_city" name="comp_city"
                                 placeholder="Company City">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="comp_state" class="form-label">Company State</label>
                             <input type="text" class="form-control form-control-lg" id="comp_state" name="comp_state"
                                 placeholder="Company State">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="comp_country" class="form-label">Company Country</label>
                             <input type="text" class="form-control form-control-lg" id="comp_country"
                                 name="comp_country" placeholder="Company Country" value="India">
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label for="comp_pincode" class="form-label">Company Pin Code</label>
                             <input type="text" class="form-control form-control-lg" id="comp_pincode"
                                 name="comp_pincode" placeholder="Company Pin Code">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="gst_no" class="form-label">GST No</label>
-                            <input type="text" class="form-control form-control-lg" id="gst_no" name="gst_no"
-                                placeholder="GST Number">
                         </div>
                     </div>
                 </div>
@@ -994,27 +1006,27 @@
                                         <input type="text" class="form-control form-control-lg product-brand"
                                             placeholder="Brand Name" required>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="form-label">Model Number</label>
                                         <input type="text" class="form-control form-control-lg product-model"
                                             placeholder="Model Number" required>
                                     </div>
-                                    <div class="col-md-4">
+                                    {{-- <div class="col-md-4">
                                         <label class="form-label">Serial Number</label>
                                         <input type="text" class="form-control form-control-lg product-serial"
                                             placeholder="Serial Number">
-                                    </div>
-                                    <div class="col-md-4">
+                                    </div> --}}
+                                    <div class="col-md-3">
                                         <label class="form-label">SKU</label>
                                         <input type="text" class="form-control form-control-lg product-sku"
                                             placeholder="SKU">
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="form-label">HSN Code</label>
                                         <input type="text" class="form-control form-control-lg product-hsn"
                                             placeholder="HSN Code">
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="form-label">Purchase Date</label>
                                         <input type="date" class="form-control form-control-lg product-purchase-date"
                                             required>
@@ -1762,6 +1774,7 @@
         let productCounter = 1; // Counter for product numbering
         let isLoggedIn = false; // Track if customer is logged in
         let customerData = null; // Store customer data if logged in
+        let customerAddresses = []; // Store customer addresses for dropdown
 
         // Initialize form
         document.addEventListener('DOMContentLoaded', function() {
@@ -1804,28 +1817,69 @@
                     document.getElementById('login-notice-text').textContent =
                         'You are logged in. Your details have been prefilled.';
 
-                    // If customer has addresses, load the first one
-                    if (customerData.addresses && customerData.addresses.length > 0) {
-                        const address = customerData.addresses[0];
-                        document.getElementById('branch_name').value = address.branch_name || '';
-                        document.getElementById('address1').value = address.address1 || '';
-                        document.getElementById('address2').value = address.address2 || '';
-                        document.getElementById('city').value = address.city || '';
-                        document.getElementById('state').value = address.state || '';
-                        document.getElementById('country').value = address.country || 'India';
-                        document.getElementById('pincode').value = address.pincode || '';
+                    // Handle addresses - result.addresses is directly accessible
+                    const addresses = result.addresses || [];
+                    customerAddresses = addresses; // Store for later use
+                    const addressSelectorRow = document.getElementById('address-selection-row');
+                    const addressSelector = document.getElementById('address_selector');
+                    
+                    console.log('Customer addresses:', addresses); // Debug log
+                    if (addresses.length > 0) {
+                        if (addresses.length === 1) {
+                            // Single address - prefill and hide dropdown
+                            const address = addresses[0];
+                            document.getElementById('branch_name').value = address.branch_name || '';
+                            document.getElementById('address1').value = address.address1 || '';
+                            document.getElementById('address2').value = address.address2 || '';
+                            document.getElementById('city').value = address.city || '';
+                            document.getElementById('state').value = address.state || '';
+                            document.getElementById('country').value = address.country || 'India';
+                            document.getElementById('pincode').value = address.pincode || '';
+                            // Set selected address ID for single address
+                            document.getElementById('selected_address_id').value = address.id || '';
+                            addressSelectorRow.style.display = 'none';
+                        } else {
+                            // Multiple addresses - show dropdown
+                            addressSelectorRow.style.display = 'block';
+                            addressSelector.innerHTML = '<option value="">Select an address</option>';
+                            
+                            addresses.forEach((address, index) => {
+                                const option = document.createElement('option');
+                                option.value = address.id; // Use actual address ID
+                                const addressText = address.branch_name || address.address1 || `Address ${index + 1}`;
+                                option.textContent = addressText + (address.city ? `, ${address.city}` : '');
+                                addressSelector.appendChild(option);
+                            });
+                            
+                            // Pre-select first address
+                            addressSelector.value = addresses[0].id;
+                            document.getElementById('selected_address_id').value = addresses[0].id || '';
+                            populateAddressFields(addresses[0]);
+                        }
+                        
+                        // Add change event listener for address dropdown
+                        addressSelector.addEventListener('change', function() {
+                            const selectedId = this.value;
+                            if (selectedId !== "") {
+                                const selectedAddress = addresses.find(addr => addr.id == selectedId);
+                                if (selectedAddress) {
+                                    populateAddressFields(selectedAddress);
+                                    document.getElementById('selected_address_id').value = selectedId;
+                                }
+                            }
+                        });
                     }
 
-                    // If customer has company details, load them
-                    if (customerData.company_details) {
-                        const company = customerData.company_details;
+                    // If customer has company details, load them - result.company_details is directly accessible
+                    if (result.company_details) {
+                        const company = result.company_details;
                         document.getElementById('company_name').value = company.company_name || '';
-                        document.getElementById('comp_address1').value = company.address1 || '';
-                        document.getElementById('comp_address2').value = company.address2 || '';
-                        document.getElementById('comp_city').value = company.city || '';
-                        document.getElementById('comp_state').value = company.state || '';
-                        document.getElementById('comp_country').value = company.country || 'India';
-                        document.getElementById('comp_pincode').value = company.pincode || '';
+                        document.getElementById('comp_address1').value = company.comp_address1 || '';
+                        document.getElementById('comp_address2').value = company.comp_address2 || '';
+                        document.getElementById('comp_city').value = company.comp_city || '';
+                        document.getElementById('comp_state').value = company.comp_state || '';
+                        document.getElementById('comp_country').value = company.comp_country || 'India';
+                        document.getElementById('comp_pincode').value = company.comp_pincode || '';
                         document.getElementById('gst_no').value = company.gst_no || '';
                     }
 
@@ -1838,6 +1892,17 @@
             } catch (error) {
                 console.error('Error checking customer login:', error);
             }
+        }
+        
+        // Function to populate address fields
+        function populateAddressFields(address) {
+            document.getElementById('branch_name').value = address.branch_name || '';
+            document.getElementById('address1').value = address.address1 || '';
+            document.getElementById('address2').value = address.address2 || '';
+            document.getElementById('city').value = address.city || '';
+            document.getElementById('state').value = address.state || '';
+            document.getElementById('country').value = address.country || 'India';
+            document.getElementById('pincode').value = address.pincode || '';
         }
 
         // Check email exists in database
@@ -1959,27 +2024,22 @@
                             <option value="">Select Brand</option>
                         </select>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">Model Number</label>
                         <input type="text" class="form-control form-control-lg product-model"
                             placeholder="Model Number" required>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Serial Number</label>
-                        <input type="text" class="form-control form-control-lg product-serial"
-                            placeholder="Serial Number">
-                    </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">SKU</label>
                         <input type="text" class="form-control form-control-lg product-sku"
                             placeholder="SKU">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">HSN Code</label>
                         <input type="text" class="form-control form-control-lg product-hsn"
                             placeholder="HSN Code">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">Purchase Date</label>
                         <input type="date" class="form-control form-control-lg product-purchase-date" required>
                     </div>
@@ -2257,7 +2317,6 @@
                         product_type: entry.querySelector('.product-type').value,
                         brand_name: entry.querySelector('.product-brand').value,
                         model_number: entry.querySelector('.product-model').value,
-                        serial_number: entry.querySelector('.product-serial').value,
                         sku: entry.querySelector('.product-sku').value,
                         hsn: entry.querySelector('.product-hsn').value,
                         purchase_date: entry.querySelector('.product-purchase-date').value
@@ -2273,7 +2332,6 @@
                         !input.classList.contains('product-type') &&
                         !input.classList.contains('product-brand') &&
                         !input.classList.contains('product-model') &&
-                        !input.classList.contains('product-serial') &&
                         !input.classList.contains('product-sku') &&
                         !input.classList.contains('product-hsn') &&
                         !input.classList.contains('product-purchase-date')) {
@@ -2331,7 +2389,6 @@
                     <p class="mb-1"><strong>Product Type:</strong> ${productTypeName}</p>
                     <p class="mb-1"><strong>Brand:</strong> ${brandName}</p>
                     <p class="mb-1"><strong>Model:</strong> ${product.model_number || ''}</p>
-                    <p class="mb-1"><strong>Serial Number:</strong> ${product.serial_number || ''}</p>
                     <p class="mb-1"><strong>Purchase Date:</strong> ${product.purchase_date || ''}</p>
                 </div>
             `;
@@ -2364,10 +2421,12 @@
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
 
+                let selected_address_id = document.getElementById('selected_address_id') ? document.getElementById('selected_address_id').value : null;
                 // Combine form data with products data
                 const submitData = {
                     ...formData,
-                    products: productsData
+                    products: productsData,
+                    selected_address_id: selected_address_id    
                 };
                 console.log('Submitting data:', submitData);
 

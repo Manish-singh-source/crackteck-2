@@ -12,6 +12,7 @@ class AssignedEngineer extends Model
 
     protected $fillable = [
         'service_request_id',
+        'amc_schedule_meeting_id',
         'engineer_id',
         'assignment_type',
         'assigned_at',

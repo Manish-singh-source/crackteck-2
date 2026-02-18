@@ -640,9 +640,9 @@ class ApiAuthController extends Controller
 
         // Choose guard based on role
         if ($staffRole == 'customers') {
-            $guard = 'customers';
+            $guard = 'customer_api';
         } else {
-            $guard = 'staff';
+            $guard = 'staff_api';
         }
         $token = auth($guard)->login($user); // if guard mapping in config/auth.php
 
@@ -663,9 +663,9 @@ class ApiAuthController extends Controller
         $staffRole = $this->getRoleId($request->role_id);
 
         if ($staffRole == 'customers') {
-            auth()->guard('customers')->logout();
+            auth()->guard('customer_api')->logout();
         } else {
-            auth()->guard('staff')->logout();
+            auth()->guard('staff_api')->logout();
         }
 
         return response()->json(['success' => true, 'message' => 'User logged out successfully']);
@@ -673,9 +673,9 @@ class ApiAuthController extends Controller
 
     public function updateToken(Request $request)
     {
-        $user = auth()->guard('staff')->user();
+        $user = auth()->guard('staff_api')->user();
         if (!$user) {
-            $user = auth()->guard('customers')->user();
+            $user = auth()->guard('customer_api')->user();
         }
         if ($user) {
             $user->device_token = $request->token;

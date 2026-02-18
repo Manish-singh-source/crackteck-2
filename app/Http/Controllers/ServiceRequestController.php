@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\StatusUpdateHelper;
 use App\Models\AMC;
 use App\Models\AmcBranch;
-use App\Models\AmcPlan;
 use App\Models\AmcEngineerAssignment;
 use App\Models\AmcGroupEngineer;
+use App\Models\AmcPlan;
 use App\Models\AmcProduct;
+use App\Models\AmcScheduleMeeting;
 use App\Models\AmcService;
 use App\Models\AssignedEngineer;
 use App\Models\Brand;
+use App\Models\CaseTransferRequest;
 use App\Models\CoveredItem;
 use App\Models\Customer;
 use App\Models\CustomerAddressDetail;
@@ -28,10 +31,8 @@ use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestProductPickup;
 use App\Models\ServiceRequestProductRequestPart;
 use App\Models\ServiceRequestProductReturn;
-use App\Models\Warehouse;
-use App\Helpers\StatusUpdateHelper;
-use App\Models\CaseTransferRequest;
 use App\Models\Staff;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -2370,7 +2371,7 @@ class ServiceRequestController extends Controller
             $serviceRequest->update([
                 'customer_id' => $customer->id,
                 'service_type' => $service_type, // Quick Service
-                'request_source' => 'system',
+                // 'request_source' => 'system',
                 'visit_date' => $request->visit_date,
                 'request_date' => $serviceRequest->request_date ?? now(),
                 'created_by' => $serviceRequest->created_by ?? Auth::id(),
@@ -2630,11 +2631,20 @@ class ServiceRequestController extends Controller
             $serviceRequest = ServiceRequest::findOrFail($request->service_request_id);
 
             /** Only approved requests can be assigned */
-            if (!in_array($serviceRequest->status, ['active', 'admin_approved', 'engineer_not_approved', 'in_transfer'])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Engineer can only be assigned to approved requests.',
-                ], 422);
+            if ($serviceRequest->service_type == 'amc') {
+                if (!in_array($serviceRequest->amc_status, ['active',])) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Engineer can only be assigned to active AMC requests.',
+                    ], 422);
+                }
+            } else {
+                if (!in_array($serviceRequest->status, ['active', 'admin_approved', 'engineer_not_approved', 'in_transfer'])) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Engineer can only be assigned to approved requests.',
+                    ], 422);
+                }
             }
 
             /** ---------------- PREVIOUS ASSIGNMENT ---------------- */
@@ -2649,11 +2659,17 @@ class ServiceRequestController extends Controller
                 ]);
             }
 
+            if ($serviceRequest->service_type == 'amc') { 
+                $amcScheduleMeeting = AmcScheduleMeeting::where('service_request_id', $serviceRequest->id)->where('status', 'scheduled')->first();
+            }
+            
+
             /** ---------------- ASSIGN ENGINEER ---------------- */
             if ($request->assignment_type === 'individual') {
 
                 $assignment = AssignedEngineer::create([
                     'service_request_id' => $serviceRequest->id,
+                    'amc_schedule_meeting_id' => $serviceRequest->service_type == 'amc' ? $amcScheduleMeeting->id ?? null : null,
                     'engineer_id'        => $request->engineer_id,
                     'assignment_type'    => 'individual',
                     'assigned_at'        => now(),
@@ -2682,6 +2698,7 @@ class ServiceRequestController extends Controller
 
                 $assignment = AssignedEngineer::create([
                     'service_request_id' => $serviceRequest->id,
+                    'amc_schedule_meeting_id' => $serviceRequest->service_type == 'amc' ? $amcScheduleMeeting->id ?? null : null,
                     'engineer_id'        => $request->supervisor_id,
                     'assignment_type'    => 'group',
                     'group_name'         => $request->group_name,
@@ -2746,6 +2763,7 @@ class ServiceRequestController extends Controller
                 'success' => true,
                 'message' => $message,
                 'old_status' => $oldStatus,
+                'amc_schedule_meeting_id' => $amcScheduleMeeting->id ?? null,
                 'new_status' => 'assigned_engineer',
             ], 200);
         } catch (\Exception $e) {

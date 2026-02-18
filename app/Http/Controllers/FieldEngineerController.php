@@ -8,6 +8,7 @@ use App\Models\ServiceRequest;
 use App\Models\AssignedEngineer;
 use App\Models\StockInHandProduct;
 use App\Models\CaseTransferRequest;
+use App\Models\CoveredItem;
 use Illuminate\Support\Facades\File;
 use App\Models\ServiceRequestProduct;
 use App\Models\EngineerDiagnosisDetail;
@@ -202,6 +203,11 @@ class FieldEngineerController extends Controller
         }
 
         $validated = $validated->validated();
+
+        // return response()->json(['success' => false, 'message' => 'Unauthorized.', 'id' => auth()->id()], 401);
+        if ($validated['user_id'] != auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        }
 
         $serviceRequestProduct = ServiceRequestProduct::with(['itemCode'])
             ->where('service_requests_id', $id)
@@ -523,7 +529,16 @@ class FieldEngineerController extends Controller
 
             if ($diagnosisDetails->isEmpty()) {
                 if ($serviceRequest->service_type == 'amc') {
-                    $diagnosisDetails = $serviceRequest->amcPlan;
+                    // For AMC, if no diagnosis details found, return the diagnosis list from AMC plan instead of item code
+                    $amcPlan = $serviceRequest->amcPlan;
+                    $diagnosisDetails = [];
+                    foreach ($amcPlan->covered_items as $key => $coveredItem) {
+                        if ($key > 1) continue;
+                        $coveredItemDetails = CoveredItem::where('id', $coveredItem)->first();
+                        if ($coveredItemDetails) {
+                            $diagnosisDetails[] = $coveredItemDetails->diagnosis_list;
+                        }
+                    }
                 } else {
                     $diagnosisDetails = $serviceRequestProduct->itemCode->diagnosis_list;
                 }
@@ -685,7 +700,7 @@ class FieldEngineerController extends Controller
                 throw new \Exception('Assigned engineer not found.');
             }
 
-            if($serviceRequest->service_type != 'amc') {
+            if ($serviceRequest->service_type != 'amc') {
                 $coveredItemId = $serviceRequestProduct->item_code_id;
             } else {
                 $coveredItemId = null;

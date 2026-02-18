@@ -1168,11 +1168,11 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-center py-4">
+                <div class="modal-body text-center py-4 mb-3">
                     <p class="mb-3">The email address you entered is already registered in our system.</p>
                     <p class="mb-4">Please login to continue with your existing account.</p>
                     <div class="d-flex justify-content-center gap-3">
-                        <a href="{{ route('ecommerce.login') }}" class="btn btn-primary">
+                        <a href="#log" data-bs-toggle="modal" class="btn btn-primary" onclick="$('#loginRequiredModal').modal('hide');">
                             <i class="fas fa-sign-in-alt me-2"></i>Login
                         </a>
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">

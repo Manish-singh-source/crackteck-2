@@ -107,7 +107,7 @@ class DatabaseSeeder extends Seeder
             AssignedEngineerSeeder::class,
             EngineerDiagnosisDetailSeeder::class,
             ServiceRequestProductPickupSeeder::class,
-            ServiceRequestProductRequestPartSeeder::class,
+            // ServiceRequestProductRequestPartSeeder::class,
             // RequestedPartDeliverySeeder::class,
             // AssignedEngineerGroupSeeder::class,
             // ServiceRequestPaymentSeeder::class,

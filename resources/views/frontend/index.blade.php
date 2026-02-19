@@ -3476,6 +3476,83 @@
         // Initialize counts on page load
         updateWishlistCount();
         updateCartCount();
+
+        // Add to Wishlist functionality
+        $('.add-to-wishlist-btn').on('click', function(e) {
+            e.preventDefault();
+
+            const $button = $(this);
+            const productId = $button.data('product-id');
+            const productName = $button.data('product-name');
+
+            // Check if user is authenticated
+            @guest
+                showNotification('Please login to add products to your wishlist.', 'warning');
+                return;
+            @endguest
+
+            // Show loading state
+            const originalIcon = $button.find('.icon').attr('class');
+            const originalTooltip = $button.find('.tooltip').text();
+
+            $button.find('.icon').attr('class', 'icon icon-loading');
+            $button.find('.tooltip').text('Adding...');
+            $button.prop('disabled', true);
+
+            // Make AJAX request
+            $.ajax({
+                url: '{{ route("wishlist.toggle") }}',
+                method: 'POST',
+                data: {
+                    ecommerce_product_id: productId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        showNotification(response.message, 'success');
+
+                        // Update button state based on action
+                        if (response.action === 'added') {
+                            $button.find('.icon').attr('class', 'icon icon-heart-fill');
+                            $button.find('.tooltip').text('In Wishlist');
+                            $button.addClass('in-wishlist');
+                        } else if (response.action === 'removed') {
+                            $button.find('.icon').attr('class', 'icon icon-heart2');
+                            $button.find('.tooltip').text('Add to Wishlist');
+                            $button.removeClass('in-wishlist');
+                        }
+
+                        // Update wishlist count if there's a counter
+                        updateWishlistCount();
+                    } else {
+                        showNotification(response.message, 'error');
+                        // Reset button state
+                        $button.find('.icon').attr('class', originalIcon);
+                        $button.find('.tooltip').text(originalTooltip);
+                    }
+                },
+                error: function(xhr) {
+                    let message = 'An error occurred while updating the wishlist.';
+
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    } else if (xhr.status === 401) {
+                        message = 'Please login to add products to your wishlist.';
+                    } else if (xhr.status === 409) {
+                        message = 'This product is already in your wishlist.';
+                    }
+
+                    showNotification(message, 'error');
+
+                    // Reset button state
+                    $button.find('.icon').attr('class', originalIcon);
+                    $button.find('.tooltip').text(originalTooltip);
+                },
+                complete: function() {
+                    $button.prop('disabled', false);
+                }
+            });
+        });
+
         });
     </script>
 @endsection

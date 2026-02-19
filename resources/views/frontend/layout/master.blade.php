@@ -351,10 +351,6 @@
                                                 <i class="icon-hearth"></i>
                                                 <span class="count-box">0</span>
                                             </span>
-                                            <!-- <div class="infor text-start d-none d-xxl-flex">
-                                                <span class="body-text-3 text-main-2">wishlist:</span>
-                                                <h6 class="number-item fw-semibold text-main-2">4 item</h6>
-                                            </div> -->
                                         </a>
                                     </li>
                                     <li class="d-none d-xl-block">
@@ -363,22 +359,11 @@
                                                 <i class="icon-cart"></i>
                                                 <span class="count-box">0</span>
                                             </span>
-                                            <!-- <div class="infor text-start d-none d-xxl-flex">
-                                                <span class="body-text-3 text-main-2">Your cart:</span>
-                                                <h6 class="number-item text-primary fw-semibold text-main-2">238,100
-                                                </h6>
-                                            </div> -->
                                         </a>
                                     </li>
                                     {{-- Compare Section  --}}
                                     <li class="d-none d-xl-block">
                                         <a href="{{ route('compare') }}" class="nav-icon-item">
-                                            <!-- <img src="icons/icomoon/fonts/compare1.png" alt=""> -->
-                                            <!-- <div class="infor text-start d-none d-xxl-flex">
-                                                <span class="body-text-3 text-main-2">Your cart:</span>
-                                                <h6 class="number-item text-primary fw-semibold text-main-2">₹238,100
-                                                </h6>
-                                            </div> -->
                                             <span class="icon position-relative">
                                                 <img width="35" height="35"
                                                 src="https://img.icons8.com/ios/50/1A1A1A/compare-git.png"
@@ -526,7 +511,6 @@
                                             <li><a href="{{ route('my-account') }}" class="link">My Account</a>
                                             </li>
                                             <li><a href="{{ route('amc') }}" class="link">AMC</a></li>
-                                            <li><a href="{{ route('non-amc') }}" class="link">NON AMC</a></li>
                                             <li><a href="{{ route('track-your-order') }}" class="link">Track your
                                                     Order</a>
                                             </li>
@@ -1572,7 +1556,7 @@
     <script src="{{ asset('frontend-assets/js/infinityslide.js') }}"></script>
     <script src="{{ asset('frontend-assets/js/simpleParallaxVanilla.umd.js') }}"></script>
     <script src="{{ asset('frontend-assets/js/main.js') }}"></script>
-    <script src="{{ asset('frontend-assets/js/product-actions.js') }}"></script>
+    {{-- <script src="{{ asset('frontend-assets/js/product-actions.js') }}"></script> --}}
 
     <script src="{{ asset('js/drift.min.js') }}"></script>
     <script type="module" src="{{ asset('js/zoom.js') }}"></script>

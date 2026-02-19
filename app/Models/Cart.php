@@ -27,6 +27,11 @@ class Cart extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
     /**
      * Get the ecommerce product that belongs to the cart item.
      */

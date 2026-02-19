@@ -30,7 +30,7 @@ class WishlistController extends Controller
             'ecommerceProduct.warehouseProduct.parentCategorie',
             'ecommerceProduct.warehouseProduct.subCategorie',
         ])
-            ->where('user_id', Auth::id())
+            ->where('customer_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -57,7 +57,7 @@ class WishlistController extends Controller
 
             // Add to wishlist
             $wishlistItem = Wishlist::create([
-                'user_id' => $userId,
+                'customer_id' => $userId,
                 'ecommerce_product_id' => $ecommerceProductId,
             ]);
 
@@ -85,7 +85,7 @@ class WishlistController extends Controller
         try {
             // Find the wishlist item and ensure it belongs to the authenticated user
             $wishlistItem = Wishlist::where('id', $id)
-                ->where('user_id', Auth::id())
+                ->where('customer_id', Auth::id())
                 ->first();
 
             if (! $wishlistItem) {
@@ -122,7 +122,7 @@ class WishlistController extends Controller
             // Find the wishlist item and ensure it belongs to the authenticated user
             $wishlistItem = Wishlist::with('ecommerceProduct')
                 ->where('id', $id)
-                ->where('user_id', Auth::id())
+                ->where('customer_id', Auth::id())
                 ->first();
 
             if (! $wishlistItem) {
@@ -178,7 +178,7 @@ class WishlistController extends Controller
                 return response()->json(['count' => 0]);
             }
 
-            $count = Wishlist::where('user_id', Auth::id())->count();
+            $count = Wishlist::where('customer_id', Auth::id())->count();
 
             return response()->json(['count' => $count]);
 
@@ -217,7 +217,8 @@ class WishlistController extends Controller
     public function toggleWishlist(Request $request): JsonResponse
     {
         // Check authentication
-        if (! Auth::guard('customer_web')->check()) {
+        $customer = Auth::guard('customer_web')->user();
+        if (! $customer) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to manage your wishlist.',
@@ -238,14 +239,13 @@ class WishlistController extends Controller
 
         DB::beginTransaction();
         try {
-            $userId = Auth::id();
+            $customerId = $customer->id; // Use the correct customer ID
             $ecommerceProductId = $request->ecommerce_product_id;
 
             // Check if the e-commerce product exists and is active
             $ecommerceProduct = EcommerceProduct::active()->find($ecommerceProductId);
             if (! $ecommerceProduct) {
                 DB::rollBack();
-
                 return response()->json([
                     'success' => false,
                     'message' => 'Product not found or is not available.',
@@ -253,7 +253,7 @@ class WishlistController extends Controller
             }
 
             // Check if product is already in wishlist
-            $existingWishlistItem = Wishlist::where('user_id', $userId)
+            $existingWishlistItem = Wishlist::where('customer_id', $customerId)
                 ->where('ecommerce_product_id', $ecommerceProductId)
                 ->first();
 
@@ -264,26 +264,26 @@ class WishlistController extends Controller
 
                 activity()
                     ->performedOn($existingWishlistItem)
-                    ->causedBy(Auth::user())
+                    ->causedBy($customer)
                     ->log('Removed product from wishlist');
 
                 return response()->json([
                     'success' => true,
                     'action' => 'removed',
                     'message' => 'Product removed from wishlist.',
-                    'wishlist_count' => Wishlist::where('user_id', $userId)->count(),
+                    'wishlist_count' => Wishlist::where('customer_id', $customerId)->count(),
                 ]);
             } else {
                 // Add to wishlist
                 $wishlistItem = Wishlist::create([
-                    'user_id' => $userId,
+                    'customer_id' => $customerId,
                     'ecommerce_product_id' => $ecommerceProductId,
                 ]);
                 DB::commit();
 
                 activity()
                     ->performedOn($wishlistItem)
-                    ->causedBy(Auth::user())
+                    ->causedBy($customer)
                     ->log('Added product to wishlist');
 
                 return response()->json([
@@ -291,7 +291,7 @@ class WishlistController extends Controller
                     'action' => 'added',
                     'message' => 'Product added to wishlist successfully!',
                     'wishlist_item_id' => $wishlistItem->id,
-                    'wishlist_count' => Wishlist::where('user_id', $userId)->count(),
+                    'wishlist_count' => Wishlist::where('customer_id', $customerId)->count(),
                 ]);
             }
         } catch (\Exception $e) {
@@ -304,4 +304,5 @@ class WishlistController extends Controller
             ], 500);
         }
     }
-}
+
+    }

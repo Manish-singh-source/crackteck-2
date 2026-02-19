@@ -274,7 +274,7 @@
                     }
                 } else {
                     if (typeof showNotification === 'function') {
-                        showNotification('Error updating cart. Please try again.', 'error');
+                        showNotification('Error updating cart. Please try againnnnnnn.', 'error');
                     }
                 }
             },

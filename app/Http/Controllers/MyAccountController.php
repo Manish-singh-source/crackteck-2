@@ -291,11 +291,13 @@ class MyAccountController extends Controller
         }
 
         // Get AMC services for the logged-in user (by email)
-        $amcServices = \App\Models\AmcPlan::where('plan_name','plan_code')
+        $servicesRequest = \App\Models\ServiceRequest::where('customer_id', $customer->id)
+            ->whereNotNull('amc_plan_id') // Only AMC services
+            ->with('customer') // Load relationship (if defined in model)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('frontend.my-account-amc', compact('amcServices'));
+        return view('frontend.my-account-amc', compact('servicesRequest'));
     }
 
     /**
@@ -307,8 +309,11 @@ class MyAccountController extends Controller
             return redirect()->route('login')->with('error', 'Please login to access your account.');
         }
 
+        $customer = Auth::user();
+        $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
+
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|exists:amc_services,id',
+            'id' => 'required|exists:service_requests,id',
         ]);
 
         if ($validator->fails()) {
@@ -316,13 +321,18 @@ class MyAccountController extends Controller
         }
 
         try {
-            $amcService = \App\Models\AmcService::with([
+            $amcService = \App\Models\ServiceRequest::with([
                 'amcPlan',
-                'branches',
-                'products.type',
-                'products.brand',
-                'creator',
-            ])->findOrFail($id);
+                'customer',
+                'customer.companyDetails',
+                'customer.branches',
+                'products',
+                'amcScheduleMeetings',
+                'amcScheduleMeetings.activeAssignment.engineer',
+            ])
+            ->where('id', $id)
+            ->where('customer_id', $customerId)
+            ->firstOrFail();
 
             return view('frontend.my-account-amc-view', compact('amcService'));
         } catch (\Exception $e) {

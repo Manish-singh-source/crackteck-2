@@ -78,6 +78,7 @@ class ServiceRequestController extends Controller
         // Quick
         $quickServiceRequests = (clone $baseQuery)
             ->where('service_type', 'quick_service')
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return view('crm.service-request.index', compact(
@@ -1557,8 +1558,9 @@ class ServiceRequestController extends Controller
             * 3. UPDATE PRODUCTS (simple strategy: delete old + recreate from form)
             *    This ensures quick_service_id + price (service_charge) are in sync.
             */
-            // Handle existing product images deletion only if needed; here we keep them.
-            $serviceRequest->products()->delete();
+            // Update / Create products instead of deleting all and recreating.
+            $existingProductIds = $serviceRequest->products()->pluck('id')->toArray();
+            $incomingProductIds = [];
 
             foreach ($request->products as $index => $prod) {
                 $imagePath = null;
@@ -1571,7 +1573,40 @@ class ServiceRequestController extends Controller
                     $imagePath = 'uploads/service-request-products/' . $imageName;
                 }
 
-                ServiceRequestProduct::create([
+                // If an id is provided, try to update the existing product
+                if (! empty($prod['id'])) {
+                    $product = ServiceRequestProduct::where('id', $prod['id'])
+                        ->where('service_requests_id', $serviceRequest->id)
+                        ->first();
+
+                    if ($product) {
+                        $updateData = [
+                            'name' => $prod['product_name'] ?? null,
+                            'type' => $prod['product_type'] ?? null,
+                            'brand' => $prod['product_brand'] ?? null,
+                            'model_no' => $prod['model_no'] ?? null,
+                            'hsn' => $prod['hsn'] ?? null,
+                            'purchase_date' => $prod['purchase_date'] ?? null,
+                            'item_code_id' => $prod['installation_service_id'] ?? null,
+                            'service_charge' => $prod['price'] ?? null,
+                            'description' => $prod['issue_description'] ?? null,
+                        ];
+
+                        if ($imagePath) {
+                            if ($product->images && File::exists(public_path($product->images))) {
+                                File::delete(public_path($product->images));
+                            }
+                            $updateData['images'] = $imagePath;
+                        }
+
+                        $product->update($updateData);
+                        $incomingProductIds[] = $product->id;
+                        continue;
+                    }
+                }
+
+                // Otherwise create a new product
+                $new = ServiceRequestProduct::create([
                     'service_requests_id' => $serviceRequest->id,
                     'name' => $prod['product_name'] ?? null,
                     'type' => $prod['product_type'] ?? null,
@@ -1584,6 +1619,20 @@ class ServiceRequestController extends Controller
                     'description' => $prod['issue_description'] ?? null,
                     'images' => $imagePath,
                 ]);
+
+                $incomingProductIds[] = $new->id;
+            }
+
+            // Delete any products that were removed in the request
+            $toDelete = array_diff($existingProductIds, $incomingProductIds);
+            if (! empty($toDelete)) {
+                $productsToDelete = ServiceRequestProduct::whereIn('id', $toDelete)->get();
+                foreach ($productsToDelete as $p) {
+                    if ($p->images && File::exists(public_path($p->images))) {
+                        File::delete(public_path($p->images));
+                    }
+                    $p->delete();
+                }
             }
 
             DB::commit();
@@ -1867,8 +1916,9 @@ class ServiceRequestController extends Controller
             * 3. UPDATE PRODUCTS (simple strategy: delete old + recreate from form)
             *    This ensures quick_service_id + price (service_charge) are in sync.
             */
-            // Handle existing product images deletion only if needed; here we keep them.
-            $serviceRequest->products()->delete();
+            // Update / Create products instead of deleting all and recreating.
+            $existingProductIds = $serviceRequest->products()->pluck('id')->toArray();
+            $incomingProductIds = [];
 
             foreach ($request->products as $index => $prod) {
                 $imagePath = null;
@@ -1881,7 +1931,40 @@ class ServiceRequestController extends Controller
                     $imagePath = 'uploads/service-request-products/' . $imageName;
                 }
 
-                ServiceRequestProduct::create([
+                // If an id is provided, try to update the existing product
+                if (! empty($prod['id'])) {
+                    $product = ServiceRequestProduct::where('id', $prod['id'])
+                        ->where('service_requests_id', $serviceRequest->id)
+                        ->first();
+
+                    if ($product) {
+                        $updateData = [
+                            'name' => $prod['product_name'] ?? null,
+                            'type' => $prod['product_type'] ?? null,
+                            'brand' => $prod['product_brand'] ?? null,
+                            'model_no' => $prod['model_no'] ?? null,
+                            'hsn' => $prod['hsn'] ?? null,
+                            'purchase_date' => $prod['purchase_date'] ?? null,
+                            'item_code_id' => $prod['repairing_service_id'] ?? null,
+                            'service_charge' => $prod['price'] ?? null,
+                            'description' => $prod['issue_description'] ?? null,
+                        ];
+
+                        if ($imagePath) {
+                            if ($product->images && File::exists(public_path($product->images))) {
+                                File::delete(public_path($product->images));
+                            }
+                            $updateData['images'] = $imagePath;
+                        }
+
+                        $product->update($updateData);
+                        $incomingProductIds[] = $product->id;
+                        continue;
+                    }
+                }
+
+                // Otherwise create a new product
+                $new = ServiceRequestProduct::create([
                     'service_requests_id' => $serviceRequest->id,
                     'name' => $prod['product_name'] ?? null,
                     'type' => $prod['product_type'] ?? null,
@@ -1894,6 +1977,20 @@ class ServiceRequestController extends Controller
                     'description' => $prod['issue_description'] ?? null,
                     'images' => $imagePath,
                 ]);
+
+                $incomingProductIds[] = $new->id;
+            }
+
+            // Delete any products that were removed in the request
+            $toDelete = array_diff($existingProductIds, $incomingProductIds);
+            if (! empty($toDelete)) {
+                $productsToDelete = ServiceRequestProduct::whereIn('id', $toDelete)->get();
+                foreach ($productsToDelete as $p) {
+                    if ($p->images && File::exists(public_path($p->images))) {
+                        File::delete(public_path($p->images));
+                    }
+                    $p->delete();
+                }
             }
 
             DB::commit();
@@ -2382,8 +2479,9 @@ class ServiceRequestController extends Controller
             * 3. UPDATE PRODUCTS (simple strategy: delete old + recreate from form)
             *    This ensures quick_service_id + price (service_charge) are in sync.
             */
-            // Handle existing product images deletion only if needed; here we keep them.
-            $serviceRequest->products()->delete();
+            // Update / Create products instead of deleting all and recreating.
+            $existingProductIds = $serviceRequest->products()->pluck('id')->toArray();
+            $incomingProductIds = [];
 
             foreach ($request->products as $index => $prod) {
                 $imagePath = null;
@@ -2396,7 +2494,44 @@ class ServiceRequestController extends Controller
                     $imagePath = 'uploads/service-request-products/' . $imageName;
                 }
 
-                ServiceRequestProduct::create([
+                // If an id is provided, try to update the existing product
+                if (! empty($prod['id'])) {
+                    $product = ServiceRequestProduct::where('id', $prod['id'])
+                        ->where('service_requests_id', $serviceRequest->id)
+                        ->first();
+
+                    if ($product) {
+                        $updateData = [
+                            'name' => $prod['product_name'] ?? null,
+                            'type' => $prod['product_type'] ?? null,
+                            'brand' => $prod['product_brand'] ?? null,
+                            'model_no' => $prod['model_no'] ?? null,
+                            'hsn' => $prod['hsn'] ?? null,
+                            'purchase_date' => $prod['purchase_date'] ?? null,
+                            'item_code_id' => $prod['quick_service_id'] ?? null,
+                            'service_charge' => $prod['price'] ?? null,
+                            'description' => $prod['issue_description'] ?? null,
+                        ];
+
+                        if ($imagePath) {
+                            if ($product->images && File::exists(public_path($product->images))) {
+                                File::delete(public_path($product->images));
+                            }
+                            $updateData['images'] = $imagePath;
+                        }
+                        if($request->status === 'completed') {
+                            $updateData['status'] = 'diagnosis_completed';
+                        }
+
+                        // Do not force status change for existing products
+                        $product->update($updateData);
+                        $incomingProductIds[] = $product->id;
+                        continue;
+                    }
+                }
+
+                // Otherwise create a new product (new products start as pending)
+                $new = ServiceRequestProduct::create([
                     'service_requests_id' => $serviceRequest->id,
                     'name' => $prod['product_name'] ?? null,
                     'type' => $prod['product_type'] ?? null,
@@ -2404,17 +2539,31 @@ class ServiceRequestController extends Controller
                     'model_no' => $prod['model_no'] ?? null,
                     'hsn' => $prod['hsn'] ?? null,
                     'purchase_date' => $prod['purchase_date'] ?? null,
-                    'item_code_id' => $prod['quick_service_id'] ?? null,   // quick service id
-                    'service_charge' => $prod['price'] ?? null,              // Quick Service Price from form
+                    'item_code_id' => $prod['quick_service_id'] ?? null,
+                    'service_charge' => $prod['price'] ?? null,
                     'description' => $prod['issue_description'] ?? null,
                     'images' => $imagePath,
-                    'status' => 'pending', // Set initial status as pending
+                    'status' => 'pending', // Set initial status as pending for new products
                 ]);
 
-                // Update all products from pending to approved after successful update
-                ServiceRequestProduct::where('service_requests_id', $serviceRequest->id)
-                    ->where('status', 'pending')
-                    ->update(['status' => 'approved']);
+                $incomingProductIds[] = $new->id;
+            }
+
+            // Approve any newly created pending products
+            // ServiceRequestProduct::where('service_requests_id', $serviceRequest->id)
+            //     ->where('status', 'pending')
+            //     ->update(['status' => 'approved']);
+
+            // Delete any products that were removed in the request
+            $toDelete = array_diff($existingProductIds, $incomingProductIds);
+            if (! empty($toDelete)) {
+                $productsToDelete = ServiceRequestProduct::whereIn('id', $toDelete)->get();
+                foreach ($productsToDelete as $p) {
+                    if ($p->images && File::exists(public_path($p->images))) {
+                        File::delete(public_path($p->images));
+                    }
+                    $p->delete();
+                }
             }
 
             DB::commit();
@@ -2659,10 +2808,10 @@ class ServiceRequestController extends Controller
                 ]);
             }
 
-            if ($serviceRequest->service_type == 'amc') { 
+            if ($serviceRequest->service_type == 'amc') {
                 $amcScheduleMeeting = AmcScheduleMeeting::where('service_request_id', $serviceRequest->id)->where('status', 'scheduled')->first();
             }
-            
+
 
             /** ---------------- ASSIGN ENGINEER ---------------- */
             if ($request->assignment_type === 'individual') {
@@ -3063,7 +3212,7 @@ class ServiceRequestController extends Controller
                 'product_id' => 'required|exists:service_request_products,id',
                 'pickups_id' => 'required|exists:service_request_product_pickups,id',
                 'assigned_person_type' => 'required|in:delivery_man,engineer',
-                'delivery_man_id' => 'required|exists:staff,id',
+                'assigned_person_id' => 'required|exists:staff,id',
             ]);
         } else {
             $validator = Validator::make($request->all(), [
@@ -3071,7 +3220,7 @@ class ServiceRequestController extends Controller
                 'product_id' => 'required|exists:service_request_products,id',
                 'pickups_id' => 'required|exists:service_request_product_pickups,id',
                 'assigned_person_type' => 'required|in:delivery_man,engineer',
-                'engineer_id' => 'required|exists:staff,id',
+                'assigned_person_id' => 'required|exists:staff,id',
             ]);
         }
 
@@ -3091,9 +3240,9 @@ class ServiceRequestController extends Controller
 
             // Get assigned person type and id
             if ($assignedPersonType === 'delivery_man') {
-                $assignedPersonId = $request->delivery_man_id;
+                $assignedPersonId = $request->assigned_person_id;
             } else {
-                $assignedPersonId = $request->engineer_id;
+                $assignedPersonId = $request->assigned_person_id;
             }
 
             if (empty($assignedPersonId)) {

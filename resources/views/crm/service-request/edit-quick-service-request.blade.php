@@ -459,6 +459,7 @@
                                         <div class="row g-3 pb-3">
                                             <div class="col-xl-4 col-lg-6">
                                                 <div>
+                                                    <input type="hidden" name="products[{{ $idx }}][id]" value="{{ $product->id }}">
                                                     <label class="form-label">Product Name <span
                                                             class="text-danger">*</span></label>
                                                     <input type="text" name="products[{{ $idx }}][product_name]"

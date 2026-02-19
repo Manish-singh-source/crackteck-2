@@ -195,7 +195,7 @@ class ProductController extends Controller
                 //         'status' => $product->status,
                 //     ];
                 // }),
-                'total_requested_quantity' => $item->sum('requested_quantity'),
+                'total_requested_quantity' => $item->requested_quantity,
             ];
         });
 

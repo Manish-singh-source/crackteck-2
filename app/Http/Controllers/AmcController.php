@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Amc;
 use App\Models\AmcPlan;
 use App\Models\CoveredItem;
 use App\Models\DeviceSpecificDiagnosis;
+use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -513,5 +515,58 @@ class AmcController extends Controller
                 'message' => 'Device diagnosis not found',
             ], 404);
         }
+    }
+
+
+
+
+    // AMC of customers 
+
+    // 1. List AMC requests (with filters)
+    public function listAmcRequests(Request $request)
+    {
+        $query = Amc::query();
+
+        if ($request->filled('customer_name')) {
+            $query->whereHas('customer', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->customer_name . '%');
+            });
+        }
+
+        if ($request->filled('plan_id')) {
+            $query->where('amc_plan_id', $request->plan_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $amcRequests = $query->with(['customer', 'amcPlan', 'amcProducts'])->get();
+
+        return view('/crm/active-amcs/index', compact('amcRequests'));
+    }
+
+    // 2. Delete AMC request (if needed)
+    public function deleteAmcsRequest($id)
+    {
+        $amcRequest = Amc::findOrFail($id);
+        $amcRequest->delete();
+
+        return redirect()->route('active-amcs.index')->with('success', 'AMC Request deleted successfully.');
+    }
+
+    // 3. View AMC request details
+    public function viewAmcsRequest($id)
+    {
+        $amcRequest = Amc::with([
+            'customer',
+            'customerAddress',
+            'amcPlan',
+            'amcProducts'
+        ])->findOrFail($id);
+
+        $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
+
+        return view('/crm/active-amcs/view', compact('amcRequest', 'engineers'));
     }
 }

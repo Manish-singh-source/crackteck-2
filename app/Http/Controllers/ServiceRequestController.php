@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\StatusUpdateHelper;
-use App\Models\AMC;
+use App\Models\Amc;
 use App\Models\AmcBranch;
 use App\Models\AmcEngineerAssignment;
 use App\Models\AmcGroupEngineer;
@@ -1097,8 +1097,9 @@ class ServiceRequestController extends Controller
             }
 
             // 2. Store service request
+            $uniqRequestId = uniqid('SR-'); // Generate unique request ID with prefix
             $serviceRequest = ServiceRequest::create([
-                'request_id' => uniqid(),
+                'request_id' => $uniqRequestId,
                 'service_type' => $request->service_type,
                 'customer_id' => $customer->id,
                 'customer_address_id' => $customerAddress->id ?? null,
@@ -1112,6 +1113,20 @@ class ServiceRequestController extends Controller
                 'amc_status' => 'active',
                 'amc_plan_id' => $request->amc_plan_id,
             ]);
+
+            if ($request->service_type == 'amc') {
+                $amc = Amc::create([
+                    'request_id' => $uniqRequestId,
+                    'service_type' => $request->service_type,
+                    'customer_id' => $customer->id,
+                    'customer_address_id' => $customerAddress->id ?? null,
+                    'amc_plan_id' => $request->amc_plan_id,
+                    'request_date' => now(),
+                    'request_source' => 'system',
+                    'status' => 'active',
+                    'created_by' => Auth::id(),
+                ]);
+            }
 
             $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
 
@@ -1159,6 +1174,20 @@ class ServiceRequestController extends Controller
                     'description' => $product['issue_description'] ?? 'N/A',
                     'service_charge' => $product['price'] ?? '100',
                 ]);
+
+                if ($request->service_type == 'amc') {
+                    AmcProduct::create([
+                        'amc_id' => $amc->id,
+                        'name' => $product['product_name'] ?? 'N/A',
+                        'type' => $product['product_type'] ?? 'N/A',
+                        'model_no' => $product['model_no'] ?? 'N/A',
+                        'sku' => $product['sku'] ?? null,
+                        'hsn' => $product['hsn'] ?? null,
+                        'purchase_date' => $product['purchase_date'] ?? 'N/A',
+                        'brand' => $product['product_brand'] ?? 'N/A',
+                        'description' => $product['issue_description'] ?? 'N/A',
+                    ]);
+                }
             }
 
             DB::commit();
@@ -2519,7 +2548,7 @@ class ServiceRequestController extends Controller
                             }
                             $updateData['images'] = $imagePath;
                         }
-                        if($request->status === 'completed') {
+                        if ($request->status === 'completed') {
                             $updateData['status'] = 'diagnosis_completed';
                         }
 

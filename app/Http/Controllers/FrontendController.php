@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AMC;
+use App\Models\Amc;
 use App\Models\AmcPlan;
+use App\Models\AmcProduct;
 use App\Models\Brand;
 use App\Models\Collection;
 use App\Models\Contact;
@@ -372,10 +373,11 @@ class FrontendController extends Controller
             // Generate unique service ID
             $serviceId = $this->generateServiceId();
 
+            $uniqId = uniqid('SR-'); // Generate unique request ID with prefix
             // Create Service Request in service_requests table
             $serviceRequest = \App\Models\ServiceRequest::create([
-                'request_id' => uniqid(),
-                'service_type' => 'AMC',
+                'request_id' => $uniqId,
+                'service_type' => 'amc',
                 'customer_id' => $customer->id,
                 'customer_address_id' => $customerAddress->id,
                 'amc_plan_id' => $request->amc_plan_id,
@@ -383,6 +385,20 @@ class FrontendController extends Controller
                 'status' => 'active',
                 'request_source' => $request->source_type ?? 'customer',
                 'visit_date' => $request->preferred_start_date,
+            ]);
+
+
+            // AMC Add 
+            $amc = Amc::create([
+                'request_id' => $uniqId,
+                'service_type' => 'amc',
+                'customer_id' => $customer->id,
+                'customer_address_id' => $customerAddress->id,
+                'amc_plan_id' => $request->amc_plan_id,
+                'request_date' => now(),
+                'request_source' => $request->source_type ?? 'customer',
+                'status' => 'active',
+                'created_by' => Auth::id(),
             ]);
 
             $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
@@ -426,6 +442,17 @@ class FrontendController extends Controller
                     'sku' => $productData['sku'] ?? null,
                     'hsn' => $productData['hsn'] ?? null,
                     'status' => 'Pending',
+                ]);
+
+                AmcProduct::create([
+                    'amc_id' => $amc->id,
+                    'name' => $productData['product_name'],
+                    'type' => $productData['product_type'],
+                    'brand' => $productData['brand_name'],
+                    'model_no' => $productData['model_number'],
+                    'purchase_date' => $productData['purchase_date'],
+                    'sku' => $productData['sku'] ?? null,
+                    'hsn' => $productData['hsn'] ?? null,
                 ]);
             }
 

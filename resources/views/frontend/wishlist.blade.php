@@ -75,9 +75,9 @@
                         <td class="wishlist-item_price">
                             <p class="price-wrap fw-medium flex-nowrap">
                                 @if($item->ecommerceProduct->warehouseProduct)
-                                    @if($item->ecommerceProduct->warehouseProduct->discount_price && $item->ecommerceProduct->warehouseProduct->selling_price > 0)
-                                        <span class="new-price price-text fw-medium mb-0">₹{{ number_format($item->ecommerceProduct->warehouseProduct->selling_price, 2) }}</span>
-                                        <span class="old-price body-md-2 text-main-2 fw-normal">₹{{ number_format($item->ecommerceProduct->warehouseProduct->cost_price, 2) }}</span>
+                                    @if($item->ecommerceProduct->warehouseProduct->discount_price && $item->ecommerceProduct->warehouseProduct->final_price > 0)
+                                        <span class="new-price price-text fw-medium mb-0">₹{{ number_format($item->ecommerceProduct->warehouseProduct->final_price, 2) }}</span>
+                                        <span class="old-price body-md-2 text-main-2 fw-normal">₹{{ number_format($item->ecommerceProduct->warehouseProduct->final_price + $item->ecommerceProduct->warehouseProduct->discount_price, 2) }}</span>
                                     @else
                                         <span class="new-price price-text fw-medium mb-0">₹{{ number_format($item->ecommerceProduct->warehouseProduct->cost_price, 2) }}</span>
                                     @endif

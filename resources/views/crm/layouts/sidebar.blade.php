@@ -208,6 +208,13 @@
 
                 <li class="menu-title mt-2">Services</li>
                 <li>
+                    <a class='tp-link' href="{{ route('amcs-lists.index') }}">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span class="ps-1"> AMCs </span>
+                    </a>
+                </li>
+                
+                <li>
                     <a class='tp-link' href="{{ route('service-request.index') }}">
                         <i class="fas fa-clipboard-list"></i>
                         <span class="ps-1"> Service Requests </span>

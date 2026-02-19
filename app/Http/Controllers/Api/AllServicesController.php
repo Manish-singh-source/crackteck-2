@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\QuotationDetailResource;
 use App\Http\Resources\QuotationResource;
+use App\Models\Amc;
 use App\Models\AmcPlan;
+use App\Models\AmcProduct;
 use App\Models\CoveredItem;
 use App\Models\EngineerDiagnosisDetail;
 use App\Models\Feedback;
@@ -16,6 +18,7 @@ use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestProductRequestPart;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -252,6 +255,21 @@ class AllServicesController extends Controller
                     'status' => $request->service_type == 'amc' ? 'active' : 'pending',
                 ]);
 
+                if ($request->service_type == 'amc') {
+                    $amc = Amc::create([
+                        'request_id' => $serviceRequest,
+                        'service_type' => $request->service_type,
+                        'customer_id' => $request->customer_id,
+                        'customer_address_id' => $request->customer_address_id,
+                        'amc_plan_id' => $request->amc_plan_id,
+                        'request_date' => now(),
+                        'request_source' => 'customer',
+                        'status' => 'active',
+                        'created_by' => Auth::id(),
+                    ]);
+                }
+
+
                 if ($servicesRequest) {
                     if ($request->service_type == 'amc') {
                         $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
@@ -309,6 +327,20 @@ class AllServicesController extends Controller
                             'service_charge' => $services->service_charge ?? null,
                         ]);
 
+                        if ($request->service_type == 'amc') {
+                            $amcProduct = AmcProduct::create([
+                                'amc_id' => $amc->id,
+                                'name' => $product['name'] ?? null,
+                                'type' => $product['type'] ?? null,
+                                'model_no' => $product['model_no'] ?? null,
+                                'sku' => $product['sku'] ?? null,
+                                'hsn' => $product['hsn'] ?? null,
+                                'purchase_date' => $product['purchase_date'] ?? null,
+                                'brand' => $product['brand'] ?? null,
+                                'description' => $product['description'] ?? null,
+                            ]);
+                        }
+
                         $images = $serviceProduct->images ?? [];
                         if (!empty($product['images']) && is_array($product['images'])) {
                             foreach ($product['images'] as $file) {
@@ -330,6 +362,9 @@ class AllServicesController extends Controller
 
                         $serviceProduct->images = $images;
                         $serviceProduct->save();
+
+                        $amcProduct->images = $images;
+                        $amcProduct->save();
                     }
                 }
 
@@ -721,8 +756,10 @@ class AllServicesController extends Controller
                 $invoice->quoteDetails->leadDetails->update(['status' => 'won']);
             }
 
+            $uniqId = uniqid();
+
             $serviceRequest = new ServiceRequest();
-            $serviceRequest->request_id = uniqid();
+            $serviceRequest->request_id = $uniqId;
             $serviceRequest->service_type = 'amc';
             $serviceRequest->customer_id = $invoice->customer_id ?? null;
             $serviceRequest->customer_address_id = $invoice->quoteDetails->leadDetails->customer_address_id ?? null;
@@ -736,6 +773,17 @@ class AllServicesController extends Controller
             $serviceRequest->amc_plan_id = $invoice->amc_plan_id ?? null;
             $serviceRequest->save();
 
+            $amc = Amc::create([
+                'request_id' => $uniqId,
+                'service_type' => 'amc',
+                'customer_id' => $invoice->customer_id ?? null,
+                'customer_address_id' => $invoice->quoteDetails->leadDetails->customer_address_id ?? null,
+                'amc_plan_id' => $invoice->amc_plan_id ?? null,
+                'request_date' => now(),
+                'request_source' => 'lead_won',
+                'status' => 'active',
+                'created_by' => Auth::id(),
+            ]);
 
             $amcPlan = AmcPlan::where('id', $invoice->amc_plan_id)->first();
 
@@ -774,6 +822,18 @@ class AllServicesController extends Controller
                     'brand' => $item->brand ?? 'N/A',
                     'description' => $item->description ?? 'N/A',
                     'service_charge' => $item->service_charge ?? '100',
+                ]);
+
+                AmcProduct::create([
+                    'amc_id' => $amc->id,
+                    'name' => $item->name ?? 'N/A',
+                    'type' => $item->type ?? 'N/A',
+                    'model_no' => $item->model_no ?? 'N/A',
+                    'sku' => $item->sku ?? null,
+                    'hsn' => $item->hsn ?? null,
+                    'purchase_date' => $item->purchase_date ?? 'N/A',
+                    'brand' => $item->brand ?? 'N/A',
+                    'description' => $item->description ?? 'N/A',
                 ]);
             }
 

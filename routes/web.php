@@ -484,23 +484,28 @@ Route::prefix('/demo')->group(function () {
             Route::delete('/delete-amc-plans{id}', 'delete')->name('amc-plan.delete');
 
             // Covered Items Page
-            Route::get('/crm/covered-items', 'coveredItems')->name('covered-items.index');
-            Route::get('/crm/create-covered-items', 'createCoveredItems')->name('covered-items.create');
-            Route::post('/crm/store-covered-items', 'storeCoveredItems')->name('covered-items.store');
-            Route::get('/crm/edit-covered-items/{id}', 'editCoveredItems')->name('covered-items.edit');
-            Route::put('/crm/update-covered-items/{id}', 'updateCoveredItems')->name('covered-items.update');
-            Route::delete('/crm/delete-covered-items/{id}', 'deleteCoveredItems')->name('covered-items.delete');
+            Route::get('/covered-items', 'coveredItems')->name('covered-items.index');
+            Route::get('/create-covered-items', 'createCoveredItems')->name('covered-items.create');
+            Route::post('/store-covered-items', 'storeCoveredItems')->name('covered-items.store');
+            Route::get('/edit-covered-items/{id}', 'editCoveredItems')->name('covered-items.edit');
+            Route::put('/update-covered-items/{id}', 'updateCoveredItems')->name('covered-items.update');
+            Route::delete('/delete-covered-items/{id}', 'deleteCoveredItems')->name('covered-items.delete');
 
             // Covered Items Page
-            Route::get('/crm/device-specific-diagnosis', 'deviceSpecificDiagnosis')->name('device-specific-diagnosis.index');
-            Route::get('/crm/create-device-specific-diagnosis', 'createDeviceSpecificDiagnosis')->name('device-specific-diagnosis.create');
-            Route::post('/crm/store-device-specific-diagnosis', 'storeDeviceSpecificDiagnosis')->name('device-specific-diagnosis.store');
-            Route::get('/crm/edit-device-specific-diagnosis/{id}', 'editDeviceSpecificDiagnosis')->name('device-specific-diagnosis.edit');
-            Route::put('/crm/update-device-specific-diagnosis/{id}', 'updateDeviceSpecificDiagnosis')->name('device-specific-diagnosis.update');
-            Route::delete('/crm/delete-device-specific-diagnosis/{id}', 'deleteDeviceSpecificDiagnosis')->name('device-specific-diagnosis.delete');
+            Route::get('/device-specific-diagnosis', 'deviceSpecificDiagnosis')->name('device-specific-diagnosis.index');
+            Route::get('/create-device-specific-diagnosis', 'createDeviceSpecificDiagnosis')->name('device-specific-diagnosis.create');
+            Route::post('/store-device-specific-diagnosis', 'storeDeviceSpecificDiagnosis')->name('device-specific-diagnosis.store');
+            Route::get('/edit-device-specific-diagnosis/{id}', 'editDeviceSpecificDiagnosis')->name('device-specific-diagnosis.edit');
+            Route::put('/update-device-specific-diagnosis/{id}', 'updateDeviceSpecificDiagnosis')->name('device-specific-diagnosis.update');
+            Route::delete('/delete-device-specific-diagnosis/{id}', 'deleteDeviceSpecificDiagnosis')->name('device-specific-diagnosis.delete');
 
             // AJAX endpoint to fetch diagnosis list
-            Route::get('/crm/get-diagnosis-list/{id?}', 'getDiagnosisList')->name('get-diagnosis-list');
+            Route::get('/get-diagnosis-list/{id?}', 'getDiagnosisList')->name('get-diagnosis-list');
+
+            // Active AMC Page
+            Route::get('/amcs-list', 'listAmcRequests')->name('amcs-lists.index');
+            Route::delete('/amcs-request/{id}', 'deleteAmcsRequest')->name('amcs-request.delete');
+            Route::get('/amcs-request/{id}', 'viewAmcsRequest')->name('amcs-request.view');
         });
     });
 

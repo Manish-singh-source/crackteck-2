@@ -234,7 +234,7 @@ class CheckoutController extends Controller
             'shipping_address_line_2' => 'nullable|string',
             'shipping_phone' => 'required|string|max:20',
 
-            'previous_address' => 'required|integer',
+            'previous_address' => 'nullable|integer',
 
 
             // Billing address
@@ -263,6 +263,8 @@ class CheckoutController extends Controller
 
         try {
             DB::beginTransaction();
+
+
 
             // Get checkout items
             $checkoutData = $this->getCheckoutData($request);
@@ -348,6 +350,25 @@ class CheckoutController extends Controller
         // Calculate total items
         $totalItems = $checkoutData['items']->sum('quantity');
 
+        // Check if previous_address is available, if not then save the new shipping address
+        $shippingAddressId = $validated['previous_address'] ?? null;
+        
+        if (empty($shippingAddressId)) {
+            // Create new address in customer_address_details table
+            $customerAddress = CustomerAddressDetail::create([
+                'customer_id' => Auth::id(),
+                'branch_name' => $validated['shipping_first_name'] . ' ' . $validated['shipping_last_name'],
+                'address1' => $validated['shipping_address_line_1'],
+                'address2' => $validated['shipping_address_line_2'] ?? null,
+                'city' => $validated['shipping_city'],
+                'state' => $validated['shipping_state'],
+                'country' => $validated['shipping_country'],
+                'pincode' => $validated['shipping_zipcode'],
+            ]);
+            
+            $shippingAddressId = $customerAddress->id;
+        }
+
         $orderData = [
             'customer_id' => Auth::id(),
             'order_source' => $source,
@@ -365,7 +386,7 @@ class CheckoutController extends Controller
             'total_amount' => $totals['total'],
 
             // Shipping address
-            'shipping_address_id' => $validated['previous_address'],
+            'shipping_address_id' => $shippingAddressId,
 
             // Billing address
             'billing_same_as_shipping' => $validated['billing_same_as_shipping'],
@@ -569,7 +590,12 @@ class CheckoutController extends Controller
         }
 
         // Find order by order number and ensure it belongs to the authenticated user
-        $order = Order::with(['orderItems.ecommerceProduct.warehouseProduct', 'customer.addressDetails',])
+        $order = Order::with([
+            'orderItems.ecommerceProduct.warehouseProduct', 
+            'customer.addressDetails',
+            'customer.primaryAddress',
+            'shippingAddress',
+        ])
             ->where('order_number', $orderNumber)
             ->where('customer_id', Auth::id())
             ->first();

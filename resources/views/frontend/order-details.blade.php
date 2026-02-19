@@ -101,10 +101,10 @@
                             <tr>
                                 <td colspan="3"><strong>Total</strong></td>
                                 <td><strong>{{ $order->orderItems->sum('quantity') }}</strong></td>
-                                <td><strong>₹{{ number_format($order->orderItems->sum('line_total'), 2) }}</strong></td>
+                                <td><strong>₹{{ number_format($order->orderItems->sum('unit_price'), 2) }} </strong></td>
                                 <td><strong>{{ number_format($order->orderItems->avg('tax_per_unit'), 2) }} %</strong></td>
                                 <td><strong>₹{{ number_format($totals['total_tax'], 2) }}</strong></td>
-                                <td><strong>₹{{ number_format($item->line_total, 2) }}</strong></td>
+                                <td><strong>₹{{ number_format($order->orderItems->sum('line_total'), 2) }}</strong></td>
                             </tr>
                         </tfoot>
                     </table>                    
@@ -157,7 +157,7 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-center mb-2 pe-3">
                                 <p class="mb-0">Total Value (in figure)</p>
-                                <p class="text-dark fw-medium mb-2">₹{{ number_format($item->unit_price + $totals['shipping_charges'], 2) }}</p>
+                                <p class="text-dark fw-medium mb-2">₹{{ number_format($order->orderItems->sum('line_total'), 2) }}</p>
                             </div>
                             {{-- <div class="d-flex justify-content-between align-items-center mb-2 pe-3">
                                 <p class="mb-0">Total Value (in Word)</p>
@@ -171,19 +171,32 @@
                     <div class="order-detail-wrap">
                         <h5 class="fw-bold">Billing Address</h5>
                         <div class="billing-info">
-                            <p>{{ $order->customer->first_name }} {{ $order->customer->last_name }}</p>
-                            <p>{{ $order->customer->email }}</p>
-                            @if($order->billing_company)
-                                <p>{{ $order->billing_company }}</p>
-                            @endif
-                            <p>{{ $order->customer->addressDetails[0]->address1 }}</p>
-                            @if($order->customer->addressDetails[0]->address2)
-                                <p>{{ $order->customer->addressDetails[0]->address2 }}</p>
-                            @endif
-                            <p>{{ $order->customer->addressDetails[0]->city }}, {{ $order->customer->addressDetails[0]->state }}</p>
-                            <p>{{ $order->customer->addressDetails[0]->country }} - {{ $order->customer->addressDetails[0]->postal_code }}</p>
-                            @if($order->customer->phone)
-                                <p>{{ $order->customer->phone }}</p>
+                            @if($order->billing_same_as_shipping)
+                                {{-- If billing is same as shipping, show shipping address --}}
+                                @if($order->shippingAddress)
+                                    <p>{{ $order->shippingAddress->branch_name }}</p>
+                                    <p>{{ $order->shippingAddress->address1 }}</p>
+                                    @if($order->shippingAddress->address2)
+                                        <p>{{ $order->shippingAddress->address2 }}</p>
+                                    @endif
+                                    <p>{{ $order->shippingAddress->city }}, {{ $order->shippingAddress->state }}</p>
+                                    <p>{{ $order->shippingAddress->country }} - {{ $order->shippingAddress->pincode }}</p>
+                                @else
+                                    <p>No address available</p>
+                                @endif
+                            @else
+                                {{-- If billing is different, show primary address --}}
+                                @if($order->customer->primaryAddress)
+                                    <p>{{ $order->customer->primaryAddress->branch_name }}</p>
+                                    <p>{{ $order->customer->primaryAddress->address1 }}</p>
+                                    @if($order->customer->primaryAddress->address2)
+                                        <p>{{ $order->customer->primaryAddress->address2 }}</p>
+                                    @endif
+                                    <p>{{ $order->customer->primaryAddress->city }}, {{ $order->customer->primaryAddress->state }}</p>
+                                    <p>{{ $order->customer->primaryAddress->country }} - {{ $order->customer->primaryAddress->pincode }}</p>
+                                @else
+                                    <p>No primary address available</p>
+                                @endif
                             @endif
                         </div>
                     </div>
@@ -192,19 +205,16 @@
                     <div class="order-detail-wrap">
                         <h5 class="fw-bold">Shipping Address</h5>
                         <div class="billing-info">
-                            <p>{{ $order->customer->first_name }} {{ $order->customer->last_name }}</p>
-                            <p>{{ $order->customer->email }}</p>
-                            @if($order->shipping_company)
-                                <p>{{ $order->shipping_company }}</p>
-                            @endif
-                            <p>{{ $order->customer->addressDetails[0]->address1 }}</p>
-                            @if($order->customer->addressDetails[0]->address2)
-                                <p>{{ $order->customer->addressDetails[0]->address2 }}</p>
-                            @endif
-                            <p>{{ $order->customer->addressDetails[0]->city }}, {{ $order->customer->addressDetails[0]->state }}</p>
-                            <p>{{ $order->customer->addressDetails[0]->country }} - {{ $order->customer->addressDetails[0]->postal_code }}</p>
-                            @if($order->customer->phone)
-                                <p>{{ $order->customer->phone }}</p>
+                            @if($order->shippingAddress)
+                                <p>{{ $order->shippingAddress->branch_name }}</p>
+                                <p>{{ $order->shippingAddress->address1 }}</p>
+                                @if($order->shippingAddress->address2)
+                                    <p>{{ $order->shippingAddress->address2 }}</p>
+                                @endif
+                                <p>{{ $order->shippingAddress->city }}, {{ $order->shippingAddress->state }}</p>
+                                <p>{{ $order->shippingAddress->country }} - {{ $order->shippingAddress->pincode }}</p>
+                            @else
+                                <p>No address available</p>
                             @endif
                         </div>
                     </div>

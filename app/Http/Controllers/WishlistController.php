@@ -83,15 +83,25 @@ class WishlistController extends Controller
     public function destroy($id): JsonResponse
     {
         try {
+            // Check if user is authenticated
+            if (! Auth::guard('customer_web')->check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please login to remove items from wishlist.',
+                ], 401);
+            }
+
+            $customerId = Auth::guard('customer_web')->id();
+            
             // Find the wishlist item and ensure it belongs to the authenticated user
             $wishlistItem = Wishlist::where('id', $id)
-                ->where('customer_id', Auth::id())
+                ->where('customer_id', $customerId)
                 ->first();
 
             if (! $wishlistItem) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Wishlist item not found.',
+                    'message' => 'Wishlist item not found. ID: ' . $id . ', Customer ID: ' . $customerId,
                 ], 404);
             }
 
@@ -119,35 +129,57 @@ class WishlistController extends Controller
     public function moveToCart($id): JsonResponse
     {
         try {
+            // Check if user is authenticated
+            if (! Auth::guard('customer_web')->check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please login to move items to cart.',
+                ], 401);
+            }
+
+            $customerId = Auth::guard('customer_web')->id();
+
             // Find the wishlist item and ensure it belongs to the authenticated user
             $wishlistItem = Wishlist::with('ecommerceProduct')
                 ->where('id', $id)
-                ->where('customer_id', Auth::id())
+                ->where('customer_id', $customerId)
                 ->first();
 
             if (! $wishlistItem) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Wishlist item not found.',
+                    'message' => 'Wishlist item not found. ID: ' . $id . ', Customer ID: ' . $customerId,
                 ], 404);
             }
 
             // Check if the product is still available
-            if (! $wishlistItem->ecommerceProduct || $wishlistItem->ecommerceProduct->ecommerce_status !== 'active') {
+            if (! $wishlistItem->ecommerceProduct || $wishlistItem->ecommerceProduct->status !== 'active') {
                 return response()->json([
                     'success' => false,
                     'message' => 'This product is no longer available.',
                 ], 400);
             }
 
-            // TODO: Implement cart functionality here
-            // For now, we'll just remove from wishlist and return success
-            // In a real implementation, you would add the product to the cart system
-            $cartController = new CartController;
-            $cartController->store(request()->merge([
-                'ecommerce_product_id' => $wishlistItem->ecommerce_product_id,
-                'quantity' => 1,
-            ]));
+            // Add to cart directly
+            $productId = $wishlistItem->ecommerce_product_id;
+            
+            // Check if already in cart
+            $existingCartItem = \App\Models\Cart::where('customer_id', $customerId)
+                ->where('ecommerce_product_id', $productId)
+                ->first();
+            
+            if ($existingCartItem) {
+                // Update quantity
+                $existingCartItem->quantity += 1;
+                $existingCartItem->save();
+            } else {
+                // Add to cart
+                \App\Models\Cart::create([
+                    'customer_id' => $customerId,
+                    'ecommerce_product_id' => $productId,
+                    'quantity' => 1,
+                ]);
+            }
 
             // Remove from wishlist
             $wishlistItem->delete();

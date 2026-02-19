@@ -349,7 +349,7 @@
                                         <a href="{{ route('wishlist') }}" class="nav-icon-item">
                                             <span class="icon position-relative">
                                                 <i class="icon-hearth"></i>
-                                                <span class="count-box">0</span>
+                                                {{-- <span class="count-box">0</span> --}}
                                             </span>
                                         </a>
                                     </li>
@@ -357,7 +357,7 @@
                                         <a href="{{ route('shop-cart') }}" class="nav-icon-item">
                                             <span class="icon position-relative">
                                                 <i class="icon-cart"></i>
-                                                <span class="count-box">0</span>
+                                                {{-- <span class="count-box">0</span> --}}
                                             </span>
                                         </a>
                                     </li>
@@ -368,7 +368,7 @@
                                                 <img width="35" height="35"
                                                 src="https://img.icons8.com/ios/50/1A1A1A/compare-git.png"
                                                 alt="compare-git" />
-                                                <span class="count-box" id="compare-count">0</span>
+                                                {{-- <span class="count-box" id="compare-count">0</span> --}}
                                             </span>
                                             
                                         </a>

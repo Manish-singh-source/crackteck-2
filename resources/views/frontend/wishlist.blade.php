@@ -40,7 +40,9 @@
                         <th class="wishlist-item_stock">
                             <p class="product-title fw-semibold">Stock Status</p>
                         </th>
-                        <th class="wishlist-item_action"></th>
+                        <th class="wishlist-item_action">
+                            <p class="product-title fw-semibold">Action</p>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -73,9 +75,9 @@
                         <td class="wishlist-item_price">
                             <p class="price-wrap fw-medium flex-nowrap">
                                 @if($item->ecommerceProduct->warehouseProduct)
-                                    @if($item->ecommerceProduct->warehouseProduct->discount_price && $item->ecommerceProduct->warehouseProduct->selling_price > 0)
-                                        <span class="new-price price-text fw-medium mb-0">₹{{ number_format($item->ecommerceProduct->warehouseProduct->selling_price, 2) }}</span>
-                                        <span class="old-price body-md-2 text-main-2 fw-normal">₹{{ number_format($item->ecommerceProduct->warehouseProduct->cost_price, 2) }}</span>
+                                    @if($item->ecommerceProduct->warehouseProduct->discount_price && $item->ecommerceProduct->warehouseProduct->final_price > 0)
+                                        <span class="new-price price-text fw-medium mb-0">₹{{ number_format($item->ecommerceProduct->warehouseProduct->final_price, 2) }}</span>
+                                        <span class="old-price body-md-2 text-main-2 fw-normal">₹{{ number_format($item->ecommerceProduct->warehouseProduct->final_price + $item->ecommerceProduct->warehouseProduct->discount_price, 2) }}</span>
                                     @else
                                         <span class="new-price price-text fw-medium mb-0">₹{{ number_format($item->ecommerceProduct->warehouseProduct->cost_price, 2) }}</span>
                                     @endif
@@ -86,7 +88,7 @@
                         </td>
                         <td class="wishlist-item_stock">
                             @if($item->ecommerceProduct->warehouseProduct)
-                                @if($item->ecommerceProduct->warehouseProduct->stock_status === 'In Stock' && $item->ecommerceProduct->warehouseProduct->stock_quantity > 0)
+                                @if($item->ecommerceProduct->warehouseProduct->stock_status == 'in_stock' && $item->ecommerceProduct->warehouseProduct->stock_quantity > 0)
                                     <span class="wishlist-stock-status text-success">In Stock</span>
                                 @else
                                     <span class="wishlist-stock-status text-danger">Out of Stock</span>
@@ -96,7 +98,7 @@
                             @endif
                         </td>
                         <td class="wishlist-item_action">
-                            @if($item->ecommerceProduct->warehouseProduct && $item->ecommerceProduct->warehouseProduct->stock_status === 'In Stock' && $item->ecommerceProduct->warehouseProduct->stock_quantity > 0)
+                            @if($item->ecommerceProduct->warehouseProduct && $item->ecommerceProduct->warehouseProduct->stock_status === 'in_stock' && $item->ecommerceProduct->warehouseProduct->stock_quantity > 0)
                                 <button class="tf-btn btn-gray move-to-cart-btn"
                                         data-wishlist-id="{{ $item->id }}"
                                         data-product-name="{{ $item->ecommerceProduct->warehouseProduct->product_name ?? 'Product' }}">
@@ -163,7 +165,7 @@ $(document).ready(function() {
 
         // Make AJAX request
         $.ajax({
-            url: `/wishlist/${wishlistId}`,
+            url: `wishlist/${wishlistId}`,
             method: 'DELETE',
             success: function(response) {
                 if (response.success) {
@@ -215,7 +217,7 @@ $(document).ready(function() {
 
         // Make AJAX request
         $.ajax({
-            url: `/wishlist/${wishlistId}/move-to-cart`,
+            url: `wishlist/${wishlistId}/move-to-cart`,
             method: 'POST',
             success: function(response) {
                 if (response.success) {
@@ -227,7 +229,8 @@ $(document).ready(function() {
 
                         // Check if wishlist is now empty
                         if ($('.wishlist-item').length === 0) {
-                            location.reload(); // Reload to show empty state
+                            location.href = '{{ route("shop-cart") }}'; // Reload to show empty state
+                            // location.reload(); // Reload to show empty state
                         }
                     });
 

@@ -95,4 +95,12 @@ class EcommerceProduct extends Model
     {
         return $this->hasMany(ProductDealItem::class);
     }
+
+    /**
+     * Scope a query to only include active products.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
 }

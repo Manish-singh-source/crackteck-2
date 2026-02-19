@@ -21,7 +21,7 @@ class ServiceRequestSeeder extends Seeder
                 'request_id' => 'SR-' . Carbon::now()->subDays(5)->format('Ymd') . '-001',
                 'customer_id' => 1,
                 'request_date' => Carbon::now()->subDays(5)->toDateString(),
-                'request_status' => "pending", // Pending
+                // 'request_status' => "pending", // Pending
                 'request_source' => "customer", // Customer
                 'created_by' => null,
                 'is_engineer_assigned' => "not_assigned",
@@ -32,7 +32,7 @@ class ServiceRequestSeeder extends Seeder
                 'request_id' => 'SR-' . Carbon::now()->subDays(3)->format('Ymd') . '-001',
                 'customer_id' => 2,
                 'request_date' => Carbon::now()->subDays(3)->toDateString(),
-                'request_status' => "processing", // Processing
+                // 'request_status' => "processing", // Processing
                 'request_source' => "customer",
                 'created_by' => 1,
                 'is_engineer_assigned' => "assigned",
@@ -43,7 +43,7 @@ class ServiceRequestSeeder extends Seeder
                 'request_id' => 'SR-' . Carbon::now()->subDays(2)->format('Ymd') . '-001',
                 'customer_id' => 3,
                 'request_date' => Carbon::now()->subDays(2)->toDateString(),
-                'request_status' => "approved", // Approved
+                // 'request_status' => "approved", // Approved
                 'request_source' => "system", // System
                 'created_by' => 2,
                 'is_engineer_assigned' => "not_assigned",
@@ -54,7 +54,7 @@ class ServiceRequestSeeder extends Seeder
                 'request_id' => 'SR-' . Carbon::now()->subDays(1)->format('Ymd') . '-001',
                 'customer_id' => 4,
                 'request_date' => Carbon::now()->subDays(1)->toDateString(),
-                'request_status' => "4", // In Progress
+                // 'request_status' => "4", // In Progress
                 'request_source' => "0",
                 'created_by' => null,
                 'is_engineer_assigned' => "1",

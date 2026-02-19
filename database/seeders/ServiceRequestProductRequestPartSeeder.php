@@ -120,8 +120,10 @@ class ServiceRequestProductRequestPartSeeder extends Seeder
                 'otp' => (string) rand(100000, 999999),
                 'otp_expiry' => Carbon::now()->addHours(2)->toDateTimeString(),
                 'assigned_at' => $assignedAt->toDateTimeString(),
-                'approved_at' => $approvedAt ? $approvedAt->toDateTimeString() : null,
-                'rejected_at' => $rejectedAt ? $rejectedAt->toDateTimeString() : null,
+                'accepted_at' => $approvedAt?->toDateTimeString(),
+                'accepted_by' => $approvedBy ?? null, // Should be user ID, not datetime
+                'admin_approved_at' => $adminApprovedAt?->toDateTimeString(),
+                'admin_rejected_at' => $adminRejectedAt?->toDateTimeString(),
                 'customer_approved_at' => $customerApprovedAt ? $customerApprovedAt->toDateTimeString() : null,
                 'customer_rejected_at' => $customerRejectedAt ? $customerRejectedAt->toDateTimeString() : null,
                 'picked_at' => $pickedAt ? $pickedAt->toDateTimeString() : null,

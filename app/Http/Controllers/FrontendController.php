@@ -417,6 +417,7 @@ class FrontendController extends Controller
                 // Create a service request visit for each visit
                 $serviceRequest->amcScheduleMeetings()->create([
                     'service_request_id' => $serviceRequest->id,
+                    'amc_id' => $amc->id,
                     'scheduled_at' => $nextVisitDate,
                     'completed_at' => null,
                     'remarks' => null,

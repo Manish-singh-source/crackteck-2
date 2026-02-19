@@ -288,6 +288,7 @@ class AllServicesController extends Controller
                             // Create a service request visit for each visit
                             $servicesRequest->amcScheduleMeetings()->create([
                                 'service_request_id' => $servicesRequest->id,
+                                'amc_id' => $amc->id,
                                 'scheduled_at' => $nextVisitDate,
                                 'completed_at' => null,
                                 'remarks' => null,
@@ -796,6 +797,7 @@ class AllServicesController extends Controller
                 // service_request_id	scheduled_at	completed_at	remarks	report	visits_count	status	created_at	updated_at
                 $serviceRequest->amcScheduleMeetings()->create([
                     'service_request_id' => $serviceRequest->id,
+                    'amc_id' => $amc->id,
                     'scheduled_at' => $nextVisitDate,
                     'completed_at' => null,
                     'remarks' => null,

@@ -204,13 +204,15 @@
                                     </h5>
                                 </div>
                                 <div class="d-flex flex-row justify-content-between align-items-center gap-2">
+                                    {{-- 
                                     <div>
                                         <span>
                                             Next Visit Date:
                                         </span>
                                         <span
-                                            class="p-1 rounded bg-warning-subtle text-warning fw-semibold">{{ $request->amcScheduleMeetings->first()?->scheduled_at ? \Carbon\Carbon::parse($request->amcScheduleMeetings->first()->scheduled_at)->format('d M Y') : 'N/A' }}</span>
-                                    </div>
+                                            class="p-1 rounded bg-warning-subtle text-warning fw-semibold">{{ $amcRequest->amcScheduleMeetings->first()?->scheduled_at ? \Carbon\Carbon::parse($amcRequest->amcScheduleMeetings->first()->scheduled_at)->format('d M Y') : 'N/A' }}</span>
+                                    </div> 
+                                    --}}
                                     <div>
                                         <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
                                             data-bs-target="#addVisitModal2">Assign Engineer</button>
@@ -232,7 +234,7 @@
 
                                                         <div class="modal-body p-2">
                                                             <input type="hidden" name="service_request_id"
-                                                                value="{{ $request->id }}">
+                                                                value="{{ $amcRequest->id }}">
 
                                                             <div class="mb-3">
                                                                 <label class="form-label fw-semibold">Assignment Type</label>
@@ -348,7 +350,7 @@
                                 </thead>
                                 <tbody>
 
-                                    @foreach ($request->amcScheduleMeetings as $index => $meeting)
+                                    @foreach ($amcRequest->amcScheduleMeetings as $index => $meeting)
                                         <tr class="align-middle">
                                             <td>
                                                 {{ $index + 1 }}    

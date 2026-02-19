@@ -9,6 +9,7 @@ class AmcScheduleMeeting extends Model
     //
     protected $fillable = [
         'service_request_id',
+        'amc_id',
         'scheduled_at',
         'completed_at',
         'remarks',

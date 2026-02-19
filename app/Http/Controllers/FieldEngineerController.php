@@ -578,7 +578,7 @@ class FieldEngineerController extends Controller
                         // If status is stock_in_hand or request_part, add part details
                         if (in_array($itemStatus, ['stock_in_hand', 'request_part', 'used', 'working'])) {
                             $itemData['part_id'] = $item['part_id'] ?? null;
-                            if ($item['part_id']) {
+                            if ($itemData['part_id']) {
                                 $itemData['quantity'] = $item['quantity'] ?? 1;
 
                                 // Get the part request status from service_request_product_request_parts

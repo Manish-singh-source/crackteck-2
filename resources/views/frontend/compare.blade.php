@@ -85,11 +85,11 @@
                                 @foreach($products as $product)
                                     <td class="tf-compare-col">
                                         <p class="price-wrap fw-medium flex-nowrap">
-                                            @if($product->warehouseProduct->discount_price && $product->warehouseProduct->selling_price > $product->warehouseProduct->discount_price)
-                                                <span class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->selling_price, 2) }}</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹{{ number_format($product->warehouseProduct->cost_price, 2) }}</span>
+                                            @if($product->warehouseProduct->discount_price && $product->warehouseProduct->final_price > $product->warehouseProduct->discount_price)
+                                                <span class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->final_price, 2) }}</span>
+                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹{{ number_format($product->warehouseProduct->selling_price + $product->warehouseProduct->discount_price + $product->warehouseProduct->tax, 2) }}</span>
                                             @else
-                                                <span class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->selling_price ?? 0, 2) }}</span>
+                                                <span class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->final_price ?? 0, 2) }}</span>
                                             @endif
                                         </p>
                                     </td>
@@ -125,7 +125,7 @@
                                     </td>
                                 @endforeach
                             </tr>
-                            <tr class="tf-compare-row">
+                            {{-- <tr class="tf-compare-row">
                                 <td class="tf-compare-col">
                                     <h6 class="fw-semibold">Serial No</h6>
                                 </td>
@@ -134,7 +134,7 @@
                                         <span>{{ $product->warehouseProduct->serial_no ?? 'N/A' }}</span>
                                     </td>
                                 @endforeach
-                            </tr>
+                            </tr> --}}
                             <tr class="tf-compare-row">
                                 <td class="tf-compare-col">
                                     <h6 class="fw-semibold">Category</h6>

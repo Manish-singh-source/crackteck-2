@@ -292,8 +292,8 @@ class CartController extends Controller
      */
     public function toggleCart(Request $request): JsonResponse
     {
-        // Check authentication
-        if (! Auth::guard('customer_web')->check()) {
+        $customer = Auth::guard('customer_web')->user();
+        if (! $customer) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please login to manage your cart.',
@@ -317,7 +317,7 @@ class CartController extends Controller
         try {
             $productId = $request->product_id;
             $quantity = $request->quantity ?? 1;
-            $userId = Auth::id();
+            $customerId = $customer->id;
 
             // Check if product exists and is active
             $product = EcommerceProduct::with('warehouseProduct')
@@ -335,7 +335,7 @@ class CartController extends Controller
             }
 
             // Check if product is already in cart
-            $existingCartItem = Cart::getCartItem($userId, $productId);
+            $existingCartItem = Cart::getCartItem($customerId, $productId);
 
             if ($existingCartItem) {
                 // Remove from cart
@@ -344,20 +344,20 @@ class CartController extends Controller
 
                 activity()
                     ->performedOn($existingCartItem)
-                    ->causedBy(Auth::user())
+                    ->causedBy($customer)
                     ->log('Removed product from cart');
 
                 return response()->json([
                     'success' => true,
                     'action' => 'removed',
                     'message' => 'Product removed from cart.',
-                    'cart_count' => Cart::getCartCount($userId),
-                    'cart_total' => Cart::getCartTotal($userId),
+                    'cart_count' => Cart::getCartCount($customer),
+                    'cart_total' => Cart::getCartTotal($customer),
                 ]);
             } else {
                 // Add to cart
                 $cartItem = Cart::create([
-                    'customer_id' => $userId,
+                    'customer_id' => $customerId,
                     'ecommerce_product_id' => $productId,
                     'quantity' => $quantity,
                 ]);
@@ -365,15 +365,15 @@ class CartController extends Controller
 
                 activity()
                     ->performedOn($cartItem)
-                    ->causedBy(Auth::user())
+                    ->causedBy($customer)
                     ->log('Added product to cart');
 
                 return response()->json([
                     'success' => true,
                     'action' => 'added',
                     'message' => 'Product added to cart successfully.',
-                    'cart_count' => Cart::getCartCount($userId),
-                    'cart_total' => Cart::getCartTotal($userId),
+                    'cart_count' => Cart::getCartCount($customer),
+                    'cart_total' => Cart::getCartTotal($customer),
                 ]);
             }
         } catch (\Exception $e) {

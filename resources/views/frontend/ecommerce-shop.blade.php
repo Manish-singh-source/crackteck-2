@@ -690,6 +690,162 @@
                 }
             });
 
+            // Add to Cart button handler for shop page (Toggle: add if not in cart, remove if in cart)
+            $(document).on('click', '.add-to-cart-btn', function(e) {
+                e.preventDefault();
+
+                const $button = $(this);
+                const productId = $button.data('product-id');
+                const quantity = 1;
+
+                // Show loading state
+                const originalHtml = $button.html();
+                $button.html('<i class="fa-solid fa-spinner fa-spin"></i> Adding...');
+                $button.prop('disabled', true);
+
+                // Make AJAX request to toggle cart (add if not in cart, remove if in cart)
+                $.ajax({
+                    url: '{{ route("cart.toggle") }}',
+                    method: 'POST',
+                    data: {
+                        product_id: productId,
+                        quantity: quantity
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
+                            
+                            // Update button state based on action
+                            if (response.action === 'added') {
+                                $button.html('<span>Added</span> <i class="icon-cart-2"></i>');
+                                $button.addClass('in-cart');
+                            } else {
+                                $button.html('<span class="icon icon-cart2"></span><span class="tooltip">Add to Cart</span>');
+                                $button.removeClass('in-cart');
+                            }
+                            
+                            // Update cart count and sidebar
+                            updateCartCount();
+                            updateCartSidebar();
+                        } else {
+                            showNotification(response.message, 'error');
+                            $button.html(originalHtml);
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 401 && xhr.responseJSON && xhr.responseJSON.requires_auth) {
+                            showLoginModal();
+                        } else {
+                            showNotification('Error updating cart. Please try again.', 'error');
+                        }
+                        $button.html(originalHtml);
+                    },
+                    complete: function() {
+                        $button.prop('disabled', false);
+                    }
+                });
+            });
+
+            // Add to Wishlist button handler for shop page (Toggle: add if not in wishlist, remove if in wishlist)
+            $(document).on('click', '.add-to-wishlist-btn', function(e) {
+                e.preventDefault();
+
+                const $button = $(this);
+                const productId = $button.data('product-id');
+
+                // Show loading state
+                const originalHtml = $button.html();
+                $button.html('<i class="fa-solid fa-spinner fa-spin"></i>');
+                $button.prop('disabled', true);
+
+                // Make AJAX request to toggle wishlist
+                $.ajax({
+                    url: '{{ route("wishlist.toggle") }}',
+                    method: 'POST',
+                    data: {
+                        ecommerce_product_id: productId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
+                            
+                            // Update button state based on action
+                            if (response.action === 'added') {
+                                $button.addClass('in-wishlist');
+                                $button.find('i').removeClass('fa-heart').addClass('fa-solid fa-heart');
+                            } else {
+                                $button.removeClass('in-wishlist');
+                                $button.find('i').removeClass('fa-solid fa-heart').addClass('fa-heart');
+                            }
+                            
+                            // Update wishlist count
+                            updateWishlistCount();
+                        } else {
+                            showNotification(response.message, 'error');
+                            $button.html(originalHtml);
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 401 && xhr.responseJSON && xhr.responseJSON.requires_auth) {
+                            showLoginModal();
+                        } else {
+                            showNotification('Error updating wishlist. Please try again.', 'error');
+                        }
+                        $button.html(originalHtml);
+                    },
+                    complete: function() {
+                        $button.prop('disabled', false);
+                    }
+                });
+            });
+
+            // Compare button handler for shop page
+            $(document).on('click', '.compare-btn', function(e) {
+                e.preventDefault();
+
+                const $button = $(this);
+                const productId = $button.data('product-id');
+
+                // Show loading state
+                const originalHtml = $button.html();
+                $button.html('<i class="fa-solid fa-spinner fa-spin"></i>');
+                $button.prop('disabled', true);
+
+                // Make AJAX request to toggle compare
+                $.ajax({
+                    url: '{{ route("compare.add") }}',
+                    method: 'POST',
+                    data: {
+                        ecommerce_product_id: productId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
+                            
+                            // Update button state based on action
+                            if (response.action === 'added') {
+                                $button.addClass('in-compare');
+                            } else {
+                                $button.removeClass('in-compare');
+                            }
+                            
+                            // Update compare count
+                            updateCompareCount();
+                        } else {
+                            showNotification(response.message, 'error');
+                            $button.html(originalHtml);
+                        }
+                    },
+                    error: function(xhr) {
+                        showNotification('Error updating compare list. Please try again.', 'error');
+                        $button.html(originalHtml);
+                    },
+                    complete: function() {
+                        $button.prop('disabled', false);
+                    }
+                });
+            });
+
             // Quick view functionality
             $('.quickview').on('click', function(e) {
                     e.preventDefault();

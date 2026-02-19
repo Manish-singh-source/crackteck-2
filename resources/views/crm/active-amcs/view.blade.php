@@ -66,7 +66,7 @@
                         <h4 class="fs-18 fw-semibold m-0">View AMC Service Request</h4>
                     </div>
                 </div>
-                <div class="col-xl-8 mx-auto">
+                <div class="col-xl-12 mx-auto">
 
                     <!-- Customer Details Card -->
                     <div class="card">

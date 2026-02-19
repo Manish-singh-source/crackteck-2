@@ -43,4 +43,9 @@ class Amc extends Model
         return $this->hasMany(AmcProduct::class, 'amc_id');
     }
 
+    public function amcScheduleMeetings()
+    {
+        return $this->hasMany(AmcScheduleMeeting::class, 'amc_id');
+    }
+
 }

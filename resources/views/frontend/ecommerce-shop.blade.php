@@ -717,7 +717,7 @@
                             
                             // Update button state based on action
                             if (response.action === 'added') {
-                                $button.html('<span>Added</span> <i class="icon-cart-2"></i>');
+                                $button.html('<i class="icon-cart-2"></i>');
                                 $button.addClass('in-cart');
                             } else {
                                 $button.html('<span class="icon icon-cart2"></span><span class="tooltip">Add to Cart</span>');

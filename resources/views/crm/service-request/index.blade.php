@@ -368,8 +368,8 @@
                                                                         @endphp
 
                                                                         <span
-                                                                            class="{{ $statusClasses[$request->request_status] ?? 'badge bg-light' }}">
-                                                                            {{ ucfirst($request->request_status) }}
+                                                                            class="{{ $statusClasses[$request->status] ?? 'badge bg-light' }}">
+                                                                            {{ ucfirst($request->status) }}
                                                                         </span>
                                                                     </td>
                                                                     <td>
@@ -588,8 +588,8 @@
                                                                         @endphp
 
                                                                         <span
-                                                                            class="{{ $statusClasses[$request->request_status] ?? 'badge bg-light' }}">
-                                                                            {{ ucfirst($request->request_status) }}
+                                                                            class="{{ $statusClasses[$request->status] ?? 'badge bg-light' }}">
+                                                                            {{ ucfirst($request->status) }}
                                                                         </span>
                                                                     </td>
                                                                     <td>

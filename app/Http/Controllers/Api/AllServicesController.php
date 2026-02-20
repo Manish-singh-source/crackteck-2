@@ -239,22 +239,6 @@ class AllServicesController extends Controller
             if ($staffRole == 'customers') {
                 $serviceRequest = uniqid();
 
-                $servicesRequest = ServiceRequest::create([
-                    'request_id' => $serviceRequest,
-                    'service_type' => $request->service_type,
-                    'customer_id' => $request->customer_id,
-                    'customer_address_id' => $request->customer_address_id,
-                    'created_by' => $request->customer_id,
-                    'request_date' => now(),
-                    'amc_plan_id' => $request->filled('amc_plan_id')
-                        ? $request->amc_plan_id
-                        : null,
-                    // 'request_status' => 'pending',
-                    'request_source' => 'customer',
-                    // 'is_engineer_assigned' => '0',   
-                    'status' => $request->service_type == 'amc' ? 'active' : 'pending',
-                ]);
-
                 if ($request->service_type == 'amc') {
                     $amc = Amc::create([
                         'request_id' => $serviceRequest,
@@ -267,53 +251,109 @@ class AllServicesController extends Controller
                         'status' => 'active',
                         'created_by' => Auth::id(),
                     ]);
+                } else {
+                    $servicesRequest = ServiceRequest::create([
+                        'request_id' => $serviceRequest,
+                        'service_type' => $request->service_type,
+                        'customer_id' => $request->customer_id,
+                        'customer_address_id' => $request->customer_address_id,
+                        'created_by' => $request->customer_id,
+                        'request_date' => now(),
+                        'amc_plan_id' => $request->filled('amc_plan_id')
+                            ? $request->amc_plan_id
+                            : null,
+                        // 'request_status' => 'pending',
+                        'request_source' => 'customer',
+                        // 'is_engineer_assigned' => '0',   
+                        'status' => $request->service_type == 'amc' ? 'active' : 'pending',
+                    ]);
                 }
 
 
-                if ($servicesRequest) {
-                    if ($request->service_type == 'amc') {
-                        $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
+                if ($request->service_type != 'amc') {
+                    $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
 
-                        // Calculate the month gap between visits as an integer (avoid fractional months)
-                        $monthGapFloat = intval($amcPlan->duration) / max(1, intval($amcPlan->total_visits));
-                        $monthGap = (int) round($monthGapFloat);
+                    // Calculate the month gap between visits as an integer (avoid fractional months)
+                    $monthGapFloat = intval($amcPlan->duration) / max(1, intval($amcPlan->total_visits));
+                    $monthGap = (int) round($monthGapFloat);
 
-                        // Ensure we have a Carbon instance for dates
-                        $startVisitDate = $servicesRequest->visit_date ? \Carbon\Carbon::parse($servicesRequest->visit_date) : \Carbon\Carbon::now();
+                    // Ensure we have a Carbon instance for dates
+                    $startVisitDate = $servicesRequest->visit_date ? \Carbon\Carbon::parse($servicesRequest->visit_date) : \Carbon\Carbon::now();
 
-                        // Start from the next visit after the initial visit date
-                        $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
+                    // Start from the next visit after the initial visit date
+                    $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
 
-                        foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
-                            // Create a service request visit for each visit
-                            $servicesRequest->amcScheduleMeetings()->create([
-                                'service_request_id' => $servicesRequest->id,
-                                'amc_id' => $amc->id,
-                                'scheduled_at' => $nextVisitDate,
-                                'completed_at' => null,
-                                'remarks' => null,
-                                'report' => null,
-                                'visits_count' => $visitNumber,
-                                'status' => 'scheduled',
-                            ]);
+                    foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
+                        // Create a service request visit for each visit
+                        $servicesRequest->amcScheduleMeetings()->create([
+                            'service_request_id' => $servicesRequest->id,
+                            'amc_id' => $amc->id,
+                            'scheduled_at' => $nextVisitDate,
+                            'completed_at' => null,
+                            'remarks' => null,
+                            'report' => null,
+                            'visits_count' => $visitNumber,
+                            'status' => 'scheduled',
+                        ]);
 
-                            // Update the next visit date for the next iteration
-                            $nextVisitDate = $nextVisitDate->addMonths($monthGap);
+                        // Update the next visit date for the next iteration
+                        $nextVisitDate = $nextVisitDate->addMonths($monthGap);
+                    }
+                } else {
+                    $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
+
+                    // Calculate the month gap between visits as an integer (avoid fractional months)
+                    $monthGapFloat = intval($amcPlan->duration) / max(1, intval($amcPlan->total_visits));
+                    $monthGap = (int) round($monthGapFloat);
+
+                    // Ensure we have a Carbon instance for dates
+                    $startVisitDate = \Carbon\Carbon::now();
+
+                    // Start from the next visit after the initial visit date
+                    $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
+
+                    foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
+                        // Create a service request visit for each visit
+                        $amc->amcScheduleMeetings()->create([
+                            'amc_id' => $amc->id,
+                            'scheduled_at' => $nextVisitDate,
+                            'completed_at' => null,
+                            'remarks' => null,
+                            'report' => null,
+                            'visits_count' => $visitNumber,
+                            'status' => 'scheduled',
+                        ]);
+
+                        // Update the next visit date for the next iteration
+                        $nextVisitDate = $nextVisitDate->addMonths($monthGap);
+                    }
+                }
+
+                foreach ($request->products as $product) {
+
+                    if ($request->service_type != 'amc') {
+                        $services = CoveredItem::where('status', 'active')
+                            ->where('id', $product['service_type_id'] ?? null)
+                            ->first();
+
+                        if (! $services) {
+                            continue;
                         }
                     }
 
-                    foreach ($request->products as $product) {
-
-                        if ($request->service_type != 'amc') {
-                            $services = CoveredItem::where('status', 'active')
-                                ->where('id', $product['service_type_id'] ?? null)
-                                ->first();
-
-                            if (! $services) {
-                                continue;
-                            }
-                        }
-
+                    if ($request->service_type == 'amc') {
+                        $amcProduct = AmcProduct::create([
+                            'amc_id' => $amc->id,
+                            'name' => $product['name'] ?? null,
+                            'type' => $product['type'] ?? null,
+                            'model_no' => $product['model_no'] ?? null,
+                            'sku' => $product['sku'] ?? null,
+                            'hsn' => $product['hsn'] ?? null,
+                            'purchase_date' => $product['purchase_date'] ?? null,
+                            'brand' => $product['brand'] ?? null,
+                            'description' => $product['description'] ?? null,
+                        ]);
+                    } else {
                         $serviceProduct = $servicesRequest->products()->create([
                             'service_requests_id' => $servicesRequest->id,
                             'item_code_id' => $services->id ?? null,
@@ -327,50 +367,45 @@ class AllServicesController extends Controller
                             'description' => $product['description'] ?? null,
                             'service_charge' => $services->service_charge ?? null,
                         ]);
+                    }
 
-                        if ($request->service_type == 'amc') {
-                            $amcProduct = AmcProduct::create([
-                                'amc_id' => $amc->id,
-                                'name' => $product['name'] ?? null,
-                                'type' => $product['type'] ?? null,
-                                'model_no' => $product['model_no'] ?? null,
-                                'sku' => $product['sku'] ?? null,
-                                'hsn' => $product['hsn'] ?? null,
-                                'purchase_date' => $product['purchase_date'] ?? null,
-                                'brand' => $product['brand'] ?? null,
-                                'description' => $product['description'] ?? null,
-                            ]);
-                        }
+                    $images = $serviceProduct->images ?? [];
+                    if (!empty($product['images']) && is_array($product['images'])) {
+                        foreach ($product['images'] as $file) {
 
-                        $images = $serviceProduct->images ?? [];
-                        if (!empty($product['images']) && is_array($product['images'])) {
-                            foreach ($product['images'] as $file) {
-
-                                if (!$file || !($file instanceof \Illuminate\Http\UploadedFile)) {
-                                    continue;
-                                }
-
-                                $filename = time() . '_' . $serviceProduct->id . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-
-                                $file->move(
-                                    public_path('uploads/crm/quick-service/products'),
-                                    $filename
-                                );
-
-                                $images[] = 'uploads/crm/quick-service/products/' . $filename;
+                            if (!$file || !($file instanceof \Illuminate\Http\UploadedFile)) {
+                                continue;
                             }
+
+                            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+                            $file->move(
+                                public_path('uploads/crm/quick-service/products'),
+                                $filename
+                            );
+
+                            $images[] = 'uploads/crm/quick-service/products/' . $filename;
                         }
+                    }
 
-                        $serviceProduct->images = $images;
-                        $serviceProduct->save();
-
+                    if ($request->service_type == 'amc') {
                         $amcProduct->images = $images;
                         $amcProduct->save();
+                    } else {
+                        $serviceProduct->images = $images;
+                        $serviceProduct->save();
                     }
                 }
 
+                if ($request->service_type == 'amc') {
+                    $data = $amc->load('amcProducts');
+                } else {
+                    $data = $servicesRequest->load('products');
+                }
+
+
                 DB::commit();
-                return response()->json(['quick_service_request' => $servicesRequest->load('products')], 200);
+                return response()->json(['quick_service_request' => $data], 200);
             }
         } catch (\Exception $e) {
             DB::rollBack();
@@ -759,20 +794,20 @@ class AllServicesController extends Controller
 
             $uniqId = uniqid();
 
-            $serviceRequest = new ServiceRequest();
-            $serviceRequest->request_id = $uniqId;
-            $serviceRequest->service_type = 'amc';
-            $serviceRequest->customer_id = $invoice->customer_id ?? null;
-            $serviceRequest->customer_address_id = $invoice->quoteDetails->leadDetails->customer_address_id ?? null;
-            $serviceRequest->request_date = now();
-            $serviceRequest->request_source = 'lead_won'; // lead_won
-            $serviceRequest->visit_date = now()->addDays(5); // after 5 days of current date
-            $serviceRequest->reschedule_date = null;
-            $serviceRequest->created_by = $invoice->staff_id ?? null;
-            $serviceRequest->is_engineer_assigned = 'not_assigned';
-            $serviceRequest->status = 'active';
-            $serviceRequest->amc_plan_id = $invoice->amc_plan_id ?? null;
-            $serviceRequest->save();
+            // $serviceRequest = new ServiceRequest();
+            // $serviceRequest->request_id = $uniqId;
+            // $serviceRequest->service_type = 'amc';
+            // $serviceRequest->customer_id = $invoice->customer_id ?? null;
+            // $serviceRequest->customer_address_id = $invoice->quoteDetails->leadDetails->customer_address_id ?? null;
+            // $serviceRequest->request_date = now();
+            // $serviceRequest->request_source = 'lead_won'; // lead_won
+            // $serviceRequest->visit_date = now()->addDays(5); // after 5 days of current date
+            // $serviceRequest->reschedule_date = null;
+            // $serviceRequest->created_by = $invoice->staff_id ?? null;
+            // $serviceRequest->is_engineer_assigned = 'not_assigned';
+            // $serviceRequest->status = 'active';
+            // $serviceRequest->amc_plan_id = $invoice->amc_plan_id ?? null;
+            // $serviceRequest->save();
 
             $amc = Amc::create([
                 'request_id' => $uniqId,
@@ -789,14 +824,13 @@ class AllServicesController extends Controller
             $amcPlan = AmcPlan::where('id', $invoice->amc_plan_id)->first();
 
             $monthGap = $amcPlan->duration / $amcPlan->total_visits; // Calculate the month gap between visits 
-            $startVisitDate = $serviceRequest->visit_date; // Start visit date is the initial visit date of the service request
+            $startVisitDate = now()->addDays(5); // Start visit date is the initial visit date of the service request
             $nextVisitDate = $startVisitDate->addMonths($monthGap); // Set the next visit date based on the month gap
 
             foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
                 // Create a service request visit for each visit
                 // service_request_id	scheduled_at	completed_at	remarks	report	visits_count	status	created_at	updated_at
-                $serviceRequest->amcScheduleMeetings()->create([
-                    'service_request_id' => $serviceRequest->id,
+                $amc->amcScheduleMeetings()->create([
                     'amc_id' => $amc->id,
                     'scheduled_at' => $nextVisitDate,
                     'completed_at' => null,
@@ -812,19 +846,19 @@ class AllServicesController extends Controller
 
             // add service request products according to quotation products
             foreach ($invoice->items as $item) {
-                $serviceRequest->products()->create([
-                    'service_requests_id' => $serviceRequest->id,
-                    'item_code_id' => $item->item_code_id ?? null,
-                    'name' => $item->name ?? 'N/A',
-                    'type' => $item->type ?? 'N/A',
-                    'model_no' => $item->model_no ?? 'N/A',
-                    'sku' => $item->sku ?? 'N/A',
-                    'hsn' => $item->hsn ?? 'N/A',
-                    'purchase_date' => $item->purchase_date ?? 'N/A',
-                    'brand' => $item->brand ?? 'N/A',
-                    'description' => $item->description ?? 'N/A',
-                    'service_charge' => $item->service_charge ?? '100',
-                ]);
+                // $serviceRequest->products()->create([
+                //     'service_requests_id' => $serviceRequest->id,
+                //     'item_code_id' => $item->item_code_id ?? null,
+                //     'name' => $item->name ?? 'N/A',
+                //     'type' => $item->type ?? 'N/A',
+                //     'model_no' => $item->model_no ?? 'N/A',
+                //     'sku' => $item->sku ?? 'N/A',
+                //     'hsn' => $item->hsn ?? 'N/A',
+                //     'purchase_date' => $item->purchase_date ?? 'N/A',
+                //     'brand' => $item->brand ?? 'N/A',
+                //     'description' => $item->description ?? 'N/A',
+                //     'service_charge' => $item->service_charge ?? '100',
+                // ]);
 
                 AmcProduct::create([
                     'amc_id' => $amc->id,

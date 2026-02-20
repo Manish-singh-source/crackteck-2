@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\Admin\SduiPageController;
+use App\Http\Controllers\Admin\SduiSettingController;
 use App\Http\Controllers\AmcController;
 use App\Http\Controllers\AmcServicesController;
 use App\Http\Controllers\AssignedJobController;
@@ -45,8 +47,6 @@ use App\Http\Controllers\TrackRequestController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\WithdrawController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\SduiPageController;
-use App\Http\Controllers\Admin\SduiSettingController;
 
 
 Route::get('/', function () {

@@ -17,6 +17,7 @@ use App\Models\ServiceRequestProductRequestPart;
 use Rappasoft\LaravelAuthenticationLog\Models\AuthenticationLog;
 use App\Models\Staff;
 use Illuminate\Support\Facades\{Auth, DB, Log, Storage, Validator};
+use App\Models\AmcScheduleMeeting;
 
 class FieldEngineerController extends Controller
 {
@@ -359,6 +360,12 @@ class FieldEngineerController extends Controller
             ServiceRequestProduct::where('service_requests_id', $id)
                 ->where('status', 'processing')
                 ->update(['status' => 'in_progress']);
+
+            $amcScheduleMeeting = AmcScheduleMeeting::where('service_request_id', $id)->where('status', 'scheduled')->first();
+            if ($amcScheduleMeeting) {
+                $amcScheduleMeeting->status = 'in_progress';
+                $amcScheduleMeeting->save();
+            }
 
             DB::commit();
 
@@ -890,6 +897,13 @@ class FieldEngineerController extends Controller
             if ($newServiceStatus) {
                 ServiceRequest::where('id', $service_request_id)
                     ->update(['status' => $newServiceStatus]);
+                if($newServiceStatus === 'completed') { 
+                    $amcScheduleMeeting = AmcScheduleMeeting::where('service_request_id', $service_request_id)->where('status', 'in_progress')->first();
+                    if ($amcScheduleMeeting) {
+                        $amcScheduleMeeting->status = 'completed';
+                        $amcScheduleMeeting->save();
+                    }
+                }
             }
 
             /** ---------------- CREATE PICKUP RECORD IF STATUS IS PICKING ---------------- */

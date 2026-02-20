@@ -262,7 +262,7 @@
                                         <span class="fw-semibold text-break">Status :
 
                                         </span>
-                                        <span class="badge bg-danger-subtle text-danger fw-semibold">{{ ucfirst($serviceRequest->request_status) }}</span>
+                                        <span class="badge bg-danger-subtle text-danger fw-semibold">{{ ucfirst($serviceRequest->status) }}</span>
                                     </li>
 
                                 </ul>

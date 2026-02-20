@@ -375,17 +375,17 @@ class FrontendController extends Controller
 
             $uniqId = uniqid('SR-'); // Generate unique request ID with prefix
             // Create Service Request in service_requests table
-            $serviceRequest = \App\Models\ServiceRequest::create([
-                'request_id' => $uniqId,
-                'service_type' => 'amc',
-                'customer_id' => $customer->id,
-                'customer_address_id' => $customerAddress->id,
-                'amc_plan_id' => $request->amc_plan_id,
-                'request_date' => now(),
-                'status' => 'active',
-                'request_source' => $request->source_type ?? 'customer',
-                'visit_date' => $request->preferred_start_date,
-            ]);
+            // $serviceRequest = \App\Models\ServiceRequest::create([
+            //     'request_id' => $uniqId,
+            //     'service_type' => 'amc',
+            //     'customer_id' => $customer->id,
+            //     'customer_address_id' => $customerAddress->id,
+            //     'amc_plan_id' => $request->amc_plan_id,
+            //     'request_date' => now(),
+            //     'status' => 'active',
+            //     'request_source' => $request->source_type ?? 'customer',
+            //     'visit_date' => $request->preferred_start_date,
+            // ]);
 
 
             // AMC Add 
@@ -408,15 +408,15 @@ class FrontendController extends Controller
             $monthGap = (int) round($monthGapFloat);
 
             // Ensure we have a Carbon instance for dates
-            $startVisitDate = $serviceRequest->visit_date ? \Carbon\Carbon::parse($serviceRequest->visit_date) : \Carbon\Carbon::now();
+            $startVisitDate = $request->preferred_start_date ? \Carbon\Carbon::parse($request->preferred_start_date) : \Carbon\Carbon::now();
 
             // Start from the next visit after the initial visit date
             $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
 
             foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
                 // Create a service request visit for each visit
-                $serviceRequest->amcScheduleMeetings()->create([
-                    'service_request_id' => $serviceRequest->id,
+                $amc->amcScheduleMeetings()->create([
+                    // 'service_request_id' => $serviceRequest->id,
                     'amc_id' => $amc->id,
                     'scheduled_at' => $nextVisitDate,
                     'completed_at' => null,
@@ -433,17 +433,17 @@ class FrontendController extends Controller
             // Create Service Request Products in service_request_products table
             $products = $request->input('products', []);
             foreach ($products as $productData) {
-                \App\Models\ServiceRequestProduct::create([
-                    'service_requests_id' => $serviceRequest->id,
-                    'name' => $productData['product_name'],
-                    'type' => $productData['product_type'],
-                    'brand' => $productData['brand_name'],
-                    'model_no' => $productData['model_number'],
-                    'purchase_date' => $productData['purchase_date'],
-                    'sku' => $productData['sku'] ?? null,
-                    'hsn' => $productData['hsn'] ?? null,
-                    'status' => 'Pending',
-                ]);
+                // \App\Models\ServiceRequestProduct::create([
+                //     'service_requests_id' => $serviceRequest->id,
+                //     'name' => $productData['product_name'],
+                //     'type' => $productData['product_type'],
+                //     'brand' => $productData['brand_name'],
+                //     'model_no' => $productData['model_number'],
+                //     'purchase_date' => $productData['purchase_date'],
+                //     'sku' => $productData['sku'] ?? null,
+                //     'hsn' => $productData['hsn'] ?? null,
+                //     'status' => 'Pending',
+                // ]);
 
                 AmcProduct::create([
                     'amc_id' => $amc->id,
@@ -460,8 +460,8 @@ class FrontendController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'AMC service request submitted successfully!',
-                'service_id' => $serviceId,
-                'data' => $serviceRequest,
+                'service_id' => $amc->id,
+                'data' => $amc,
                 'selected_address_id' => $request->selected_address_id,
                 'products_count' => count($products),
             ]);

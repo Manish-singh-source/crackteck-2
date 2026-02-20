@@ -1098,21 +1098,6 @@ class ServiceRequestController extends Controller
 
             // 2. Store service request
             $uniqRequestId = uniqid('SR-'); // Generate unique request ID with prefix
-            $serviceRequest = ServiceRequest::create([
-                'request_id' => $uniqRequestId,
-                'service_type' => $request->service_type,
-                'customer_id' => $customer->id,
-                'customer_address_id' => $customerAddress->id ?? null,
-                'request_date' => now()->addDays(5), // after 5 days of current date 
-                'request_source' => 'system',
-                'visit_date' => $request->visit_date,
-                'reschedule_date' => null,
-                'created_by' => Auth::id(),
-                'is_engineer_assigned' => 'not_assigned',
-                'status' => 'active',
-                'amc_status' => 'active',
-                'amc_plan_id' => $request->amc_plan_id,
-            ]);
 
             if ($request->service_type == 'amc') {
                 $amc = Amc::create([
@@ -1126,6 +1111,22 @@ class ServiceRequestController extends Controller
                     'status' => 'active',
                     'created_by' => Auth::id(),
                 ]);
+            } else {
+                $serviceRequest = ServiceRequest::create([
+                    'request_id' => $uniqRequestId,
+                    'service_type' => $request->service_type,
+                    'customer_id' => $customer->id,
+                    'customer_address_id' => $customerAddress->id ?? null,
+                    'request_date' => now()->addDays(5), // after 5 days of current date 
+                    'request_source' => 'system',
+                    'visit_date' => $request->visit_date,
+                    'reschedule_date' => null,
+                    'created_by' => Auth::id(),
+                    'is_engineer_assigned' => 'not_assigned',
+                    'status' => 'active',
+                    'amc_status' => 'active',
+                    'amc_plan_id' => $request->amc_plan_id,
+                ]);
             }
 
             $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
@@ -1135,7 +1136,7 @@ class ServiceRequestController extends Controller
             $monthGap = (int) round($monthGapFloat);
 
             // Ensure we have a Carbon instance for dates
-            $startVisitDate = $serviceRequest->visit_date ? \Carbon\Carbon::parse($serviceRequest->visit_date) : \Carbon\Carbon::now();
+            $startVisitDate = $request->visit_date ? \Carbon\Carbon::parse($request->visit_date) : \Carbon\Carbon::now();
 
             // Start from the next visit after the initial visit date
             $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
@@ -1159,23 +1160,6 @@ class ServiceRequestController extends Controller
 
             // 3. Store products
             foreach ($request->products as $product) {
-
-                $serviceRequest->products()->create([
-                    'service_requests_id' => $serviceRequest->id,
-                    'item_code_id' => $request->amc_plan_id ?? null,
-
-                    'name' => $product['product_name'] ?? 'N/A',
-                    'type' => $product['product_type'] ?? 'N/A',
-                    'model_no' => $product['model_no'] ?? 'N/A',
-                    'sku' => $product['sku'] ?? 'N/A',
-                    'hsn' => $product['hsn'] ?? 'N/A',
-
-                    'purchase_date' => $product['purchase_date'] ?? 'N/A',
-                    'brand' => $product['product_brand'] ?? 'N/A',
-                    'description' => $product['issue_description'] ?? 'N/A',
-                    'service_charge' => $product['price'] ?? '100',
-                ]);
-
                 if ($request->service_type == 'amc') {
                     AmcProduct::create([
                         'amc_id' => $amc->id,
@@ -1187,6 +1171,22 @@ class ServiceRequestController extends Controller
                         'purchase_date' => $product['purchase_date'] ?? 'N/A',
                         'brand' => $product['product_brand'] ?? 'N/A',
                         'description' => $product['issue_description'] ?? 'N/A',
+                    ]);
+                } else {
+                    $serviceRequest->products()->create([
+                        'service_requests_id' => $serviceRequest->id,
+                        'item_code_id' => $request->amc_plan_id ?? null,
+
+                        'name' => $product['product_name'] ?? 'N/A',
+                        'type' => $product['product_type'] ?? 'N/A',
+                        'model_no' => $product['model_no'] ?? 'N/A',
+                        'sku' => $product['sku'] ?? 'N/A',
+                        'hsn' => $product['hsn'] ?? 'N/A',
+
+                        'purchase_date' => $product['purchase_date'] ?? 'N/A',
+                        'brand' => $product['product_brand'] ?? 'N/A',
+                        'description' => $product['issue_description'] ?? 'N/A',
+                        'service_charge' => $product['price'] ?? '100',
                     ]);
                 }
             }
@@ -1403,7 +1403,6 @@ class ServiceRequestController extends Controller
                 'service_type' => $request->service_type,
                 'customer_id' => $customer->id,
                 'request_date' => now(),
-                'request_status' => 'pending',
                 'request_source' => 'system',
                 'created_by' => Auth::id(),
             ]);
@@ -1761,7 +1760,6 @@ class ServiceRequestController extends Controller
                 'service_type' => $request->service_type,
                 'customer_id' => $customer->id,
                 'request_date' => now(),
-                'request_status' => 'pending',
                 'request_source' => 'system',
                 'created_by' => Auth::id(),
             ]);
@@ -2164,7 +2162,6 @@ class ServiceRequestController extends Controller
                 'customer_id' => $customer->id,
                 'customer_address_id' => $customerAddressId,
                 'request_date' => now(),
-                'request_status' => 'pending',
                 'request_source' => 'system',
                 'created_by' => Auth::id(),
             ]);
@@ -2780,9 +2777,15 @@ class ServiceRequestController extends Controller
     {
         /** ---------------- VALIDATION ---------------- */
         $rules = [
-            'service_request_id' => 'required|exists:service_requests,id',
+            'service_type' => 'required|in:amc,quick_service,installation,repair',
             'assignment_type'    => 'required|in:individual,group',
         ];
+
+        if ($request->service_type == 'amc') {
+            $rules['amc_id'] = 'required|exists:amcs,id';
+        } else {
+            $rules['service_request_id'] = 'required|exists:service_requests,id';
+        }
 
         if ($request->assignment_type === 'individual') {
             $rules['engineer_id'] = 'required|exists:staff,id';
@@ -2807,13 +2810,57 @@ class ServiceRequestController extends Controller
         DB::beginTransaction();
 
         try {
-            $serviceRequest = ServiceRequest::findOrFail($request->service_request_id);
+            if ($request->service_type == 'amc') {
+                $amc = Amc::with('amcProducts')->findOrFail($request->amc_id);
+
+                $amcScheduleMeeting = AmcScheduleMeeting::where('amc_id', $amc->id)->where('status', 'scheduled')->first();
+
+                $serviceRequest = ServiceRequest::create([
+                    'request_id' => uniqid(),
+                    'service_type' => $request->service_type,
+                    'customer_id' => $amc->customer_id,
+                    'customer_address_id' => $amc->customer_address_id ?? null,
+                    'request_date' => now(),
+                    'request_source' => 'system',
+                    'visit_date' => $amcScheduleMeeting->scheduled_at,
+                    'reschedule_date' => null,
+                    'created_by' => Auth::guard('web')->id(),
+                    'is_engineer_assigned' => 'not_assigned',
+                    'status' => 'pending',
+                    'amc_status' => 'active',
+                    'amc_plan_id' => $amc->amc_plan_id,
+                ]);
+
+
+                // Create Service Request Products in service_request_products table
+                $products = $amc->amcProducts;
+                foreach ($products as $productData) {
+
+                    // add logic for getting item_code_id using product_type 
+                    \App\Models\ServiceRequestProduct::create([
+                        'service_requests_id' => $serviceRequest->id,
+                        'name' => $productData->name,
+                        'type' => $productData->type,
+                        'model_no' => $productData->model_no,
+                        'sku' => $productData->sku ?? null,
+                        'hsn' => $productData->hsn ?? null,
+                        'purchase_date' => $productData->purchase_date,
+                        'brand' => $productData->brand,
+                        'images' => $productData->images,
+                        'item_code_id' => $productData->item_code_id ?? null,
+                        'service_charge' => '0',
+                        'status' => 'Pending',
+                    ]);
+                }
+            } else {
+                $serviceRequest = ServiceRequest::findOrFail($request->service_request_id);
+            }
 
             /** Only approved requests can be assigned */
             if ($serviceRequest->service_type == 'amc') {
-                if (!in_array($serviceRequest->amc_status, ['active',])) {
+                if (!in_array($serviceRequest->status, ['active', 'pending'])) {
                     return response()->json([
-                        'success' => false,
+                        'success' => false, 
                         'message' => 'Engineer can only be assigned to active AMC requests.',
                     ], 422);
                 }
@@ -2839,7 +2886,10 @@ class ServiceRequestController extends Controller
             }
 
             if ($serviceRequest->service_type == 'amc') {
-                $amcScheduleMeeting = AmcScheduleMeeting::where('service_request_id', $serviceRequest->id)->where('status', 'scheduled')->first();
+                $amcScheduleMeeting = AmcScheduleMeeting::where('amc_id', $amc->id)->where('status', 'scheduled')->first();
+                $amcScheduleMeeting->update([
+                    'service_request_id' => $serviceRequest->id,
+                ]);
             }
 
 

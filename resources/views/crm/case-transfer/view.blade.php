@@ -345,7 +345,7 @@
 
                                             </span>
                                             <span
-                                                class="badge bg-danger-subtle text-danger fw-semibold">{{ ucfirst($serviceRequest->request_status ?? 'pending') }}</span>
+                                                class="badge bg-danger-subtle text-danger fw-semibold">{{ ucfirst($serviceRequest->status ?? 'pending') }}</span>
                                         </li>
 
                                     </ul>

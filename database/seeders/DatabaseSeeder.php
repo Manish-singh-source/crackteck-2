@@ -87,9 +87,9 @@ class DatabaseSeeder extends Seeder
             
             
             // crm ====================
-            LeadTableSeeder::class,
-            FollowUpTableSeeder::class,
-            MeetTableSeeder::class,
+            // LeadTableSeeder::class,
+            // FollowUpTableSeeder::class,
+            // MeetTableSeeder::class,
 
             // QuotationTableSeeder::class,
             // QuotationProductTableSeeder::class,
@@ -99,14 +99,14 @@ class DatabaseSeeder extends Seeder
             PincodeSeeder::class,
 
 
-            ServiceRequestSeeder::class,
-            ServiceRequestProductSeeder::class,
+            // ServiceRequestSeeder::class,
+            // ServiceRequestProductSeeder::class,
             // ServiceRequestQuotationSeeder::class,
 
             
-            AssignedEngineerSeeder::class,
-            EngineerDiagnosisDetailSeeder::class,
-            ServiceRequestProductPickupSeeder::class,
+            // AssignedEngineerSeeder::class,
+            // EngineerDiagnosisDetailSeeder::class,
+            // ServiceRequestProductPickupSeeder::class,
             // ServiceRequestProductRequestPartSeeder::class,
             // RequestedPartDeliverySeeder::class,
             // AssignedEngineerGroupSeeder::class,

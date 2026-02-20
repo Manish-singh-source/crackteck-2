@@ -234,20 +234,20 @@
                                                                 value="{{ $request->id }}">
 
                                                             <div class="mb-3">
-                                                                <label class="form-label fw-semibold">Assignment Type</label>
+                                                                <label class="form-label fw-semibold">Assignment
+                                                                    Type</label>
                                                                 <div>
                                                                     <div class="form-check form-check-inline">
                                                                         <input class="form-check-input" type="radio"
-                                                                            name="assignment_type"
-                                                                            id="typeIndividualModal" value="individual"
-                                                                            checked>
+                                                                            name="assignment_type" id="typeIndividualModal"
+                                                                            value="individual" checked>
                                                                         <label class="form-check-label"
                                                                             for="typeIndividualModal">Individual</label>
                                                                     </div>
                                                                     <div class="form-check form-check-inline">
                                                                         <input class="form-check-input" type="radio"
-                                                                            name="assignment_type"
-                                                                            id="typeGroupModal" value="group">
+                                                                            name="assignment_type" id="typeGroupModal"
+                                                                            value="group">
                                                                         <label class="form-check-label"
                                                                             for="typeGroupModal">Group</label>
                                                                     </div>
@@ -350,7 +350,7 @@
                                     @foreach ($request->amcScheduleMeetings as $index => $meeting)
                                         <tr class="align-middle">
                                             <td>
-                                                {{ $index + 1 }}    
+                                                {{ $index + 1 }}
                                             </td>
                                             <td>
                                                 {{ $meeting->activeAssignment->engineer->first_name ?? 'N/A' }}
@@ -360,18 +360,50 @@
                                                 Maintanance
                                             </td>
                                             <td>
-                                                NA
+                                                @if ($meeting->status == 'completed')
+                                                    <!-- Report Button -->
+                                                    <a href="{{ route('service-request.view-amc-service-request', $meeting->service_request_id) }}"
+                                                        class="btn btn-sm btn-primary">
+                                                        View Report
+                                                    </a>
+                                                @else
+                                                    N/A
+                                                @endif
                                             </td>
                                             <td>
-                                                <span
-                                                    class="badge bg-warning-subtle text-warning fw-semibold">{{ $meeting->status ?? 'N/A' }}</span>
+                                                @php
+                                                    $status = [
+                                                        'scheduled' => 'Scheduled',
+                                                        'in_progress' => 'In Progress',
+                                                        'completed' => 'Completed',
+                                                        'missed' => 'missed',
+                                                    ];
+
+                                                    $statusColor = [
+                                                        'scheduled' => 'bg-warning-subtle text-warning',
+                                                        'in_progress' => 'bg-info-subtle text-info',
+                                                        'completed' => 'bg-success-subtle text-success',
+                                                        'missed' => 'bg-danger-subtle text-danger',
+                                                    ];
+
+                                                @endphp
+                                                <span class="badge {{ $statusColor[$meeting->status] }} fw-semibold">
+                                                    {{ $status[$meeting->status] }}
+                                                </span>
                                             </td>
                                             <td>
-                                                <!-- Re-Scheduled Button -->
-                                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                                    data-bs-target="#rescheduleModal">
-                                                    Re-Scheduled
-                                                </button>
+                                                @if ($meeting->status == 'completed')
+                                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                                        data-bs-target="#rescheduleModal" disabled>
+                                                        Re-Scheduled
+                                                    </button>
+                                                @else
+                                                    <!-- Re-Scheduled Button -->
+                                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                                        data-bs-target="#rescheduleModal">
+                                                        Re-Scheduled
+                                                    </button>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -1775,7 +1807,7 @@
                             location.reload();
                         } else {
                             alert('Error: ' + response.message);
-                        }   
+                        }
                     },
                     error: function(xhr) {
                         console.error('Assignment Error:', xhr);

@@ -18,7 +18,6 @@ class ServiceRequest extends Model
         'customer_id',
         'customer_address_id',
         'request_date',
-        'request_status',
         'request_source',   
         'visit_date',
         'reschedule_date',

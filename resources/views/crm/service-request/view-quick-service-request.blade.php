@@ -947,7 +947,8 @@ $isProcessed = in_array($currentStatus, [
                                 <form id="assignEngineerForm">
                                     @csrf
                                     <input type="hidden" name="service_request_id" value="{{ $request->id }}">
-
+                                    <input type="hidden" name="service_type"
+                                                                value="{{ $request->service_type }}">
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold">Assignment Type</label>
                                         <div>

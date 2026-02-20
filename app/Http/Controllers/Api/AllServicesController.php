@@ -270,36 +270,38 @@ class AllServicesController extends Controller
                 }
 
 
-                if ($request->service_type != 'amc') {
-                    $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
+                if ($request->service_type == 'amc') 
+                //     {
+                //     $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
 
-                    // Calculate the month gap between visits as an integer (avoid fractional months)
-                    $monthGapFloat = intval($amcPlan->duration) / max(1, intval($amcPlan->total_visits));
-                    $monthGap = (int) round($monthGapFloat);
+                //     // Calculate the month gap between visits as an integer (avoid fractional months)
+                //     $monthGapFloat = intval($amcPlan->duration) / max(1, intval($amcPlan->total_visits));
+                //     $monthGap = (int) round($monthGapFloat);
 
-                    // Ensure we have a Carbon instance for dates
-                    $startVisitDate = $servicesRequest->visit_date ? \Carbon\Carbon::parse($servicesRequest->visit_date) : \Carbon\Carbon::now();
+                //     // Ensure we have a Carbon instance for dates
+                //     $startVisitDate = $servicesRequest->visit_date ? \Carbon\Carbon::parse($servicesRequest->visit_date) : \Carbon\Carbon::now();
 
-                    // Start from the next visit after the initial visit date
-                    $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
+                //     // Start from the next visit after the initial visit date
+                //     $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
 
-                    foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
-                        // Create a service request visit for each visit
-                        $servicesRequest->amcScheduleMeetings()->create([
-                            'service_request_id' => $servicesRequest->id,
-                            'amc_id' => $amc->id,
-                            'scheduled_at' => $nextVisitDate,
-                            'completed_at' => null,
-                            'remarks' => null,
-                            'report' => null,
-                            'visits_count' => $visitNumber,
-                            'status' => 'scheduled',
-                        ]);
+                //     foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
+                //         // Create a service request visit for each visit
+                //         $servicesRequest->amcScheduleMeetings()->create([
+                //             'service_request_id' => $servicesRequest->id,
+                //             'amc_id' => $amc->id,
+                //             'scheduled_at' => $nextVisitDate,
+                //             'completed_at' => null,
+                //             'remarks' => null,
+                //             'report' => null,
+                //             'visits_count' => $visitNumber,
+                //             'status' => 'scheduled',
+                //         ]);
 
-                        // Update the next visit date for the next iteration
-                        $nextVisitDate = $nextVisitDate->addMonths($monthGap);
-                    }
-                } else {
+                //         // Update the next visit date for the next iteration
+                //         $nextVisitDate = $nextVisitDate->addMonths($monthGap);
+                //     }
+                // } else 
+                {
                     $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
 
                     // Calculate the month gap between visits as an integer (avoid fractional months)

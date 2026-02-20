@@ -600,7 +600,15 @@ class FieldEngineerController extends Controller
 
                                     // product data 
                                     $productData = Product::where('id', $item['part_id'])->first();
-                                    $itemData['product_data'] = $productData ? $productData : 'N/A';
+                                    if ($productData) {
+                                        $data = [
+                                            'id' => $productData->id,
+                                            'product_name' => $productData->product_name,
+                                            'main_product_image' => $productData->main_product_image,
+                                            'final_price' => $productData->final_price,
+                                        ];
+                                    }
+                                    $itemData['product_data'] = $productData ? $data : [];
                                 }
                             }
                         }
@@ -903,7 +911,7 @@ class FieldEngineerController extends Controller
             if ($newServiceStatus) {
                 ServiceRequest::where('id', $service_request_id)
                     ->update(['status' => $newServiceStatus]);
-                if($newServiceStatus === 'completed') { 
+                if ($newServiceStatus === 'completed') {
                     $amcScheduleMeeting = AmcScheduleMeeting::where('service_request_id', $service_request_id)->where('status', 'in_progress')->first();
                     if ($amcScheduleMeeting) {
                         $amcScheduleMeeting->status = 'completed';
@@ -925,7 +933,7 @@ class FieldEngineerController extends Controller
                         ->where('product_id', $serviceRequestProduct->id)
                         ->first();
 
-                    if (!$existingPickup) { 
+                    if (!$existingPickup) {
                         // Extract reason from diagnosis list
                         $reason = '';
                         if (!empty($diagnosisList)) {

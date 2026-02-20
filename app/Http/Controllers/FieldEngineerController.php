@@ -600,7 +600,7 @@ class FieldEngineerController extends Controller
 
                                     // product data 
                                     $productData = Product::where('id', $item['part_id'])->first();
-                                    $itemData['product_data'] = $productData ? $productData->name : 'N/A';
+                                    $itemData['product_data'] = $productData ? $productData : 'N/A';
                                 }
                             }
                         }

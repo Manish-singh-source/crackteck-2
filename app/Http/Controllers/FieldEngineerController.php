@@ -18,6 +18,7 @@ use Rappasoft\LaravelAuthenticationLog\Models\AuthenticationLog;
 use App\Models\Staff;
 use Illuminate\Support\Facades\{Auth, DB, Log, Storage, Validator};
 use App\Models\AmcScheduleMeeting;
+use App\Models\Product;
 
 class FieldEngineerController extends Controller
 {
@@ -595,6 +596,11 @@ class FieldEngineerController extends Controller
                                         ->where('part_id', $item['part_id'])
                                         ->first();
                                     $itemData['part_status'] = $partRequest ? $partRequest->status : 'pending';
+
+
+                                    // product data 
+                                    $productData = Product::where('id', $item['part_id'])->first();
+                                    $itemData['product_ata'] = $productData ? $productData->name : 'N/A';
                                 }
                             }
                         }
@@ -919,7 +925,7 @@ class FieldEngineerController extends Controller
                         ->where('product_id', $serviceRequestProduct->id)
                         ->first();
 
-                    if (!$existingPickup) {
+                    if (!$existingPickup) { 
                         // Extract reason from diagnosis list
                         $reason = '';
                         if (!empty($diagnosisList)) {

@@ -13,14 +13,14 @@ class AuthController extends Controller
     // Custom guard for offline customers
     protected function guard()
     {
-        return Auth::guard('customer');
+        return Auth::guard('customer_web');
     }
 
     //
     public function login()
     {
         // If already logged in, redirect to index
-        if (Auth::guard('customer')->check()) {
+        if (Auth::guard('customer_web')->check()) {
             return redirect()->route('index');
         }
         
@@ -80,7 +80,7 @@ class AuthController extends Controller
         }
 
         // Login the customer
-        Auth::guard('customer')->login($customer);
+        Auth::guard('customer_web')->login($customer);
 
         $request->session()->regenerate();
 
@@ -96,7 +96,7 @@ class AuthController extends Controller
 
     public function offlinelogout(Request $request)
     {
-        Auth::guard('customer')->logout();
+        Auth::guard('customer_web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

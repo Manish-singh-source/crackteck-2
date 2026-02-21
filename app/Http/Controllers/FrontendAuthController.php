@@ -58,7 +58,7 @@ class FrontendAuthController extends Controller
         if (Auth::guard('customer_web')->attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->intended('demo/'); // customer dashboard
+            return redirect()->intended('beta/'); // customer dashboard
         }
 
         return back()->withErrors([
@@ -72,7 +72,7 @@ class FrontendAuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->intended('demo/');
+        return redirect()->intended('beta/');
     }
 
     /**

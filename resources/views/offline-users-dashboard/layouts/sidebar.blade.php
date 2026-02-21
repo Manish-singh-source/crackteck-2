@@ -4,7 +4,7 @@
         <div id="sidebar-menu">
 
             <div class="logo-box">
-                <a class='logo logo-light' href="{{ route('index') }}">
+                <a class='logo logo-light' href="{{ route('offline-index') }}">
                     <span class="logo-sm">
                         <img src="{{ asset('assets/images/logo-sm.png') }}" alt="">
                     </span>
@@ -12,7 +12,7 @@
                         <img src="{{ asset('assets/images/logo-light.png') }}" alt="">
                     </span>
                 </a>
-                <a class='logo logo-dark' href="{{ route('index') }}">
+                <a class='logo logo-dark' href="{{ route('offline-index') }}">
                     <span class="logo-sm">
                         <img src="{{ asset('assets/images/logo-sm.png') }}" alt="">
                     </span>
@@ -26,7 +26,7 @@
 
                 <li class="menu-title mt-2">Dashboard</li>
                 <li>
-                    <a class='tp-link' href="{{ route('index') }}">
+                    <a class='tp-link' href="{{ route('offline-index') }}">
                         <i class="fas fa-tachometer-alt"></i>
                         <span class="ps-1">Dashboard</span>
                     </a>
@@ -40,7 +40,7 @@
 
                 <li class="menu-title mt-2">My Services</li>
                 <li>
-                    <a class='tp-link' href="{{ route('amc') }}">
+                    <a class='tp-link' href="{{ route('offline-amc') }}">
                         <i class="fas fa-clipboard-check"></i>
                         <span class="ps-1">AMC</span>
                     </a>

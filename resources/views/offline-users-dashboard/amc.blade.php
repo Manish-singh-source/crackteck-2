@@ -10,7 +10,7 @@
                     <h4 class="fs-18 fw-semibold m-0">AMC Service Requests</h4>
                     <nav aria-label="breadcrumb" class="mt-1">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="{{ route('index') }}" class="text-muted">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('offline-index') }}" class="text-muted">Dashboard</a></li>
                             <li class="breadcrumb-item active" aria-current="page">AMC</li>
                         </ol>
                     </nav>
@@ -54,7 +54,7 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
-                                    {{-- <h4 class="fw-bold mb-0">{{ $servicesRequest->where('amc_status', 'Active')->count() }}</h4> --}}
+                                    <h4 class="fw-bold mb-0">{{ $servicesRequest->where('status', 'active')->count() }}</h4>
                                     <small class="text-muted">Active</small>
                                 </div>
                             </div>
@@ -72,7 +72,7 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
-                                    {{-- <h4 class="fw-bold mb-0">{{ $servicesRequest->where('amc_status', 'Inactive')->count() }}</h4> --}}
+                                    <h4 class="fw-bold mb-0">{{ $servicesRequest->where('status', 'inactive')->count() }}</h4>
                                     <small class="text-muted">Inactive</small>
                                 </div>
                             </div>
@@ -90,7 +90,7 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
-                                    {{-- <h4 class="fw-bold mb-0">{{ $servicesRequest->where('amc_status', 'Expired')->count() }}</h4> --}}
+                                    <h4 class="fw-bold mb-0">{{ $servicesRequest->where('status', 'expired')->count() }}</h4>
                                     <small class="text-muted">Expired</small>
                                 </div>
                             </div>
@@ -109,13 +109,12 @@
                             </h5>
                             <div class="d-flex gap-2">
                                 <span class="badge bg-light text-dark border px-3 py-2 fs-12">
-                                    {{-- <i class="fas fa-list me-1"></i> {{ $servicesRequest->count() }} Records --}}
+                                    <i class="fas fa-list me-1"></i> {{ $servicesRequest->count() }} Records
                                 </span>
                             </div>
                         </div>
                         <div class="card-body p-0">
-                            hello
-                            {{-- @if ($servicesRequest->isEmpty())
+                            @if ($servicesRequest->isEmpty())
                                 <div class="text-center py-5">
                                     <div class="mb-3" style="font-size: 60px; opacity: 0.2;">
                                         <i class="fas fa-clipboard-list"></i>
@@ -153,7 +152,7 @@
                                                     </td>
                                                     <td>
                                                         <span class="badge bg-info-subtle text-info rounded-pill px-3 py-1">
-                                                            <i class="fas fa-box me-1"></i>{{ $service->products->count() }} Product(s)
+                                                            <i class="fas fa-box me-1"></i>{{ $service->amc_products_count }} Product(s)
                                                         </span>
                                                     </td>
                                                     <td>
@@ -178,21 +177,19 @@
                                                     </td>
                                                     <td>
                                                         @php
-                                                            $statusConfig = match ($service->amc_status) {
-                                                                'Active' => ['class' => 'bg-success-subtle text-success', 'icon' => 'fa-check-circle'],
-                                                                'Inactive' => ['class' => 'bg-warning-subtle text-warning', 'icon' => 'fa-clock'],
-                                                                'Expired' => ['class' => 'bg-danger-subtle text-danger', 'icon' => 'fa-times-circle'],
-                                                                'Cancelled' => ['class' => 'bg-danger-subtle text-danger', 'icon' => 'fa-ban'],
-                                                                default => ['class' => 'bg-secondary-subtle text-secondary', 'icon' => 'fa-question-circle'],
-                                                            };
-                                                        @endphp
-                                                        <span class="badge {{ $statusConfig['class'] }} rounded-pill px-3 py-1">
-                                                            <i class="fas {{ $statusConfig['icon'] }} me-1"></i>
-                                                            {{ ucwords(str_replace('_', ' ', $service->amc_status)) }}
-                                                        </span>
+                                                        $statusClass = match ($service->status) {
+                                                            'inactive' => 'text-warning',
+                                                            'expired' => 'text-danger',
+                                                            'active' => 'text-success',
+                                                            'cancelled' => 'text-danger',
+                                                            default => 'text-secondary',
+                                                        };
+                                                    @endphp
+                                                    <span
+                                                        class="{{ $statusClass }} fw-semibold">{{ ucwords(str_replace('_', ' ', $service->status)) }}</span>
                                                     </td>
                                                     <td class="text-center">
-                                                        <a href="{{ route('my-account-amc.view', $service->id) }}"
+                                                        <a href="{{ route('offline-amc-view', $service->id) }}"
                                                            class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                                             <i class="fas fa-eye me-1"></i> View
                                                         </a>
@@ -215,25 +212,23 @@
                                                         <small class="text-muted">{{ $service->amcPlan->plan_name ?? 'N/A' }}</small>
                                                     </div>
                                                     @php
-                                                        $statusConfig = match ($service->amc_status) {
-                                                            'Active' => ['class' => 'bg-success-subtle text-success', 'icon' => 'fa-check-circle'],
-                                                            'Inactive' => ['class' => 'bg-warning-subtle text-warning', 'icon' => 'fa-clock'],
-                                                            'Expired' => ['class' => 'bg-danger-subtle text-danger', 'icon' => 'fa-times-circle'],
-                                                            'Cancelled' => ['class' => 'bg-danger-subtle text-danger', 'icon' => 'fa-ban'],
-                                                            default => ['class' => 'bg-secondary-subtle text-secondary', 'icon' => 'fa-question-circle'],
+                                                        $statusClass = match ($service->status) {
+                                                            'inactive' => 'text-warning',
+                                                            'expired' => 'text-danger',
+                                                            'active' => 'text-success',
+                                                            'cancelled' => 'text-danger',
+                                                            default => 'text-secondary',
                                                         };
                                                     @endphp
-                                                    <span class="badge {{ $statusConfig['class'] }} rounded-pill px-3 py-1">
-                                                        <i class="fas {{ $statusConfig['icon'] }} me-1"></i>
-                                                        {{ ucwords(str_replace('_', ' ', $service->amc_status)) }}
-                                                    </span>
+                                                    <span
+                                                        class="{{ $statusClass }} fw-semibold">{{ ucwords(str_replace('_', ' ', $service->status)) }}</span>
                                                 </div>
 
                                                 <div class="row g-2 mb-3">
                                                     <div class="col-6">
                                                         <small class="text-muted d-block">Products</small>
                                                         <span class="badge bg-info-subtle text-info rounded-pill px-2 py-1 fs-12">
-                                                            <i class="fas fa-box me-1"></i>{{ $service->products->count() }} Product(s)
+                                                            <i class="fas fa-box me-1"></i>{{ $service->amc_products_count }} Product(s)
                                                         </span>
                                                     </div>
                                                     <div class="col-6">
@@ -263,7 +258,7 @@
                                         </div>
                                     @endforeach
                                 </div>
-                            @endif --}}
+                            @endif
                         </div>
                     </div>
                 </div>

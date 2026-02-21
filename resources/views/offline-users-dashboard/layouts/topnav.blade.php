@@ -23,7 +23,7 @@
 
                 <li class="px-2 py-1 rounded-lg">
                     <h5 class="mb-0">
-                        <a class='tp-link' href="{{ route('index') }}">
+                        <a class='tp-link' href="{{ route('offline-index') }}">
                             <i class="fas fa-clipboard-check"></i>
                             <!-- <img width="" height="20" src="https://img.icons8.com/external-outline-design-circle/66/1A1A1A/external-Crm-customer-service-outline-design-circle.png" alt="external-Crm-customer-service-outline-design-circle" /> -->
                             <span class="d-none d-md-inline-flex ps-1"> AMC </span>
@@ -175,7 +175,7 @@
 
                 <!-- User Dropdown -->
                 @php
-                    $customer = Auth::guard('customer')->user();
+                    $customer = Auth::guard('customer_web')->user();
                 @endphp
                 <li class="dropdown notification-list topbar-dropdown">
                     <a class="nav-link dropdown-toggle nav-user me-0" data-bs-toggle="dropdown" href="#"

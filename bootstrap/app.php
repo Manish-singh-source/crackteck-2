@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'jwt.verify' => \App\Http\Middleware\JWTMiddleware::class,
+            'customer.auth' => \App\Http\Middleware\AuthenticateCustomer::class,
+            'customer.guest' => \App\Http\Middleware\RedirectIfCustomer::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

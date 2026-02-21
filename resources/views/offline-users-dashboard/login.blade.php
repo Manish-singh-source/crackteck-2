@@ -6,7 +6,7 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>Log In</title>
+    <title>Log In | Offline Customer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <meta name="description" content="" /> -->
     <meta name="author" content="Technofra" />
@@ -46,7 +46,7 @@
                                             </div>
 
                                             <div class="pt-0">
-                                                <form action="{{ route('loginStore') }}" method="POST" class="my-4">
+                                                <form action="{{ route('offlineloginStore') }}" method="POST" class="my-4">
                                                     @csrf
                                                     <div class="form-group mb-3">
                                                         <label for="email" class="form-label">Email address</label>

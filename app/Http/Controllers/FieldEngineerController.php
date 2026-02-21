@@ -158,6 +158,7 @@ class FieldEngineerController extends Controller
             ->whereHas('activeAssignment', function ($query) use ($request) {
                 $query->where('engineer_id', $request->user_id);
             })
+            ->where('status', '!=', 'completed')
             ->where('is_engineer_assigned', 'assigned')
             ->orderBy('created_at', 'desc')
             ->get();

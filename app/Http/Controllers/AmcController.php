@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Amc;
 use App\Models\AmcPlan;
+use App\Models\AmcScheduleMeeting;
 use App\Models\CoveredItem;
 use App\Models\DeviceSpecificDiagnosis;
+use App\Models\ServiceRequest;
 use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -568,5 +570,36 @@ class AmcController extends Controller
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
 
         return view('/crm/active-amcs/view', compact('amcRequest', 'engineers'));
+    }
+
+    // 4. Reschedule AMC request 
+    public function rescheduleAmcRequest(Request $request)
+    {
+        if ($request->filled('request_type') == 'amc') {
+            
+            $amcScheduleMeeting = AmcScheduleMeeting::with('serviceRequest')->findOrFail($request->amc_schedule_meeting_id);
+            
+            if (!$amcScheduleMeeting) {
+                return redirect()->back()->with('error', 'AMC Schedule Meeting not found.');
+            }
+
+            $amcScheduleMeeting->rescheduled_at = $amcScheduleMeeting->scheduled_at;
+            $amcScheduleMeeting->scheduled_at = $request->new_date;
+            $amcScheduleMeeting->save();
+
+            $amcScheduleMeeting->serviceRequest->reschedule_date = $request->new_date;
+            $amcScheduleMeeting->save();
+        } else {
+            $serviceRequest = ServiceRequest::findOrFail($request->service_request_id);
+
+            if (!$serviceRequest) {
+                return redirect()->back()->with('error', 'Service Request not found.');
+            }
+
+            $serviceRequest->reschedule_date = $request->new_date;
+            $serviceRequest->save();
+        }
+
+        return redirect()->back()->with('success', 'AMC Schedule Meeting updated successfully.');
     }
 }

@@ -506,6 +506,9 @@ Route::prefix('/demo')->group(function () {
             Route::get('/amcs-list', 'listAmcRequests')->name('amcs-lists.index');
             Route::delete('/amcs-request/{id}', 'deleteAmcsRequest')->name('amcs-request.delete');
             Route::get('/amcs-request/{id}', 'viewAmcsRequest')->name('amcs-request.view');
+            // Reschedule AMC 
+            Route::post('/amcs-request/reschedule', 'rescheduleAmcRequest')->name('amcs-request.reschedule');
+            
         });
     });
 

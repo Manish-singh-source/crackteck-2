@@ -218,8 +218,8 @@
                                         <span class="fw-semibold text-break">Date :
                                         </span>
                                         <span>
-                                            <div>{{ $serviceRequest->request_date->diffForHumans() }}</div>
-                                            <div>{{ $serviceRequest->request_date->format('Y-m-d H:i A') }}</div>
+                                            <div>{{ $serviceRequest->request_date }}</div>
+                                            <div>{{ $serviceRequest->request_date }}</div>
                                         </span>
                                     </li>
                                     <li class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">

@@ -400,7 +400,9 @@
                                                 @else
                                                     <!-- Re-Scheduled Button -->
                                                     <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                                        data-bs-target="#rescheduleModal">
+                                                        data-bs-target="#rescheduleModal"
+                                                        data-reschedule-id="{{ $meeting->id }}"
+                                                        data-scheduled-time="{{ $meeting->scheduled_at }}">
                                                         Re-Scheduled
                                                     </button>
                                                 @endif
@@ -412,12 +414,19 @@
                         </div>
                     </div>
 
-                    <!-- Modal -->
+                    <!-- Re-Schedule Visit Modal -->
                     <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel"
                         aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
-                                <form action="#">
+                                <form action="{{ route('amcs-request.reschedule') }}" method="POST">
+                                    @csrf
+                                    @method('POST')
+
+                                    <input type="hidden" name="amc_schedule_meeting_id" id="rescheduleModalMeetingId"
+                                        value="">
+                                    <input type="hidden" name="request_type" value="amc">
+
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="rescheduleModalLabel">
                                             Reschedule Appointment</h5>
@@ -428,11 +437,11 @@
                                     <div class="modal-body p-2">
                                         <p>Please enter new schedule date:</p>
                                         <input type="date" id="newSchedule" class="form-control"
-                                            placeholder="Enter new date/time">
+                                            placeholder="Enter new date/time" name="new_date" required>
                                     </div>
 
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-success">Submit</button>
+                                        <button type="submit" class="btn btn-success">Submit</button>
                                     </div>
                                 </form>
                             </div>
@@ -1624,6 +1633,17 @@
 
 @section('scripts')
     <script>
+        // Handle reschedule modal - set meeting ID when modal opens
+        const rescheduleModal = document.getElementById('rescheduleModal');
+        if (rescheduleModal) {
+            rescheduleModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget; // Button that triggered the modal
+                const meetingId = button.getAttribute('data-reschedule-id');
+                const inputField = document.getElementById('rescheduleModalMeetingId');
+                inputField.value = meetingId;
+            });
+        }
+
         $(document).ready(function() {
             // Toggle between Individual and Group sections
             $('input[name="assignment_type"]').change(function() {

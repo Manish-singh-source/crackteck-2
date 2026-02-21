@@ -86,19 +86,16 @@
                                     </div>
                                     <div>
                                         @php
-                                            $statusClass = match ($amcService->amc_status) {
-                                                'Pending' => 'badge bg-warning text-dark',
-                                                'Inactive' => 'badge bg-warning text-dark',
-                                                'Active' => 'badge bg-success',
-                                                'In Progress' => 'badge bg-info',
-                                                'Completed' => 'badge bg-success',
-                                                'Expired' => 'badge bg-danger',
-                                                'Cancelled' => 'badge bg-danger',
+                                            $statusClass = match ($amcService->status) {
+                                                'inactive' => 'badge bg-warning text-dark',
+                                                'active' => 'badge bg-success',
+                                                'expired' => 'badge bg-danger',
+                                                'cancelled' => 'badge bg-danger',
                                                 default => 'badge bg-secondary',
                                             };
                                         @endphp
                                         <span
-                                            class="{{ $statusClass }} fs-6">{{ ucwords(str_replace('_', ' ', $amcService->amc_status ?? 'Pending')) }}</span>
+                                            class="{{ $statusClass }} fs-6">{{ ucwords(str_replace('_', ' ', $amcService->status ?? 'Pending')) }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -229,10 +226,10 @@
                         <div class="card mb-3">
                             <div class="card-header bg-light">
                                 <h6 class="mb-0 fw-semibold"><i class="fas fa-box me-2"></i>Products
-                                    ({{ $amcService->products->count() }})</h6>
+                                    ({{ $amcService->amc_products_count }})</h6>
                             </div>
                             <div class="card-body">
-                                @if ($amcService->products->isEmpty())
+                                @if ($amcService->amcProducts->isEmpty())
                                     <p class="text-muted mb-0">No products added</p>
                                 @else
                                     <div class="table-responsive">
@@ -250,7 +247,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($amcService->products as $index => $product)
+                                                @foreach ($amcService->amcProducts as $index => $product)
                                                     <tr>
                                                         <td>{{ $index + 1 }}</td>
                                                         <td>{{ $product->name ?? ($product->item_name ?? 'N/A') }}

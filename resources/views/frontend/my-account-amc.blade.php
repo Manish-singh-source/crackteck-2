@@ -57,8 +57,7 @@
                     <div class="my-account-content account-dashboard">
                         <div class="d-flex justify-content-between align-items-center mb-20">
                             <h4 class="fw-semibold mb-0">AMC Service Requests</h4>
-                            <a href="{{ route('amc') }}"
-                                class="tf-btn btn-small d-inline-flex">
+                            <a href="{{ route('amc') }}" class="tf-btn btn-small d-inline-flex">
                                 <span class="text-white">New Request</span>
                             </a>
                         </div>
@@ -88,7 +87,7 @@
                                             <tr class="td-order-item">
                                                 <td class="body-text-3">{{ $service->request_id }}</td>
                                                 <td class="body-text-3">
-                                                    <span class="">{{ $service->products->count() }}
+                                                    <span class="">{{ $service->amc_products_count }}
                                                         Product(s)</span>
                                                 </td>
                                                 <td class="body-text-3">{{ $service->amcPlan->plan_name ?? 'N/A' }}</td>
@@ -109,16 +108,16 @@
                                                 </td>
                                                 <td class="body-text-3">
                                                     @php
-                                                        $statusClass = match ($service->amc_status) {
-                                                            'Inactive' => 'text-warning',
-                                                            'Expired' => 'text-danger',
-                                                            'Active' => 'text-success',
-                                                            'Cancelled' => 'text-danger',
+                                                        $statusClass = match ($service->status) {
+                                                            'inactive' => 'text-warning',
+                                                            'expired' => 'text-danger',
+                                                            'active' => 'text-success',
+                                                            'cancelled' => 'text-danger',
                                                             default => 'text-secondary',
                                                         };
                                                     @endphp
                                                     <span
-                                                        class="{{ $statusClass }} fw-semibold">{{ ucwords(str_replace('_', ' ', $service->amc_status)) }}</span>
+                                                        class="{{ $statusClass }} fw-semibold">{{ ucwords(str_replace('_', ' ', $service->status)) }}</span>
                                                 </td>
                                                 <td>
                                                     <a href="{{ route('my-account-amc.view', $service->id) }}"

@@ -7,7 +7,7 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>Warehouse | Dashboard</title>
+    <title>Offline Customer | Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <meta name="description" content="" /> -->
     <meta name="author" content="Technofra" />
@@ -70,11 +70,11 @@
     <div id="app-layout">
 
         <!-- Topbar Start -->
-        @include('warehouse/layouts/topnav')
+        @include('offline-users-dashboard/layouts/topnav')
         <!-- end Topbar -->
 
         <!-- Left Sidebar Start -->
-        @include('warehouse/layouts/sidebar')
+        @include('offline-users-dashboard/layouts/sidebar')
         <!-- Left Sidebar End -->
 
         <!-- ============================================================== -->

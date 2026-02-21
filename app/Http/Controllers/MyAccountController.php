@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Amc;
 use App\Models\CustomerAddressDetail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -282,21 +283,28 @@ class MyAccountController extends Controller
         }
 
         // Debug: Check what Auth::id() returns
-        $customerId = Auth::id();
+        $customerId = Auth::guard('customer_web')->id();
 
         // If using Customer model, get the actual customer ID
-        $customer = Auth::user();
+        $customer = Auth::guard('customer_web')->user();
         if ($customer instanceof \App\Models\Customer) {
             $customerId = $customer->id;
         }
 
         // Get AMC services for the logged-in user (by email)
-        $servicesRequest = \App\Models\ServiceRequest::where('customer_id', $customer->id)
-            ->whereNotNull('amc_plan_id') // Only AMC services
-            ->with('customer') // Load relationship (if defined in model)
+        // $servicesRequest = \App\Models\ServiceRequest::where('customer_id', $customer->id)
+        //     ->whereNotNull('amc_plan_id') // Only AMC services
+        //     ->with('customer') // Load relationship (if defined in model)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
+
+        $servicesRequest = Amc::with('customer')
+            ->withCount('amcProducts')
+            ->where('customer_id', $customerId)
+            ->whereNotNull('amc_plan_id')
             ->orderBy('created_at', 'desc')
             ->get();
-
+        // dd($servicesRequest);
         return view('frontend.my-account-amc', compact('servicesRequest'));
     }
 
@@ -309,11 +317,11 @@ class MyAccountController extends Controller
             return redirect()->route('login')->with('error', 'Please login to access your account.');
         }
 
-        $customer = Auth::user();
+        $customer = Auth::guard('customer_web')->user();
         $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
 
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|exists:service_requests,id',
+            'id' => 'required|exists:amcs,id',
         ]);
 
         if ($validator->fails()) {
@@ -321,18 +329,18 @@ class MyAccountController extends Controller
         }
 
         try {
-            $amcService = \App\Models\ServiceRequest::with([
+            
+            $amcService = Amc::with([
                 'amcPlan',
                 'customer',
                 'customer.companyDetails',
                 'customer.branches',
-                'products',
-                'amcScheduleMeetings',
+                'amcProducts',
+                'amcScheduleMeetings',  
                 'amcScheduleMeetings.activeAssignment.engineer',
             ])
-            ->where('id', $id)
-            ->where('customer_id', $customerId)
-            ->firstOrFail();
+            ->withCount('amcProducts')
+            ->where('id', $id)->where('customer_id', $customerId)->firstOrFail();
 
             return view('frontend.my-account-amc-view', compact('amcService'));
         } catch (\Exception $e) {

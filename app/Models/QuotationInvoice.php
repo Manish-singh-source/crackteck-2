@@ -12,6 +12,11 @@ class QuotationInvoice extends Model
     {
         return $this->hasMany(QuotationInvoiceItem::class);
     }
+ 
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id', 'id');
+    }
 
     public function leadDetails()
     {

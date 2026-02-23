@@ -1,243 +1,654 @@
 @extends('crm/layouts/master')
 
 @section('content')
+    <div class="content">
 
-<div class="content">
-    <div class="container-fluid">
-
-                <div class="pb-3 d-flex align-items-sm-center flex-sm-row flex-column">
-                    <div class="flex-grow-1">
-                        <h4 class="fs-18 fw-semibold m-0">Invoice</h4>
-                    </div>
-
-                   
+        <!-- Start Content-->
+        <div class="container-fluid">
+            <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
+                <div class="flex-grow-1">
+                    <h4 class="fs-18 fw-semibold m-0">Service Request</h4>
                 </div>
+            </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="panel-body">
-                                    <div class="clearfix">
-                                        <div class="float-start d-flex justify-content-center">
-                                            <img src="{{ asset('assets/images/favicon.png') }}" class="me-2" alt="logo" height="24">
-                                            <h4 class="mb-0 caption fw-semibold fs-18">Crackteck</h4>
-                                        </div>
-                                        <div class="float-end">
-                                            <h4 class="fs-18">Invoice #4987<br>
-                                                <strong class="fs-15 fw-normal">Invoice Number</strong>
-                                            </h4>
-                                        </div>
-                                    </div>
-                                    <hr>
-                                    <div class="row">
-                                        <div class="col-md-12 bg-primary rounded-2 mb-3">
-                                            <div class="float-start mt-3 text-white">
-                                                <address>
-                                                    <strong>Invoice To:</strong><br>
-                                                   Sanjay Nagar lalji Pada<br>
-                                                    Kandivali West M-400067<br>
-                                                    <abbr title="Phone">P: </abbr>+91 9607 78 8836
-                                                </address>
-                                            </div>
-                                            <div class="float-end mt-3 text-white">
-                                                <address>
-                                                    <strong>Bill To:</strong><br>
-                                                    <table>
-                                                        <tbody>
-                                                          <tr>
-                                                            <td class="pe-4">Customer Name:</td>
-                                                            <td class="fw-medium">Manish</td>
-                                                          </tr>
-                                                          <tr>
-                                                            <td class="pe-4">Email:</td>
-                                                            <td>crackteck@gmail.com</td>
-                                                          </tr>
-                                                          <tr>
-                                                            <td class="pe-4">Phone:</td>
-                                                            <td>+91 9607 78 8836</td>
-                                                          </tr>
-                                                          <tr>
-                                                            <td class="pe-4">Billing Address:</td>
-                                                            <td>Borivali West Devidas Road</td>
-                                                          </tr>
-                                                          <tr>
-                                                            <td class="pe-4">Shipping Address:</td>
-                                                            <td>Borivali West Devidas Road</td>
-                                                          </tr>
-                                                          <tr>
-                                                            <td class="pe-4"></td>
-                                                            <td>400067</td>
-                                                          </tr>
-                                                        </tbody>
-                                                      </table>
-                                                </address>
-                                            </div>
-                                        </div>
-                                    </div>
+            <!-- End Main Widgets -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body pt-2">
+                            <div class="d-flex justify-content-between align-items-center border-bottom">
+                                <ul class="nav nav-underline pt-2" id="pills-tab" role="tablist">
 
-                                    <div class="row">
-                                        <div class="col-xl-3">
-                                            <p class="mb-1 fw-semibold">Invoice ID :</p>
-                                            <p class="mb-1">#ERTW1249879</p>
-                                        </div>
+                                    {{-- Quotation --}}
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link active p-2" onclick="showService('quotation')" id="quotation"
+                                            data-bs-toggle="tab" href="#quotation" role="tab">
+                                            <span class="d-block d-sm-none"><i class="mdi mdi-sitemap-outline"></i></span>
+                                            <span class="d-none d-sm-block">Quotation Invoices</span>
+                                        </a>
+                                    </li>
 
-                                        <div class="col-xl-3">
-                                            <p class="mb-1 fw-semibold">Date Issued :</p>
-                                            <p class="mb-1">10, Apr 2025</p>
-                                        </div>
+                                    {{-- E-commerce --}}
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link p-2" onclick="showService('e-commerce')" id="e-commerce"
+                                            data-bs-toggle="tab" href="#e-commerce" role="tab">
+                                            <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
+                                            <span class="d-none d-sm-block">E-commerce Invoice</span>
+                                        </a>
+                                    </li>
 
-                                        <div class="col-xl-3">
-                                            <p class="mb-1 fw-semibold">Due Date :</p>
-                                            <p class="mb-1">17, May 2025</p>
-                                        </div>
-
-                                        <div class="col-xl-3">
-                                            <p class="mb-1 fw-semibold">Due Amount :</p>
-                                            <p class="mb-1 fw-bold">₹2,032.82</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="table-responsive rounded-2">
-                                                <table class="table mt-4 mb-4 table-centered border">
-                                                    <thead class="rounded-2">
-                                                        <tr>
-                                                            <th>#</th>
-                                                            <th>Item</th>
-                                                            <th>Description</th>
-                                                            <th>Quantity</th>
-                                                            <th>Unit Cost</th>
-                                                            <th>GST %</th>
-                                                            <th>GST Amt</th>
-                                                            <th>Total</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>1</td>
-                                                            <td>Dell Inspiron Laptop</td>
-                                                            <td>Sleek, powerful laptop ideal for multitasking and productivity.</td>
-                                                            <td>1</td>
-                                                            <td>₹180</td>
-                                                            <td>18%</td>
-                                                            <td>₹32.40</td>
-                                                            <td>₹180</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>2</td>
-                                                            <td>HP Desktop Computer</td>
-                                                            <td>Reliable desktop system perfect for office and home use.</td>
-                                                            <td>5</td>
-                                                            <td>₹150</td>
-                                                            <td>18%</td>
-                                                            <td>₹135.00</td>
-                                                            <td>₹2750</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>3</td>
-                                                            <td>Hikvision CCTV Camera</td>
-                                                            <td>High-definition surveillance camera with night vision.</td>
-                                                            <td>2</td>
-                                                            <td>₹80</td>
-                                                            <td>18%</td>
-                                                            <td>₹28.80</td>
-                                                            <td>₹160</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>4</td>
-                                                            <td>Canon All-in-One Printer</td>
-                                                            <td>Print, scan, and copy with crisp quality and fast speed.</td>
-                                                            <td>3</td>
-                                                            <td>₹300</td>
-                                                            <td>18%</td>
-                                                            <td>₹162.00</td>
-                                                            <td>₹900</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>5</td>
-                                                            <td>Mantra Biometric Scanner</td>
-                                                            <td>Secure fingerprint device for attendance and access control.</td>
-                                                            <td>5</td>
-                                                            <td>₹1520</td>
-                                                            <td>18%</td>
-                                                            <td>₹1368.00</td>
-                                                            <td>₹7600</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td colspan="4"></td>
-                                                            <td colspan="2">
-                                                                <table class="table table-sm text-nowrap mb-0 table-borderless">
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            <td>
-                                                                                <p class="mb-0">Sub-total :</p>
-                                                                            </td>
-                                                                            <td>
-                                                                                <p class="mb-0 fw-medium fs-15">₹1,1590</p>
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td scope="row">
-                                                                                <p class="mb-0">Discout :</p>
-                                                                            </td>
-                                                                            <td>
-                                                                                <p class="mb-0 fw-medium fs-15">₹29.98</p>
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td scope="row">
-                                                                                <p class="mb-0">Vat <span class="text-danger">(20%)</span> :</p>
-                                                                            </td>
-                                                                            <td>
-                                                                                <p class="mb-0 fw-medium fs-15">₹472.80</p>
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td scope="row">
-                                                                                <p class="mb-0">Due Till Date :</p>
-                                                                            </td>
-                                                                            <td>
-                                                                                <p class="mb-0 fw-medium fs-15">₹0</p>
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td scope="row">
-                                                                                <p class="mb-0 fs-14">Total :</p>
-                                                                            </td>
-                                                                            <td>
-                                                                                <p class="mb-0 fw-medium fs-16 text-success">₹2,032.82</p>
-                                                                            </td>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="d-print-none">
-                                        <div class="float-end">
-                                            <a href="javascript:window.print()" class="btn btn-dark border-0"><i class="mdi mdi-printer me-1"></i>Print</a>
-                                            <a href="{{ route('invoice.index') }}" class="btn btn-primary">Submit</a>
-                                        </div>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    
-                                </div>
+                                    {{-- Service --}}
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link p-2" onclick="showService('service')" id="service"
+                                            data-bs-toggle="tab" href="#service" role="tab">
+                                            <span class="d-block d-sm-none"><i class="mdi mdi-sitemap-outline"></i></span>
+                                            <span class="d-none d-sm-block">Services Invoice</span>
+                                        </a>
+                                    </li>
+                                </ul>
                             </div>
+
+                            <div class="tab-content text-muted">
+
+                                <div class="tab-pane active show" id="quotation" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="card shadow-none">
+                                                <div class="card-body">
+                                                    <table
+                                                        class="table table-striped table-borderless dt-responsive nowrap service-datatable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Request ID</th>
+                                                                <th>Customer Name</th>
+                                                                <th>Request Date</th>
+                                                                <th>Product Count</th>
+                                                                <th>Payment Status</th>
+                                                                <th>Status</th>
+                                                                <th>Invoice PDF</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @forelse($quotationInvoices as $invoice)
+                                                                <tr>
+                                                                    <td>{{ $invoice->invoice_number ?? $invoice->id }}</td>
+                                                                    <td>
+                                                                        <div class="fw-semibold">
+                                                                            {{ $invoice->Customer->first_name . ' ' . $invoice->customer->last_name ?? 'N/A' }}
+                                                                        </div>
+                                                                        <div class="text-muted small">
+                                                                            {{ $invoice->Customer->email ?? 'N/A' }}
+                                                                        </div>
+                                                                        <div class="text-muted small">
+                                                                            {{ $invoice->Customer->phone ?? 'N/A' }}
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>{{ $invoice->created_at->format('d-m-Y') }}</td>
+                                                                    <td>
+                                                                        <div class="fw-semibold">
+                                                                            {{ $invoice->items->count() }} Product(s)
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>{{ ucfirst($invoice->payment_status) }}</td>
+                                                                    @php
+                                                                        $sourceLabels = [
+                                                                            'customer' => 'Customer',
+                                                                            'system' => 'System',
+                                                                            'lead_won' => 'Lead Won',
+                                                                        ];
+                                                                    @endphp
+                                                                    @php
+                                                                        $statuses = [
+                                                                            'draft' => ['Drafy', 'warning'],
+                                                                            'sent' => ['Send', 'info'],
+                                                                            'accepted' => ['Accepted', 'success'],
+                                                                            'rejected' => ['Rejected', 'danger'],
+                                                                            'cancelled' => ['Cancelled', 'danger'],
+                                                                        ];
+                                                                        [$label, $color] = $statuses[
+                                                                            $invoice->status
+                                                                        ] ?? [
+                                                                            ucfirst($invoice->status ?? 'N/A'),
+                                                                            'secondary',
+                                                                        ];
+                                                                    @endphp
+                                                                    <td>
+                                                                        <span
+                                                                            class="badge bg-{{ $color }}-subtle text-{{ $color }} fw-semibold">
+                                                                            {{ $label }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="mt-2">
+                                                                            <a href="{{ route('quotation.viewInvoice', $invoice->id) }}" target="_blank"
+                                                                                class="btn btn-primary btn-sm">View
+                                                                                Invoice</a>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="7" class="text-center text-muted py-4">
+                                                                        <div class="text-muted">
+                                                                            <i class="mdi mdi-information-outline fs-1"></i>
+                                                                            <p class="mt-2">
+                                                                                No Quotation Invoices found.
+                                                                            </p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
+                                                        </tbody>
+
+
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Installation services --}}
+                                <div class="tab-pane" id="e-commerce" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="card shadow-none">
+                                                <div class="card-body">
+                                                    <table
+                                                        class="table table-striped table-borderless nowrap service-datatable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>quotation Request ID</th>
+                                                                <th>Customer Name</th>
+                                                                <th>Request Date</th>
+                                                                <th>Product Name / Model No</th>
+                                                                <th>Request Status</th>
+                                                                <th>Request Source</th>
+                                                                <th>Assign Engineer</th>
+                                                                <th>Status</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {{-- @forelse($installationServices as $request)
+                                                                <tr>
+                                                                    <td>{{ $request->request_id }}</td>
+                                                                    <td>
+                                                                        <div class="fw-semibold">
+                                                                            {{ $request->customer->first_name ?? '' }}
+                                                                            {{ $request->customer->last_name ?? '' }}
+                                                                        </div>
+                                                                        <div class="text-muted small">
+                                                                            {{ $request->customer->email ?? '' }}
+                                                                        </div>
+                                                                        <div class="text-muted small">
+                                                                            {{ $request->customer->phone ?? 'N/A' }}
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>{{ $request->request_date }}</td>
+                                                                    <td>
+                                                                        <div class="fw-semibold">
+                                                                            {{ $request->products->count() }} Product(s)
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        @php
+                                                                            $statusClasses = [
+                                                                                'pending' => 'badge bg-warning',
+                                                                                'approved' => 'badge bg-success',
+                                                                                'rejected' => 'badge bg-danger',
+                                                                                'processing' => 'badge bg-info',
+                                                                                'processed' => 'badge bg-primary',
+                                                                                'picking' => 'badge bg-secondary',
+                                                                                'picked' => 'badge bg-dark',
+                                                                                'completed' => 'badge bg-success',
+                                                                            ];
+                                                                        @endphp
+
+                                                                        <span
+                                                                            class="{{ $statusClasses[$request->status] ?? 'badge bg-light' }}">
+                                                                            {{ ucfirst($request->status) }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        @if ($request->request_source == 'customer')
+                                                                            <span
+                                                                                class="badge bg-primary-subtle text-primary fw-semibold">Customer</span>
+                                                                        @elseif($request->request_source == 'system')
+                                                                            <span
+                                                                                class="badge bg-secondary-subtle text-secondary fw-semibold">System</span>
+                                                                        @endif
+                                                                        <div class="text-muted small">
+                                                                            {{ $request->created_at->diffForHumans() }}
+                                                                        </div>
+                                                                    </td>
+
+                                                                    @php
+                                                                        $statuses = [
+                                                                            'pending' => ['Pending', 'warning'],
+                                                                            'admin_approved' => [
+                                                                                'Admin Approved',
+                                                                                'info',
+                                                                            ],
+                                                                            'assigned_engineer' => [
+                                                                                'Engineer Assigned',
+                                                                                'primary',
+                                                                            ],
+                                                                            'engineer_approved' => [
+                                                                                'Engineer Approved',
+                                                                                'success',
+                                                                            ],
+                                                                            'engineer_not_approved' => [
+                                                                                'Engineer Not Approved',
+                                                                                'danger',
+                                                                            ],
+                                                                            'in_transfer' => ['In Transfer', 'warning'],
+                                                                            'transferred' => [
+                                                                                'Transferred',
+                                                                                'secondary',
+                                                                            ],
+                                                                            'in_progress' => ['In Progress', 'primary'],
+                                                                            'picking' => ['Picking', 'info'],
+                                                                            'picked' => ['Picked', 'dark'],
+                                                                            'completed' => ['Completed', 'success'],
+                                                                        ];
+
+                                                                        [$label, $color] = $statuses[
+                                                                            $request->status
+                                                                        ] ?? [
+                                                                            ucfirst(
+                                                                                str_replace('_', ' ', $request->status),
+                                                                            ),
+                                                                            'secondary',
+                                                                        ];
+                                                                    @endphp
+
+                                                                    <td>
+                                                                        @if ($request->is_engineer_assigned == 'assigned')
+                                                                            <span
+                                                                                class="badge bg-primary-subtle text-primary fw-semibold">Assigned</span>
+                                                                        @elseif($request->is_engineer_assigned == 'not_assigned')
+                                                                            <span
+                                                                                class="badge bg-secondary-subtle text-secondary fw-semibold">Not
+                                                                                Assigned</span>
+                                                                        @endif
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <span
+                                                                            class="badge bg-{{ $color }}-subtle text-{{ $color }} fw-semibold">
+                                                                            {{ $label }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a aria-label="anchor"
+                                                                            href="{{ route('service-request.view-quick-service-request', $request->id) }}"
+                                                                            class="btn btn-icon btn-sm bg-primary-subtle me-1"
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-original-title="View">
+                                                                            <i
+                                                                                class="mdi mdi-eye-outline fs-14 text-primary"></i>
+                                                                        </a>
+                                                                        <a aria-label="anchor"
+                                                                            href="{{ route('service-request.edit-quick-service-request', [$request->id, 'installation']) }}"
+                                                                            class="btn btn-icon btn-sm bg-warning-subtle me-1"
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-original-title="Edit">
+                                                                            <i
+                                                                                class="mdi mdi-pencil-outline fs-14 text-warning"></i>
+                                                                        </a>
+                                                                        <form
+                                                                            action="{{ route('service-request.destroy-quick-service-request', $request->id) }}"
+                                                                            method="POST" class="d-inline"
+                                                                            onsubmit="return confirm('Are you sure you want to delete this quick service request?');">
+                                                                            @csrf
+                                                                            @method('DELETE')
+                                                                            <button type="submit" aria-label="anchor"
+                                                                                class="btn btn-icon btn-sm bg-danger-subtle"
+                                                                                data-bs-toggle="tooltip"
+                                                                                data-bs-original-title="Delete">
+                                                                                <i
+                                                                                    class="mdi mdi-delete fs-14 text-danger"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="9"
+                                                                        class="text-center text-muted py-4">
+                                                                        <div class="text-muted">
+                                                                            <i
+                                                                                class="mdi mdi-information-outline fs-1"></i>
+                                                                            <p class="mt-2">
+                                                                                No Quick Service requests found.
+                                                                                <a
+                                                                                    href="{{ route('quick-service-requests.create') }}">Create
+                                                                                    one now</a>
+                                                                            </p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse --}}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Repairing services --}}
+                                <div class="tab-pane" id="service" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="card shadow-none">
+                                                <div class="card-body">
+                                                    <table
+                                                        class="table table-striped table-borderless nowrap service-datatable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Request ID</th>
+                                                                <th>Customer Name</th>
+                                                                <th>Request Date</th>
+                                                                <th>Product Name / Model No</th>
+                                                                <th>Request Status</th>
+                                                                <th>Request Source</th>
+                                                                <th>Assign Engineer</th>
+                                                                <th>Status</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {{-- @forelse($repairingServices as $request)
+                                                                <tr>
+                                                                    <td>{{ $request->request_id }}</td>
+                                                                    <td>
+                                                                        <div class="fw-semibold">
+                                                                            {{ $request->customer->first_name ?? '' }}
+                                                                            {{ $request->customer->last_name ?? '' }}
+                                                                        </div>
+                                                                        <div class="text-muted small">
+                                                                            {{ $request->customer->email ?? '' }}
+                                                                        </div>
+                                                                        <div class="text-muted small">
+                                                                            {{ $request->customer->phone ?? 'N/A' }}
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>{{ $request->request_date }}</td>
+                                                                    <td>
+                                                                        <div class="fw-semibold">
+                                                                            {{ $request->products->count() }} Product(s)
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        @php
+                                                                            $statusClasses = [
+                                                                                'pending' => 'badge bg-warning',
+                                                                                'approved' => 'badge bg-success',
+                                                                                'rejected' => 'badge bg-danger',
+                                                                                'processing' => 'badge bg-info',
+                                                                                'processed' => 'badge bg-primary',
+                                                                                'picking' => 'badge bg-secondary',
+                                                                                'picked' => 'badge bg-dark',
+                                                                                'completed' => 'badge bg-success',
+                                                                            ];
+                                                                        @endphp
+
+                                                                        <span
+                                                                            class="{{ $statusClasses[$request->status] ?? 'badge bg-light' }}">
+                                                                            {{ ucfirst($request->status) }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        @if ($request->request_source == 'customer')
+                                                                            <span
+                                                                                class="badge bg-primary-subtle text-primary fw-semibold">Customer</span>
+                                                                        @elseif($request->request_source == 'system')
+                                                                            <span
+                                                                                class="badge bg-secondary-subtle text-secondary fw-semibold">System</span>
+                                                                        @endif
+                                                                        <div class="text-muted small">
+                                                                            {{ $request->created_at->diffForHumans() }}
+                                                                        </div>
+                                                                    </td>
+
+                                                                    @php
+                                                                        $statuses = [
+                                                                            'pending' => ['Pending', 'warning'],
+                                                                            'admin_approved' => [
+                                                                                'Admin Approved',
+                                                                                'info',
+                                                                            ],
+                                                                            'assigned_engineer' => [
+                                                                                'Engineer Assigned',
+                                                                                'primary',
+                                                                            ],
+                                                                            'engineer_approved' => [
+                                                                                'Engineer Approved',
+                                                                                'success',
+                                                                            ],
+                                                                            'engineer_not_approved' => [
+                                                                                'Engineer Not Approved',
+                                                                                'danger',
+                                                                            ],
+                                                                            'in_transfer' => ['In Transfer', 'warning'],
+                                                                            'transferred' => [
+                                                                                'Transferred',
+                                                                                'secondary',
+                                                                            ],
+                                                                            'in_progress' => ['In Progress', 'primary'],
+                                                                            'picking' => ['Picking', 'info'],
+                                                                            'picked' => ['Picked', 'dark'],
+                                                                            'completed' => ['Completed', 'success'],
+                                                                        ];
+
+                                                                        [$label, $color] = $statuses[
+                                                                            $request->status
+                                                                        ] ?? [
+                                                                            ucfirst(
+                                                                                str_replace('_', ' ', $request->status),
+                                                                            ),
+                                                                            'secondary',
+                                                                        ];
+                                                                    @endphp
+
+                                                                    <td>
+                                                                        @if ($request->is_engineer_assigned == 'assigned')
+                                                                            <span
+                                                                                class="badge bg-primary-subtle text-primary fw-semibold">Assigned</span>
+                                                                        @elseif($request->is_engineer_assigned == 'not_assigned')
+                                                                            <span
+                                                                                class="badge bg-secondary-subtle text-secondary fw-semibold">Not
+                                                                                Assigned</span>
+                                                                        @endif
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <span
+                                                                            class="badge bg-{{ $color }}-subtle text-{{ $color }} fw-semibold">
+                                                                            {{ $label }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a aria-label="anchor"
+                                                                            href="{{ route('service-request.view-quick-service-request', $request->id) }}"
+                                                                            class="btn btn-icon btn-sm bg-primary-subtle me-1"
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-original-title="View">
+                                                                            <i
+                                                                                class="mdi mdi-eye-outline fs-14 text-primary"></i>
+                                                                        </a>
+                                                                        <a aria-label="anchor"
+                                                                            href="{{ route('service-request.edit-quick-service-request', [$request->id, 'repairing']) }}"
+                                                                            class="btn btn-icon btn-sm bg-warning-subtle me-1"
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-original-title="Edit">
+                                                                            <i
+                                                                                class="mdi mdi-pencil-outline fs-14 text-warning"></i>
+                                                                        </a>
+                                                                        <form
+                                                                            action="{{ route('service-request.destroy-quick-service-request', $request->id) }}"
+                                                                            method="POST" class="d-inline"
+                                                                            onsubmit="return confirm('Are you sure you want to delete this quick service request?');">
+                                                                            @csrf
+                                                                            @method('DELETE')
+                                                                            <button type="submit" aria-label="anchor"
+                                                                                class="btn btn-icon btn-sm bg-danger-subtle"
+                                                                                data-bs-toggle="tooltip"
+                                                                                data-bs-original-title="Delete">
+                                                                                <i
+                                                                                    class="mdi mdi-delete fs-14 text-danger"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="9"
+                                                                        class="text-center text-muted py-4">
+                                                                        <div class="text-muted">
+                                                                            <i
+                                                                                class="mdi mdi-information-outline fs-1"></i>
+                                                                            <p class="mt-2">
+                                                                                No Quick Service requests found.
+                                                                                <a
+                                                                                    href="{{ route('quick-service-requests.create') }}">Create
+                                                                                    one now</a>
+                                                                            </p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse --}}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div> {{-- tab-content --}}
                         </div>
                     </div>
                 </div>
+            </div> <!-- row -->
+        </div> <!-- container-fluid -->
+    </div> <!-- content -->
 
-            </div> <!-- container-fluid -->
+    <script>
+        function showService(type) {
+            // Hide all filter divs first
+            document.getElementById("amc_filters").style.display = "none";
+            document.getElementById("installation_filters").style.display = "none";
+            document.getElementById("repairing_filters").style.display = "none";
+            document.getElementById("quick_filters").style.display = "none";
 
-        </div> <!-- content -->
+            // Show the correct filter div based on tab
+            switch (type) {
+                case 'AMC':
+                    document.getElementById("amc_filters").style.display = "flex";
+                    break;
+                case 'Installation':
+                    document.getElementById("installation_filters").style.display = "flex";
+                    break;
+                case 'Repairing':
+                    document.getElementById("repairing_filters").style.display = "flex";
+                    break;
+                case 'Quick':
+                    document.getElementById("quick_filters").style.display = "flex";
+                    break;
+            }
+        }
 
-</div> <!-- content -->
+        // Default: AMC tab visible
+        showService('AMC');
+    </script>
 
+    <script>
+        $(document).ready(function() {
+            $('.service-datatable').each(function() {
+                if (!$.fn.DataTable.isDataTable(this)) {
+                    $(this).DataTable({
+                        pageLength: 10
+                    });
+                }
+            });
+
+            // Filtering functionality for both request status and status
+            $('.request-status-filter, .status-filter').on('change', function() {
+                const serviceType = $(this).data('service');
+                applyFilters(serviceType);
+            });
+
+            function applyFilters(serviceType) {
+                const tableId = getTableId(serviceType);
+                const table = $('#' + tableId).find('table');
+                const filtersDiv = $('#' + serviceType + '_filters');
+                const selectedRequestStatus = filtersDiv.find('.request-status-filter').val();
+                const selectedStatus = filtersDiv.find('.status-filter').val();
+
+                table.find('tbody tr').each(function() {
+                    const requestStatusCell = $(this).find('td').eq(4); // Request Status column (0-indexed)
+                    const statusCell = $(this).find('td').eq(7); // Status column (0-indexed)
+                    const requestStatusBadge = requestStatusCell.find('.badge');
+                    const statusBadge = statusCell.find('.badge');
+                    const requestStatusText = requestStatusBadge.text().trim();
+                    const statusText = statusBadge.text().trim();
+
+                    const requestStatusKey = requestStatusText.toLowerCase(); // display is ucfirst(key)
+                    const statusKey = getStatusKey(statusText);
+
+                    const showRow = (selectedRequestStatus === '' || requestStatusKey ===
+                            selectedRequestStatus) &&
+                        (selectedStatus === '' || statusKey === selectedStatus);
+
+                    if (showRow) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                // Reinitialize DataTable if needed
+                if ($.fn.DataTable.isDataTable(table)) {
+                    table.DataTable().draw();
+                }
+            }
+
+            function getStatusKey(displayText) {
+                const statusMap = {
+                    'Pending': 'pending',
+                    'Admin Approved': 'admin_approved',
+                    'Engineer Assigned': 'assigned_engineer',
+                    'Engineer Approved': 'engineer_approved',
+                    'Engineer Not Approved': 'engineer_not_approved',
+                    'In Transfer': 'in_transfer',
+                    'Transferred': 'transferred',
+                    'In Progress': 'in_progress',
+                    'Picking': 'picking',
+                    'Picked': 'picked',
+                    'Completed': 'completed'
+                };
+
+                return statusMap[displayText] || '';
+            }
+
+            function getTableId(serviceType) {
+                switch (serviceType) {
+                    case 'amc':
+                        return 'amc_services';
+                    case 'installation':
+                        return 'installation_service';
+                    case 'repairing':
+                        return 'repairing_services';
+                    case 'quick':
+                        return 'quick_services';
+                    default:
+                        return 'amc_services';
+                }
+            }
+        });
+    </script>
 @endsection

@@ -10,7 +10,7 @@
                     <h4 class="fs-18 fw-semibold m-0">Account Details</h4>
                     <nav aria-label="breadcrumb" class="mt-1">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="{{ route('index') }}" class="text-muted">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('offline-index') }}" class="text-muted">Dashboard</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Account Details</li>
                         </ol>
                     </nav>
@@ -136,7 +136,7 @@
                                             </span>
                                             <input type="email" class="form-control border-start-0" id="email"
                                                    name="email" placeholder="Enter email address"
-                                                   value="{{ $customer->email }}" required>
+                                                   value="{{ $customer->email }}" required readonly>
                                         </div>
                                     </div>
 
@@ -168,7 +168,7 @@
                                                    placeholder="Primary Address"
                                                    value="{{ $primaryAddress ? $primaryAddress->address1 . ', ' . $primaryAddress->city . ', ' . $primaryAddress->state . ' - ' . $primaryAddress->pincode : 'No primary address set' }}"
                                                    readonly>
-                                            <a href="{{ route('my-account-address') }}" class="input-group-text bg-primary text-white text-decoration-none border-0">
+                                            <a href="{{ route('address') }}" class="input-group-text bg-primary text-white text-decoration-none border-0">
                                                 <i class="fas fa-pen fs-13"></i>
                                             </a>
                                         </div>
@@ -182,7 +182,7 @@
 
                                 <!-- Action Buttons -->
                                 <div class="d-flex justify-content-end gap-2">
-                                    <a href="{{ route('index') }}" class="btn btn-light rounded-pill px-4">
+                                    <a href="{{ route('offline-index') }}" class="btn btn-light rounded-pill px-4">
                                         <i class="fas fa-times me-1"></i> Cancel
                                     </a>
                                     <button type="submit" class="btn btn-primary rounded-pill px-4" id="update-btn">
@@ -191,34 +191,6 @@
                                     </button>
                                 </div>
                             </form>
-                        </div>
-                    </div>
-
-                    <!-- Security Section -->
-                    <div class="card border-0 shadow-sm mt-4">
-                        <div class="card-header bg-transparent border-bottom">
-                            <h5 class="card-title mb-0 fw-semibold">
-                                <i class="fas fa-shield-alt text-warning me-2"></i>Security
-                            </h5>
-                        </div>
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center">
-                                    <div class="flex-shrink-0">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center"
-                                             style="width: 48px; height: 48px; background: rgba(234, 84, 85, 0.1);">
-                                            <i class="fas fa-lock" style="color: #ea5455; font-size: 18px;"></i>
-                                        </div>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <h6 class="fw-semibold mb-1">Password</h6>
-                                        <small class="text-muted">Last changed: Unknown</small>
-                                    </div>
-                                </div>
-                                <a href="{{ route('my-account-edit') }}" class="btn btn-outline-danger btn-sm rounded-pill px-3">
-                                    <i class="fas fa-key me-1"></i> Change Password
-                                </a>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -273,7 +245,7 @@ $(document).ready(function() {
         $('#update-text').html('<i class="fas fa-spinner fa-spin me-1"></i> Updating...');
 
         $.ajax({
-            url: 'my-account/profile',
+            url: '{{ route("offline-account-update") }}',
             method: 'PUT',
             data: formData,
             success: function(response) {

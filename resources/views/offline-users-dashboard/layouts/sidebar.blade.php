@@ -45,6 +45,12 @@
                         <span class="ps-1">AMC</span>
                     </a>
                 </li>
+                <li>
+                    <a class='tp-link' href="{{ route('offline-amc') }}">
+                        <i class="fas fa-clipboard-check"></i>
+                        <span class="ps-1">Ticket</span>
+                    </a>
+                </li>
 
 
                 <li class="menu-title mt-2">Personal Details</li>

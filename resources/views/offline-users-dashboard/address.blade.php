@@ -10,7 +10,7 @@
                     <h4 class="fs-18 fw-semibold m-0">My Addresses</h4>
                     <nav aria-label="breadcrumb" class="mt-1">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="{{ route('index') }}" class="text-muted">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('offline-index') }}" class="text-muted">Dashboard</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Addresses</li>
                         </ol>
                     </nav>
@@ -46,6 +46,20 @@
                             <form id="address-form">
                                 <input type="hidden" id="customer-id" name="customer_id">
                                 <div class="row g-3">
+                                    <!-- Branch Name -->
+                                    <div class="col-md-6">
+                                        <label for="branch-name" class="form-label fw-medium fs-13">
+                                            Branch Name
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0">
+                                                <i class="fas fa-building text-muted fs-14"></i>
+                                            </span>
+                                            <input type="text" class="form-control border-start-0" id="branch-name"
+                                                   name="branch_name" placeholder="e.g., Home, Office, Branch 1">
+                                        </div>
+                                    </div>
+
                                     <!-- Address Line 1 -->
                                     <div class="col-md-6">
                                         <label for="address1" class="form-label fw-medium fs-13">
@@ -300,6 +314,7 @@
                 e.preventDefault();
 
                 const formData = {
+                    branch_name: $('#branch-name').val(),
                     address1: $('#address1').val(),
                     address2: $('#address2').val(),
                     state: $('#state').val(),
@@ -314,15 +329,21 @@
                 $('#submit-text').html('<i class="fas fa-spinner fa-spin me-1"></i>' + (isEditMode ? 'Updating...' : 'Saving...'));
 
                 const url = isEditMode ?
-                    `my-account/address/${editingAddressId}` :
-                    'my-account/address';
+                    `{{ route('offline-address-update', ['id' => '__ADDRESS_ID__']) }}`.replace('__ADDRESS_ID__', editingAddressId) :
+                    '{{ route('offline-address-store') }}';
                 const method = isEditMode ? 'PUT' : 'POST';
 
                 $.ajax({
                     url: url,
                     method: method,
                     data: formData,
+                    beforeSend: function(xhr) {
+                        console.log('Sending request to:', url);
+                        console.log('Method:', method);
+                        console.log('Data:', formData);
+                    },
                     success: function(response) {
+                        console.log('Response:', response);
                         if (response.success) {
                             showNotification(response.message, 'success');
                             $('#address-form-wrapper').slideUp();
@@ -334,7 +355,10 @@
                             showNotification(response.message, 'error');
                         }
                     },
-                    error: function(xhr) {
+                    error: function(xhr, status, error) {
+                        console.log('XHR:', xhr);
+                        console.log('Status:', status);
+                        console.log('Error:', error);
                         let message = 'An error occurred while saving the address.';
 
                         if (xhr.responseJSON && xhr.responseJSON.errors) {
@@ -363,12 +387,13 @@
                 $(this).html('<i class="fas fa-spinner fa-spin me-2 fs-13"></i> Loading...');
 
                 $.ajax({
-                    url: `my-account/address/${addressId}`,
+                    url: `{{ route('offline-address-edit', ['id' => '__ADDRESS_ID__']) }}`.replace('__ADDRESS_ID__', addressId),
                     method: 'GET',
                     success: function(response) {
                         if (response.success) {
                             const address = response.address;
 
+                            $('#branch-name').val(address.branch_name || '');
                             $('#address1').val(address.address1);
                             $('#address2').val(address.address2 || '');
                             $('#state').val(address.state);
@@ -413,7 +438,7 @@
                 $button.html('<i class="fas fa-spinner fa-spin me-2 fs-13"></i> Deleting...');
 
                 $.ajax({
-                    url: `my-account/address/${addressId}`,
+                    url: `{{ route('offline-address-delete', ['id' => '__ADDRESS_ID__']) }}`.replace('__ADDRESS_ID__', addressId),
                     method: 'DELETE',
                     success: function(response) {
                         if (response.success) {
@@ -464,6 +489,7 @@
             function resetForm() {
                 $('#address-form')[0].reset();
                 $('#address-id').val('');
+                $('#branch-name').val('');
                 isEditMode = false;
                 editingAddressId = null;
             }

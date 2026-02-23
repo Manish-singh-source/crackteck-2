@@ -10,7 +10,7 @@
                     <h4 class="fs-18 fw-semibold m-0">Change Password</h4>
                     <nav aria-label="breadcrumb" class="mt-1">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="{{ route('index') }}" class="text-muted">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('offline-index') }}" class="text-muted">Dashboard</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Change Password</li>
                         </ol>
                     </nav>
@@ -76,28 +76,6 @@
                         <div class="card-body p-4">
                             <form id="password-form">
                                 <div class="row g-3">
-                                    <!-- Current Password -->
-                                    <div class="col-12">
-                                        <label for="current-password" class="form-label fw-medium fs-13">
-                                            Current Password <span class="text-danger">*</span>
-                                        </label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-light border-end-0">
-                                                <i class="fas fa-lock text-muted fs-14"></i>
-                                            </span>
-                                            <input type="password" class="form-control border-start-0 border-end-0"
-                                                   id="current-password" name="current_password"
-                                                   placeholder="Enter your current password" required>
-                                            <button class="input-group-text bg-light border-start-0 toggle-password" type="button" data-target="current-password">
-                                                <i class="fas fa-eye text-muted fs-14"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <hr class="my-1">
-                                    </div>
-
                                     <!-- New Password -->
                                     <div class="col-12">
                                         <label for="new-password" class="form-label fw-medium fs-13">
@@ -152,7 +130,7 @@
 
                                 <!-- Action Buttons -->
                                 <div class="d-flex justify-content-end gap-2">
-                                    <a href="{{ route('index') }}" class="btn btn-light rounded-pill px-4">
+                                    <a href="{{ route('offline-index') }}" class="btn btn-light rounded-pill px-4">
                                         <i class="fas fa-times me-1"></i> Cancel
                                     </a>
                                     <button type="submit" class="btn btn-primary rounded-pill px-4" id="password-btn">
@@ -288,14 +266,8 @@ $(document).ready(function() {
     $('#password-form').on('submit', function(e) {
         e.preventDefault();
 
-        const currentPassword = $('#current-password').val();
         const newPassword = $('#new-password').val();
         const confirmPassword = $('#confirm-password').val();
-
-        if (currentPassword.length === 0) {
-            showNotification('Current password is required.', 'error');
-            return;
-        }
 
         if (newPassword.length < 8) {
             showNotification('New password must be at least 8 characters long.', 'error');
@@ -307,13 +279,7 @@ $(document).ready(function() {
             return;
         }
 
-        if (currentPassword === newPassword) {
-            showNotification('New password must be different from current password.', 'error');
-            return;
-        }
-
         const formData = {
-            current_password: currentPassword,
             new_password: newPassword,
             new_password_confirmation: confirmPassword
         };
@@ -322,7 +288,7 @@ $(document).ready(function() {
         $('#password-text').html('<i class="fas fa-spinner fa-spin me-1"></i> Updating...');
 
         $.ajax({
-            url: 'my-account/password',
+            url: '{{ route("offline-password-update") }}',
             method: 'PUT',
             data: formData,
             success: function(response) {
@@ -333,10 +299,9 @@ $(document).ready(function() {
                     $('#password-match-error, #password-match-success').addClass('d-none');
                     $('.form-control').removeClass('is-valid is-invalid');
 
+                    // Logout after 2 seconds
                     setTimeout(function() {
-                        if (confirm('Password updated successfully! You will be logged out for security. Click OK to continue.')) {
-                            window.location.href = '/demo';
-                        }
+                        window.location.href = '{{ route("offline-logout-get") }}';
                     }, 2000);
                 } else {
                     showNotification(response.message, 'error');

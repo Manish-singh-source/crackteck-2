@@ -21,7 +21,7 @@ class AuthController extends Controller
     {
         // If already logged in, redirect to index
         if (Auth::guard('customer_web')->check()) {
-            return redirect()->route('index');
+            return redirect()->route('offline-index');
         }
         
         return view('offline-users-dashboard.login');
@@ -85,7 +85,7 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         // Redirect to intended URL or index page
-        $redirectUrl = session()->pull('url.intended', route('index'));
+        $redirectUrl = session()->pull('url.intended', route('offline-index'));
         return redirect($redirectUrl)->with('success', 'Welcome back, ' . $customer->first_name . '!');
     }
 
@@ -100,6 +100,13 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        return redirect()->route('offlinelogin');
+    }
+
+    public function offlinelogoutGet()
+    {
+        Auth::guard('customer_web')->logout();
+        
         return redirect()->route('offlinelogin');
     }
 }

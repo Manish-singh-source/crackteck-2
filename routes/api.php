@@ -49,7 +49,7 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware(['jwt.verify'])->group(function () {
         Route::post('/logout', [ApiAuthController::class, 'logout']);
-        Route::post('/refresh-token', [ApiAuthController::class, 'refreshToken']);
+        Route::post('/refresh-token', [ApiAuthController::class, 'updateToken']);
 
         // Sales Person APIs
         Route::controller(DashboardController::class)->group(function () {

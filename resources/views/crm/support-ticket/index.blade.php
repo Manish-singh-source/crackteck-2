@@ -73,70 +73,83 @@
                                                     <thead>
                                                         <tr>
                                                             <th>Time</th>
+                                                            <th>Ticket No</th>
+                                                            <th>Customer</th>
+                                                            <th>Service ID</th>
                                                             <th>Subject</th>
-                                                            <th>Ticket Number</th>
-                                                            <th>Submitted By</th>
                                                             <th>Priority</th>
                                                             <th>Status</th>
-                                                            <th>Last Reply</th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                <div>2 weeks ago</div>
-                                                                <div>2025-04-04 06:09 PM</div>
-                                                            </td>
-                                                            <td>Problem in Creating AMC Request</td>
-                                                            <td>
-                                                                <a href="amc-detail.php">
-                                                                    #1002
-                                                                </a>
-                                                            </td>
-                                                            <td>
-                                                                <div>
-                                                                    John Doe
-                                                                </div>
-                                                                <div class="badge bg-primary-subtle text-primary fw-semibold">
-                                                                    Engineer
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="badge bg-danger-subtle text-danger fw-semibold">
-                                                                    High
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="badge bg-danger-subtle text-danger fw-semibold">
-                                                                    Pending
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div>1 weeks ago</div>
-                                                                <div>2025-04-11 06:09 PM</div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="d-flex gap-2">
-                                                                    <a aria-label="anchor" href="{{ route('support-ticket.view') }}"
-                                                                        class="btn btn-icon btn-sm bg-primary-subtle me-1"
-                                                                        data-bs-toggle="tooltip" data-bs-original-title="View">
-                                                                        <i class="mdi mdi-eye-outline fs-14 text-primary"></i>
+                                                        @forelse($amcTickets as $ticket)
+                                                            <tr>
+                                                                <td>
+                                                                    <div>{{ $ticket->created_at->diffForHumans() }}</div>
+                                                                    <div>{{ $ticket->created_at->format('Y-m-d h:i A') }}</div>
+                                                                </td>
+                                                                <td>
+                                                                    <a href="#">
+                                                                        {{ $ticket->ticket_no }}
                                                                     </a>
-                                                                    <!-- <a aria-label="anchor"
-                                                                        class="btn btn-icon btn-sm bg-warning-subtle me-1"
-                                                                        data-bs-toggle="tooltip" data-bs-original-title="Edit">
-                                                                        <i class="mdi mdi-pencil-outline fs-14 text-warning"></i>
-                                                                    </a> -->
-                                                                    <a aria-label="anchor"
-                                                                        class="btn btn-icon btn-sm bg-danger-subtle delete-row"
-                                                                        data-bs-toggle="tooltip" data-bs-original-title="Delete">
-                                                                        <i class="mdi mdi-delete fs-14 text-danger"></i>
-                                                                    </a>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-
+                                                                </td>
+                                                                <td>
+                                                                    <div>
+                                                                        {{ $ticket->customer->first_name ?? '' }} {{ $ticket->customer->last_name ?? '' }}
+                                                                    </div>
+                                                                    <div class="badge bg-primary-subtle text-primary fw-semibold">
+                                                                        Customer
+                                                                    </div>
+                                                                </td>
+                                                                <td>{{ $ticket->service_id }}</td>
+                                                                <td>{{ $ticket->subject }}</td>
+                                                                <td>
+                                                                    @php
+                                                                        $priorityClass = match($ticket->priority) {
+                                                                            'high' => 'bg-danger-subtle text-danger',
+                                                                            'medium' => 'bg-warning-subtle text-warning',
+                                                                            'low' => 'bg-info-subtle text-info',
+                                                                            default => 'bg-secondary-subtle text-secondary',
+                                                                        };
+                                                                    @endphp
+                                                                    <div class="badge {{ $priorityClass }} fw-semibold">
+                                                                        {{ ucfirst($ticket->priority) }}
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    @php
+                                                                        $statusClass = match($ticket->status) {
+                                                                            'pending' => 'bg-danger-subtle text-danger',
+                                                                            'in_progress' => 'bg-warning-subtle text-warning',
+                                                                            'resolved' => 'bg-success-subtle text-success',
+                                                                            default => 'bg-secondary-subtle text-secondary',
+                                                                        };
+                                                                    @endphp
+                                                                    <div class="badge {{ $statusClass }} fw-semibold">
+                                                                        {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a aria-label="anchor" href="{{ route('support-ticket.view') }}"
+                                                                            class="btn btn-icon btn-sm bg-primary-subtle me-1"
+                                                                            data-bs-toggle="tooltip" data-bs-original-title="View">
+                                                                            <i class="mdi mdi-eye-outline fs-14 text-primary"></i>
+                                                                        </a>
+                                                                        <a aria-label="anchor"
+                                                                            class="btn btn-icon btn-sm bg-danger-subtle delete-row"
+                                                                            data-bs-toggle="tooltip" data-bs-original-title="Delete">
+                                                                            <i class="mdi mdi-delete fs-14 text-danger"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="8" class="text-center">No tickets found</td>
+                                                            </tr>
+                                                        @endforelse
                                                     </tbody>
                                                 </table>
                                             </div>

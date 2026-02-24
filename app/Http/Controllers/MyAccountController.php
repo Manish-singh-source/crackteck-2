@@ -473,4 +473,61 @@ class MyAccountController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Store a new AMC ticket
+     */
+    public function storeAmcTicket(Request $request): JsonResponse
+    {
+        if (! Auth::guard('customer_web')->check()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please login to raise a ticket.',
+            ], 401);
+        }
+
+        $customer = Auth::guard('customer_web')->user();
+        $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
+
+        $request->validate([
+            'amc_id' => 'required|exists:amcs,id',
+            'subject' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        try {
+            $amc = Amc::where('id', $request->amc_id)->where('customer_id', $customerId)->first();
+
+            if (!$amc) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'AMC service not found.',
+                ], 404);
+            }
+
+            $ticket = \App\Models\AmcTicket::create([
+                'ticket_no' => \App\Models\AmcTicket::generateTicketNo(),
+                'customer_id' => $customerId,
+                'amc_id' => $request->amc_id,
+                'service_id' => $amc->request_id,
+                'subject' => $request->subject,
+                'description' => $request->description,
+                'priority' => 'low',
+                'status' => 'pending',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ticket raised successfully!',
+                'ticket' => $ticket,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error creating AMC ticket: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating ticket: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

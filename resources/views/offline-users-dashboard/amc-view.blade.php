@@ -228,10 +228,16 @@
                 <h4 class="mb-1">AMC Service Details</h4>
                 <p class="mb-0 text-muted">View your AMC service information and history</p>
             </div>
-            <a href="{{ route('offline-amc') }}" class="back-link">
-                <i class="fas fa-arrow-left"></i>
-                Back to AMC List
-            </a>
+            <div class="d-flex gap-2">
+                <button type="button" class="back-link" data-bs-toggle="modal" data-bs-target="#raiseTicketModal" style="border: none; cursor: pointer;">
+                    <i class="fas fa-ticket-alt"></i>
+                    Raise Ticket
+                </button>
+                <a href="{{ route('offline-amc') }}" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to AMC List
+                </a>
+            </div>
         </div>
 
         <div class="row">
@@ -546,4 +552,74 @@
         </div>
     </div>
 </section>
+
+<!-- Raise Ticket Modal -->
+<div class="modal fade" id="raiseTicketModal" tabindex="-1" aria-labelledby="raiseTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="raiseTicketModalLabel">Raise Support Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="raiseTicketForm">
+                @csrf
+                <input type="hidden" name="amc_id" value="{{ $amcService->id }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="ticketSubject" class="form-label">Subject <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="ticketSubject" name="subject" required placeholder="Enter issue subject">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ticketDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="ticketDescription" name="description" rows="4" placeholder="Describe your issue in detail"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#raiseTicketForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = $(this).serialize();
+            var submitBtn = $(this).find('button[type="submit"]');
+            var originalBtnText = submitBtn.html();
+            
+            submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Submitting...');
+            
+            $.ajax({
+                url: "{{ route('offline-amc.ticket.store') }}",
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        $('#raiseTicketModal').modal('hide');
+                        $('#raiseTicketForm')[0].reset();
+                        alert(response.message + '\nTicket No: ' + response.ticket.ticket_no);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr) {
+                    var errorMessage = 'An error occurred. Please try again.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    alert(errorMessage);
+                },
+                complete: function() {
+                    submitBtn.prop('disabled', false).html(originalBtnText);
+                }
+            });
+        });
+    });
+</script>
 @endsection

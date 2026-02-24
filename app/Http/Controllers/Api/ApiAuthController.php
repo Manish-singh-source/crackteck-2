@@ -540,12 +540,12 @@ class ApiAuthController extends Controller
 
             if ($staffRole == 'customers') {
                 $user = Customer::where('phone', $request->phone_number)
-                ->where('status', 'active')
-                ->first();
+                    ->where('status', 'active')
+                    ->first();
             } else {
                 $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)
-                ->where('status', 'active')
-                ->first();
+                    ->where('status', 'active')
+                    ->first();
             }
             if (! $user) {
                 return response()->json(['success' => false, 'message' => 'User not found with the provided phone number and role.'], 404);
@@ -671,18 +671,46 @@ class ApiAuthController extends Controller
         return response()->json(['success' => true, 'message' => 'User logged out successfully']);
     }
 
+    // public function updateToken(Request $request)
+    // {
+    //     $user = auth()->guard('staff_api')->user();
+    //     if (!$user) {
+    //         $user = auth()->guard('customer_api')->user();
+    //     }
+    //     if ($user) {
+    //         $user->device_token = $request->token;
+    //         $user->save();
+    //     }
+
+    //     return response()->json(['success' => true, 'message' => 'Token updated']);
+    // }
+
     public function updateToken(Request $request)
     {
+        $request->validate([
+            'token' => 'required|string'
+        ]);
+
         $user = auth()->guard('staff_api')->user();
+
         if (!$user) {
             $user = auth()->guard('customer_api')->user();
         }
-        if ($user) {
-            $user->device_token = $request->token;
-            $user->save();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated'
+            ], 401);
         }
 
-        return response()->json(['success' => true, 'message' => 'Token updated']);
+        $user->device_token = $request->token;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Token updated successfully'
+        ]);
     }
 
     public function generateCustomerCode()

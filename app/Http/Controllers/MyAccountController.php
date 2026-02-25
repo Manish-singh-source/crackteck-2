@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Amc;
+use App\Models\AmcTicket;
 use App\Models\CustomerAddressDetail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -472,6 +473,24 @@ class MyAccountController extends Controller
                 'message' => 'An error occurred while updating your password.',
             ], 500);
         }
+    }
+
+    // Ticket Page 
+    public function ticket()
+    {
+        if (! Auth::guard('customer_web')->check()) {
+            return redirect()->route('login')->with('error', 'Please login to view your tickets.');
+        }
+
+        $customer = Auth::guard('customer_web')->user();
+        $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
+
+        $amcTickets = AmcTicket::with(['amc'])
+            ->where('customer_id', $customerId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('frontend.my-account-ticket', compact('amcTickets'));
     }
 
     /**

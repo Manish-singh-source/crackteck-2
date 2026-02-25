@@ -1,13 +1,12 @@
 @extends('crm/layouts/master')
 
 @section('content')
+    <div class="content">
+        <div class="container-fluid">
 
-<div class="content">
-    <div class="container-fluid">
-
-        <div class="row">
-            <div class="col-xl-12 mx-auto my-3">
-                <div class="card">
+            <div class="row">
+                <div class="col-xl-8 my-3">
+                    <div class="card">
                         <div class="card-header border-bottom-dashed">
                             <div class="d-flex">
                                 <h5 class="card-title flex-grow-1 mb-0">
@@ -34,7 +33,8 @@
                                             <span class="fw-semibold text-break">Customer Name :
                                             </span>
                                             <span>
-                                                {{ $amcTicket->customer->first_name ?? '' }} {{ $amcTicket->customer->last_name ?? '' }}
+                                                {{ $amcTicket->customer->first_name ?? '' }}
+                                                {{ $amcTicket->customer->last_name ?? '' }}
                                             </span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
@@ -81,7 +81,7 @@
                                             </span>
                                             <span>
                                                 @php
-                                                    $priorityClass = match($amcTicket->priority) {
+                                                    $priorityClass = match ($amcTicket->priority) {
                                                         'high' => 'bg-danger-subtle text-danger',
                                                         'medium' => 'bg-warning-subtle text-warning',
                                                         'low' => 'bg-info-subtle text-info',
@@ -98,7 +98,7 @@
                                             </span>
                                             <span>
                                                 @php
-                                                    $statusClass = match($amcTicket->status) {
+                                                    $statusClass = match ($amcTicket->status) {
                                                         'pending' => 'bg-danger-subtle text-danger',
                                                         'in_progress' => 'bg-warning-subtle text-warning',
                                                         'resolved' => 'bg-success-subtle text-success',
@@ -116,11 +116,31 @@
                         </div>
 
                     </div>
+                </div>
+                <div class="col-xl-4 my-3">
+
+                    <div class="card">
+                        <div class="card-header border-bottom-dashed">
+                            <div class="d-flex">
+                                <h5 class="card-title flex-grow-1 mb-0">
+                                    Assign Engineer
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
 
         </div>
-
-    </div>
-</div> <!-- content -->
-
+    </div> <!-- content -->
 @endsection

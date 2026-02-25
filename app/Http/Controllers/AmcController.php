@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Amc;
 use App\Models\AmcPlan;
 use App\Models\AmcScheduleMeeting;
+use App\Models\AmcTicket;
 use App\Models\CoveredItem;
 use App\Models\DeviceSpecificDiagnosis;
 use App\Models\ServiceRequest;
@@ -569,7 +570,10 @@ class AmcController extends Controller
 
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
 
-        return view('/crm/active-amcs/view', compact('amcRequest', 'engineers'));
+        // Get tickets for this AMC service
+        $amcTickets = AmcTicket::where('amc_id', $id)->orderBy('created_at', 'desc')->get();
+
+        return view('/crm/active-amcs/view', compact('amcRequest', 'engineers', 'amcTickets'));
     }
 
     // 4. Reschedule AMC request 
@@ -601,5 +605,36 @@ class AmcController extends Controller
         }
 
         return redirect()->back()->with('success', 'AMC Schedule Meeting updated successfully.');
+    }
+
+    // Update ticket status
+    public function updateTicketStatus(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|in:pending,in_progress,resolved',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid status',
+            ], 422);
+        }
+
+        try {
+            $ticket = AmcTicket::findOrFail($id);
+            $ticket->status = $request->status;
+            $ticket->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ticket status updated successfully',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating ticket status: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

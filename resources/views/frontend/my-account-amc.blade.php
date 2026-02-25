@@ -36,6 +36,7 @@
                             <li><a href="{{ route('my-account-password') }}" class="my-account-nav-item">Change Password</a>
                             </li>
                             <li><span class="my-account-nav-item active">AMC</span></li>
+                            <li><a href="{{ route('my-account-ticket') }}" class="my-account-nav-item">Support Ticket</a></li>
                             {{-- <li><a href="{{ route('my-account-non-amc') }}" class="my-account-nav-item">NON AMC</a> --}}
                             </li>
                             <li><a href="{{ route('wishlist') }}" class="my-account-nav-item">Wishlist</a></li>

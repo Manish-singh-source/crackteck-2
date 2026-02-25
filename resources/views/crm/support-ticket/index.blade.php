@@ -132,7 +132,7 @@
                                                                 </td>
                                                                 <td>
                                                                     <div class="d-flex gap-2">
-                                                                        <a aria-label="anchor" href="{{ route('support-ticket.view', $ticket->id) }}"
+                                                                        <a aria-label="anchor" href="{{ route('amcs-request.view', $ticket->amc_id) }}"
                                                                             class="btn btn-icon btn-sm bg-primary-subtle me-1"
                                                                             data-bs-toggle="tooltip" data-bs-original-title="View">
                                                                             <i class="mdi mdi-eye-outline fs-14 text-primary"></i>

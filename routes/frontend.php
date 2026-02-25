@@ -234,6 +234,10 @@ Route::prefix('beta')->group(function () {
     Route::get('/my-account-amc/{id}', [MyAccountController::class, 'viewAmcService'])
         ->name('my-account-amc.view')->middleware('auth:customer_web');
 
+    // My Account AMC
+    Route::get('/my-account-ticket', [MyAccountController::class, 'ticket'])
+        ->name('my-account-ticket')->middleware('auth:customer_web');    
+
     // Store AMC Ticket
     Route::post('/my-account-amc/ticket', [MyAccountController::class, 'storeAmcTicket'])
         ->name('my-account-amc.ticket.store')->middleware('auth:customer_web');

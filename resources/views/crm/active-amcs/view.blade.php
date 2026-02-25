@@ -193,6 +193,77 @@
                         </div>
                     </div>
 
+                    {{-- Support Tickets Section --}}
+                    @if(isset($amcTickets) && $amcTickets->isNotEmpty())
+                    <div class="card mt-3">
+                        <div class="card-header border-bottom-dashed">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Support Tickets</h5>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-nowrap card-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Ticket No</th>
+                                            <th>Subject</th>
+                                            <th>Priority</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($amcTickets as $ticket)
+                                        <tr>
+                                            <td>{{ $ticket->ticket_no }}</td>
+                                            <td>{{ $ticket->subject }}</td>
+                                            <td>
+                                                @php
+                                                    $priorityClass = match($ticket->priority) {
+                                                        'high' => 'bg-danger-subtle text-danger',
+                                                        'medium' => 'bg-warning-subtle text-warning',
+                                                        'low' => 'bg-info-subtle text-info',
+                                                        default => 'bg-secondary-subtle text-secondary',
+                                                    };
+                                                @endphp
+                                                <span class="badge {{ $priorityClass }}">{{ ucfirst($ticket->priority) }}</span>
+                                            </td>
+                                            <td>
+                                                @php
+                                                    $statusClass = match($ticket->status) {
+                                                        'pending' => 'bg-danger-subtle text-danger',
+                                                        'in_progress' => 'bg-warning-subtle text-warning',
+                                                        'resolved' => 'bg-success-subtle text-success',
+                                                        default => 'bg-secondary-subtle text-secondary',
+                                                    };
+                                                @endphp
+                                                <span class="badge {{ $statusClass }}">{{ ucfirst(str_replace('_', ' ', $ticket->status)) }}</span>
+                                            </td>
+                                            <td>{{ $ticket->created_at->format('Y-m-d') }}</td>
+                                            <td>
+                                                @if($ticket->status == 'pending')
+                                                    <button class="btn btn-sm btn-warning" onclick="updateTicketStatus({{ $ticket->id }}, 'in_progress')">
+                                                        <i class="mdi mdi-progress-clock"></i> In Progress
+                                                    </button>
+                                                @elseif($ticket->status == 'in_progress')
+                                                    <button class="btn btn-sm btn-success" onclick="updateTicketStatus({{ $ticket->id }}, 'resolved')">
+                                                        <i class="mdi mdi-check-circle"></i> Resolve
+                                                    </button>
+                                                @else
+                                                    <span class="badge bg-success-subtle text-success">Resolved</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
                     {{-- Service Visits History Details --}}
                     <div class="card">
                         <div class="card-header border-bottom-dashed">
@@ -1069,5 +1140,34 @@
                 });
             });
         });
+
+        // Function to update ticket status
+        function updateTicketStatus(ticketId, status) {
+            if (!confirm('Are you sure you want to change the status to ' + status.replace('_', ' ') + '?')) {
+                return;
+            }
+
+            fetch("{{ route('amcs-request.ticket-status', ['id' => ':ticketId']) }}".replace(':ticketId', ticketId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error updating status');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating ticket status');
+            });
+        }
     </script>
 @endsection

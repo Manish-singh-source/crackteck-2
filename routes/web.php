@@ -215,7 +215,20 @@ Route::prefix('/demo')->group(function () {
         // Payments to Vendors List Page
         Route::get('/crm/payments-to-vendor', 'index')->name('pay-to-vendors.index');
         // Create Payments to Vendors List Page
+        // Route::get('/crm/create-payments-to-vendor', 'create')->name('pay-to-vendors.create');
+
+        // Create Vendor Purchase Bill Page
         Route::get('/crm/create-payments-to-vendor', 'create')->name('pay-to-vendors.create');
+        // Store Vendor Purchase Bill
+        Route::post('/crm/create-payments-to-vendor', 'store')->name('pay-to-vendors.store');
+        // View Vendor Purchase Bill Page
+        Route::get('/crm/view-payments-to-vendor/{id}', 'view')->name('pay-to-vendors.view');
+        // Edit Vendor Purchase Bill Page
+        Route::get('/crm/edit-payments-to-vendor/{id}', 'edit')->name('pay-to-vendors.edit');
+        // Update Vendor Purchase Bill
+        Route::put('/crm/edit-payments-to-vendor{id}', 'update')->name('pay-to-vendors.update');
+        // Delete Vendor Purchase Bill
+        Route::delete('/crm/payments-to-vendor{id}', 'destroy')->name('pay-to-vendors.destroy');
     });
 
     // ######################## Creditors Report  ########################

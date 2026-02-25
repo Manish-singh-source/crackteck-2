@@ -45,13 +45,13 @@ class QuotationController extends Controller
             'quote_date' => 'required',
             'expiry_date' => 'required',
             'products' => 'array',
-            'products.*.product_name' => 'required|string',
-            'products.*.hsn_code' => 'nullable|string',
+            'products.*.name' => 'required|string',
+            'products.*.hsn' => 'nullable|string',
             'products.*.sku' => 'nullable|string',
-            'products.*.price' => 'required',
+            'products.*.unit_price' => 'required',
             'products.*.quantity' => 'required|integer',
-            'products.*.tax' => 'required',
-            'products.*.total' => 'required',
+            'products.*.tax_rate' => 'required',
+            'products.*.line_total' => 'required',
         ]));
 
         if ($validated->fails()) {
@@ -78,15 +78,15 @@ class QuotationController extends Controller
             foreach ($request->products as $productData) {
                 $quotationProduct = new QuotationProduct;
                 $quotationProduct->quotation_id = $Quotation->id;
-                $quotationProduct->product_name = $productData['product_name'];
-                $quotationProduct->hsn_code = $productData['hsn_code'];
+                $quotationProduct->name = $productData['name'];
+                $quotationProduct->hsn = $productData['hsn'];
                 $quotationProduct->sku = $productData['sku'];
-                $quotationProduct->unit_price = $productData['price'];
+                $quotationProduct->unit_price = $productData['unit_price'];
                 $quotationProduct->quantity = $productData['quantity'];
-                $quotationProduct->tax_rate = $productData['tax'];
-                $quotationProduct->line_total = $productData['total'];
+                $quotationProduct->tax_rate = $productData['tax_rate'];
+                $quotationProduct->line_total = $productData['line_total'];
                 $quotationProduct->save();
-                $subtotal += $productData['total'];
+                $subtotal += $productData['line_total'];
             }
         }
         $Quotation->subtotal = $subtotal;

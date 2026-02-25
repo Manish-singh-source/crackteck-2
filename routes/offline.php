@@ -30,6 +30,8 @@ Route::prefix('/demo/offline-customer')->group(function () {
             Route::get('/offline-amc', 'amc')->name('offline-amc');
             Route::get('/offline-amc-view/{id}', 'amcView')->name('offline-amc-view');
             Route::post('/offline-amc/ticket', 'storeAmcTicket')->name('offline-amc.ticket.store');
+            Route::get('/offline-ticket', 'ticket')->name('offline-ticket');
+            Route::get('/offline-ticket-view/{id}', 'ticketView')->name('offline-ticket-view');
             Route::get('/offline-account-detail', 'accountDetail')->name('accountDetail');
             Route::put('/offline-account-detail', 'updateProfile')->name('offline-account-update');
             Route::get('/offline-address', 'address')->name('address');

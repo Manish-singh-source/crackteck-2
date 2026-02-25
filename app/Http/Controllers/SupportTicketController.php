@@ -16,8 +16,10 @@ class SupportTicketController extends Controller
         return view('/crm/support-ticket/index', compact('amcTickets'));
     }
 
-    public function view()
+    public function view($id)
     {
-        return view('/crm/support-ticket/view');
+        $amcTicket = AmcTicket::with(['customer', 'amc'])->findOrFail($id);
+
+        return view('/crm/support-ticket/view', compact('amcTicket'));
     }
 }

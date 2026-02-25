@@ -86,6 +86,46 @@ class OfflineCustomerController extends Controller
             return redirect()->back()->with('error', 'Error loading AMC service details.');
         }
     }
+
+    /**
+     * Display list of tickets for the logged-in customer
+     */
+    public function ticket()
+    {
+        if (! Auth::guard('customer_web')->check()) {
+            return redirect()->route('offlinelogin')->with('error', 'Please login to view your tickets.');
+        }
+
+        $customer = Auth::guard('customer_web')->user();
+        $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
+
+        $amcTickets = \App\Models\AmcTicket::with(['customer', 'amc'])
+            ->where('customer_id', $customerId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('offline-users-dashboard.ticket', compact('amcTickets'));
+    }
+
+    /**
+     * Display detailed view of a specific ticket
+     */
+    public function ticketView($id)
+    {
+        if (! Auth::guard('customer_web')->check()) {
+            return redirect()->route('offlinelogin')->with('error', 'Please login to view ticket details.');
+        }
+
+        $customer = Auth::guard('customer_web')->user();
+        $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
+
+        $amcTicket = \App\Models\AmcTicket::with(['customer', 'amc'])
+            ->where('id', $id)
+            ->where('customer_id', $customerId)
+            ->firstOrFail();
+
+        return view('offline-users-dashboard.ticket-detail', compact('amcTicket'));
+    }
     public function accountDetail()
     {
         $customer = Auth::guard('customer_web')->user();

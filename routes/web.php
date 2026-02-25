@@ -789,7 +789,7 @@ Route::prefix('/demo')->group(function () {
         // Support Ticket Page
         Route::get('/crm/support-ticket', 'index')->name('support-ticket.index');
         // View Support Ticket Page
-        Route::get('/crm/view-support-ticket', 'view')->name('support-ticket.view');
+        Route::get('/crm/view-support-ticket/{id}', 'view')->name('support-ticket.view');
     });
 
     // ------------------------------------------------------------ Assign Products Page -------------------------------------------------------------

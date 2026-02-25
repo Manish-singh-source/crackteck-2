@@ -6,7 +6,7 @@
 
     <!-- Start Content-->
     <div class="container-fluid">
-        <div class="pb-3 d-flex align-items-sm-center flex-sm-row flex-column">
+        <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
                 <h4 class="fs-18 fw-semibold m-0">Ticket List</h4>
             </div>
@@ -63,7 +63,7 @@
 
                         <div class="tab-content text-muted">
 
-                            <div class="tab-pane active show pt-4" id="all_tickets" role="tabpanel">
+                            <div class="tab-pane active show" id="all_tickets" role="tabpanel">
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="card shadow-none">
@@ -132,16 +132,16 @@
                                                                 </td>
                                                                 <td>
                                                                     <div class="d-flex gap-2">
-                                                                        <a aria-label="anchor" href="{{ route('support-ticket.view') }}"
+                                                                        <a aria-label="anchor" href="{{ route('support-ticket.view', $ticket->id) }}"
                                                                             class="btn btn-icon btn-sm bg-primary-subtle me-1"
                                                                             data-bs-toggle="tooltip" data-bs-original-title="View">
                                                                             <i class="mdi mdi-eye-outline fs-14 text-primary"></i>
                                                                         </a>
-                                                                        <a aria-label="anchor"
+                                                                        {{-- <a aria-label="anchor"
                                                                             class="btn btn-icon btn-sm bg-danger-subtle delete-row"
                                                                             data-bs-toggle="tooltip" data-bs-original-title="Delete">
                                                                             <i class="mdi mdi-delete fs-14 text-danger"></i>
-                                                                        </a>
+                                                                        </a> --}}
                                                                     </div>
                                                                 </td>
                                                             </tr>

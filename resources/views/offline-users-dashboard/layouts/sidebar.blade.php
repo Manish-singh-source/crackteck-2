@@ -46,7 +46,7 @@
                     </a>
                 </li>
                 <li>
-                    <a class='tp-link' href="{{ route('offline-amc') }}">
+                    <a class='tp-link' href="{{ route('offline-ticket') }}">
                         <i class="fas fa-clipboard-check"></i>
                         <span class="ps-1">Ticket</span>
                     </a>

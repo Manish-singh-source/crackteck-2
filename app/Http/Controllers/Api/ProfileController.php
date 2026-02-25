@@ -33,39 +33,88 @@ class ProfileController extends Controller
         ][$roleId] ?? null;
     }
 
+    // public function index(Request $request)
+    // {
+    //     $validated = Validator::make($request->all(), [
+    //         // validation rules if any
+    //         'role_id' => 'required|in:1,2,3,4',
+    //         'user_id' => 'required',
+    //     ]);
+
+    //     if ($validated->fails()) {
+    //         return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+    //     }
+    //     $validated = $validated->validated();
+
+    //     if ($validated['role_id'] == 4) {
+    //         $user = Customer::where('id', $validated['user_id'])->first();
+    //         if ($user->id !== auth()->id()) {
+    //             return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+    //         }
+    //         unset($user->otp, $user->otp_expiry, $user->password, $user->created_by, $user->created_at);
+    //     } else {
+    //         $user = Staff::where('id', $validated['user_id'])->first();
+    //         if ($user->id !== auth()->id()) {
+    //             return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+    //         }
+    //         unset($user->otp, $user->otp_expiry, $user->password);
+    //     }
+
+    //     if (! $user) {
+    //         return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+    //     }
+
+    //     return response()->json(['user' => $user], 200);
+    // }
+
     public function index(Request $request)
-    {
-        $validated = Validator::make($request->all(), [
-            // validation rules if any
-            'role_id' => 'required|in:1,2,3,4',
-            'user_id' => 'required',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'role_id' => 'required|in:1,2,3,4',
+        'user_id' => 'required'
+    ]);
 
-        if ($validated->fails()) {
-            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
-        }
-        $validated = $validated->validated();
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation failed.',
+            'errors' => $validator->errors()
+        ], 422);
+    }
 
-        if ($validated['role_id'] == 4) {
-            $user = Customer::where('id', $validated['user_id'])->first();
-            if ($user->id !== auth()->id()) {
-                return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
-            }
-            unset($user->otp, $user->otp_expiry, $user->password, $user->created_by, $user->created_at);
-        } else {
-            $user = Staff::where('id', $validated['user_id'])->first();
-            if ($user->id !== auth()->id()) {
-                return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
-            }
-            unset($user->otp, $user->otp_expiry, $user->password);
-        }
+    $validated = $validator->validated();
 
-        if (! $user) {
+    if ($validated['role_id'] == 4) {
+
+        $user = Customer::find($validated['user_id']);
+
+        if (!$user) {
             return response()->json(['success' => false, 'message' => 'User not found.'], 404);
         }
 
-        return response()->json(['user' => $user], 200);
+        if ($user->id !== auth('customer_api')->id()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        }
+
+        unset($user->otp, $user->otp_expiry, $user->password, $user->created_by, $user->created_at);
+
+    } else {
+
+        $user = Staff::find($validated['user_id']);
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+        }
+
+        if ($user->id !== auth('staff_api')->id()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        }
+
+        unset($user->otp, $user->otp_expiry, $user->password);
     }
+
+    return response()->json(['user' => $user], 200);
+}
 
     public function update(Request $request)
     {

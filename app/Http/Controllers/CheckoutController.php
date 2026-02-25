@@ -11,6 +11,7 @@ use App\Models\EcommerceProduct;
 use App\Models\InventoryUpdateLog;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\OrderPayment;
 use App\Models\Product;
 use App\Models\UserAddress;
 use Illuminate\Http\JsonResponse;
@@ -278,6 +279,20 @@ class CheckoutController extends Controller
 
             // Create order
             $order = $this->createOrder($validated, $totals, $checkoutData['source'], $checkoutData);
+
+            // Create payment record
+            $paymentStatus = $validated['payment_method'] === 'cod' ? 'pending' : 'completed';
+            OrderPayment::create([
+                'order_id' => $order->id,
+                'payment_id' => 'PMT-' . strtoupper(uniqid()),
+                'transaction_id' => 'TXN-' . strtoupper(uniqid()),
+                'payment_method' => $validated['payment_method'] === 'cod' ? 'cod' : 'online',
+                'payment_gateway' => $validated['payment_method'] === 'cod' ? 'cod' : 'phonepe',
+                'amount' => $totals['total'],
+                'currency' => 'INR',
+                'status' => $paymentStatus,
+                'processed_at' => now(),
+            ]);
 
             // Create order items
             $this->createOrderItems($order, $checkoutData);

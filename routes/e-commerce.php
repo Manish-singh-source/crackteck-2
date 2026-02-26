@@ -51,6 +51,7 @@ Route::prefix('/demo/e-commerce')->group(function () {
         Route::get('/view-order/{id}', 'show')->name('order.view');
         Route::put('/order/{id}/assign-person', 'assignPerson')->name('order.assign-person');
         Route::get('/order/{id}/invoice', 'generateInvoice')->name('order.invoice');
+        Route::get('/order/{id}/invoice/download', 'downloadInvoice')->name('order.invoice-download');
         Route::get('/delivery-men-by-city/{city}', 'getDeliveryMenByCity')->name('order.delivery-men-by-city');
         Route::post('/order/{id}/assign-delivery-man', 'assignDeliveryMan')->name('order.assign-delivery-man');
         Route::post('/order/{id}/update-status', 'updateStatus')->name('order.update-status');

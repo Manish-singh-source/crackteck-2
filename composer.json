@@ -21,6 +21,7 @@
         "spatie/laravel-db-snapshots": "^2.7",
         "spatie/laravel-permission": "^6.21",
         "spatie/simple-excel": "^3.7",
+        "tecnickcom/tcpdf": "^6.10",
         "tymon/jwt-auth": "^2.2"
     },
     "require-dev": {

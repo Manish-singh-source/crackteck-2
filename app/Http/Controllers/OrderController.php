@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use \TCPDF;
 
 class OrderController extends Controller
 {
@@ -411,7 +412,7 @@ class OrderController extends Controller
         try {
             $order = Order::findOrFail($id);
             $order->assigned_person_type = $request->assigned_person_type;
-            
+
             if ($request->assigned_person_type == 'engineer') {
                 $order->assigned_person_id = $request->engineer_id;
             } else {
@@ -440,19 +441,25 @@ class OrderController extends Controller
 
     private function calculateOrderTotals($order)
     {
-        $subtotal = $order->orderItems->sum('total_price');
-        $taxAmount = $order->orderItems->sum('igst_amount');
+        $subtotal = $order->orderItems->sum('line_total');
+        $taxAmount = $order->orderItems->sum('tax_per_unit');
         $shippingCharges = $order->shipping_charges;
         $discountAmount = $order->discount_amount;
         $grandTotal = $order->total_amount;
 
+        $roundingOff = round($grandTotal) - $grandTotal;
+
         return [
             'subtotal' => $subtotal,
             'tax_amount' => $taxAmount,
+            'total_tax' => $taxAmount,
             'shipping_charges' => $shippingCharges,
             'discount_amount' => $discountAmount,
             'grand_total' => $grandTotal,
             'rounded_total' => round($grandTotal),
+            'rounding_off' => $roundingOff,
+            'total_amount' => $grandTotal,
+            'total_in_words' => $this->convertNumberToWords($grandTotal),
         ];
     }
 
@@ -474,12 +481,12 @@ class OrderController extends Controller
             $order = Order::findOrFail($id);
             $oldOrderStatus = $order->status;
             $oldStatus = $order->status;
-            
+
             // Update status only if provided
             if ($request->has('status') && $request->status) {
                 $newOrderStatus = $request->status;
                 $order->status = $newOrderStatus;
-                
+
                 // Update status timestamps for status
                 if ($newOrderStatus === 'confirmed' && $oldOrderStatus !== 'confirmed') {
                     $order->confirmed_at = now();
@@ -491,12 +498,12 @@ class OrderController extends Controller
                     $order->cancelled_at = now();
                 }
             }
-            
+
             // Update new delivery status if provided
             if ($request->has('status') && $request->status) {
                 $newStatus = $request->status;
                 $order->status = $newStatus;
-                
+
                 // Update status timestamps
                 if ($newStatus === 'admin_approved' && $oldStatus !== 'admin_approved') {
                     // admin_approved doesn't have a timestamp field
@@ -599,14 +606,12 @@ class OrderController extends Controller
     public function generateInvoice($id)
     {
         try {
-            // Fetch order with all related data
-            $order = Order::with(['user', 'orderItems.product.warehouseProduct'])
+
+            $order = Order::with(['customer', 'orderItems', 'orderPayments', 'billingAddress', 'shippingAddress'])
                 ->findOrFail($id);
 
-            // Calculate totals
             $totals = $this->calculateOrderTotals($order);
 
-            // Prepare data for the invoice template
             $invoiceData = [
                 'order' => $order,
                 'totals' => $totals,
@@ -622,28 +627,89 @@ class OrderController extends Controller
                 ],
             ];
 
-            // Generate PDF using the existing invoice view
-            $pdf = Pdf::loadView('e-commerce.ecommerce-orders.invoice', $invoiceData);
+            return view('e-commerce.order.invoice', $invoiceData);
+        } catch (\Exception $e) {
 
-            // Set paper size and orientation
-            $pdf->setPaper('A4', 'portrait');
-
-            // Set options for better rendering
-            $pdf->setOptions([
-                'isHtml5ParserEnabled' => true,
-                'isRemoteEnabled' => false,
-                'defaultFont' => 'Arial',
+            Log::error('Invoice View Error: ' . $e->getMessage(), [
+                'order_id' => $id,
+                'trace' => $e->getTraceAsString()
             ]);
 
-            // Generate filename
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate invoice',
+                'debug' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
+    }
+
+    public function downloadInvoice($id)
+    {
+        try {
+
+            $order = Order::with(['customer', 'orderItems', 'orderPayments', 'billingAddress', 'shippingAddress'])
+                ->findOrFail($id);
+
+            $totals = $this->calculateOrderTotals($order);
+
+            $invoiceData = [
+                'order' => $order,
+                'totals' => $totals,
+                'invoice_number' => 'INV-' . $order->order_number,
+                'invoice_date' => $order->created_at->format('d/m/Y'),
+                'amount_in_words' => $this->convertNumberToWords($totals['grand_total']),
+                'company' => [
+                    'name' => 'CrackTeck Solutions Pvt. Ltd.',
+                    'address' => 'Tech Park, Mumbai - 400001',
+                    'gstin' => '27AABCC1234M1Z2',
+                    'phone' => '+91 98765 43210',
+                    'email' => 'info@crackteck.com',
+                ],
+            ];
+
+            // Render the HTML view
+            $html = view('e-commerce.order.invoice-pdf', $invoiceData)->render();
+
+            // Create new PDF document
+            $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+            // Set document information
+            $pdf->SetCreator('CrackTeck');
+            $pdf->SetAuthor('CrackTeck Solutions');
+            $pdf->SetTitle('Invoice ' . $order->order_number);
+            $pdf->SetSubject('Invoice');
+
+            // Remove default header/footer
+            $pdf->setPrintHeader(false);
+            $pdf->setPrintFooter(false);
+
+            // Set margins
+            $pdf->SetMargins(15, 15, 15);
+
+            // Add a page
+            $pdf->AddPage();
+
+            // Output the HTML content
+            $pdf->writeHTML($html, true, false, true, false, '');
+
+            // Close and output PDF
             $filename = 'invoice-' . $order->order_number . '.pdf';
-
-            // Return PDF download response
-            return $pdf->download($filename);
+            return response()->make($pdf->Output($filename, 'I'), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
         } catch (\Exception $e) {
-            Log::error('Error generating invoice: ' . $e->getMessage());
 
-            return redirect()->back()->with('error', 'Failed to generate invoice. Please try again.');
+            Log::error('Invoice PDF Error: ' . $e->getMessage(), [
+                'order_id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate invoice',
+                'debug' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
         }
     }
 

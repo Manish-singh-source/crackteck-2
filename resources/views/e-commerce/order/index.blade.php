@@ -262,9 +262,9 @@
                                                     </td>
                                                     <td>
                                                         <a href="{{ route('order.invoice', $order->id) }}"
-                                                            class="btn btn-sm btn-outline-success" title="Download Invoice"
+                                                            class="btn btn-sm btn-outline-success" title="View Invoice"
                                                             target="_blank">
-                                                            <i class="fas fa-file-pdf me-1"></i> PDF
+                                                            <i class="fas fa-file-pdf me-1"></i> View
                                                         </a>
                                                     </td>
                                                     <td>

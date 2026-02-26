@@ -14,6 +14,7 @@ use App\Models\OrderItem;
 use App\Models\OrderPayment;
 use App\Models\Product;
 use App\Models\UserAddress;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -293,6 +294,9 @@ class CheckoutController extends Controller
                 'status' => $paymentStatus,
                 'processed_at' => now(),
             ]);
+
+            // Generate invoice
+            $this->generateInvoice($order);
 
             // Create order items
             $this->createOrderItems($order, $checkoutData);
@@ -732,6 +736,73 @@ class CheckoutController extends Controller
         }
 
         return trim($result) . ' Rupees Only';
+    }
+
+    /**
+     * Generate invoice for the order.
+     */
+    private function generateInvoice($order)
+    {
+        try {
+            // Fetch order with all related data
+            $order = Order::with(['customer', 'orderItems.ecommerceProduct.warehouseProduct'])
+                ->findOrFail($order->id);
+
+            // Calculate totals
+            $subtotal = $order->orderItems->sum(function ($item) {
+                $warehouseProduct = $item->ecommerceProduct->warehouseProduct ?? null;
+                $price = $warehouseProduct->final_price ?? $warehouseProduct->selling_price ?? 0;
+                return $price * $item->quantity;
+            });
+
+            $totals = [
+                'subtotal' => $subtotal,
+                'tax_amount' => $order->tax_amount ?? 0,
+                'shipping_charges' => $order->shipping_charges ?? 0,
+                'discount_amount' => $order->discount_amount ?? 0,
+                'grand_total' => $order->total_amount,
+                'rounded_total' => round($order->total_amount),
+            ];
+
+            // Prepare data for the invoice template
+            $invoiceData = [
+                'order' => $order,
+                'totals' => $totals,
+                'invoice_number' => 'INV-' . ($order->order_number ?? $order->id),
+                'invoice_date' => $order->created_at->format('d/m/Y'),
+                'amount_in_words' => $this->convertNumberToWords($totals['grand_total']),
+                'company' => [
+                    'name' => 'CrackTeck Solutions Pvt. Ltd.',
+                    'address' => 'Tech Park, Mumbai - 400001',
+                    'gstin' => '27AABCC1234M1Z2',
+                    'phone' => '+91 98765 43210',
+                    'email' => 'info@crackteck.com',
+                ],
+            ];
+
+            // Generate PDF using the existing invoice view
+            $pdf = Pdf::loadView('e-commerce.orders.invoice', $invoiceData);
+
+            // Set paper size and orientation
+            $pdf->setPaper('A4', 'portrait');
+
+            // Set options for better rendering
+            $pdf->setOptions([
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => false,
+                'defaultFont' => 'Arial',
+            ]);
+
+            // Generate filename
+            $filename = 'invoice-' . ($order->order_number ?? $order->id) . '.pdf';
+
+            // Return PDF download response
+            return $pdf->download($filename);
+        } catch (\Exception $e) {
+            Log::error('Error generating invoice: ' . $e->getMessage());
+
+            return null;
+        }
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\QuotationInvoice;
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -14,6 +15,10 @@ class InvoiceController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('/crm/invoice/index', compact('quotationInvoices'));
+        $ecommerceOrders = Order::with(['customer', 'orderItems', 'orderPayments'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('/crm/invoice/index', compact('quotationInvoices', 'ecommerceOrders'));
     }
 }

@@ -271,7 +271,7 @@ class AllServicesController extends Controller
                 }
 
 
-                if ($request->service_type == 'amc') 
+                if ($request->service_type == 'amc')
                 //     {
                 //     $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
 
@@ -516,33 +516,34 @@ class AllServicesController extends Controller
             foreach ($diagnosisDetails as $diagnosis) {
                 $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
 
-                if(isset($diagnosisList->part_id)) {
-                    // product data 
-                    $partRequest = ServiceRequestProductRequestPart::where('request_id', $id)
-                                        ->where('product_id', $product_id)
-                                        ->where('part_id', $diagnosisList->part_id)
-                                        ->first();
+                foreach ($diagnosisList as $diagnosisListData) {
+                    if (isset($diagnosisListData->part_id)) {
+                        // product data 
+                        $partRequest = ServiceRequestProductRequestPart::where('request_id', $id)
+                            ->where('product_id', $product_id)
+                            ->where('part_id', $diagnosisListData->part_id)
+                            ->first();
 
-                    $diagnosisList['part_status'] = $partRequest ? $partRequest->status : 'pending';
+                        $diagnosisList['part_status'] = $partRequest ? $partRequest->status : 'pending';
 
-                    // product data 
-                    $productData = Product::where('id', $diagnosisList->part_id)->first();
-                    if ($productData) {
-                        $data = [
-                            'id' => $productData->id,
-                            'product_name' => $productData->product_name,
-                            'main_product_image' => $productData->main_product_image,
-                            'final_price' => $productData->final_price,
-                        ];
+                        // product data 
+                        $productData = Product::where('id', $diagnosisListData->part_id)->first();
+                        if ($productData) {
+                            $data = [
+                                'id' => $productData->id,
+                                'product_name' => $productData->product_name,
+                                'main_product_image' => $productData->main_product_image,
+                                'final_price' => $productData->final_price,
+                            ];
+                        }
+                        $diagnosisList['product_data'] = $productData ? $data : [];
                     }
-                    $diagnosisList['product_data'] = $productData ? $data : [];
                 }
 
                 $diagnoses[] = [
                     'diagnosis_id' => $diagnosis->id,
                     'assigned_engineer_id' => $diagnosis->assigned_engineer_id,
-                    'diagnosis_list' => $diagnosisList ?? [],
-                    'part_id' => $diagnosisList->part_id ?? null,
+                    'diagnosis_list' => $diagnosisList ?? [], 
                     'diagnosis_notes' => $diagnosis->diagnosis_notes,
                     'completed_at' => $diagnosis->completed_at ?? null,
                 ];

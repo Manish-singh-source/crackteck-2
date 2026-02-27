@@ -166,6 +166,7 @@
                                                 ])
                                             </div>
 
+                                            {{--
                                             <div class="col-6">
                                                 @include('components.form.input', [
                                                     'label' => 'Unit Price',
@@ -175,6 +176,7 @@
                                                     'step' => '0.01',
                                                 ])
                                             </div>
+                                            --}}
 
                                             <div class="col-6">
                                                 @include('components.form.input', [
@@ -185,6 +187,7 @@
                                                 ])
                                             </div>
 
+                                            {{--
                                             <div class="col-6">
                                                 @include('components.form.input', [
                                                     'label' => 'Discount Per Unit',
@@ -194,7 +197,9 @@
                                                     'step' => '0.01',
                                                 ])
                                             </div>
+                                            --}}
 
+                                            {{--
                                             <div class="col-6">
                                                 @include('components.form.input', [
                                                     'label' => 'Tax Rate (%)',
@@ -204,7 +209,9 @@
                                                     'step' => '0.01',
                                                 ])
                                             </div>
+                                            --}}
 
+                                            {{--
                                             <div class="col-6">
                                                 @include('components.form.input', [
                                                     'label' => 'Purchase Date',
@@ -212,6 +219,7 @@
                                                     'type' => 'date',
                                                 ])
                                             </div>
+                                            --}}
 
                                             <div class="col-12">
                                                 @include('components.form.input', [
@@ -223,6 +231,7 @@
                                                 ])
                                             </div>
 
+                                            {{--
                                             <div class="col-6">
                                                 @include('components.form.input', [
                                                     'label' => 'Line Total',
@@ -233,6 +242,7 @@
                                                     'step' => '0.01',
                                                 ])
                                             </div>
+                                            --}}
 
                                             <div class="col-12">
                                                 <div class="text-end">
@@ -260,11 +270,11 @@
                                                     <th>Brand</th>
                                                     <th>SKU</th>
                                                     <th>HSN</th>
-                                                    <th>Unit Price</th>
+                                                    {{-- <th>Unit Price</th> --}}
                                                     <th>Qty</th>
-                                                    <th>Discount</th>
-                                                    <th>Tax %</th>
-                                                    <th>Line Total</th>
+                                                    {{-- <th>Discount</th> --}}
+                                                    {{-- <th>Tax %</th> --}}
+                                                    {{-- <th>Line Total</th> --}}
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -387,6 +397,7 @@
             let products = [];
 
             // Calculate total when unit_price, quantity, discount, or tax_rate changes
+            /*
             function calculateTotal() {
                 const unit_price = parseFloat($('input[name="unit_price"]').val()) || 0;
                 const quantity = parseInt($('input[name="quantity"]').val()) || 0;
@@ -402,6 +413,7 @@
 
             $('input[name="unit_price"], input[name="quantity"], input[name="discount_per_unit"], input[name="tax_rate"]')
                 .on('input', calculateTotal);
+            */
 
             // Add product to temporary array
             $('#add-product-btn').on('click', function() {
@@ -412,17 +424,14 @@
                     model_no: $('input[name="model_no"]').val(),
                     sku: $('input[name="sku"]').val(),
                     hsn: $('input[name="hsn"]').val(),
-                    unit_price: parseFloat($('input[name="unit_price"]').val()) || 0,
                     quantity: parseInt($('input[name="quantity"]').val()) || 0,
-                    discount_per_unit: parseFloat($('input[name="discount_per_unit"]').val()) || 0,
-                    tax_rate: parseFloat($('input[name="tax_rate"]').val()) || 0,
                     purchase_date: $('input[name="purchase_date"]').val(),
                     description: $('textarea[name="description"]').val(),
-                    line_total: parseFloat($('input[name="line_total"]').val()) || 0
                 };
 
                 // Validate required fields
-                if (!productData.name || productData.unit_price <= 0 || productData.quantity <= 0) {
+                // note: unit_price checks commented out since input removed
+                if (!productData.name || productData.quantity <= 0) {
                     alert('Please fill all product fields correctly');
                     return;
                 }
@@ -454,11 +463,7 @@
                         <td>${product.brand || '-'}</td>
                         <td>${product.sku}</td>
                         <td>${product.hsn || '-'}</td>
-                        <td>${product.unit_price.toFixed(2)}</td>
-                        <td>${product.quantity}</td>
-                        <td>${product.discount_per_unit.toFixed(2)}</td>
-                        <td>${product.tax_rate}%</td>
-                        <td>${product.line_total.toFixed(2)}</td>
+                        <td>${product.quantity || '-'}</td>
                         <td>
                             <button type="button" class="btn btn-icon btn-sm bg-danger-subtle delete-product-temp" data-index="${index}">
                                 <i class="mdi mdi-delete fs-14 text-danger"></i>
@@ -500,13 +505,13 @@
                 $('input[name="model_no"]').val('');
                 $('input[name="sku"]').val('');
                 $('input[name="hsn"]').val('');
-                $('input[name="unit_price"]').val('');
+                // $('input[name="unit_price"]').val('');
                 $('input[name="quantity"]').val('');
-                $('input[name="discount_per_unit"]').val('');
-                $('input[name="tax_rate"]').val('');
-                $('input[name="purchase_date"]').val('');
+                // $('input[name="discount_per_unit"]').val('');
+                // $('input[name="tax_rate"]').val('');
+                // $('input[name="purchase_date"]').val('');
                 $('textarea[name="description"]').val('');
-                $('input[name="line_total"]').val('');
+                // $('input[name="line_total"]').val('');
             }
 
             // Intercept form submission
@@ -521,7 +526,7 @@
 
                 // Validate all products have valid data
                 const invalidProducts = products.filter(p =>
-                    !p.name || isNaN(p.unit_price) || isNaN(p.quantity) || isNaN(p.line_total)
+                    !p.name || isNaN(p.quantity)
                 );
 
                 if (invalidProducts.length > 0) {

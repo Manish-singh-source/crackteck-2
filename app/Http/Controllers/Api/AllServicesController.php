@@ -12,6 +12,7 @@ use App\Models\CoveredItem;
 use App\Models\EngineerDiagnosisDetail;
 use App\Models\Feedback;
 use App\Models\Lead;
+use App\Models\Product;
 use App\Models\Quotation;
 use App\Models\QuotationInvoice;
 use App\Models\ServiceRequest;
@@ -514,6 +515,29 @@ class AllServicesController extends Controller
             $diagnoses = [];
             foreach ($diagnosisDetails as $diagnosis) {
                 $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
+
+                if(isset($diagnosisList['part_id'])) {
+                    // product data 
+                    $partRequest = ServiceRequestProductRequestPart::where('request_id', $id)
+                                        ->where('product_id', $product_id)
+                                        ->where('part_id', $diagnosisList['part_id'])
+                                        ->first();
+
+                    $diagnosisList['part_status'] = $partRequest ? $partRequest->status : 'pending';
+
+                    // product data 
+                    $productData = Product::where('id', $diagnosisList['part_id'])->first();
+                    if ($productData) {
+                        $data = [
+                            'id' => $productData->id,
+                            'product_name' => $productData->product_name,
+                            'main_product_image' => $productData->main_product_image,
+                            'final_price' => $productData->final_price,
+                        ];
+                    }
+                    $diagnosisList['product_data'] = $productData ? $data : [];
+                }
+
                 $diagnoses[] = [
                     'diagnosis_id' => $diagnosis->id,
                     'assigned_engineer_id' => $diagnosis->assigned_engineer_id,

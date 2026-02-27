@@ -36,13 +36,14 @@ class QuotationResource extends JsonResource
             'products' => $this->whenLoaded('products') ? $this->products->map(function ($product) {
                 return [
                     'id' => $product->id,
-                    'name' => $product->name,
+                    'name' => $product->name ?? null,
+                    'type' => $product->type ?? null,
+                    'model_no' => $product->model_no ?? null,
                     'hsn' => $product->hsn ?? null,
-                    'sku' => $product->sku ?? null,
-                    'unit_price' => $product->unit_price ?? null,
-                    'quantity' => $product->quantity ?? null,
-                    'tax_rate' => $product->tax_rate ?? null,
-                    'line_total' => $product->line_total ?? null,
+                    'purchase_date' => $product->purchase_date ?? null,
+                    'brand' => $product->brand ?? null,
+                    'description' => $product->description ?? null,
+                    'images' => $product->images ?? null,
                 ];
             }) : [],
             'leadDetails' => $this->whenLoaded('leadDetails') ? [

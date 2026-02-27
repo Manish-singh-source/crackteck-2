@@ -85,13 +85,13 @@ class QuotationController extends Controller
             'products.*.model_no' => 'nullable|string',
             'products.*.sku' => 'nullable|string',
             'products.*.hsn' => 'nullable|string',
-            'products.*.unit_price' => 'required|numeric|min:0',
+            'products.*.unit_price' => 'nullable|numeric|min:0',
             'products.*.quantity' => 'required|integer|min:1',
             'products.*.discount_per_unit' => 'nullable|numeric|min:0',
             'products.*.tax_rate' => 'nullable|numeric|min:0',
             'products.*.purchase_date' => 'nullable|date',
             'products.*.description' => 'nullable|string',
-            'products.*.line_total' => 'required|numeric|min:0',
+            'products.*.line_total' => 'nullable|numeric|min:0',
             'amc_plan_id' => 'nullable|string',
             'plan_duration' => 'nullable|integer|min:0',
             'plan_start_date' => 'nullable|date',
@@ -473,13 +473,9 @@ class QuotationController extends Controller
             'model_no' => 'nullable|string',
             'sku' => 'nullable|string',
             'hsn' => 'nullable|string',
-            'unit_price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:1',
-            'discount_per_unit' => 'nullable|numeric|min:0',
-            'tax_rate' => 'required|numeric|min:0',
             'purchase_date' => 'nullable|date',
             'description' => 'nullable|string',
-            'line_total' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -499,13 +495,9 @@ class QuotationController extends Controller
                 'model_no' => $request->model_no,
                 'sku' => $request->sku,
                 'hsn' => $request->hsn,
-                'unit_price' => $request->unit_price,
                 'quantity' => $request->quantity,
-                'discount_per_unit' => $request->discount_per_unit,
-                'tax_rate' => $request->tax_rate,
                 'purchase_date' => $request->purchase_date,
                 'description' => $request->description,
-                'line_total' => $request->line_total,
             ]);
 
             return response()->json([
@@ -533,13 +525,8 @@ class QuotationController extends Controller
             'model_no' => 'nullable|string',
             'sku' => 'nullable|string',
             'hsn' => 'nullable|string',
-            'unit_price' => 'required|numeric|min:0',
-            'quantity' => 'required|integer|min:1',
-            'discount_per_unit' => 'nullable|numeric|min:0',
-            'tax_rate' => 'required|numeric|min:0',
             'purchase_date' => 'nullable|date',
             'description' => 'nullable|string',
-            'line_total' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -559,13 +546,9 @@ class QuotationController extends Controller
                 'model_no' => $request->model_no,
                 'sku' => $request->sku,
                 'hsn' => $request->hsn,
-                'unit_price' => $request->unit_price,
                 'quantity' => $request->quantity,
-                'discount_per_unit' => $request->discount_per_unit,
-                'tax_rate' => $request->tax_rate,
                 'purchase_date' => $request->purchase_date,
                 'description' => $request->description,
-                'line_total' => $request->line_total,
             ]);
 
             return response()->json([

@@ -252,6 +252,7 @@ Route::prefix('/demo')->group(function () {
     Route::controller(StockReportController::class)->group(function () {
         // Stock Request Page
         Route::get('/crm/stock-report', 'index')->name('stock-report.index');
+        Route::get('/warehouse/stock-report', 'warehouseIndex')->name('warehouse.stock-report.index');
         // Stock Request Create Page
         Route::get('/crm/create-stock-report', 'create')->name('stock-report.create');
         // Stock Request Edit Page

@@ -542,7 +542,7 @@ class AllServicesController extends Controller
                     'diagnosis_id' => $diagnosis->id,
                     'assigned_engineer_id' => $diagnosis->assigned_engineer_id,
                     'diagnosis_list' => $diagnosisList ?? [],
-                    'part_id' => $diagnosisList['part_id'] ?? null,
+                    'part_id' => $diagnosisList->part_id ?? null,
                     'diagnosis_notes' => $diagnosis->diagnosis_notes,
                     'completed_at' => $diagnosis->completed_at ?? null,
                 ];

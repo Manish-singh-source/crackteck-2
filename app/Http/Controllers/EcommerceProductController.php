@@ -136,6 +136,7 @@ class EcommerceProductController extends Controller
             $data['is_best_seller'] = $request->boolean('is_best_seller');
             $data['is_suggested'] = $request->boolean('is_suggested');
             $data['is_todays_deal'] = $request->boolean('is_todays_deal');
+            $data['is_returnable'] = $request->boolean('is_returnable');
 
             // 7) Create record
             $ecommerceProduct = EcommerceProduct::create($data);
@@ -256,6 +257,7 @@ class EcommerceProductController extends Controller
             $data['is_best_seller'] = $request->boolean('is_best_seller');
             $data['is_suggested'] = $request->boolean('is_suggested');
             $data['is_todays_deal'] = $request->boolean('is_todays_deal');
+            $data['is_returnable'] = $request->boolean('is_returnable');
 
             // 3) Normalize shipping_class to 0..3
             if ($request->filled('shipping_class')) {

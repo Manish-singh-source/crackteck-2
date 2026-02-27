@@ -167,7 +167,7 @@ Route::prefix('demo/warehouse')->group(function () {
 
     Route::controller(LowStockController::class)->group(function () {
         // Low Stock Page
-        Route::get('/low-stock-alert', 'index')->name('low-stock.index');
+        Route::get('/low-stock-alert', 'warehouseIndex')->name('warehouse.low-stock.index');
         // export low stock products
         Route::get('/export-low-stock', 'exportLowStock')->name('low-stock.export');
     });

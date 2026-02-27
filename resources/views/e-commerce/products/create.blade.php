@@ -628,6 +628,18 @@
                                                 ],
                                             ])
                                         </div>
+                                        <div class="mb-3">
+                                            @include('components.form.select', [
+                                                'label' => 'Is Returnable',
+                                                'name' => 'is_returnable',
+                                                'value' => '0',
+                                                'options' => [
+                                                    '' => '--Select--',
+                                                    '0' => 'No',
+                                                    '1' => 'Yes',
+                                                ],
+                                            ])
+                                        </div>
                                     </div>
                                 </div>
 

@@ -26,6 +26,7 @@ class EcommerceProduct extends Model
         'is_best_seller',
         'is_suggested',
         'is_todays_deal',
+        'is_returnable',
         'product_tags',
         'status',
         'meta_title',
@@ -43,6 +44,7 @@ class EcommerceProduct extends Model
         'is_best_seller' => 'boolean',
         'is_suggested' => 'boolean',
         'is_todays_deal' => 'boolean',
+        'is_returnable' => 'boolean',
         'shipping_charges' => 'decimal:2',
     ];
 

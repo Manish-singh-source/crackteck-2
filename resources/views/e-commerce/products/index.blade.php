@@ -147,6 +147,13 @@
                                                                                 {{ $product->is_suggested ? 'Yes' : 'No' }}
                                                                             </span>
                                                                         </div>
+                                                                        <div>
+                                                                            <span
+                                                                            class="text-{{ $product->is_returnable ? 'success' : 'muted' }}">
+                                                                            Returnable:
+                                                                            {{ $product->is_returnable ? 'Yes' : 'No' }}
+                                                                            </span>
+                                                                        </div>
                                                                     </td>
                                                                     <td>
                                                                         <span

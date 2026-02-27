@@ -542,7 +542,18 @@
                                     <input type="hidden" name="product_tags" id="product_tags_json"
                                         value='@json(old('product_tags', $product->product_tags ?? []))'>
                                 </div>
-
+                                <div class="mb-3">
+                                    @include('components.form.select', [
+                                        'label' => 'Is Returnable',
+                                        'name' => 'is_returnable',
+                                        'value' => old('is_returnable', $product->is_returnable),
+                                        'options' => [
+                                            '' => '--Select--',
+                                            '0' => 'No',
+                                            '1' => 'Yes',
+                                        ],
+                                    ])
+                                </div>
 
                             </div>
                         </div>

@@ -69,9 +69,6 @@
                                 <a class='tp-link' href="{{ route('withdraw') }}">Withdraw</a>
                             </li>
                             <li>
-                                <a class='tp-link' href="{{ route('kyc-log') }}">KYC Log</a>
-                            </li>
-                            <li>
                                 <a class='tp-link' href="{{ route('sales.index') }}">
                                     Sales Invoicing
                                 </a>
@@ -107,6 +104,9 @@
                                 <a class='tp-link' href="{{ route('low-stock-alert') }}">
                                     Low Stock Reports
                                 </a>
+                            </li>
+                            <li>
+                                <a class='tp-link' href="{{ route('kyc-log') }}">KYC Log</a>
                             </li>
                         </ul>
                     </div>

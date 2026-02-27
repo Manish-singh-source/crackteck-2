@@ -82,13 +82,13 @@
                 <li class="menu-title mt-2">Manage Stock Alerts</li>
                 
                 <li>
-                    <a class='tp-link' href="{{ route('stock-reports.index') }}">
+                    <a class='tp-link' href="{{ route('warehouse.stock-report.index') }}">
                         <i class="fas fa-chart-bar"></i>
-                        <span class="ps-1"> Stock Requests </span>
+                        <span class="ps-1"> Stock Reports </span>
                     </a>
                 </li>
                 <li>
-                    <a class='tp-link' href="{{ route('low-stock.index') }}">
+                    <a class='tp-link' href="{{ route('warehouse.low-stock.index') }}">
                         <i class="fas fa-exclamation-triangle"></i>
                         <span class="ps-1"> Low Stock Reports </span>
                     </a>

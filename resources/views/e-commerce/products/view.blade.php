@@ -653,6 +653,17 @@
                                         </p>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="fw-semibold">Is Returnable:</label>
+                                        <p class="text-muted">
+                                            <span
+                                                class="badge {{ $product->is_returnable ? 'bg-success' : 'bg-secondary' }}">
+                                                {{ $product->is_returnable ? 'Yes' : 'No' }}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

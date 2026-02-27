@@ -516,17 +516,17 @@ class AllServicesController extends Controller
             foreach ($diagnosisDetails as $diagnosis) {
                 $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
 
-                if(isset($diagnosisList['part_id'])) {
+                if(isset($diagnosisList->part_id)) {
                     // product data 
                     $partRequest = ServiceRequestProductRequestPart::where('request_id', $id)
                                         ->where('product_id', $product_id)
-                                        ->where('part_id', $diagnosisList['part_id'])
+                                        ->where('part_id', $diagnosisList->part_id)
                                         ->first();
 
                     $diagnosisList['part_status'] = $partRequest ? $partRequest->status : 'pending';
 
                     // product data 
-                    $productData = Product::where('id', $diagnosisList['part_id'])->first();
+                    $productData = Product::where('id', $diagnosisList->part_id)->first();
                     if ($productData) {
                         $data = [
                             'id' => $productData->id,
@@ -543,7 +543,7 @@ class AllServicesController extends Controller
                     'assigned_engineer_id' => $diagnosis->assigned_engineer_id,
                     'diagnosis_list' => $diagnosisList ?? [],
                     'diagnosis_notes' => $diagnosis->diagnosis_notes,
-                    'completed_at' => $diagnosis->completed_at,
+                    'completed_at' => $diagnosis->completed_at ?? null,
                 ];
             }
 

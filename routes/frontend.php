@@ -183,6 +183,12 @@ Route::prefix('beta')->group(function () {
 
         // Order details page (requires authentication)
         Route::get('/order-details/{orderNumber}', 'orderDetails')->name('order-details')->middleware('auth:customer_web');
+
+        // Cancel order (requires authentication)
+        Route::post('/order/cancel', 'cancelOrder')->name('order.cancel')->middleware('auth:customer_web');
+
+        // Return order (requires authentication)
+        Route::post('/order/return', 'returnOrder')->name('order.return')->middleware('auth:customer_web');
     });
 
     // Product Detail

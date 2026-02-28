@@ -118,6 +118,31 @@
                                                 <span>{{ $order->expected_delivery_date ?? 'N/A' }}</span>
                                             </li>
                                         @endif
+                                        <!-- Return Delivery Status Display - Show for all return order statuses -->
+                                        @if ($returnOrder)
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold text-danger">Return Status:</span>
+                                                @php
+                                                    $returnStatusBadgeColor = match ($returnOrder->status) {
+                                                        'pending' => 'warning',
+                                                        'assigned' => 'info',
+                                                        'accepted' => 'primary',
+                                                        'picked' => 'primary',
+                                                        'received' => 'success',
+                                                        default => 'secondary',
+                                                    };
+                                                    $returnStatusText = match ($returnOrder->status) {
+                                                        'pending' => 'Return Pending',
+                                                        'assigned' => 'Return Assigned',
+                                                        'accepted' => 'Return Accepted',
+                                                        'picked' => 'Return Picked',
+                                                        'received' => 'Received in Warehouse',
+                                                        default => 'Unknown',
+                                                    };
+                                                @endphp
+                                                <span class="badge bg-{{ $returnStatusBadgeColor }}">{{ $returnStatusText }}</span>
+                                            </li>
+                                        @endif
                                     </ul>
                                 </div>
                                 <div class="col-lg-6">
@@ -171,6 +196,38 @@
                                             <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                                 <span class="fw-semibold">Expected Delivery:</span>
                                                 <span>{{ $order->expected_delivery_date->format('d M Y') }}</span>
+                                            </li>
+                                        @endif
+
+                                        <!-- Return Person Timeline -->
+                                        @if ($returnOrder)
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap mt-3 pt-3 border-top">
+                                                <span class="fw-semibold text-primary">Return Person Type:</span>
+                                                <span>Delivery Man</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Return Person:</span>
+                                                <span>{{ $returnOrder->deliveryMan ? $returnOrder->deliveryMan->first_name . ' ' . $returnOrder->deliveryMan->last_name : 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Return Assigned At:</span>
+                                                <span>{{ $returnOrder->return_assigned_at ? $returnOrder->return_assigned_at->format('d M Y h:i A') : 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Return Accepted At:</span>
+                                                <span>{{ $returnOrder->return_accepted_at ? $returnOrder->return_accepted_at->format('d M Y h:i A') : 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Return Picked At:</span>
+                                                <span>{{ $returnOrder->return_picked_at ? $returnOrder->return_picked_at->format('d M Y h:i A') : 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Return Received At:</span>
+                                                <span>{{ $returnOrder->return_delivered_at ? $returnOrder->return_delivered_at->format('d M Y h:i A') : 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Return Completed At:</span>
+                                                <span>{{ $returnOrder->return_completed_at ? $returnOrder->return_completed_at->format('d M Y h:i A') : 'N/A' }}</span>
                                             </li>
                                         @endif
 
@@ -434,6 +491,186 @@
                             </ul>
                         </div>
                     </div>
+
+                    <!-- Product Picked - In Transit to Warehouse Section -->
+                    @if ($returnOrder && $returnOrder->status === 'picked')
+                        <div class="card mt-3 border-primary">
+                            <div class="card-header bg-primary text-white border-bottom-dashed">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-truck me-2"></i>
+                                    <h5 class="card-title mb-0">Product Picked - In Transit to Warehouse</h5>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Return Order #{{ $returnOrder->return_order_number }}</strong> has been picked up from the customer.
+                                    <br>
+                                    <small>Picked at: {{ $returnOrder->return_picked_at ? $returnOrder->return_picked_at->format('d M Y h:i A') : 'N/A' }}</small>
+                                </div>
+                                
+                                <!-- Warehouse Receive Form -->
+                                <form action="{{ route('order.return.receive', $returnOrder->id) }}" method="POST" id="receive-return-form">
+                                    @csrf
+                                    @method('PUT')
+                                    
+                                    <div class="d-flex align-items-end gap-2">
+                                        <div class="flex-grow-1">
+                                            <label for="warehouse_status" class="form-label fw-semibold">Warehouse Action</label>
+                                            <select class="form-select" id="warehouse_status" name="warehouse_status" required>
+                                                <option value="" selected disabled>-- Select Action --</option>
+                                                <option value="received">Mark as Received in Warehouse</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-warehouse me-1"></i> Update Status
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Item Received in Warehouse Section -->
+                    @if ($returnOrder && $returnOrder->status === 'received')
+                        <div class="card mt-3 border-success">
+                            <div class="card-header bg-success text-white border-bottom-dashed">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-warehouse me-2"></i>
+                                    <h5 class="card-title mb-0">Item Received in Warehouse</h5>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-success mb-3">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <strong>Return Order #{{ $returnOrder->return_order_number }}</strong> has been received in the warehouse.
+                                    <br>
+                                    <small>Received at: {{ $returnOrder->return_delivered_at ? $returnOrder->return_delivered_at->format('d M Y h:i A') : 'N/A' }}</small>
+                                </div>
+                                
+                                <!-- Returned Product Details -->
+                                <h6 class="fw-semibold mb-3">Returned Product Details:</h6>
+                                @if ($order->orderItems && $order->orderItems->count() > 0)
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th>Quantity</th>
+                                                    <th>Unit Price</th>
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($order->orderItems as $item)
+                                                    <tr>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                @if ($item->product->main_product_image)
+                                                                    <img src="{{ asset($item->product->main_product_image) }}" 
+                                                                        alt="Product" class="rounded me-2" width="40" height="40">
+                                                                @else
+                                                                    <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center"
+                                                                        style="width: 40px; height: 40px;">
+                                                                        <i class="fas fa-image text-muted"></i>
+                                                                    </div>
+                                                                @endif
+                                                                <div>
+                                                                    <div class="fw-medium">{{ $item->product->product_name }}</div>
+                                                                    <small class="text-muted">{{ $item->product->model_no ?? 'N/A' }}</small>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>{{ $item->quantity }}</td>
+                                                        <td>₹{{ number_format($item->unit_price, 2) }}</td>
+                                                        <td>₹{{ number_format($item->line_total, 2) }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @else
+                                    <p class="text-muted">No product details available.</p>
+                                @endif
+
+                                <div class="mt-3 pt-3 border-top">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {{-- <p class="mb-1"><strong>Return Reason:</strong> {{ $returnOrder->return_reason ?? 'N/A' }}</p> --}}
+                                            @if ($returnOrder->refund_status !== 'completed')
+                                                <!-- Refund Button with Confirmation -->
+                                                <form action="{{ route('order.return.complete-refund', $returnOrder->id) }}" method="POST" id="complete-refund-form-{{ $returnOrder->id }}">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="button" class="btn btn-success btn-sm" onclick="confirmRefund({{ $returnOrder->id }}, {{ $returnOrder->refund_amount ?? 0 }})">
+                                                        <i class="fas fa-rupee-sign me-1"></i> Refund ₹{{ number_format($returnOrder->refund_amount ?? 0, 2) }}
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                        <div class="col-md-6 text-md-end">
+                                            <p class="mb-0"><strong>Refund Status:</strong> 
+                                                @php
+                                                    $refundStatusBadgeColor = match ($returnOrder->refund_status) {
+                                                        'pending' => 'warning',
+                                                        'processing' => 'info',
+                                                        'completed' => 'success',
+                                                        'failed' => 'danger',
+                                                        default => 'secondary',
+                                                    };
+                                                @endphp
+                                                <span class="badge bg-{{ $refundStatusBadgeColor }}">{{ ucfirst($returnOrder->refund_status ?? 'Pending') }}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Assign Return Delivery Man Card - Show only when order is delivered and return status is pending/assigned -->
+                    @if ($order->status === 'delivered' && $returnOrder && in_array($returnOrder->status, ['pending', 'assigned']))
+                        <div class="card mt-3">
+                            <div class="card-header border-bottom-dashed">
+                                <div class="d-flex">
+                                    <h5 class="card-title flex-grow-1 mb-0">
+                                        <i class="fas fa-truck-loading me-2"></i>Assign Return Delivery Man
+                                    </h5>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <form action="{{ route('order.assign-person', $order->id) }}" method="POST"
+                                    id="assign-return-delivery-man-form">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <input type="hidden" name="assigned_person_type" value="delivery_man">
+
+                                    <div class="mb-3">
+                                        <label for="return_delivery_man_id" class="form-label">Select Delivery Man for Return</label>
+                                        <select class="form-select @error('delivery_man_id') is-invalid @enderror"
+                                            id="return_delivery_man_id" name="delivery_man_id">
+                                            <option value="" selected disabled>-- Select Delivery Man --</option>
+                                            @foreach ($deliveryMen as $deliveryMan)
+                                                <option value="{{ $deliveryMan->id }}"
+                                                    @if ($returnOrder && $returnOrder->delivery_man_id == $deliveryMan->id) selected @endif>
+                                                    {{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('delivery_man_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <button type="submit" class="btn btn-warning w-100 mt-3">
+                                        <i class="mdi mdi-check-circle me-2"></i>Assign Return Delivery Man
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Assign Delivery Man Card - Show only when status is admin_approved -->
                     @if ($order->status === 'admin_approved')
@@ -753,6 +990,65 @@
                     }
                 });
             });
+
+            // Handle assign return delivery man form submission
+            $('#assign-return-delivery-man-form').on('submit', function(e) {
+                e.preventDefault();
+
+                const form = $(this);
+                const button = form.find('button[type="submit"]');
+                const originalText = button.html();
+
+                button.prop('disabled', true).html(
+                    '<i class="fas fa-spinner fa-spin me-1"></i> Assigning...');
+
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.success(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+                        }
+                    },
+                    error: function(xhr) {
+                        const message = xhr.responseJSON?.message ||
+                            'Failed to assign return delivery man';
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error(message);
+                        } else {
+                            alert(message);
+                        }
+                    },
+                    complete: function() {
+                        button.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
         });
+    </script>
+
+    <script>
+        // Function to confirm refund
+        function confirmRefund(returnOrderId, refundAmount) {
+            const formattedAmount = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(refundAmount);
+            
+            if (confirm('Are you sure you want to refund ' + formattedAmount + ' to the customer?')) {
+                document.getElementById('complete-refund-form-' + returnOrderId).submit();
+            }
+        }
     </script>
 @endsection

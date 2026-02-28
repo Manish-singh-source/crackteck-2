@@ -118,6 +118,13 @@
                                                 <span>{{ $order->expected_delivery_date ?? 'N/A' }}</span>
                                             </li>
                                         @endif
+                                        <!-- Return Delivery Status Display -->
+                                        @if ($order->status === 'delivered' && $returnOrder && $returnOrder->status === 'pending')
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold text-danger">Return Status:</span>
+                                                <span class="badge bg-warning">Return Pending</span>
+                                            </li>
+                                        @endif
                                     </ul>
                                 </div>
                                 <div class="col-lg-6">
@@ -171,6 +178,34 @@
                                             <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                                 <span class="fw-semibold">Expected Delivery:</span>
                                                 <span>{{ $order->expected_delivery_date->format('d M Y') }}</span>
+                                            </li>
+                                        @endif
+
+                                        <!-- Return Person Timeline -->
+                                        @if ($returnOrder)
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap mt-3 pt-3 border-top">
+                                                <span class="fw-semibold text-primary">Return Person Type:</span>
+                                                <span>Delivery Man</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Return Person:</span>
+                                                <span>{{ $returnOrder->deliveryMan ? $returnOrder->deliveryMan->first_name . ' ' . $returnOrder->deliveryMan->last_name : 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Return Assigned At:</span>
+                                                <span>{{ $returnOrder->return_assigned_at ? $returnOrder->return_assigned_at->format('d M Y h:i A') : 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Return Accepted At:</span>
+                                                <span>{{ $returnOrder->return_accepted_at ? $returnOrder->return_accepted_at->format('d M Y h:i A') : 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Return Picked At:</span>
+                                                <span>{{ $returnOrder->return_picked_at ? $returnOrder->return_picked_at->format('d M Y h:i A') : 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="fw-semibold">Return Delivered At:</span>
+                                                <span>{{ $returnOrder->return_delivered_at ? $returnOrder->return_delivered_at->format('d M Y h:i A') : 'N/A' }}</span>
                                             </li>
                                         @endif
 
@@ -434,6 +469,50 @@
                             </ul>
                         </div>
                     </div>
+
+                    <!-- Assign Return Delivery Man Card - Show only when order is delivered and return is pending -->
+                    @if ($order->status === 'delivered' && $returnOrder && $returnOrder->status === 'pending')
+                        <div class="card mt-3">
+                            <div class="card-header border-bottom-dashed">
+                                <div class="d-flex">
+                                    <h5 class="card-title flex-grow-1 mb-0">
+                                        <i class="fas fa-truck-loading me-2"></i>Assign Return Delivery Man
+                                    </h5>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <form action="{{ route('order.assign-person', $order->id) }}" method="POST"
+                                    id="assign-return-delivery-man-form">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <input type="hidden" name="assigned_person_type" value="delivery_man">
+
+                                    <div class="mb-3">
+                                        <label for="return_delivery_man_id" class="form-label">Select Delivery Man for Return</label>
+                                        <select class="form-select @error('delivery_man_id') is-invalid @enderror"
+                                            id="return_delivery_man_id" name="delivery_man_id">
+                                            <option value="" selected disabled>-- Select Delivery Man --</option>
+                                            @foreach ($deliveryMen as $deliveryMan)
+                                                <option value="{{ $deliveryMan->id }}"
+                                                    @if ($returnOrder && $returnOrder->delivery_man_id == $deliveryMan->id) selected @endif>
+                                                    {{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('delivery_man_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <button type="submit" class="btn btn-warning w-100 mt-3">
+                                        <i class="mdi mdi-check-circle me-2"></i>Assign Return Delivery Man
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Assign Delivery Man Card - Show only when status is admin_approved -->
                     @if ($order->status === 'admin_approved')
@@ -742,6 +821,54 @@
                     error: function(xhr) {
                         const message = xhr.responseJSON?.message ||
                             'Failed to assign delivery man';
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error(message);
+                        } else {
+                            alert(message);
+                        }
+                    },
+                    complete: function() {
+                        button.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+
+            // Handle assign return delivery man form submission
+            $('#assign-return-delivery-man-form').on('submit', function(e) {
+                e.preventDefault();
+
+                const form = $(this);
+                const button = form.find('button[type="submit"]');
+                const originalText = button.html();
+
+                button.prop('disabled', true).html(
+                    '<i class="fas fa-spinner fa-spin me-1"></i> Assigning...');
+
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.success(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+                        }
+                    },
+                    error: function(xhr) {
+                        const message = xhr.responseJSON?.message ||
+                            'Failed to assign return delivery man';
                         if (typeof toastr !== 'undefined') {
                             toastr.error(message);
                         } else {

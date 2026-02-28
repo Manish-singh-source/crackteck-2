@@ -332,6 +332,22 @@
                                                     in stock</span>
                                             </li>
                                         @endif
+
+                                        @if ($product->is_returnable)
+                                            <li>
+                                                <p class="body-md-2 fw-semibold">Return</p>
+                                                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                                                     7 Day Return
+                                                </span>
+                                            </li>
+                                        @else
+                                            <li>
+                                                <p class="body-md-2 fw-semibold">Return</p>
+                                                <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
+                                                     Non-Returnable
+                                                </span>
+                                            </li>
+                                        @endif
                                     </ul>
 
                                     <div class="">

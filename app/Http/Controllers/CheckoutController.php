@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderPayment;
 use App\Models\Product;
+use App\Models\ReturnOrder;
 use App\Models\UserAddress;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
@@ -369,6 +370,19 @@ class CheckoutController extends Controller
         // Calculate total items
         $totalItems = $checkoutData['items']->sum('quantity');
 
+        // Check if any product in the order is returnable
+        $isReturnable = false;
+        $returnDays = 0;
+        
+        foreach ($checkoutData['items'] as $item) {
+            $ecommerceProduct = $item->ecommerceProduct;
+            if ($ecommerceProduct && $ecommerceProduct->is_returnable) {
+                $isReturnable = true;
+                $returnDays = 7; // 7 days return policy
+                break; // If any product is returnable, mark the order as returnable
+            }
+        }
+
         // Check if previous_address is available, if not then save the new shipping address
         $shippingAddressId = $validated['previous_address'] ?? null;
         
@@ -424,8 +438,8 @@ class CheckoutController extends Controller
             'source_platform' => 'website',
             'tracking_number' => null,
             'tracking_url' => null,
-            'is_returnable' => false,
-            'return_days' => 0,
+            'is_returnable' => $isReturnable,
+            'return_days' => $returnDays,
             'return_status' => null,
             'refund_amount' => 0,
             'refund_status' => null,
@@ -821,5 +835,173 @@ class CheckoutController extends Controller
             ->paginate(10);
 
         return view('frontend.my-account-orders', compact('orders'));
+    }
+
+    /**
+     * Cancel an order.
+     */
+    public function cancelOrder(Request $request)
+    {
+        try {
+            if (! Auth::guard('customer_web')->check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please login to cancel order.'
+                ], 401);
+            }
+
+            $request->validate([
+                'order_number' => 'required|string|exists:orders,order_number'
+            ]);
+
+            $order = Order::where('order_number', $request->order_number)
+                ->where('customer_id', Auth::id())
+                ->first();
+
+            if (! $order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order not found.'
+                ], 404);
+            }
+
+            // Debug: log the current status
+            Log::info('Order status: ' . $order->status . ' - Customer ID: ' . Auth::id());
+
+            // Check if order can be cancelled
+            $cancellableStatuses = [
+                Order::STATUS_PENDING,
+                Order::STATUS_ADMIN_APPROVED,
+                Order::STATUS_ASSIGNED_DELIVERY_MAN,
+                Order::STATUS_ORDER_ACCEPTED,
+                Order::STATUS_PRODUCT_TAKEN,
+            ];
+
+            if (! in_array($order->status, $cancellableStatuses)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This order cannot be cancelled. Current status: ' . $order->status
+                ], 400);
+            }
+
+            // Update order status to cancelled
+            $order->status = Order::STATUS_CANCELLED;
+            $order->status = 'cancelled';
+            $order->cancelled_at = now();
+            $order->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order cancelled successfully.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error cancelling order: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Initiate return for an order.
+     */
+    public function returnOrder(Request $request)
+    {
+        if (! Auth::guard('customer_web')->check()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please login to return order.'
+            ], 401);
+        }
+
+        $request->validate([
+            'order_number' => 'required|string|exists:orders,order_number'
+        ]);
+
+        $order = Order::where('order_number', $request->order_number)
+            ->where('customer_id', Auth::id())
+            ->first();
+
+        if (! $order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found.'
+            ], 404);
+        }
+
+        // Check if order status is delivered
+        if ($order->status !== Order::STATUS_DELIVERED) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only delivered orders can be returned.'
+            ], 400);
+        }
+
+        // Check if order is returnable
+        if (! $order->is_returnable) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This order is not returnable.'
+            ], 400);
+        }
+
+        // Check if return days have passed
+        if ($order->delivered_at) {
+            $returnDeadline = $order->delivered_at->addDays($order->return_days ?? 30);
+            if (now()->greaterThan($returnDeadline)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Return period has expired. You can no longer return this order.'
+                ], 400);
+            }
+        }
+
+        // Check if a return order already exists
+        $existingReturn = ReturnOrder::where('order_number', $order->order_number)
+            ->where('customer_id', Auth::id())
+            ->first();
+
+        if ($existingReturn) {
+            return response()->json([
+                'success' => false,
+                'message' => 'A return request already exists for this order.'
+            ], 400);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Create return order
+            $returnOrder = ReturnOrder::create([
+                'return_order_number' => ReturnOrder::generateReturnOrderNumber(),
+                'order_number' => $order->order_number,
+                'customer_id' => $order->customer_id,
+                'status' => ReturnOrder::STATUS_PENDING,
+            ]);
+
+            // Update order return status
+            $order->return_status = 'pending';
+            $order->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Return request initiated successfully.',
+                'data' => [
+                    'return_order_number' => $returnOrder->return_order_number
+                ]
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error initiating return: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to initiate return. Please try again.'
+            ], 500);
+        }
     }
 }

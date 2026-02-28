@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderPayment;
 use App\Models\Product;
+use App\Models\ReturnOrder;
 use App\Models\Staff;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -386,11 +387,14 @@ class OrderController extends Controller
         $deliveryMen = Staff::where('staff_role', 'delivery_man')->where('status', 'active')->get();
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
         $assignedPerson = Staff::find($order->assigned_person_id);
-        // dd($assignedPerson);
+        
+        // Get return order if exists for this order
+        $returnOrder = ReturnOrder::where('order_number', $order->order_number)->first();
+        
         // Calculate totals
         $totals = $this->calculateOrderTotals($order);
 
-        return view('e-commerce.order.view', compact('order', 'totals', 'deliveryMen', 'engineers', 'assignedPerson'));
+        return view('e-commerce.order.view', compact('order', 'totals', 'deliveryMen', 'engineers', 'assignedPerson', 'returnOrder'));
     }
 
     public function assignPerson(Request $request, $id)
@@ -421,6 +425,17 @@ class OrderController extends Controller
                 if ($order->status === 'admin_approved') {
                     $order->status = 'assigned_delivery_man';
                     $order->assigned_at = now();
+                }
+                
+                // Also update return_orders table if return exists for this order
+                $returnOrder = ReturnOrder::where('order_number', $order->order_number)->first();
+                if ($returnOrder) {
+                    $returnOrder->delivery_man_id = $request->delivery_man_id;
+                    $returnOrder->return_assigned_at = now();
+                    if ($returnOrder->status === 'pending') {
+                        $returnOrder->status = 'assigned';
+                    }
+                    $returnOrder->save();
                 }
             }
             $order->save();

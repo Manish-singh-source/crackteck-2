@@ -515,19 +515,19 @@ class AllServicesController extends Controller
             $diagnoses = [];
             foreach ($diagnosisDetails as $diagnosis) {
                 $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
-
-                foreach ($diagnosisList as $diagnosisListData) {
-                    if (isset($diagnosisListData->part_id)) {
+                $dummydata = [];
+                foreach ($diagnosisList as $key => $diagnosisListData) {
+                    if (isset($diagnosisListData['part_id'])) {
                         // product data 
                         $partRequest = ServiceRequestProductRequestPart::where('request_id', $id)
                             ->where('product_id', $product_id)
-                            ->where('part_id', $diagnosisListData->part_id)
+                            ->where('part_id', $diagnosisListData['part_id'])
                             ->first();
 
-                        $diagnosisList['part_status'] = $partRequest ? $partRequest->status : 'pending';
+                        $diagnosisList[$key]['part_status'] = $partRequest ? $partRequest->status : 'pending';
 
                         // product data 
-                        $productData = Product::where('id', $diagnosisListData->part_id)->first();
+                        $productData = Product::where('id', $diagnosisListData['part_id'])->first();
                         if ($productData) {
                             $data = [
                                 'id' => $productData->id,
@@ -536,35 +536,35 @@ class AllServicesController extends Controller
                                 'final_price' => $productData->final_price,
                             ];
                         }
-                        $diagnosisList['product_data'] = $productData ? $data : [];
+                        $diagnosisList[$key]['product_data'] = $productData ? $data : [];
                     }
                 }
 
                 $diagnoses[] = [
                     'diagnosis_id' => $diagnosis->id,
                     'assigned_engineer_id' => $diagnosis->assigned_engineer_id,
-                    'diagnosis_list' => $diagnosisList ?? [], 
+                    'diagnosis_list' => $diagnosisList ?? [],
                     'diagnosis_notes' => $diagnosis->diagnosis_notes,
                     'completed_at' => $diagnosis->completed_at ?? null,
                 ];
             }
 
             // Get request parts for this product
-            $requestParts = ServiceRequestProductRequestPart::where('product_id', $product_id)
-                ->where('request_id', $id)
-                ->get();
+            // $requestParts = ServiceRequestProductRequestPart::where('product_id', $product_id)
+            //     ->where('request_id', $id)
+            //     ->get();
 
-            $parts = [];
-            foreach ($requestParts as $part) {
-                $parts[] = [
-                    'id' => $part->id,
-                    'part_id' => $part->part_id,
-                    'requested_quantity' => $part->requested_quantity,
-                    'request_type' => $part->request_type,
-                    'status' => $part->status,
-                    'requires_customer_action' => in_array($part->status, ['admin_approved', 'warehouse_approved']),
-                ];
-            }
+            // $parts = [];
+            // foreach ($requestParts as $part) {
+            //     $parts[] = [
+            //         'id' => $part->id,
+            //         'part_id' => $part->part_id,
+            //         'requested_quantity' => $part->requested_quantity,
+            //         'request_type' => $part->request_type,
+            //         'status' => $part->status,
+            //         'requires_customer_action' => in_array($part->status, ['admin_approved', 'warehouse_approved']),
+            //     ];
+            // }
 
             return response()->json([
                 'product' => [
@@ -573,7 +573,7 @@ class AllServicesController extends Controller
                     'status' => $serviceRequestProduct->status,
                 ],
                 'diagnoses' => $diagnoses,
-                'request_parts' => $parts,
+                // 'request_parts' => $parts,
             ], 200);
         }
     }

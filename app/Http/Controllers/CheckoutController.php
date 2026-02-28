@@ -851,7 +851,8 @@ class CheckoutController extends Controller
             }
 
             $request->validate([
-                'order_number' => 'required|string|exists:orders,order_number'
+                'order_number' => 'required|string|exists:orders,order_number',
+                'customer_notes' => 'nullable|string|max:1000'
             ]);
 
             $order = Order::where('order_number', $request->order_number)
@@ -888,6 +889,7 @@ class CheckoutController extends Controller
             $order->status = Order::STATUS_CANCELLED;
             $order->status = 'cancelled';
             $order->cancelled_at = now();
+            $order->customer_notes = $request->customer_notes ?? null;
             $order->save();
 
             return response()->json([
@@ -917,7 +919,8 @@ class CheckoutController extends Controller
         }
 
         $request->validate([
-            'order_number' => 'required|string|exists:orders,order_number'
+            'order_number' => 'required|string|exists:orders,order_number',
+            'customer_notes' => 'nullable|string|max:1000'
         ]);
 
         $order = Order::where('order_number', $request->order_number)
@@ -985,6 +988,7 @@ class CheckoutController extends Controller
 
             // Update order return status
             $order->return_status = 'pending';
+            $order->customer_notes = $request->customer_notes ?? null;
             $order->save();
 
             DB::commit();

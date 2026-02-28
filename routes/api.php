@@ -75,6 +75,10 @@ Route::prefix('v1')->group(function () {
             Route::get('/order', 'listOrders'); // Sales Person and Customer
             Route::get('/order/{id}', 'order'); // Sales Person and Customer
 
+            // Cancel and Return Order APIs
+            Route::post('/cancel-order/{order_id}', 'cancelOrder');
+            Route::post('/return-order/{order_id}', 'returnOrder');
+
             // Engineer APIs
             Route::get('/all-product', 'allListProducts'); // Engineer
             Route::get('/all-product/{id}', 'allProduct'); // Engineer

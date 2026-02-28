@@ -53,6 +53,7 @@ class ReturnOrder extends Model
         'otp_verified_at',
         'return_completed_at',
         'return_reason',
+        'customer_notes',
         'refund_amount',
         'refund_status',
     ];

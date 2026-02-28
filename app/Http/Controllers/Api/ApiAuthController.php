@@ -685,31 +685,44 @@ class ApiAuthController extends Controller
     //     return response()->json(['success' => true, 'message' => 'Token updated']);
     // }
 
-    public function updateToken(Request $request)
+    public function refreshToken(Request $request)
     {
-        $request->validate([
-            'token' => 'required|string'
-        ]);
+        // attempt to refresh with each guard until one works
+        $guards = ['staff_api', 'customer_api'];
+        $newToken = null;
+        $usedGuard = null;
 
-        $user = auth()->guard('staff_api')->user();
-
-        if (!$user) {
-            $user = auth()->guard('customer_api')->user();
+        foreach ($guards as $g) {
+            try {
+                // refresh uses the token from the Authorization header; if it's invalid or expired the
+                // underlying JWT library will throw an exception which we catch and try the next guard.
+                $newToken = auth()->guard($g)->refresh();
+                $usedGuard = $g;
+                break;
+            } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+                // token is expired but within refresh_ttl, still returns new token; unpredictably we may
+                // not reach here because refresh itself will succeed, so ignore.
+            } catch (\Exception $e) {
+                // failed for this guard, try next one
+                continue;
+            }
         }
 
-        if (!$user) {
+        if (! $newToken) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not authenticated'
+                'message' => 'Unable to refresh token. Make sure a valid token is provided.'
             ], 401);
         }
 
-        $user->device_token = $request->token;
-        $user->save();
+        // retrieve user from the guard using the new token, just in case the previous user lookup fails
+        $user = auth()->guard($usedGuard)->setToken($newToken)->user();
 
         return response()->json([
             'success' => true,
-            'message' => 'Token updated successfully'
+            'message' => 'Token refreshed successfully',
+            'token' => $newToken,
+            'user' => $user,
         ]);
     }
 

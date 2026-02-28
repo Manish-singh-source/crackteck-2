@@ -9,14 +9,19 @@ class QuotationResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        
+        $quotation = $this->whenLoaded('quotation') ? $this->quotation : null;
+        $products = $this->whenLoaded('quotation.products') ? $quotation->products : null;
+        $customer = $this->whenLoaded('customer') ? $this->customer : null;
+        
         $status = 'pending';
-        if ($this->status == 'sent') {
+        if ($quotation->status == 'sent') {
             $status = 'pending';
-        } elseif ($this->status == 'accepted') {
+        } elseif ($quotation->status == 'accepted') {
             $status = 'accepted';
-        } elseif ($this->status == 'rejected') {
+        } elseif ($quotation->status == 'rejected') {
             $status = 'rejected';
-        } elseif ($this->status == 'converted') {
+        } elseif ($quotation->status == 'converted') {
             $status = 'converted';
         } else {
             $status = 'pending';
@@ -25,15 +30,20 @@ class QuotationResource extends JsonResource
         return [
             'id' => $this->id,
             'quote_id' => $this->id ?? null,
-            'lead_id' => $this->lead_id ?? null,
+            'lead_id' => $this->id ?? null,
+            
             'lead_number' => $this->lead_number ?? null,
-            'quote_number' => $this->quote_number ?? null,
-            'quote_date' => $this->quote_date ?? null,
-            'expiry_date' => $this->expiry_date ?? null,
-            'total_items' => $this->total_items ?? null,
-            'total_amount' => $this->total_amount ?? null,
+            'customer_name' => $customer->first_name ?? null,
+            'phone' => $customer->phone ?? null,
+            'email' => $customer->email ?? null,
+
+            'quote_number' => $quotation->quote_number ?? null,
+            'quote_date' => $quotation->quote_date ?? null,
+            'expiry_date' => $quotation->expiry_date ?? null,
+            'total_items' => $quotation->products_count ?? null,
+            'total_amount' => $quotation->total_amount ?? null,
             'status' => $status,
-            'products' => $this->whenLoaded('products') ? $this->products->map(function ($product) {
+            'products' => $products ? $products?->map(function ($product) {
                 return [
                     'id' => $product->id,
                     'name' => $product->name ?? null,
@@ -46,13 +56,6 @@ class QuotationResource extends JsonResource
                     'images' => $product->images ?? null,
                 ];
             }) : [],
-            'leadDetails' => $this->whenLoaded('leadDetails') ? [
-                'id' => $this->leadDetails->id,
-                'lead_number' => $this->leadDetails->lead_number ?? null,
-                'customer_name' => $this->leadDetails->customer ? ($this->leadDetails->customer->first_name . ' ' . $this->leadDetails->customer->last_name) : null,
-                'phone' => $this->leadDetails->customer->phone ?? null,
-                'email' => $this->leadDetails->customer->email ?? null,
-            ] : null,
         ];
     }
 }

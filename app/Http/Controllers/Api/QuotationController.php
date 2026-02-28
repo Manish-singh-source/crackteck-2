@@ -26,7 +26,7 @@ class QuotationController extends Controller
 
         $validated = $validated->validated();
 
-        $quotations = Quotation::with('leadDetails','products')->where('staff_id', $validated['user_id'])->get();
+        $quotations = Quotation::with('leadDetails', 'products')->where('staff_id', $validated['user_id'])->get();
 
         if ($quotations->isEmpty()) {
             return response()->json(['message' => 'No quotations found'], 404);
@@ -46,12 +46,15 @@ class QuotationController extends Controller
             'expiry_date' => 'required',
             'products' => 'array',
             'products.*.name' => 'required|string',
+            'products.*.type' => 'nullable|string',
+            'products.*.model_no' => 'nullable|string',
             'products.*.hsn' => 'nullable|string',
             'products.*.sku' => 'nullable|string',
-            'products.*.unit_price' => 'required',
-            'products.*.quantity' => 'required|integer',
-            'products.*.tax_rate' => 'required',
-            'products.*.line_total' => 'required',
+            'products.*.purchase_date' => 'nullable|string',
+            'products.*.brand' => 'nullable|string',
+            'products.*.description' => 'nullable|string',
+            'products.*.images' => 'nullable|mimes:jpeg,png,jpg,gif|max:2048',
+            'products.*.quantity' => 'nullable|integer',
         ]));
 
         if ($validated->fails()) {
@@ -69,24 +72,39 @@ class QuotationController extends Controller
         $validated['tax_amount'] = 0;
         $validated['discount_amount'] = 0;
         $validated['total_amount'] = 0;
-        
+
         $Quotation = Quotation::create($validated);
 
         if ($request->has('products')) {
             $subtotal = 0;
-            
+
             foreach ($request->products as $productData) {
+                // image store 
+                if ($productData['images']) {
+                    $file = $productData['images'];
+                    $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $file->move(
+                        public_path('uploads/crm/quick-service/products'),
+                        $filename
+                    );
+                    $path = 'uploads/crm/quick-service/products/' . $filename;
+                }
+
                 $quotationProduct = new QuotationProduct;
                 $quotationProduct->quotation_id = $Quotation->id;
                 $quotationProduct->name = $productData['name'];
+                $quotationProduct->type = $productData['type'];
+                $quotationProduct->model_no = $productData['model_no'];
                 $quotationProduct->hsn = $productData['hsn'];
                 $quotationProduct->sku = $productData['sku'];
-                $quotationProduct->unit_price = $productData['unit_price'];
+                $quotationProduct->purchase_date = $productData['purchase_date'];
+                $quotationProduct->brand = $productData['brand'];
+                $quotationProduct->description = $productData['description'];
+                $quotationProduct->images = $path;
                 $quotationProduct->quantity = $productData['quantity'];
-                $quotationProduct->tax_rate = $productData['tax_rate'];
-                $quotationProduct->line_total = $productData['line_total'];
                 $quotationProduct->save();
-                $subtotal += $productData['line_total'];
+
+                $subtotal += 0;
             }
         }
         $Quotation->subtotal = $subtotal;

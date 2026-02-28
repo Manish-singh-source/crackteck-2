@@ -206,34 +206,26 @@
                                                 <th>Product Name</th>
                                                 <th>HSN Code</th>
                                                 <th>SKU</th>
-                                                <th>Price</th>
                                                 <th>Quantity</th>
-                                                <th>Tax (%)</th>
-                                                <th>Total</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($quotation->products as $product)
                                                 <tr>
-                                                    <td>{{ $product->product_name }}</td>
-                                                    <td>{{ $product->hsn_code }}</td>
+                                                    <td>{{ $product->name }}</td>
+                                                    <td>{{ $product->hsn }}</td>
                                                     <td>{{ $product->sku }}</td>
-                                                    <td>{{ $product->unit_price }}</td>
                                                     <td>{{ $product->quantity }}</td>
-                                                    <td>{{ $product->tax_rate }}</td>
-                                                    <td>{{ $product->line_total }}</td>
                                                     <td>
                                                         <button type="button"
                                                             class="btn btn-icon btn-sm bg-warning-subtle editProductBtn"
                                                             data-product-id="{{ $product->id }}"
-                                                            data-product-name="{{ $product->product_name }}"
-                                                            data-product-hsn-code="{{ $product->hsn_code }}"
+                                                            data-product-name="{{ $product->name }}"
+                                                            data-product-hsn="{{ $product->hsn }}"
                                                             data-product-sku="{{ $product->sku }}"
-                                                            data-product-unit_price="{{ $product->unit_price }}"
                                                             data-product-quantity="{{ $product->quantity }}"
-                                                            data-product-tax_rate="{{ $product->tax_rate }}"
-                                                            data-product-line_total="{{ $product->line_total }}">
+                                                        >
                                                             <i class="mdi mdi-pencil fs-14 text-warning"></i>
                                                         </button>
                                                         <button type="button"
@@ -262,7 +254,7 @@
                                         <div class="col-6">
                                             @include('components.form.input', [
                                                 'label' => 'Product Name',
-                                                'name' => 'product_name',
+                                                'name' => 'name',
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Product Name',
                                             ])
@@ -271,7 +263,7 @@
                                         <div class="col-6">
                                             @include('components.form.input', [
                                                 'label' => 'HSN Code',
-                                                'name' => 'hsn_code',
+                                                'name' => 'hsn',
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter HSN Code',
                                             ])
@@ -288,41 +280,12 @@
 
                                         <div class="col-6">
                                             @include('components.form.input', [
-                                                'label' => 'Price',
-                                                'name' => 'unit_price',
-                                                'type' => 'number',
-                                                'placeholder' => 'Enter Price',
-                                            ])
-                                        </div>
-
-                                        <div class="col-6">
-                                            @include('components.form.input', [
                                                 'label' => 'Quantity',
                                                 'name' => 'quantity',
                                                 'type' => 'number',
                                                 'placeholder' => 'Enter Quantity',
                                             ])
                                         </div>
-
-                                        <div class="col-6">
-                                            @include('components.form.input', [
-                                                'label' => 'Tax (%)',
-                                                'name' => 'tax_rate',
-                                                'type' => 'number',
-                                                'placeholder' => 'Enter Tax Percentage',
-                                            ])
-                                        </div>
-
-                                        <div class="col-6">
-                                            @include('components.form.input', [
-                                                'label' => 'Total',
-                                                'name' => 'line_total',
-                                                'type' => 'number',
-                                                'placeholder' => 'Auto Calculated',
-                                                'readonly' => true,
-                                            ])
-                                        </div>
-
                                         <div class="col-12">
                                             <div class="text-end">
                                                 <button type="button" class="btn btn-success" id="save-product-btn">
@@ -352,40 +315,20 @@
             let editMode = false;
             let editProductId = null;
 
-            // Calculate total when price, quantity, or tax changes
-            function calculateTotal() {
-                const price = parseFloat($('input[name="unit_price"]').val()) || 0;
-                const quantity = parseInt($('input[name="quantity"]').val()) || 0;
-                const tax = parseFloat($('input[name="tax_rate"]').val()) || 0;
-
-                const subtotal = price * quantity;
-                const taxAmount = (subtotal * tax) / 100;
-                const total = subtotal + taxAmount;
-
-                $('input[name="line_total"]').val(total.toFixed(2));
-            }
-
-            $('input[name="unit_price"], input[name="quantity"], input[name="tax_rate"]').on('input',
-                calculateTotal);
-
             // Save Product Button Click (Add or Update)
             $('#save-product-btn').on('click', function(e) {
                 e.preventDefault();
 
                 const productData = {
                     quotation_id: quotationId,
-                    product_name: $('input[name="product_name"]').val(),
-                    hsn_code: $('input[name="hsn_code"]').val(),
+                    name: $('input[name="name"]').val(),
+                    hsn: $('input[name="hsn"]').val(),
                     sku: $('input[name="sku"]').val(),
-                    unit_price: $('input[name="unit_price"]').val(),
                     quantity: $('input[name="quantity"]').val(),
-                    tax_rate: $('input[name="tax_rate"]').val(),
-                    line_total: $('input[name="line_total"]').val()
                 };
 
                 // Validation
-                if (!productData.product_name || !productData.hsn_code || !productData.sku ||
-                    !productData.unit_price || !productData.quantity || !productData.tax_rate) {
+                if (!productData.name || !productData.hsn || !productData.sku || !productData.quantity) {
                     alert('Please fill all required fields');
                     return;
                 }
@@ -455,13 +398,10 @@
                 editProductId = $(this).data('product-id');
 
                 // Populate form with product data
-                $('input[name="product_name"]').val($(this).data('product-name'));
-                $('input[name="hsn_code"]').val($(this).data('product-hsn-code'));
+                $('input[name="name"]').val($(this).data('product-name'));
+                $('input[name="hsn"]').val($(this).data('product-hsn'));
                 $('input[name="sku"]').val($(this).data('product-sku'));
-                $('input[name="unit_price"]').val($(this).data('product-unit_price'));
                 $('input[name="quantity"]').val($(this).data('product-quantity'));
-                $('input[name="tax_rate"]').val($(this).data('product-tax_rate'));
-                $('input[name="line_total"]').val($(this).data('product-line_total'));
 
                 // Update button text and show cancel button
                 $('#btn-text').text('Update Product');
@@ -520,10 +460,7 @@
                 $('input[name="product_name"]').val('');
                 $('input[name="hsn_code"]').val('');
                 $('input[name="sku"]').val('');
-                $('input[name="unit_price"]').val('');
                 $('input[name="quantity"]').val('');
-                $('input[name="tax_rate"]').val('');
-                $('input[name="line_total"]').val('');
             }
 
             // Add Product Button Click

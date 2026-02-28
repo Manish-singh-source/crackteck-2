@@ -54,11 +54,7 @@
                                                     <th>Model</th>
                                                     <th>SKU</th>
                                                     <th>HSN</th>
-                                                    <th>Unit Price</th>
                                                     <th>Qty</th>
-                                                    <th>Discount</th>
-                                                    <th>Tax %</th>
-                                                    <th>Total</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -70,12 +66,7 @@
                                                         <td>{{ $product->model_no ?? '-' }}</td>
                                                         <td>{{ $product->sku ?? '-' }}</td>
                                                         <td>{{ $product->hsn ?? ($product->hsn_code ?? '-') }}</td>
-                                                        <td>₹{{ number_format($product->unit_price ?? ($product->price ?? 0), 2) }}
-                                                        </td>
                                                         <td>{{ $product->quantity ?? 1 }}</td>
-                                                        <td>₹{{ number_format($product->discount_per_unit ?? 0, 2) }}</td>
-                                                        <td>{{ $product->tax_rate ?? ($product->tax ?? 0) }}%</td>
-                                                        <td>₹{{ number_format($product->line_total ?? $product->quantity * ($product->unit_price ?? ($product->price ?? 0)), 2) }}
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -83,20 +74,39 @@
                                         </table>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="form-label">Subtotal</label>
-                                        <input type="text" readonly class="form-control"
-                                            value="₹{{ number_format($quotation->subtotal ?? 0, 2) }}">
+                                        <input type="text" readonly class="form-control" id="subtotal"
+                                            value="₹{{ number_format($invoice->subtotal ?? ($quotation->amcData->total_amount ?? 0), 2) }}">
+                                        <input type="hidden" id="subtotal_value"
+                                            value="{{ $invoice->subtotal ?? ($quotation->amcData->total_amount ?? 0) }}">
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="form-label">Tax</label>
-                                        <input type="text" readonly class="form-control"
-                                            value="₹{{ number_format($quotation->tax_amount ?? 0, 2) }}">
+                                        <input type="number" step="0.01" name="tax_amount" class="form-control"
+                                            id="tax_amount"
+                                            value="{{ old('tax_amount', $invoice->total_tax ?? ($quotation->tax_amount ?? 0)) }}"
+                                            placeholder="0.00" required>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Total Discount</label>
+                                        <input type="number" step="0.01" name="total_discount" class="form-control"
+                                            id="total_discount"
+                                            value="{{ old('total_discount', $invoice->total_discount ?? 0) }}"
+                                            placeholder="0.00">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Round Off</label>
+                                        <input type="number" step="0.01" name="round_off" class="form-control"
+                                            id="round_off" value="{{ old('round_off', $invoice->round_off ?? 0) }}"
+                                            placeholder="0.00">
+                                    </div>
+                                    <div class="col-md-12">
                                         <label class="form-label">Grand Total</label>
-                                        <input type="text" readonly class="form-control"
-                                            value="₹{{ number_format($quotation->total_amount ?? 0, 2) }}">
+                                        <input type="text" readonly class="form-control" id="grand_total"
+                                            value="₹{{ number_format(old('grand_total', $invoice->grand_total ?? ($quotation->amcData->total_amount ?? 0)), 2) }}">
+                                        <input type="hidden" name="grand_total" id="grand_total_value"
+                                            value="{{ old('grand_total', $invoice->grand_total ?? ($quotation->amcData->total_amount ?? 0)) }}">
                                     </div>
 
                                     <input type="hidden" name="status" id="invoice_status"
@@ -125,6 +135,27 @@
 
 @section('scripts')
     <script>
+        // Calculate Grand Total = Subtotal + Tax - Discount + RoundOff
+        function calculateGrandTotal() {
+            const subtotal = parseFloat(document.getElementById('subtotal_value').value) || 0;
+            const tax = parseFloat(document.getElementById('tax_amount').value) || 0;
+            const discount = parseFloat(document.getElementById('total_discount').value) || 0;
+            const roundOff = parseFloat(document.getElementById('round_off').value) || 0;
+
+            const grandTotal = subtotal + tax - discount + roundOff;
+
+            document.getElementById('grand_total').value = '₹' + grandTotal.toFixed(2);
+            document.getElementById('grand_total_value').value = grandTotal.toFixed(2);
+        }
+
+        // Attach event listeners for auto-calculation
+        document.getElementById('tax_amount').addEventListener('input', calculateGrandTotal);
+        document.getElementById('total_discount').addEventListener('input', calculateGrandTotal);
+        document.getElementById('round_off').addEventListener('input', calculateGrandTotal);
+
+        // Calculate on page load
+        document.addEventListener('DOMContentLoaded', calculateGrandTotal);
+
         document.getElementById('saveDraftBtn').addEventListener('click', function() {
             document.getElementById('invoice_status').value = 'draft';
             document.getElementById('invoiceForm').submit();

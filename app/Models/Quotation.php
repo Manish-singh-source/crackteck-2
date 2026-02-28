@@ -45,4 +45,8 @@ class Quotation extends Model
     {
         return $this->hasMany(QuotationAmcDetail::class, 'quotation_id', 'id');
     }
+
+    public function amcData() {
+        return $this->hasOne(QuotationAmcDetail::class, 'quotation_id', 'id');
+    }
 }

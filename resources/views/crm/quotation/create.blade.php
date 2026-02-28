@@ -304,7 +304,7 @@
                                                         <option value="{{ $plan->id }}"
                                                             data-cost="{{ $plan->total_cost }}"
                                                             data-duration="{{ $plan->duration }}">
-                                                            {{ $plan->plan_name }} - {{ $plan->plan_type }}
+                                                            {{ $plan->plan_name }}
                                                         </option>
                                                     @endforeach
                                                 </select>

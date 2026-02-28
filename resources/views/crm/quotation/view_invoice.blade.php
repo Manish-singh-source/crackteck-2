@@ -24,7 +24,6 @@
                             <div class="mb-3">
                                 <strong>Invoice Date:</strong> {{ $invoice->invoice_date }}<br>
                                 <strong>Due Date:</strong> {{ $invoice->due_date }}<br>
-                                <strong>Status:</strong> {{ ucfirst($invoice->status) }}
                             </div>
 
                             <div class="mb-3">
@@ -62,29 +61,34 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>Product</th>
+                                            <th>Images</th>
+                                            <th>Product Name</th>
+                                            <th>Description</th>
+                                            <th>Type</th>
+                                            <th>Model No</th>
                                             <th>SKU</th>
+                                            <th>HSN</th>
+                                            <th>Purchase Date</th>
                                             <th>Qty</th>
-                                            <th>Unit Price</th>
-                                            <th>Tax</th>
-                                            <th>Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($invoice->items as $item)
                                             <tr>
-                                                <td>{{ $item->name ?? ($item->product_name ?? 'Item') }}
+                                                <td>{{ $item->images ?? '-' }}</td>
+                                                <td>{{ $item->name ?? ($item->name ?? 'Item') }}
                                                     @if ($item->type || $item->brand)
                                                         <div class="text-muted small">{{ $item->type ?? '' }}
                                                             {{ $item->brand ? '- ' . $item->brand : '' }}</div>
                                                     @endif
                                                 </td>
+                                                <td>{{ $item->description ?? '-' }}</td>
+                                                <td>{{ $item->type ?? '-' }}</td>
+                                                <td>{{ $item->model_no ?? '-' }}</td>
                                                 <td>{{ $item->sku ?? '-' }}</td>
+                                                <td>{{ $item->hsn ?? '-' }}</td>
+                                                <td>{{ $item->purchase_date ?? '-' }}</td>
                                                 <td>{{ $item->quantity }}</td>
-                                                <td>₹{{ number_format($item->unit_price, 2) }}</td>
-                                                <td>₹{{ number_format($item->tax_amount, 2) }} ({{ $item->tax_rate }}%)
-                                                </td>
-                                                <td>₹{{ number_format($item->line_total, 2) }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -102,6 +106,15 @@
                                         <tr>
                                             <th>Total Tax</th>
                                             <td class="text-end">₹{{ number_format($invoice->total_tax, 2) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Discount</th>
+                                            <td class="text-end">₹{{ number_format($invoice->total_discount ?? 0, 2) }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Round Off</th>
+                                            <td class="text-end">₹{{ number_format($invoice->round_off ?? 0, 2) }}</td>
                                         </tr>
                                         <tr class="border-top">
                                             <th>Grand Total</th>

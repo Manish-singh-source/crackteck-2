@@ -11,8 +11,9 @@ class QuotationResource extends JsonResource
     {
         
         $quotation = $this->whenLoaded('quotation') ? $this->quotation : null;
-        $products = $this->whenLoaded('quotation.products') ? $quotation->products : null;
+        $products = $this->whenLoaded('quotation.products') ? $this->quotation?->products : null;
         $customer = $this->whenLoaded('customer') ? $this->customer : null;
+        
         
         $status = 'pending';
         if ($quotation->status == 'sent') {
@@ -28,8 +29,8 @@ class QuotationResource extends JsonResource
         }
 
         return [
-            'id' => $this->id,
-            'quote_id' => $this->id ?? null,
+            'id' => $quotation->id,
+            'quote_id' => $quotation->id ?? null,
             'lead_id' => $this->id ?? null,
             
             'lead_number' => $this->lead_number ?? null,
@@ -43,6 +44,7 @@ class QuotationResource extends JsonResource
             'total_items' => $quotation->products_count ?? null,
             'total_amount' => $quotation->total_amount ?? null,
             'status' => $status,
+
             'products' => $products ? $products?->map(function ($product) {
                 return [
                     'id' => $product->id,

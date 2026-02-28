@@ -9,6 +9,7 @@ use App\Models\DmAadharDetails;
 use App\Models\DmDrivingLicenseDetails;
 use App\Models\DmPanCardDetails;
 use App\Models\Order;
+use App\Models\ReturnOrder;
 use App\Models\Engineer;
 use App\Models\SalesPerson;
 use App\Models\Staff;
@@ -788,6 +789,312 @@ class DeliveryOrderController extends Controller
             $panCardDetails->save();
 
             return response()->json(['message' => 'PAN card details updated successfully'], 200);
+        }
+    }
+
+    // ======================================= Return Order APIs for Delivery Man ========================================
+
+    /**
+     * Get all return orders assigned to delivery man
+     */
+    public function allReturnOrders(Request $request)
+    {
+        $roleValidated = Validator::make($request->all(), [
+            'role_id' => 'required|in:2',
+            'user_id' => 'required',
+        ]);
+
+        if ($roleValidated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
+        }
+
+        $staffRole = $this->getRoleId($request->role_id);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'delivery_man') {
+            $returnOrders = ReturnOrder::with(['customer', 'order'])
+                ->where('delivery_man_id', $request->user_id);
+
+            if ($request->filled('status')) {
+                $returnOrders->where('status', $request->status);
+            }
+
+            $returnOrders = $returnOrders->get();
+
+            return response()->json(['return_orders' => $returnOrders], 200);
+        }
+    }
+
+    /**
+     * Get particular return order details
+     */
+    public function returnOrderDetails(Request $request, $id)
+    {
+        $roleValidated = Validator::make($request->all(), [
+            'role_id' => 'required|in:2',
+            'user_id' => 'required',
+        ]);
+
+        if ($roleValidated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
+        }
+
+        $staffRole = $this->getRoleId($request->role_id);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'delivery_man') {
+            $returnOrder = ReturnOrder::with(['customer', 'order', 'deliveryMan'])
+                ->where('id', $id)
+                ->where('delivery_man_id', $request->user_id)
+                ->first();
+
+            if (! $returnOrder) {
+                return response()->json(['message' => 'Return order not found'], 404);
+            }
+
+            return response()->json(['return_order' => $returnOrder], 200);
+        }
+    }
+
+    /**
+     * Accept a return order
+     */
+    public function acceptReturnOrder(Request $request, $id)
+    {
+        $roleValidated = Validator::make($request->all(), [
+            'role_id' => 'required|in:2',
+            'user_id' => 'required',
+        ]);
+
+        if ($roleValidated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
+        }
+
+        $staffRole = $this->getRoleId($request->role_id);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'delivery_man') {
+            $returnOrder = ReturnOrder::where('id', $id)
+                ->where('delivery_man_id', $request->user_id)
+                ->first();
+
+            if (! $returnOrder) {
+                return response()->json(['message' => 'Return order not found'], 404);
+            }
+
+            if ($returnOrder->status != 'assigned') {
+                return response()->json(['message' => 'Return order cannot be accepted. Current status: ' . $returnOrder->status], 400);
+            }
+
+            if ($returnOrder->delivery_man_id != $request->user_id) {
+                return response()->json(['message' => 'This return order is assigned to another delivery man'], 400);
+            }
+
+            $returnOrder->update([
+                'status' => 'accepted',
+                'return_accepted_at' => now(),
+            ]);
+
+            return response()->json(['message' => 'Return order accepted successfully'], 200);
+        }
+    }
+
+    /**
+     * Generate OTP for return order
+     */
+    public function returnOrderOtp(Request $request, $id)
+    {
+        $roleValidated = Validator::make($request->all(), [
+            'role_id' => 'required|in:2',
+            'user_id' => 'required',
+        ]);
+
+        if ($roleValidated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
+        }
+
+        $staffRole = $this->getRoleId($request->role_id);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'delivery_man') {
+            $returnOrder = ReturnOrder::where('id', $id)
+                ->where('delivery_man_id', $request->user_id)
+                ->first();
+
+            if (! $returnOrder) {
+                return response()->json(['message' => 'Return order not found'], 404);
+            }
+
+            // Only allow OTP generation when status is 'accepted'
+            if ($returnOrder->status != 'accepted') {
+                return response()->json(['message' => 'OTP can only be generated when return order is accepted. Current status: ' . $returnOrder->status], 400);
+            }
+
+            $otp = rand(1000, 9999);
+            $returnOrder->otp = $otp;
+            $returnOrder->otp_expiry = now()->addMinutes(5);
+            $returnOrder->save();
+
+            // Get customer phone number
+            $customer = Customer::where('id', $returnOrder->customer_id)->first();
+
+            if ($customer) {
+                // Send OTP via SMS (commented out - uncomment when SMS is configured)
+                // $templateId = env('FAST2SMS_TEMPLATE_ID');
+                // $this->sendDltSms($customer->phone, $templateId, $otp);
+            }
+
+            return response()->json(['message' => 'OTP sent successfully', 'otp' => $otp], 200);
+        }
+    }
+
+    /**
+     * Verify OTP for return order
+     */
+    public function verifyReturnOrderOtp(Request $request, $id)
+    {
+        $roleValidated = Validator::make($request->all(), [
+            'role_id' => 'required|in:2',
+            'user_id' => 'required',
+            'otp' => 'required',
+        ]);
+
+        if ($roleValidated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
+        }
+
+        $staffRole = $this->getRoleId($request->role_id);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'delivery_man') {
+            $returnOrder = ReturnOrder::where('id', $id)
+                ->where('delivery_man_id', $request->user_id)
+                ->first();
+
+            if (! $returnOrder) {
+                return response()->json(['message' => 'Return order not found'], 404);
+            }
+
+            if ($returnOrder->otp != $request->otp) {
+                return response()->json(['message' => 'Invalid OTP'], 400);
+            }
+
+            if (now()->gt($returnOrder->otp_expiry)) {
+                return response()->json(['message' => 'OTP expired'], 400);
+            }
+
+            // Update status to picked
+            $returnOrder->update([
+                'otp' => null,
+                'otp_expiry' => null,
+                'otp_verified_at' => now(),
+                'status' => 'picked',
+                'return_picked_at' => now(),
+            ]);
+
+            return response()->json(['message' => 'OTP verified successfully. Return order marked as picked.'], 200);
+        }
+    }
+
+    /**
+     * Get only picked return order details
+     */
+    public function pickedReturnOrderDetails(Request $request, $id)
+    {
+        $roleValidated = Validator::make($request->all(), [
+            'role_id' => 'required|in:2',
+            'user_id' => 'required',
+        ]);
+
+        if ($roleValidated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
+        }
+
+        $staffRole = $this->getRoleId($request->role_id);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'delivery_man') {
+            $returnOrder = ReturnOrder::with(['customer', 'order', 'deliveryMan'])
+                ->where('id', $id)
+                ->where('delivery_man_id', $request->user_id)
+                ->where('status', 'picked')
+                ->first();
+
+            if (! $returnOrder) {
+                return response()->json(['message' => 'Picked return order not found'], 404);
+            }
+
+            return response()->json(['return_order' => $returnOrder], 200);
+        }
+    }
+
+    /**
+     * Mark return order as received in warehouse
+     */
+    public function receiveReturnOrder(Request $request, $id)
+    {
+        $roleValidated = Validator::make($request->all(), [
+            'role_id' => 'required|in:2',
+            'user_id' => 'required',
+        ]);
+
+        if ($roleValidated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
+        }
+
+        $staffRole = $this->getRoleId($request->role_id);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'delivery_man') {
+            $returnOrder = ReturnOrder::where('id', $id)
+                ->where('delivery_man_id', $request->user_id)
+                ->first();
+
+            if (! $returnOrder) {
+                return response()->json(['message' => 'Return order not found'], 404);
+            }
+
+            // Only allow receiving when status is 'picked'
+            if ($returnOrder->status != 'picked') {
+                return response()->json(['message' => 'Return order must be in picked status to receive in warehouse. Current status: ' . $returnOrder->status], 400);
+            }
+
+            // Update return order status to received
+            $returnOrder->update([
+                'status' => 'received',
+                'return_delivered_at' => now(),
+            ]);
+
+            // Update main order status to 'returned'
+            $order = Order::where('order_number', $returnOrder->order_number)->first();
+            if ($order) {
+                $order->update([
+                    'status' => 'returned',
+                ]);
+            }
+
+            return response()->json(['message' => 'Return order received in warehouse successfully'], 200);
         }
     }
 }

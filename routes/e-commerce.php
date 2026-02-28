@@ -50,6 +50,8 @@ Route::prefix('/demo/e-commerce')->group(function () {
         Route::post('/orders/bulk-delete', 'bulkDestroy')->name('order.bulk-delete');
         Route::get('/view-order/{id}', 'show')->name('order.view');
         Route::put('/order/{id}/assign-person', 'assignPerson')->name('order.assign-person');
+        Route::put('/return/{id}/receive', 'returnReceive')->name('order.return.receive');
+        Route::put('/return/{id}/complete-refund', 'completeRefund')->name('order.return.complete-refund');
         Route::get('/order/{id}/invoice', 'generateInvoice')->name('order.invoice');
         Route::get('/order/{id}/invoice/download', 'downloadInvoice')->name('order.invoice-download');
         Route::get('/delivery-men-by-city/{city}', 'getDeliveryMenByCity')->name('order.delivery-men-by-city');

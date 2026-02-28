@@ -978,6 +978,8 @@ class CheckoutController extends Controller
                 'return_order_number' => ReturnOrder::generateReturnOrderNumber(),
                 'order_number' => $order->order_number,
                 'customer_id' => $order->customer_id,
+                'refund_amount' => $order->total_amount,
+                'refund_status' => 'pending',
                 'status' => ReturnOrder::STATUS_PENDING,
             ]);
 

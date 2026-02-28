@@ -380,6 +380,76 @@ class OrderController extends Controller
         return response()->json($customers);
     }
 
+    /**
+     * Mark return order as received in warehouse
+     */
+    public function returnReceive(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'warehouse_status' => 'required|in:received',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->with('error', 'Invalid warehouse status');
+        }
+
+        try {
+            $returnOrder = ReturnOrder::findOrFail($id);
+
+            // Check if return order is in picked status
+            if ($returnOrder->status !== 'picked') {
+                return redirect()->back()->with('error', 'Return order must be in picked status to receive in warehouse');
+            }
+
+            // Update return order status to received
+            $returnOrder->status = 'received';
+            $returnOrder->return_delivered_at = now();
+            $returnOrder->save();
+
+            // Update main order status to 'returned'
+            $order = Order::where('order_number', $returnOrder->order_number)->first();
+            if ($order) {
+                $order->status = 'returned';
+                $order->save();
+            }
+
+            return redirect()->back()->with('success', 'Return order received in warehouse successfully');
+        } catch (\Exception $e) {
+            Log::error('Error receiving return order: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to receive return order');
+        }
+    }
+
+    /**
+     * Complete the refund for return order
+     */
+    public function completeRefund(Request $request, $id)
+    {
+        try {
+            $returnOrder = ReturnOrder::findOrFail($id);
+
+            // Check if return order is in received status
+            if ($returnOrder->status !== 'received') {
+                return redirect()->back()->with('error', 'Return order must be received in warehouse to complete refund');
+            }
+
+            // Check if refund is not already completed
+            if ($returnOrder->refund_status === 'completed') {
+                return redirect()->back()->with('error', 'Refund already completed');
+            }
+
+            // Update refund status to completed
+            $returnOrder->refund_status = 'completed';
+            $returnOrder->return_completed_at = now();
+            $returnOrder->save();
+
+            return redirect()->back()->with('success', 'Refund completed successfully');
+        } catch (\Exception $e) {
+            Log::error('Error completing refund: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to complete refund');
+        }
+    }
+
     public function show($id)
     {
         $order = Order::with(['customer', 'orderItems.product.ecommerceProduct', 'orderPayments'])

@@ -174,6 +174,15 @@ Route::prefix('v1')->group(function () {
 
             Route::post('/delivery-orders', 'store');
 
+            // Return Order Flow 
+            Route::get('/return-orders', 'allReturnOrders');
+            Route::get('/return-orders/{id}', 'returnOrderDetails');
+            Route::post('/accept-return-order/{id}', 'acceptReturnOrder');
+            Route::post('/return-order/{id}/otp', 'returnOrderOtp');
+            Route::post('/return-order/{id}/verify-otp', 'verifyReturnOrderOtp');
+            Route::post('/return-order-received/{id}', 'receiveReturnOrder');
+            Route::get('/return-order-picked/{id}', 'pickedReturnOrderDetails');
+
             // vehical registration
             Route::get('/vehicle-registration', 'getVehicleDetails');
             Route::post('/vehicle-registration', 'vehicleRegistration');

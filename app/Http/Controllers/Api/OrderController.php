@@ -10,6 +10,7 @@ use App\Models\OrderItem;
 use App\Models\DeliveryMan;
 use App\Models\SalesPerson;
 use App\Models\StockRequest;
+use App\Models\ReturnOrder;
 use Illuminate\Http\Request;
 use App\Models\EcommerceOrder;
 use App\Models\ParentCategory;
@@ -183,8 +184,8 @@ class OrderController extends Controller
                 'source_platform' => 'mobile_app',
                 'tracking_number' => null,
                 'tracking_url' => null,
-                'is_returnable' => false,
-                'return_days' => 0,
+                'is_returnable' => $product->is_returnable ?? false,
+                'return_days' => $product->is_returnable ? 7 : 0,
                 'return_status' => null,
                 'refund_amount' => 0,
                 'refund_status' => null,
@@ -390,6 +391,130 @@ class OrderController extends Controller
             }
 
             return response()->json(['order' => $order], 200);
+        }
+    }
+
+    // Cancel Order API
+    public function cancelOrder(Request $request, $order_id)
+    {
+        $validator = Validator::make($request->all(), [
+            'customer_id' => 'required|exists:customers,id',
+            'customer_notes' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validator->errors()], 422);
+        }
+
+        $order = Order::where('id', $order_id)
+            ->where('customer_id', $request->customer_id)
+            ->first();
+
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
+        }
+
+        // Check if order can be cancelled
+        $cancellableStatuses = ['pending', 'admin_approved', 'assigned_delivery_man', 'order_accepted', 'product_taken'];
+
+        if (!in_array($order->status, $cancellableStatuses)) {
+            return response()->json(['success' => false, 'message' => 'This order cannot be cancelled. Current status: ' . $order->status], 400);
+        }
+
+        // Update order status to cancelled
+        $order->status = 'cancelled';
+        $order->cancelled_at = now();
+        $order->customer_notes = $request->customer_notes ?? null;
+        $order->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order cancelled successfully.',
+            'data' => [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'status' => $order->status
+            ]
+        ]);
+    }
+
+    // Return Order API
+    public function returnOrder(Request $request, $order_id)
+    {
+        $validator = Validator::make($request->all(), [
+            'customer_id' => 'required|exists:customers,id',
+            'customer_notes' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validator->errors()], 422);
+        }
+
+        $order = Order::where('id', $order_id)
+            ->where('customer_id', $request->customer_id)
+            ->first();
+
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
+        }
+
+        // Check if order status is delivered
+        if ($order->status !== 'delivered') {
+            return response()->json(['success' => false, 'message' => 'Only delivered orders can be returned.'], 400);
+        }
+
+        // Check if order is returnable
+        if (!$order->is_returnable) {
+            return response()->json(['success' => false, 'message' => 'This order is not returnable.'], 400);
+        }
+
+        // Check if return days have passed
+        if ($order->delivered_at) {
+            $returnDeadline = $order->delivered_at->addDays($order->return_days ?? 30);
+            if (now()->greaterThan($returnDeadline)) {
+                return response()->json(['success' => false, 'message' => 'Return period has expired. You can no longer return this order.'], 400);
+            }
+        }
+
+        // Check if a return order already exists
+        $existingReturn = ReturnOrder::where('order_number', $order->order_number)
+            ->where('customer_id', $request->customer_id)
+            ->first();
+
+        if ($existingReturn) {
+            return response()->json(['success' => false, 'message' => 'A return request already exists for this order.'], 400);
+        }
+
+        try {
+            // Create return order
+            $returnOrder = ReturnOrder::create([
+                'return_order_number' => ReturnOrder::generateReturnOrderNumber(),
+                'order_number' => $order->order_number,
+                'customer_id' => $order->customer_id,
+                'return_reason' => $request->customer_notes ?? null,
+                'customer_notes' => $request->customer_notes ?? null,
+                'refund_amount' => $order->total_amount,
+                'refund_status' => 'pending',
+                'status' => 'pending',
+            ]);
+
+            // Update order return status
+            $order->return_status = 'pending';
+            $order->customer_notes = $request->customer_notes ?? null;
+            $order->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Return request initiated successfully.',
+                'data' => [
+                    'return_order_id' => $returnOrder->id,
+                    'return_order_number' => $returnOrder->return_order_number,
+                    'order_number' => $returnOrder->order_number,
+                    'status' => $returnOrder->status
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to initiate return. Please try again.'], 500);
         }
     }
 }

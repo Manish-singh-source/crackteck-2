@@ -669,10 +669,9 @@ class AllServicesController extends Controller
         }
 
         // Pending to implement quotation list logic
-        // $serviceRequestQuotations = ServiceRequestQuotation::with('serviceRequest', 'serviceRequestPart')->orderBy('created_at', 'desc')->get();
-        // $serviceRequestQuotations = ServiceRequest::with('quotations')->orderBy('created_at', 'desc')->get();
-        $leadQuotations = Lead::with(['quotation' => function ($query) {
+        $leadQuotations = Lead::with(['quotation.products', 'customer', 'quotation' => function ($query) {
             $query->where('status', '!=', 'draft');
+            $query->withCount('products');
         }])
             ->where('customer_id', $validated['user_id'])
             ->whereHas('quotation', function ($query) {
@@ -680,9 +679,12 @@ class AllServicesController extends Controller
             })
             ->orderBy('created_at', 'desc')
             ->get();
-        $data = QuotationResource::collection($leadQuotations);
 
-        return response()->json(['data' => $data, 'success' => true], 200);
+        $data = QuotationResource::collection($leadQuotations);
+        if ($data) {
+            return response()->json(['data' => $data, 'success' => true], 200);
+        }
+        return response()->json(['data' => [], 'success' => false], 200);
     }
 
     public function serviceRequestQuotationDetails(Request $request, $id)

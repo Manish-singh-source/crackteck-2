@@ -302,29 +302,13 @@
 
                                         <li
                                             class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                            <span class="fw-semibold text-break">Quotation Date :
-                                            </span>
-                                            <span>
-                                                {{ $quotation->quote_date ?? 'N/A' }}
-                                            </span>
-                                        </li>
-
-                                        <li
-                                            class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                             <span class="fw-semibold text-break">Expiry Date:
                                             </span>
                                             <span>
                                                 {{ $quotation->expiry_date ? \Carbon\Carbon::parse($quotation->expiry_date)->format('Y-m-d h:i A') : 'N/A' }}
                                             </span>
                                         </li>
-                                        <li
-                                            class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                            <span class="fw-semibold text-break">Total Items :
-                                            </span>
-                                            <span>
-                                                {{ $quotation->total_items ?? 'N/A' }}
-                                            </span>
-                                        </li>
+                                        
                                         <li
                                             class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                             <span class="fw-semibold text-break">Currency :
@@ -336,6 +320,27 @@
                                     </ul>
                                 </div>
                                 <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush">
+                                        <li
+                                            class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Quotation Date :
+                                            </span>
+                                            <span>
+                                                {{ $quotation->quote_date ?? 'N/A' }}
+                                            </span>
+                                        </li>
+
+                                        <li
+                                            class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                            <span class="fw-semibold text-break">Total Items :
+                                            </span>
+                                            <span>
+                                                {{ $quotation->total_items ?? 'N/A' }}
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                {{-- <div class="col-lg-6">
                                     <ul class="list-group list-group-flush">
 
                                         <li
@@ -372,7 +377,7 @@
                                             </span>
                                         </li>
                                     </ul>
-                                </div>
+                                </div> --}}
                             </div>
                         @else
                             <div class="row">
@@ -520,11 +525,7 @@
                                     <th>Model No.</th>
                                     <th>SKU</th>
                                     <th>HSN</th>
-                                    <th>Unit Price</th>
                                     <th>Qty</th>
-                                    <th>Discount</th>
-                                    <th>Tax %</th>
-                                    <th>Line Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -552,31 +553,20 @@
                                                 {{ $product->hsn ?? 'N/A' }}
                                             </td>
                                             <td>
-                                                ₹{{ number_format($product->unit_price, 2) }}
-                                            </td>
-                                            <td>
                                                 {{ $product->quantity }}
-                                            </td>
-                                            <td>
-                                                ₹{{ number_format($product->discount_per_unit, 2) }}
-                                            </td>
-                                            <td>
-                                                {{ $product->tax_rate ?? 0 }}%
-                                            </td>
-                                            <td>
-                                                ₹{{ number_format($product->line_total, 2) }}
                                             </td>
                                         </tr>
                                     @endforeach
                                 @else
                                     <tr>
-                                        <td colspan="11" class="text-center text-muted">No products available.</td>
+                                        <td colspan="7" class="text-center text-muted">No products available.</td>
                                     </tr>
                                 @endif
                             </tbody>
                         </table>
                     </div>
 
+                    {{-- 
                     <div class="card-footer">
                         @if ($quotation->products && $quotation->products->count() > 0)
                             @php
@@ -628,7 +618,8 @@
                                 </div>
                             </div>
                         @endif
-                    </div>
+                    </div> 
+                    --}}
                 </div>
             </div>
         </div>

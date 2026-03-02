@@ -1084,15 +1084,14 @@ class AllServicesController extends Controller
         }
 
         // for amc  status is active
-        if ($serviceType === 'amc' && $service->status !== 'Active') {
+        if ($serviceType === 'amc' && $service->status !== 'active') {
             return response()->json(['success' => false, 'message' => 'Service is not completed.'], 400);
         }
 
         // for non amc and quick service status is completed
-        if ($serviceType !== 'amc' && $service->status !== '10') {
+        if ($serviceType !== 'amc' && $service->status !== 'completed') {
             return response()->json(['success' => false, 'message' => 'Service is not completed.'], 400);
         }
-        // return response()->json(['request_data' => $service->status], 200);
 
         $feedback = Feedback::create([
             'customer_id' => $validated['customer_id'],

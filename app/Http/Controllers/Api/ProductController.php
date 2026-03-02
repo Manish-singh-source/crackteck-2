@@ -45,6 +45,8 @@ class ProductController extends Controller
                 'cost_price',
                 'selling_price',
                 'discount_price',
+                'tax',
+                'final_price',
                 'stock_quantity',
                 'stock_status',
             ])

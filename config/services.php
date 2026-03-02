@@ -42,4 +42,9 @@ return [
         'entity_id' => env('FAST2SMS_ENTITY_ID'),
     ],
 
+    'firebase' => [
+        'project_id'  => env('FIREBASE_PROJECT_ID'),
+        'credentials' => env('FIREBASE_CREDENTIALS'),
+    ],
+
 ];

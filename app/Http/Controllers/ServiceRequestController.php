@@ -2308,9 +2308,9 @@ class ServiceRequestController extends Controller
                 ];
 
                 // Update quantity if provided
-                if ($request->has('quantity') && $request->quantity > 0) {
-                    $updateData['requested_quantity'] = $request->quantity;
-                }
+                // if ($request->has('quantity') && $request->quantity > 0) {
+                //     $updateData['requested_quantity'] = $request->quantity;
+                // }
 
                 $requestPart->update($updateData);
                 $message = 'Request approved successfully.';

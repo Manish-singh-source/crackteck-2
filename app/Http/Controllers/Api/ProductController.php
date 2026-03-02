@@ -116,15 +116,23 @@ class ProductController extends Controller
         }
 
         // Create stock in hand request in service_request_product_request_parts table
-        $stockInHandRequest = ServiceRequestProductRequestPart::create([
-            'engineer_id' => $request->user_id,
-            'part_id' => $request->part_id,
-            'requested_quantity' => $request->requested_quantity,
-            'request_type' => 'stock_in_hand',
-            'assigned_person_type' => 'engineer',
-            'assigned_person_id' => $request->user_id,
-            'status' => 'pending',
-        ]);
+
+        $stockInHandRequest = ServiceRequestProductRequestPart::where('engineer_id', $request->user_id)
+            ->where('part_id', $request->part_id)->first();
+        if ($stockInHandRequest) {
+            $stockInHandRequest->requested_quantity = $stockInHandRequest->requested_quantity + $request->requested_quantity;
+            $stockInHandRequest->save();
+        } else {
+            $stockInHandRequest = ServiceRequestProductRequestPart::create([
+                'engineer_id' => $request->user_id,
+                'part_id' => $request->part_id,
+                'requested_quantity' => $request->requested_quantity,
+                'request_type' => 'stock_in_hand',
+                'assigned_person_type' => 'engineer',
+                'assigned_person_id' => $request->user_id,
+                'status' => 'pending',
+            ]);
+        }
 
         return response()->json([
             'success' => true,

@@ -634,12 +634,14 @@ class AllServicesController extends Controller
                     'customer_approved_at' => now(),
                 ]);
                 $message = 'Part approved successfully.';
-            } else {
+            } else if($validated['action'] === 'customer_rejected') {
                 $requestPart->update([
                     'status' => 'customer_rejected',
                     'customer_rejected_at' => now(),
                 ]);
                 $message = 'Part rejected successfully.';
+            } else {
+                return response()->json(['success' => true, 'message' => 'Part status not updated.']);
             }
 
             return response()->json([

@@ -179,6 +179,9 @@ class QuotationController extends Controller
         $validated = Validator::make($request->all(), ([
             // validation rules if any
             'user_id' => 'required',
+            'lead_id' => 'required', 
+            'quote_date' => 'nullable',
+            'expiry_date' => 'nullable',
         ]));
 
         if ($validated->fails()) {
@@ -219,7 +222,9 @@ class QuotationController extends Controller
 
         $Quotation->load('products');
 
-        return new QuotationResource($Quotation);
+        return response()->json(['success' => true, 'message' => 'Quotations Updated successfully.', 'data' => $Quotation]);
+
+        // return new QuotationResource($Quotation);
     }
 
     public function destroy(Request $request, $lead_id)

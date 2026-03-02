@@ -78,10 +78,11 @@ class AmcController extends Controller
             $amc->covered_items = $request->covered_items_ids ?? [];
 
             if ($request->hasFile('brochure')) {
-                $file = $request->file('brochure');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/crm/amc/brochure'), $filename);
-                $amc->brochure = 'uploads/crm/amc/brochure/' . $filename;
+                // $file = $request->file('brochure');
+                // $filename = time() . '.' . $file->getClientOriginalExtension();
+                // $file->move(public_path('uploads/crm/amc/brochure'), $filename);
+                // $amc->brochure = 'uploads/crm/amc/brochure/' . $filename;
+                $amc->brochure = fileUpload($request->file('brochure'), 'uploads/crm/amc/brochure/');
             }
 
             $amc->tandc = $request->tandc;
@@ -173,15 +174,11 @@ class AmcController extends Controller
 
             // Brochure upload (replace old if new uploaded)
             if ($request->hasFile('brochure')) {
-                // optionally delete old file
-                if ($amc->brochure && file_exists(public_path($amc->brochure))) {
-                    @unlink(public_path($amc->brochure));
-                }
-
-                $file = $request->file('brochure');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/crm/amc/brochure'), $filename);
-                $amc->brochure = 'uploads/crm/amc/brochure/' . $filename;
+                $amc->brochure = app('App\Helpers\FileUpload')->updateFileUpload(
+                    $request->file('brochure'),
+                    $amc->brochure,
+                    'uploads/crm/amc/brochure/'
+                );
             }
 
             $amc->tandc = $request->tandc;
@@ -580,9 +577,9 @@ class AmcController extends Controller
     public function rescheduleAmcRequest(Request $request)
     {
         if ($request->filled('request_type') == 'amc') {
-            
+
             $amcScheduleMeeting = AmcScheduleMeeting::with('serviceRequest')->findOrFail($request->amc_schedule_meeting_id);
-            
+
             if (!$amcScheduleMeeting) {
                 return redirect()->back()->with('error', 'AMC Schedule Meeting not found.');
             }

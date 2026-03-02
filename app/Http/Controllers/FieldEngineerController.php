@@ -810,8 +810,16 @@ class FieldEngineerController extends Controller
                         ->first();
 
                     if ($requestPart) {
+
+                        if($requestPart->requested_quantity > $diagnosis['quantity']) {
+                            $requestPart->requested_quantity = $requestPart->requested_quantity - $diagnosis['quantity'];
+                        } else {
+                            $requestPart->requested_quantity = 0;
+                        }
+
                         $requestPart->update([
                             'status' => 'used',
+                            'requested_quantity' => $requestPart->requested_quantity,
                             'used_at' => now()
                         ]);
                     }

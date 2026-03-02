@@ -615,7 +615,9 @@ class AllServicesController extends Controller
                 return response()->json(['success' => false, 'message' => 'Service request not found or does not belong to this customer.'], 404);
             }
 
-            $requestPart = ServiceRequestProductRequestPart::where('id', $validated['part_id'])
+            $requestPart = ServiceRequestProductRequestPart::where('part_id', $validated['part_id'])
+                ->where('request_id', $validated['service_request_id'])
+                ->where('product_id', $validated['product_id'])
                 ->first();
 
             if (!$requestPart) {
@@ -634,12 +636,14 @@ class AllServicesController extends Controller
                     'customer_approved_at' => now(),
                 ]);
                 $message = 'Part approved successfully.';
-            } else {
+            } else if($validated['action'] === 'customer_rejected') {
                 $requestPart->update([
                     'status' => 'customer_rejected',
                     'customer_rejected_at' => now(),
                 ]);
                 $message = 'Part rejected successfully.';
+            } else {
+                return response()->json(['success' => true, 'message' => 'Part status not updated.']);
             }
 
             return response()->json([
@@ -1080,15 +1084,14 @@ class AllServicesController extends Controller
         }
 
         // for amc  status is active
-        if ($serviceType === 'amc' && $service->status !== 'Active') {
+        if ($serviceType === 'amc' && $service->status !== 'active') {
             return response()->json(['success' => false, 'message' => 'Service is not completed.'], 400);
         }
 
         // for non amc and quick service status is completed
-        if ($serviceType !== 'amc' && $service->status !== '10') {
+        if ($serviceType !== 'amc' && $service->status !== 'completed') {
             return response()->json(['success' => false, 'message' => 'Service is not completed.'], 400);
         }
-        // return response()->json(['request_data' => $service->status], 200);
 
         $feedback = Feedback::create([
             'customer_id' => $validated['customer_id'],

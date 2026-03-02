@@ -16,28 +16,14 @@ class QuotationDetailResource extends JsonResource
     {
 
         $products = $this->whenLoaded('products') ? $this->products : ($this->products ?? collect());
-        $amcDetail = $this->whenLoaded('amcDetail') ? $this->amcDetail : ($this->amcDetail ?? collect());
+        $amcDetail = $this->whenLoaded('amcData') ? $this->amcData : ($this->amcData ?? collect());
         $leadDetails = $this->whenLoaded('leadDetails') ? $this->leadDetails : ($this->leadDetails ?? collect());
-
-        // $status = 'pending';
-        // if ($this->status == 'sent') {
-        //     $status = 'pending';
-        // } elseif ($this->status == 'accepted') {
-        //     $status = 'accepted';
-        // } elseif ($this->status == 'rejected') {
-        //     $status = 'rejected';
-        // } elseif ($this->status == 'converted') {
-        //     $status = 'converted';
-        // } else {
-        //     $status = 'pending';
-        // };
-
 
         return [
             'id' => $this->id,
             'quote_id' => $this->quote_id,
             'lead_id' => $this->lead_id,
-            'customer_id' => $this->customer_id,
+            'customer_id' => $leadDetails->customer_id,
             'quote_date' => $this->quote_date,
             'expiry_date' => $this->expiry_date,
             'quote_number' => $this->quote_number,
@@ -45,7 +31,7 @@ class QuotationDetailResource extends JsonResource
             'total_amount' => $this->total_amount,
             'status' => $this->status,
             'products' => $products ?? collect(),
-            'amc_detail' => $amcDetail ?? collect(),
+            'amc_detail' => $amcData ?? collect(),
             'lead_details' => $leadDetails ?? collect(),
         ];
     }

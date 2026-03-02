@@ -671,9 +671,9 @@ class AllServicesController extends Controller
 
         // Pending to implement quotation list logic
         $leadQuotations = Lead::with(['quotation.products', 'customer', 'quotation' => function ($query) {
-            $query->where('status', '!=', 'draft');
-            $query->withCount('products');
-        }])
+                $query->where('status', '!=', 'draft');
+                $query->withCount('products');
+            }])
             ->where('customer_id', $validated['user_id'])
             ->whereHas('quotation', function ($query) {
                 $query->where('status', '!=', 'draft');
@@ -708,11 +708,13 @@ class AllServicesController extends Controller
 
         // Pending to implement quotation details logic
         // Current (works fine)
-        $quotationDetails = Quotation::with('leadDetails', 'amcDetail', 'products')->where('id', $id)->first();
+        $quotationDetails = Quotation::with('leadDetails', 'amcData', 'products')->where('id', $id)->first();
 
         if (! $quotationDetails) {
             return response()->json(['success' => false, 'message' => 'Quotation not found.'], 404);
         }
+
+        return response()->json(['success' => false, 'message' => $quotationDetails], 404);
 
         $data = new QuotationDetailResource($quotationDetails);
 

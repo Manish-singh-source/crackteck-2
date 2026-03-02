@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\QuotationResource;
+use App\Models\AmcPlan;
 use App\Models\Quotation;
+use App\Models\QuotationAmcDetail;
 use App\Models\QuotationProduct;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class QuotationController extends Controller
@@ -26,13 +29,13 @@ class QuotationController extends Controller
 
         $validated = $validated->validated();
 
-        $quotations = Quotation::with('leadDetails', 'products')->where('staff_id', $validated['user_id'])->get();
+        $quotations = Quotation::with('leadDetails', 'products', 'amcDetail')->where('staff_id', $validated['user_id'])->get();
 
         if ($quotations->isEmpty()) {
             return response()->json(['message' => 'No quotations found'], 404);
         }
 
-        return QuotationResource::collection($quotations);
+        return response()->json(['success' => true, 'message' => 'Quotations found successfully.', 'data' => $quotations]);
     }
 
     // I want to create quotation with there products details
@@ -55,6 +58,10 @@ class QuotationController extends Controller
             'products.*.description' => 'nullable|string',
             'products.*.images' => 'nullable|mimes:jpeg,png,jpg,gif|max:2048',
             'products.*.quantity' => 'nullable|integer',
+            'amc_plan_id' => 'nullable|string',
+            'plan_start_date' => 'nullable|date',
+            'priority_level' => 'nullable|string',
+            'additional_notes' => 'nullable|string',
         ]));
 
         if ($validated->fails()) {
@@ -71,7 +78,7 @@ class QuotationController extends Controller
         $validated['subtotal'] = 0;
         $validated['tax_amount'] = 0;
         $validated['discount_amount'] = 0;
-        $validated['total_amount'] = 0;
+        $validated['total_amount'] = $amcPlan->total_cost ?? 0;
 
         $Quotation = Quotation::create($validated);
 
@@ -113,13 +120,36 @@ class QuotationController extends Controller
             return response()->json(['message' => 'Quotation not created'], 500);
         }
 
+
+        if ($request->has('amc_plan_id')) {
+            $amcPlan = AmcPlan::find($request->amc_plan_id);
+
+            $quotationAmcDetail = new QuotationAmcDetail;
+            $quotationAmcDetail->quotation_id = $Quotation->id;
+            $quotationAmcDetail->amc_plan_id = $request->amc_plan_id;
+            $quotationAmcDetail->plan_duration = intval($amcPlan->duration);
+            $quotationAmcDetail->total_amount = $amcPlan->total_cost;
+
+            $startDate = Carbon::parse($request->plan_start_date);
+            $quotationAmcDetail->plan_start_date = $startDate;
+            // plan end date = plan start date + duration (in months)
+            $planEndDate = $startDate->copy()->addMonths($amcPlan->duration);
+            $quotationAmcDetail->plan_end_date = $planEndDate;
+            $quotationAmcDetail->priority_level = $request->priority_level;
+            $quotationAmcDetail->additional_notes = $request->additional_notes;
+            $quotationAmcDetail->save();
+        }
+
+
         $Quotation->load('products');
+
+        return response()->json(['success' => true, 'message' => 'Quotations found successfully.', 'data' => $Quotation]);
 
         return new QuotationResource($Quotation);
     }
 
     // I want quotation details with there products details
-    public function show(Request $request, $lead_id)
+    public function show(Request $request, $quote_id)
     {
         $validated = Validator::make($request->all(), ([
             // validation rules if any
@@ -132,13 +162,15 @@ class QuotationController extends Controller
 
         $validated = $validated->validated();
 
-        $Quotation = Quotation::with('leadDetails', 'products')->where('staff_id', $validated['user_id'])->first();
+        $Quotation = Quotation::with('leadDetails', 'products', 'amcDetail')->where('staff_id', $validated['user_id'])->find($quote_id);
 
         if (! $Quotation) {
             return response()->json(['message' => 'Quotation not found'], 404);
         }
 
-        return new QuotationResource($Quotation);
+        return response()->json(['success' => true, 'message' => 'Quotations found successfully.', 'data' => $Quotation]);
+
+        // return new QuotationResource($Quotation);
     }
 
     // I want to update quotation with there products details

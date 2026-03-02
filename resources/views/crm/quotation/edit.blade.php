@@ -112,7 +112,7 @@
                                                         <option value="{{ $plan->id }}"
                                                             data-cost="{{ $plan->total_cost }}"
                                                             data-duration="{{ $plan->duration }}"
-                                                            @if ($quotation->amcDetail[0]->id == $plan->id) selected @endif>
+                                                            @if ($quotation->amcDetail[0]->amc_plan_id == $plan->id) selected @endif>
                                                             {{ $plan->plan_name }} - AMC
                                                         </option>
                                                     @endforeach
@@ -154,12 +154,12 @@
                                                     <option value="">--Select Plan--</option>
                                                     {{-- @foreach ($amcPlans as $plan) --}}
                                                         <option value="High"
-                                                            @if ($quotation->amcDetail[0]->priority_level == 'High') selected @endif>High</option>
+                                                            @if (strtolower($quotation->amcDetail[0]->priority_level) == 'high') selected @endif>High</option>
                                                         <option value="Medium"
-                                                            @if ($quotation->amcDetail[0]->priority_level == 'Medium') selected @endif>Medium
+                                                            @if (strtolower($quotation->amcDetail[0]->priority_level) == 'medium') selected @endif>Medium
                                                         </option>
                                                         <option value="Low"
-                                                            @if ($quotation->amcDetail[0]->priority_level == 'Low') selected @endif>Low</option>
+                                                            @if (strtolower($quotation->amcDetail[0]->priority_level) == 'low') selected @endif>Low</option>
                                                     {{-- @endforeach --}}
                                                 </select>
                                             </div>

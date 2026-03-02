@@ -92,6 +92,7 @@ class QuotationController extends Controller
             'products.*.purchase_date' => 'nullable|date',
             'products.*.description' => 'nullable|string',
             'products.*.line_total' => 'nullable|numeric|min:0',
+            
             'amc_plan_id' => 'nullable|string',
             'plan_duration' => 'nullable|integer|min:0',
             'plan_start_date' => 'nullable|date',
@@ -222,7 +223,6 @@ class QuotationController extends Controller
             'products',
             'amcDetail.amcPlan',
         ])->findOrFail($id);
-
         $leads = Lead::with('customer')->get();
         $amcPlans = AmcPlan::where('status', 'Active')->get();
         // dd($quotation);
@@ -626,11 +626,10 @@ class QuotationController extends Controller
      */
     public function generateInvoice($id)
     {
-        $quotation = Quotation::with(['leadDetails', 'leadDetails.customerAddress', 'products', 'amcDetail'])->findOrFail($id);
+        $quotation = Quotation::with(['leadDetails', 'leadDetails.customerAddress', 'products', 'amcData'])->findOrFail($id);
 
         // if invoice exists, pass it to the view for editing
         $invoice = QuotationInvoice::where('quote_id', $id)->latest()->first();
-
         return view('/crm/quotation/generate_invoice', compact('quotation', 'invoice'));
     }
 
@@ -663,6 +662,10 @@ class QuotationController extends Controller
             'billing_address' => 'nullable|string',
             'shipping_address' => 'nullable|string',
             'payment_method' => 'nullable|string',
+            'tax_amount' => 'required|numeric|min:0',
+            'total_discount' => 'required|numeric|min:0',
+            'round_off' => 'required|numeric|min:0',
+            'grand_total' => 'required|numeric|min:0',
             'status' => 'nullable|in:draft,sent',
         ]);
 
@@ -690,11 +693,11 @@ class QuotationController extends Controller
         $invoice->staff_id = $quotation->staff_id ?? auth()->id();
         $invoice->amc_plan_id = $quotation->amcDetail->first()->amc_plan_id ?? null;
         $invoice->total_items = $quotation->products->count();
-        $invoice->subtotal = $quotation->subtotal ?? 0;
-        $invoice->total_discount = $quotation->discount_amount ?? 0;
-        $invoice->total_tax = $quotation->tax_amount ?? 0;
-        $invoice->round_off = 0;
-        $invoice->grand_total = $quotation->total_amount ?? 0;
+        $invoice->subtotal = $quotation->amcData->total_amount ?? $quotation->subtotal ?? 0;
+        $invoice->total_discount = $request->total_discount ?? 0;
+        $invoice->total_tax = $request->tax_amount ?? 0;
+        $invoice->round_off = $request->round_off ?? 0;
+        $invoice->grand_total = $request->grand_total ?? 0;
         $invoice->currency = $quotation->currency ?? 'INR';
         $invoice->status = $request->status ?: 'draft';
         $invoice->notes = $request->notes ?? null;

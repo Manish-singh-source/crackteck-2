@@ -615,7 +615,9 @@ class AllServicesController extends Controller
                 return response()->json(['success' => false, 'message' => 'Service request not found or does not belong to this customer.'], 404);
             }
 
-            $requestPart = ServiceRequestProductRequestPart::where('id', $validated['part_id'])
+            $requestPart = ServiceRequestProductRequestPart::where('part_id', $validated['part_id'])
+                ->where('request_id', $validated['service_request_id'])
+                ->where('product_id', $validated['product_id'])
                 ->first();
 
             if (!$requestPart) {

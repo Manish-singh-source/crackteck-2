@@ -17,6 +17,7 @@ use App\Models\Quotation;
 use App\Models\QuotationInvoice;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
+use App\Models\ServiceRequestProductPickup;
 use App\Models\ServiceRequestProductRequestPart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -1155,5 +1156,71 @@ class AllServicesController extends Controller
         }
 
         return response()->json(['success' => true, 'data' => $feedback], 200);
+    }
+
+    /**
+     * Customer approve or reject pickup request.
+     */
+    public function customerApproveRejectPickup(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'customer_id' => 'required|integer|exists:customers,id',
+            'service_request_id' => 'required|integer|exists:service_request_product_pickups,request_id',
+            'product_id' => 'required|integer|exists:service_request_product_pickups,product_id',
+            'action' => 'required|in:customer_approved,customer_rejected',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (!$staffRole || $staffRole !== 'customers') {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        $pickup = ServiceRequestProductPickup::with('serviceRequest')
+            ->where('request_id', $validated['service_request_id'])
+            ->where('product_id', $validated['product_id'])
+            ->first();
+
+        if (!$pickup) {
+            return response()->json(['success' => false, 'message' => 'Pickup request not found.'], 404);
+        }
+
+        // Verify the pickup belongs to this customer
+        if ($pickup->serviceRequest->customer_id != $validated['customer_id']) {
+            return response()->json(['success' => false, 'message' => 'Pickup request does not belong to this customer.'], 403);
+        }
+
+        // Check if customer action is allowed (only for admin_approved status)
+        if ($pickup->status !== 'admin_approved') {
+            return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: ' . $pickup->status], 400);
+        }
+
+        // Update the status based on customer action
+        if ($validated['action'] === 'customer_approved') {
+            $pickup->update([
+                'status' => 'customer_approved',
+                'customer_approved_at' => now(),
+            ]);
+            $message = 'Pickup approved successfully.';
+        } else {
+            $pickup->update([
+                'status' => 'customer_rejected',
+                'customer_rejected_at' => now(),
+            ]);
+            $message = 'Pickup rejected successfully.';
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'pickup_id' => $pickup->id,
+            'status' => $pickup->status,
+        ], 200);
     }
 }

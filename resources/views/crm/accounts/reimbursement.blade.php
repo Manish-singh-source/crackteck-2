@@ -1,14 +1,14 @@
-@extends('crm/layouts/master')
+@extends('crm/layouts/master') 
 
 @section('content')
 
-<div class="content">
+<div class="content"> 
 
 
     <div class="container-fluid">
-        <div class="pb-3 d-flex align-items-sm-center flex-sm-row flex-column">
+        <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
-                <h4 class="fs-18 fw-semibold m-0">Re-Imbursement log list</h4>
+                <h4 class="fs-18 fw-semibold m-0">Re-Imbursement List</h4>
             </div>
         </div>
 
@@ -18,43 +18,76 @@
                 <div class="card">
                     <div class="card-body pt-0">
 
-                        <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
+                        @php
+                                $statuses = [
+                                    'all' => ['label' => 'All', 'icon' => 'mdi-format-list-bulleted', 'color' => ''],
+                                    
+                                    'pending' => [
+                                        'label' => 'Pending',
+                                        'icon' => 'mdi-clock-time-four-outline',
+                                        'color' => 'text-warning',
+                                    ],
+                                    'completed' => [
+                                        'label' => 'Completed',
+                                        'icon' => 'mdi-check-circle-outline',
+                                        'color' => 'text-success',
+                                    ],
+                                    'failed' => [
+                                        'label' => 'Failed',
+                                        'icon' => 'mdi-alert-circle-outline',
+                                        'color' => 'text-danger',
+                                    ],
+                                ];
+
+                                $currentStatus = request()->get('status') ?? 'all';
+                            @endphp
+
+                            <ul class="nav nav-underline border-bottom" id="pills-tab" role="tablist">
+                                @foreach ($statuses as $key => $status)
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link {{ $currentStatus === $key ? 'active' : '' }} p-2"
+                                            href="{{ $key === 'all' ? route('reimbursement') : route('reimbursement', ['status' => $key]) }}">
+                                            <span class="d-block d-sm-none">
+                                                <i class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>
+                                            </span>
+                                            <span class="d-none d-sm-block">
+                                                <i
+                                                    class="mdi {{ $status['icon'] }} fs-16 me-1 {{ $status['color'] }}"></i>{{ $status['label'] }}
+                                            </span>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+
+                        {{-- <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link active p-2" id="all_customer_tab" data-bs-toggle="tab"
-                                    href="#all_customer" role="tab">
-                                    <span class="d-block d-sm-none"><i
-                                            class="mdi mdi-information"></i></span>
-                                    <span class="d-none d-sm-block">All Re-Imbursements</span>
+                                <a class="nav-link {{ $status === 'all' ? 'active' : '' }} p-2" id="all_tab" 
+                                    href="{{ route('reimbursement', ['status' => 'all']) }}" role="tab">
+                                    <span class="d-none d-sm-block">All</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link p-2" id="active_customer_tab" data-bs-toggle="tab" href="#active_customer"
-                                    role="tab">
-                                    <span class="d-block d-sm-none"><i
-                                            class="mdi mdi-sitemap-outline"></i></span>
-                                    <span class="d-none d-sm-block">Pending Re-Imbursements</span>
+                                <a class="nav-link {{ $status === 'pending' ? 'active' : '' }} p-2" id="pending_tab" 
+                                    href="{{ route('reimbursement', ['status' => 'pending']) }}" role="tab">
+                                    <span class="d-none d-sm-block">Pending</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link p-2" id="active_customer_tab" data-bs-toggle="tab" href="#active_customer"
-                                    role="tab">
-                                    <span class="d-block d-sm-none"><i
-                                            class="mdi mdi-sitemap-outline"></i></span>
-                                    <span class="d-none d-sm-block">Approved Imbursements</span>
+                                <a class="nav-link {{ $status === 'completed' ? 'active' : '' }} p-2" id="completed_tab" 
+                                    href="{{ route('reimbursement', ['status' => 'completed']) }}" role="tab">
+                                    <span class="d-none d-sm-block">Completed</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link p-2" id="active_customer_tab" data-bs-toggle="tab" href="#active_customer"
-                                    role="tab">
-                                    <span class="d-block d-sm-none"><i
-                                            class="mdi mdi-sitemap-outline"></i></span>
-                                    <span class="d-none d-sm-block">Rejected Imbursements</span>
+                                <a class="nav-link {{ $status === 'failed' ? 'active' : '' }} p-2" id="failed_tab" 
+                                    href="{{ route('reimbursement', ['status' => 'failed']) }}" role="tab">
+                                    <span class="d-none d-sm-block">Failed</span>
                                 </a>
                             </li>
-                        </ul>
+                        </ul> --}}
 
                         <div class="tab-content text-muted">
-                            <div class="tab-pane active show pt-4" id="all_customer" role="tabpanel">
+                            <div class="tab-pane active show" id="all_customer" role="tabpanel">
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="card shadow-none">
@@ -64,58 +97,44 @@
                                                     <thead>
 
                                                         <tr>
-                                                            <td>Imbursements ID</td>
+                                                            <td>Return Number</td>
                                                             <td>Date</td>
                                                             <td>User Type</td>
                                                             <td>Name</td>
                                                             <td>Amount</td>
                                                             <td>Method</td>
                                                             <td>Status</td>
-                                                            <td>Reference Note</td>
+                                                            <td>Note</td>
                                                         </tr>
 
                                                     </thead>
                                                     <tbody>
-
-                                                        <tr>
-
-                                                            <td>RI001</td>
-                                                            <td>2025-05-26</td>
-                                                            <td>Customer</td>
-                                                            <td>Ravi Kumar</td>
-                                                            <td>500 INR</td>
-                                                            <td>Wallet Top-Up</td>
-                                                            <td>
-                                                                <span class="badge bg-success-subtle text-success fw-semibold">Completed</span>
-                                                            </td>
-                                                            <td>Monthly advance</td>
-
-                                                        </tr>
-                                                        <tr>
-
-                                                            <td>RI002</td>
-                                                            <td>2025-05-26</td>
-                                                            <td>Staff</td>
-                                                            <td>Admin User</td>
-                                                            <td>1,200 INR</td>
-                                                            <td>Bank Transfer</td>
-                                                            <td>
-                                                                <span class="badge bg-danger-subtle text-danger fw-semibold">Pending</span>
-                                                            </td>
-                                                            <td>Inventory fund</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>RI003</td>
-                                                            <td>2025-05-25</td>
-                                                            <td>Customer</td>
-                                                            <td>Sarah Khan</td>
-                                                            <td>300 INR</td>
-                                                            <td>UPI</td>
-                                                            <td>
-                                                                <span class="badge bg-success-subtle text-success fw-semibold">Completed</span>
-                                                            </td>
-                                                            <td>AMC deposit</td>
-                                                        </tr>
+                                                        @forelse($returnOrders as $order)
+                                                            <tr>
+                                                                <td>{{ $order->return_order_number }}</td>
+                                                                <td>{{ $order->created_at->format('d M Y') }}</td>
+                                                                <td>Customer</td>
+                                                                <td>{{ $order->customer->first_name ?? '' }} {{ $order->customer->last_name ?? '' }}</td>
+                                                                <td>₹{{ number_format($order->refund_amount, 2) }}</td>
+                                                                <td>PhonePe</td>
+                                                                <td>
+                                                                    @if($order->refund_status === 'pending')
+                                                                        <span class="badge bg-warning">Pending</span>
+                                                                    @elseif($order->refund_status === 'completed')
+                                                                        <span class="badge bg-success">Completed</span>
+                                                                    @elseif($order->refund_status === 'failed')
+                                                                        <span class="badge bg-danger">Failed</span>
+                                                                    @else
+                                                                        <span class="badge bg-secondary">{{ $order->refund_status }}</span>
+                                                                    @endif
+                                                                </td>
+                                                                <td>{{ $order->return_reason ?? $order->customer_notes ?? '-' }}</td>
+                                                            </tr>
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="8" class="text-center">No records found</td>
+                                                            </tr>
+                                                        @endforelse
                                                     </tbody>
                                                 </table>
                                             </div>

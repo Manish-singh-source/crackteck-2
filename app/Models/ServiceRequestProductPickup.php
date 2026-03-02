@@ -21,6 +21,8 @@ class ServiceRequestProductPickup extends Model
         'otp',
         'otp_expiry',
         'admin_approved_at',
+        'customer_approved_at',
+        'customer_rejected_at',
         'assigned_at',
         'approved_at',
         'picked_at',
@@ -37,6 +39,9 @@ class ServiceRequestProductPickup extends Model
         'cancelled_at' => 'datetime',
         'returned_at' => 'datetime',
         'otp_expiry' => 'datetime',
+        'admin_approved_at' => 'datetime',
+        'customer_approved_at' => 'datetime',
+        'customer_rejected_at' => 'datetime',
     ];
 
     /**

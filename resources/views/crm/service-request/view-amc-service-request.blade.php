@@ -881,7 +881,7 @@
                     @php
                         $pickup = isset($pickups) && $pickups->count() > 0 ? $pickups->first() : null;
                         $showAssignmentForm =
-                            $pickup && ($pickup->status === 'admin_approved' || $pickup->status === 'approved');
+                            $pickup && ($pickup->status === 'customer_approved');
                         $pickingProducts = [];
                         foreach ($request->products as $product) {
                             if ($product->diagnosisDetails && $product->diagnosisDetails->count() > 0) {
@@ -951,7 +951,7 @@
                                     <form id="assignPickupForm">
                                         @csrf
                                         <input type="hidden" name="service_request_id" value="{{ $request->id }}">
-                                        @if ($pickup && $pickup->status === 'approved')
+                                        @if ($pickup && $pickup->status === 'customer_approved')
                                             <input type="hidden" name="pickup_id" value="{{ $pickup->id }}">
                                             <div class="alert alert-info mb-3">
                                                 <i class="mdi mdi-information"></i>

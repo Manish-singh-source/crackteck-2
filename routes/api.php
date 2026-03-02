@@ -236,8 +236,11 @@ Route::prefix('v1')->group(function () {
             // diagnosis list with full details
             // Route::get('/service-request/{id}/{product_id}/diagnosis-list', 'diagnosisList');
             
-            // customer approve/reject for picked, stock_in_hand, request_part
+            // customer approve/reject for stock_in_hand, request_part
             Route::post('/customer-approve-reject-part', 'customerApproveRejectPart');
+
+            // Customer approve/reject for pickup
+            Route::post('/customer-approve-reject-pickup', 'customerApproveRejectPickup');
 
             // service request quotation details
             Route::get('/service-request-quotations', 'serviceRequestQuotations');

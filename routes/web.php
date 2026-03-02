@@ -245,6 +245,18 @@ Route::prefix('/demo')->group(function () {
         Route::get('/crm/expenses', 'index')->name('expenses.index');
         // Expenses Create Page
         Route::get('/crm/create-expenses', 'create')->name('expenses.create');
+        // Store Expense
+        Route::post('/crm/store-expenses', 'store')->name('expenses.store');
+        // View Expense
+        Route::get('/crm/view-expenses/{id}', 'view')->name('expenses.view');
+        // Edit Expense
+        Route::get('/crm/edit-expenses/{id}', 'edit')->name('expenses.edit');
+        // Update Expense
+        Route::put('/crm/update-expenses/{id}', 'update')->name('expenses.update');
+        // Delete Expense
+        Route::delete('/crm/delete-expenses/{id}', 'delete')->name('expenses.delete');
+        // Update Expense Status
+        Route::post('/crm/update-expense-status/{id}', 'updateStatus')->name('expenses.update-status');
     });
 
     // ######################## Stock Request  ########################

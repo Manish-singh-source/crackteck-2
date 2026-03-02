@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Symfony\Component\Mime\Address;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\StaffWalletController;
 use App\Http\Controllers\Api\LeadController;
 use App\Http\Controllers\Api\MeetController;
 use App\Http\Controllers\Api\SDUIController;
@@ -46,6 +47,20 @@ Route::prefix('v1')->group(function () {
     Route::post('/signup', [ApiAuthController::class, 'signup']);
     Route::post('/send-otp', [ApiAuthController::class, 'login']);
     Route::post('/verify-otp', [ApiAuthController::class, 'verifyOtp']);
+    
+    // Public route for staff wallet status update (used by admin panel)
+    Route::put('/staff-expenses/{id}/status', [StaffWalletController::class, 'updateStatus']);
+    
+    // Receipt download route (public - outside JWT middleware)
+    Route::get('/receipts/{filename}', function ($filename) {
+        $path = storage_path('app/public/receipts/' . $filename);
+        
+        if (!file_exists($path)) {
+            return response()->json(['message' => 'File not found'], 404);
+        }
+        
+        return response()->file($path);
+    });
 
     Route::middleware(['jwt.verify'])->group(function () {
         Route::post('/logout', [ApiAuthController::class, 'logout']);
@@ -372,6 +387,18 @@ Route::prefix('v1')->group(function () {
 
             // (5) Verify OTP and change status to delivered
             Route::post('/part-request/{id}/verify-otp', 'verifyPartRequestOtp');
+        });
+
+        // Staff Wallet / Expense APIs for Engineer and Delivery Man
+        Route::controller(StaffWalletController::class)->group(function () {
+            // Get expense details
+            Route::get('/staff-expenses', 'index');
+            // Submit expense form
+            Route::post('/staff-expenses', 'store');
+            // Get single expense details
+            Route::get('/staff-expenses/{id}', 'show');
+            // Get expense history
+            Route::get('/staff-expenses-history', 'history');
         });
     });
 });

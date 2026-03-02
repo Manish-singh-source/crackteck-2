@@ -39,113 +39,62 @@
         padding: 4px;
         cursor: pointer;
     }
+    
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .status-pending {
+        background-color: #FFF3CD;
+        color: #856404;
+    }
+    
+    .status-admin_approved {
+        background-color: #D4EDDA;
+        color: #155724;
+    }
+    
+    .status-admin_rejected {
+        background-color: #F8D7DA;
+        color: #721C24;
+    }
+    
+    .status-paid {
+        background-color: #CCE5FF;
+        color: #004085;
+    }
 </style>
 <div class="content">
 
     <!-- Start Content-->
     <div class="container-fluid">
-        <div class="pb-3 d-flex align-items-sm-center flex-sm-row flex-column">
+        <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
-                <h4 class="fs-18 fw-semibold m-0">Expenses</h4>
+                <h4 class="fs-18 fw-semibold m-0">Staff Wallet Expenses</h4>
             </div>
             <div>
                 <a href="{{ route('expenses.create') }}" class="btn btn-primary">Add Expense</a>
             </div>
         </div>
 
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-body border border-dashed border-end-0 border-start-0">
-                        <form action="#" method="get">
-                            <div class="d-flex justify-content-between">
-                                <div class="row">
-                                    <div class="col-xl-10 col-md-10 col-sm-10">
-                                        <div class="search-box">
-                                            <input type="text" name="search" value="" class="form-control search" placeholder="Search Customer">
-                                            <i class="ri-search-line search-icon"></i>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-2 col-md-2 col-sm-2 col-2">
-                                        <div class="d-flex justify-content-center align-items-center">
-                                            <button type="submit" class="btn btn-primary waves ripple-light">
-                                                <!-- <span class="d-none d-md-inline-flex"> Search </span> -->
-                                                <i class="fa-solid fa-magnifying-glass "></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row g-3">
-                                    <div class="col-xl-6 col-md-6 col-sm-6 col-6 btn-group" role="group">
-                                        <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <!-- <span class="d-none d-md-inline-flex"> Sort </span> -->
-                                            <i class="fa-solid fa-arrow-up-z-a "></i>
-                                        </button>
-                                        
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="#">Sort By Name</a></li>
-                                            <li><a class="dropdown-item" href="#">Sort By E-mail</a></li>
-                                        </ul>
-                                    </div>
-
-                                    <div class="col-xl-6 col-md-6 col-sm-6 col-6 btn-group" role="group">
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#standard-modal">
-                                            <!-- <span class="d-none d-md-inline-flex"> Filters </span> -->
-                                            <i class="fa-solid fa-filter "></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="modal fade" id="standard-modal" tabindex="-1" aria-labelledby="standard-modalLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h1 class="modal-title fs-5" id="standard-modalLabel">Filters</h1>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-
-                                            <div class="modal-body px-3 py-md-2">
-                                                <h5>Status</h5>
-                                                <div class="row">
-                                                    <div class="col-6">
-
-                                                        <div class="mt-3">
-                                                            <div class="form-check mb-2">
-                                                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-                                                                <label class="form-check-label" for="flexRadioDefault1">
-                                                                    Active
-                                                                </label>
-                                                            </div>
-
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
-                                                                <label class="form-check-label" for="flexRadioDefault2">
-                                                                    Inactive
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary">Save changes</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </form>
-                    </div>
                     <div class="card-body pt-0">
                         <div class="d-flex justify-content-between align-items-center">
                             <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link active p-2" id="all_customer_tab" data-bs-toggle="tab"
-                                        href="#all_customer" role="tab">
+                                    <a class="nav-link active p-2" id="all_expenses_tab" data-bs-toggle="tab"
+                                        href="#all_expenses" role="tab">
                                         <span class="d-block d-sm-none"><i
                                                 class="mdi mdi-information"></i></span>
                                         <span class="d-none d-sm-block">All Expenses</span>
@@ -157,7 +106,7 @@
 
                         <div class="tab-content text-muted">
 
-                            <div class="tab-pane active show pt-4" id="all_customer" role="tabpanel">
+                            <div class="tab-pane active show" id="all_expenses" role="tabpanel">
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="card shadow-none">
@@ -167,69 +116,104 @@
 
                                                     <thead>
                                                         <tr>
-                                                            <td>Expense Type</td>
-                                                            <td>Date</td>
+                                                            <td>ID</td>
+                                                            <td>Staff Type</td>
+                                                            <td>Staff Name</td>
+                                                            <td>Staff Code</td>
                                                             <td>Amount</td>
-                                                            <td>Paid To</td>
-                                                            <td>Payment Mode</td>
-                                                            <td>Remarks</td>
-                                                            <td>Upload Bill Copy</td>
+                                                            <td>Reason</td>
+                                                            <td>Receipt</td>
+                                                            <td>Status</td>
+                                                            <td>Date</td>
+                                                            <td>Actions</td>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
+                                                        @forelse($expenses as $expense)
                                                         <tr class="align-middle">
-                                                            <td>Fuel</td>
-                                                            <td>2025-06-03</td>
-                                                            <td>₹1,200</td>
-                                                            <td>Shell Petrol Pump</td>
-                                                            <td>Cash</td>
-                                                            <td>Office van refueling</td>
+                                                            <td>{{ $expense->id }}</td>
                                                             <td>
-                                                                <a href="#" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                                                                @if($expense->staff_type == 'engineer')
+                                                                    <span class="badge bg-primary">Engineer</span>
+                                                                @elseif($expense->staff_type == 'delivery_man')
+                                                                    <span class="badge bg-info">Delivery Man</span>
+                                                                @else
+                                                                    <span class="badge bg-secondary">{{ ucfirst($expense->staff_type) }}</span>
+                                                                @endif
                                                             </td>
+                                                            <td>
+                                                                @if($expense->staff)
+                                                                    {{ $expense->staff->first_name }} {{ $expense->staff->last_name }}
+                                                                @else
+                                                                    N/A
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                @if($expense->staff)
+                                                                    {{ $expense->staff->staff_code }}
+                                                                @else
+                                                                    N/A
+                                                                @endif
+                                                            </td>
+                                                            <td>₹{{ number_format($expense->amount, 2) }}</td>
+                                                            <td>{{ Str::limit($expense->reason, 50) }}</td>
+                                                            <td>
+                                                                @if($expense->receipt)
+                                                                    <a href="{{ asset('storage/' . $expense->receipt) }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                                                                @else
+                                                                    <span class="text-muted">No Receipt</span>
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                <span class="status-badge status-{{ $expense->status }}">
+                                                                    @if($expense->status == 'pending')
+                                                                        Pending
+                                                                    @elseif($expense->status == 'admin_approved')
+                                                                        Admin Approved
+                                                                    @elseif($expense->status == 'admin_rejected')
+                                                                        Admin Rejected
+                                                                    @elseif($expense->status == 'paid')
+                                                                        Paid
+                                                                    @endif
+                                                                </span>
+                                                            </td>
+                                                            <td>{{ date('d-m-Y', strtotime($expense->created_at)) }}</td>
+                                                            <td>
+                                                                <div class="d-flex gap-2">
+                                                                    {{-- <a href="{{ route('expenses.view', $expense->id) }}" class="btn btn-sm btn-outline-info" title="View">
+                                                                        <i class="fa-solid fa-eye"></i>
+                                                                    </a> --}}
+                                                                    <a href="{{ route('expenses.edit', $expense->id) }}" class="btn btn-sm btn-outline-warning" title="Edit">
+                                                                        <i class="fa-solid fa-edit"></i>
+                                                                    </a>
+                                                                    <form action="{{ route('expenses.delete', $expense->id) }}" method="POST" style="display:inline;">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this expense?')">
+                                                                            <i class="fa-solid fa-trash"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
                                                             </td>
                                                         </tr>
-                                                        <tr class="align-middle">
-                                                            <td>Travel</td>
-                                                            <td>2025-06-01</td>
-                                                            <td>₹3,500</td>
-                                                            <td>Rajesh Kumar</td>
-                                                            <td> UPI</td>
-                                                            <td> Client meeting in Pune</td>
-                                                            <td>
-                                                                <a href="#" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
-                                                            </td>
+                                                        @empty
+                                                        <tr>
+                                                            <td colspan="10" class="text-center">No expenses found</td>
                                                         </tr>
-                                                        <tr class="align-middle">
-                                                            <td> Rent</td>
-                                                            <td> 2025-06-01</td>
-                                                            <td> ₹25,000</td>
-                                                            <td> Building Owner</td>
-                                                            <td> Bank Transfer</td>
-                                                            <td> Monthly office rent</td>
-                                                            <td>
-                                                                <a href="#" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
-                                                            </td>
-                                                        </tr>
-                                                        <tr class="align-middle">
-                                                            <td> Salary</td>
-                                                            <td> 2025-06-05</td>
-                                                            <td> ₹40,000</td>
-                                                            <td> Priya Mehta</td>
-                                                            <td> Bank Transfer</td>
-                                                            <td> June salary</td>
-                                                            <td>
-                                                                <a href="#" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
-                                                            </td>
-                                                        </tr>
+                                                        @endforelse
                                                     </tbody>
                                                 </table>
+                                                
+                                                <!-- Pagination -->
+                                                <div class="d-flex justify-content-center">
+                                                    {{ $expenses->links() }}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                            </div><!-- end Experience -->
+                            </div><!-- end tab-pane -->
 
                         </div> <!-- Tab panes -->
                     </div>

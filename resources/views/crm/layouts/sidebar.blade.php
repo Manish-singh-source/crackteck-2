@@ -68,7 +68,7 @@
                             <li>
                                 <a class='tp-link' href="{{ route('withdraw') }}">Withdraw</a>
                             </li>
-                            <li>
+                            {{-- <li>
                                 <a class='tp-link' href="{{ route('sales.index') }}">
                                     Sales Invoicing
                                 </a>
@@ -78,6 +78,12 @@
                                 <a class='tp-link' href="{{ route('client.index') }}">
                                     Client Receipts
                                 </a>
+                            </li> --}}
+                            <li>
+                                <a class='tp-link' href="{{ route('invoice.index') }}">
+                                    {{-- <i class="fas fa-file-invoice"></i> --}}
+                                    <span class="ps-1"> Invoice </span>
+                                </a>
                             </li>
 
                             <li>
@@ -85,11 +91,11 @@
                                     Payments to Vendor
                                 </a>
                             </li>
-                            <li>
+                            {{-- <li>
                                 <a class='tp-link' href="{{ route('creditors-report.index') }}">
                                     Creditors Reports
                                 </a>
-                            </li>
+                            </li> --}}
                             <li>
                                 <a class='tp-link' href="{{ route('expenses.index') }}">
                                     Expenses
@@ -308,12 +314,7 @@
                         <span class="ps-1"> Tickets </span>
                     </a>
                 </li>
-                <li>
-                    <a class='tp-link' href="{{ route('invoice.index') }}">
-                        <i class="fas fa-file-invoice"></i>
-                        <span class="ps-1"> Invoice </span>
-                    </a>
-                </li>
+                
 
                 {{-- 
                 <li class="menu-title mt-2">App UI Settings</li>

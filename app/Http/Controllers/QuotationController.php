@@ -111,10 +111,11 @@ class QuotationController extends Controller
 
         try {
             DB::beginTransaction();
+            $lead = Lead::findOrFail($request->lead_id);
 
             $quotation = new Quotation;
             $quotation->lead_id = $request->lead_id;
-            $quotation->staff_id = auth()->id(); // Assuming the logged-in user is creating the quotation
+            $quotation->staff_id = $lead->staff_id; // Assuming the logged-in user is creating the quotation
             $quotation->quote_id = $request->quote_id;
             $quotation->quote_number = $request->quote_id;
             $quotation->quote_date = $request->quote_date;

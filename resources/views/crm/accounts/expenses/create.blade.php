@@ -7,7 +7,10 @@
     <div class="container-fluid">
         <div class="pb-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
-                <h4 class="fs-18 fw-semibold m-0">Create Vendor Payment</h4>
+                <h4 class="fs-18 fw-semibold m-0">Create Staff Expense</h4>
+            </div>
+            <div>
+                <a href="{{ route('expenses.index') }}" class="btn btn-secondary">Back to List</a>
             </div>
         </div>
 
@@ -15,86 +18,82 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Payment Details</h5>
+                        <h5 class="card-title mb-0">Expense Details</h5>
                     </div>
                     <div class="card-body">
-                        <form action="#" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('expenses.store') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
                             <div class="row g-3 pb-3">
 
                                 <div class="col-xl-4 col-lg-6">
                                     <div>
-                                        @include('components.form.select', [
-                                        'label' => 'Expense Type',
-                                        'name' => 'vendorName',
-                                        'options' => ["0" => "--Select--", "1" => "Fuel", "2" => "Travel", "3" => "Rent", "4" => "Salary"]
-                                        ])
-                                    </div>
-                                </div>
-                                <div class="col-xl-4 col-lg-6">
-                                    <div>
-                                        @include('components.form.input', [
-                                        'label' => 'Date',
-                                        'name' => 'date',
-                                        'type' => 'date',
-                                        ])
+                                        <label class="form-label">Staff Type <span class="text-danger">*</span></label>
+                                        <select name="staff_type" id="staff_type" class="form-select" required>
+                                            <option value="">-- Select Staff Type --</option>
+                                            <option value="engineer">Engineer</option>
+                                            <option value="delivery_man">Delivery Man</option>
+                                        </select>
+                                        @error('staff_type')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
 
                                 <div class="col-xl-4 col-lg-6">
                                     <div>
-                                        @include('components.form.input', [
-                                        'label' => 'Amount',
-                                        'name' => 'amount',
-                                        'type' => 'text',
-                                        'placeholder' => 'Enter Total Paid Amount'
-                                        ])
+                                        <label class="form-label">Staff <span class="text-danger">*</span></label>
+                                        <select name="staff_id" id="staff_id" class="form-select" required>
+                                            <option value="">-- Select Staff Type First --</option>
+                                            @foreach($staff as $staffMember)
+                                                <option value="{{ $staffMember->id }}" data-staff-type="{{ $staffMember->staff_role }}">
+                                                    {{ $staffMember->first_name }} {{ $staffMember->last_name }} ({{ $staffMember->staff_code }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('staff_id')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
+
                                 <div class="col-xl-4 col-lg-6">
                                     <div>
-                                        @include('components.form.select', [
-                                            'label' => 'Paid To',
-                                        'name' => 'linkedBill',
-                                        'options' => ["0" => "--Select--", "1" => "Saurabh", "2" => "Manish"]
-                                        ])
+                                        <label class="form-label">Amount <span class="text-danger">*</span></label>
+                                        <input type="number" name="amount" class="form-control" placeholder="Enter Amount" step="0.01" min="0" required>
+                                        @error('amount')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
-                                <div class="col-xl-4 col-lg-6">
+
+                                <div class="col-xl-12 col-lg-12">
                                     <div>
-                                        @include('components.form.select', [
-                                            'label' => 'Payment Mode',
-                                        'name' => 'payStatus',
-                                        'options' => ["0" => "--Select--", "1" => "Cash", "2" => "Bank Transfer", "3" => "UPI", "4" => "Cheque"]
-                                        ])
+                                        <label class="form-label">Reason <span class="text-danger">*</span></label>
+                                        <textarea name="reason" class="form-control" rows="3" placeholder="Enter Reason for expense" required></textarea>
+                                        @error('reason')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
-                                
-                                <div class="col-xl-4 col-lg-6">
+
+                                <div class="col-xl-6 col-lg-6">
                                     <div>
-                                        @include('components.form.input', [
-                                        'label' => 'Notes/Remarks',
-                                        'name' => 'remarks',
-                                        'type' => 'text',
-                                        'placeholder' => 'Enter Notes/Remarks'
-                                        ])
+                                        <label class="form-label">Receipt</label>
+                                        <input type="file" name="receipt" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
+                                        <small class="text-muted">Accepted formats: JPG, JPEG, PNG, PDF (Max: 2MB)</small>
+                                        @error('receipt')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
-                                <div class="col-xl-4 col-lg-6">
-                                    <div>
-                                        @include('components.form.input', [
-                                        'label' => 'Upload Bill Copy',
-                                        'name' => 'bill_copy',
-                                        'type' => 'file',
-                                        ])
-                                    </div>
-                                </div>
+
                                 <div class="col-12">
-                                    <div class="text-start">
-                                        <a href="{{ route('expenses.index') }}" class="btn btn-primary">
-                                            Submit
-                                        </a>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">Submit Expense</button>
+                                        <a href="{{ route('expenses.index') }}" class="btn btn-secondary">Cancel</a>
                                     </div>
                                 </div>
+
                             </div>
                         </form>
                     </div>
@@ -103,5 +102,46 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const staffTypeSelect = document.getElementById('staff_type');
+    const staffSelect = document.getElementById('staff_id');
+    const staffOptions = staffSelect.querySelectorAll('option');
+    
+    function filterStaff() {
+        const selectedType = staffTypeSelect.value;
+        
+        staffOptions.forEach(option => {
+            if (option.value === '') return; // Skip the default option
+            
+            const optionStaffType = option.getAttribute('data-staff-type');
+            if (selectedType === '' || optionStaffType === selectedType) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+        
+        // Update default option text based on selection
+        const defaultOption = staffSelect.querySelector('option[value=""]');
+        if (selectedType === '') {
+            defaultOption.textContent = '-- Select Staff Type First --';
+        } else {
+            defaultOption.textContent = '-- Select Staff --';
+        }
+        defaultOption.selected = true;
+    }
+    
+    staffTypeSelect.addEventListener('change', filterStaff);
+    
+    // Initial filter on page load (hide all staff until type is selected)
+    staffOptions.forEach(option => {
+        if (option.value !== '') {
+            option.style.display = 'none';
+        }
+    });
+});
+</script>
 
 @endsection

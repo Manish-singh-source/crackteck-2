@@ -310,6 +310,7 @@ class StaffController extends Controller
 
 
         $loginLogs = AuthenticationLog::forUser($staff)->get();
+        // dd($loginLogs);
 
         return view('/crm/access-control/staff/view', compact('staff', 'roles', 'totalTasks', 'completedTasks', 'pendingTasks', 'inProgressTasks', 'stockInHand', 'loginLogs'));
     }

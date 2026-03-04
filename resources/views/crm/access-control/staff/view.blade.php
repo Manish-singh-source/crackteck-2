@@ -475,7 +475,7 @@
                                             </div>
                                         </div>
                                     </div> --}}
-                                    <div class="tab-pane pt-4" id="logsdetiles" role="tabpanel">
+                                    <div class="tab-pane" id="logsdetiles" role="tabpanel">
                                         <div class="row">
                                             <div class="col-md-12 col-sm-12 col-md-12 mb-4">
 
@@ -483,7 +483,7 @@
 
 
                                                     <div class="tab-content text-muted">
-                                                        <div class="tab-pane active show pt-4" id="all_customer"
+                                                        <div class="tab-pane active show" id="all_customer"
                                                             role="tabpanel">
                                                             <div class="row">
                                                                 <div class="col-12">
@@ -493,33 +493,68 @@
                                                                                 class="table table-striped table-borderless dt-responsive nowrap">
                                                                                 <thead>
                                                                                     <tr>
-                                                                                        <th>Date</th>
                                                                                         <th>Login Time</th>
                                                                                         <th>Logout Time</th>
-                                                                                        <th>Total Hours</th>
-                                                                                        <th>Remarks</th>
+                                                                                        <th>Last Activity</th>
+                                                                                        <th>IP Address</th>
+                                                                                        <th>Device</th>
                                                                                         <th>Status</th>
+                                                                                        <th>Security</th>
                                                                                     </tr>
                                                                                 </thead>
+
                                                                                 <tbody>
-                                                                                    {{-- 
-                                                                                    @forelse($loginLogs as $data)
+                                                                                    @forelse($loginLogs as $log)
                                                                                         <tr>
-                                                                                            <td>{{ Carbon\Carbon::parse($data->created_at)->format('d M Y') }}</td>
-                                                                                            <td>{{ $data->login_at }}</td>
-                                                                                            <td>{{ $data->logout_at ?? 'N/A' }}</td>
-                                                                                            <td>{{ $data->total_hours }}</td>
-                                                                                            <td>{{ $data->remarks ?? 'N/A' }}</td>
                                                                                             <td>
-                                                                                                {{ ucwords(str_replace('_', ' ', $data->status)) }}
+                                                                                                {{ $log->login_at?->format('d M Y h:i A') ?? 'N/A' }}
+                                                                                            </td>
+
+                                                                                            <td>
+                                                                                                {{ $log->logout_at?->format('d M Y h:i A') ?? 'Still Logged In' }}
+                                                                                            </td>
+
+                                                                                            <td>
+                                                                                                {{ $log->last_activity_at?->format('d M Y h:i A') ?? 'N/A' }}
+                                                                                            </td>
+
+                                                                                            <td>{{ $log->ip_address ?? 'N/A' }}
+                                                                                            </td>
+
+                                                                                            <td>{{ $log->device_name ?? 'Unknown Device' }}
+                                                                                            </td>
+
+                                                                                            <td>
+                                                                                                @if ($log->login_successful)
+                                                                                                    <span
+                                                                                                        class="badge bg-success">Successful</span>
+                                                                                                @else
+                                                                                                    <span
+                                                                                                        class="badge bg-danger">Failed</span>
+                                                                                                @endif
+                                                                                            </td>
+
+                                                                                            <td>
+                                                                                                @if ($log->is_suspicious)
+                                                                                                    <span
+                                                                                                        class="badge bg-warning text-dark">
+                                                                                                        Suspicious
+                                                                                                    </span>
+                                                                                                @else
+                                                                                                    <span
+                                                                                                        class="badge bg-secondary">
+                                                                                                        Normal
+                                                                                                    </span>
+                                                                                                @endif
                                                                                             </td>
                                                                                         </tr>
                                                                                     @empty
                                                                                         <tr>
-                                                                                            <td colspan="10" >
-                                                                                                No Logs Found</td>
+                                                                                            <td colspan="7"
+                                                                                                class="text-center">No
+                                                                                                Login Logs Found</td>
                                                                                         </tr>
-                                                                                    @endforelse --}}
+                                                                                    @endforelse
                                                                                 </tbody>
                                                                             </table>
                                                                         </div>

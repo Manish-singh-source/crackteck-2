@@ -12,6 +12,7 @@ use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth, DB, Log, Validator};
+use Rappasoft\LaravelAuthenticationLog\Models\AuthenticationLog;
 use Spatie\Permission\Models\Role;
 
 class StaffController extends Controller
@@ -303,11 +304,14 @@ class StaffController extends Controller
 
         $stockInHand = ServiceRequestProductRequestPart::with('product', 'serviceRequest', 'serviceRequest.customer')
         ->where('engineer_id', $id)
-        // ->where('status', 'picked')
-        // ->where('request_type', 'stock_in_hand')
+        ->where('status', 'picked')
+        ->where('request_type', 'stock_in_hand')
         ->get();
 
-        return view('/crm/access-control/staff/view', compact('staff', 'roles', 'totalTasks', 'completedTasks', 'pendingTasks', 'inProgressTasks', 'stockInHand'));
+
+        $loginLogs = AuthenticationLog::forUser($staff)->get();
+
+        return view('/crm/access-control/staff/view', compact('staff', 'roles', 'totalTasks', 'completedTasks', 'pendingTasks', 'inProgressTasks', 'stockInHand', 'loginLogs'));
     }
 
     public function update(Request $request, $id)

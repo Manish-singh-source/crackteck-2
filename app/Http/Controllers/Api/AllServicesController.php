@@ -718,11 +718,8 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Quotation not found.'], 404);
         }
 
-        return response()->json(['success' => false, 'message' => $quotationDetails], 404);
+        return response()->json(['success' => true, 'message' => $quotationDetails], 200);
 
-        $data = new QuotationDetailResource($quotationDetails);
-
-        return response()->json(['success' => true, 'data' => $data], 200);
     }
 
     public function acceptQuotation(Request $request, $id)

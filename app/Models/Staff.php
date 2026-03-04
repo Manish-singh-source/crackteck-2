@@ -29,6 +29,19 @@ class Staff extends Authenticatable implements JWTSubject
         'status',
     ];
 
+        /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+    
     public function getJWTIdentifier()
     {
         return $this->getKey();

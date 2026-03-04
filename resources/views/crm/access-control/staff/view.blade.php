@@ -502,46 +502,24 @@
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
-                                                                                    <tr>
-                                                                                        <td>
-                                                                                            <div>
-                                                                                                2 weeks ago
-                                                                                            </div>
-                                                                                            <div>
-                                                                                                2025-04-04 06:09 PM
-                                                                                            </div>
-                                                                                        </td>
-                                                                                        <td>09:15 AM</td>
-
-                                                                                        <td>06:00 PM</td>
-                                                                                        <td>8.75</td>
-
-
-                                                                                        <td>Late login by 15 mins</td>
-                                                                                        <td>
-                                                                                            Present
-                                                                                        </td>
-                                                                                    </tr>
-                                                                                    <tr>
-                                                                                        <td>
-                                                                                            <div>
-                                                                                                2 weeks ago
-                                                                                            </div>
-                                                                                            <div>
-                                                                                                2025-04-04 06:09 PM
-                                                                                            </div>
-                                                                                        </td>
-                                                                                        <td>09:15 AM</td>
-
-                                                                                        <td>06:00 PM</td>
-                                                                                        <td>8.75</td>
-
-
-                                                                                        <td>Late login by 15 mins</td>
-                                                                                        <td>
-                                                                                            Present
-                                                                                        </td>
-                                                                                    </tr>
+                                                                                    {{-- 
+                                                                                    @forelse($loginLogs as $data)
+                                                                                        <tr>
+                                                                                            <td>{{ Carbon\Carbon::parse($data->created_at)->format('d M Y') }}</td>
+                                                                                            <td>{{ $data->login_at }}</td>
+                                                                                            <td>{{ $data->logout_at ?? 'N/A' }}</td>
+                                                                                            <td>{{ $data->total_hours }}</td>
+                                                                                            <td>{{ $data->remarks ?? 'N/A' }}</td>
+                                                                                            <td>
+                                                                                                {{ ucwords(str_replace('_', ' ', $data->status)) }}
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    @empty
+                                                                                        <tr>
+                                                                                            <td colspan="10" >
+                                                                                                No Logs Found</td>
+                                                                                        </tr>
+                                                                                    @endforelse --}}
                                                                                 </tbody>
                                                                             </table>
                                                                         </div>
@@ -613,15 +591,17 @@
                                                                                                 {{ ucwords(str_replace('_', ' ', $data->status)) }}
                                                                                             </td>
                                                                                             <td>
-                                                                                                <a href="{{ route('spare-parts-requests.view', $data->id) }}" class="btn btn-primary btn-sm">View</a>
+                                                                                                <a href="{{ route('spare-parts-requests.view', $data->id) }}"
+                                                                                                    class="btn btn-primary btn-sm">View</a>
                                                                                             </td>
-                                                                                        @empty
+                                                                                        </tr>
+                                                                                    @empty
                                                                                         <tr>
                                                                                             <td colspan="10"
                                                                                                 class="text-center text-muted py-4">
                                                                                                 No tasks assigned yet</td>
                                                                                         </tr>
-                                                                                    @endif
+                                                                                    @endforelse
                                                                                 </tbody>
                                                                             </table>
                                                                         </div>

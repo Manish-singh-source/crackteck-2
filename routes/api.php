@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\AllServicesController;
 use App\Http\Controllers\Api\AmcServicesController;
 use App\Http\Controllers\Api\ApiAuthController;
@@ -51,6 +52,12 @@ Route::prefix('v1')->group(function () {
     
     // Public route for staff wallet status update (used by admin panel)
     Route::put('/staff-expenses/{id}/status', [StaffWalletController::class, 'updateStatus']);
+    
+    // KYC Routes (public - for Engineer, Sales Person, Delivery Man)
+    Route::controller(KycController::class)->group(function () {
+        Route::get('/kyc/status', 'getStatus'); // Get KYC status and reason
+        Route::post('/kyc/submit', 'submitKyc'); // Submit KYC details
+    });
     
     // Receipt download route (public - outside JWT middleware)
     Route::get('/receipts/{filename}', function ($filename) {

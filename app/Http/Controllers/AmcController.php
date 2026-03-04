@@ -10,6 +10,7 @@ use App\Models\CoveredItem;
 use App\Models\DeviceSpecificDiagnosis;
 use App\Models\ServiceRequest;
 use App\Models\Staff;
+use App\Helpers\FileUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -82,7 +83,7 @@ class AmcController extends Controller
                 // $filename = time() . '.' . $file->getClientOriginalExtension();
                 // $file->move(public_path('uploads/crm/amc/brochure'), $filename);
                 // $amc->brochure = 'uploads/crm/amc/brochure/' . $filename;
-                $amc->brochure = fileUpload($request->file('brochure'), 'uploads/crm/amc/brochure/');
+                $amc->brochure = FileUpload::fileUpload($request->file('brochure'), 'uploads/crm/amc/brochure/');
             }
 
             $amc->tandc = $request->tandc;
@@ -174,7 +175,7 @@ class AmcController extends Controller
 
             // Brochure upload (replace old if new uploaded)
             if ($request->hasFile('brochure')) {
-                $amc->brochure = app('App\Helpers\FileUpload')->updateFileUpload(
+                $amc->brochure = FileUpload::updateFileUpload(
                     $request->file('brochure'),
                     $amc->brochure,
                     'uploads/crm/amc/brochure/'

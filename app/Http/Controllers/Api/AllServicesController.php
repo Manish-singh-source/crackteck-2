@@ -962,7 +962,7 @@ class AllServicesController extends Controller
         }
 
         // Find the quotation invoice according to quotation id
-        $invoice = QuotationInvoice::with('items')->where('quote_id', $id)->first();
+        $invoice = QuotationInvoice::with('items')->where('id', $id)->first();
 
         if (! $invoice) {
             return response()->json(['success' => false, 'message' => 'Invoice not found.'], 404);

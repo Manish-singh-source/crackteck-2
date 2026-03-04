@@ -6,7 +6,7 @@ use Illuminate\Http\UploadedFile;
 
 class FileUpload
 {
-    public function fileUpload(UploadedFile $file, string $path = ''): string
+    public static function fileUpload(UploadedFile $file, string $path = ''): string
     {
         // Use default path if empty
         $path = !empty($path) ? $path : 'uploads/crm/amc/brochure/';
@@ -36,7 +36,7 @@ class FileUpload
      * @param string $path The directory path where the file will be stored
      * @return string The path to the newly uploaded file
      */
-    public function updateFileUpload(UploadedFile $file, string $oldFilePath = '', string $path = ''): string
+    public static function updateFileUpload(UploadedFile $file, string $oldFilePath = '', string $path = ''): string
     {
         // Delete old file if it exists
         if (!empty($oldFilePath) && file_exists(public_path($oldFilePath))) {
@@ -44,6 +44,6 @@ class FileUpload
         }
 
         // Upload new file using existing method
-        return $this->fileUpload($file, $path);
+        return self::fileUpload($file, $path);
     }
 }

@@ -195,6 +195,7 @@
                                             <span class="d-none d-sm-block">Professional</span>
                                         </a>
                                     </li>
+                                    {{-- 
                                     <li class="nav-item">
                                         <a class="nav-link p-2" id="portfolio_education_tab" data-bs-toggle="tab"
                                             href="#profile_education" role="tab">
@@ -202,6 +203,7 @@
                                             <span class="d-none d-sm-block">Employment History</span>
                                         </a>
                                     </li>
+                                    --}}
                                     <li class="nav-item">
                                         <a class="nav-link p-2" id="logsdetiles_tab" data-bs-toggle="tab"
                                             href="#logsdetiles" role="tab">
@@ -311,7 +313,7 @@
                                                                 </span>
                                                                 <span>
                                                                     <span
-                                                                        class="fw-bold text-dark">{{ $staff->staff_code }}</span><br>
+                                                                        class="fw-bold text-dark">{{ ucwords(str_replace('_', ' ', $staff->staff_role)) }}</span><br>
                                                                 </span>
                                                             </li>
 
@@ -364,7 +366,7 @@
                                                                     Technical Skills :
                                                                 </span>
                                                                 <span>
-                                                                    {{ $staff->workSkills->primary_skills ?? 'N/A' }}
+                                                                    {{ implode(', ', json_decode($staff->workSkills->primary_skills ?? '[]')) ?: 'N/A' }}
                                                                 </span>
                                                             </li>
 
@@ -374,7 +376,7 @@
                                                                 </span>
                                                                 <span>
                                                                     <div>
-                                                                        {{ $staff->workSkills->certificates ?? 'N/A' }}
+                                                                        {{ implode(', ', json_decode($staff->workSkills->certifications ?? '[]')) ?: 'N/A' }}
                                                                     </div>
                                                                 </span>
                                                             </li>
@@ -384,7 +386,7 @@
                                                                 <span class="fw-semibold text-break">Experience :
                                                                 </span>
                                                                 <span>
-                                                                    <div>{{ $staff->workSkills->experience ?? 'N/A' }}
+                                                                    <div>{{ $staff->workSkills->experience ?? '0' }}
                                                                         Years</div>
                                                                 </span>
                                                             </li>
@@ -394,18 +396,18 @@
                                                                 </span>
                                                                 <span>
                                                                     <div>
-                                                                        {{ $staff->workSkills->languages_known ?? 'N/A' }}
+                                                                        {{ implode(', ', json_decode($staff->workSkills->languages_known ?? '[]')) ?: 'N/A' }}
                                                                     </div>
                                                                 </span>
                                                             </li>
                                                         </ul>
                                                     </div>
                                                 </div>
-
                                             </div>
                                         </div>
                                     </div>
 
+                                    {{-- 
                                     <div class="tab-pane pt-4" id="profile_education" role="tabpanel">
                                         <div class="row">
                                             <div class="col-md-12 col-sm-12 col-md-12 mb-4">
@@ -470,10 +472,9 @@
                                                         </ul>
                                                     </div>
                                                 </div>
-
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="tab-pane pt-4" id="logsdetiles" role="tabpanel">
                                         <div class="row">
                                             <div class="col-md-12 col-sm-12 col-md-12 mb-4">
@@ -576,8 +577,7 @@
                                                                                         <th>Quantity</th>
                                                                                         <th>Service ID</th>
                                                                                         <th>Customer Name</th>
-                                                                                        <th>Assigned Date</th>
-                                                                                        <th>Visit Date</th>
+                                                                                        <th>Picked Date</th>
                                                                                         <th>Assignment Type</th>
                                                                                         <th>Issue Type</th>
                                                                                         <th>Status</th>
@@ -585,232 +585,43 @@
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
-                                                                                    {{-- @forelse($visitAssignments as $assignment)
+                                                                                    @forelse($stockInHand as $data)
                                                                                         <tr>
                                                                                             <td>
-                                                                                                <a
-                                                                                                    href="{{ route('amc-services.view', $assignment->visit->amc_service_id) }}">
-                                                                                                    #{{ $assignment->visit->amcService->id ?? 'N/A' }}
-                                                                                                </a>
+                                                                                                {{ $data->product->product_name }}
                                                                                             </td>
                                                                                             <td>
-                                                                                                @if ($assignment->visit->amcService->branches->first())
-                                                                                                    {{ $assignment->visit->amcService->branches->first()->customer_name ?? 'N/A' }}
-                                                                                                @else
-                                                                                                    N/A
-                                                                                                @endif
-                                                                                            </td>
-                                                                                            <td>{{ $assignment->assigned_at ? $assignment->assigned_at->format('d M Y h:i A') : 'N/A' }}
-                                                                                            </td>
-                                                                                            <td>{{ $assignment->visit->scheduled_date ? $assignment->visit->scheduled_date->format('d M Y h:i A') : 'N/A' }}
+                                                                                                {{ $data->requested_quantity }}
                                                                                             </td>
                                                                                             <td>
-                                                                                                @if ($assignment->assignment_type == 'Individual')
-                                                                                                    <span
-                                                                                                        class="badge bg-info-subtle text-info">Individual</span>
-                                                                                                @else
-                                                                                                    <span
-                                                                                                        class="badge bg-primary-subtle text-primary">Group
-                                                                                                        -
-                                                                                                        {{ $assignment->group_name }}</span>
-                                                                                                @endif
-                                                                                            </td>
-                                                                                            <td>{{ $assignment->visit->issue_type ?? 'N/A' }}
+                                                                                                {{ $data->serviceRequest->request_id }}
                                                                                             </td>
                                                                                             <td>
-                                                                                                @if ($assignment->status == 'Transferred')
-                                                                                                    <span
-                                                                                                        class="badge bg-danger-subtle text-danger fw-semibold">
-                                                                                                        <i
-                                                                                                            class="bx bx-transfer me-1"></i>Transferred
-                                                                                                    </span>
-                                                                                                    @if ($assignment->transferredToAssignment)
-                                                                                                        <div
-                                                                                                            class="small text-muted mt-1">
-                                                                                                            To:
-                                                                                                            @if ($assignment->transferredToAssignment->assignment_type == 'Individual')
-                                                                                                                {{ $assignment->transferredToAssignment->engineer->first_name ?? '' }}
-                                                                                                                {{ $assignment->transferredToAssignment->engineer->last_name ?? '' }}
-                                                                                                            @else
-                                                                                                                {{ $assignment->transferredToAssignment->group_name }}
-                                                                                                            @endif
-                                                                                                        </div>
-                                                                                                    @endif
-                                                                                                @elseif($assignment->visit->status == 'Completed')
-                                                                                                    <span
-                                                                                                        class="badge bg-success-subtle text-success fw-semibold">Completed</span>
-                                                                                                @elseif($assignment->visit->status == 'Upcoming')
-                                                                                                    <span
-                                                                                                        class="badge bg-warning-subtle text-warning fw-semibold">Upcoming</span>
-                                                                                                @else
-                                                                                                    <span
-                                                                                                        class="badge bg-secondary-subtle text-secondary fw-semibold">{{ $assignment->visit->status }}</span>
-                                                                                                @endif
+                                                                                                {{ $data->serviceRequest->customer->first_name }}
+                                                                                                {{ $data->serviceRequest->customer->last_name }}
                                                                                             </td>
                                                                                             <td>
-                                                                                                <a aria-label="anchor"
-                                                                                                    href="{{ route('engineers.visit-detail', $assignment->visit->id) }}"
-                                                                                                    class="btn btn-icon btn-sm bg-primary-subtle me-1"
-                                                                                                    data-bs-toggle="tooltip"
-                                                                                                    data-bs-original-title="View">
-                                                                                                    <i
-                                                                                                        class="mdi mdi-eye-outline fs-14 text-primary"></i>
-                                                                                                </a>
-                                                                                            </td>
-                                                                                        </tr>
-                                                                                    @empty
-                                                                                    @endforelse --}}
-
-                                                                                    {{-- Quick Service Request Assignments --}}
-                                                                                    {{-- @forelse($quickServiceAssignments as $assignment)
-                                                                                        <tr>
-                                                                                            <td>
-                                                                                                <a
-                                                                                                    href="{{ route('service-request.view-quick-service-request', $assignment->quick_service_request_id) }}">
-                                                                                                    #QSR-{{ str_pad($assignment->quick_service_request_id, 4, '0', STR_PAD_LEFT) }}
-                                                                                                </a>
+                                                                                                {{ $data->picked_at ?? 'N/A' }}
                                                                                             </td>
                                                                                             <td>
-                                                                                                {{ $assignment->quickServiceRequest->customer->first_name ?? '' }}
-                                                                                                {{ $assignment->quickServiceRequest->customer->last_name ?? '' }}
-                                                                                            </td>
-                                                                                            <td>{{ $assignment->assigned_at ? $assignment->assigned_at->format('d M Y h:i A') : 'N/A' }}
+                                                                                                {{ $data->assigned_person_type ?? 'N/A' }}
                                                                                             </td>
                                                                                             <td>
-                                                                                                <span
-                                                                                                    class="badge bg-info-subtle text-info">Quick
-                                                                                                    Service</span>
+                                                                                                {{ $data->reason ?? 'N/A' }}
                                                                                             </td>
                                                                                             <td>
-                                                                                                @if ($assignment->assignment_type == 'Individual')
-                                                                                                    <span
-                                                                                                        class="badge bg-info-subtle text-info">Individual</span>
-                                                                                                @else
-                                                                                                    <span
-                                                                                                        class="badge bg-primary-subtle text-primary">Group
-                                                                                                        -
-                                                                                                        {{ $assignment->group_name }}</span>
-                                                                                                @endif
-                                                                                            </td>
-                                                                                            <td>{{ $assignment->quickServiceRequest->issue ?? 'N/A' }}
+                                                                                                {{ ucwords(str_replace('_', ' ', $data->status)) }}
                                                                                             </td>
                                                                                             <td>
-                                                                                                @if ($assignment->status == 'Transferred')
-                                                                                                    <span
-                                                                                                        class="badge bg-danger-subtle text-danger fw-semibold">
-                                                                                                        <i
-                                                                                                            class="bx bx-transfer me-1"></i>Transferred
-                                                                                                    </span>
-                                                                                                @elseif($assignment->status == 'Completed')
-                                                                                                    <span
-                                                                                                        class="badge bg-success-subtle text-success fw-semibold">Completed</span>
-                                                                                                @elseif($assignment->status == 'Active')
-                                                                                                    <span
-                                                                                                        class="badge bg-primary-subtle text-primary fw-semibold">Assigned</span>
-                                                                                                @else
-                                                                                                    <span
-                                                                                                        class="badge bg-secondary-subtle text-secondary fw-semibold">{{ $assignment->status }}</span>
-                                                                                                @endif
+                                                                                                <a href="{{ route('spare-parts-requests.view', $data->id) }}" class="btn btn-primary btn-sm">View</a>
                                                                                             </td>
-                                                                                            <td>
-                                                                                                <a aria-label="anchor"
-                                                                                                    href="{{ route('service-request.view-quick-service-request', $assignment->quick_service_request_id) }}"
-                                                                                                    class="btn btn-icon btn-sm bg-primary-subtle me-1"
-                                                                                                    data-bs-toggle="tooltip"
-                                                                                                    data-bs-original-title="View">
-                                                                                                    <i
-                                                                                                        class="mdi mdi-eye-outline fs-14 text-primary"></i>
-                                                                                                </a>
-                                                                                            </td>
-                                                                                        </tr>
-                                                                                    @empty
-                                                                                    @endforelse --}}
-
-                                                                                    {{-- NON AMC Service Assignments --}}
-                                                                                    {{-- @forelse($nonAmcAssignments as $assignment)
-                                                                                        <tr>
-                                                                                            <td>
-                                                                                                <a
-                                                                                                    href="{{ route('service-request.view-non-amc', $assignment->non_amc_service_id) }}">
-                                                                                                    #NON-AMC-{{ str_pad($assignment->non_amc_service_id, 4, '0', STR_PAD_LEFT) }}
-                                                                                                </a>
-                                                                                            </td>
-                                                                                            <td>
-                                                                                                {{ $assignment->nonAmcService->first_name ?? '' }}
-                                                                                                {{ $assignment->nonAmcService->last_name ?? '' }}
-                                                                                            </td>
-                                                                                            <td>{{ $assignment->assigned_at ? $assignment->assigned_at->format('d M Y h:i A') : 'N/A' }}
-                                                                                            </td>
-                                                                                            <td>
-                                                                                                <span
-                                                                                                    class="badge bg-warning-subtle text-warning">NON
-                                                                                                    AMC</span>
-                                                                                            </td>
-                                                                                            <td>
-                                                                                                @if ($assignment->assignment_type == 'Individual')
-                                                                                                    <span
-                                                                                                        class="badge bg-info-subtle text-info">Individual</span>
-                                                                                                @else
-                                                                                                    <span
-                                                                                                        class="badge bg-primary-subtle text-primary">Group
-                                                                                                        -
-                                                                                                        {{ $assignment->group_name }}</span>
-                                                                                                @endif
-                                                                                            </td>
-                                                                                            <td>{{ $assignment->nonAmcService->problem_type ?? ($assignment->nonAmcService->service_type ?? 'N/A') }}
-                                                                                            </td>
-                                                                                            <td>
-                                                                                                @if ($assignment->status == 'Transferred')
-                                                                                                    <span
-                                                                                                        class="badge bg-danger-subtle text-danger fw-semibold">
-                                                                                                        <i
-                                                                                                            class="bx bx-transfer me-1"></i>Transferred
-                                                                                                    </span>
-                                                                                                    @if ($assignment->transferredToAssignment)
-                                                                                                        <div
-                                                                                                            class="small text-muted mt-1">
-                                                                                                            To:
-                                                                                                            @if ($assignment->transferredToAssignment->assignment_type == 'Individual')
-                                                                                                                {{ $assignment->transferredToAssignment->engineer->first_name ?? '' }}
-                                                                                                                {{ $assignment->transferredToAssignment->engineer->last_name ?? '' }}
-                                                                                                            @else
-                                                                                                                {{ $assignment->transferredToAssignment->group_name }}
-                                                                                                            @endif
-                                                                                                        </div>
-                                                                                                    @endif
-                                                                                                @elseif($assignment->status == 'Completed')
-                                                                                                    <span
-                                                                                                        class="badge bg-success-subtle text-success fw-semibold">Completed</span>
-                                                                                                @elseif($assignment->status == 'Active')
-                                                                                                    <span
-                                                                                                        class="badge bg-primary-subtle text-primary fw-semibold">Assigned</span>
-                                                                                                @else
-                                                                                                    <span
-                                                                                                        class="badge bg-secondary-subtle text-secondary fw-semibold">{{ $assignment->status }}</span>
-                                                                                                @endif
-                                                                                            </td>
-                                                                                            <td>
-                                                                                                <a aria-label="anchor"
-                                                                                                    href="{{ route('service-request.view-non-amc', $assignment->non_amc_service_id) }}"
-                                                                                                    class="btn btn-icon btn-sm bg-primary-subtle me-1"
-                                                                                                    data-bs-toggle="tooltip"
-                                                                                                    data-bs-original-title="View">
-                                                                                                    <i
-                                                                                                        class="mdi mdi-eye-outline fs-14 text-primary"></i>
-                                                                                                </a>
-                                                                                            </td>
-                                                                                        </tr>
-                                                                                    @empty
-                                                                                    @endforelse --}}
-
-                                                                                    {{-- Show "No tasks" message only if all are empty --}}
-                                                                                    {{-- @if ($visitAssignments->isEmpty() && $quickServiceAssignments->isEmpty() && $nonAmcAssignments->isEmpty())
+                                                                                        @empty
                                                                                         <tr>
                                                                                             <td colspan="10"
                                                                                                 class="text-center text-muted py-4">
                                                                                                 No tasks assigned yet</td>
                                                                                         </tr>
-                                                                                    @endif --}}
+                                                                                    @endif
                                                                                 </tbody>
                                                                             </table>
                                                                         </div>

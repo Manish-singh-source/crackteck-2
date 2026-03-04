@@ -6,6 +6,7 @@ use App\Http\Requests\StoreStaffRequest;
 use App\Models\AssignedEngineer;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProductPickup;
+use App\Models\ServiceRequestProductRequestPart;
 use App\Models\ServiceRequestProductReturn;
 use App\Models\Staff;
 use App\Models\User;
@@ -300,9 +301,13 @@ class StaffController extends Controller
         // In progress Tasks End
 
 
+        $stockInHand = ServiceRequestProductRequestPart::with('product', 'serviceRequest', 'serviceRequest.customer')
+        ->where('engineer_id', $id)
+        // ->where('status', 'picked')
+        // ->where('request_type', 'stock_in_hand')
+        ->get();
 
-
-        return view('/crm/access-control/staff/view', compact('staff', 'roles', 'totalTasks', 'completedTasks', 'pendingTasks', 'inProgressTasks'));
+        return view('/crm/access-control/staff/view', compact('staff', 'roles', 'totalTasks', 'completedTasks', 'pendingTasks', 'inProgressTasks', 'stockInHand'));
     }
 
     public function update(Request $request, $id)

@@ -184,6 +184,8 @@ Route::prefix('/demo')->group(function () {
 
     // KYC Log Page
     Route::get('/crm/kyc-log', [KycLogController::class, 'index'])->name('kyc-log');
+    Route::get('/crm/kyc-log/{id}', [KycLogController::class, 'view'])->name('kyc-log.view');
+    Route::put('/crm/kyc-log/{id}/status', [KycLogController::class, 'updateStatus'])->name('kyc-log.update-status');
 
     // ######################## Sales Invoicing  ########################
 

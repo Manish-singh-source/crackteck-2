@@ -25,7 +25,9 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-
+            return redirect()->intended('demo/crm/index');
+        } elseif (Auth::guard('staff_web')->attempt($credentials)) {
+            $request->session()->regenerate();
             return redirect()->intended('demo/crm/index');
         }
 

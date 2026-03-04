@@ -95,9 +95,6 @@ class FieldEngineerController extends Controller
         $authLog->login_successful = true;
         $authLog->save();
 
-        // // Login the user via JWT
-        // $token = auth('staff')->login($user);
-
         return response()->json([
             'message' => 'Login successful',
             'auth_log' => $authLog,
@@ -134,9 +131,6 @@ class FieldEngineerController extends Controller
         $logoutTime = strtotime($authLog->logout_at);
         $totalHours = ($logoutTime - $loginTime) / 3600;
         $workingHours = round($totalHours, 2);
-
-        // Logout the user via JWT
-        // auth('staff')->logout();
 
         return response()->json([
             'message' => 'Logout successful',
@@ -187,7 +181,6 @@ class FieldEngineerController extends Controller
         ])->findOrFail($id);
 
         // Get active assignment
-        // $activeAssignment = AssignedEngineer::with(['engineer', 'groupEngineers'])
         $activeAssignment = AssignedEngineer::with(['engineer'])
             ->where('service_request_id', $id)
             ->where('status', 'active')

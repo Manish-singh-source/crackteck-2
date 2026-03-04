@@ -117,10 +117,8 @@ class OrderController extends Controller
     }
 
     // Buy Product
-    // role_id, product_id, quantity
     public function buyProduct(Request $request, $product_id)
     {
-        // return response()->json(['message' => $request->all()], 501);
         $roleValidated = Validator::make($request->all(), ([
             'role_id' => 'required|in:4',
             'quantity' => 'required|integer|min:1',
@@ -311,11 +309,7 @@ class OrderController extends Controller
         }
     }
 
-    // Product requested by engineer
-    // in this function engineer can request multiple products at once
-    // and store in stock_requests table
-
-    // but request submit by engineer so in by requested_by field store engineer_id
+    
     public function requestProduct(Request $request)
     {
         $roleValidated = Validator::make($request->all(), ([

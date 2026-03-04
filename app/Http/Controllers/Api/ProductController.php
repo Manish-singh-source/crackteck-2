@@ -193,16 +193,6 @@ class ProductController extends Controller
                 'stock_in_hand_id' => $item->id,
                 'status' => $item->status,
                 'products' => $item->product,
-                // ->map(function ($product) {
-                //     return [
-                //         'product_id' => $product->product_id,
-                //         'product_name' => $product->product->product_name ?? null,
-                //         'quantity' => $product->requested_quantity,
-                //         'delivered_quantity' => $product->delivered_quantity,
-                //         'unit_price' => $product->unit_price,
-                //         'status' => $product->status,
-                //     ];
-                // }),
                 'total_requested_quantity' => $item->requested_quantity,
             ];
         });

@@ -186,7 +186,7 @@ class AllServicesController extends Controller
         if ($request->service_type == 'amc') {
             $rules = [
                 'role_id' => 'required|in:4',
-                'customer_id' => 'required|integer|exists:customers,id',
+                'user_id' => 'required|integer|exists:customers,id',
                 'customer_address_id' => 'required|integer|exists:customer_address_details,id',
                 'service_type' => 'required|in:amc',
                 'products' => 'required|array|min:1',
@@ -205,7 +205,7 @@ class AllServicesController extends Controller
         } else {
             $rules = [
                 'role_id' => 'required|in:4',
-                'customer_id' => 'required|integer|exists:customers,id',
+                'user_id' => 'required|integer|exists:customers,id',
                 'customer_address_id' => 'required|integer|exists:customer_address_details,id',
                 'service_type' => 'required|in:quick_service,installation,repairing',
                 'products' => 'required|array|min:1',
@@ -245,7 +245,7 @@ class AllServicesController extends Controller
                     $amc = Amc::create([
                         'request_id' => $serviceRequest,
                         'service_type' => $request->service_type,
-                        'customer_id' => $request->customer_id,
+                        'customer_id' => $request->user_id,
                         'customer_address_id' => $request->customer_address_id,
                         'amc_plan_id' => $request->amc_plan_id,
                         'request_date' => now(),
@@ -257,9 +257,9 @@ class AllServicesController extends Controller
                     $servicesRequest = ServiceRequest::create([
                         'request_id' => $serviceRequest,
                         'service_type' => $request->service_type,
-                        'customer_id' => $request->customer_id,
+                        'customer_id' => $request->user_id,
                         'customer_address_id' => $request->customer_address_id,
-                        'created_by' => $request->customer_id,
+                        'created_by' => $request->user_id,
                         'request_date' => now(),
                         'amc_plan_id' => $request->filled('amc_plan_id')
                             ? $request->amc_plan_id
@@ -390,7 +390,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
@@ -405,7 +405,7 @@ class AllServicesController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $serviceRequests = ServiceRequest::where('customer_id', $validated['customer_id'])->orderBy('created_at', 'desc')->get();
+            $serviceRequests = ServiceRequest::where('customer_id', $validated['user_id'])->orderBy('created_at', 'desc')->get();
 
             return response()->json(['service_requests' => $serviceRequests], 200);
         }
@@ -415,7 +415,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
@@ -430,7 +430,7 @@ class AllServicesController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $serviceRequest = ServiceRequest::with('products', 'customer')->where('id', $id)->where('customer_id', $validated['customer_id'])->first();
+            $serviceRequest = ServiceRequest::with('products', 'customer')->where('id', $id)->where('customer_id', $validated['user_id'])->first();
 
             if (! $serviceRequest) {
                 return response()->json(['success' => false, 'message' => 'Service request not found.'], 404);
@@ -444,7 +444,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
@@ -460,7 +460,7 @@ class AllServicesController extends Controller
 
         if ($staffRole == 'customers') {
             $serviceRequest = ServiceRequest::where('id', $id)
-                ->where('customer_id', $validated['customer_id'])
+                ->where('customer_id', $validated['user_id'])
                 ->first();
 
             if (! $serviceRequest) {
@@ -538,7 +538,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
             'service_request_id' => 'required|integer|exists:service_requests,id',
             'product_id' => 'required|integer|exists:service_request_products,id',
             'part_id' => 'required|integer',
@@ -560,7 +560,7 @@ class AllServicesController extends Controller
         if ($staffRole == 'customers') {
             // Verify the service request belongs to this customer
             $serviceRequest = ServiceRequest::where('id', $validated['service_request_id'])
-                ->where('customer_id', $validated['customer_id'])
+                ->where('customer_id', $validated['user_id'])
                 ->first();
 
             if (! $serviceRequest) {
@@ -979,7 +979,7 @@ class AllServicesController extends Controller
         // Store only that feedback whose status is completed
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
             'service_type' => 'required|in:amc,repairing,installation,quick_service',
             'service_id' => 'required|integer',
             'rating' => 'required|numeric|min:1|max:5',
@@ -1003,14 +1003,14 @@ class AllServicesController extends Controller
         $comments = $validated['comments'] ?? null;
 
         $service = null;
-        $service = ServiceRequest::where('id', $serviceId)->where('customer_id', $validated['customer_id'])->first();
+        $service = ServiceRequest::where('id', $serviceId)->where('customer_id', $validated['user_id'])->first();
 
         if (! $service) {
             return response()->json(['success' => false, 'message' => 'Service not found.'], 404);
         }
 
         // If  feedback already exists for same service
-        $existingFeedback = Feedback::where('customer_id', $validated['customer_id'])
+        $existingFeedback = Feedback::where('customer_id', $validated['user_id'])
             ->where('service_type', $validated['service_type'])
             ->where('service_id', $validated['service_id'])
             ->first();
@@ -1030,7 +1030,7 @@ class AllServicesController extends Controller
         }
 
         $feedback = Feedback::create([
-            'customer_id' => $validated['customer_id'],
+            'customer_id' => $validated['user_id'],
             'service_type' => $validated['service_type'],
             'service_id' => $validated['service_id'],
             'rating' => $validated['rating'],
@@ -1048,7 +1048,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
@@ -1062,7 +1062,7 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        $feedbacks = Feedback::with('serviceRequest')->where('customer_id', $validated['customer_id'])->get();
+        $feedbacks = Feedback::with('serviceRequest')->where('customer_id', $validated['user_id'])->get();
 
         return response()->json(['success' => true, 'data' => $feedbacks], 200);
     }
@@ -1071,7 +1071,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
@@ -1087,7 +1087,7 @@ class AllServicesController extends Controller
 
         $feedback = Feedback::with('serviceRequest')
             ->where('id', $feedback_id)
-            ->where('customer_id', $validated['customer_id'])
+            ->where('customer_id', $validated['user_id'])
             ->first();
 
         if (! $feedback) {
@@ -1104,7 +1104,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
             'service_request_id' => 'required|integer|exists:service_request_product_pickups,request_id',
             'product_id' => 'required|integer|exists:service_request_product_pickups,product_id',
             'action' => 'required|in:customer_approved,customer_rejected',
@@ -1131,7 +1131,7 @@ class AllServicesController extends Controller
         }
 
         // Verify the pickup belongs to this customer
-        if ($pickup->serviceRequest->customer_id != $validated['customer_id']) {
+        if ($pickup->serviceRequest->customer_id != $validated['user_id']) {
             return response()->json(['success' => false, 'message' => 'Pickup request does not belong to this customer.'], 403);
         }
 

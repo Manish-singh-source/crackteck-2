@@ -75,7 +75,6 @@ class ProfileController extends Controller
         }
 
         $validated = $validated->validated();
-        // return response()->json(['message' => $request->all()], 501);
 
         if (! $validated['user_id']) {
             return response()->json(['message' => 'User ID is required'], 400);
@@ -85,7 +84,6 @@ class ProfileController extends Controller
         }
 
         if ($request->role_id == 4) {
-            // return  response()->json(['message' => $request->address], 501);
             $user = Customer::findOrFail($validated['user_id']);
             $user->first_name = $request->first_name;
             $user->last_name = $request->last_name;

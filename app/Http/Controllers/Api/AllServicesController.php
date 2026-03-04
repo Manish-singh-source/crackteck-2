@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\AuthorizeUser;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\QuotationDetailResource;
 use App\Http\Resources\QuotationResource;
@@ -636,7 +637,7 @@ class AllServicesController extends Controller
                     'customer_approved_at' => now(),
                 ]);
                 $message = 'Part approved successfully.';
-            } else if($validated['action'] === 'customer_rejected') {
+            } else if ($validated['action'] === 'customer_rejected') {
                 $requestPart->update([
                     'status' => 'customer_rejected',
                     'customer_rejected_at' => now(),
@@ -675,9 +676,9 @@ class AllServicesController extends Controller
 
         // Pending to implement quotation list logic
         $leadQuotations = Lead::with(['quotation.products', 'customer', 'quotation' => function ($query) {
-                $query->where('status', '!=', 'draft');
-                $query->withCount('products');
-            }])
+            $query->where('status', '!=', 'draft');
+            $query->withCount('products');
+        }])
             ->where('customer_id', $validated['user_id'])
             ->whereHas('quotation', function ($query) {
                 $query->where('status', '!=', 'draft');
@@ -719,7 +720,6 @@ class AllServicesController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => $quotationDetails], 200);
-
     }
 
     public function acceptQuotation(Request $request, $id)
@@ -932,6 +932,11 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
+        $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
+        if (!$userAuthorize) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        }
+
         // Find all quotation invoices for the customer
         $invoices = QuotationInvoice::with('quoteDetails.leadDetails', 'items')
             ->whereHas('quoteDetails.leadDetails', function ($query) use ($validated) {
@@ -961,6 +966,11 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
+        $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
+        if (!$userAuthorize) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        }
+
         // Find the quotation invoice according to quotation id
         $invoice = QuotationInvoice::with('items')->where('id', $id)->first();
 
@@ -987,6 +997,11 @@ class AllServicesController extends Controller
 
         if (! $staffRole) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
+        if (!$userAuthorize) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
         }
 
         // Find the quotation invoice
@@ -1018,6 +1033,11 @@ class AllServicesController extends Controller
 
         if (! $staffRole) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
+        if (!$userAuthorize) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
         }
 
         // Find the quotation invoice

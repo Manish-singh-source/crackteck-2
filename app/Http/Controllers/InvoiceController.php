@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\QuotationInvoice;
 use App\Models\Order;
-use Illuminate\Http\Request;
+use App\Models\QuotationInvoice;
 
 class InvoiceController extends Controller
 {

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ApiResponse;
+use App\Helpers\FileUpload;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Staff;
@@ -13,7 +15,6 @@ use App\Models\StaffPoliceVerification;
 use App\Models\StaffVehicleDetail;
 use App\Models\StaffWorkSkill;
 use App\Services\Fast2smsService;
-use App\Helpers\FileUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -78,7 +79,7 @@ class ApiAuthController extends Controller
 
             return false;
         } catch (\Exception $e) {
-            Log::error('Fast2SMS Exception: ' . $e->getMessage());
+            Log::error('Fast2SMS Exception: '.$e->getMessage());
 
             return false;
         }
@@ -312,7 +313,7 @@ class ApiAuthController extends Controller
 
         // Create Staff
         $staff = Staff::create([
-            'staff_code' => 'STF' . time() . rand(100, 999),
+            'staff_code' => 'STF'.time().rand(100, 999),
             'staff_role' => $staffRole,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -473,7 +474,7 @@ class ApiAuthController extends Controller
                     'otp' => $otp, // For testing only
                 ], 200);
             } else {
-                Log::error('OTP sending failed for phone: ' . $user->phone);
+                Log::error('OTP sending failed for phone: '.$user->phone);
 
                 return response()->json([
                     'success' => false,
@@ -485,7 +486,7 @@ class ApiAuthController extends Controller
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            Log::error('Login error: ' . $e->getMessage());
+            Log::error('Login error: '.$e->getMessage());
 
             return response()->json(['success' => false, 'message' => 'An error occurred during login', 'error' => $e->getMessage()], 500);
         }
@@ -514,10 +515,9 @@ class ApiAuthController extends Controller
 
             if ($staffRole == 'delivery_man') {
 
-
                 $user = Staff::with('vehicleDetails')->where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
 
-                if (!$user->vehicleDetails) {
+                if (! $user->vehicleDetails) {
                     return response()->json(['error' => 'Vehical Details Not Found']);
                 }
             } else {
@@ -568,46 +568,61 @@ class ApiAuthController extends Controller
 
     public function refreshToken(Request $request)
     {
-        // attempt to refresh with each guard until one works
-        $guards = ['staff_api', 'customer_api'];
-        $newToken = null;
-        $usedGuard = null;
+        try {
+            $validated = Validator::make($request->all(), [
+                'user_id' => 'required',
+                'role_id' => 'required|in:1,2,3,4',
+            ]);
 
-        foreach ($guards as $g) {
-            try {
-                $newToken = auth()->guard($g)->refresh();
-                $usedGuard = $g;
-                break;
-            } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Token expired. Please login again.',
-                ], 401);
-            } catch (\Exception $e) {
-                // failed for this guard, try next one
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to refresh token. Make sure a valid token is provided.',
-                ], 401);
+            if ($validated->fails()) {
+                return ApiResponse::error('Validation failed.', 422, $validated->errors());
             }
+
+            // Determine guard based on role_id
+            if ($request->role_id == 4) {
+                $guard = 'customer_api';
+            } else {
+                $guard = 'staff_api';
+            }
+
+            // Get authenticated user with current token
+            $user = auth()->guard($guard)->user();
+
+            if (! $user) {
+                return ApiResponse::error('Invalid or expired token. Please login again.', 401);
+            }
+
+            // Attempt to refresh the token
+            $newToken = auth()->guard($guard)->refresh();
+
+            if (! $newToken) {
+                return ApiResponse::error('Unable to refresh token. Please try logging in again.', 401);
+            }
+
+            // Retrieve user with the new token
+            $refreshedUser = auth()->guard($guard)->setToken($newToken)->user();
+
+            if (! $refreshedUser) {
+                return ApiResponse::error('Token refresh failed. User not found after token refresh.', 401);
+            }
+
+            $data = [
+                'token' => $newToken,
+                'user' => $refreshedUser,
+            ];
+
+            return ApiResponse::success($data, 'Token refreshed successfully.', 200);
+        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+            return ApiResponse::error('Token has expired. Please login again.', 401);
+        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+            return ApiResponse::error('Invalid token provided. Please login again.', 401);
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return ApiResponse::error('Token error: '.$e->getMessage(), 401);
+        } catch (\Exception $e) {
+            Log::error('Token refresh error: '.$e->getMessage());
+
+            return ApiResponse::error('An error occurred while refreshing token.', 500);
         }
-
-        if (! $newToken) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unable to refresh token. Make sure a valid token is provided.'
-            ], 401);
-        }
-
-        // retrieve user from the guard using the new token, just in case the previous user lookup fails
-        $user = auth()->guard($usedGuard)->setToken($newToken)->user();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Token refreshed successfully',
-            'token' => $newToken,
-            'user' => $user,
-        ]);
     }
 
     public function generateCustomerCode()
@@ -620,6 +635,6 @@ class ApiAuthController extends Controller
             $number = 1;
         }
 
-        return 'CST-' . str_pad($number, 6, '0', STR_PAD_LEFT);
+        return 'CST-'.str_pad($number, 6, '0', STR_PAD_LEFT);
     }
 }

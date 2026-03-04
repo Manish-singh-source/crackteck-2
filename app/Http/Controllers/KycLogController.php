@@ -22,10 +22,10 @@ class KycLogController extends Controller
         // Search by name, email, or phone
         if ($request->has('search') && $request->search) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             });
         }
 
@@ -40,6 +40,7 @@ class KycLogController extends Controller
     public function view($id)
     {
         $kyc = Kyc::with(['staff', 'role'])->findOrFail($id);
+
         return view('/crm/accounts/kyc-log/view', compact('kyc'));
     }
 
@@ -55,7 +56,7 @@ class KycLogController extends Controller
 
         $kyc = Kyc::with('staff')->findOrFail($id);
         $status = $request->status;
-        
+
         switch ($status) {
             case Kyc::STATUS_APPROVED:
                 $kyc->approve($request->reason);

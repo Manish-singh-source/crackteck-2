@@ -18,9 +18,9 @@ class ProductVariantsController extends Controller
             $query->where('status', $status);
         }
         $attributeName = $query->get();
+
         return view('/e-commerce/product-variants/index', compact('attributeName'));
     }
-
 
     public function storeAttribute(Request $request)
     {
@@ -60,7 +60,6 @@ class ProductVariantsController extends Controller
 
         return view('/e-commerce/product-variants/edit', compact('attributeName'));
     }
-
 
     public function deleteAttribute($id)
     {

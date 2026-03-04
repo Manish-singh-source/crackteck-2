@@ -84,7 +84,7 @@ class QuickServiceController extends Controller
         if ($staffRole == 'customers') {
             $quickService = QuickService::where('id', $id)->first();
 
-            if (!$quickService) {
+            if (! $quickService) {
                 return response()->json(['success' => false, 'message' => 'Quick service not found.'], 404);
             }
 

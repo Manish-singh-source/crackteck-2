@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Lead;
-use App\Models\Staff;
 use App\Models\Quotation;
+use App\Models\Staff;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class QuotationFactory extends Factory
 {
-    
     /**
      * The name of the factory's corresponding model.
      *
@@ -41,16 +40,16 @@ class QuotationFactory extends Factory
                 }
 
                 return Staff::inRandomOrder()->value('id') ?? Staff::create([
-                    'staff_code' => 'SEED' . time() . rand(100, 999),
+                    'staff_code' => 'SEED'.time().rand(100, 999),
                     'staff_role' => 'sales_person',
                     'first_name' => 'Seed',
                     'last_name' => 'User',
-                    'email' => 'seed' . time() . '@example.test',
-                    'phone' => '0000000000'
+                    'email' => 'seed'.time().'@example.test',
+                    'phone' => '0000000000',
                 ])->id;
             },
-            'quote_id' => 'QUO' . strtoupper(uniqid()),
-            'quote_number' => 'QUO' . strtoupper(uniqid()),
+            'quote_id' => 'QUO'.strtoupper(uniqid()),
+            'quote_number' => 'QUO'.strtoupper(uniqid()),
             'quote_date' => $this->faker->date(),
             'expiry_date' => $this->faker->date(),
             'total_items' => $this->faker->numberBetween(1, 100),

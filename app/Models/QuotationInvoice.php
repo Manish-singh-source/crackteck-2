@@ -12,7 +12,7 @@ class QuotationInvoice extends Model
     {
         return $this->hasMany(QuotationInvoiceItem::class);
     }
- 
+
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'customer_id', 'id');
@@ -28,5 +28,3 @@ class QuotationInvoice extends Model
         return $this->belongsTo(Quotation::class, 'quote_id', 'id');
     }
 }
-
-

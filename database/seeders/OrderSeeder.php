@@ -2,12 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Customer;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\Customer;
-use App\Models\Order;
 
 class OrderSeeder extends Seeder
 {
@@ -32,7 +30,7 @@ class OrderSeeder extends Seeder
                     'customer_type' => 'ecommerce',
                     'source_type' => 'website',
                     'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-                    'status' => "active",
+                    'status' => 'active',
                     'created_at' => $now,
                     'updated_at' => $now,
                 ],
@@ -47,7 +45,7 @@ class OrderSeeder extends Seeder
                     'customer_type' => 'ecommerce',
                     'source_type' => 'website',
                     'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-                    'status' => "active",
+                    'status' => 'active',
                     'created_at' => $now,
                     'updated_at' => $now,
                 ],
@@ -62,7 +60,7 @@ class OrderSeeder extends Seeder
                     'customer_type' => 'ecommerce',
                     'source_type' => 'website',
                     'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-                    'status' => "active",
+                    'status' => 'active',
                     'created_at' => $now,
                     'updated_at' => $now,
                 ],
@@ -75,7 +73,7 @@ class OrderSeeder extends Seeder
         foreach ($customers as $cust) {
             $orders[] = [
                 'customer_id' => $cust->id,
-                'order_number' => 'ORD-' . strtoupper(uniqid()),
+                'order_number' => 'ORD-'.strtoupper(uniqid()),
                 'total_items' => 0,
                 'subtotal' => 0,
                 'discount_amount' => 0,
@@ -118,7 +116,7 @@ class OrderSeeder extends Seeder
             ];
         }
 
-        if (!empty($orders)) {
+        if (! empty($orders)) {
             DB::table('orders')->insert($orders);
         }
     }

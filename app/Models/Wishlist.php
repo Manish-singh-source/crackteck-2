@@ -36,8 +36,8 @@ class Wishlist extends Model
     public static function isInWishlist($userId, $productId)
     {
         return self::where('customer_id', $userId)
-                   ->where('ecommerce_product_id', $productId)
-                   ->exists();
+            ->where('ecommerce_product_id', $productId)
+            ->exists();
     }
 
     /**
@@ -46,7 +46,7 @@ class Wishlist extends Model
     public static function getWishlistItem($userId, $productId)
     {
         return self::where('customer_id', $userId)
-                   ->where('ecommerce_product_id', $productId)
-                   ->first();
+            ->where('ecommerce_product_id', $productId)
+            ->first();
     }
 }

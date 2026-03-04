@@ -13,7 +13,7 @@ class FcmTestController extends Controller
         $data = $request->validate([
             'token' => ['required', 'string'],
             'title' => ['required', 'string'],
-            'body'  => ['required', 'string'],
+            'body' => ['required', 'string'],
         ]);
 
         $result = $fcm->sendToToken(

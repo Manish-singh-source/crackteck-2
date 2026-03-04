@@ -25,7 +25,6 @@ class CoveredItem extends Model
         'diagnosis_list' => 'array',
     ];
 
-
     public static function generateItemCode($typeCode): string
     {
         $typeName = $typeCode;          // e.g. "Installation"

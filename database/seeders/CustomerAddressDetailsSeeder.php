@@ -26,7 +26,7 @@ class CustomerAddressDetailsSeeder extends Seeder
             if ($cid) {
                 DB::table('customer_address_details')->updateOrInsert([
                     'customer_id' => $cid,
-                    'branch_name' => $addr['branch_name']
+                    'branch_name' => $addr['branch_name'],
                 ], [
                     'address1' => $addr['address1'],
                     'address2' => $addr['address2'],
@@ -34,7 +34,7 @@ class CustomerAddressDetailsSeeder extends Seeder
                     'state' => $addr['state'],
                     'country' => $addr['country'],
                     'pincode' => $addr['pincode'],
-                    'is_primary' => "yes",
+                    'is_primary' => 'yes',
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Helpers\AuthorizeUser;
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\CustomerAadharDetail;
@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\Validator;
 class ProfileController extends Controller
 {
     //
-
     protected function getRoleId($roleId)
     {
         return [
@@ -34,50 +33,29 @@ class ProfileController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'role_id' => 'required|in:1,2,3,4',
-            'user_id' => 'required'
+            'user_id' => 'required',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed.',
-                'errors' => $validator->errors()
-            ], 422);
+            return ApiResponse::error('Validation failed.', 422, $validator->errors());
         }
 
         $validated = $validator->validated();
-
         if ($validated['role_id'] == 4) {
-
             $user = Customer::find($validated['user_id']);
-
-            if (!$user) {
-                return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+            if (! $user) {
+                return ApiResponse::error('User not found.', 401);
             }
-
-            $userAuthorize = AuthorizeUser::authorizeUser($user->id, 'customer_api');
-            if (!$userAuthorize) {
-                return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
-            }
-
             unset($user->otp, $user->otp_expiry, $user->password, $user->created_by, $user->created_at);
         } else {
-
             $user = Staff::find($validated['user_id']);
-
-            if (!$user) {
-                return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+            if (! $user) {
+                return ApiResponse::error('User not found.', 404);
             }
-
-            $userAuthorize = AuthorizeUser::authorizeUser($user->id, 'staff_api');
-            if (!$userAuthorize) {
-                return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
-            }
-
             unset($user->otp, $user->otp_expiry, $user->password);
         }
 
-        return response()->json(['user' => $user], 200);
+        return ApiResponse::success($user, 'Profile data fetched successfully.', 200);
     }
 
     public function update(Request $request)
@@ -121,7 +99,6 @@ class ProfileController extends Controller
 
             return response()->json(['success' => true, 'message' => 'User updated successfully.'], 200);
         }
-
 
         $user = Staff::where('id', $validated['user_id'])->first();
         if (! $user) {
@@ -197,22 +174,21 @@ class ProfileController extends Controller
             return response()->json(['success' => false, 'message' => 'Addresses are only available for customers.'], 400);
         }
 
-        $primaryAddress = CustomerAddressDetail::where('customer_id', $validated['user_id'])->where('is_primary', "yes")->first();
+        $primaryAddress = CustomerAddressDetail::where('customer_id', $validated['user_id'])->where('is_primary', 'yes')->first();
 
         if ($request->filled('is_primary')) {
-            if ($request->is_primary && !$primaryAddress) {
-                $request->is_primary = "yes";
+            if ($request->is_primary && ! $primaryAddress) {
+                $request->is_primary = 'yes';
             } else {
-                $request->is_primary = "no";
+                $request->is_primary = 'no';
             }
         } else {
             if (! $primaryAddress) {
-                $request->is_primary = "yes";
+                $request->is_primary = 'yes';
             } else {
-                $request->is_primary = "no";
+                $request->is_primary = 'no';
             }
         }
-
 
         $address = CustomerAddressDetail::create([
             'customer_id' => $validated['user_id'],
@@ -225,7 +201,6 @@ class ProfileController extends Controller
             'pincode' => $request->pincode,
             'is_primary' => $request->is_primary,
         ]);
-
 
         if (! $address) {
             return response()->json(['success' => false, 'message' => 'Address not added.'], 404);
@@ -271,11 +246,11 @@ class ProfileController extends Controller
             $address->pincode = $request->pincode;
 
             if ($request->is_primary) {
-                $primaryAddress = CustomerAddressDetail::where('customer_id', $validated['user_id'])->where('is_primary', "1")->first();
+                $primaryAddress = CustomerAddressDetail::where('customer_id', $validated['user_id'])->where('is_primary', '1')->first();
                 if ($primaryAddress) {
                     return response()->json(['success' => false, 'message' => 'One address is already primary.'], 400);
                 }
-                $address->is_primary = "yes";
+                $address->is_primary = 'yes';
             }
             $address->save();
         } else {
@@ -303,7 +278,7 @@ class ProfileController extends Controller
         $validated = $validated->validated();
 
         if ($validated['role_id'] == 4) {
-            // check customer exists 
+            // check customer exists
             $customer = Customer::where('id', $validated['user_id'])->first();
             if (! $customer) {
                 return response()->json(['success' => false, 'message' => 'Customer not found.'], 404);
@@ -341,7 +316,7 @@ class ProfileController extends Controller
         $validated = $validated->validated();
 
         if ($validated['role_id'] == 4) {
-            // check customer exists 
+            // check customer exists
             $customer = Customer::where('id', $validated['user_id'])->first();
             if (! $customer) {
                 return response()->json(['success' => false, 'message' => 'Customer not found.'], 404);
@@ -360,9 +335,9 @@ class ProfileController extends Controller
                 }
 
                 $file = $request->file('aadhar_front_path');
-                $filename = time() . '_aadhar_front.' . $file->getClientOriginalExtension();
+                $filename = time().'_aadhar_front.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/customer/aadhar'), $filename);
-                $aadharFrontPath = 'uploads/crm/customer/aadhar/' . $filename;
+                $aadharFrontPath = 'uploads/crm/customer/aadhar/'.$filename;
             }
 
             if ($request->hasFile('aadhar_back_path')) {
@@ -371,9 +346,9 @@ class ProfileController extends Controller
                 }
 
                 $file = $request->file('aadhar_back_path');
-                $filename = time() . '_aadhar_back.' . $file->getClientOriginalExtension();
+                $filename = time().'_aadhar_back.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/customer/aadhar'), $filename);
-                $aadharBackPath = 'uploads/crm/customer/aadhar/' . $filename;
+                $aadharBackPath = 'uploads/crm/customer/aadhar/'.$filename;
             }
 
             // create aadhar card
@@ -384,7 +359,7 @@ class ProfileController extends Controller
                 'aadhar_back_path' => $aadharBackPath,
             ]);
         } else {
-            // check staff exists 
+            // check staff exists
             $staff = Staff::where('id', $validated['user_id'])->first();
             if (! $staff) {
                 return response()->json(['success' => false, 'message' => 'Staff not found.'], 404);
@@ -396,7 +371,7 @@ class ProfileController extends Controller
                 return response()->json(['success' => false, 'message' => 'Aadhar card already exists.'], 400);
             }
 
-            // upload aadhar card            
+            // upload aadhar card
             $aadharCard = StaffAadharDetail::create([
                 'staff_id' => $validated['user_id'],
                 'aadhar_number' => $request->aadhar_number,
@@ -429,7 +404,7 @@ class ProfileController extends Controller
         $validated = $validated->validated();
 
         if ($validated['role_id'] == 4) {
-            // check customer exists 
+            // check customer exists
             $customer = Customer::where('id', $validated['user_id'])->first();
             if (! $customer) {
                 return response()->json(['success' => false, 'message' => 'Customer not found.'], 404);
@@ -438,7 +413,7 @@ class ProfileController extends Controller
             // check if aadhar card already exists
             $aadharCard = CustomerAadharDetail::where('customer_id', $validated['user_id'])->find($id);
         } else {
-            // check staff exists 
+            // check staff exists
             $staff = Staff::where('id', $validated['user_id'])->first();
             if (! $staff) {
                 return response()->json(['success' => false, 'message' => 'Staff not found.'], 404);
@@ -454,9 +429,9 @@ class ProfileController extends Controller
             }
 
             $file = $request->file('aadhar_front_path');
-            $filename = time() . '_aadhar_front.' . $file->getClientOriginalExtension();
+            $filename = time().'_aadhar_front.'.$file->getClientOriginalExtension();
             $file->move(public_path('uploads/crm/customer/aadhar'), $filename);
-            $aadharFrontPath = 'uploads/crm/customer/aadhar/' . $filename;
+            $aadharFrontPath = 'uploads/crm/customer/aadhar/'.$filename;
         }
 
         if ($request->hasFile('aadhar_back_path')) {
@@ -465,9 +440,9 @@ class ProfileController extends Controller
             }
 
             $file = $request->file('aadhar_back_path');
-            $filename = time() . '_aadhar_back.' . $file->getClientOriginalExtension();
+            $filename = time().'_aadhar_back.'.$file->getClientOriginalExtension();
             $file->move(public_path('uploads/crm/customer/aadhar'), $filename);
-            $aadharBackPath = 'uploads/crm/customer/aadhar/' . $filename;
+            $aadharBackPath = 'uploads/crm/customer/aadhar/'.$filename;
         }
 
         if (! $aadharCard) {
@@ -501,14 +476,14 @@ class ProfileController extends Controller
         $validated = $validated->validated();
 
         if ($validated['role_id'] == 4) {
-            // check customer exists 
+            // check customer exists
             $customer = Customer::where('id', $validated['user_id'])->first();
             if (! $customer) {
                 return response()->json(['success' => false, 'message' => 'Customer not found.'], 404);
             }
             $panCard = CustomerPanCardDetail::where('customer_id', $validated['user_id'])->first();
         } else {
-            // check staff exists 
+            // check staff exists
             $staff = Staff::where('id', $validated['user_id'])->first();
             if (! $staff) {
                 return response()->json(['success' => false, 'message' => 'Staff not found.'], 404);
@@ -543,7 +518,7 @@ class ProfileController extends Controller
         $validated = $validated->validated();
 
         if ($validated['role_id'] == 4) {
-            // check customer exists 
+            // check customer exists
             $customer = Customer::where('id', $validated['user_id'])->first();
             if (! $customer) {
                 return response()->json(['success' => false, 'message' => 'Customer not found.'], 404);
@@ -560,9 +535,9 @@ class ProfileController extends Controller
                 }
 
                 $file = $request->file('pan_card_front_path');
-                $filename = time() . '_pan_card_front.' . $file->getClientOriginalExtension();
+                $filename = time().'_pan_card_front.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/customer/pan'), $filename);
-                $panCardFrontPath = 'uploads/crm/customer/pan/' . $filename;
+                $panCardFrontPath = 'uploads/crm/customer/pan/'.$filename;
             }
 
             if ($request->hasFile('pan_card_back_path')) {
@@ -571,9 +546,9 @@ class ProfileController extends Controller
                 }
 
                 $file = $request->file('pan_card_back_path');
-                $filename = time() . '_pan_card_back.' . $file->getClientOriginalExtension();
+                $filename = time().'_pan_card_back.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/customer/pan'), $filename);
-                $panCardBackPath = 'uploads/crm/customer/pan/' . $filename;
+                $panCardBackPath = 'uploads/crm/customer/pan/'.$filename;
             }
 
             $panCard = CustomerPanCardDetail::create([
@@ -630,10 +605,10 @@ class ProfileController extends Controller
                 File::delete(public_path($request->pan_card_front_path));
             }
 
-            $file = $request->file('pan_card_front_path');;
-            $filename = time() . '_pan_card_front.' . $file->getClientOriginalExtension();
+            $file = $request->file('pan_card_front_path');
+            $filename = time().'_pan_card_front.'.$file->getClientOriginalExtension();
             $file->move(public_path('uploads/crm/customer/pan'), $filename);
-            $panCardFrontPath = 'uploads/crm/customer/pan/' . $filename;
+            $panCardFrontPath = 'uploads/crm/customer/pan/'.$filename;
         }
 
         if ($request->hasFile('pan_card_back_path')) {
@@ -641,10 +616,10 @@ class ProfileController extends Controller
                 File::delete(public_path($request->pan_card_back_path));
             }
 
-            $file = $request->file('pan_card_back_path');;
-            $filename = time() . '_pan_card_back.' . $file->getClientOriginalExtension();
+            $file = $request->file('pan_card_back_path');
+            $filename = time().'_pan_card_back.'.$file->getClientOriginalExtension();
             $file->move(public_path('uploads/crm/customer/pan'), $filename);
-            $panCardBackPath = 'uploads/crm/customer/pan/' . $filename;
+            $panCardBackPath = 'uploads/crm/customer/pan/'.$filename;
         }
 
         if (! $panCard) {
@@ -659,6 +634,7 @@ class ProfileController extends Controller
         if (! $panCard) {
             return response()->json(['success' => false, 'message' => 'Pan card not updated.'], 404);
         }
+
         return response()->json(['pan_card' => $panCard], 200);
     }
 

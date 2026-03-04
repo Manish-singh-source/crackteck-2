@@ -17,10 +17,10 @@ return new class extends Migration
             $table->unsignedBigInteger('service_id');
             $table->string('service_type'); // e.g., 'amc', 'non_amc', 'quick_service'
             $table->unsignedTinyInteger('rating'); // e.g., 1 to 5
-            $table->text('comments')->nullable();   
+            $table->text('comments')->nullable();
             $table->timestamps();
         });
-    }   
+    }
 
     /**
      * Reverse the migrations.

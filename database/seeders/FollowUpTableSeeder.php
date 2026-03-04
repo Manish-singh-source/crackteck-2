@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\FollowUp;
 use App\Models\Lead;
 use Illuminate\Database\Seeder;
 

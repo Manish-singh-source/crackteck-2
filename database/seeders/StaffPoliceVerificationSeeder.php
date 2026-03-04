@@ -47,7 +47,7 @@ class StaffPoliceVerificationSeeder extends Seeder
             'frontend-assets/images/new-products/product-detail-4.webp',
             'frontend-assets/images/new-products/product-detail-5.webp',
             'frontend-assets/images/new-products/product-detail-6.webp',
-            'frontend-assets/images/new-products/product-detail-7.webp'
+            'frontend-assets/images/new-products/product-detail-7.webp',
         ];
 
         StaffPoliceVerification::truncate();

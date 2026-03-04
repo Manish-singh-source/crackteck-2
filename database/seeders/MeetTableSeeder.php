@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Lead;
-use App\Models\Meet;
 use Illuminate\Database\Seeder;
 
 class MeetTableSeeder extends Seeder

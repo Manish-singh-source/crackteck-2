@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Support\Str;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Spatie\SimpleExcel\SimpleExcelWriter;
 
 class LowStockController extends Controller
@@ -20,8 +18,10 @@ class LowStockController extends Controller
             ->where('status', 'active')
             ->orderBy('stock_quantity', 'asc')
             ->get();
+
         return view('crm/accounts/low-stock-alert', compact('lowStockProducts'));
     }
+
     public function warehouseIndex()
     {
         $lowStockProducts = Product::with(['brand', 'parentCategorie', 'subCategorie', 'warehouse'])
@@ -29,6 +29,7 @@ class LowStockController extends Controller
             ->where('status', 'active')
             ->orderBy('stock_quantity', 'asc')
             ->get();
+
         return view('/warehouse/low-stock-alert/index', compact('lowStockProducts'));
     }
 
@@ -40,8 +41,8 @@ class LowStockController extends Controller
             ->orderBy('stock_quantity', 'asc')
             ->get();
 
-        // Create a new Excel instance spatie/simple-excel 
-        $tempXlsxPath = storage_path('app/product_sheet_' . Str::random(8) . '.xlsx');
+        // Create a new Excel instance spatie/simple-excel
+        $tempXlsxPath = storage_path('app/product_sheet_'.Str::random(8).'.xlsx');
         $writer = SimpleExcelWriter::create($tempXlsxPath);
 
         // Add data rows

@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use App\Models\WebsiteBanner;
-use Illuminate\Validation\Rule;
 use App\Http\Requests\StoreWebsiteBannerRequest;
 use App\Http\Requests\UpdateWebsiteBannerRequest;
-use Illuminate\Support\Facades\{Auth, DB, File, Log, Validator};
+use App\Models\WebsiteBanner;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class BannerController extends Controller
 {
@@ -17,7 +19,7 @@ class BannerController extends Controller
      */
     public function websiteBanner()
     {
-        // 
+        //
         $status = request()->get('status') ?? 'all';
 
         $website = WebsiteBanner::query();
@@ -49,30 +51,30 @@ class BannerController extends Controller
             $path = null;
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
-                $filename = time() . '_' . $file->getClientOriginalName();
+                $filename = time().'_'.$file->getClientOriginalName();
                 $file->move(public_path('uploads/e-commerce/banner/website_banner'), $filename);
-                $path = 'uploads/e-commerce/banner/website_banner/' . $filename;
+                $path = 'uploads/e-commerce/banner/website_banner/'.$filename;
             }
 
             $banner = WebsiteBanner::create([
-                'title'          => $request->title,
-                'slug'           => Str::slug($request->title),
-                'description'    => $request->description,
-                'image_url'      => $path,
-                'type'           => $request->type,
-                'channel'        => $request->channel,
+                'title' => $request->title,
+                'slug' => Str::slug($request->title),
+                'description' => $request->description,
+                'image_url' => $path,
+                'type' => $request->type,
+                'channel' => $request->channel,
                 'promotion_type' => $request->promotion_type ?: null,
                 'discount_value' => $request->discount_value,
-                'discount_type'  => $request->discount_type ?: null,
-                'promo_code'     => $request->promo_code,
-                'link_url'       => $request->link_url,
-                'link_target'    => $request->link_target ?? 'self',
-                'position'       => $request->position,
-                'display_order'  => $request->display_order,
-                'start_at'       => $request->start_at,
-                'end_at'         => $request->end_at,
-                'is_active'      => $request->is_active,
-                'metadata'       => $request->metadata
+                'discount_type' => $request->discount_type ?: null,
+                'promo_code' => $request->promo_code,
+                'link_url' => $request->link_url,
+                'link_target' => $request->link_target ?? 'self',
+                'position' => $request->position,
+                'display_order' => $request->display_order,
+                'start_at' => $request->start_at,
+                'end_at' => $request->end_at,
+                'is_active' => $request->is_active,
+                'metadata' => $request->metadata
                     ? json_decode($request->metadata, true)
                     : null,
             ]);
@@ -89,7 +91,7 @@ class BannerController extends Controller
                 ->with('success', 'Banner added successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Banner Store Error: ' . $e->getMessage());
+            Log::error('Banner Store Error: '.$e->getMessage());
 
             return back()
                 ->withInput()
@@ -103,6 +105,7 @@ class BannerController extends Controller
     public function showWebsiteBanner($id)
     {
         $website = WebsiteBanner::findOrFail($id);
+
         return view('/e-commerce/banner/website-banner/show', compact('website'));
     }
 
@@ -112,6 +115,7 @@ class BannerController extends Controller
     public function editWebsiteBanner($id)
     {
         $website = WebsiteBanner::findOrFail($id);
+
         return view('/e-commerce/banner/website-banner/edit', compact('website'));
     }
 
@@ -133,37 +137,37 @@ class BannerController extends Controller
                 }
 
                 $file = $request->file('image');
-                $filename = time() . '_' . $file->getClientOriginalName();
+                $filename = time().'_'.$file->getClientOriginalName();
                 $file->move(public_path('uploads/e-commerce/banner/website_banner'), $filename);
-                $path = 'uploads/e-commerce/banner/website_banner/' . $filename;
+                $path = 'uploads/e-commerce/banner/website_banner/'.$filename;
             }
 
             $banner->update([
-                'title'          => $request->title,
-                'slug'           => Str::slug($request->title),
-                'description'    => $request->description,
-                'image_url'      => $path,
-                'type'           => $request->type,
-                'channel'        => $request->channel,
+                'title' => $request->title,
+                'slug' => Str::slug($request->title),
+                'description' => $request->description,
+                'image_url' => $path,
+                'type' => $request->type,
+                'channel' => $request->channel,
 
                 // ?: explained here
                 'promotion_type' => $request->promotion_type ?: null,
-                'discount_type'  => $request->discount_type ?: null,
+                'discount_type' => $request->discount_type ?: null,
 
                 'discount_value' => $request->discount_value,
-                'promo_code'     => $request->promo_code,
-                'link_url'       => $request->link_url,
+                'promo_code' => $request->promo_code,
+                'link_url' => $request->link_url,
 
                 // ?? is safer for defaults
-                'link_target'    => $request->link_target ?? 1,
+                'link_target' => $request->link_target ?? 1,
 
-                'position'       => $request->position,
-                'display_order'  => $request->display_order,
-                'start_at'       => $request->start_at,
-                'end_at'         => $request->end_at,
-                'is_active'      => $request->is_active,
+                'position' => $request->position,
+                'display_order' => $request->display_order,
+                'start_at' => $request->start_at,
+                'end_at' => $request->end_at,
+                'is_active' => $request->is_active,
 
-                'metadata'       => $request->metadata
+                'metadata' => $request->metadata
                     ? json_decode($request->metadata, true)
                     : null,
             ]);
@@ -180,7 +184,7 @@ class BannerController extends Controller
                 ->with('success', 'Banner updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Banner Update Error: ' . $e->getMessage());
+            Log::error('Banner Update Error: '.$e->getMessage());
 
             return back()
                 ->withInput()
@@ -206,11 +210,13 @@ class BannerController extends Controller
 
             DB::commit();
             activity()->performedOn($banner)->causedBy(Auth::user())->log('Banner deleted');
+
             return redirect()->route('website.banner.index')->with('success', 'Banner deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Banner Delete Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+            Log::error('Banner Delete Error: '.$e->getMessage());
+
+            return redirect()->back()->with('error', 'Error: '.$e->getMessage());
         }
     }
 
@@ -232,7 +238,7 @@ class BannerController extends Controller
 
             return response()->json(['success' => true, 'message' => 'Banner order updated successfully']);
         } catch (\Exception $e) {
-            Log::error('Banner sort order update failed: ' . $e->getMessage());
+            Log::error('Banner sort order update failed: '.$e->getMessage());
 
             return response()->json(['success' => false, 'message' => 'Failed to update banner order']);
         }

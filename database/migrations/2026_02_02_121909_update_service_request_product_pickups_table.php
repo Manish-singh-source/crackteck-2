@@ -22,7 +22,7 @@ return new class extends Migration
                 'received',
                 'cancelled',
                 'returned',
-                'completed'
+                'completed',
             ])->change();
 
             // Add new column
@@ -45,7 +45,7 @@ return new class extends Migration
                 'received',
                 'cancelled',
                 'returned',
-                'completed'
+                'completed',
             ])->change();
 
             // Drop new column

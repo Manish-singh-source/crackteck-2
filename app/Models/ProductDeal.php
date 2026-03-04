@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ProductDeal extends Model
 {
     use SoftDeletes;
+
     //
     protected $fillable = [
         'deal_title',

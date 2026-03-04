@@ -27,7 +27,7 @@ class FrontendAuthController extends Controller
         $customerCode = str_replace('CUST', '', $lastCustomerCode);
         $customerCode = (int) $customerCode + 1;
 
-        $customerCode = 'CUST' . str_pad($customerCode, 4, '0', STR_PAD_LEFT);
+        $customerCode = 'CUST'.str_pad($customerCode, 4, '0', STR_PAD_LEFT);
 
         // Create customer directly in customers table
         $customer = Customer::create([

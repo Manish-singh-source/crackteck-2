@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -23,10 +23,10 @@ return new class extends Migration
         /**
          * STEP 2: Rename country using RAW SQL (MariaDB safe)
          */
-        DB::statement("
+        DB::statement('
             ALTER TABLE customer_company_details
             CHANGE country comp_country VARCHAR(255)
-        ");
+        ');
 
         /**
          * STEP 3: Make columns nullable
@@ -60,10 +60,10 @@ return new class extends Migration
         /**
          * STEP 2: Rename back country using RAW SQL
          */
-        DB::statement("
+        DB::statement('
             ALTER TABLE customer_company_details
             CHANGE comp_country country VARCHAR(255)
-        ");
+        ');
 
         /**
          * STEP 3: Rename other columns back

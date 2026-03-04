@@ -12,6 +12,7 @@ class SubscriberController extends Controller
     public function index()
     {
         $subscriber = Subscriber::all();
+
         return view('/e-commerce/subscribers/index', compact('subscriber'));
     }
 

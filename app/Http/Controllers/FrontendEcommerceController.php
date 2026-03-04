@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use App\Models\EcommerceProduct;
-use App\Models\ParentCategorie;
 use App\Models\ParentCategory;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -21,31 +20,31 @@ class FrontendEcommerceController extends Controller
             'warehouseProduct.brand',
             'warehouseProduct.parentCategorie',
             'warehouseProduct.subCategorie',
-            ])
-            ->where('status', "active")
+        ])
+            ->where('status', 'active')
             ->get();
 
-        $categories = ParentCategory::where('status_ecommerce', "active")
+        $categories = ParentCategory::where('status_ecommerce', 'active')
             ->whereHas('products', function ($query) {
                 $query->whereHas('ecommerceProduct', function ($q) {
-                    $q->where('status_ecommerce', "active")
+                    $q->where('status_ecommerce', 'active')
                         ->whereNull('deleted_at');
                 });
             })
             ->orderBy('sort_order', 'asc')
             ->get(['id', 'name', 'image']);
 
-        $brands = Brand::where('status', "active")
+        $brands = Brand::where('status', 'active')
             ->whereHas('products', function ($query) {
                 $query->whereHas('ecommerceProduct', function ($q) {
-                    $q->where('status_ecommerce', "active")
+                    $q->where('status_ecommerce', 'active')
                         ->whereNull('deleted_at');
                 });
             })
             ->orderBy('name', 'asc')
             ->get(['id', 'name', 'image']);
 
-        // dd($brands);    
+        // dd($brands);
 
         return view('frontend.ecommerce-shop', compact('products', 'categories', 'brands'));
     }
@@ -62,10 +61,10 @@ class FrontendEcommerceController extends Controller
             'warehouseProduct.parentCategorie',
             'warehouseProduct.subCategorie',
         ])
-            ->where('status', "active")
+            ->where('status', 'active')
             ->findOrFail($id);
 
-            // dd($product);
+        // dd($product);
 
         // Track recently viewed products
         $this->trackRecentlyViewed($id);
@@ -151,7 +150,7 @@ class FrontendEcommerceController extends Controller
             'warehouseProduct.subCategorie',
         ])
             ->where('id', '!=', $product->id)
-            ->where('status', "active");
+            ->where('status', 'active');
 
         // First try to get products from same sub-category
         if ($product->warehouseProduct && $product->warehouseProduct->sub_category_id) {

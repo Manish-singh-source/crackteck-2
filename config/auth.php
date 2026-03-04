@@ -49,7 +49,7 @@ return [
             'provider' => 'staff',
         ],
 
-         // API guards (JWT token based)
+        // API guards (JWT token based)
         'api' => [
             'driver' => 'jwt',
             'provider' => 'users',

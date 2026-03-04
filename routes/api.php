@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\AllServicesController;
 use App\Http\Controllers\Api\AmcServicesController;
 use App\Http\Controllers\Api\ApiAuthController;
@@ -9,6 +8,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DeliveryOrderController;
 use App\Http\Controllers\Api\FcmTestController;
 use App\Http\Controllers\Api\FollowUpController;
+use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\LeadController;
 use App\Http\Controllers\Api\MeetController;
 use App\Http\Controllers\Api\OrderController;
@@ -23,7 +23,6 @@ use App\Http\Controllers\PartRequestController;
 use App\Http\Controllers\PickupRequestController;
 use App\Http\Controllers\ReturnRequestController;
 use Illuminate\Support\Facades\Route;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -40,31 +39,31 @@ Route::prefix('v1')->group(function () {
     Route::post('/signup', [ApiAuthController::class, 'signup']);
     Route::post('/send-otp', [ApiAuthController::class, 'login']);
     Route::post('/verify-otp', [ApiAuthController::class, 'verifyOtp']);
-    
+
     // Public route for staff wallet status update (used by admin panel)
     Route::put('/staff-expenses/{id}/status', [StaffWalletController::class, 'updateStatus']);
-    
+
     // KYC Routes (public - for Engineer, Sales Person, Delivery Man)
     Route::controller(KycController::class)->group(function () {
         Route::get('/kyc/status', 'getStatus'); // Get KYC status and reason
         Route::post('/kyc/submit', 'submitKyc'); // Submit KYC details
     });
-    
+
     // Receipt download route (public - outside JWT middleware)
     Route::get('/receipts/{filename}', function ($filename) {
-        $path = storage_path('app/public/receipts/' . $filename);
-        
-        if (!file_exists($path)) {
+        $path = storage_path('app/public/receipts/'.$filename);
+
+        if (! file_exists($path)) {
             return response()->json(['message' => 'File not found'], 404);
         }
-        
+
         return response()->file($path);
     });
 
     Route::middleware(['jwt.verify'])->group(function () {
 
         Route::post('/test-fcm', [FcmTestController::class, 'send']);
-        
+
         Route::post('/logout', [ApiAuthController::class, 'logout']);
         Route::post('/refresh-token', [ApiAuthController::class, 'refreshToken']);
 
@@ -103,7 +102,7 @@ Route::prefix('v1')->group(function () {
 
         });
 
-        // 
+        //
         Route::controller(LeadController::class)->group(function () {
             Route::get('/leads', 'index');
             Route::post('/lead', 'store');
@@ -137,7 +136,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::controller(ProfileController::class)->group(function () {
-            // For Profile APIs 
+            // For Profile APIs
             Route::get('/profile', 'index');
             Route::put('/profile', 'update');
 
@@ -195,7 +194,7 @@ Route::prefix('v1')->group(function () {
 
             Route::post('/delivery-orders', 'store');
 
-            // Return Order Flow 
+            // Return Order Flow
             Route::get('/return-orders', 'allReturnOrders');
             Route::get('/return-orders/{id}', 'returnOrderDetails');
             Route::post('/accept-return-order/{id}', 'acceptReturnOrder');
@@ -232,27 +231,26 @@ Route::prefix('v1')->group(function () {
         //     Route::post('/stock-in-hand', 'store');
         // });
 
-
         // ================================== Customer APIs ========================================
         // All Requests APIs AMC and Non-AMC
         Route::controller(AllServicesController::class)->group(function () {
-            // Quick Services List 
+            // Quick Services List
             Route::get('/services', 'servicesList');
             Route::get('/quick-services', 'quickServicesList');
             Route::get('/services-list', 'servicesListByType');
             Route::get('/service-details/{id}', 'getServiceDetails');
-            // submit service request 
+            // submit service request
             Route::post('/submit-quick-service-request', 'submitQuickServiceRequest');
 
             // Get all service requests
             Route::get('/all-service-requests', 'allServiceRequests');
             // service request details
             Route::get('/service-request-details/{id}', 'serviceRequestDetails');
-            // service request product diagnostics 
+            // service request product diagnostics
             Route::get('/service-request-product-diagnostics/{id}/{product_id}', 'serviceRequestProductDiagnostics');
             // diagnosis list with full details
             // Route::get('/service-request/{id}/{product_id}/diagnosis-list', 'diagnosisList');
-            
+
             // customer approve/reject for stock_in_hand, request_part
             Route::post('/customer-approve-reject-part', 'customerApproveRejectPart');
 
@@ -263,18 +261,17 @@ Route::prefix('v1')->group(function () {
             Route::get('/service-request-quotations', 'serviceRequestQuotations');
             Route::get('/service-request-quotation-details/{id}', 'serviceRequestQuotationDetails');
 
-
             // accept or reject quotation
             Route::post('/service-request-quotations/{id}/accept', 'acceptQuotation');
             Route::post('/service-request-quotations/{id}/reject', 'rejectQuotation');
 
-            // display invoice to the customer 
+            // display invoice to the customer
             Route::get('/service-request-invoices', 'serviceRequestInvoicesList');
             Route::get('/service-request-invoice/{id}', 'serviceRequestInvoice');
-            Route::post('/service-request-invoice/{id}/accept', 'acceptInvoice');   
+            Route::post('/service-request-invoice/{id}/accept', 'acceptInvoice');
             Route::post('/service-request-invoice/{id}/reject', 'rejectInvoice');
 
-            // invoice payment 
+            // invoice payment
             Route::post('/invoice-payment/{id}', 'payInvoice');
 
             // Give Feedback APIs
@@ -283,17 +280,15 @@ Route::prefix('v1')->group(function () {
             Route::get('/get-feedback/{feedback_id}', 'getFeedback');
         });
 
-
-
-        // Feild Engineer APIs 
+        // Feild Engineer APIs
         Route::controller(FieldEngineerController::class)->group(function () {
-            // List of services 
-            Route::get('/service-requests', 'serviceRequests'); 
+            // List of services
+            Route::get('/service-requests', 'serviceRequests');
             // Service details and List of products in this service
             Route::get('/service-request/{id}', 'serviceRequestDetails');
             // Product details of selected service and it's product
             Route::get('/service-request/{id}/{product_id}', 'serviceRequestProductDetails');
-            // Accept Request 
+            // Accept Request
             Route::post('/service-request/{id}/accept', 'acceptServiceRequest');
 
             // Send otp for Start Diagnosis
@@ -301,24 +296,23 @@ Route::prefix('v1')->group(function () {
             // Verify otp for Start Diagnosis
             Route::post('/service-request/{id}/verify-otp', 'verifyDiagnosis');
 
-            // Case Transfer API 
+            // Case Transfer API
             Route::post('/service-request/{id}/case-transfer', 'caseTransfer');
             // Reschedule Service Request API
             Route::post('/service-request/{id}/reschedule', 'rescheduleServiceRequest');
 
-            // List of diagnosis 
+            // List of diagnosis
             Route::get('/service-request/{id}/{product_id}/diagnosis-list', 'diagnosisList');
-            // Submit Diagnosis 
+            // Submit Diagnosis
             Route::post('/service-request/{id}/{product_id}/submit-diagnosis', 'submitDiagnosis');
 
-
-            // Stock In Hand Products APIs 
+            // Stock In Hand Products APIs
             Route::get('/stock-in-hand', 'stockInHand');
 
-            // Request Part 
+            // Request Part
             Route::post('/service-request/{id}/{product_id}/request-part', 'requestPart');
 
-            // Attendance APIs 
+            // Attendance APIs
             Route::get('/attendance', 'index');
             Route::post('/check-in', 'store');
             Route::post('/check-out', 'logout');
@@ -406,52 +400,45 @@ Route::prefix('v1')->group(function () {
 });
 
 /**
- * 
  * signup
  * send-otp
- * verify-otp 
- * refresh-token 
+ * verify-otp
+ * refresh-token
  * logout
- * 
- * 
+ *
+ *
  * service-requests                     - service request list
  * service-request/{id}                 - service request detail
  * service-request/{id}/{product_id}    - service request product detail
  * service-request/{id}/accept          - accept service request
- * 
- * service-request/{id}/send-otp - Send otp 
+ *
+ * service-request/{id}/send-otp - Send otp
  * service-request/{id}/verify-otp - Verify otp
- * 
- * service-request/{id}/case-transfer    - case transfer 
+ *
+ * service-request/{id}/case-transfer    - case transfer
  * service-request/{id}/reschedule      - reschedule service request
- * 
- * service-request/{id}/{product_id}/diagnosis-list - list of diagnosis 
+ *
+ * service-request/{id}/{product_id}/diagnosis-list - list of diagnosis
  * service-request/{id}/{product_id}/submit-diagnosis - submit diagnosis
- * 
- * 
+ *
+ *
  * stock-in-hand                         - stock in hand products
- * stock-in-hand/{id}                    - stock in hand product detail 
- * 
+ * stock-in-hand/{id}                    - stock in hand product detail
+ *
  * products                              - products list
  * products/{id}                         - product detail
  * stock-in-hand/{id}/submit             - request part (stock in hand/spare part), multiple
- * 
- * 
- * attendance 
- * check-in 
+ *
+ *
+ * attendance
+ * check-in
  * check-out
- * 
- * personal details 
- * 
- * 
+ *
+ * personal details
+ *
+ *
  * service-request/{id}/{product_id}/pickup-request - send pickup request
  * service-request/{id}/{product_id}/pickup-status - pickup status
- * 
+ *
  * pickup-requests - pickup requests
- * 
- * 
- * 
- * 
- * 
- * 
  */

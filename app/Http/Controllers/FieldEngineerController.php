@@ -2,23 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\StockInHand;
-use Illuminate\Http\Request;
-use App\Models\ServiceRequest;
+use App\Models\AmcScheduleMeeting;
 use App\Models\AssignedEngineer;
-use App\Models\StockInHandProduct;
 use App\Models\CaseTransferRequest;
 use App\Models\CoveredItem;
-use Illuminate\Support\Facades\File;
-use App\Models\ServiceRequestProduct;
 use App\Models\EngineerDiagnosisDetail;
+use App\Models\Product;
+use App\Models\ServiceRequest;
+use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestProductPickup;
 use App\Models\ServiceRequestProductRequestPart;
-use Rappasoft\LaravelAuthenticationLog\Models\AuthenticationLog;
 use App\Models\Staff;
-use Illuminate\Support\Facades\{Auth, DB, Log, Storage, Validator};
-use App\Models\AmcScheduleMeeting;
-use App\Models\Product;
+use App\Models\StockInHand;
+use App\Models\StockInHandProduct;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Rappasoft\LaravelAuthenticationLog\Models\AuthenticationLog;
 
 class FieldEngineerController extends Controller
 {
@@ -85,7 +87,7 @@ class FieldEngineerController extends Controller
         $user = Staff::findOrFail($validated['user_id']);
 
         // Create a new authentication log entry manually
-        $authLog = new AuthenticationLog();
+        $authLog = new AuthenticationLog;
         $authLog->authenticatable()->associate($user);
         $authLog->ip_address = $request->ip();
         $authLog->user_agent = $request->userAgent();
@@ -210,7 +212,7 @@ class FieldEngineerController extends Controller
         // return response()->json(['success' => false, 'message' => 'Unauthorized.', 'id' => auth()->id()], 401);
         // if ($validated['user_id'] != auth()->guard('staff_api')->id()) {
         //     return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
-        // }   
+        // }
 
         $serviceRequestProduct = ServiceRequestProduct::with(['itemCode'])
             ->where('service_requests_id', $id)
@@ -244,7 +246,6 @@ class FieldEngineerController extends Controller
         $assignEngineer->engineer_approved_at = now();
         $assignEngineer->save();
 
-
         return response()->json(['message' => 'Service request accepted successfully.'], 200);
     }
 
@@ -253,24 +254,24 @@ class FieldEngineerController extends Controller
         try {
             $serviceRequest = ServiceRequest::find($id);
 
-            if (!$serviceRequest) {
+            if (! $serviceRequest) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Service request not found.'
+                    'message' => 'Service request not found.',
                 ], 404);
             }
 
             if ($serviceRequest->status !== 'engineer_approved') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'OTP can be sent only after Engineer Approval.'
+                    'message' => 'OTP can be sent only after Engineer Approval.',
                 ], 400);
             }
 
             if ($serviceRequest->otp && $serviceRequest->otp_expiry && now()->lt($serviceRequest->otp_expiry)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'OTP already sent and is still valid. Please wait before retrying.'
+                    'message' => 'OTP already sent and is still valid. Please wait before retrying.',
                 ], 400);
             }
 
@@ -288,21 +289,21 @@ class FieldEngineerController extends Controller
                 'data' => [
                     'service_request_id' => $serviceRequest->id,
                     'otp' => $otp,
-                    'otp_expiry' => $serviceRequest->otp_expiry
-                ]
+                    'otp_expiry' => $serviceRequest->otp_expiry,
+                ],
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
 
             Log::error('Start diagnosis OTP failed', [
                 'service_request_id' => $id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to send OTP. Please try again later.',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -311,42 +312,42 @@ class FieldEngineerController extends Controller
     {
         try {
             $request->validate([
-                'otp' => 'required|digits:4'
+                'otp' => 'required|digits:4',
             ]);
 
             $serviceRequest = ServiceRequest::find($id);
 
-            if (!$serviceRequest) {
+            if (! $serviceRequest) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Service request not found.'
+                    'message' => 'Service request not found.',
                 ], 404);
             }
 
             if ($serviceRequest->status !== 'engineer_approved') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'OTP verification not allowed at this stage.'
+                    'message' => 'OTP verification not allowed at this stage.',
                 ], 400);
             }
-            if (!$serviceRequest->otp || !$serviceRequest->otp_expiry) {
+            if (! $serviceRequest->otp || ! $serviceRequest->otp_expiry) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'OTP not generated for this service request.'
+                    'message' => 'OTP not generated for this service request.',
                 ], 400);
             }
 
             if (now()->gt($serviceRequest->otp_expiry)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'OTP has expired. Please request a new OTP.'
+                    'message' => 'OTP has expired. Please request a new OTP.',
                 ], 400);
             }
 
             if ($serviceRequest->otp != $request->otp) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid OTP.'
+                    'message' => 'Invalid OTP.',
                 ], 401);
             }
 
@@ -355,7 +356,7 @@ class FieldEngineerController extends Controller
             $serviceRequest->update([
                 'otp' => null,
                 'otp_expiry' => null,
-                'status' => 'in_progress' // optional, if you want to move workflow forward
+                'status' => 'in_progress', // optional, if you want to move workflow forward
             ]);
 
             // Update all service request products status from 'approved' to 'in_progress'
@@ -377,15 +378,15 @@ class FieldEngineerController extends Controller
                 'message' => 'OTP verified successfully. Diagnosis can be started.',
                 'data' => [
                     'service_request_id' => $serviceRequest->id,
-                    'verified_at' => now()
-                ]
+                    'verified_at' => now(),
+                ],
             ], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Validation errors
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid input.',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             // Other unexpected errors
@@ -393,13 +394,13 @@ class FieldEngineerController extends Controller
 
             Log::error('Verify diagnosis OTP failed', [
                 'service_request_id' => $id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to verify OTP. Please try again later.',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -426,7 +427,7 @@ class FieldEngineerController extends Controller
 
         // Create case transfer request
         $caseTransferRequest = CaseTransferRequest::create([
-            'transfer_id' => 'CTR-' . date('Ymd') . '-' . random_int(100, 999),
+            'transfer_id' => 'CTR-'.date('Ymd').'-'.random_int(100, 999),
             'service_request_id' => $id,
             'requesting_engineer_id' => $validated['user_id'],
             'engineer_reason' => $validated['engineer_reason'],
@@ -458,7 +459,7 @@ class FieldEngineerController extends Controller
         $serviceRequest->reschedule_date = $validated['reschedule_date'];
         $serviceRequest->save();
 
-        if (!$serviceRequest) {
+        if (! $serviceRequest) {
             return response()->json(['success' => false, 'message' => 'Failed to reschedule service request.'], 500);
         }
 
@@ -516,7 +517,7 @@ class FieldEngineerController extends Controller
                 ->where('status', 'active')
                 ->first();
 
-            if (!$assignedEngineer) {
+            if (! $assignedEngineer) {
                 return response()->json(['success' => false, 'message' => 'Service request not found or not assigned to this engineer.'], 404);
             }
 
@@ -527,7 +528,7 @@ class FieldEngineerController extends Controller
                 ->where('service_requests_id', $id)
                 ->first();
 
-            if (!$serviceRequestProduct) {
+            if (! $serviceRequestProduct) {
                 return response()->json(['success' => false, 'message' => 'Product not found.'], 404);
             }
 
@@ -542,7 +543,9 @@ class FieldEngineerController extends Controller
                     $amcPlan = $serviceRequest->amcPlan;
                     $diagnosisDetails = [];
                     foreach ($amcPlan->covered_items as $key => $coveredItem) {
-                        if ($key > 1) continue;
+                        if ($key > 1) {
+                            continue;
+                        }
                         $coveredItemDetails = CoveredItem::where('id', $coveredItem)->first();
                         if ($coveredItemDetails) {
                             $diagnosisDetails[] = $coveredItemDetails->diagnosis_list;
@@ -598,8 +601,7 @@ class FieldEngineerController extends Controller
                                         ->first();
                                     $itemData['part_status'] = $partRequest ? $partRequest->status : 'pending';
 
-
-                                    // product data 
+                                    // product data
                                     $productData = Product::where('id', $item['part_id'])->first();
                                     if ($productData) {
                                         $data = [
@@ -701,7 +703,7 @@ class FieldEngineerController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -712,7 +714,7 @@ class FieldEngineerController extends Controller
             $serviceRequestProduct = ServiceRequestProduct::where('service_requests_id', $service_request_id)
                 ->find($product_id);
 
-            if (!$serviceRequestProduct) {
+            if (! $serviceRequestProduct) {
                 throw new \Exception('Service request product not found.');
             }
 
@@ -720,7 +722,7 @@ class FieldEngineerController extends Controller
                 ->where('engineer_id', $request->user_id)
                 ->first();
 
-            if (!$assignedEngineer) {
+            if (! $assignedEngineer) {
                 throw new \Exception('Assigned engineer not found.');
             }
 
@@ -736,7 +738,7 @@ class FieldEngineerController extends Controller
                 foreach ($request->file('before_photos') as $k => $photo) {
                     $beforePhotos[$k] = $photo->storeAs(
                         'diagnosis_photos/before',
-                        'before_' . time() . "_$k." . $photo->getClientOriginalExtension(),
+                        'before_'.time()."_$k.".$photo->getClientOriginalExtension(),
                         'public'
                     );
                 }
@@ -747,7 +749,7 @@ class FieldEngineerController extends Controller
                 foreach ($request->file('after_photos') as $k => $photo) {
                     $afterPhotos[$k] = $photo->storeAs(
                         'diagnosis_photos/after',
-                        'after_' . time() . "_$k." . $photo->getClientOriginalExtension(),
+                        'after_'.time()."_$k.".$photo->getClientOriginalExtension(),
                         'public'
                     );
                 }
@@ -783,7 +785,7 @@ class FieldEngineerController extends Controller
                             ->where('request_type', 'request_part')
                             ->first();
 
-                        if (!$existingRequestPart) {
+                        if (! $existingRequestPart) {
                             ServiceRequestProductRequestPart::create([
                                 'request_id' => $service_request_id,
                                 'product_id' => $product_id,
@@ -811,7 +813,7 @@ class FieldEngineerController extends Controller
 
                     if ($requestPart) {
 
-                        if($requestPart->requested_quantity > $diagnosis['quantity']) {
+                        if ($requestPart->requested_quantity > $diagnosis['quantity']) {
                             $requestPart->requested_quantity = $requestPart->requested_quantity - $diagnosis['quantity'];
                         } else {
                             $requestPart->requested_quantity = 0;
@@ -820,17 +822,17 @@ class FieldEngineerController extends Controller
                         $requestPart->update([
                             'status' => 'used',
                             'requested_quantity' => $requestPart->requested_quantity,
-                            'used_at' => now()
+                            'used_at' => now(),
                         ]);
                     }
                 }
 
-                if (!empty($diagnosis['images'])) {
+                if (! empty($diagnosis['images'])) {
                     $imgs = [];
                     foreach ($diagnosis['images'] as $j => $img) {
                         $imgs[] = $img->storeAs(
                             'diagnosis_photos/list',
-                            'diag_' . time() . "_{$i}_{$j}." . $img->getClientOriginalExtension(),
+                            'diag_'.time()."_{$i}_{$j}.".$img->getClientOriginalExtension(),
                             'public'
                         );
                     }
@@ -942,14 +944,14 @@ class FieldEngineerController extends Controller
                         ->where('product_id', $serviceRequestProduct->id)
                         ->first();
 
-                    if (!$existingPickup) {
+                    if (! $existingPickup) {
                         // Extract reason from diagnosis list
                         $reason = '';
-                        if (!empty($diagnosisList)) {
+                        if (! empty($diagnosisList)) {
                             $reasonParts = [];
                             foreach ($diagnosisList as $item) {
                                 if (isset($item['status']) && $item['status'] === 'picking') {
-                                    $reasonParts[] = ($item['name'] ?? '') . ': ' . ($item['report'] ?? '');
+                                    $reasonParts[] = ($item['name'] ?? '').': '.($item['report'] ?? '');
                                 }
                             }
                             $reason = implode('; ', $reasonParts);
@@ -976,24 +978,23 @@ class FieldEngineerController extends Controller
                 'data' => [
                     'diagnosis_id' => $diagnosis->id,
                     'product_status' => $productStatus,
-                    'service_request_status' => $newServiceStatus ?? 'unchanged'
-                ]
+                    'service_request_status' => $newServiceStatus ?? 'unchanged',
+                ],
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
 
             Log::error('Diagnosis submit failed', [
                 'service_request_id' => $service_request_id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
-
 
     public function stockInHand(Request $request)
     {
@@ -1013,7 +1014,7 @@ class FieldEngineerController extends Controller
             return $query->where('engineer_id', $validated['user_id']);
         }])->get();
 
-        if (!$stockInHandProducts) {
+        if (! $stockInHandProducts) {
             return response()->json(['success' => false, 'message' => 'No stock in hand products found.'], 404);
         }
 
@@ -1035,11 +1036,11 @@ class FieldEngineerController extends Controller
 
         $validated = $validated->validated();
 
-        // TODO: Request part logic 
-        // 1. Check if part is in stock 
-        // 2. If part is in stock then reduce quantity from stock in hand 
-        // 3. If part is not in stock then request from warehouse 
-        // 4. Create request part entry 
+        // TODO: Request part logic
+        // 1. Check if part is in stock
+        // 2. If part is in stock then reduce quantity from stock in hand
+        // 3. If part is not in stock then request from warehouse
+        // 4. Create request part entry
 
         return response()->json(['message' => 'Request part API is working.'], 200);
     }

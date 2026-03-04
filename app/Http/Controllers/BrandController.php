@@ -22,6 +22,7 @@ class BrandController extends Controller
             $query->where('status_ecommerce', $status_ecommerce);
         }
         $brand = $query->get();
+
         return view('e-commerce/brands/index', compact('brand'));
     }
 
@@ -51,10 +52,10 @@ class BrandController extends Controller
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $filename = time().'.'.$file->getClientOriginalExtension();
 
             $file->move(public_path('uploads/e-commerce/brands'), $filename);
-            $brand->image = 'uploads/e-commerce/brands/' . $filename;
+            $brand->image = 'uploads/e-commerce/brands/'.$filename;
         }
 
         $brand->save();
@@ -69,6 +70,7 @@ class BrandController extends Controller
     public function edit($id)
     {
         $brand = Brand::find($id);
+
         return view('e-commerce/brands/edit', compact('brand'));
     }
 
@@ -98,10 +100,10 @@ class BrandController extends Controller
             }
 
             $file = $request->file('image');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $filename = time().'.'.$file->getClientOriginalExtension();
 
             $file->move(public_path('uploads/e-commerce/brands'), $filename);
-            $brand->image = 'uploads/e-commerce/brands/' . $filename;
+            $brand->image = 'uploads/e-commerce/brands/'.$filename;
         }
 
         $brand->save();

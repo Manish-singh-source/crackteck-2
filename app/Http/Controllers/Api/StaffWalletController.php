@@ -12,10 +12,9 @@ class StaffWalletController extends Controller
 {
     /**
      * Get expense details for engineer or delivery man.
-     * 
+     *
      * GET /api/v1/staff-expenses
-     * 
-     * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
@@ -28,7 +27,7 @@ class StaffWalletController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -37,10 +36,10 @@ class StaffWalletController extends Controller
         // Get staff details
         $staff = Staff::find($staffId);
 
-        if (!$staff) {
+        if (! $staff) {
             return response()->json([
                 'success' => false,
-                'message' => 'Staff not found'
+                'message' => 'Staff not found',
             ], 404);
         }
 
@@ -54,8 +53,9 @@ class StaffWalletController extends Controller
             ->get()
             ->map(function ($expense) {
                 if ($expense->receipt) {
-                    $expense->receipt_url = url('api/v1/receipts/' . basename($expense->receipt));
+                    $expense->receipt_url = url('api/v1/receipts/'.basename($expense->receipt));
                 }
+
                 return $expense;
             });
 
@@ -86,7 +86,7 @@ class StaffWalletController extends Controller
             'data' => [
                 'staff' => [
                     'id' => $staff->id,
-                    'name' => $staff->first_name . ' ' . $staff->last_name,
+                    'name' => $staff->first_name.' '.$staff->last_name,
                     'staff_code' => $staff->staff_code,
                     'staff_role' => $staff->staff_role,
                     'phone' => $staff->phone,
@@ -98,17 +98,16 @@ class StaffWalletController extends Controller
                     'total_approved' => $totalApproved,
                     'total_rejected' => $totalRejected,
                     'total_payed' => $totalPayed,
-                ]
-            ]
+                ],
+            ],
         ], 200);
     }
 
     /**
      * Submit expense form for engineer or delivery man.
-     * 
+     *
      * POST /api/v1/staff-expenses
-     * 
-     * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
@@ -124,7 +123,7 @@ class StaffWalletController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -133,10 +132,10 @@ class StaffWalletController extends Controller
         // Verify staff exists and get staff details
         $staff = Staff::find($staffId);
 
-        if (!$staff) {
+        if (! $staff) {
             return response()->json([
                 'success' => false,
-                'message' => 'Staff not found'
+                'message' => 'Staff not found',
             ], 404);
         }
 
@@ -145,10 +144,10 @@ class StaffWalletController extends Controller
 
         // Validate that staff_type is valid (engineer or delivery_man)
         $validStaffTypes = ['engineer', 'delivery_man'];
-        if (!in_array($staffType, $validStaffTypes)) {
+        if (! in_array($staffType, $validStaffTypes)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid staff role. Only engineer or delivery_man can submit expenses.'
+                'message' => 'Invalid staff role. Only engineer or delivery_man can submit expenses.',
             ], 422);
         }
 
@@ -156,9 +155,9 @@ class StaffWalletController extends Controller
         $receiptPath = null;
         if ($request->hasFile('receipt')) {
             $receipt = $request->file('receipt');
-            $receiptName = time() . '_' . $receipt->getClientOriginalName();
+            $receiptName = time().'_'.$receipt->getClientOriginalName();
             $receipt->move(public_path('public/receipts'), $receiptName);
-            $receiptPath = 'receipts/' . $receiptName;
+            $receiptPath = 'receipts/'.$receiptName;
         }
 
         // Create new expense entry with auto-determined staff_type
@@ -174,7 +173,7 @@ class StaffWalletController extends Controller
         // Build receipt URL if exists
         $receiptUrl = null;
         if ($receiptPath) {
-            $receiptUrl = url('api/v1/receipts/' . basename($receiptPath));
+            $receiptUrl = url('api/v1/receipts/'.basename($receiptPath));
         }
 
         return response()->json([
@@ -190,33 +189,33 @@ class StaffWalletController extends Controller
                 'receipt_url' => $receiptUrl,
                 'status' => $expense->status,
                 'created_at' => $expense->created_at,
-            ]
+            ],
         ], 201);
     }
 
     /**
      * Get single expense details.
-     * 
+     *
      * GET /api/v1/staff-expenses/{id}
-     * 
-     * @param int $id
+     *
+     * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
         $expense = StaffWallet::with('staff')->find($id);
 
-        if (!$expense) {
+        if (! $expense) {
             return response()->json([
                 'success' => false,
-                'message' => 'Expense not found'
+                'message' => 'Expense not found',
             ], 404);
         }
 
         // Build receipt URL if exists
         $receiptUrl = null;
         if ($expense->receipt) {
-            $receiptUrl = url('api/v1/receipts/' . basename($expense->receipt));
+            $receiptUrl = url('api/v1/receipts/'.basename($expense->receipt));
         }
 
         $expenseData = $expense->toArray();
@@ -225,16 +224,15 @@ class StaffWalletController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Expense details retrieved successfully',
-            'data' => $expenseData
+            'data' => $expenseData,
         ], 200);
     }
 
     /**
      * Get expense history for a specific staff.
-     * 
+     *
      * GET /api/v1/staff-expenses/history
-     * 
-     * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function history(Request $request)
@@ -248,7 +246,7 @@ class StaffWalletController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -257,10 +255,10 @@ class StaffWalletController extends Controller
         // Get staff details
         $staff = Staff::find($staffId);
 
-        if (!$staff) {
+        if (! $staff) {
             return response()->json([
                 'success' => false,
-                'message' => 'Staff not found'
+                'message' => 'Staff not found',
             ], 404);
         }
 
@@ -279,17 +277,16 @@ class StaffWalletController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Expense history retrieved successfully',
-            'data' => $expenses
+            'data' => $expenses,
         ], 200);
     }
 
     /**
      * Update expense status.
-     * 
+     *
      * PUT /api/v1/staff-expenses/{id}/status
-     * 
-     * @param Request $request
-     * @param int $id
+     *
+     * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function updateStatus(Request $request, $id)
@@ -302,16 +299,16 @@ class StaffWalletController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $expense = StaffWallet::find($id);
 
-        if (!$expense) {
+        if (! $expense) {
             return response()->json([
                 'success' => false,
-                'message' => 'Expense not found'
+                'message' => 'Expense not found',
             ], 404);
         }
 
@@ -324,7 +321,7 @@ class StaffWalletController extends Controller
             'data' => [
                 'id' => $expense->id,
                 'status' => $expense->status,
-            ]
+            ],
         ], 200);
     }
 }

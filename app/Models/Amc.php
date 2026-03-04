@@ -20,7 +20,7 @@ class Amc extends Model
         'request_date',
         'request_source',
         'status',
-        'created_by'
+        'created_by',
     ];
 
     public function customer()
@@ -47,5 +47,4 @@ class Amc extends Model
     {
         return $this->hasMany(AmcScheduleMeeting::class, 'amc_id');
     }
-
 }

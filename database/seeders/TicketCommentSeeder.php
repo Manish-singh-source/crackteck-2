@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use App\Models\Ticket;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class TicketCommentSeeder extends Seeder
 {
@@ -35,14 +34,14 @@ class TicketCommentSeeder extends Seeder
 
                 $attachments = [];
                 if (rand(0, 3) === 0) {
-                    $attachments[] = 'screenshot_' . rand(1, 10) . '.png';
+                    $attachments[] = 'screenshot_'.rand(1, 10).'.png';
                 }
 
                 $comments[] = [
                     'ticket_id' => $ticket->id,
                     'created_by' => $creator,
                     'comment' => $isInternal ? 'Internal note: follow up with vendor.' : 'Customer comment: please assist with the issue.',
-                    'attachments' => !empty($attachments) ? json_encode($attachments) : null,
+                    'attachments' => ! empty($attachments) ? json_encode($attachments) : null,
                     'is_internal' => $isInternal,
                     'created_at' => $now->subDays(rand(0, 30))->subMinutes(rand(0, 1440))->toDateTimeString(),
                     'updated_at' => $now,
@@ -50,7 +49,7 @@ class TicketCommentSeeder extends Seeder
             }
         }
 
-        if (!empty($comments)) {
+        if (! empty($comments)) {
             DB::table('ticket_comments')->insert($comments);
         }
     }

@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class CustomerAadharDetailSeeder extends Seeder
 {
@@ -27,7 +26,7 @@ class CustomerAadharDetailSeeder extends Seeder
             $cid = DB::table('customers')->where('customer_code', $d['code'])->value('id');
             if ($cid) {
                 DB::table('customer_aadhar_details')->updateOrInsert([
-                    'customer_id' => $cid
+                    'customer_id' => $cid,
                 ], [
                     'aadhar_number' => $d['aadhar_number'],
                     'aadhar_front_path' => $d['front'],

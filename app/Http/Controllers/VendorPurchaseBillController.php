@@ -7,9 +7,8 @@ use App\Http\Requests\UpdateVendorPurchaseOrderRequest;
 use App\Models\Vendor;
 use App\Models\VendorPurchaseOrder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\Request;
 
 class VendorPurchaseBillController extends Controller
 {
@@ -35,6 +34,7 @@ class VendorPurchaseBillController extends Controller
     public function create()
     {
         $vendors = Vendor::all();
+
         return view('/warehouse/vendor-purchase-bills/create', compact('vendors'));
     }
 
@@ -48,7 +48,7 @@ class VendorPurchaseBillController extends Controller
             // Handle invoice upload
             if ($request->hasFile('invoice_pdf')) {
                 $file = $request->file('invoice_pdf');
-                $filename = time() . '_' . $file->getClientOriginalName();
+                $filename = time().'_'.$file->getClientOriginalName();
 
                 $data['invoice_pdf'] = $file->storeAs(
                     'uploads/vendor-purchase-bills',
@@ -123,7 +123,7 @@ class VendorPurchaseBillController extends Controller
                 }
 
                 $file = $request->file('invoice_pdf');
-                $filename = time() . '_' . $file->getClientOriginalName();
+                $filename = time().'_'.$file->getClientOriginalName();
 
                 $data['invoice_pdf'] = $file->storeAs(
                     'uploads/vendor-purchase-bills',

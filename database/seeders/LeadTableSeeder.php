@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Lead;
-use App\Models\Staff;
 use App\Models\Customer;
 use App\Models\CustomerAddressDetail;
+use App\Models\Lead;
+use App\Models\Staff;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -24,7 +24,7 @@ class LeadTableSeeder extends Seeder
 
         // Ensure we have at least one customer
         if (Customer::count() === 0) {
-            echo "Creating dummy customer for leads...";
+            echo 'Creating dummy customer for leads...';
             // Create a dummy customer if none exist
             $customerId = DB::table('customers')->insertGetId([
                 'customer_code' => 'CUS-SEED-LEAD',
@@ -37,7 +37,7 @@ class LeadTableSeeder extends Seeder
                 'customer_type' => 'ecommerce',
                 'source_type' => 'lead',
                 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // dummy password
-                'status' => "active",  // Ensure status is set
+                'status' => 'active',  // Ensure status is set
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -73,12 +73,12 @@ class LeadTableSeeder extends Seeder
         foreach ($customers as $customer) {
             // Select a random staff member for each lead
             $staffId = $staffs->random()->id;
-            
+
             // Select a random address for the customer
             $customerAddressId = CustomerAddressDetail::where('customer_id', $customer->id)
                 ->inRandomOrder()
                 ->value('id');
-            
+
             // Define the number of leads to create per customer (you can make this dynamic)
             $leadCount = rand(1, 5); // For example, create between 1 and 5 leads per customer
 
@@ -87,7 +87,7 @@ class LeadTableSeeder extends Seeder
                     'staff_id' => $staffId,  // Random staff ID
                     'customer_id' => $customer->id,  // Customer ID
                     'customer_address_id' => $customerAddressId,  // Random address for the same customer
-                    'lead_number' => 'LEAD' . strtoupper(uniqid()),  // Unique lead number
+                    'lead_number' => 'LEAD'.strtoupper(uniqid()),  // Unique lead number
                     'requirement_type' => fake()->randomElement(['servers', 'cctv', 'biometric', 'networking']),
                     'budget_range' => fake()->randomElement(['10K-50K', '50K-100K', '100K-500K', '500K-1000K']),
                     'urgency' => fake()->randomElement(['low', 'medium', 'high', 'critical']),

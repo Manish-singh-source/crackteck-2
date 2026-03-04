@@ -24,12 +24,12 @@ class ProductsSeeder extends Seeder
         $products = [];
 
         for ($i = 0; $i < 16; $i++) {
-            $sku = 'SKU' . str_pad($i + 1, 5, '0', STR_PAD_LEFT);
-            $modelNo = 'MODEL' . str_pad($i + 1, 5, '0', STR_PAD_LEFT);
+            $sku = 'SKU'.str_pad($i + 1, 5, '0', STR_PAD_LEFT);
+            $modelNo = 'MODEL'.str_pad($i + 1, 5, '0', STR_PAD_LEFT);
             $vendor_id = $vendors[array_rand($vendors)];
             $vendor_purchase_order_id = DB::table('vendor_purchase_orders')->where('vendor_id', $vendor_id)->pluck('id')->toArray();
 
-            // cost price 
+            // cost price
             $cost_price = rand(1000, 10000);
             $selling_price = $cost_price + rand(1000, 10000);
             $discount_price = rand(0, $selling_price);
@@ -40,7 +40,7 @@ class ProductsSeeder extends Seeder
             $stock_quantity = rand(0, 100);
             if ($stock_quantity == 0) {
                 $stock_status = 'out_of_stock';
-            } elseif($stock_quantity < 10) {
+            } elseif ($stock_quantity < 10) {
                 $stock_status = 'low_stock';
             } else {
                 $stock_status = 'in_stock';
@@ -57,7 +57,6 @@ class ProductsSeeder extends Seeder
             // status
             $statuses = ['active', 'inactive'];
             $status = $statuses[array_rand($statuses)];
-
 
             $products[] = [
                 'vendor_id' => $vendor_id,

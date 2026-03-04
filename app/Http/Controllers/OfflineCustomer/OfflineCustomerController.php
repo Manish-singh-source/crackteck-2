@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\OfflineCustomer;
-use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Amc;
 use App\Models\CustomerAddressDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,6 +16,7 @@ class OfflineCustomerController extends Controller
     public function index()
     {
         $customer = Auth::guard('customer_web')->user();
+
         return view('offline-users-dashboard.index', compact('customer'));
     }
 
@@ -40,6 +41,7 @@ class OfflineCustomerController extends Controller
             ->whereNotNull('amc_plan_id')
             ->orderBy('created_at', 'desc')
             ->get();
+
         // dd($servicesRequest);
         return view('offline-users-dashboard.amc', compact('servicesRequest'));
     }
@@ -65,23 +67,23 @@ class OfflineCustomerController extends Controller
         }
 
         try {
-            
+
             $amcService = Amc::with([
                 'amcPlan',
                 'customer',
                 'customer.companyDetails',
                 'customer.branches',
                 'amcProducts',
-                'amcScheduleMeetings',  
+                'amcScheduleMeetings',
                 'amcScheduleMeetings.activeAssignment.engineer',
             ])
-            ->withCount('amcProducts')
-            ->where('id', $id)->where('customer_id', $customerId)->firstOrFail();
+                ->withCount('amcProducts')
+                ->where('id', $id)->where('customer_id', $customerId)->firstOrFail();
 
             return view('offline-users-dashboard.amc-view', compact('amcService'));
         } catch (\Exception $e) {
             dd($e->getMessage());
-            Log::error('Error viewing AMC service: ' . $e->getMessage());
+            Log::error('Error viewing AMC service: '.$e->getMessage());
 
             return redirect()->back()->with('error', 'Error loading AMC service details.');
         }
@@ -126,6 +128,7 @@ class OfflineCustomerController extends Controller
 
         return view('offline-users-dashboard.ticket-detail', compact('amcTicket'));
     }
+
     public function accountDetail()
     {
         $customer = Auth::guard('customer_web')->user();
@@ -137,6 +140,7 @@ class OfflineCustomerController extends Controller
 
         return view('offline-users-dashboard.account-detail', compact('customer', 'primaryAddress'));
     }
+
     public function address()
     {
         if (! Auth::guard('customer_web')->check()) {
@@ -152,7 +156,9 @@ class OfflineCustomerController extends Controller
 
         return view('offline-users-dashboard.address', compact('addresses', 'customer'));
     }
-    public function changePassword(){
+
+    public function changePassword()
+    {
         return view('offline-users-dashboard.password');
     }
 
@@ -165,7 +171,7 @@ class OfflineCustomerController extends Controller
         if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please login to change password.'
+                'message' => 'Please login to change password.',
             ], 401);
         }
 
@@ -180,17 +186,17 @@ class OfflineCustomerController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         try {
             $customer = \App\Models\Customer::find($customerId);
-            
-            if (!$customer) {
+
+            if (! $customer) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Customer not found'
+                    'message' => 'Customer not found',
                 ], 404);
             }
 
@@ -200,14 +206,14 @@ class OfflineCustomerController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Password updated successfully'
+                'message' => 'Password updated successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating password: ' . $e->getMessage());
-            
+            Log::error('Error updating password: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating password. Please try again.'
+                'message' => 'Error updating password. Please try again.',
             ], 500);
         }
     }
@@ -231,17 +237,17 @@ class OfflineCustomerController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         try {
             $customer = \App\Models\Customer::find($customerId);
-            
-            if (!$customer) {
+
+            if (! $customer) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Customer not found'
+                    'message' => 'Customer not found',
                 ], 404);
             }
 
@@ -252,14 +258,14 @@ class OfflineCustomerController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Profile updated successfully'
+                'message' => 'Profile updated successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating customer profile: ' . $e->getMessage());
-            
+            Log::error('Error updating customer profile: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating profile. Please try again.'
+                'message' => 'Error updating profile. Please try again.',
             ], 500);
         }
     }
@@ -271,11 +277,11 @@ class OfflineCustomerController extends Controller
     {
         // Check if customer is authenticated
         $isAuthenticated = Auth::guard('customer_web')->check();
-        
-        if (!$isAuthenticated) {
+
+        if (! $isAuthenticated) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please login to add an address. Auth: ' . ($isAuthenticated ? 'yes' : 'no')
+                'message' => 'Please login to add an address. Auth: '.($isAuthenticated ? 'yes' : 'no'),
             ], 401);
         }
 
@@ -296,20 +302,20 @@ class OfflineCustomerController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         try {
             // Check if setting as default (handle checkbox properly)
             $isDefault = $request->is_default === true || $request->is_default === 'true' || $request->is_default === '1' || $request->is_default === 1;
-            
+
             // If setting as default, remove default from other addresses
             if ($isDefault) {
                 CustomerAddressDetail::where('customer_id', $customerId)->update(['is_primary' => 'no']);
             }
 
-            $address = new CustomerAddressDetail();
+            $address = new CustomerAddressDetail;
             $address->customer_id = $customerId;
             $address->branch_name = $request->branch_name ?? 'Home';
             $address->address1 = $request->address1;
@@ -323,14 +329,14 @@ class OfflineCustomerController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Address added successfully'
+                'message' => 'Address added successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error storing address: ' . $e->getMessage());
-            
+            Log::error('Error storing address: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error adding address: ' . $e->getMessage()
+                'message' => 'Error adding address: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -344,7 +350,7 @@ class OfflineCustomerController extends Controller
         if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please login to edit address.'
+                'message' => 'Please login to edit address.',
             ], 401);
         }
 
@@ -356,23 +362,23 @@ class OfflineCustomerController extends Controller
                 ->where('customer_id', $customerId)
                 ->first();
 
-            if (!$address) {
+            if (! $address) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Address not found'
+                    'message' => 'Address not found',
                 ], 404);
             }
 
             return response()->json([
                 'success' => true,
-                'address' => $address
+                'address' => $address,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error loading address: ' . $e->getMessage());
-            
+            Log::error('Error loading address: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error loading address.'
+                'message' => 'Error loading address.',
             ], 500);
         }
     }
@@ -386,7 +392,7 @@ class OfflineCustomerController extends Controller
         if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please login to update address.'
+                'message' => 'Please login to update address.',
             ], 401);
         }
 
@@ -407,7 +413,7 @@ class OfflineCustomerController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -416,10 +422,10 @@ class OfflineCustomerController extends Controller
                 ->where('customer_id', $customerId)
                 ->first();
 
-            if (!$address) {
+            if (! $address) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Address not found'
+                    'message' => 'Address not found',
                 ], 404);
             }
 
@@ -442,14 +448,14 @@ class OfflineCustomerController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Address updated successfully'
+                'message' => 'Address updated successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating address: ' . $e->getMessage());
-            
+            Log::error('Error updating address: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating address. Please try again.'
+                'message' => 'Error updating address. Please try again.',
             ], 500);
         }
     }
@@ -463,7 +469,7 @@ class OfflineCustomerController extends Controller
         if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please login to delete address.'
+                'message' => 'Please login to delete address.',
             ], 401);
         }
 
@@ -475,10 +481,10 @@ class OfflineCustomerController extends Controller
                 ->where('customer_id', $customerId)
                 ->first();
 
-            if (!$address) {
+            if (! $address) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Address not found'
+                    'message' => 'Address not found',
                 ], 404);
             }
 
@@ -497,14 +503,14 @@ class OfflineCustomerController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Address deleted successfully'
+                'message' => 'Address deleted successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error deleting address: ' . $e->getMessage());
-            
+            Log::error('Error deleting address: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error deleting address. Please try again.'
+                'message' => 'Error deleting address. Please try again.',
             ], 500);
         }
     }
@@ -534,14 +540,14 @@ class OfflineCustomerController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         try {
             $amc = Amc::where('id', $request->amc_id)->where('customer_id', $customerId)->first();
 
-            if (!$amc) {
+            if (! $amc) {
                 return response()->json([
                     'success' => false,
                     'message' => 'AMC service not found.',
@@ -565,11 +571,11 @@ class OfflineCustomerController extends Controller
                 'ticket' => $ticket,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error creating AMC ticket: ' . $e->getMessage());
+            Log::error('Error creating AMC ticket: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error creating ticket: ' . $e->getMessage(),
+                'message' => 'Error creating ticket: '.$e->getMessage(),
             ], 500);
         }
     }

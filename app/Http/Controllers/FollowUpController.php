@@ -18,6 +18,7 @@ class FollowUpController extends Controller
             $query->where('status', $status);
         }
         $followup = $query->with('leadDetails.customer', 'staffDetails')->get();
+
         return view('/crm/follow-up/index', compact('followup'));
     }
 
@@ -36,7 +37,7 @@ class FollowUpController extends Controller
             'followup_time' => 'required',
             'staff_id' => 'required',
             'status' => 'required',
-            'remarks' => 'nullable'
+            'remarks' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -83,7 +84,7 @@ class FollowUpController extends Controller
             'followup_date' => 'required',
             'followup_time' => 'required',
             'status' => 'required',
-            'remarks' => 'nullable'
+            'remarks' => 'nullable',
         ]);
 
         // dd($request->all());
@@ -115,12 +116,12 @@ class FollowUpController extends Controller
     {
         $lead = Lead::with('customer', 'staff')->find($id);
 
-        if (!$lead) {
+        if (! $lead) {
             return response()->json(['error' => 'Lead not found'], 404);
         }
 
         $customer = $lead->customer;
-        if (!$customer) {
+        if (! $customer) {
             return response()->json([
                 'client_name' => '',
                 'email' => '',
@@ -129,7 +130,7 @@ class FollowUpController extends Controller
         }
 
         $staff = $lead->staff;
-        if (!$staff) {
+        if (! $staff) {
             return response()->json([
                 'staff_name' => '',
                 'staff_id' => '',
@@ -137,9 +138,9 @@ class FollowUpController extends Controller
         }
 
         return response()->json([
-            'staff_name' => ($staff->first_name ?? '') . ' ' . ($staff->last_name ?? ''),
+            'staff_name' => ($staff->first_name ?? '').' '.($staff->last_name ?? ''),
             'staff_id' => ($staff->id ?? ''),
-            'client_name' => ($customer->first_name ?? '') . ' ' . ($customer->last_name ?? ''),
+            'client_name' => ($customer->first_name ?? '').' '.($customer->last_name ?? ''),
             'email' => $customer->email ?? '',
             'phone' => $customer->phone ?? '',
         ]);

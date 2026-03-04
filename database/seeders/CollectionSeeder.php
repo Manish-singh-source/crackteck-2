@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\ParentCategory;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\ParentCategory;
 
 class CollectionSeeder extends Seeder
 {
@@ -20,31 +20,31 @@ class CollectionSeeder extends Seeder
         if (ParentCategory::count() < 3) {
             DB::table('parent_categories')->insert([
                 [
-                    'slug' => 'electronics', 
+                    'slug' => 'electronics',
                     'name' => 'Electronics',
                     'image' => 'uploads/e-commerce/categories/1760427505.png',
                     'sort_order' => 1,
-                    'status_ecommerce' => "active", 
-                    'status' => "active", 
-                    'created_at' => $now, 
+                    'status_ecommerce' => 'active',
+                    'status' => 'active',
+                    'created_at' => $now,
                     'updated_at' => $now],
                 [
-                    'slug' => 'home-appliances', 
+                    'slug' => 'home-appliances',
                     'name' => 'Home Appliances',
                     'image' => 'uploads/e-commerce/categories/1760427505.png',
                     'sort_order' => 2,
-                    'status_ecommerce' => "active", 
-                    'status' => "active", 
-                    'created_at' => $now, 
+                    'status_ecommerce' => 'active',
+                    'status' => 'active',
+                    'created_at' => $now,
                     'updated_at' => $now],
                 [
-                    'slug' => 'kitchen', 
+                    'slug' => 'kitchen',
                     'name' => 'Kitchen',
                     'image' => 'uploads/e-commerce/categories/1760427505.png',
                     'sort_order' => 3,
-                    'status_ecommerce' => "active", 
-                    'status' => "active", 
-                    'created_at' => $now, 
+                    'status_ecommerce' => 'active',
+                    'status' => 'active',
+                    'created_at' => $now,
                     'updated_at' => $now],
             ]);
         }
@@ -53,37 +53,37 @@ class CollectionSeeder extends Seeder
 
         $collections = [
             [
-                'name' => 'summer-deals', 
-                'slug' => 'summer-deals', 
-                'description' => 'Best summer discounts', 
-                'image_url' => null, 
-                'sort_order' => 1, 
-                'status' => "active", 
-                'products_count' => 0, 
-                'created_at' => $now, 
-                'updated_at' => $now
+                'name' => 'summer-deals',
+                'slug' => 'summer-deals',
+                'description' => 'Best summer discounts',
+                'image_url' => null,
+                'sort_order' => 1,
+                'status' => 'active',
+                'products_count' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
             [
-                'name' => 'top-rated', 
-                'slug' => 'top-rated', 
-                'description' => 'Top rated products', 
-                'image_url' => null, 
-                'sort_order' => 2, 
-                'status' => "active", 
-                'products_count' => 0, 
-                'created_at' => $now, 
-                'updated_at' => $now
+                'name' => 'top-rated',
+                'slug' => 'top-rated',
+                'description' => 'Top rated products',
+                'image_url' => null,
+                'sort_order' => 2,
+                'status' => 'active',
+                'products_count' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
             [
-                'name' => 'new-arrivals', 
-                'slug' => 'new-arrivals', 
-                'description' => 'Latest products', 
-                'image_url' => null, 
-                'sort_order' => 3, 
-                'status' => "active", 
-                'products_count' => 0, 
-                'created_at' => $now, 
-                'updated_at' => $now
+                'name' => 'new-arrivals',
+                'slug' => 'new-arrivals',
+                'description' => 'Latest products',
+                'image_url' => null,
+                'sort_order' => 3,
+                'status' => 'active',
+                'products_count' => 0,
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
         ];
 

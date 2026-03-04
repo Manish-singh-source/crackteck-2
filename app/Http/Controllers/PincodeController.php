@@ -12,24 +12,23 @@ class PincodeController extends Controller
     public function index()
     {
         $pincode = Pincode::query();
-        
-        if($status = request()->get('delivery_status')) {
+
+        if ($status = request()->get('delivery_status')) {
             $pincode = $pincode->where('delivery', $status);
         }
-        if($status = request()->get('installation_status')) {
+        if ($status = request()->get('installation_status')) {
             $pincode = $pincode->where('installation', $status);
         }
-        if($status = request()->get('repair_status')) {
+        if ($status = request()->get('repair_status')) {
             $pincode = $pincode->where('repair', $status);
         }
-        if($status = request()->get('quick_service_status')) {
+        if ($status = request()->get('quick_service_status')) {
             $pincode = $pincode->where('quick_service', $status);
         }
-        if($status = request()->get('amc_status')) {
+        if ($status = request()->get('amc_status')) {
             $pincode = $pincode->where('amc', $status);
         }
         $pincode = $pincode->get();
-
 
         return view('/crm/manage-pincodes/index', compact('pincode'));
     }

@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Customer extends Authenticatable implements JWTSubject
 {
@@ -66,7 +65,7 @@ class Customer extends Authenticatable implements JWTSubject
         return $this->hasMany(CustomerAddressDetail::class);
     }
 
-    // primary address only 
+    // primary address only
     public function primaryAddress()
     {
         return $this->hasOne(CustomerAddressDetail::class)->where('is_primary', 'yes');

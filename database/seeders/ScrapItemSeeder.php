@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use App\Models\Product;
 use App\Models\ProductSerial;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ScrapItemSeeder extends Seeder
 {
@@ -38,7 +37,7 @@ class ScrapItemSeeder extends Seeder
                 'quantity_scrapped' => rand(1, 3),
                 'reason_for_scrap' => 'Damaged in transit',
                 'scrap_notes' => 'Packaging torn and unit not powering on.',
-                'photos' => json_encode(['damaged_' . strtolower($product->sku ?? 'prod') . '.jpg']),
+                'photos' => json_encode(['damaged_'.strtolower($product->sku ?? 'prod').'.jpg']),
                 'scrapped_by' => 1,
                 'scrapped_at' => $now->subDays(rand(1, 30))->toDateTimeString(),
                 'created_at' => $now,
@@ -54,7 +53,7 @@ class ScrapItemSeeder extends Seeder
                     'quantity_scrapped' => 1,
                     'reason_for_scrap' => 'Defective unit',
                     'scrap_notes' => 'Unit failed QA during inspection.',
-                    'photos' => json_encode([$ps->auto_generated_serial . '.jpg']),
+                    'photos' => json_encode([$ps->auto_generated_serial.'.jpg']),
                     'scrapped_by' => 2,
                     'scrapped_at' => $now->subDays(rand(1, 30))->toDateTimeString(),
                     'created_at' => $now,
@@ -63,7 +62,7 @@ class ScrapItemSeeder extends Seeder
             }
         }
 
-        if (!empty($inserts)) {
+        if (! empty($inserts)) {
             DB::table('scrap_items')->insert($inserts);
         }
     }

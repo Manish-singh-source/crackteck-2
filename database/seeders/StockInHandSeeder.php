@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class StockInHandSeeder extends Seeder
 {
@@ -17,7 +17,7 @@ class StockInHandSeeder extends Seeder
 
         DB::table('stock_in_hands')->insert([
             [
-                'stock_in_hand_id' => 'SIH-' . $now->copy()->subDays(4)->format('Ymd') . '-001',
+                'stock_in_hand_id' => 'SIH-'.$now->copy()->subDays(4)->format('Ymd').'-001',
                 'service_request_id' => 2,
                 'engineer_id' => 2,
                 'customer_id' => 2,
@@ -25,7 +25,7 @@ class StockInHandSeeder extends Seeder
                 'assigned_delivery_man_id' => 6,
                 'assigned_at' => $now->copy()->subDays(3),
                 'delivered_at' => $now->copy()->subDays(2),
-                'status' => "pending",
+                'status' => 'pending',
                 'request_notes' => 'Replace battery for Dell Inspiron (customer agreed to replacement).',
                 'delivery_photos' => json_encode(['uploads/delivery/si1_photo1.jpg']),
                 'cancellation_reason' => null,
@@ -37,7 +37,7 @@ class StockInHandSeeder extends Seeder
                 'updated_at' => $now->copy()->subDays(2),
             ],
             [
-                'stock_in_hand_id' => 'SIH-' . \Carbon\Carbon::now()->subDays(2)->format('Ymd') . '-001',
+                'stock_in_hand_id' => 'SIH-'.\Carbon\Carbon::now()->subDays(2)->format('Ymd').'-001',
                 'service_request_id' => 3,
                 'engineer_id' => 3,
                 'customer_id' => 3,
@@ -45,7 +45,7 @@ class StockInHandSeeder extends Seeder
                 'assigned_delivery_man_id' => null,
                 'assigned_at' => null,
                 'delivered_at' => null,
-                'status' => "pending",
+                'status' => 'pending',
                 'request_notes' => 'Spare part required for diagnostic follow-up.',
                 'delivery_photos' => null,
                 'cancellation_reason' => null,
@@ -57,7 +57,7 @@ class StockInHandSeeder extends Seeder
                 'updated_at' => \Carbon\Carbon::now()->subDays(2),
             ],
             [
-                'stock_in_hand_id' => 'SIH-' . \Carbon\Carbon::now()->format('Ymd') . '-001',
+                'stock_in_hand_id' => 'SIH-'.\Carbon\Carbon::now()->format('Ymd').'-001',
                 'service_request_id' => 1,
                 'engineer_id' => 1,
                 'customer_id' => 1,
@@ -65,7 +65,7 @@ class StockInHandSeeder extends Seeder
                 'assigned_delivery_man_id' => null,
                 'assigned_at' => null,
                 'delivered_at' => null,
-                'status' => "cancelled",
+                'status' => 'cancelled',
                 'request_notes' => 'Customer cancelled after request placed.',
                 'delivery_photos' => null,
                 'cancellation_reason' => 'Customer no longer available',

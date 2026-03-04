@@ -6,7 +6,6 @@ use App\Http\Requests\StoreVendorRequest;
 use App\Http\Requests\UpdateVendorRequest;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class VendorController extends Controller
 {
@@ -34,11 +33,11 @@ class VendorController extends Controller
         $data = $request->validated();
 
         // Generate vendor code: VD-25-0001
-        $data['vendor_code'] = 'VD-' . date('y') . '-' . str_pad(Vendor::count() + 1, 4, '0', STR_PAD_LEFT);
+        $data['vendor_code'] = 'VD-'.date('y').'-'.str_pad(Vendor::count() + 1, 4, '0', STR_PAD_LEFT);
 
         $vendor = Vendor::create($data);
 
-        if (!$vendor) {
+        if (! $vendor) {
             return back()->with('error', 'Something went wrong.');
         }
 

@@ -21,6 +21,7 @@ class LeadController extends Controller
             $query->where('status', $status);
         }
         $leads = $query->with('staff', 'customer', 'customerAddress', 'companyDetails')->get();
+
         return view('/crm/leads/index', compact('leads'));
     }
 
@@ -61,7 +62,7 @@ class LeadController extends Controller
         $lead->customer_id = $customer->id;
         $lead->staff_id = $request->sales_person_id;
         $lead->customer_address_id = $request->shipping_address_id;
-        $lead->lead_number = 'LEAD' . str_pad(Lead::count() + 1, 3, '0', STR_PAD_LEFT);
+        $lead->lead_number = 'LEAD'.str_pad(Lead::count() + 1, 3, '0', STR_PAD_LEFT);
         $lead->requirement_type = $request->requirement_type;
         $lead->budget_range = $request->budget_range;
         $lead->urgency = $request->urgency;

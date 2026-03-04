@@ -92,7 +92,7 @@ class WishlistController extends Controller
             }
 
             $customerId = Auth::guard('customer_web')->id();
-            
+
             // Find the wishlist item and ensure it belongs to the authenticated user
             $wishlistItem = Wishlist::where('id', $id)
                 ->where('customer_id', $customerId)
@@ -101,7 +101,7 @@ class WishlistController extends Controller
             if (! $wishlistItem) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Wishlist item not found. ID: ' . $id . ', Customer ID: ' . $customerId,
+                    'message' => 'Wishlist item not found. ID: '.$id.', Customer ID: '.$customerId,
                 ], 404);
             }
 
@@ -148,7 +148,7 @@ class WishlistController extends Controller
             if (! $wishlistItem) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Wishlist item not found. ID: ' . $id . ', Customer ID: ' . $customerId,
+                    'message' => 'Wishlist item not found. ID: '.$id.', Customer ID: '.$customerId,
                 ], 404);
             }
 
@@ -162,12 +162,12 @@ class WishlistController extends Controller
 
             // Add to cart directly
             $productId = $wishlistItem->ecommerce_product_id;
-            
+
             // Check if already in cart
             $existingCartItem = \App\Models\Cart::where('customer_id', $customerId)
                 ->where('ecommerce_product_id', $productId)
                 ->first();
-            
+
             if ($existingCartItem) {
                 // Update quantity
                 $existingCartItem->quantity += 1;
@@ -278,6 +278,7 @@ class WishlistController extends Controller
             $ecommerceProduct = EcommerceProduct::active()->find($ecommerceProductId);
             if (! $ecommerceProduct) {
                 DB::rollBack();
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Product not found or is not available.',
@@ -336,5 +337,4 @@ class WishlistController extends Controller
             ], 500);
         }
     }
-
-    }
+}

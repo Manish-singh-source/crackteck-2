@@ -73,8 +73,8 @@ class QuotationController extends Controller
         $validated['staff_id'] = $validated['user_id'];
         unset($validated['user_id']);
 
-        $validated['quote_id'] = 'Q-' . strtoupper(uniqid());
-        $validated['quote_number'] = 'Q-' . strtoupper(uniqid());
+        $validated['quote_id'] = 'Q-'.strtoupper(uniqid());
+        $validated['quote_number'] = 'Q-'.strtoupper(uniqid());
         $validated['subtotal'] = 0;
         $validated['tax_amount'] = 0;
         $validated['discount_amount'] = 0;
@@ -86,15 +86,15 @@ class QuotationController extends Controller
             $subtotal = 0;
 
             foreach ($request->products as $productData) {
-                // image store 
+                // image store
                 if ($productData['images']) {
                     $file = $productData['images'];
-                    $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
                     $file->move(
                         public_path('uploads/crm/quick-service/products'),
                         $filename
                     );
-                    $path = 'uploads/crm/quick-service/products/' . $filename;
+                    $path = 'uploads/crm/quick-service/products/'.$filename;
                 }
 
                 $quotationProduct = new QuotationProduct;
@@ -120,7 +120,6 @@ class QuotationController extends Controller
             return response()->json(['message' => 'Quotation not created'], 500);
         }
 
-
         if ($request->has('amc_plan_id')) {
             $amcPlan = AmcPlan::find($request->amc_plan_id);
 
@@ -139,7 +138,6 @@ class QuotationController extends Controller
             $quotationAmcDetail->additional_notes = $request->additional_notes;
             $quotationAmcDetail->save();
         }
-
 
         $Quotation->load('products');
 
@@ -179,7 +177,7 @@ class QuotationController extends Controller
         $validated = Validator::make($request->all(), ([
             // validation rules if any
             'user_id' => 'required',
-            'lead_id' => 'required', 
+            'lead_id' => 'required',
             'quote_date' => 'nullable',
             'expiry_date' => 'nullable',
         ]));

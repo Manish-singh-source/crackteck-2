@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductSerial;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class OrderItemSeeder extends Seeder
 {
@@ -75,7 +75,7 @@ class OrderItemSeeder extends Seeder
             ];
         }
 
-        if (!empty($items)) {
+        if (! empty($items)) {
             DB::table('order_items')->insert($items);
         }
 

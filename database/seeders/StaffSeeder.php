@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Staff;
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 class StaffSeeder extends Seeder
 {
@@ -43,13 +43,13 @@ class StaffSeeder extends Seeder
         $i = 1;
 
         foreach ($roles as $roleId => $roleName) {
-            for ($j = 1; $j <= 5; $j++) { 
+            for ($j = 1; $j <= 5; $j++) {
                 $staff[] = [
-                    'staff_code' => 'STF' . str_pad($i, 3, '0', STR_PAD_LEFT),
+                    'staff_code' => 'STF'.str_pad($i, 3, '0', STR_PAD_LEFT),
                     'staff_role' => $staffRoles[$roleId],
                     'first_name' => fake()->firstName(),
                     'last_name' => fake()->lastName(),
-                    'phone' => '98' . rand(10000000, 99999999),
+                    'phone' => '98'.rand(10000000, 99999999),
                     'email' => fake()->unique()->safeEmail(),
                     'dob' => fake()->date(),
                     'gender' => $genders[array_rand($genders)],

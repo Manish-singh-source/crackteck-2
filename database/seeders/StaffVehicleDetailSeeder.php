@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Staff;
 use App\Models\StaffVehicleDetail;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class StaffVehicleDetailSeeder extends Seeder
@@ -48,7 +47,7 @@ class StaffVehicleDetailSeeder extends Seeder
             'frontend-assets/images/new-products/product-detail-4.webp',
             'frontend-assets/images/new-products/product-detail-5.webp',
             'frontend-assets/images/new-products/product-detail-6.webp',
-            'frontend-assets/images/new-products/product-detail-7.webp'
+            'frontend-assets/images/new-products/product-detail-7.webp',
         ];
 
         StaffVehicleDetail::truncate();
@@ -62,9 +61,9 @@ class StaffVehicleDetailSeeder extends Seeder
                 // 70% chance staff owns a vehicle
                 if (rand(1, 100) <= 70) {
                     $state = $states[array_rand($states)];
-                    $num = str_pad((string)rand(1, 99), 2, '0', STR_PAD_LEFT);
+                    $num = str_pad((string) rand(1, 99), 2, '0', STR_PAD_LEFT);
                     $alpha = substr(str_shuffle($letters), 0, 2);
-                    $last = str_pad((string)rand(1000, 9999), 4, '0', STR_PAD_LEFT);
+                    $last = str_pad((string) rand(1000, 9999), 4, '0', STR_PAD_LEFT);
                     $vehNo = "{$state}{$num}{$alpha}{$last}";
 
                     // Ensure that both images are different
@@ -78,7 +77,7 @@ class StaffVehicleDetailSeeder extends Seeder
                         'staff_id' => $staff->id,
                         'vehicle_type' => $vehicleTypes[array_rand($vehicleTypes)],
                         'vehicle_number' => $vehNo,
-                        'driving_license_no' => 'DL' . str_pad((string)rand(1000000000, 9999999999), 10, '0', STR_PAD_LEFT),
+                        'driving_license_no' => 'DL'.str_pad((string) rand(1000000000, 9999999999), 10, '0', STR_PAD_LEFT),
                         'driving_license_front_path' => $frontImage,
                         'driving_license_back_path' => $backImage,
                     ]);

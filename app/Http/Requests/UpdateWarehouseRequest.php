@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Models\Warehouse;
-use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateWarehouseRequest extends FormRequest
 {
@@ -75,8 +75,8 @@ class UpdateWarehouseRequest extends FormRequest
             if (
                 $this->default_warehouse === 'yes' &&
                 Warehouse::where('default_warehouse', 'yes')
-                ->where('id', '!=', $this->route('id'))
-                ->exists()
+                    ->where('id', '!=', $this->route('id'))
+                    ->exists()
             ) {
                 $validator->errors()->add(
                     'default_warehouse',

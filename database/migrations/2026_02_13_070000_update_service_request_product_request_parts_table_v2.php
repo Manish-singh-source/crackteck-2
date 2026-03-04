@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -13,8 +13,8 @@ return new class extends Migration
     public function up(): void
     {
         // Step 1: Make request_id and product_id nullable using raw SQL
-        DB::statement("ALTER TABLE service_request_product_request_parts MODIFY COLUMN request_id BIGINT UNSIGNED NULL");
-        DB::statement("ALTER TABLE service_request_product_request_parts MODIFY COLUMN product_id BIGINT UNSIGNED NULL");
+        DB::statement('ALTER TABLE service_request_product_request_parts MODIFY COLUMN request_id BIGINT UNSIGNED NULL');
+        DB::statement('ALTER TABLE service_request_product_request_parts MODIFY COLUMN product_id BIGINT UNSIGNED NULL');
 
         // Step 2: Update assigned_person_type default to 'engineer' and remove nullable
         DB::statement("ALTER TABLE service_request_product_request_parts MODIFY COLUMN assigned_person_type ENUM('delivery_man', 'engineer') NOT NULL DEFAULT 'engineer'");
@@ -41,7 +41,7 @@ return new class extends Migration
         ];
 
         foreach ($columnsToAdd as $column) {
-            if (!Schema::hasColumn('service_request_product_request_parts', $column['name'])) {
+            if (! Schema::hasColumn('service_request_product_request_parts', $column['name'])) {
                 $afterColumn = $column['after'];
                 DB::statement("ALTER TABLE service_request_product_request_parts ADD COLUMN {$column['name']} TIMESTAMP NULL AFTER {$afterColumn}");
             }
@@ -50,10 +50,10 @@ return new class extends Migration
         // Step 6: Reorganize columns - Drop and recreate table with correct column order
         // Disable foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
-        
+
         $tableName = 'service_request_product_request_parts';
-        $tempTable = 'temp_' . $tableName;
-        
+        $tempTable = 'temp_'.$tableName;
+
         if (Schema::hasTable($tableName)) {
             // Create temporary table with correct column order
             Schema::create($tempTable, function (Blueprint $table) {
@@ -87,31 +87,31 @@ return new class extends Migration
                 $table->timestamp('deleted_at')->nullable();
                 $table->timestamps();
             });
-            
+
             // Copy data from old table to temp table with dynamic column check
-            $columns = ['id', 'request_id', 'product_id', 'engineer_id', 'part_id', 'requested_quantity', 'reason', 'request_type', 
-                 'assigned_person_type', 'assigned_person_id', 'status', 'otp', 'otp_expiry'];
-            
-            $timestampColumns = ['admin_approved_at', 'admin_rejected_at', 'customer_approved_at', 'customer_rejected_at', 
+            $columns = ['id', 'request_id', 'product_id', 'engineer_id', 'part_id', 'requested_quantity', 'reason', 'request_type',
+                'assigned_person_type', 'assigned_person_id', 'status', 'otp', 'otp_expiry'];
+
+            $timestampColumns = ['admin_approved_at', 'admin_rejected_at', 'customer_approved_at', 'customer_rejected_at',
                 'assigned_at', 'assigned_approved_at', 'assigned_rejected_at', 'warehouse_approved_at', 'warehouse_rejected_at',
                 'picked_at', 'in_transit_at', 'delivered_at', 'used_at', 'cancelled_at', 'deleted_at', 'created_at', 'updated_at'];
-            
+
             foreach ($timestampColumns as $col) {
                 if (Schema::hasColumn($tableName, $col)) {
                     $columns[] = $col;
                 }
             }
-            
+
             $columnsList = implode(', ', $columns);
             DB::statement("INSERT INTO $tempTable ($columnsList) SELECT $columnsList FROM $tableName");
-            
+
             // Drop the original table
             Schema::drop($tableName);
-            
+
             // Rename temp table to original name
             Schema::rename($tempTable, $tableName);
         }
-        
+
         // Re-enable foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
     }
@@ -123,11 +123,11 @@ return new class extends Migration
     {
         // Disable foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
-        
+
         $tableName = 'service_request_product_request_parts';
-        $tempTable = 'temp_' . $tableName;
-        $originalTable = 'original_' . $tableName;
-        
+        $tempTable = 'temp_'.$tableName;
+        $originalTable = 'original_'.$tableName;
+
         if (Schema::hasTable($tableName)) {
             // Create original table with old structure
             Schema::create($originalTable, function (Blueprint $table) {
@@ -157,11 +157,11 @@ return new class extends Migration
                 $table->timestamp('deleted_at')->nullable();
                 $table->timestamps();
             });
-            
+
             // Copy data from current table to original table with column mapping
-            $columns = ['id', 'request_id', 'product_id', 'engineer_id', 'part_id', 'requested_quantity', 'reason', 'request_type', 
-                 'assigned_person_type', 'assigned_person_id', 'status', 'otp', 'otp_expiry'];
-            
+            $columns = ['id', 'request_id', 'product_id', 'engineer_id', 'part_id', 'requested_quantity', 'reason', 'request_type',
+                'assigned_person_type', 'assigned_person_id', 'status', 'otp', 'otp_expiry'];
+
             $columnMapping = [
                 'approved_at' => 'admin_approved_at',
                 'rejected_at' => 'admin_rejected_at',
@@ -177,7 +177,7 @@ return new class extends Migration
                 'created_at' => 'created_at',
                 'updated_at' => 'updated_at',
             ];
-            
+
             $selectColumns = [];
             foreach ($columns as $col) {
                 $selectColumns[] = $col;
@@ -189,17 +189,17 @@ return new class extends Migration
                     $selectColumns[] = "NULL AS $newCol";
                 }
             }
-            
+
             $selectList = implode(', ', $selectColumns);
             DB::statement("INSERT INTO $originalTable ($selectList) SELECT * FROM (SELECT $selectList FROM $tableName) AS temp");
-            
+
             // Drop the current table
             Schema::drop($tableName);
-            
+
             // Rename original table to current name
             Schema::rename($originalTable, $tableName);
         }
-        
+
         // Re-enable foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
     }

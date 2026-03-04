@@ -2,52 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\AmcPlan;
-use App\Models\Customer;
-use App\Models\Engineer;
-use App\Models\AmcService;
-use App\Models\CoveredItem;
-use App\Models\DeliveryMan;
-use App\Models\SalesPerson;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
+use App\Models\AmcPlan;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class AmcServicesController extends Controller
 {
     //
-    public function generateServiceId()
-    {
-        $year = date('Y');
-        $lastService = NonAmcService::whereYear('created_at', $year)
-            ->orderBy('id', 'desc')
-            ->first();
-
-        $nextNumber = $lastService ? (intval(substr($lastService->service_id, -4)) + 1) : 1;
-
-        return 'SRV-' . $year . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-    }
-
-    public function calculateEndDate($startDate, $duration)
-    {
-        $duration = strtolower($duration);
-        $startDate = \Carbon\Carbon::parse($startDate);
-
-        if (strpos($duration, 'months') !== false) {
-            $months = intval($duration);
-
-            return $startDate->addMonths($months);
-        } elseif (strpos($duration, 'years') !== false) {
-            $years = intval($duration);
-
-            return $startDate->addYears($years);
-        }
-
-        // Default to 1 year if duration format is unclear
-        return $startDate->addYear();
-    }
-
     protected function getRoleId($roleId)
     {
         return [

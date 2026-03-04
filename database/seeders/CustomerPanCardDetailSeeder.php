@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class CustomerPanCardDetailSeeder extends Seeder
 {
@@ -25,7 +24,7 @@ class CustomerPanCardDetailSeeder extends Seeder
             $cid = DB::table('customers')->where('customer_code', $d['code'])->value('id');
             if ($cid) {
                 DB::table('customer_pan_card_details')->updateOrInsert([
-                    'customer_id' => $cid
+                    'customer_id' => $cid,
                 ], [
                     'pan_number' => $d['pan'],
                     'pan_card_front_path' => $d['front'],

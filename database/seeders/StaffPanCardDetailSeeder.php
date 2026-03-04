@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Staff;
 use App\Models\StaffPanCardDetail;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class StaffPanCardDetailSeeder extends Seeder
@@ -49,7 +48,7 @@ class StaffPanCardDetailSeeder extends Seeder
             'frontend-assets/images/new-products/product-detail-4.webp',
             'frontend-assets/images/new-products/product-detail-5.webp',
             'frontend-assets/images/new-products/product-detail-6.webp',
-            'frontend-assets/images/new-products/product-detail-7.webp'
+            'frontend-assets/images/new-products/product-detail-7.webp',
         ];
 
         StaffPanCardDetail::truncate();
@@ -65,7 +64,7 @@ class StaffPanCardDetailSeeder extends Seeder
                     $backImage = $images[array_rand($images)];
                 }
 
-                $pan = substr(str_shuffle($letters), 0, 5) . rand(1000, 9999) . substr(str_shuffle($letters), 0, 1);
+                $pan = substr(str_shuffle($letters), 0, 5).rand(1000, 9999).substr(str_shuffle($letters), 0, 1);
                 StaffPanCardDetail::create([
                     'staff_id' => $staff->id,
                     'pan_number' => $pan,

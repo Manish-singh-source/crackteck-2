@@ -18,9 +18,9 @@ class CaseTransferController extends Controller
         }
 
         // Search by service request ID
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $query->whereHas('serviceRequest', function ($q) use ($request) {
-                $q->where('service_request_id', 'like', '%' . $request->search . '%');
+                $q->where('service_request_id', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -28,7 +28,7 @@ class CaseTransferController extends Controller
         if ($request->has('sort')) {
             if ($request->sort == 'service_id') {
                 $query->join('service_requests', 'case_transfer_requests.service_request_id', '=', 'service_requests.id')
-                      ->orderBy('service_requests.service_request_id');
+                    ->orderBy('service_requests.service_request_id');
             } elseif ($request->sort == 'time') {
                 $query->orderBy('created_at', 'desc');
             }
@@ -57,10 +57,10 @@ class CaseTransferController extends Controller
             'serviceRequest.products.itemCode',
             'requestingEngineer',
             'engineer',
-            'coveredItems'
+            'coveredItems',
         ])->find($id);
 
-        if (!$caseTransfer) {
+        if (! $caseTransfer) {
             return redirect()->back()->with('error', 'Case Transfer not found');
         }
 
@@ -91,7 +91,7 @@ class CaseTransferController extends Controller
     {
         $caseTransfer = CaseTransferRequest::find($id);
 
-        if (!$caseTransfer) {
+        if (! $caseTransfer) {
             return response()->json(['success' => false, 'message' => 'Case Transfer not found'], 404);
         }
 

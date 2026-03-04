@@ -2,13 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\AssignedEngineer;
+use App\Models\ServiceRequestProduct;
+use App\Models\Staff;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\ServiceRequestProduct;
-use App\Models\AssignedEngineer;
-use App\Models\Staff;
 
 class ServiceRequestProductPickupSeeder extends Seeder
 {
@@ -91,7 +90,7 @@ class ServiceRequestProductPickupSeeder extends Seeder
             ];
         }
 
-        if (!empty($pickups)) {
+        if (! empty($pickups)) {
             DB::table('service_request_product_pickups')->insert($pickups);
         }
     }

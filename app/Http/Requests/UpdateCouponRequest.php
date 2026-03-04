@@ -17,7 +17,7 @@ class UpdateCouponRequest extends FormRequest
         $couponId = $this->route('id'); // matches controller parameter
 
         return [
-            'code' => 'required|string|max:50|unique:coupons,code,' . $couponId,
+            'code' => 'required|string|max:50|unique:coupons,code,'.$couponId,
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
 

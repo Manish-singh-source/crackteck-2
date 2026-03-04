@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Product;
-use App\Models\StockInHand;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\ServiceRequestProductRequestPart;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
-
     /**
      * 1. Products List of all the product available in warehouse with status active (Basic Details)
      */
@@ -25,7 +23,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -55,7 +53,7 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Products retrieved successfully.',
-            'products' => $products
+            'products' => $products,
         ], 200);
     }
 
@@ -66,14 +64,14 @@ class ProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'role_id' => 'required|in:1',
-            'user_id' => 'required'
+            'user_id' => 'required',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -84,17 +82,17 @@ class ProductController extends Controller
             ->with('subCategorie')
             ->first();
 
-        if (!$product) {
+        if (! $product) {
             return response()->json([
                 'success' => false,
-                'message' => 'Product not found.'
+                'message' => 'Product not found.',
             ], 404);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Product details retrieved successfully.',
-            'product' => $product
+            'product' => $product,
         ], 200);
     }
 
@@ -113,7 +111,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -149,7 +147,7 @@ class ProductController extends Controller
                 'assigned_person_id' => $stockInHandRequest->assigned_person_id,
                 'status' => $stockInHandRequest->status,
                 'created_at' => $stockInHandRequest->created_at,
-            ]
+            ],
         ], 201);
     }
 
@@ -167,7 +165,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -181,7 +179,7 @@ class ProductController extends Controller
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'This API is only available for engineer and customer roles.'
+                'message' => 'This API is only available for engineer and customer roles.',
             ], 400);
         }
 
@@ -212,7 +210,7 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Stock in hand list retrieved successfully.',
-            'stock_in_hand_items' => $formattedItems
+            'stock_in_hand_items' => $formattedItems,
         ], 200);
     }
 }

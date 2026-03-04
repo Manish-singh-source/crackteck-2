@@ -34,6 +34,7 @@ class AmcTicket extends Model
     {
         $lastTicket = self::orderBy('id', 'desc')->first();
         $lastId = $lastTicket ? $lastTicket->id : 0;
-        return 'AMC-TICKET-' . str_pad($lastId + 1, 5, '0', STR_PAD_LEFT);
+
+        return 'AMC-TICKET-'.str_pad($lastId + 1, 5, '0', STR_PAD_LEFT);
     }
 }

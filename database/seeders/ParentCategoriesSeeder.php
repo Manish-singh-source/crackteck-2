@@ -21,10 +21,10 @@ class ParentCategoriesSeeder extends Seeder
         ];
         $names = ['Printer', 'Monitor', 'Laptop', 'CCTV', 'Biometric', 'Router', 'SSD', 'Scanner', 'Server', 'Keyboard', 'Mouse'];
         $slugs = ['printer', 'monitor', 'laptop', 'cctv', 'biometric', 'router', 'ssd', 'scanner', 'server', 'keyboard', 'mouse'];
-        
+
         $statuses = ['active', 'inactive'];
 
-        $parentCategories = []; 
+        $parentCategories = [];
 
         for ($i = 0; $i < count($names); $i++) {
             $parentCategories[] = [

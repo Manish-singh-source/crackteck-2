@@ -5,15 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Kyc;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class KycController extends Controller
 {
     /**
      * Get KYC status and reason
-     * 
-     * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function getStatus(Request $request)
@@ -28,18 +27,18 @@ class KycController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         // Find KYC by phone
         $kyc = Kyc::where('phone', $request->phone)->first();
 
-        if (!$kyc) {
+        if (! $kyc) {
             return response()->json([
                 'success' => false,
                 'message' => 'KYC not found',
-                'data' => null
+                'data' => null,
             ], 404);
         }
 
@@ -63,14 +62,13 @@ class KycController extends Controller
                 'rejected_at' => $kyc->rejected_at,
                 'created_at' => $kyc->created_at,
                 'updated_at' => $kyc->updated_at,
-            ]
+            ],
         ], 200);
     }
 
     /**
      * Submit KYC details
-     * 
-     * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function submitKyc(Request $request)
@@ -92,7 +90,7 @@ class KycController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -104,12 +102,12 @@ class KycController extends Controller
         if ($request->hasFile('document_file')) {
             // Delete old file if exists
             if ($kyc && $kyc->document_file) {
-                Storage::delete('public/' . $kyc->document_file);
+                Storage::delete('public/'.$kyc->document_file);
             }
-            
+
             // Store new file
             $file = $request->file('document_file');
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
             $documentFilePath = $file->storeAs('kyc_documents', $filename, 'public');
         }
 
@@ -145,7 +143,7 @@ class KycController extends Controller
                     'document_file_url' => $kyc->document_file_url,
                     'created_at' => $kyc->created_at,
                     'updated_at' => $kyc->updated_at,
-                ]
+                ],
             ], 200);
         } else {
             // Create new KYC
@@ -179,16 +177,15 @@ class KycController extends Controller
                     'document_file_url' => $kyc->document_file_url,
                     'created_at' => $kyc->created_at,
                     'updated_at' => $kyc->updated_at,
-                ]
+                ],
             ], 201);
         }
     }
 
     /**
      * Update KYC status (for admin use)
-     * 
-     * @param Request $request
-     * @param int $id
+     *
+     * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function updateStatus(Request $request, $id)
@@ -202,21 +199,21 @@ class KycController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $kyc = Kyc::find($id);
 
-        if (!$kyc) {
+        if (! $kyc) {
             return response()->json([
                 'success' => false,
-                'message' => 'KYC not found'
+                'message' => 'KYC not found',
             ], 404);
         }
 
         $status = $request->status;
-        
+
         switch ($status) {
             case Kyc::STATUS_APPROVED:
                 $kyc->approve($request->reason);
@@ -240,14 +237,13 @@ class KycController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'KYC status updated successfully',
-            'data' => $kyc
+            'data' => $kyc,
         ], 200);
     }
 
     /**
      * Get all KYC records (for admin use)
-     * 
-     * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
@@ -267,10 +263,10 @@ class KycController extends Controller
         // Search by name, email, or phone
         if ($request->has('search') && $request->search) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             });
         }
 
@@ -279,7 +275,7 @@ class KycController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'KYC records retrieved successfully',
-            'data' => $kycs
+            'data' => $kycs,
         ], 200);
     }
 }

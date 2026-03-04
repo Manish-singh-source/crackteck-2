@@ -48,7 +48,6 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\WithdrawController;
 use Illuminate\Support\Facades\Route;
 
-
 Route::get('/', function () {
     return view('comming-soon');
 })->name('comming-soon');
@@ -133,8 +132,6 @@ Route::prefix('/demo')->group(function () {
             Route::post('/store-staff', 'store')->name('staff.store');
             Route::delete('/delete-staff/{id}', 'delete')->name('staff.delete');
 
-
-
             Route::get('/edit-staff/{id}', 'edit')->name('staff.edit');
             Route::get('/view-staff/{id}', 'view')->name('staff.view');
             Route::put('/update-staff/{id}', 'update')->name('staff.update');
@@ -165,8 +162,6 @@ Route::prefix('/demo')->group(function () {
             Route::delete('/delete-permission/{id}', 'delete')->name('permission.delete');
         });
     });
-
-
 
     // ------------------------------------------------------------ Accounts Page -------------------------------------------------------------
 
@@ -411,7 +406,6 @@ Route::prefix('/demo')->group(function () {
 
         Route::get('/search-customers', 'searchCustomers')->name('leads.search-customers');
 
-
         // Branch Management Routes
         Route::post('/crm/leads/branches/store', 'storeBranch')->name('leads.branches.store');
         Route::put('/crm/leads/branches/{id}', 'updateBranch')->name('leads.branches.update');
@@ -535,9 +529,9 @@ Route::prefix('/demo')->group(function () {
             Route::delete('/amcs-request/{id}', 'deleteAmcsRequest')->name('amcs-request.delete');
             Route::get('/amcs-request/{id}', 'viewAmcsRequest')->name('amcs-request.view');
             Route::post('/amcs-request/ticket-status/{id}', 'updateTicketStatus')->name('amcs-request.ticket-status');
-            // Reschedule AMC 
+            // Reschedule AMC
             Route::post('/amcs-request/reschedule', 'rescheduleAmcRequest')->name('amcs-request.reschedule');
-            
+
         });
     });
 
@@ -598,9 +592,9 @@ Route::prefix('/demo')->group(function () {
         // Delete Section For All the Service Request
         Route::delete('/crm/service-request/destroy-service-request/{id}', 'destroyQuickServiceRequest')->name('service-request.destroy-quick-service-request');
 
-        // 
+        //
         Route::post('/crm/service-request/assign-quick-service-engineer', 'assignQuickServiceEngineer')->name('service-request.assign-quick-service-engineer');
-        Route::post('/crm/service-request/assign-non-amc-engineer', 'assignNonAmcEngineer')->name('service-request.assign-non-amc-engineer');      /// need to check
+        Route::post('/crm/service-request/assign-non-amc-engineer', 'assignNonAmcEngineer')->name('service-request.assign-non-amc-engineer');      // / need to check
 
         // Assign Pickup for Quick Service Request
         Route::post('/crm/service-request/assign-pickup', 'assignPickup')->name('service-request.assign-pickup');
@@ -612,8 +606,6 @@ Route::prefix('/demo')->group(function () {
         // Mark part as picked from warehouse
         Route::post('/crm/service-request/part-picked', 'partPicked')->name('service-request.part-picked');
 
-
-
         // Amc Service Request Create
         Route::get('/crm/create-amc-request', 'createAmcServiceRequest')->name('amc-service-requests.create');
         // Amc Service Request Store
@@ -624,8 +616,6 @@ Route::prefix('/demo')->group(function () {
         Route::get('/crm/service-request/edit-amc-service-request/{id}/{service_type}', 'editAmcServiceRequest')->name('service-request.edit-amc-service-request');
         // Amc Service Request Update
         Route::put('/crm/service-request/update-amc-service-request/{id}', 'updateAmcServiceRequest')->name('service-request.update-amc-service-request');
-
-
 
         // AMC Request CRUD Routes
         // Create AMC Request Page
@@ -835,7 +825,6 @@ Route::prefix('/demo')->group(function () {
     // ********************************************************************      SDUI ADMIN PANEL       ******************************************************
     // *******************************************************************************************************************************************************
     // *******************************************************************************************************************************************************
-
 
     Route::prefix('admin/sdui')->middleware(['auth', 'admin'])->name('admin.sdui.')->group(function () {
 

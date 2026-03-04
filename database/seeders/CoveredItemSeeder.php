@@ -2,11 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\CoveredItem;
 
 class CoveredItemSeeder extends Seeder
 {
@@ -68,12 +66,12 @@ class CoveredItemSeeder extends Seeder
             };
 
             $inserts[] = [
-                'item_code' => $prefix . '-' . str_pad($index + 1, 6, '0', STR_PAD_LEFT),
+                'item_code' => $prefix.'-'.str_pad($index + 1, 6, '0', STR_PAD_LEFT),
                 'service_type' => $it['service_type'],
                 'service_name' => $it['service_name'],
                 'image' => null,
                 'service_charge' => $it['service_charge'],
-                'status' => "active",
+                'status' => 'active',
                 'diagnosis_list' => json_encode($it['diagnosis_list']),
                 'created_at' => $now,
                 'updated_at' => $now,

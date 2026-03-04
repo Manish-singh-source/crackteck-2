@@ -16,11 +16,11 @@ class FirebaseStorageHelper
         $filename = Str::slug($name).'-'.time().'.'.$extension;
 
         $localFolder = storage_path('app/tmp/');
-        if (!is_dir($localFolder)) {
+        if (! is_dir($localFolder)) {
             mkdir($localFolder, 0775, true);
         }
 
-        if (!$file->move($localFolder, $filename)) {
+        if (! $file->move($localFolder, $filename)) {
             throw new \RuntimeException('Failed to move file locally');
         }
 

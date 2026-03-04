@@ -62,7 +62,7 @@ class AttendanceController extends Controller
         $user = Staff::findOrFail($validated['user_id']);
 
         // Create a new authentication log entry manually
-        $authLog = new AuthenticationLog();
+        $authLog = new AuthenticationLog;
         $authLog->authenticatable()->associate($user);
         $authLog->ip_address = $request->ip();
         $authLog->user_agent = $request->userAgent();
@@ -109,9 +109,6 @@ class AttendanceController extends Controller
         $logoutTime = strtotime($authLog->logout_at);
         $totalHours = ($logoutTime - $loginTime) / 3600;
         $workingHours = round($totalHours, 2);
-
-        // Logout the user via JWT
-        // auth('staff')->logout();
 
         return response()->json([
             'message' => 'Logout successful',

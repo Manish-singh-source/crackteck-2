@@ -1,20 +1,20 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\BrandController;
-use App\Http\Controllers\OrderController;
 use App\Http\Controllers\BannerController;
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\CategorieController;
-use App\Http\Controllers\CollectionController;
-use App\Http\Controllers\SubscriberController;
+use App\Http\Controllers\EcommerceOrderController;
+use App\Http\Controllers\EcommerceProductController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductDealController;
 use App\Http\Controllers\ProductListController;
-use App\Http\Controllers\EcommerceOrderController;
 use App\Http\Controllers\ProductVariantsController;
-use App\Http\Controllers\EcommerceProductController;
+use App\Http\Controllers\SubscriberController;
+use Illuminate\Support\Facades\Route;
 
 // *******************************************************************************************************************************************************
 // *******************************************************************************************************************************************************
@@ -61,7 +61,6 @@ Route::prefix('/demo/e-commerce')->group(function () {
         Route::get('/search-customers', 'searchCustomers')->name('order.search-customers');
         Route::get('/search-products', 'searchProducts')->name('order.search-products');
     });
-
 
     // // ------------------------------------------------------------ E-Commerce Orders Management -------------------------------------------------------------
 
@@ -194,11 +193,11 @@ Route::prefix('/demo/e-commerce')->group(function () {
         Route::put('/edit-product-deal/{productDeal}', 'update')->name('product-deals.update');
         Route::delete('/delete-product-deal/{productDeal}', 'destroy')->name('product-deals.delete');
 
-            // AJAX Routes for E-commerce Product Search
-            Route::get('/search-ecommerce-products', 'searchEcommerceProducts')->name('product-deals.search-products');
-            Route::get('/get-ecommerce-product/{id}', 'getEcommerceProduct')->name('product-deals.get-product');
-            Route::post('/remove-product-from-deal', 'removeProductFromDeal')->name('product-deals.remove-product');
-        });
+        // AJAX Routes for E-commerce Product Search
+        Route::get('/search-ecommerce-products', 'searchEcommerceProducts')->name('product-deals.search-products');
+        Route::get('/get-ecommerce-product/{id}', 'getEcommerceProduct')->name('product-deals.get-product');
+        Route::post('/remove-product-from-deal', 'removeProductFromDeal')->name('product-deals.remove-product');
+    });
 
     // ------------------------------------------------------------ E-Commerce Collection Page -------------------------------------------------------------
     Route::controller(CollectionController::class)->group(function () {

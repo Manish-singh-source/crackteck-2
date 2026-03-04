@@ -35,7 +35,6 @@ class Warehouse extends Model
         'status',
     ];
 
-
     public function racks(): HasMany
     {
         return $this->hasMany(WarehouseRack::class, 'warehouse_id');

@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateWebsiteBannerRequest extends FormRequest
 {
@@ -25,19 +25,19 @@ class UpdateWebsiteBannerRequest extends FormRequest
         $id = $this->route('id');
 
         return [
-            'title'           => 'required|string|min:3|max:255',
-            'image'           => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'type'            => 'required|in:website,promotional',
-            'channel'         => 'required|in:website,mobile',
-            'description'     => 'nullable|string|min:3',
-            'promotion_type'  => 'nullable|in:discount,coupon,flash_sale,event',
-            'discount_value'  => 'nullable|numeric|min:0',
-            'discount_type'   => 'nullable|in:percentage,fixed',
-            'promo_code'      => 'nullable|string|max:100',
-            'link_url'        => 'nullable|url|max:255',
-            'link_target'     => 'nullable|in:self,blank',
-            'position'        => 'required|in:homepage,category,product,slider,checkout,cart',
-            'display_order'   => [
+            'title' => 'required|string|min:3|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'type' => 'required|in:website,promotional',
+            'channel' => 'required|in:website,mobile',
+            'description' => 'nullable|string|min:3',
+            'promotion_type' => 'nullable|in:discount,coupon,flash_sale,event',
+            'discount_value' => 'nullable|numeric|min:0',
+            'discount_type' => 'nullable|in:percentage,fixed',
+            'promo_code' => 'nullable|string|max:100',
+            'link_url' => 'nullable|url|max:255',
+            'link_target' => 'nullable|in:self,blank',
+            'position' => 'required|in:homepage,category,product,slider,checkout,cart',
+            'display_order' => [
                 'required',
                 'integer',
                 'min:0',
@@ -46,18 +46,17 @@ class UpdateWebsiteBannerRequest extends FormRequest
                     ->ignore($id)
                     ->whereNull('deleted_at'),
             ],
-            'start_at'        => 'required|date',
-            'end_at'          => 'required|date|after:start_at',
-            'is_active'       => 'required|in:0,1',
-            'metadata'        => 'nullable|json',
+            'start_at' => 'required|date',
+            'end_at' => 'required|date|after:start_at',
+            'is_active' => 'required|in:0,1',
+            'metadata' => 'nullable|json',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'display_order.unique' =>
-            'This display order is already taken for this banner type. Please choose a different order.',
+            'display_order.unique' => 'This display order is already taken for this banner type. Please choose a different order.',
         ];
     }
 }

@@ -2,19 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Staff;
-use Illuminate\View\View;
-use App\Models\DeliveryMan;
-use App\Models\StockRequest;
-use Illuminate\Http\Request;
-use App\Models\SparePartRequest;
-use App\Models\StockRequestItem;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\UpdateStockRequestRequest;
 use App\Models\ServiceRequestProductRequestPart;
+use App\Models\Staff;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class SparePartController extends Controller
 {
@@ -93,7 +84,7 @@ class SparePartController extends Controller
         ])->findOrFail($id);
         // dd($stockRequests);
         $deliveryMen = Staff::where('staff_role', 'delivery_man')->get();
-        $engineers   = Staff::where('staff_role', 'engineer')->get();
+        $engineers = Staff::where('staff_role', 'engineer')->get();
 
         if ($request->routeIs('spare-parts-requests.view')) {
             return view('crm.spare-parts-requests.view', compact('stockRequests', 'deliveryMen', 'engineers'));
@@ -103,7 +94,6 @@ class SparePartController extends Controller
             return view('warehouse.spare-parts-requests.view', compact('stockRequests', 'deliveryMen', 'engineers'));
         }
     }
-
 
     public function assignPerson(Request $request, $id)
     {
@@ -164,7 +154,7 @@ class SparePartController extends Controller
         $sparePartRequest->update($data);
 
         return redirect()->route('spare-parts-requests.view', $id)
-            ->with('success', 'Request ' . str_replace('_', ' ', $request->admin_status) . ' successfully.');
+            ->with('success', 'Request '.str_replace('_', ' ', $request->admin_status).' successfully.');
     }
 
     /**
@@ -193,7 +183,7 @@ class SparePartController extends Controller
         $sparePartRequest->update($data);
 
         return redirect()->route('spare-parts-requests.view', $id)
-            ->with('success', 'Request ' . str_replace('_', ' ', $request->warehouse_status) . ' successfully.');
+            ->with('success', 'Request '.str_replace('_', ' ', $request->warehouse_status).' successfully.');
     }
 
     /**

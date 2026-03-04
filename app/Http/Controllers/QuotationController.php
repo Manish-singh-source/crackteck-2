@@ -10,16 +10,16 @@ use App\Models\Quotation;
 use App\Models\QuotationAmcDetail;
 use App\Models\QuotationEngineerAssignment;
 use App\Models\QuotationGroupEngineer;
-use App\Models\QuotationProduct;
-use App\Models\Staff;
 use App\Models\QuotationInvoice;
 use App\Models\QuotationInvoiceItem;
+use App\Models\QuotationProduct;
+use App\Models\Staff;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class QuotationController extends Controller
 {
@@ -36,7 +36,7 @@ class QuotationController extends Controller
 
         $nextNumber = $lastService ? (intval(substr($lastService->id, -4)) + 1) : 1;
 
-        return 'SRV-' . $year . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        return 'SRV-'.$year.'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     public function index()
@@ -92,7 +92,7 @@ class QuotationController extends Controller
             'products.*.purchase_date' => 'nullable|date',
             'products.*.description' => 'nullable|string',
             'products.*.line_total' => 'nullable|numeric|min:0',
-            
+
             'amc_plan_id' => 'nullable|string',
             'plan_duration' => 'nullable|integer|min:0',
             'plan_start_date' => 'nullable|date',
@@ -173,7 +173,6 @@ class QuotationController extends Controller
                 $amcDetail->save();
             }
 
-
             $quotation->subtotal = $subtotal;
             $quotation->tax_amount = $taxAmount;
             $quotation->discount_amount = $discount;
@@ -226,6 +225,7 @@ class QuotationController extends Controller
         ])->findOrFail($id);
         $leads = Lead::with('customer')->get();
         $amcPlans = AmcPlan::where('status', 'Active')->get();
+
         // dd($quotation);
         return view('/crm/quotation/edit', compact('quotation', 'leads', 'amcPlans'));
     }
@@ -356,7 +356,7 @@ class QuotationController extends Controller
 
         $amcPlanDetail = QuotationAmcDetail::where('id', $request->amc_plan_id)->first();
 
-        if (!$amcPlanDetail) {
+        if (! $amcPlanDetail) {
             return redirect()->back()->with('error', 'AMC details not found.');
         }
 
@@ -417,7 +417,7 @@ class QuotationController extends Controller
                 ]);
 
                 $engineer = Engineer::find($request->engineer_id);
-                $message = 'Engineer ' . $engineer->first_name . ' ' . $engineer->last_name . ' assigned successfully';
+                $message = 'Engineer '.$engineer->first_name.' '.$engineer->last_name.' assigned successfully';
             } else {
                 // Group assignment
                 $assignment = QuotationEngineerAssignment::create([
@@ -438,7 +438,7 @@ class QuotationController extends Controller
                     ]);
                 }
 
-                $message = 'Group "' . $request->group_name . '" assigned successfully with ' . count($request->engineer_ids) . ' engineers';
+                $message = 'Group "'.$request->group_name.'" assigned successfully with '.count($request->engineer_ids).' engineers';
             }
 
             DB::commit();
@@ -456,7 +456,7 @@ class QuotationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error assigning engineer: ' . $e->getMessage(),
+                'message' => 'Error assigning engineer: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -509,7 +509,7 @@ class QuotationController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error adding product: ' . $e->getMessage(),
+                'message' => 'Error adding product: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -560,7 +560,7 @@ class QuotationController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating product: ' . $e->getMessage(),
+                'message' => 'Error updating product: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -581,7 +581,7 @@ class QuotationController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error deleting product: ' . $e->getMessage(),
+                'message' => 'Error deleting product: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -611,13 +611,13 @@ class QuotationController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Quotation status updated from ' . $oldStatus . ' to ' . $request->status . ' successfully',
+                'message' => 'Quotation status updated from '.$oldStatus.' to '.$request->status.' successfully',
                 'status' => $quotation->status,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating status: ' . $e->getMessage(),
+                'message' => 'Error updating status: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -631,6 +631,7 @@ class QuotationController extends Controller
 
         // if invoice exists, pass it to the view for editing
         $invoice = QuotationInvoice::where('quote_id', $id)->latest()->first();
+
         return view('/crm/quotation/generate_invoice', compact('quotation', 'invoice'));
     }
 
@@ -678,12 +679,12 @@ class QuotationController extends Controller
         $existing = QuotationInvoice::where('quote_id', $quotation->id)->latest()->first();
 
         // Generate invoice number if not provided
-        $invoiceNumber = $request->input('invoice_number') ?: ($existing->invoice_number ?? 'INV-' . time());
+        $invoiceNumber = $request->input('invoice_number') ?: ($existing->invoice_number ?? 'INV-'.time());
 
         if ($existing) {
             $invoice = $existing;
         } else {
-            $invoice = new QuotationInvoice();
+            $invoice = new QuotationInvoice;
         }
 
         $invoice->invoice_number = $invoiceNumber;
@@ -750,14 +751,14 @@ class QuotationController extends Controller
         }
 
         // Generate PDF if status is 'sent'
-        if ($invoice->status === 'sent' && !$invoice->invoice_pdf) {
+        if ($invoice->status === 'sent' && ! $invoice->invoice_pdf) {
             $pdfPath = $this->generateInvoicePdf($invoice);
             $invoice->invoice_pdf = $pdfPath;
             $invoice->save();
         }
 
         // redirect back to quotation view so buttons update
-        return redirect()->route('quotation.view', $quotation->id)->with('success', 'Invoice has been ' . ($invoice->status === 'sent' ? 'sent' : 'saved as draft'));
+        return redirect()->route('quotation.view', $quotation->id)->with('success', 'Invoice has been '.($invoice->status === 'sent' ? 'sent' : 'saved as draft'));
     }
 
     /**
@@ -773,8 +774,8 @@ class QuotationController extends Controller
             ->setPaper('a4', 'portrait');
 
         // Define storage path
-        $filename = 'invoices/' . $invoice->invoice_number . '_' . time() . '.pdf';
-        $storagePath = 'public/' . $filename;
+        $filename = 'invoices/'.$invoice->invoice_number.'_'.time().'.pdf';
+        $storagePath = 'public/'.$filename;
 
         // Store PDF file
         Storage::put($storagePath, $pdf->output());

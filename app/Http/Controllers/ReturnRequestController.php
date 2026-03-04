@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\StatusUpdateHelper;
-use App\Models\Staff;
-use App\Models\ServiceRequestProductReturn;
 use App\Models\ServiceRequestProductPickup;
+use App\Models\ServiceRequestProductReturn;
+use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -41,19 +41,19 @@ class ReturnRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
         // Verify user exists
         $user = Staff::where('id', $request->user_id)->first();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['success' => false, 'message' => 'User not found.'], 404);
         }
 
@@ -80,8 +80,8 @@ class ReturnRequestController extends Controller
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name ?? $user->first_name,
-                'role' => $roleName
-            ]
+                'role' => $roleName,
+            ],
         ], 200);
     }
 
@@ -99,13 +99,13 @@ class ReturnRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
@@ -119,23 +119,23 @@ class ReturnRequestController extends Controller
             'pickup',
         ])->find($id);
 
-        if (!$returnRequest) {
+        if (! $returnRequest) {
             return response()->json(['success' => false, 'message' => 'Return request not found.'], 404);
         }
 
         // Verify the user has access to this return request
-        if ($returnRequest->assigned_person_type !== $roleName || 
+        if ($returnRequest->assigned_person_type !== $roleName ||
             $returnRequest->assigned_person_id != $request->user_id) {
             return response()->json([
-                'success' => false, 
-                'message' => 'You do not have access to this return request.'
+                'success' => false,
+                'message' => 'You do not have access to this return request.',
             ], 403);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Return request details retrieved successfully.',
-            'return_request' => $returnRequest
+            'return_request' => $returnRequest,
         ], 200);
     }
 
@@ -153,37 +153,37 @@ class ReturnRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
         // Find the return request
         $returnRequest = ServiceRequestProductReturn::find($id);
 
-        if (!$returnRequest) {
+        if (! $returnRequest) {
             return response()->json(['success' => false, 'message' => 'Return request not found.'], 404);
         }
 
         // Verify the user has access to this return request
-        if ($returnRequest->assigned_person_type !== $roleName || 
+        if ($returnRequest->assigned_person_type !== $roleName ||
             $returnRequest->assigned_person_id != $request->user_id) {
             return response()->json([
-                'success' => false, 
-                'message' => 'You do not have access to this return request.'
+                'success' => false,
+                'message' => 'You do not have access to this return request.',
             ], 403);
         }
 
         // Check if already accepted
         if ($returnRequest->status === 'accepted') {
             return response()->json([
-                'success' => false, 
-                'message' => 'Return request is already accepted.'
+                'success' => false,
+                'message' => 'Return request is already accepted.',
             ], 400);
         }
 
@@ -199,21 +199,21 @@ class ReturnRequestController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Return request accepted successfully.',
-                'return_request' => $returnRequest
+                'return_request' => $returnRequest,
             ], 200);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error accepting return request: ' . $e->getMessage(), [
+            Log::error('Error accepting return request: '.$e->getMessage(), [
                 'return_request_id' => $id,
                 'user_id' => $request->user_id,
                 'role_id' => $request->role_id,
-                'exception' => $e->getTraceAsString()
+                'exception' => $e->getTraceAsString(),
             ]);
-            
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while accepting the return request: ' . $e->getMessage()
+                'message' => 'An error occurred while accepting the return request: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -233,44 +233,44 @@ class ReturnRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
         // Find the return request
         $returnRequest = ServiceRequestProductReturn::with(['serviceRequest.customer'])->find($id);
 
-        if (!$returnRequest) {
+        if (! $returnRequest) {
             return response()->json(['success' => false, 'message' => 'Return request not found.'], 404);
         }
 
         // Verify the user has access to this return request
-        if ($returnRequest->assigned_person_type !== $roleName || 
+        if ($returnRequest->assigned_person_type !== $roleName ||
             $returnRequest->assigned_person_id != $request->user_id) {
             return response()->json([
-                'success' => false, 
-                'message' => 'You do not have access to this return request.'
+                'success' => false,
+                'message' => 'You do not have access to this return request.',
             ], 403);
         }
 
         // Check if status is 'picked' - only then can OTP be sent
         if ($returnRequest->status !== 'picked') {
             return response()->json([
-                'success' => false, 
-                'message' => 'Return request must be in "picked" status before sending OTP.'
+                'success' => false,
+                'message' => 'Return request must be in "picked" status before sending OTP.',
             ], 400);
         }
 
         try {
             // Generate 4-digit OTP
             $otp = rand(1000, 9999);
-            
+
             // Update return request with OTP and expiry (5 minutes)
             $returnRequest->otp = $otp;
             $returnRequest->otp_expiry = now()->addMinutes(5);
@@ -278,13 +278,13 @@ class ReturnRequestController extends Controller
 
             // Get customer phone number for SMS
             $customer = $returnRequest->serviceRequest->customer;
-            
+
             if ($customer && $customer->phone) {
                 // Log OTP for debugging (in production, send via SMS)
                 Log::info('Return OTP generated', [
                     'return_id' => $id,
                     'otp' => $otp,
-                    'customer_phone' => $customer->phone
+                    'customer_phone' => $customer->phone,
                 ]);
 
                 // TODO: Send OTP via SMS service (Fast2SMS, etc.)
@@ -295,18 +295,18 @@ class ReturnRequestController extends Controller
                 'success' => true,
                 'message' => 'OTP sent successfully.',
                 'otp' => $otp,
-                'otp_expires_in_seconds' => 300 // 5 minutes
+                'otp_expires_in_seconds' => 300, // 5 minutes
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('Error sending return OTP: ' . $e->getMessage(), [
+            Log::error('Error sending return OTP: '.$e->getMessage(), [
                 'return_request_id' => $id,
-                'exception' => $e->getTraceAsString()
+                'exception' => $e->getTraceAsString(),
             ]);
-            
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while sending OTP: ' . $e->getMessage()
+                'message' => 'An error occurred while sending OTP: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -326,45 +326,45 @@ class ReturnRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
         // Find the return request
         $returnRequest = ServiceRequestProductReturn::find($id);
 
-        if (!$returnRequest) {
+        if (! $returnRequest) {
             return response()->json(['success' => false, 'message' => 'Return request not found.'], 404);
         }
 
         // Verify the user has access to this return request
-        if ($returnRequest->assigned_person_type !== $roleName || 
+        if ($returnRequest->assigned_person_type !== $roleName ||
             $returnRequest->assigned_person_id != $request->user_id) {
             return response()->json([
-                'success' => false, 
-                'message' => 'You do not have access to this return request.'
+                'success' => false,
+                'message' => 'You do not have access to this return request.',
             ], 403);
         }
 
         // Check if OTP matches
         if ($returnRequest->otp !== $request->otp) {
             return response()->json([
-                'success' => false, 
-                'message' => 'Invalid OTP.'
+                'success' => false,
+                'message' => 'Invalid OTP.',
             ], 400);
         }
 
         // Check if OTP has expired
         if (now()->gt($returnRequest->otp_expiry)) {
             return response()->json([
-                'success' => false, 
-                'message' => 'OTP has expired. Please request a new OTP.'
+                'success' => false,
+                'message' => 'OTP has expired. Please request a new OTP.',
             ], 400);
         }
 
@@ -393,21 +393,21 @@ class ReturnRequestController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'OTP verified successfully. Return status updated to delivered.'
+                'message' => 'OTP verified successfully. Return status updated to delivered.',
             ], 200);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error verifying return OTP: ' . $e->getMessage(), [
+            Log::error('Error verifying return OTP: '.$e->getMessage(), [
                 'return_request_id' => $id,
                 'user_id' => $request->user_id,
                 'role_id' => $request->role_id,
-                'exception' => $e->getTraceAsString()
+                'exception' => $e->getTraceAsString(),
             ]);
-            
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while verifying OTP: ' . $e->getMessage()
+                'message' => 'An error occurred while verifying OTP: '.$e->getMessage(),
             ], 500);
         }
     }

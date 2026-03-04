@@ -4,9 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\Customer;
-use App\Models\DeliveryMan;
-use App\Models\EcommerceOrder;
-use App\Models\EcommerceOrderItem;
 use App\Models\EcommerceProduct;
 use App\Models\InventoryUpdateLog;
 use App\Models\Order;
@@ -15,13 +12,12 @@ use App\Models\OrderPayment;
 use App\Models\Product;
 use App\Models\ReturnOrder;
 use App\Models\Staff;
-use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use \TCPDF;
+use TCPDF;
 
 class OrderController extends Controller
 {
@@ -80,7 +76,7 @@ class OrderController extends Controller
             $totalAmount = $subtotal + $taxAmount + $shippingCharges + $packagingCharges - $discountAmount - $couponCode;
 
             // Generate order number
-            $orderNumber = 'ORD-' . date('Ymd') . '-' . str_pad(Order::count() + 1, 4, '0', STR_PAD_LEFT);
+            $orderNumber = 'ORD-'.date('Ymd').'-'.str_pad(Order::count() + 1, 4, '0', STR_PAD_LEFT);
 
             // Create the order
             $order = Order::create([
@@ -124,8 +120,8 @@ class OrderController extends Controller
             // Create payment record
             OrderPayment::create([
                 'order_id' => $order->id,
-                'payment_id' => 'PMT-' . strtoupper(uniqid()),
-                'transaction_id' => 'TXN-' . strtoupper(uniqid()),
+                'payment_id' => 'PMT-'.strtoupper(uniqid()),
+                'transaction_id' => 'TXN-'.strtoupper(uniqid()),
                 'payment_method' => $request->payment_method,
                 'payment_gateway' => $request->payment_method === 'online' ? 'phonepe' : 'cash_on_delivery',
                 'amount' => $totalAmount,
@@ -144,7 +140,8 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             \Log::error('Order creation failed', ['error' => $e->getMessage(), 'order_data' => $request->all()]);
-            return redirect()->back()->withInput()->with('error', 'Failed to create order: ' . $e->getMessage());
+
+            return redirect()->back()->withInput()->with('error', 'Failed to create order: '.$e->getMessage());
         }
     }
 
@@ -214,11 +211,11 @@ class OrderController extends Controller
                 ->with('success', 'Order updated successfully!');
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error updating order: ' . $e->getMessage());
+            Log::error('Error updating order: '.$e->getMessage());
 
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'An error occurred while updating the order: ' . $e->getMessage());
+                ->with('error', 'An error occurred while updating the order: '.$e->getMessage());
         }
     }
 
@@ -240,9 +237,9 @@ class OrderController extends Controller
 
             return redirect()->route('order.index')->with('success', 'Order deleted successfully!');
         } catch (\Exception $e) {
-            Log::error('Error deleting order: ' . $e->getMessage());
+            Log::error('Error deleting order: '.$e->getMessage());
 
-            return redirect()->back()->with('error', 'An error occurred while deleting the order: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while deleting the order: '.$e->getMessage());
         }
     }
 
@@ -288,8 +285,8 @@ class OrderController extends Controller
                         $deletedCount++;
                     }
                 } catch (\Exception $e) {
-                    $errors[] = "Failed to delete order ID {$orderId}: " . $e->getMessage();
-                    Log::error("Error deleting order {$orderId}: " . $e->getMessage());
+                    $errors[] = "Failed to delete order ID {$orderId}: ".$e->getMessage();
+                    Log::error("Error deleting order {$orderId}: ".$e->getMessage());
                 }
             }
 
@@ -319,11 +316,11 @@ class OrderController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error in bulk delete: ' . $e->getMessage());
+            Log::error('Error in bulk delete: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while deleting orders: ' . $e->getMessage(),
+                'message' => 'An error occurred while deleting orders: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -352,7 +349,7 @@ class OrderController extends Controller
                     'brand' => $product->warehouseProduct->brand->name ?? 'N/A',
                     'hsn_code' => $product->warehouseProduct->hsn_code,
                     'price' => $product->warehouseProduct->final_price,
-                    'display' => $product->warehouseProduct->product_name . ' (' . $product->warehouseProduct->sku . ')',
+                    'display' => $product->warehouseProduct->product_name.' ('.$product->warehouseProduct->sku.')',
                 ];
             });
 
@@ -415,7 +412,8 @@ class OrderController extends Controller
 
             return redirect()->back()->with('success', 'Return order received in warehouse successfully');
         } catch (\Exception $e) {
-            Log::error('Error receiving return order: ' . $e->getMessage());
+            Log::error('Error receiving return order: '.$e->getMessage());
+
             return redirect()->back()->with('error', 'Failed to receive return order');
         }
     }
@@ -445,7 +443,8 @@ class OrderController extends Controller
 
             return redirect()->back()->with('success', 'Refund completed successfully');
         } catch (\Exception $e) {
-            Log::error('Error completing refund: ' . $e->getMessage());
+            Log::error('Error completing refund: '.$e->getMessage());
+
             return redirect()->back()->with('error', 'Failed to complete refund');
         }
     }
@@ -457,10 +456,10 @@ class OrderController extends Controller
         $deliveryMen = Staff::where('staff_role', 'delivery_man')->where('status', 'active')->get();
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
         $assignedPerson = Staff::find($order->assigned_person_id);
-        
+
         // Get return order if exists for this order
         $returnOrder = ReturnOrder::where('order_number', $order->order_number)->first();
-        
+
         // Calculate totals
         $totals = $this->calculateOrderTotals($order);
 
@@ -496,7 +495,7 @@ class OrderController extends Controller
                     $order->status = 'assigned_delivery_man';
                     $order->assigned_at = now();
                 }
-                
+
                 // Also update return_orders table if return exists for this order
                 $returnOrder = ReturnOrder::where('order_number', $order->order_number)->first();
                 if ($returnOrder) {
@@ -515,7 +514,7 @@ class OrderController extends Controller
                 'message' => 'Person assigned successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error assigning person: ' . $e->getMessage());
+            Log::error('Error assigning person: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -603,7 +602,7 @@ class OrderController extends Controller
                     $order->cancelled_at = now();
                 }
             }
-            
+
             // Update expected_delivery_date if provided
             if ($request->has('expected_delivery_date') && $request->expected_delivery_date) {
                 $order->expected_delivery_date = $request->expected_delivery_date;
@@ -616,7 +615,7 @@ class OrderController extends Controller
                 'message' => 'Order status updated successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating order status: ' . $e->getMessage());
+            Log::error('Error updating order status: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -650,7 +649,7 @@ class OrderController extends Controller
 
             return redirect()->back()->with('success', 'Product pickup confirmed. Order status updated to product_taken.');
         } catch (\Exception $e) {
-            Log::error('Error updating product pickup: ' . $e->getMessage());
+            Log::error('Error updating product pickup: '.$e->getMessage());
 
             return redirect()->back()->with('error', 'Failed to update product pickup.');
         }
@@ -679,7 +678,7 @@ class OrderController extends Controller
                 'message' => 'Delivery man assigned successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error assigning delivery man: ' . $e->getMessage());
+            Log::error('Error assigning delivery man: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -700,7 +699,7 @@ class OrderController extends Controller
             $invoiceData = [
                 'order' => $order,
                 'totals' => $totals,
-                'invoice_number' => 'INV-' . $order->order_number,
+                'invoice_number' => 'INV-'.$order->order_number,
                 'invoice_date' => $order->created_at->format('d/m/Y'),
                 'amount_in_words' => $this->convertNumberToWords($totals['grand_total']),
                 'company' => [
@@ -715,15 +714,15 @@ class OrderController extends Controller
             return view('e-commerce.order.invoice', $invoiceData);
         } catch (\Exception $e) {
 
-            Log::error('Invoice View Error: ' . $e->getMessage(), [
+            Log::error('Invoice View Error: '.$e->getMessage(), [
                 'order_id' => $id,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to generate invoice',
-                'debug' => config('app.debug') ? $e->getMessage() : null
+                'debug' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -740,7 +739,7 @@ class OrderController extends Controller
             $invoiceData = [
                 'order' => $order,
                 'totals' => $totals,
-                'invoice_number' => 'INV-' . $order->order_number,
+                'invoice_number' => 'INV-'.$order->order_number,
                 'invoice_date' => $order->created_at->format('d/m/Y'),
                 'amount_in_words' => $this->convertNumberToWords($totals['grand_total']),
                 'company' => [
@@ -761,7 +760,7 @@ class OrderController extends Controller
             // Set document information
             $pdf->SetCreator('CrackTeck');
             $pdf->SetAuthor('CrackTeck Solutions');
-            $pdf->SetTitle('Invoice ' . $order->order_number);
+            $pdf->SetTitle('Invoice '.$order->order_number);
             $pdf->SetSubject('Invoice');
 
             // Remove default header/footer
@@ -778,22 +777,23 @@ class OrderController extends Controller
             $pdf->writeHTML($html, true, false, true, false, '');
 
             // Close and output PDF
-            $filename = 'invoice-' . $order->order_number . '.pdf';
+            $filename = 'invoice-'.$order->order_number.'.pdf';
+
             return response()->make($pdf->Output($filename, 'I'), 200, [
                 'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             ]);
         } catch (\Exception $e) {
 
-            Log::error('Invoice PDF Error: ' . $e->getMessage(), [
+            Log::error('Invoice PDF Error: '.$e->getMessage(), [
                 'order_id' => $id,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to generate invoice',
-                'debug' => config('app.debug') ? $e->getMessage() : null
+                'debug' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -841,39 +841,39 @@ class OrderController extends Controller
 
         if ($number >= 10000000) { // Crores
             $crores = intval($number / 10000000);
-            $result .= $this->convertHundreds($crores, $words) . ' Crore ';
+            $result .= $this->convertHundreds($crores, $words).' Crore ';
             $number %= 10000000;
         }
 
         if ($number >= 100000) { // Lakhs
             $lakhs = intval($number / 100000);
-            $result .= $this->convertHundreds($lakhs, $words) . ' Lakh ';
+            $result .= $this->convertHundreds($lakhs, $words).' Lakh ';
             $number %= 100000;
         }
 
         if ($number >= 1000) { // Thousands
             $thousands = intval($number / 1000);
-            $result .= $this->convertHundreds($thousands, $words) . ' Thousand ';
+            $result .= $this->convertHundreds($thousands, $words).' Thousand ';
             $number %= 1000;
         }
 
         if ($number >= 100) { // Hundreds
             $hundreds = intval($number / 100);
-            $result .= $words[$hundreds] . ' Hundred ';
+            $result .= $words[$hundreds].' Hundred ';
             $number %= 100;
         }
 
         if ($number >= 20) {
             $tens = intval($number / 10) * 10;
-            $result .= $words[$tens] . ' ';
+            $result .= $words[$tens].' ';
             $number %= 10;
         }
 
         if ($number > 0) {
-            $result .= $words[$number] . ' ';
+            $result .= $words[$number].' ';
         }
 
-        return trim($result) . ' Rupees Only';
+        return trim($result).' Rupees Only';
     }
 
     private function convertHundreds($number, $words)
@@ -882,18 +882,18 @@ class OrderController extends Controller
 
         if ($number >= 100) {
             $hundreds = intval($number / 100);
-            $result .= $words[$hundreds] . ' Hundred ';
+            $result .= $words[$hundreds].' Hundred ';
             $number %= 100;
         }
 
         if ($number >= 20) {
             $tens = intval($number / 10) * 10;
-            $result .= $words[$tens] . ' ';
+            $result .= $words[$tens].' ';
             $number %= 10;
         }
 
         if ($number > 0) {
-            $result .= $words[$number] . ' ';
+            $result .= $words[$number].' ';
         }
 
         return trim($result);

@@ -27,6 +27,4 @@ class QuotationAmcDetail extends Model
     {
         return $this->belongsTo(AmcPlan::class);
     }
-
-    
 }

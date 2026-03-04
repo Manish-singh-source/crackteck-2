@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->foreignId('customer_id')->constrained('customers')->cascadeOnDelete();
             $table->foreignId('customer_address_id')->nullable()->constrained('customer_address_details')->nullOnDelete();
-            
+
             $table->foreignId('amc_plan_id')->nullable()->constrained('amc_plans')->onDelete('cascade');
 
             $table->date('request_date');

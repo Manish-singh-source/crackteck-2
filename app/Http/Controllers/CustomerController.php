@@ -10,9 +10,6 @@ use App\Models\CustomerAddressDetail;
 use App\Models\CustomerCompanyDetail;
 use App\Models\CustomerPanCardDetail;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class CustomerController extends Controller
 {
@@ -56,7 +53,7 @@ class CustomerController extends Controller
             $customerCode = str_replace('CUST', '', $lastCustomerCode);
             $customerCode = (int) $customerCode + 1;
 
-            $customerCode = 'CUST' . str_pad($customerCode, 4, '0', STR_PAD_LEFT);
+            $customerCode = 'CUST'.str_pad($customerCode, 4, '0', STR_PAD_LEFT);
 
             // 1. Create Customer
             $customer = Customer::create([
@@ -247,7 +244,7 @@ class CustomerController extends Controller
             foreach ($validated['branches'] as $index => $branch) {
                 $isPrimary = ($index === $primaryIndex) ? 'yes' : 'no';
 
-                if (!empty($branch['id'])) {
+                if (! empty($branch['id'])) {
                     $address = $customer->addressDetails()->find($branch['id']);
                     $address?->update([
                         'branch_name' => $branch['branch_name'],
@@ -304,8 +301,8 @@ class CustomerController extends Controller
 
         // return redirect()->route('customer.index')
         //     ->with('success', 'Customer updated successfully.');
-        // remove id from url 
-        $url = str_replace('/' . $id, '', $request->getRequestUri());
+        // remove id from url
+        $url = str_replace('/'.$id, '', $request->getRequestUri());
 
         if ($url == '/demo/crm/update-customer') {
             return redirect()->route('customer.index')

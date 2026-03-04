@@ -62,5 +62,4 @@ class ServiceRequestProduct extends Model
     {
         return $this->hasMany(ServiceRequestProductRequestPart::class, 'product_id');
     }
-
 }

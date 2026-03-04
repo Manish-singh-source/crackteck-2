@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\Order;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class CouponUsageSeeder extends Seeder
 {
@@ -62,7 +62,7 @@ class CouponUsageSeeder extends Seeder
             }
         }
 
-        if (!empty($inserts)) {
+        if (! empty($inserts)) {
             DB::table('coupon_usages')->insert($inserts);
         }
     }

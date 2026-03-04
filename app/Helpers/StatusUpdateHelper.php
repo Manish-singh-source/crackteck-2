@@ -14,9 +14,6 @@ class StatusUpdateHelper
     /**
      * Condition 1: Check if all products of a service have diagnosis_completed status
      * If yes, update all product statuses to completed
-     *
-     * @param int $serviceRequestId
-     * @return bool
      */
     public static function checkAndUpdateProductStatusToCompleted(int $serviceRequestId): bool
     {
@@ -40,7 +37,7 @@ class StatusUpdateHelper
 
                 Log::info('All products status updated to completed', [
                     'service_request_id' => $serviceRequestId,
-                    'product_count' => $products->count()
+                    'product_count' => $products->count(),
                 ]);
 
                 return true;
@@ -50,8 +47,9 @@ class StatusUpdateHelper
         } catch (\Exception $e) {
             Log::error('Error in checkAndUpdateProductStatusToCompleted', [
                 'service_request_id' => $serviceRequestId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -62,16 +60,13 @@ class StatusUpdateHelper
      * 1. Service exists in service_request_product_returns with status 'delivered'
      * 2. Same service in service_request_product_pickups has status 'returned'
      * 3. All products in service_request_products have status 'completed'
-     *
-     * @param int $serviceRequestId
-     * @return bool
      */
     public static function checkAndUpdateServiceRequestStatus(int $serviceRequestId): bool
     {
         try {
             $serviceRequest = ServiceRequest::find($serviceRequestId);
 
-            if (!$serviceRequest) {
+            if (! $serviceRequest) {
                 return false;
             }
 
@@ -80,7 +75,7 @@ class StatusUpdateHelper
                 ->where('status', 'delivered')
                 ->exists();
 
-            if (!$hasDeliveredReturns) {
+            if (! $hasDeliveredReturns) {
                 return false;
             }
 
@@ -89,7 +84,7 @@ class StatusUpdateHelper
                 ->where('status', 'completed')
                 ->exists();
 
-            if (!$hasReturnedPickups) {
+            if (! $hasReturnedPickups) {
                 return false;
             }
 
@@ -100,7 +95,7 @@ class StatusUpdateHelper
                     return $product->status === 'completed';
                 });
 
-            if (!$allProductsCompleted) {
+            if (! $allProductsCompleted) {
                 return false;
             }
 
@@ -112,15 +107,16 @@ class StatusUpdateHelper
                 'service_request_id' => $serviceRequestId,
                 'has_delivered_returns' => $hasDeliveredReturns,
                 'has_returned_pickups' => $hasReturnedPickups,
-                'all_products_completed' => $allProductsCompleted
+                'all_products_completed' => $allProductsCompleted,
             ]);
 
             return true;
         } catch (\Exception $e) {
             Log::error('Error in checkAndUpdateServiceRequestStatus', [
                 'service_request_id' => $serviceRequestId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -131,9 +127,6 @@ class StatusUpdateHelper
      * - service_request_products
      * - service_request_product_returns
      * - service_request_product_pickups
-     *
-     * @param int $serviceRequestId
-     * @return array
      */
     public static function checkAllStatusConditions(int $serviceRequestId): array
     {
@@ -156,15 +149,12 @@ class StatusUpdateHelper
     /**
      * Check status completion for a specific service request product
      * Call this after updating product status
-     *
-     * @param int $productId
-     * @return array
      */
     public static function checkProductStatusCompletion(int $productId): array
     {
         $product = ServiceRequestProduct::find($productId);
 
-        if (!$product) {
+        if (! $product) {
             return ['success' => false, 'message' => 'Product not found'];
         }
 
@@ -175,22 +165,19 @@ class StatusUpdateHelper
             'success' => true,
             'product_id' => $productId,
             'service_request_id' => $serviceRequestId,
-            'results' => $results
+            'results' => $results,
         ];
     }
 
     /**
      * Check status completion for a return request
      * Call this after updating return status
-     *
-     * @param int $returnId
-     * @return array
      */
     public static function checkReturnStatusCompletion(int $returnId): array
     {
         $return = ServiceRequestProductReturn::find($returnId);
 
-        if (!$return) {
+        if (! $return) {
             return ['success' => false, 'message' => 'Return request not found'];
         }
 
@@ -201,22 +188,19 @@ class StatusUpdateHelper
             'success' => true,
             'return_id' => $returnId,
             'service_request_id' => $serviceRequestId,
-            'results' => $results
+            'results' => $results,
         ];
     }
 
     /**
      * Check status completion for a pickup request
      * Call this after updating pickup status
-     *
-     * @param int $pickupId
-     * @return array
      */
     public static function checkPickupStatusCompletion(int $pickupId): array
     {
         $pickup = ServiceRequestProductPickup::find($pickupId);
 
-        if (!$pickup) {
+        if (! $pickup) {
             return ['success' => false, 'message' => 'Pickup request not found'];
         }
 
@@ -227,7 +211,7 @@ class StatusUpdateHelper
             'success' => true,
             'pickup_id' => $pickupId,
             'service_request_id' => $serviceRequestId,
-            'results' => $results
+            'results' => $results,
         ];
     }
 }

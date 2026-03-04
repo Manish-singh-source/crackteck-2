@@ -1,16 +1,16 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\VendorController;
 use App\Http\Controllers\LowStockController;
-use App\Http\Controllers\SparePartController;
-use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\ProductListController;
+use App\Http\Controllers\SparePartController;
 use App\Http\Controllers\StockReportController;
 use App\Http\Controllers\TrackProductController;
-use App\Http\Controllers\WarehouseRackController;
+use App\Http\Controllers\VendorController;
 use App\Http\Controllers\VendorPurchaseBillController;
 use App\Http\Controllers\Warehouse\ScrapItemController;
+use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\WarehouseRackController;
+use Illuminate\Support\Facades\Route;
 
 // *******************************************************************************************************************************************************
 // *******************************************************************************************************************************************************
@@ -23,7 +23,6 @@ Route::prefix('demo/warehouse')->group(function () {
     Route::get('/index', function () {
         return view('/warehouse/index');
     })->name('warehouse/index');
-
 
     // ------------------------------------------------------------ Warehouse Page ------------------------------------------------------------
 
@@ -45,7 +44,6 @@ Route::prefix('demo/warehouse')->group(function () {
         // Delete Warehouse Page
         Route::delete('/delete-warehouse/{id}', 'delete')->name('warehouse.delete');
     });
-
 
     // ------------------------------------------------------------ Vendor Purchase Page -------------------------------------------------------------
 
@@ -83,7 +81,6 @@ Route::prefix('demo/warehouse')->group(function () {
         Route::delete('/vendor-purchase-bill/{id}', 'destroy')->name('vendor.destroy');
     });
 
-
     // ------------------------------------------------------------ Products List -------------------------------------------------------------
 
     Route::controller(ProductListController::class)->group(function () {
@@ -101,7 +98,6 @@ Route::prefix('demo/warehouse')->group(function () {
         Route::put('/edit-product-list/{id}', 'update')->name('product-list.update');
         // Delete Product
         Route::delete('/product-list/{id}', 'destroy')->name('product-list.destroy');
-
 
         // Need to check
         // Save Serial Number
@@ -159,7 +155,7 @@ Route::prefix('demo/warehouse')->group(function () {
     // ------------------------------------------------------------ Stock Requests Page -------------------------------------------------------------
 
     Route::controller(StockReportController::class)->group(function () {
-        // Stock Reports 
+        // Stock Reports
         Route::get('/stock-reports', 'index')->name('stock-reports.index');
     });
 
@@ -171,15 +167,6 @@ Route::prefix('demo/warehouse')->group(function () {
         // export low stock products
         Route::get('/export-low-stock', 'exportLowStock')->name('low-stock.export');
     });
-
-
-
-
-
-
-
-
-
 
     // ------------------------------------------------------------ Not Needed/Future Functionality Warehouse Rack Page -------------------------------------------------------------
 

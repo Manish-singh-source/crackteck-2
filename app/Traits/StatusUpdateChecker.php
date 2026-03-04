@@ -16,9 +16,6 @@ trait StatusUpdateChecker
 {
     /**
      * Check and update status after product status change
-     *
-     * @param int $productId
-     * @return array
      */
     protected function checkProductStatusUpdate(int $productId): array
     {
@@ -27,9 +24,6 @@ trait StatusUpdateChecker
 
     /**
      * Check and update status after return status change
-     *
-     * @param int $returnId
-     * @return array
      */
     protected function checkReturnStatusUpdate(int $returnId): array
     {
@@ -38,9 +32,6 @@ trait StatusUpdateChecker
 
     /**
      * Check and update status after pickup status change
-     *
-     * @param int $pickupId
-     * @return array
      */
     protected function checkPickupStatusUpdate(int $pickupId): array
     {
@@ -49,9 +40,6 @@ trait StatusUpdateChecker
 
     /**
      * Check and update all status conditions for a service request
-     *
-     * @param int $serviceRequestId
-     * @return array
      */
     protected function checkAllStatusUpdates(int $serviceRequestId): array
     {

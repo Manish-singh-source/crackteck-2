@@ -21,16 +21,16 @@ return new class extends Migration
 
             // Re-add foreign key
             $table->foreign('service_request_id')
-                  ->references('id')
-                  ->on('service_requests')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('service_requests')
+                ->onDelete('cascade');
 
             // Add new amc_id column
             $table->foreignId('amc_id')
-                  ->nullable()
-                  ->after('service_request_id')
-                  ->constrained('amcs')
-                  ->onDelete('cascade');
+                ->nullable()
+                ->after('service_request_id')
+                ->constrained('amcs')
+                ->onDelete('cascade');
         });
     }
 
@@ -53,9 +53,9 @@ return new class extends Migration
 
             // Re-add foreign key
             $table->foreign('service_request_id')
-                  ->references('id')
-                  ->on('service_requests')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('service_requests')
+                ->onDelete('cascade');
         });
     }
 };

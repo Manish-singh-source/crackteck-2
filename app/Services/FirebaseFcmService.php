@@ -8,7 +8,9 @@ use GuzzleHttp\Client;
 class FirebaseFcmService
 {
     protected string $projectId;
+
     protected string $credentialsPath;
+
     protected Client $http;
 
     public function __construct()
@@ -18,7 +20,7 @@ class FirebaseFcmService
 
         $this->http = new Client([
             'base_uri' => 'https://fcm.googleapis.com/v1/',
-            'timeout'  => 5.0,
+            'timeout' => 5.0,
         ]);
     }
 
@@ -44,10 +46,10 @@ class FirebaseFcmService
 
         $payload = [
             'message' => [
-                'token'        => $token,
+                'token' => $token,
                 'notification' => [
                     'title' => $title,
-                    'body'  => $body,
+                    'body' => $body,
                 ],
                 'data' => $data,
             ],
@@ -56,7 +58,7 @@ class FirebaseFcmService
         $response = $this->http->post($url, [
             'headers' => [
                 'Authorization' => 'Bearer '.$accessToken,
-                'Content-Type'  => 'application/json; charset=UTF-8',
+                'Content-Type' => 'application/json; charset=UTF-8',
             ],
             'json' => $payload,
         ]);

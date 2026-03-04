@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class CustomerCompanyDetailSeeder extends Seeder
 {
@@ -23,7 +22,7 @@ class CustomerCompanyDetailSeeder extends Seeder
             $cid = DB::table('customers')->where('customer_code', $c['code'])->value('id');
             if ($cid) {
                 DB::table('customer_company_details')->updateOrInsert([
-                    'customer_id' => $cid
+                    'customer_id' => $cid,
                 ], [
                     'company_name' => $c['company_name'],
                     'comp_address1' => $c['comp_address1'],

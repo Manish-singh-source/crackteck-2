@@ -20,8 +20,8 @@ class ExpensesController extends Controller
             $search = $request->search;
             $query->whereHas('staff', function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('staff_code', 'like', "%{$search}%");
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('staff_code', 'like', "%{$search}%");
             });
         }
 
@@ -34,7 +34,7 @@ class ExpensesController extends Controller
         }
 
         $expenses = $query->orderBy('created_at', 'desc')->paginate(10);
-        
+
         return view('/crm/accounts/expenses/index', compact('expenses'));
     }
 
@@ -47,11 +47,11 @@ class ExpensesController extends Controller
             'engineer' => 'Engineer',
             'delivery_man' => 'Delivery Man',
         ];
-        
+
         $staff = Staff::whereIn('staff_role', ['engineer', 'delivery_man'])
             ->where('status', 'active')
             ->get();
-            
+
         return view('/crm/accounts/expenses/create', compact('staff', 'staffTypes'));
     }
 
@@ -72,9 +72,9 @@ class ExpensesController extends Controller
         $receiptPath = null;
         if ($request->hasFile('receipt')) {
             $receipt = $request->file('receipt');
-            $receiptName = time() . '_' . $receipt->getClientOriginalName();
+            $receiptName = time().'_'.$receipt->getClientOriginalName();
             $receipt->storeAs('public/receipts', $receiptName);
-            $receiptPath = 'receipts/' . $receiptName;
+            $receiptPath = 'receipts/'.$receiptName;
         }
 
         StaffWallet::create([
@@ -95,6 +95,7 @@ class ExpensesController extends Controller
     public function view($id)
     {
         $expense = StaffWallet::with('staff')->findOrFail($id);
+
         return view('/crm/accounts/expenses/view', compact('expense'));
     }
 
@@ -104,12 +105,12 @@ class ExpensesController extends Controller
     public function edit($id)
     {
         $expense = StaffWallet::findOrFail($id);
-        
+
         $staffTypes = [
             'engineer' => 'Engineer',
             'delivery_man' => 'Delivery Man',
         ];
-        
+
         $staff = Staff::whereIn('staff_role', ['engineer', 'delivery_man'])
             ->where('status', 'active')
             ->get();
@@ -136,9 +137,9 @@ class ExpensesController extends Controller
         // Handle receipt file upload
         if ($request->hasFile('receipt')) {
             $receipt = $request->file('receipt');
-            $receiptName = time() . '_' . $receipt->getClientOriginalName();
+            $receiptName = time().'_'.$receipt->getClientOriginalName();
             $receipt->storeAs('public/receipts', $receiptName);
-            $validated['receipt'] = 'receipts/' . $receiptName;
+            $validated['receipt'] = 'receipts/'.$receiptName;
         } else {
             unset($validated['receipt']);
         }

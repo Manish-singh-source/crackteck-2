@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->enum('status', ['inactive', 'active', 'blocked', 'suspended'])->default('active');
             $table->boolean('is_lead')->default(false);
-            
+
             // Authentication / Verification
             $table->string('otp')->nullable();
             $table->timestamp('otp_expiry')->nullable();

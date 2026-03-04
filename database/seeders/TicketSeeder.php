@@ -2,13 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\Ticket;
 use App\Models\Customer;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class TicketSeeder extends Seeder
 {
@@ -22,9 +20,9 @@ class TicketSeeder extends Seeder
         // Ensure there are some customers
         if (Customer::count() < 3) {
             DB::table('customers')->insert([
-                ['first_name' => 'Ticket', 'last_name' => 'User1', 'phone' => '9000000010', 'email' => 'ticket.user1@example.com', 'status' => "active", 'created_at' => $now, 'updated_at' => $now],
-                ['first_name' => 'Ticket', 'last_name' => 'User2', 'phone' => '9000000011', 'email' => 'ticket.user2@example.com', 'status' => "active", 'created_at' => $now, 'updated_at' => $now],
-                ['first_name' => 'Ticket', 'last_name' => 'User3', 'phone' => '9000000012', 'email' => 'ticket.user3@example.com', 'status' => "1", 'created_at' => $now, 'updated_at' => $now],
+                ['first_name' => 'Ticket', 'last_name' => 'User1', 'phone' => '9000000010', 'email' => 'ticket.user1@example.com', 'status' => 'active', 'created_at' => $now, 'updated_at' => $now],
+                ['first_name' => 'Ticket', 'last_name' => 'User2', 'phone' => '9000000011', 'email' => 'ticket.user2@example.com', 'status' => 'active', 'created_at' => $now, 'updated_at' => $now],
+                ['first_name' => 'Ticket', 'last_name' => 'User3', 'phone' => '9000000012', 'email' => 'ticket.user3@example.com', 'status' => '1', 'created_at' => $now, 'updated_at' => $now],
             ]);
         }
 
@@ -58,9 +56,9 @@ class TicketSeeder extends Seeder
 
             $tickets[] = [
                 'customer_id' => $cust->id,
-                'ticket_number' => 'TCK-' . strtoupper(uniqid()),
-                'ticket_id' => 'TCK-' . strtoupper(uniqid()),
-                'title' => ucfirst($category) . ' issue for ' . ($cust->first_name ?? 'Customer'),
+                'ticket_number' => 'TCK-'.strtoupper(uniqid()),
+                'ticket_id' => 'TCK-'.strtoupper(uniqid()),
+                'title' => ucfirst($category).' issue for '.($cust->first_name ?? 'Customer'),
                 'description' => 'This is a seeded ticket to simulate typical support requests.',
                 'category' => $category,
                 'subcategory' => null,
@@ -76,7 +74,7 @@ class TicketSeeder extends Seeder
             ];
         }
 
-        if (!empty($tickets)) {
+        if (! empty($tickets)) {
             DB::table('tickets')->insert($tickets);
         }
     }

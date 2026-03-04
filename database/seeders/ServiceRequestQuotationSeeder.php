@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Product;
+use App\Models\ServiceRequestProductRequestPart;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\ServiceRequestProductRequestPart;
-use App\Models\Product;
 
 class ServiceRequestQuotationSeeder extends Seeder
 {
@@ -51,8 +51,7 @@ class ServiceRequestQuotationSeeder extends Seeder
             ];
         }
 
-
-        if (!empty($quotations)) {
+        if (! empty($quotations)) {
             DB::table('service_request_quotations')->insert($quotations);
         }
     }

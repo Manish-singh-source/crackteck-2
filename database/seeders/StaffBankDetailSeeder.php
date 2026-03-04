@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Staff;
 use App\Models\StaffBankDetail;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class StaffBankDetailSeeder extends Seeder
@@ -48,7 +47,7 @@ class StaffBankDetailSeeder extends Seeder
             'frontend-assets/images/new-products/product-detail-4.webp',
             'frontend-assets/images/new-products/product-detail-5.webp',
             'frontend-assets/images/new-products/product-detail-6.webp',
-            'frontend-assets/images/new-products/product-detail-7.webp'
+            'frontend-assets/images/new-products/product-detail-7.webp',
         ];
 
         StaffBankDetail::truncate();
@@ -58,14 +57,14 @@ class StaffBankDetailSeeder extends Seeder
         Staff::chunk(50, function ($staffs) use ($banks, $images) {
             foreach ($staffs as $staff) {
                 $bank = $banks[array_rand($banks)];
-                $ifsc = strtoupper(substr(str_replace(' ', '', $bank), 0, 4)) . '0' . str_pad((string)rand(0, 999999), 6, '0', STR_PAD_LEFT);
+                $ifsc = strtoupper(substr(str_replace(' ', '', $bank), 0, 4)).'0'.str_pad((string) rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
                 // Ensure that both images are different
                 $frontImage = $images[array_rand($images)];
 
                 StaffBankDetail::create([
                     'staff_id' => $staff->id,
-                    'bank_acc_holder_name' => trim($staff->first_name . ' ' . $staff->last_name),
+                    'bank_acc_holder_name' => trim($staff->first_name.' '.$staff->last_name),
                     'bank_acc_number' => (string) rand(100000000000, 999999999999),
                     'bank_name' => $bank,
                     'ifsc_code' => $ifsc,

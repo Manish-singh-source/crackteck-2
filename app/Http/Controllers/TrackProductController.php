@@ -17,7 +17,8 @@ class TrackProductController extends Controller
             'warehouse',
             'warehouseRack',
         ])
-        ->get();
+            ->get();
+
         return view('/warehouse/track-product/index', compact('products'));
     }
 
@@ -40,9 +41,9 @@ class TrackProductController extends Controller
             ])
             // ->where('sku', 'LIKE', '%' . $searchTerm . '%')
             // ->orWhere('product_name', 'LIKE', '%' . $searchTerm . '%')
-            ->whereHas('productSerials', function ($query) use ($searchTerm) {
-                $query->where('auto_generated_serial', 'LIKE', '%' . $searchTerm . '%')
-                ->orWhere('manual_serial', 'LIKE', '%' . $searchTerm . '%');
+                ->whereHas('productSerials', function ($query) use ($searchTerm) {
+                    $query->where('auto_generated_serial', 'LIKE', '%'.$searchTerm.'%')
+                        ->orWhere('manual_serial', 'LIKE', '%'.$searchTerm.'%');
                 })
                 ->get();
             if ($products) {

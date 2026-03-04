@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('purchase_date')->nullable();
             $table->string('brand')->nullable();
             $table->text('images')->nullable();
-            $table->string('description')->nullable();  
+            $table->string('description')->nullable();
 
             $table->enum('status', ['active', 'inactive', 'deleted'])->default('active');
             $table->timestamps();

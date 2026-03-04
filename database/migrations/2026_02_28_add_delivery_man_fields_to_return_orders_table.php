@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('return_orders', function (Blueprint $table) {
             // Add delivery man id field
             $table->foreignId('delivery_man_id')->nullable()->constrained('staff')->onDelete('set null');
-            
+
             // Add return status timeline fields
             $table->timestamp('return_picked_at')->nullable()->after('return_accepted_at');
             $table->timestamp('return_delivered_at')->nullable()->after('return_picked_at');

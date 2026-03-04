@@ -27,28 +27,30 @@ class MeetController extends Controller
             $query->where('status', $status);
         }
         $meet = $query->with('leadDetails.customer')->get();
+
         return view('/crm/meets/index', compact('meet'));
     }
 
     public function create()
     {
         $leads = Lead::all();
+
         // dd($leads);
         return view('/crm/meets/create', compact('leads'));
-        }
-        
-        public function store(Request $request)
-        {
+    }
+
+    public function store(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'lead_id' => 'required',
             'meet_title' => 'required|min:3',
             'meeting_type' => 'required',
             'date' => 'required',
             'time' => 'required',
-            ]);
-            // dd($request->all());
+        ]);
+        // dd($request->all());
 
-            if ($validator->fails()) {
+        if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
         // dd($request->all());
@@ -61,11 +63,11 @@ class MeetController extends Controller
         $meet->date = $request->date;
         $meet->start_time = $request->time;
         $meet->location = $request->location;
-        
+
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
-            
+            $filename = time().'.'.$file->getClientOriginalExtension();
+
             // Ensure "small" directory exists
             $smallDir = public_path('uploads/crm/meets');
             if (! File::exists($smallDir)) {
@@ -74,19 +76,19 @@ class MeetController extends Controller
 
             $file->move(public_path('uploads/crm/meets'), $filename);
             $meet->attachment = $filename;
-            }
-            
-            $meet->meet_agenda = $request->meetAgenda;
-            $meet->follow_up_action = $request->followUp;
-            $meet->status = $request->status;
+        }
+
+        $meet->meet_agenda = $request->meetAgenda;
+        $meet->follow_up_action = $request->followUp;
+        $meet->status = $request->status;
 
         $meet->save();
 
         if (! $meet) {
             return back()->with('error', 'Something went wrong.');
-            }
+        }
 
-            return redirect()->route('meets.index')->with('success', 'Meets added successfully.');
+        return redirect()->route('meets.index')->with('success', 'Meets added successfully.');
     }
 
     public function view($id)
@@ -94,7 +96,6 @@ class MeetController extends Controller
         $meet = Meet::find($id);
         $leads = Lead::all();
 
-        
         return view('/crm/meets/view', compact('meet'));
     }
 
@@ -131,14 +132,14 @@ class MeetController extends Controller
 
         // Only if updating profile
         if ($request->attachment != '') {
-            if (File::exists(public_path('uploads/crm/meets/' . $request->attachment))) {
-                File::delete(public_path('uploads/crm/meets/' . $request->attachment));
+            if (File::exists(public_path('uploads/crm/meets/'.$request->attachment))) {
+                File::delete(public_path('uploads/crm/meets/'.$request->attachment));
             }
         }
 
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $filename = time().'.'.$file->getClientOriginalExtension();
 
             // Ensure "small" directory exists
             $smallDir = public_path('uploads/crm/meets');

@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreWarehouseRequest;
+use App\Http\Requests\UpdateWarehouseRequest;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
-use App\Http\Requests\StoreWarehouseRequest;
-use App\Http\Requests\UpdateWarehouseRequest;
-use Termwind\Components\Raw;
 
 class WarehouseController extends Controller
 {
@@ -39,13 +37,13 @@ class WarehouseController extends Controller
             $data = $request->validated();
 
             // Generate warehouse code
-            $data['warehouse_code'] = 'WH-' . date('y') . '-' .
+            $data['warehouse_code'] = 'WH-'.date('y').'-'.
                 str_pad(Warehouse::count() + 1, 4, '0', STR_PAD_LEFT);
 
             // Handle file upload
             if ($request->hasFile('licence_doc')) {
                 $file = $request->file('licence_doc');
-                $filename = time() . '_' . $file->getClientOriginalName();
+                $filename = time().'_'.$file->getClientOriginalName();
                 $path = $file->storeAs(
                     'uploads/warehouses/licence-docs',
                     $filename,
@@ -101,7 +99,7 @@ class WarehouseController extends Controller
                 }
 
                 $file = $request->file('licence_doc');
-                $filename = time() . '_' . $file->getClientOriginalName();
+                $filename = time().'_'.$file->getClientOriginalName();
 
                 $data['licence_doc'] = $file->storeAs(
                     'uploads/warehouses/licence-docs',
@@ -126,7 +124,6 @@ class WarehouseController extends Controller
         }
     }
 
-
     public function updateStatus(Request $request, $id)
     {
         $warehouse = Warehouse::find($id);
@@ -134,8 +131,8 @@ class WarehouseController extends Controller
         if (
             $request->default_warehouse === 'yes' &&
             Warehouse::where('default_warehouse', 'yes')
-            ->where('id', '!=', $id)
-            ->exists()
+                ->where('id', '!=', $id)
+                ->exists()
         ) {
             return redirect()
                 ->back()
@@ -154,7 +151,7 @@ class WarehouseController extends Controller
     public function delete($id)
     {
         $warehouse = Warehouse::withCount('products')->find($id);
-        if (!$warehouse) {
+        if (! $warehouse) {
             return redirect()->route('warehouses-list.index')->with('error', 'Warehouse not found.');
         }
         if ($warehouse->products_count > 0) {

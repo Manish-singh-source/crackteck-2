@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Staff;
-use Illuminate\Http\Request;
-use App\Models\AssignedEngineer;
-use Spatie\Permission\Models\Role;
 use App\Http\Requests\StoreStaffRequest;
+use App\Models\AssignedEngineer;
+use App\Models\ServiceRequest;
+use App\Models\ServiceRequestProductPickup;
+use App\Models\ServiceRequestProductReturn;
+use App\Models\Staff;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth, DB, Log, Validator};
+use Spatie\Permission\Models\Role;
 
 class StaffController extends Controller
 {
@@ -245,27 +248,61 @@ class StaffController extends Controller
     {
         $staff = Staff::with(['address', 'bankDetails', 'workSkills', 'aadharDetails', 'panDetails', 'vehicleDetails', 'policeVerification'])->findOrFail($id);
         $roles = Role::where('name', '!=', 'Customer')->get();
-        // dd($staff);
-        // Fetch assigned tasks for this engineer
-        $assignedTasks = AssignedEngineer::with([
-            'serviceRequest.customer',
-            'serviceRequest.customerAddress',
-            // 'groupEngineers'
-        ])
-            ->where(function ($query) use ($id) {
-                // Individual assignments
-                $query->where('engineer_id', $id)
-                    ->where('assignment_type', 'individual');
-            })
-            // ->orWhereHas('groupEngineers', function ($query) use ($id) {
-            //     // Group assignments where this engineer is a member
-            //     $query->where('engineer_id', $id);
-            // })
-            ->where('status', 'active') // Active assignments only
-            ->orderBy('assigned_at', 'desc')
-            ->get();
 
-        return view('/crm/access-control/staff/view', compact('staff', 'roles', 'assignedTasks'));
+        // Total Tasks
+        $totalServiceRequestTasks = ServiceRequest::withWhereHas('activeAssignment', function ($q) use ($id) {
+            $q->where('engineer_id', $id);
+        })
+        ->whereIn('status', ['engineer_approved', 'in_progress', 'completed'])
+        ->count();
+
+        $totalPickupRequestTasks = ServiceRequestProductPickup::where('assigned_person_id', $id)->count();
+        $totalReturnRequestTasks = ServiceRequestProductReturn::where('assigned_person_id', $id)->count();
+
+        $totalTasks = $totalServiceRequestTasks + $totalPickupRequestTasks + $totalReturnRequestTasks;
+        // Total Tasks End
+
+        // Completed Tasks
+        $completedServiceRequestTasks = ServiceRequest::withWhereHas('activeAssignment', function ($q) use ($id) {
+            $q->where('engineer_id', $id);
+        })
+        ->where('status', 'completed')
+        ->count();
+        $completedPickupRequestTasks = ServiceRequestProductPickup::where('assigned_person_id', $id)->where('status', 'completed')->count();
+        $completedReturnRequestTasks = ServiceRequestProductReturn::where('assigned_person_id', $id)->where('status', 'completed')->count();
+
+        $completedTasks = $completedServiceRequestTasks + $completedPickupRequestTasks + $completedReturnRequestTasks;
+        // Completed Tasks End
+
+        // Pending Tasks
+        $pendingServiceRequestTasks = ServiceRequest::withWhereHas('activeAssignment', function ($q) use ($id) {
+            $q->where('engineer_id', $id);
+        })
+        ->where('status', 'engineer_approved')
+        ->count();
+        $pendingPickupRequestTasks = ServiceRequestProductPickup::where('assigned_person_id', $id)->where('status', 'approved')->count();
+        $pendingReturnRequestTasks = ServiceRequestProductReturn::where('assigned_person_id', $id)->where('status', 'accepted')->count();
+
+        $pendingTasks = $pendingServiceRequestTasks + $pendingPickupRequestTasks + $pendingReturnRequestTasks;
+        // Pending Tasks End
+
+
+        // In progress Tasks
+         $inProgressServiceRequestTasks = ServiceRequest::withWhereHas('activeAssignment', function ($q) use ($id) {
+            $q->where('engineer_id', $id);
+        })
+        ->where('status', 'in_progress')
+        ->count();
+        $inProgressPickupRequestTasks = ServiceRequestProductPickup::where('assigned_person_id', $id)->where('status', 'picked')->count();
+        $inProgressReturnRequestTasks = ServiceRequestProductReturn::where('assigned_person_id', $id)->where('status', 'picked')->count();
+
+        $inProgressTasks = $inProgressServiceRequestTasks + $inProgressPickupRequestTasks + $inProgressReturnRequestTasks;
+        // In progress Tasks End
+
+
+
+
+        return view('/crm/access-control/staff/view', compact('staff', 'roles', 'totalTasks', 'completedTasks', 'pendingTasks', 'inProgressTasks'));
     }
 
     public function update(Request $request, $id)

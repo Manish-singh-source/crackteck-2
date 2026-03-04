@@ -51,7 +51,7 @@ Route::prefix('v1')->group(function () {
 
     // Receipt download route (public - outside JWT middleware)
     Route::get('/receipts/{filename}', function ($filename) {
-        $path = storage_path('app/public/receipts/'.$filename);
+        $path = storage_path('app/public/receipts/' . $filename);
 
         if (! file_exists($path)) {
             return response()->json(['message' => 'File not found'], 404);
@@ -60,7 +60,7 @@ Route::prefix('v1')->group(function () {
         return response()->file($path);
     });
 
-    Route::middleware(['jwt.verify'])->group(function () {
+    Route::middleware(['throttle:60,1', 'jwt.verify'])->group(function () {
 
         Route::post('/test-fcm', [FcmTestController::class, 'send']);
 

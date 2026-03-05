@@ -122,7 +122,7 @@ class OrderController extends Controller
         $roleValidated = Validator::make($request->all(), ([
             'role_id' => 'required|in:4',
             'quantity' => 'required|integer|min:1',
-            'customer_id' => 'required',
+            'user_id' => 'required',
             'shipping_address_id' => 'required',
         ]));
 
@@ -144,7 +144,7 @@ class OrderController extends Controller
             }
 
             // Store Order in Order Table
-            $customer = Customer::with('addressDetails')->where('id', $request->customer_id)->first();
+            $customer = Customer::with('addressDetails')->where('id', $request->user_id)->first();
             if (! $customer) {
                 return response()->json(['message' => 'Customer not found'], 404);
             }
@@ -154,8 +154,8 @@ class OrderController extends Controller
             $total = $quantity * $price;
 
             $order = Order::create([
-                'customer_id' => $request->customer_id,
-                'order_number' => 'ORD-'.date('YmdHis').'-'.$request->customer_id,
+                'customer_id' => $request->user_id,
+                'order_number' => 'ORD-'.date('YmdHis').'-'.$request->user_id,
                 'total_items' => $quantity,
                 'subtotal' => $product->warehouseProduct->final_price,
                 'discount_amount' => 0,
@@ -229,7 +229,7 @@ class OrderController extends Controller
     public function listOrders(Request $request)
     {
         $roleValidated = Validator::make($request->all(), ([
-            'customer_id' => 'required',
+            'user_id' => 'required',
             'role_id' => 'required|in:4',
         ]));
 
@@ -244,7 +244,7 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $orders = Order::with('orderItems', 'orderItems.product')->where('customer_id', $request->customer_id)->get();
+            $orders = Order::with('orderItems', 'orderItems.product')->where('customer_id', $request->user_id)->get();
 
             return response()->json(['orders' => $orders], 200);
         }

@@ -852,10 +852,10 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
-        if (! $userAuthorize) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
-        }
+        // $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
+        // if (! $userAuthorize) {
+        //     return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        // }
 
         // Find all quotation invoices for the customer
         $invoices = QuotationInvoice::with('quoteDetails.leadDetails', 'items')
@@ -886,10 +886,10 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
-        if (! $userAuthorize) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
-        }
+        // $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
+        // if (! $userAuthorize) {
+        //     return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        // }
 
         // Find the quotation invoice according to quotation id
         $invoice = QuotationInvoice::with('items')->where('id', $id)->first();
@@ -919,10 +919,10 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
-        if (! $userAuthorize) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
-        }
+        // $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
+        // if (! $userAuthorize) {
+        //     return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        // }
 
         // Find the quotation invoice
         $invoice = QuotationInvoice::where('id', $id)->first();
@@ -955,10 +955,10 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
-        if (! $userAuthorize) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
-        }
+        // $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
+        // if (! $userAuthorize) {
+        //     return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        // }
 
         // Find the quotation invoice
         $invoice = QuotationInvoice::where('id', $id)->first();

@@ -6,12 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\CausesActivity;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Models\Role;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Staff extends Authenticatable implements JWTSubject
 {
-    use AuthenticationLoggable, HasFactory, Notifiable;
+    use AuthenticationLoggable, HasFactory, Notifiable, LogsActivity, CausesActivity;
 
     protected $fillable = [
         'staff_code',
@@ -41,6 +44,31 @@ class Staff extends Authenticatable implements JWTSubject
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'staff_code',
+                'staff_role',
+                'first_name',
+                'last_name',
+                'phone',
+                'email',
+                'dob',
+                'gender',
+                'marital_status',
+                'employment_type',
+                'joining_date',
+                'assigned_area',
+                'status',
+                'kyc_status',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->causedBy(auth()->guard(['web', 'staff_web'])->user())
+            ->setDescriptionForEvent(fn(string $eventName) => "User {$eventName}");
     }
 
     public function getJWTIdentifier()

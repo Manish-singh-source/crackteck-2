@@ -244,7 +244,10 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $orders = Order::with('orderItems', 'orderItems.product')->where('customer_id', $request->user_id)->get();
+            $orders = Order::with('orderItems', 'orderItems.product')
+                ->where('customer_id', $request->user_id)
+                ->orderBy('created_at', 'desc')
+                ->get();
 
             return response()->json(['orders' => $orders], 200);
         }

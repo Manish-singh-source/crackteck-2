@@ -67,7 +67,6 @@ class Staff extends Authenticatable implements JWTSubject
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->causedBy(auth()->guard(['web', 'staff_web'])->user())
             ->setDescriptionForEvent(fn(string $eventName) => "User {$eventName}");
     }
 

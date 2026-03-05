@@ -444,7 +444,7 @@ class ApiAuthController extends Controller
                     ->first();
             }
             if (! $user) {
-                return response()->json(['success' => false, 'message' => 'User not found with the provided phone number and role.'], 404);
+                return response()->json(['success' => false, 'message' => 'User not found with the provided phone number.'], 404);
             }
 
             $otp = rand(1000, 9999);
@@ -518,7 +518,7 @@ class ApiAuthController extends Controller
                 $user = Staff::with('vehicleDetails')->where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
 
                 if (! $user->vehicleDetails) {
-                    return response()->json(['error' => 'Vehical Details Not Found']);
+                    return response()->json(['success' => false, 'message' => 'Vehical Details Not Found'], 401);
                 }
             } else {
                 $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
@@ -526,7 +526,7 @@ class ApiAuthController extends Controller
         }
 
         if (! $user || $user->otp != $request->otp || now()->gt($user->otp_expiry)) {
-            return response()->json(['error' => 'Invalid or expired OTP'], 401);
+            return response()->json(['success' => false, 'message' => 'Invalid or expired OTP'], 401);
         }
 
         $user->otp = null; // reset OTP after verification
@@ -563,7 +563,7 @@ class ApiAuthController extends Controller
             auth()->guard('staff_api')->logout();
         }
 
-        return response()->json(['success' => true, 'message' => 'User logged out successfully']);
+        return response()->json(['success' => true, 'message' => 'User logged out successfully'], 200);
     }
 
     public function refreshToken(Request $request)
@@ -635,6 +635,6 @@ class ApiAuthController extends Controller
             $number = 1;
         }
 
-        return 'CST-'.str_pad($number, 6, '0', STR_PAD_LEFT);
+        return 'CUST-'.str_pad($number, 6, '0', STR_PAD_LEFT);
     }
 }

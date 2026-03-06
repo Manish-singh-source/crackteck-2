@@ -26,9 +26,10 @@ class FrontendController extends Controller
     {
         // Get only type 0 (website) active banners for the homepage carousel, ordered by display_order
         $banners = WebsiteBanner::where('is_active', '1')
-            ->where('type', '0')
+            ->where('type', 'website')
             ->orderBy('display_order', 'asc')
             ->get();
+        // dd($banners);
 
         // Get active parent categories for e-commerce display, ordered by sort_order
         $categories = ParentCategory::where('status', '1')

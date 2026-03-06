@@ -45,7 +45,7 @@ class AmcServicesController extends Controller
             foreach ($amcPlans as $plan) {
                 $amcPlansCoveredItems[] = [
                     'plan' => $plan,
-                    'covered_items' => $plan->coveredItems(),
+                    'covered_items' => $plan->coveredItems() ?? [],
                 ];
             }
 

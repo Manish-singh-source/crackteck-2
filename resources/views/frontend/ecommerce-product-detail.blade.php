@@ -1251,16 +1251,17 @@
                     const quantity = $('.quantity-input').val() || 1;
 
                     // Check if user is authenticated
-                    // @guest
-                    //     // Show login modal for unauthenticated users
-                    //     showLoginModal();
-                    //     return;
-                    // @endguest
+                    @guest
+                        // Show login modal for unauthenticated users
+                        console.log("Error");
+                        showLoginModal();
+                        return;
+                    @endguest
 
-                    // // Show loading state
-                    // const originalText = $button.html(); $button.html(
-                    //     '<i class="spinner-border spinner-border-sm me-2"></i>Adding...'); $button.prop('disabled',
-                    //     true);
+                    // Show loading state
+                    const originalText = $button.html(); $button.html(
+                        '<i class="spinner-border spinner-border-sm me-2"></i>Adding...'); $button.prop('disabled',
+                        true);
 
                     // Make AJAX request
                     $.ajax({

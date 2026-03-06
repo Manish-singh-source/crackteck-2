@@ -38,11 +38,11 @@ class OrderItem extends Model
     public static function createFromProduct($product, $quantity, $orderId)
     {
         $warehouseProduct = $product->warehouseProduct;
-        
+
         $unitPrice = $warehouseProduct->final_price ?? $warehouseProduct->selling_price ?? 0;
         $lineTotal = $unitPrice * $quantity;
         $taxPerUnit = $warehouseProduct->tax ?? 0;
-        
+
         return self::create([
             'order_id' => $orderId,
             'product_id' => $warehouseProduct->id,
@@ -68,17 +68,17 @@ class OrderItem extends Model
     {
         $product = $cartItem->ecommerceProduct;
         $warehouseProduct = $product->warehouseProduct;
-        
+
         $unitPrice = $warehouseProduct->final_price ?? $warehouseProduct->selling_price ?? 0;
         $lineTotal = $unitPrice * $cartItem->quantity;
         $taxPerUnit = $warehouseProduct->tax ?? 0;
-        
+
         return self::create([
             'order_id' => $orderId,
             'product_id' => $warehouseProduct->id,
             'product_serial_id' => null,
             'product_name' => $warehouseProduct->product_name,
-            'product_sku' => $warehouseProduct->sku ?? 'SKU-' . $warehouseProduct->id,
+            'product_sku' => $warehouseProduct->sku ?? 'SKU-'.$warehouseProduct->id,
             'hsn_code' => $warehouseProduct->hsn_code ?? null,
             'quantity' => $cartItem->quantity,
             'unit_price' => $unitPrice,
@@ -99,13 +99,14 @@ class OrderItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+        // return $this->belongsTo(EcommerceProduct::class);
     }
 
     public function ecommerceProduct()
     {
         return $this->belongsTo(EcommerceProduct::class);
     }
-    
+
     public function productSerial()
     {
         return $this->belongsTo(ProductSerial::class);

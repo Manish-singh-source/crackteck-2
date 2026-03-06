@@ -1,14 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\VendorPurchaseOrder;
 
 use App\Http\Requests\StoreVendorPurchaseOrderRequest;
 use App\Http\Requests\UpdateVendorPurchaseOrderRequest;
 use App\Models\Vendor;
+use App\Models\VendorPurchaseOrder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Support\Facades\Storage;
 
 class PayToVendorController extends Controller
@@ -33,6 +31,7 @@ class PayToVendorController extends Controller
     public function create()
     {
         $vendors = Vendor::all();
+
         return view('/crm/accounts/payments-to-vendors/create', compact('vendors'));
     }
 
@@ -46,7 +45,7 @@ class PayToVendorController extends Controller
             // Handle invoice upload
             if ($request->hasFile('invoice_pdf')) {
                 $file = $request->file('invoice_pdf');
-                $filename = time() . '_' . $file->getClientOriginalName();
+                $filename = time().'_'.$file->getClientOriginalName();
 
                 $data['invoice_pdf'] = $file->storeAs(
                     'uploads/vendor-purchase-bills',
@@ -121,7 +120,7 @@ class PayToVendorController extends Controller
                 }
 
                 $file = $request->file('invoice_pdf');
-                $filename = time() . '_' . $file->getClientOriginalName();
+                $filename = time().'_'.$file->getClientOriginalName();
 
                 $data['invoice_pdf'] = $file->storeAs(
                     'uploads/vendor-purchase-bills',

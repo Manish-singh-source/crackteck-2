@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use App\Models\AssignedEngineer;
 use App\Models\Staff;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class AssignedEngineerGroupSeeder extends Seeder
 {
@@ -72,7 +71,7 @@ class AssignedEngineerGroupSeeder extends Seeder
             }
         }
 
-        if (!empty($inserts)) {
+        if (! empty($inserts)) {
             DB::table('assigned_engineer_group')->insert($inserts);
         }
     }

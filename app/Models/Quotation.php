@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Quotation extends Model
 {
@@ -46,7 +46,8 @@ class Quotation extends Model
         return $this->hasMany(QuotationAmcDetail::class, 'quotation_id', 'id');
     }
 
-    public function amcData() {
+    public function amcData()
+    {
         return $this->hasOne(QuotationAmcDetail::class, 'quotation_id', 'id');
     }
 }

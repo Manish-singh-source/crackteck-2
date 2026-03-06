@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('service_requests', function (Blueprint $table) {
             //
-            // update request_source to be enum with add extra value 'lead_won' 
+            // update request_source to be enum with add extra value 'lead_won'
             $table->enum('request_source', ['system', 'customer', 'lead_won'])->change();
         });
     }

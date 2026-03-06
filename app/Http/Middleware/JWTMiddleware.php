@@ -2,6 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\ApiResponse;
+use App\Helpers\AuthorizeUser;
+use App\Models\Customer;
+use App\Models\Staff;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,11 +26,39 @@ class JWTMiddleware
         try {
             JWTAuth::parseToken()->authenticate();
         } catch (TokenExpiredException $e) {
-            return response()->json(['error' => 'Token expired'], 401);
+            return ApiResponse::error('Token expired.', 401);
         } catch (TokenInvalidException $e) {
-            return response()->json(['error' => 'Invalid token'], 401);
+            return ApiResponse::error('Invalid token.', 401);
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Token not provided'], 401);
+            return ApiResponse::error('Token not provided.', 401);
+        }
+
+        if ($request->role_id == 4) {
+
+            $user = Customer::find($request->user_id);
+
+            if (! $user) {
+                return ApiResponse::error('User not found.', 401);
+            }
+
+            $userAuthorize = AuthorizeUser::authorizeUser($user->id, 'customer_api');
+            if (! $userAuthorize) {
+                return ApiResponse::error('Unauthorized User.', 401);
+            }
+
+        } else {
+
+            $user = Staff::find($request->user_id);
+
+            if (! $user) {
+                return ApiResponse::error('User not found.', 404);
+            }
+
+            $userAuthorize = AuthorizeUser::authorizeUser($user->id, 'staff_api');
+            if (! $userAuthorize) {
+                return ApiResponse::error('Unauthorized User.', 401);
+            }
+
         }
 
         return $next($request);

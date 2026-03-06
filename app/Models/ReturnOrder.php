@@ -11,15 +11,22 @@ class ReturnOrder extends Model
 
     // Status constants
     const STATUS_PENDING = 'pending';
+
     const STATUS_ASSIGNED = 'assigned';
+
     const STATUS_ACCEPTED = 'accepted';
+
     const STATUS_PICKED = 'picked';
+
     const STATUS_RECEIVED = 'received';
 
     // Refund status constants
     const REFUND_STATUS_PENDING = 'pending';
+
     const REFUND_STATUS_PROCESSING = 'processing';
+
     const REFUND_STATUS_COMPLETED = 'completed';
+
     const REFUND_STATUS_FAILED = 'failed';
 
     const STATUS_OPTIONS = [
@@ -93,7 +100,7 @@ class ReturnOrder extends Model
         $date = date('Ymd');
         $random = strtoupper(substr(md5(uniqid()), 0, 6));
 
-        return $prefix . '-' . $date . '-' . $random;
+        return $prefix.'-'.$date.'-'.$random;
     }
 
     /**
@@ -199,9 +206,9 @@ class ReturnOrder extends Model
      */
     public function canVerifyOtp(): bool
     {
-        return in_array($this->status, [self::STATUS_PENDING, self::STATUS_ASSIGNED]) 
-            && $this->otp 
-            && $this->otp_expiry 
+        return in_array($this->status, [self::STATUS_PENDING, self::STATUS_ASSIGNED])
+            && $this->otp
+            && $this->otp_expiry
             && $this->otp_expiry->isFuture();
     }
 }

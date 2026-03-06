@@ -9,9 +9,9 @@ class ServiceRequestProductRequestPart extends Model
 {
     //
     use SoftDeletes;
-    
+
     protected $table = 'service_request_product_request_parts';
-    
+
     protected $fillable = [
         'request_id',
         'product_id',
@@ -22,13 +22,13 @@ class ServiceRequestProductRequestPart extends Model
         'request_type',
 
         'assigned_person_type',
-        'assigned_person_id',    
+        'assigned_person_id',
 
         'status',
 
         'otp',
         'otp_expiry',
-        
+
         'admin_approved_at',
         'admin_rejected_at',
         'assigned_at',

@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\OfflineCustomer;
-use App\Http\Controllers\Controller;
 
+use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +23,7 @@ class AuthController extends Controller
         if (Auth::guard('customer_web')->check()) {
             return redirect()->route('offline-index');
         }
-        
+
         return view('offline-users-dashboard.login');
     }
 
@@ -42,7 +42,7 @@ class AuthController extends Controller
 
         // dd($customer);
         // Check if customer exists and password matches
-        if (!$customer) {
+        if (! $customer) {
             return back()->withInput($request->only('email'))
                 ->withErrors([
                     'email' => 'No account found with this email address.',
@@ -64,7 +64,7 @@ class AuthController extends Controller
             $passwordMatch = true;
         }
 
-        if (!$passwordMatch) {
+        if (! $passwordMatch) {
             return back()->withInput($request->only('email'))
                 ->withErrors([
                     'email' => 'The provided credentials do not match our records.',
@@ -86,7 +86,8 @@ class AuthController extends Controller
 
         // Redirect to intended URL or index page
         $redirectUrl = session()->pull('url.intended', route('offline-index'));
-        return redirect($redirectUrl)->with('success', 'Welcome back, ' . $customer->first_name . '!');
+
+        return redirect($redirectUrl)->with('success', 'Welcome back, '.$customer->first_name.'!');
     }
 
     public function recover_password()
@@ -106,7 +107,7 @@ class AuthController extends Controller
     public function offlinelogoutGet()
     {
         Auth::guard('customer_web')->logout();
-        
+
         return redirect()->route('offlinelogin');
     }
 }

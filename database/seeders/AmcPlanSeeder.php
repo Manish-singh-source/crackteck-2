@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\CoveredItem;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\CoveredItem;
 
 class AmcPlanSeeder extends Seeder
 {
@@ -35,13 +34,13 @@ class AmcPlanSeeder extends Seeder
                 'plan_cost' => 4999.00,
                 'tax' => 899.82,
                 'total_cost' => 5898.82,
-                'pay_terms' => "full_payment",
+                'pay_terms' => 'full_payment',
                 'support_type' => 'onsite',
                 'covered_items' => json_encode($coveredA),
                 'brochure' => null,
                 'tandc' => null,
                 'replacement_policy' => null,
-                'status' => "active",
+                'status' => 'active',
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
@@ -54,13 +53,13 @@ class AmcPlanSeeder extends Seeder
                 'plan_cost' => 7999.00,
                 'tax' => 1439.82,
                 'total_cost' => 9438.82,
-                'pay_terms' => "installments",
+                'pay_terms' => 'installments',
                 'support_type' => 'onsite',
                 'covered_items' => json_encode($coveredB),
                 'brochure' => null,
                 'tandc' => null,
                 'replacement_policy' => null,
-                'status' => "active",
+                'status' => 'active',
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
@@ -73,13 +72,13 @@ class AmcPlanSeeder extends Seeder
                 'plan_cost' => 14999.00,
                 'tax' => 2699.82,
                 'total_cost' => 17698.82,
-                'pay_terms' => "installments",
+                'pay_terms' => 'installments',
                 'support_type' => 'onsite',
                 'covered_items' => json_encode($coveredC),
                 'brochure' => null,
                 'tandc' => null,
                 'replacement_policy' => null,
-                'status' => "active",
+                'status' => 'active',
                 'created_at' => $now,
                 'updated_at' => $now,
             ],

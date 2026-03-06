@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ServiceRequestProductRequestPart;
-use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
-use App\Models\Staff;
+use App\Models\ServiceRequestProductRequestPart;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class PartRequestController extends Controller
 {
@@ -22,6 +20,7 @@ class PartRequestController extends Controller
             1 => 'engineer',
             2 => 'delivery_man',
         ];
+
         return $roles[$roleId] ?? null;
     }
 
@@ -39,13 +38,13 @@ class PartRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
@@ -55,24 +54,25 @@ class PartRequestController extends Controller
                 'serviceRequest.customer',
                 'serviceRequestProduct',
                 'product',
-                'engineer'
+                'engineer',
             ])
-            ->where('assigned_person_type', $roleName)
-            ->where('assigned_person_id', $request->user_id)
-            ->whereIn('status', ['assigned', 'ap_approved', 'picked'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+                ->where('assigned_person_type', $roleName)
+                ->where('assigned_person_id', $request->user_id)
+                ->whereIn('status', ['assigned', 'ap_approved', 'picked'])
+                ->orderBy('created_at', 'desc')
+                ->get();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Part requests fetched successfully.',
-                'data' => $partRequests
+                'data' => $partRequests,
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error fetching part requests: ' . $e->getMessage());
+            Log::error('Error fetching part requests: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while fetching part requests.'
+                'message' => 'An error occurred while fetching part requests.',
             ], 500);
         }
     }
@@ -87,26 +87,27 @@ class PartRequestController extends Controller
                 'serviceRequest.customer',
                 'serviceRequestProduct',
                 'product',
-                'engineer'
+                'engineer',
             ])->find($id);
 
-            if (!$partRequest) {
+            if (! $partRequest) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Part request not found.'
+                    'message' => 'Part request not found.',
                 ], 404);
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Part request details fetched successfully.',
-                'data' => $partRequest
+                'data' => $partRequest,
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error fetching part request details: ' . $e->getMessage());
+            Log::error('Error fetching part request details: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while fetching part request details.'
+                'message' => 'An error occurred while fetching part request details.',
             ], 500);
         }
     }
@@ -125,13 +126,13 @@ class PartRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
@@ -139,27 +140,27 @@ class PartRequestController extends Controller
             // Find the part request
             $partRequest = ServiceRequestProductRequestPart::find($id);
 
-            if (!$partRequest) {
+            if (! $partRequest) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Part request not found.'
+                    'message' => 'Part request not found.',
                 ], 404);
             }
 
             // Verify the user has access to this part request
-            if ($partRequest->assigned_person_type !== $roleName || 
+            if ($partRequest->assigned_person_type !== $roleName ||
                 $partRequest->assigned_person_id != $request->user_id) {
                 return response()->json([
-                    'success' => false, 
-                    'message' => 'You do not have access to this part request.'
+                    'success' => false,
+                    'message' => 'You do not have access to this part request.',
                 ], 403);
             }
 
             // Check if status is 'assigned'
             if ($partRequest->status !== 'assigned') {
                 return response()->json([
-                    'success' => false, 
-                    'message' => 'Part request must be in assigned status to accept.'
+                    'success' => false,
+                    'message' => 'Part request must be in assigned status to accept.',
                 ], 400);
             }
 
@@ -172,13 +173,14 @@ class PartRequestController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Part request accepted successfully.',
-                'data' => $partRequest
+                'data' => $partRequest,
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error accepting part request: ' . $e->getMessage());
+            Log::error('Error accepting part request: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while accepting the part request.'
+                'message' => 'An error occurred while accepting the part request.',
             ], 500);
         }
     }
@@ -198,13 +200,13 @@ class PartRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
@@ -212,42 +214,42 @@ class PartRequestController extends Controller
             // Find the part request with customer details
             $partRequest = ServiceRequestProductRequestPart::with(['serviceRequest.customer'])->find($id);
 
-            if (!$partRequest) {
+            if (! $partRequest) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Part request not found.'
+                    'message' => 'Part request not found.',
                 ], 404);
             }
 
             // Verify the user has access to this part request
-            if ($partRequest->assigned_person_type !== $roleName || 
+            if ($partRequest->assigned_person_type !== $roleName ||
                 $partRequest->assigned_person_id != $request->user_id) {
                 return response()->json([
-                    'success' => false, 
-                    'message' => 'You do not have access to this part request.'
+                    'success' => false,
+                    'message' => 'You do not have access to this part request.',
                 ], 403);
             }
 
             // Check if status is 'picked' - only then can we send OTP
             if ($partRequest->status !== 'picked') {
                 return response()->json([
-                    'success' => false, 
-                    'message' => 'Part request must be in picked status to send OTP.'
+                    'success' => false,
+                    'message' => 'Part request must be in picked status to send OTP.',
                 ], 400);
             }
 
             // Check if customer has phone number
             $customer = $partRequest->serviceRequest->customer;
-            if (!$customer || !$customer->phone) {
+            if (! $customer || ! $customer->phone) {
                 return response()->json([
-                    'success' => false, 
-                    'message' => 'Customer phone number not found.'
+                    'success' => false,
+                    'message' => 'Customer phone number not found.',
                 ], 400);
             }
 
             // Generate 4-digit OTP
             $otp = rand(1000, 9999);
-            
+
             // Update part request with OTP and expiry (5 minutes)
             $partRequest->update([
                 'otp' => $otp,
@@ -264,14 +266,15 @@ class PartRequestController extends Controller
                 'data' => [
                     'otp_sent_to' => $customer->phone,
                     'otp' => $otp,
-                    'otp_expiry' => $partRequest->otp_expiry
-                ]
+                    'otp_expiry' => $partRequest->otp_expiry,
+                ],
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error sending OTP: ' . $e->getMessage());
+            Log::error('Error sending OTP: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while sending OTP.'
+                'message' => 'An error occurred while sending OTP.',
             ], 500);
         }
     }
@@ -291,13 +294,13 @@ class PartRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
@@ -305,19 +308,19 @@ class PartRequestController extends Controller
             // Find the part request
             $partRequest = ServiceRequestProductRequestPart::find($id);
 
-            if (!$partRequest) {
+            if (! $partRequest) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Part request not found.'
+                    'message' => 'Part request not found.',
                 ], 404);
             }
 
             // Verify the user has access to this part request
-            if ($partRequest->assigned_person_type !== $roleName || 
+            if ($partRequest->assigned_person_type !== $roleName ||
                 $partRequest->assigned_person_id != $request->user_id) {
                 return response()->json([
-                    'success' => false, 
-                    'message' => 'You do not have access to this part request.'
+                    'success' => false,
+                    'message' => 'You do not have access to this part request.',
                 ], 403);
             }
 
@@ -325,19 +328,19 @@ class PartRequestController extends Controller
             if ($partRequest->otp !== $request->otp) {
                 // Increment OTP attempts
                 $partRequest->increment('otp_attempts');
-                
+
                 return response()->json([
-                    'success' => false, 
+                    'success' => false,
                     'message' => 'Invalid OTP.',
-                    'attempts' => $partRequest->otp_attempts
+                    'attempts' => $partRequest->otp_attempts,
                 ], 400);
             }
 
             // Check if OTP has expired
             if (now()->gt($partRequest->otp_expiry)) {
                 return response()->json([
-                    'success' => false, 
-                    'message' => 'OTP has expired. Please request a new OTP.'
+                    'success' => false,
+                    'message' => 'OTP has expired. Please request a new OTP.',
                 ], 400);
             }
 
@@ -346,26 +349,27 @@ class PartRequestController extends Controller
                 'status' => 'delivered',
                 'delivered_at' => now(),
                 'otp' => null, // Clear OTP after successful verification
-                'otp_expiry' => null
+                'otp_expiry' => null,
             ]);
 
             // Also update the service_request_products status to in_progress
             if ($partRequest->product_id) {
                 ServiceRequestProduct::where('id', $partRequest->product_id)->update([
-                    'status' => 'in_progress'
+                    'status' => 'in_progress',
                 ]);
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'OTP verified successfully. Part delivered.',
-                'data' => $partRequest
+                'data' => $partRequest,
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error verifying OTP: ' . $e->getMessage());
+            Log::error('Error verifying OTP: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while verifying OTP.'
+                'message' => 'An error occurred while verifying OTP.',
             ], 500);
         }
     }

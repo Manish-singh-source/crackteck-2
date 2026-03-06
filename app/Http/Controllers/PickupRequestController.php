@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\StatusUpdateHelper;
-use App\Models\Staff;
 use App\Models\Customer;
 use App\Models\DeliveryMan;
 use App\Models\Engineer;
 use App\Models\SalesPerson;
 use App\Models\ServiceRequestProductPickup;
+use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -58,19 +58,19 @@ class PickupRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
         // Verify user exists
-        $user = Staff::where('id' , $request->user_id)->first();
-        if (!$user) {
+        $user = Staff::where('id', $request->user_id)->first();
+        if (! $user) {
             return response()->json(['success' => false, 'message' => 'User not found.'], 404);
         }
 
@@ -81,13 +81,13 @@ class PickupRequestController extends Controller
             'serviceRequest.customer',
             'serviceRequestProduct.serviceRequest',
         ])
-        ->where('assigned_person_type', $roleName)
-        ->where('assigned_person_id', $request->user_id)
-        ->when($request->filled('status'), function ($query) use ($request) {
-            return $query->where('status', $request->status);
-        })
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->where('assigned_person_type', $roleName)
+            ->where('assigned_person_id', $request->user_id)
+            ->when($request->filled('status'), function ($query) use ($request) {
+                return $query->where('status', $request->status);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json([
             'success' => true,
@@ -96,8 +96,8 @@ class PickupRequestController extends Controller
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name ?? $user->first_name,
-                'role' => $roleName
-            ]
+                'role' => $roleName,
+            ],
         ], 200);
     }
 
@@ -115,13 +115,13 @@ class PickupRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
@@ -133,23 +133,23 @@ class PickupRequestController extends Controller
             'assignedPerson',
         ])->find($id);
 
-        if (!$pickupRequest) {
+        if (! $pickupRequest) {
             return response()->json(['success' => false, 'message' => 'Pickup request not found.'], 404);
         }
 
         // Verify the user has access to this pickup request
-        if ($pickupRequest->assigned_person_type !== $roleName || 
+        if ($pickupRequest->assigned_person_type !== $roleName ||
             $pickupRequest->assigned_person_id != $request->user_id) {
             return response()->json([
-                'success' => false, 
-                'message' => 'You do not have access to this pickup request.'
+                'success' => false,
+                'message' => 'You do not have access to this pickup request.',
             ], 403);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Pickup request details retrieved successfully.',
-            'pickup_request' => $pickupRequest
+            'pickup_request' => $pickupRequest,
         ], 200);
     }
 
@@ -167,37 +167,37 @@ class PickupRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
         // Find the pickup request
         $pickupRequest = ServiceRequestProductPickup::find($id);
 
-        if (!$pickupRequest) {
+        if (! $pickupRequest) {
             return response()->json(['success' => false, 'message' => 'Pickup request not found.'], 404);
         }
 
         // Verify the user has access to this pickup request
-        if ($pickupRequest->assigned_person_type !== $roleName || 
+        if ($pickupRequest->assigned_person_type !== $roleName ||
             $pickupRequest->assigned_person_id != $request->user_id) {
             return response()->json([
-                'success' => false, 
-                'message' => 'You do not have access to this pickup request.'
+                'success' => false,
+                'message' => 'You do not have access to this pickup request.',
             ], 403);
         }
 
         // Check if already accepted/approved
         if ($pickupRequest->status === 'approved') {
             return response()->json([
-                'success' => false, 
-                'message' => 'Pickup request is already approved.'
+                'success' => false,
+                'message' => 'Pickup request is already approved.',
             ], 400);
         }
 
@@ -210,7 +210,7 @@ class PickupRequestController extends Controller
             $updatedCount = ServiceRequestProductPickup::where('request_id', $serviceRequestId)
                 ->update([
                     'status' => 'approved',
-                    'approved_at' => now()
+                    'approved_at' => now(),
                 ]);
 
             DB::commit();
@@ -218,16 +218,16 @@ class PickupRequestController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Pickup request accepted successfully. All products for this service have been approved.',
-                'approved_count' => $updatedCount
+                'approved_count' => $updatedCount,
             ], 200);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error accepting pickup request: ' . $e->getMessage());
-            
+            Log::error('Error accepting pickup request: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while accepting the pickup request.'
+                'message' => 'An error occurred while accepting the pickup request.',
             ], 500);
         }
     }
@@ -246,59 +246,59 @@ class PickupRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
         // Find the pickup request
         $pickupRequest = ServiceRequestProductPickup::with(['serviceRequest.customer'])->find($id);
 
-        if (!$pickupRequest) {
+        if (! $pickupRequest) {
             return response()->json(['success' => false, 'message' => 'Pickup request not found.'], 404);
         }
 
         // Verify the user has access to this pickup request
-        if ($pickupRequest->assigned_person_type !== $roleName || 
+        if ($pickupRequest->assigned_person_type !== $roleName ||
             $pickupRequest->assigned_person_id != $request->user_id) {
             return response()->json([
-                'success' => false, 
-                'message' => 'You do not have access to this pickup request.'
+                'success' => false,
+                'message' => 'You do not have access to this pickup request.',
             ], 403);
         }
 
         // Check if status is approved
         if ($pickupRequest->status !== 'approved') {
             return response()->json([
-                'success' => false, 
-                'message' => 'Pickup request must be approved before sending OTP.'
+                'success' => false,
+                'message' => 'Pickup request must be approved before sending OTP.',
             ], 400);
         }
 
         try {
             // Generate 4-digit OTP
             $otp = rand(1000, 9999);
-            
+
             // Update pickup request with OTP and expiry (5 minutes)
             $pickupRequest->update([
                 'otp' => $otp,
-                'otp_expiry' => now()->addMinutes(5)
+                'otp_expiry' => now()->addMinutes(5),
             ]);
 
             // Get customer phone number for SMS
             $customer = $pickupRequest->serviceRequest->customer;
-            
+
             if ($customer && $customer->phone) {
                 // Log OTP for debugging (in production, send via SMS)
                 Log::info('Pickup OTP generated', [
                     'pickup_id' => $id,
                     'otp' => $otp,
-                    'customer_phone' => $customer->phone
+                    'customer_phone' => $customer->phone,
                 ]);
 
                 // TODO: Send OTP via SMS service (Fast2SMS, etc.)
@@ -309,15 +309,15 @@ class PickupRequestController extends Controller
                 'success' => true,
                 'message' => 'OTP sent successfully.',
                 'otp' => $otp,
-                'otp_expires_in_seconds' => 300 // 5 minutes
+                'otp_expires_in_seconds' => 300, // 5 minutes
             ], 200);
 
         } catch (\Exception $e) {
-            Log::error('Error sending pickup OTP: ' . $e->getMessage());
-            
+            Log::error('Error sending pickup OTP: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while sending OTP.'
+                'message' => 'An error occurred while sending OTP.',
             ], 500);
         }
     }
@@ -337,45 +337,45 @@ class PickupRequestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $roleName = $this->getRoleId($request->role_id);
 
-        if (!$roleName) {
+        if (! $roleName) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
         // Find the pickup request
         $pickupRequest = ServiceRequestProductPickup::find($id);
 
-        if (!$pickupRequest) {
+        if (! $pickupRequest) {
             return response()->json(['success' => false, 'message' => 'Pickup request not found.'], 404);
         }
 
         // Verify the user has access to this pickup request
-        if ($pickupRequest->assigned_person_type !== $roleName || 
+        if ($pickupRequest->assigned_person_type !== $roleName ||
             $pickupRequest->assigned_person_id != $request->user_id) {
             return response()->json([
-                'success' => false, 
-                'message' => 'You do not have access to this pickup request.'
+                'success' => false,
+                'message' => 'You do not have access to this pickup request.',
             ], 403);
         }
 
         // Check if OTP matches
         if ($pickupRequest->otp !== $request->otp) {
             return response()->json([
-                'success' => false, 
-                'message' => 'Invalid OTP.'
+                'success' => false,
+                'message' => 'Invalid OTP.',
             ], 400);
         }
 
         // Check if OTP has expired
         if (now()->gt($pickupRequest->otp_expiry)) {
             return response()->json([
-                'success' => false, 
-                'message' => 'OTP has expired. Please request a new OTP.'
+                'success' => false,
+                'message' => 'OTP has expired. Please request a new OTP.',
             ], 400);
         }
 
@@ -386,7 +386,7 @@ class PickupRequestController extends Controller
                 'otp' => null,
                 'otp_expiry' => null,
                 'status' => 'picked',
-                'picked_at' => now()
+                'picked_at' => now(),
             ]);
 
             // Check and update service request status based on return/pickup/product conditions
@@ -396,16 +396,16 @@ class PickupRequestController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'OTP verified successfully. Pickup status updated to picked.'
+                'message' => 'OTP verified successfully. Pickup status updated to picked.',
             ], 200);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error verifying pickup OTP: ' . $e->getMessage());
-            
+            Log::error('Error verifying pickup OTP: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while verifying OTP.'
+                'message' => 'An error occurred while verifying OTP.',
             ], 500);
         }
     }
@@ -416,12 +416,12 @@ class PickupRequestController extends Controller
     public function index()
     {
         $status = request()->get('status', 'all');
-        
+
         $query = ServiceRequestProductPickup::with([
             'serviceRequestProduct',
             'serviceRequest',
             'assignedPerson',
-            'assignedEngineer.engineer'
+            'assignedEngineer.engineer',
         ])->whereHas('serviceRequest');
 
         if ($status !== 'all') {
@@ -442,7 +442,7 @@ class PickupRequestController extends Controller
             'serviceRequestProduct',
             'serviceRequest.customer',
             'assignedPerson',
-            'assignedEngineer.engineer'
+            'assignedEngineer.engineer',
         ])->findOrFail($id);
 
         return view('/crm/pickup-requests/view', compact('pickup'));

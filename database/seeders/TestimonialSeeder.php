@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class TestimonialSeeder extends Seeder
 {
@@ -26,7 +25,7 @@ class TestimonialSeeder extends Seeder
                 'source' => 'web',
                 'is_verified' => 1,
                 'is_featured' => 1,
-                'is_active' => "active",
+                'is_active' => 'active',
                 'display_order' => 1,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -40,7 +39,7 @@ class TestimonialSeeder extends Seeder
                 'source' => 'email',
                 'is_verified' => 1,
                 'is_featured' => 0,
-                'is_active' => "active",
+                'is_active' => 'active',
                 'display_order' => 2,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -54,7 +53,7 @@ class TestimonialSeeder extends Seeder
                 'source' => 'mobile',
                 'is_verified' => 1,
                 'is_featured' => 1,
-                'is_active' => "active",
+                'is_active' => 'active',
                 'display_order' => 3,
                 'created_at' => $now,
                 'updated_at' => $now,

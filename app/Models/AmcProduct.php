@@ -3,10 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class AmcProduct extends Model
 {
     //
+    use LogsActivity;
+
     protected $fillable = [
         'amc_id',
         'name',
@@ -20,8 +24,35 @@ class AmcProduct extends Model
         'description',
         'status',
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
+
+
+    /**
+     * Configure activity logging options.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'amc_id',
+                'name',
+                'type',
+                'model_no',
+                'sku',
+                'hsn',
+                'purchase_date',
+                'brand',
+                'images',
+                'description',
+                'status',
+                'created_at',
+                'updated_at',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "AMC {$eventName}");
+    }
 
     protected $casts = [
         'images' => 'array',

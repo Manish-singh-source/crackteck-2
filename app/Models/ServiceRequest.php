@@ -18,10 +18,10 @@ class ServiceRequest extends Model
         'customer_id',
         'customer_address_id',
         'request_date',
-        'request_source',   
+        'request_source',
         'visit_date',
         'reschedule_date',
-        'created_by',   
+        'created_by',
         'is_engineer_assigned',
         'status',
         'amc_plan_id',
@@ -109,9 +109,9 @@ class ServiceRequest extends Model
         return $this->hasMany(ServiceRequestProductReturn::class, 'request_id');
     }
 
-    //  
-    public function amcScheduleMeetings() {
+    //
+    public function amcScheduleMeetings()
+    {
         return $this->hasMany(AmcScheduleMeeting::class, 'service_request_id')->orderBy('visits_count', 'asc');
     }
 }
-    

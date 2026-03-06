@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ApiResponse;
+use App\Helpers\FileUpload;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
-use App\Models\DeliveryMan;
-use App\Models\Engineer;
-use App\Models\SalesPerson;
 use App\Models\Staff;
-use App\Models\StaffAddress;
 use App\Models\StaffAadharDetail;
+use App\Models\StaffAddress;
 use App\Models\StaffBankDetail;
 use App\Models\StaffPanCardDetail;
 use App\Models\StaffPoliceVerification;
@@ -17,8 +16,6 @@ use App\Models\StaffVehicleDetail;
 use App\Models\StaffWorkSkill;
 use App\Services\Fast2smsService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -82,7 +79,7 @@ class ApiAuthController extends Controller
 
             return false;
         } catch (\Exception $e) {
-            Log::error('Fast2SMS Exception: ' . $e->getMessage());
+            Log::error('Fast2SMS Exception: '.$e->getMessage());
 
             return false;
         }
@@ -171,18 +168,12 @@ class ApiAuthController extends Controller
             if ($request->filled('pan_no')) {
                 $panFront = null;
                 if ($request->hasFile('pan_card_front_path')) {
-                    $file = $request->file('pan_card_front_path');
-                    $filename = time() . '_pan_front.' . $file->getClientOriginalExtension();
-                    $file->move(public_path('uploads/pan_card'), $filename);
-                    $panFront = 'uploads/pan_card/' . $filename;
+                    $panFront = FileUpload::fileUpload($request->file('pan_card_front_path'), 'uploads/pan_card/');
                 }
 
                 $panBack = null;
                 if ($request->hasFile('pan_card_back_path')) {
-                    $file = $request->file('pan_card_back_path');
-                    $filename = time() . '_pan_back.' . $file->getClientOriginalExtension();
-                    $file->move(public_path('uploads/pan_card'), $filename);
-                    $panBack = 'uploads/pan_card/' . $filename;
+                    $panBack = FileUpload::fileUpload($request->file('pan_card_back_path'), 'uploads/pan_card/');
                 }
 
                 $customer->panCardDetails()->create([
@@ -200,18 +191,12 @@ class ApiAuthController extends Controller
             if ($request->filled('aadhar_number')) {
                 $aadharFront = null;
                 if ($request->hasFile('aadhar_front_path')) {
-                    $file = $request->file('aadhar_front_path');
-                    $filename = time() . '_aadhar_front.' . $file->getClientOriginalExtension();
-                    $file->move(public_path('uploads/aadhar_card'), $filename);
-                    $aadharFront = 'uploads/aadhar_card/' . $filename;
+                    $aadharFront = FileUpload::fileUpload($request->file('aadhar_front_path'), 'uploads/aadhar_card/');
                 }
 
                 $aadharBack = null;
                 if ($request->hasFile('aadhar_back_path')) {
-                    $file = $request->file('aadhar_back_path');
-                    $filename = time() . '_aadhar_back.' . $file->getClientOriginalExtension();
-                    $file->move(public_path('uploads/aadhar_card'), $filename);
-                    $aadharBack = 'uploads/aadhar_card/' . $filename;
+                    $aadharBack = FileUpload::fileUpload($request->file('aadhar_back_path'), 'uploads/aadhar_card/');
                 }
 
                 $customer->aadharDetails()->create([
@@ -294,130 +279,41 @@ class ApiAuthController extends Controller
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
-        // // Handle file uploads for Aadhar
-        // if ($request->hasFile('aadhar_front_path')) {
-        //     $file = $request->file('aadhar_front_path');
-        //     $filename = time() . '_aadhar_front.' . $file->getClientOriginalExtension();
-        //     $file->move(public_path('uploads/aadhar_card'), $filename);
-        //     $request->merge(['aadhar_front_path' => 'uploads/aadhar_card/' . $filename]);
-        // }
-
-        // if ($request->hasFile('aadhar_back_path')) {
-        //     $file = $request->file('aadhar_back_path');
-        //     $filename = time() . '_aadhar_back.' . $file->getClientOriginalExtension();
-        //     $file->move(public_path('uploads/aadhar_card'), $filename);
-        //     $request->merge(['aadhar_back_path' => 'uploads/aadhar_card/' . $filename]);
-        // }
-
-        // // Handle file uploads for PAN Card
-        // if ($request->hasFile('pan_card_front_path')) {
-        //     $file = $request->file('pan_card_front_path');
-        //     $filename = time() . '_pan_front.' . $file->getClientOriginalExtension();
-        //     $file->move(public_path('uploads/pan_card'), $filename);
-        //     $request->merge(['pan_card_front_path' => 'uploads/pan_card/' . $filename]);
-        // }
-
-        // if ($request->hasFile('pan_card_back_path')) {
-        //     $file = $request->file('pan_card_back_path');
-        //     $filename = time() . '_pan_back.' . $file->getClientOriginalExtension();
-        //     $file->move(public_path('uploads/pan_card'), $filename);
-        //     $request->merge(['pan_card_back_path' => 'uploads/pan_card/' . $filename]);
-        // }
-
-        // // Handle file uploads for Driving License
-        // $drivingLicenseFront = null;
-        // if ($request->hasFile('driving_license_front_path')) {
-        //     $file = $request->file('driving_license_front_path');
-        //     $filename = time() . '_driving_license_front.' . $file->getClientOriginalExtension();
-        //     $file->move(public_path('uploads/driving_license'), $filename);
-        //     $drivingLicenseFront = 'uploads/driving_license/' . $filename;
-        // }
-
-        // $drivingLicenseBack = null;
-        // if ($request->hasFile('driving_license_back_path')) {
-        //     $file = $request->file('driving_license_back_path');
-        //     $filename = time() . '_driving_license_back.' . $file->getClientOriginalExtension();
-        //     $file->move(public_path('uploads/driving_license'), $filename);
-        //     $drivingLicenseBack = 'uploads/driving_license/' . $filename;
-        // }
-
-        // // Handle file uploads for Police Certificate
-        // $policeCertificate = null;
-        // if ($request->hasFile('police_certificate')) {
-        //     $file = $request->file('police_certificate');
-        //     $filename = time() . '_police_certificate.' . $file->getClientOriginalExtension();
-        //     $file->move(public_path('uploads/police_certificate'), $filename);
-        //     $policeCertificate = 'uploads/police_certificate/' . $filename;
-        // }
-
-        // // Handle file uploads for Passbook
-        // $passbookPic = null;
-        // if ($request->hasFile('passbook_pic')) {
-        //     $file = $request->file('passbook_pic');
-        //     $filename = time() . '_passbook.' . $file->getClientOriginalExtension();
-        //     $file->move(public_path('uploads/passbook'), $filename);
-        //     $passbookPic = 'uploads/passbook/' . $filename;
-        // }
-
         if ($request->hasFile('aadhar_front_path')) {
-            $file = $request->file('aadhar_front_path');
-            $filename = time() . '_aadhar_front.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/crm/staff/aadhar'), $filename);
-            $aadharFrontPath = 'uploads/crm/staff/aadhar/' . $filename;
+            $aadharFrontPath = FileUpload::fileUpload($request->file('aadhar_front_path'), 'uploads/crm/staff/aadhar/');
         }
 
         if ($request->hasFile('aadhar_back_path')) {
-            $file = $request->file('aadhar_back_path');
-            $filename = time() . '_aadhar_back.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/crm/staff/aadhar'), $filename);
-            $aadharBackPath = 'uploads/crm/staff/aadhar/' . $filename;
+            $aadharBackPath = FileUpload::fileUpload($request->file('aadhar_back_path'), 'uploads/crm/staff/aadhar/');
         }
 
         if ($request->hasFile('pan_card_front_path')) {
-            $file = $request->file('pan_card_front_path');
-            $filename = time() . 'pan_front.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/crm/staff/pan'), $filename);
-            $panFrontPath = 'uploads/crm/staff/pan/' . $filename;
+            $panFrontPath = FileUpload::fileUpload($request->file('pan_card_front_path'), 'uploads/crm/staff/pan/');
         }
 
         if ($request->hasFile('pan_card_back_path')) {
-            $file = $request->file('pan_card_back_path');
-            $filename = time() . 'pan_back.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/crm/staff/pan'), $filename);
-            $panBackPath = 'uploads/crm/staff/pan/' . $filename;
+            $panBackPath = FileUpload::fileUpload($request->file('pan_card_back_path'), 'uploads/crm/staff/pan/');
         }
 
         if ($request->hasFile('driving_license_front_path')) {
-            $file = $request->file('driving_license_front_path');
-            $filename = time() . 'driving_license_front.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/crm/staff/drivingLicense'), $filename);
-            $drivingLicenseFrontPath = 'uploads/crm/staff/drivingLicense/' . $filename;
+            $drivingLicenseFrontPath = FileUpload::fileUpload($request->file('driving_license_front_path'), 'uploads/crm/staff/drivingLicense/');
         }
 
         if ($request->hasFile('driving_license_back_path')) {
-            $file = $request->file('driving_license_back_path');
-            $filename = time() . 'driving_license_back.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/crm/staff/drivingLicense'), $filename);
-            $drivingLicenseBackPath = 'uploads/crm/staff/drivingLicense/' . $filename;
+            $drivingLicenseBackPath = FileUpload::fileUpload($request->file('driving_license_back_path'), 'uploads/crm/staff/drivingLicense/');
         }
 
         if ($request->hasFile('passbook_pic')) {
-            $file = $request->file('passbook_pic');
-            $filename = time() . 'passbook_pic.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/crm/staff/passbookPic'), $filename);
-            $passbookPic = 'uploads/crm/staff/passbookPic/' . $filename;
+            $passbookPic = FileUpload::fileUpload($request->file('passbook_pic'), 'uploads/crm/staff/passbookPic/');
         }
 
         if ($request->hasFile('police_certificate')) {
-            $file = $request->file('police_certificate');
-            $filename = time() . 'police_certificate.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/crm/staff/policeCertificate'), $filename);
-            $policeCertificate = 'uploads/crm/staff/policeCertificate/' . $filename;
+            $policeCertificate = FileUpload::fileUpload($request->file('police_certificate'), 'uploads/crm/staff/policeCertificate/');
         }
 
         // Create Staff
         $staff = Staff::create([
-            'staff_code' => 'STF' . time() . rand(100, 999),
+            'staff_code' => 'STF'.time().rand(100, 999),
             'staff_role' => $staffRole,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -548,7 +444,7 @@ class ApiAuthController extends Controller
                     ->first();
             }
             if (! $user) {
-                return response()->json(['success' => false, 'message' => 'User not found with the provided phone number and role.'], 404);
+                return response()->json(['success' => false, 'message' => 'User not found with the provided phone number.'], 404);
             }
 
             $otp = rand(1000, 9999);
@@ -578,7 +474,7 @@ class ApiAuthController extends Controller
                     'otp' => $otp, // For testing only
                 ], 200);
             } else {
-                Log::error('OTP sending failed for phone: ' . $user->phone);
+                Log::error('OTP sending failed for phone: '.$user->phone);
 
                 return response()->json([
                     'success' => false,
@@ -590,7 +486,7 @@ class ApiAuthController extends Controller
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            Log::error('Login error: ' . $e->getMessage());
+            Log::error('Login error: '.$e->getMessage());
 
             return response()->json(['success' => false, 'message' => 'An error occurred during login', 'error' => $e->getMessage()], 500);
         }
@@ -619,11 +515,10 @@ class ApiAuthController extends Controller
 
             if ($staffRole == 'delivery_man') {
 
-
                 $user = Staff::with('vehicleDetails')->where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
 
-                if (!$user->vehicleDetails) {
-                    return response()->json(['error' => 'Vehical Details Not Found']);
+                if (! $user->vehicleDetails) {
+                    return response()->json(['success' => false, 'message' => 'Vehical Details Not Found'], 401);
                 }
             } else {
                 $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
@@ -631,7 +526,7 @@ class ApiAuthController extends Controller
         }
 
         if (! $user || $user->otp != $request->otp || now()->gt($user->otp_expiry)) {
-            return response()->json(['error' => 'Invalid or expired OTP'], 401);
+            return response()->json(['success' => false, 'message' => 'Invalid or expired OTP'], 401);
         }
 
         $user->otp = null; // reset OTP after verification
@@ -668,62 +563,66 @@ class ApiAuthController extends Controller
             auth()->guard('staff_api')->logout();
         }
 
-        return response()->json(['success' => true, 'message' => 'User logged out successfully']);
+        return response()->json(['success' => true, 'message' => 'User logged out successfully'], 200);
     }
-
-    // public function updateToken(Request $request)
-    // {
-    //     $user = auth()->guard('staff_api')->user();
-    //     if (!$user) {
-    //         $user = auth()->guard('customer_api')->user();
-    //     }
-    //     if ($user) {
-    //         $user->device_token = $request->token;
-    //         $user->save();
-    //     }
-
-    //     return response()->json(['success' => true, 'message' => 'Token updated']);
-    // }
 
     public function refreshToken(Request $request)
     {
-        // attempt to refresh with each guard until one works
-        $guards = ['staff_api', 'customer_api'];
-        $newToken = null;
-        $usedGuard = null;
+        try {
+            $validated = Validator::make($request->all(), [
+                'user_id' => 'required',
+                'role_id' => 'required|in:1,2,3,4',
+            ]);
 
-        foreach ($guards as $g) {
-            try {
-                // refresh uses the token from the Authorization header; if it's invalid or expired the
-                // underlying JWT library will throw an exception which we catch and try the next guard.
-                $newToken = auth()->guard($g)->refresh();
-                $usedGuard = $g;
-                break;
-            } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-                // token is expired but within refresh_ttl, still returns new token; unpredictably we may
-                // not reach here because refresh itself will succeed, so ignore.
-            } catch (\Exception $e) {
-                // failed for this guard, try next one
-                continue;
+            if ($validated->fails()) {
+                return ApiResponse::error('Validation failed.', 422, $validated->errors());
             }
+
+            // Determine guard based on role_id
+            if ($request->role_id == 4) {
+                $guard = 'customer_api';
+            } else {
+                $guard = 'staff_api';
+            }
+
+            // Get authenticated user with current token
+            $user = auth()->guard($guard)->user();
+
+            if (! $user) {
+                return ApiResponse::error('Invalid or expired token. Please login again.', 401);
+            }
+
+            // Attempt to refresh the token
+            $newToken = auth()->guard($guard)->refresh();
+
+            if (! $newToken) {
+                return ApiResponse::error('Unable to refresh token. Please try logging in again.', 401);
+            }
+
+            // Retrieve user with the new token
+            $refreshedUser = auth()->guard($guard)->setToken($newToken)->user();
+
+            if (! $refreshedUser) {
+                return ApiResponse::error('Token refresh failed. User not found after token refresh.', 401);
+            }
+
+            $data = [
+                'token' => $newToken,
+                'user' => $refreshedUser,
+            ];
+
+            return ApiResponse::success($data, 'Token refreshed successfully.', 200);
+        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+            return ApiResponse::error('Token has expired. Please login again.', 401);
+        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+            return ApiResponse::error('Invalid token provided. Please login again.', 401);
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return ApiResponse::error('Token error: '.$e->getMessage(), 401);
+        } catch (\Exception $e) {
+            Log::error('Token refresh error: '.$e->getMessage());
+
+            return ApiResponse::error('An error occurred while refreshing token.', 500);
         }
-
-        if (! $newToken) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unable to refresh token. Make sure a valid token is provided.'
-            ], 401);
-        }
-
-        // retrieve user from the guard using the new token, just in case the previous user lookup fails
-        $user = auth()->guard($usedGuard)->setToken($newToken)->user();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Token refreshed successfully',
-            'token' => $newToken,
-            'user' => $user,
-        ]);
     }
 
     public function generateCustomerCode()
@@ -736,6 +635,6 @@ class ApiAuthController extends Controller
             $number = 1;
         }
 
-        return 'CST-' . str_pad($number, 6, '0', STR_PAD_LEFT);
+        return 'CUST-'.str_pad($number, 6, '0', STR_PAD_LEFT);
     }
 }

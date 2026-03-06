@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('quotation_invoice_items', function (Blueprint $table) {
             //
-            // Snapshot of product details at time of invoice            
+            // Snapshot of product details at time of invoice
             $table->string('name')->nullable();
             $table->string('type')->nullable();
             $table->string('model_no')->nullable();

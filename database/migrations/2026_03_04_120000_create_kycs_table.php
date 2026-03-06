@@ -25,7 +25,7 @@ return new class extends Migration
             $table->timestamp('approved_at')->nullable();
             $table->timestamp('rejected_at')->nullable();
             $table->timestamps();
-            
+
             // Add indexes for better query performance
             $table->index('status');
             $table->index('phone');

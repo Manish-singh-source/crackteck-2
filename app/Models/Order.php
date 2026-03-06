@@ -8,12 +8,19 @@ class Order extends Model
 {
     // New status constants for delivery tracking
     const STATUS_PENDING = 'pending';
+
     const STATUS_ADMIN_APPROVED = 'admin_approved';
+
     const STATUS_ASSIGNED_DELIVERY_MAN = 'assigned_delivery_man';
+
     const STATUS_ORDER_ACCEPTED = 'order_accepted';
+
     const STATUS_PRODUCT_TAKEN = 'product_taken';
+
     const STATUS_DELIVERED = 'delivered';
+
     const STATUS_CANCELLED = 'cancelled';
+
     const STATUS_RETURNED = 'returned';
 
     // Array of all status options
@@ -129,7 +136,7 @@ class Order extends Model
         $date = date('Ymd');
         $random = strtoupper(substr(md5(uniqid()), 0, 6));
 
-        return $prefix . '-' . $date . '-' . $random;
+        return $prefix.'-'.$date.'-'.$random;
     }
 
     /**

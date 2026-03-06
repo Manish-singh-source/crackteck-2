@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\ServiceRequest;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\ServiceRequest;
 
 class ServiceRequestPaymentSeeder extends Seeder
 {
@@ -35,7 +34,7 @@ class ServiceRequestPaymentSeeder extends Seeder
 
             $payments[] = [
                 'service_request_id' => $req->id,
-                'transaction_id' => 'SRP-' . strtoupper(uniqid()),
+                'transaction_id' => 'SRP-'.strtoupper(uniqid()),
                 'total_amount' => $total,
                 'payment_gateway' => 'manual',
                 'payment_method' => 'online',
@@ -46,7 +45,7 @@ class ServiceRequestPaymentSeeder extends Seeder
             ];
         }
 
-        if (!empty($payments)) {
+        if (! empty($payments)) {
             DB::table('service_request_payments')->insert($payments);
         }
     }

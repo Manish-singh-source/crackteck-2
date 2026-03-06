@@ -302,8 +302,8 @@
                         role="button" aria-haspopup="false" aria-expanded="false">
                         <img src="{{ asset('assets/images/users/user-13.jpg') }}" alt="user-image"
                             class="rounded-circle" />
-                        <span class="d-none d-sm-inline-block pro-user-name ms-1">{{ Auth::user()->name ?? 'Guest' }} <i
-                                class="mdi mdi-chevron-down"></i></span>
+                        <span class="d-none d-sm-inline-block pro-user-name ms-1">{{ Auth::guard('staff_web')->user()->first_name ?? 'Guest' }} <i
+                                class="mdi mdi-chevron-down"></i></span>    
                     </a>
                     <div class="dropdown-menu dropdown-menu-end profile-dropdown">
                         <!-- item-->

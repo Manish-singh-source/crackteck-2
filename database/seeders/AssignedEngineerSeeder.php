@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use App\Models\ServiceRequest;
 use App\Models\Staff;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class AssignedEngineerSeeder extends Seeder
 {
@@ -53,7 +53,7 @@ class AssignedEngineerSeeder extends Seeder
             ];
         }
 
-        if (!empty($assignments)) {
+        if (! empty($assignments)) {
             DB::table('assigned_engineers')->insert($assignments);
         }
     }

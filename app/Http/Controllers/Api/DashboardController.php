@@ -3,15 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
-use App\Models\DeliveryMan;
-use App\Models\EcommerceOrder;
-use App\Models\Engineer;
 use App\Models\FollowUp;
 use App\Models\Lead;
 use App\Models\Meet;
 use App\Models\Order;
-use App\Models\SalesPerson;
 use App\Models\WebsiteBanner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -29,12 +24,8 @@ class DashboardController extends Controller
         ][$roleId] ?? null;
     }
 
-    // Dashboard data based on role 
-    // role_id: 1 => engineer, 2 => delivery man completed 
-    // 3 => sales person, 4 => customers pending 
     public function index(Request $request)
     {
-
         $validated = Validator::make($request->all(), [
             'role_id' => 'nullable|in:1,2,3,4',
             'user_id' => 'required',
@@ -112,7 +103,8 @@ class DashboardController extends Controller
         if ($validated->fails()) {
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
-        $banners = WebsiteBanner::where('is_active', "1")->where('channel', 'mobile')->get();
+        $banners = WebsiteBanner::where('is_active', '1')->where('channel', 'mobile')->get();
+
         return response()->json(['banners' => $banners], 200);
     }
 }

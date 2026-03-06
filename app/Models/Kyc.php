@@ -46,18 +46,26 @@ class Kyc extends Model
      * Status constants
      */
     const STATUS_PENDING = 'pending';
+
     const STATUS_SUBMITTED = 'submitted';
+
     const STATUS_UNDER_REVIEW = 'under_review';
+
     const STATUS_APPROVED = 'approved';
+
     const STATUS_REJECTED = 'rejected';
+
     const STATUS_RESUBMIT_REQUIRED = 'resubmit_required';
 
     /**
      * Document types constants
      */
     const DOCUMENT_AADHAR = 'aadhar';
+
     const DOCUMENT_PAN = 'pan';
+
     const DOCUMENT_DRIVING_LICENSE = 'driving_license';
+
     const DOCUMENT_POLICE_VERIFICATION_CERTIFICATE = 'police_verification_certificate';
 
     /**
@@ -172,8 +180,9 @@ class Kyc extends Model
     public function getDocumentFileUrlAttribute()
     {
         if ($this->document_file) {
-            return asset('storage/' . $this->document_file);
+            return asset('storage/'.$this->document_file);
         }
+
         return null;
     }
 

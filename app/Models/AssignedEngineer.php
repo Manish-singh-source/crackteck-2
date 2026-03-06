@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class AssignedEngineer extends Model
 {
     //
-    use SoftDeletes;
+    use SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'service_request_id',
@@ -32,6 +34,34 @@ class AssignedEngineer extends Model
         'transferred_at' => 'datetime',
         'engineer_approved_at' => 'datetime',
     ];
+
+
+    /**
+     * Configure activity logging options.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'service_request_id',
+                'amc_schedule_meeting_id',
+                'engineer_id',
+                'assignment_type',
+                'assigned_at',
+                'transferred_to',
+                'transferred_at',
+                'group_name',
+                'is_supervisor',
+                'notes',
+                'status',
+                'is_approved_by_engineer',
+                'engineer_approved_at',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "AMC {$eventName}");
+    }
+
 
     public function serviceRequest()
     {

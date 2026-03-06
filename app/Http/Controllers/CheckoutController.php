@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Coupon;
 use App\Models\CustomerAddressDetail;
-use App\Models\EcommerceOrder;
-use App\Models\EcommerceOrderItem;
 use App\Models\EcommerceProduct;
 use App\Models\InventoryUpdateLog;
 use App\Models\Order;
@@ -14,7 +12,6 @@ use App\Models\OrderItem;
 use App\Models\OrderPayment;
 use App\Models\Product;
 use App\Models\ReturnOrder;
-use App\Models\UserAddress;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -93,7 +90,7 @@ class CheckoutController extends Controller
 
             // Create a cart-like structure for consistency
             $item = (object) [
-                'id' => 'buy_now_' . $productId,
+                'id' => 'buy_now_'.$productId,
                 'ecommerce_product_id' => $product->id,
                 'quantity' => $quantity,
                 'ecommerceProduct' => $product,
@@ -191,7 +188,7 @@ class CheckoutController extends Controller
             'addresses' => $addresses->map(function ($address) {
                 return [
                     'id' => $address->id,
-                    'label' => $address->label ?? 'Address ' . $address->id,
+                    'label' => $address->label ?? 'Address '.$address->id,
                     'full_name' => $address->full_name,
                     'formatted_address' => $address->formatted_address,
                     'first_name' => $address->first_name,
@@ -239,7 +236,6 @@ class CheckoutController extends Controller
 
             'previous_address' => 'nullable|integer',
 
-
             // Billing address
             'billing_same_as_shipping' => 'boolean',
             'billing_first_name' => 'nullable|string|max:255',
@@ -267,8 +263,6 @@ class CheckoutController extends Controller
         try {
             DB::beginTransaction();
 
-
-
             // Get checkout items
             $checkoutData = $this->getCheckoutData($request);
 
@@ -286,8 +280,8 @@ class CheckoutController extends Controller
             $paymentStatus = $validated['payment_method'] === 'cod' ? 'pending' : 'completed';
             OrderPayment::create([
                 'order_id' => $order->id,
-                'payment_id' => 'PMT-' . strtoupper(uniqid()),
-                'transaction_id' => 'TXN-' . strtoupper(uniqid()),
+                'payment_id' => 'PMT-'.strtoupper(uniqid()),
+                'transaction_id' => 'TXN-'.strtoupper(uniqid()),
                 'payment_method' => $validated['payment_method'] === 'cod' ? 'cod' : 'online',
                 'payment_gateway' => $validated['payment_method'] === 'cod' ? 'cod' : 'phonepe',
                 'amount' => $totals['total'],
@@ -337,7 +331,7 @@ class CheckoutController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Checkout error: ' . $e->getMessage(), [
+            Log::error('Checkout error: '.$e->getMessage(), [
                 'customer_id' => Auth::id(),
                 'request_data' => $request->all(),
             ]);
@@ -373,7 +367,7 @@ class CheckoutController extends Controller
         // Check if any product in the order is returnable
         $isReturnable = false;
         $returnDays = 0;
-        
+
         foreach ($checkoutData['items'] as $item) {
             $ecommerceProduct = $item->ecommerceProduct;
             if ($ecommerceProduct && $ecommerceProduct->is_returnable) {
@@ -385,12 +379,12 @@ class CheckoutController extends Controller
 
         // Check if previous_address is available, if not then save the new shipping address
         $shippingAddressId = $validated['previous_address'] ?? null;
-        
+
         if (empty($shippingAddressId)) {
             // Create new address in customer_address_details table
             $customerAddress = CustomerAddressDetail::create([
                 'customer_id' => Auth::id(),
-                'branch_name' => $validated['shipping_first_name'] . ' ' . $validated['shipping_last_name'],
+                'branch_name' => $validated['shipping_first_name'].' '.$validated['shipping_last_name'],
                 'address1' => $validated['shipping_address_line_1'],
                 'address2' => $validated['shipping_address_line_2'] ?? null,
                 'city' => $validated['shipping_city'],
@@ -398,7 +392,7 @@ class CheckoutController extends Controller
                 'country' => $validated['shipping_country'],
                 'pincode' => $validated['shipping_zipcode'],
             ]);
-            
+
             $shippingAddressId = $customerAddress->id;
         }
 
@@ -599,12 +593,12 @@ class CheckoutController extends Controller
                 'message' => 'Address saved successfully!',
                 'address' => [
                     'id' => $address->id,
-                    'label' => $address->label ?? 'Address ' . $address->id,
+                    'label' => $address->label ?? 'Address '.$address->id,
                     'formatted_address' => $address->formatted_address,
                 ],
             ]);
         } catch (\Exception $e) {
-            Log::error('Address save error: ' . $e->getMessage());
+            Log::error('Address save error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -624,7 +618,7 @@ class CheckoutController extends Controller
 
         // Find order by order number and ensure it belongs to the authenticated user
         $order = Order::with([
-            'orderItems.ecommerceProduct.warehouseProduct', 
+            'orderItems.ecommerceProduct.warehouseProduct',
             'customer.addressDetails',
             'customer.primaryAddress',
             'shippingAddress',
@@ -717,39 +711,39 @@ class CheckoutController extends Controller
 
         if ($number >= 10000000) { // Crores
             $crores = (int) ($number / 10000000);
-            $result .= $this->convertNumberToWords($crores) . ' Crore ';
+            $result .= $this->convertNumberToWords($crores).' Crore ';
             $number %= 10000000;
         }
 
         if ($number >= 100000) { // Lakhs
             $lakhs = (int) ($number / 100000);
-            $result .= $this->convertNumberToWords($lakhs) . ' Lakh ';
+            $result .= $this->convertNumberToWords($lakhs).' Lakh ';
             $number %= 100000;
         }
 
         if ($number >= 1000) { // Thousands
             $thousands = (int) ($number / 1000);
-            $result .= $this->convertNumberToWords($thousands) . ' Thousand ';
+            $result .= $this->convertNumberToWords($thousands).' Thousand ';
             $number %= 1000;
         }
 
         if ($number >= 100) { // Hundreds
             $hundreds = (int) ($number / 100);
-            $result .= $words[$hundreds] . ' Hundred ';
+            $result .= $words[$hundreds].' Hundred ';
             $number %= 100;
         }
 
         if ($number >= 20) {
             $tens = (int) ($number / 10) * 10;
-            $result .= $words[$tens] . ' ';
+            $result .= $words[$tens].' ';
             $number %= 10;
         }
 
         if ($number > 0) {
-            $result .= $words[$number] . ' ';
+            $result .= $words[$number].' ';
         }
 
-        return trim($result) . ' Rupees Only';
+        return trim($result).' Rupees Only';
     }
 
     /**
@@ -766,6 +760,7 @@ class CheckoutController extends Controller
             $subtotal = $order->orderItems->sum(function ($item) {
                 $warehouseProduct = $item->ecommerceProduct->warehouseProduct ?? null;
                 $price = $warehouseProduct->final_price ?? $warehouseProduct->selling_price ?? 0;
+
                 return $price * $item->quantity;
             });
 
@@ -782,7 +777,7 @@ class CheckoutController extends Controller
             $invoiceData = [
                 'order' => $order,
                 'totals' => $totals,
-                'invoice_number' => 'INV-' . ($order->order_number ?? $order->id),
+                'invoice_number' => 'INV-'.($order->order_number ?? $order->id),
                 'invoice_date' => $order->created_at->format('d/m/Y'),
                 'amount_in_words' => $this->convertNumberToWords($totals['grand_total']),
                 'company' => [
@@ -808,12 +803,12 @@ class CheckoutController extends Controller
             ]);
 
             // Generate filename
-            $filename = 'invoice-' . ($order->order_number ?? $order->id) . '.pdf';
+            $filename = 'invoice-'.($order->order_number ?? $order->id).'.pdf';
 
             // Return PDF download response
             return $pdf->download($filename);
         } catch (\Exception $e) {
-            Log::error('Error generating invoice: ' . $e->getMessage());
+            Log::error('Error generating invoice: '.$e->getMessage());
 
             return null;
         }
@@ -846,13 +841,13 @@ class CheckoutController extends Controller
             if (! Auth::guard('customer_web')->check()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Please login to cancel order.'
+                    'message' => 'Please login to cancel order.',
                 ], 401);
             }
 
             $request->validate([
                 'order_number' => 'required|string|exists:orders,order_number',
-                'customer_notes' => 'nullable|string|max:1000'
+                'customer_notes' => 'nullable|string|max:1000',
             ]);
 
             $order = Order::where('order_number', $request->order_number)
@@ -862,12 +857,12 @@ class CheckoutController extends Controller
             if (! $order) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Order not found.'
+                    'message' => 'Order not found.',
                 ], 404);
             }
 
             // Debug: log the current status
-            Log::info('Order status: ' . $order->status . ' - Customer ID: ' . Auth::id());
+            Log::info('Order status: '.$order->status.' - Customer ID: '.Auth::id());
 
             // Check if order can be cancelled
             $cancellableStatuses = [
@@ -881,7 +876,7 @@ class CheckoutController extends Controller
             if (! in_array($order->status, $cancellableStatuses)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'This order cannot be cancelled. Current status: ' . $order->status
+                    'message' => 'This order cannot be cancelled. Current status: '.$order->status,
                 ], 400);
             }
 
@@ -894,14 +889,14 @@ class CheckoutController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Order cancelled successfully.'
+                'message' => 'Order cancelled successfully.',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error cancelling order: ' . $e->getMessage() . ' - ' . $e->getTraceAsString());
+            Log::error('Error cancelling order: '.$e->getMessage().' - '.$e->getTraceAsString());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
+                'message' => 'Error: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -914,13 +909,13 @@ class CheckoutController extends Controller
         if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please login to return order.'
+                'message' => 'Please login to return order.',
             ], 401);
         }
 
         $request->validate([
             'order_number' => 'required|string|exists:orders,order_number',
-            'customer_notes' => 'nullable|string|max:1000'
+            'customer_notes' => 'nullable|string|max:1000',
         ]);
 
         $order = Order::where('order_number', $request->order_number)
@@ -930,7 +925,7 @@ class CheckoutController extends Controller
         if (! $order) {
             return response()->json([
                 'success' => false,
-                'message' => 'Order not found.'
+                'message' => 'Order not found.',
             ], 404);
         }
 
@@ -938,7 +933,7 @@ class CheckoutController extends Controller
         if ($order->status !== Order::STATUS_DELIVERED) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only delivered orders can be returned.'
+                'message' => 'Only delivered orders can be returned.',
             ], 400);
         }
 
@@ -946,7 +941,7 @@ class CheckoutController extends Controller
         if (! $order->is_returnable) {
             return response()->json([
                 'success' => false,
-                'message' => 'This order is not returnable.'
+                'message' => 'This order is not returnable.',
             ], 400);
         }
 
@@ -956,7 +951,7 @@ class CheckoutController extends Controller
             if (now()->greaterThan($returnDeadline)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Return period has expired. You can no longer return this order.'
+                    'message' => 'Return period has expired. You can no longer return this order.',
                 ], 400);
             }
         }
@@ -969,7 +964,7 @@ class CheckoutController extends Controller
         if ($existingReturn) {
             return response()->json([
                 'success' => false,
-                'message' => 'A return request already exists for this order.'
+                'message' => 'A return request already exists for this order.',
             ], 400);
         }
 
@@ -997,16 +992,16 @@ class CheckoutController extends Controller
                 'success' => true,
                 'message' => 'Return request initiated successfully.',
                 'data' => [
-                    'return_order_number' => $returnOrder->return_order_number
-                ]
+                    'return_order_number' => $returnOrder->return_order_number,
+                ],
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error initiating return: ' . $e->getMessage());
+            Log::error('Error initiating return: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to initiate return. Please try again.'
+                'message' => 'Failed to initiate return. Please try again.',
             ], 500);
         }
     }

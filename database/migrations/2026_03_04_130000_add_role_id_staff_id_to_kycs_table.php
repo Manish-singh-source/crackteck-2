@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::table('kycs', function (Blueprint $table) {
             $table->unsignedBigInteger('role_id')->nullable()->after('document_no');
             $table->unsignedBigInteger('staff_id')->nullable()->after('role_id');
-            
+
             // Add foreign keys
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('set null');
             $table->foreign('staff_id')->references('id')->on('staff')->onDelete('set null');
-            
+
             // Add indexes
             $table->index('role_id');
             $table->index('staff_id');

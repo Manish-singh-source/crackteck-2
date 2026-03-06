@@ -15,7 +15,7 @@ return new class extends Migration
             // Add customer_approved_at and customer_rejected_at after admin_approved_at
             $table->timestamp('customer_approved_at')->nullable()->after('admin_approved_at');
             $table->timestamp('customer_rejected_at')->nullable()->after('customer_approved_at');
-            
+
             // Change status column to include new options
             $table->enum('status', [
                 'pending',
@@ -28,7 +28,7 @@ return new class extends Migration
                 'received',
                 'cancelled',
                 'returned',
-                'completed'
+                'completed',
             ])->default('pending')->change();
         });
     }
@@ -40,7 +40,7 @@ return new class extends Migration
     {
         Schema::table('service_request_product_pickups', function (Blueprint $table) {
             $table->dropColumn(['customer_approved_at', 'customer_rejected_at']);
-            
+
             // Revert status column to original values
             $table->enum('status', [
                 'pending',
@@ -51,7 +51,7 @@ return new class extends Migration
                 'received',
                 'cancelled',
                 'returned',
-                'completed'
+                'completed',
             ])->default('pending')->change();
         });
     }

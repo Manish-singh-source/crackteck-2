@@ -27,7 +27,7 @@ class StoreOrderRequest extends FormRequest
             'email' => 'required|email',
             'customer_id' => 'required|integer',
             'shipping_address_id' => 'required|integer',
-            
+
             'payment_status' => 'required|in:pending,partial,completed,failed,refunded',
             'payment_method' => 'required|in:online,cod',
 

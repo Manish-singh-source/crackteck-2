@@ -22,13 +22,13 @@ class UpdateCustomerRequest extends FormRequest
     public function rules(): array
     {
         $customerId = $this->route('id');
-        
+
         return [
             // Personal
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'email' => 'required|email|unique:customers,email,' . $customerId,
+            'email' => 'required|email|unique:customers,email,'.$customerId,
             'dob' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',
             'customer_type' => 'nullable|in:ecommerce,amc,both,offline',

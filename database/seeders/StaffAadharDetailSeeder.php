@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Staff;
 use App\Models\StaffAadharDetail;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class StaffAadharDetailSeeder extends Seeder
@@ -49,9 +48,8 @@ class StaffAadharDetailSeeder extends Seeder
             'frontend-assets/images/new-products/product-detail-4.webp',
             'frontend-assets/images/new-products/product-detail-5.webp',
             'frontend-assets/images/new-products/product-detail-6.webp',
-            'frontend-assets/images/new-products/product-detail-7.webp'
+            'frontend-assets/images/new-products/product-detail-7.webp',
         ];
-
 
         Staff::chunk(50, function ($staffs) use ($images) {
             foreach ($staffs as $staff) {

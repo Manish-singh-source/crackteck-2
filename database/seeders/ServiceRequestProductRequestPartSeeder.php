@@ -2,14 +2,13 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\AssignedEngineer;
+use App\Models\Product;
+use App\Models\ServiceRequestProduct;
+use App\Models\Staff;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\ServiceRequestProduct;
-use App\Models\AssignedEngineer;
-use App\Models\Staff;
-use App\Models\Product;
 
 class ServiceRequestProductRequestPartSeeder extends Seeder
 {
@@ -96,10 +95,10 @@ class ServiceRequestProductRequestPartSeeder extends Seeder
                 $pickedAt = (clone $baseForPick)->addHours(rand(1, 48));
             }
             if (in_array($statusKey, ['in_transit', 'delivered', 'used'])) {
-                $inTransitAt = (clone($pickedAt ?: $assignedAt))->addHours(rand(1, 72));
+                $inTransitAt = (clone ($pickedAt ?: $assignedAt))->addHours(rand(1, 72));
             }
             if (in_array($statusKey, ['delivered', 'used'])) {
-                $deliveredAt = (clone($inTransitAt ?: $pickedAt ?: $assignedAt))->addHours(rand(1, 48));
+                $deliveredAt = (clone ($inTransitAt ?: $pickedAt ?: $assignedAt))->addHours(rand(1, 48));
             }
             if ($statusKey === 'used' && $deliveredAt) {
                 $usedAt = (clone $deliveredAt)->addDays(rand(0, 5));
@@ -136,7 +135,7 @@ class ServiceRequestProductRequestPartSeeder extends Seeder
             ];
         }
 
-        if (!empty($requests)) {
+        if (! empty($requests)) {
             DB::table('service_request_product_request_parts')->insert($requests);
         }
     }

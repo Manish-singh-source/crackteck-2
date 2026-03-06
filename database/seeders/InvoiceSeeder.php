@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Order;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\Order;
 
 class InvoiceSeeder extends Seeder
 {
@@ -49,8 +49,8 @@ class InvoiceSeeder extends Seeder
             $invoices[] = [
                 'order_id' => $order->id,
                 'customer_id' => $order->customer_id,
-                'invoice_number' => 'INV-' . strtoupper(uniqid()),
-                'invoice_id' => 'INV-' . strtoupper(uniqid()),
+                'invoice_number' => 'INV-'.strtoupper(uniqid()),
+                'invoice_id' => 'INV-'.strtoupper(uniqid()),
                 'invoice_date' => $invoiceDate->toDateString(),
                 'due_date' => $dueDate->toDateString(),
                 'currency' => 'INR',
@@ -60,7 +60,7 @@ class InvoiceSeeder extends Seeder
                 'total_amount' => $total,
                 'paid_amount' => $paidAmount,
                 'status' => $status,
-                'notes' => 'Seeded invoice for order #' . $order->order_number,
+                'notes' => 'Seeded invoice for order #'.$order->order_number,
                 'invoice_document_path' => null,
                 'sent_at' => $now->toDateTimeString(),
                 'viewed_at' => $paidAmount > 0 ? $now->subDays(rand(0, 10))->toDateTimeString() : null,
@@ -70,7 +70,7 @@ class InvoiceSeeder extends Seeder
             ];
         }
 
-        if (!empty($invoices)) {
+        if (! empty($invoices)) {
             DB::table('invoices')->insert($invoices);
         }
     }

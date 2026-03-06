@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Order;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\Order;
 
 class OrderPaymentSeeder extends Seeder
 {
@@ -29,8 +29,8 @@ class OrderPaymentSeeder extends Seeder
 
             $payments[] = [
                 'order_id' => $order->id,
-                'payment_id' => 'PMT-' . strtoupper(uniqid()),
-                'transaction_id' => 'TXN-' . strtoupper(uniqid()),
+                'payment_id' => 'PMT-'.strtoupper(uniqid()),
+                'transaction_id' => 'TXN-'.strtoupper(uniqid()),
                 'payment_method' => 'online',
                 'payment_gateway' => 'phonepe',
                 'amount' => $order->total_amount,
@@ -51,7 +51,7 @@ class OrderPaymentSeeder extends Seeder
             ];
         }
 
-        if (!empty($payments)) {
+        if (! empty($payments)) {
             DB::table('order_payments')->insert($payments);
         }
 

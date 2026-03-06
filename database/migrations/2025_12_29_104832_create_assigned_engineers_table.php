@@ -25,7 +25,7 @@ return new class extends Migration
 
             $table->string('group_name')->nullable();
             $table->boolean('is_supervisor')->default(false);
-            
+
             $table->enum('status', ['active', 'inactive'])->default('active')->comment('0 - Active, 1 - Inactive');
             $table->softDeletes();
             $table->timestamps();

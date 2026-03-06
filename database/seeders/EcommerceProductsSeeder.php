@@ -38,7 +38,7 @@ class EcommerceProductsSeeder extends Seeder
                 'is_suggested' => 0,
                 'is_todays_deal' => 0,
                 'product_tags' => null,
-                'status' => "active", // Active
+                'status' => 'active', // Active
                 'created_at' => Carbon::parse('2025-10-01 10:29:49'),
                 'updated_at' => Carbon::parse('2025-10-01 10:29:49'),
             ],
@@ -66,7 +66,7 @@ class EcommerceProductsSeeder extends Seeder
                 'is_suggested' => 0,
                 'is_todays_deal' => 0,
                 'product_tags' => null,
-                'status' => "active", // Active
+                'status' => 'active', // Active
                 'created_at' => Carbon::parse('2025-10-01 10:30:06'),
                 'updated_at' => Carbon::parse('2025-10-01 10:30:06'),
             ],
@@ -94,7 +94,7 @@ class EcommerceProductsSeeder extends Seeder
                 'is_suggested' => 0,
                 'is_todays_deal' => 0,
                 'product_tags' => null,
-                'status' => "active", // Active
+                'status' => 'active', // Active
                 'created_at' => Carbon::parse('2025-10-01 10:30:21'),
                 'updated_at' => Carbon::parse('2025-10-01 10:30:21'),
             ],
@@ -124,7 +124,7 @@ class EcommerceProductsSeeder extends Seeder
             'is_todays_deal',
             'product_tags',
             'status',
-            'updated_at'
+            'updated_at',
         ]);
     }
 }

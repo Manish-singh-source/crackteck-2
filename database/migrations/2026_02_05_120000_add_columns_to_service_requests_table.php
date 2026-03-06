@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('service_requests', function (Blueprint $table) {
             // Add customer_address_id after customer_id
             $table->foreignId('customer_address_id')->nullable()->constrained('customer_address_details')->nullOnDelete()->after('customer_id');
-            
+
             // Add visit_date and reschedule_date after request_source
             $table->date('visit_date')->nullable()->after('request_source');
             $table->date('reschedule_date')->nullable()->after('visit_date');

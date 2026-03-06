@@ -9,12 +9,11 @@ class QuotationResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        
+
         $quotation = $this->whenLoaded('quotation') ? $this->quotation : null;
         $products = $this->whenLoaded('quotation.products') ? $this->quotation?->products : null;
         $customer = $this->whenLoaded('customer') ? $this->customer : null;
-        
-        
+
         $status = 'pending';
         if ($quotation->status == 'sent') {
             $status = 'pending';
@@ -32,7 +31,7 @@ class QuotationResource extends JsonResource
             'id' => $quotation->id,
             'quote_id' => $quotation->id ?? null,
             'lead_id' => $this->id ?? null,
-            
+
             'lead_number' => $this->lead_number ?? null,
             'customer_name' => $customer->first_name ?? null,
             'phone' => $customer->phone ?? null,

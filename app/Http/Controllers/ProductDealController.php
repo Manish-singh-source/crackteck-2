@@ -77,7 +77,7 @@ class ProductDealController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
 
-            return back()->with('error', 'Error creating product deal: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Error creating product deal: '.$e->getMessage())->withInput();
         }
     }
 
@@ -171,7 +171,7 @@ class ProductDealController extends Controller
             // Rollback the transaction in case of any error
             DB::rollback();
 
-            return back()->with('error', 'Error updating product deal: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Error updating product deal: '.$e->getMessage())->withInput();
         }
     }
 
@@ -183,7 +183,7 @@ class ProductDealController extends Controller
 
             return redirect()->route('product-deals.index')->with('success', 'Product deal deleted successfully!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting product deal: ' . $e->getMessage());
+            return back()->with('error', 'Error deleting product deal: '.$e->getMessage());
         }
     }
 
@@ -216,7 +216,7 @@ class ProductDealController extends Controller
                     'brand' => $product->warehouseProduct->brand->brand_title ?? 'N/A',
                     'final_price' => $product->warehouseProduct->final_price,
                     'image' => $product->warehouseProduct->main_product_image,
-                    'display_text' => $product->warehouseProduct->product_name . ' (SKU: ' . $product->sku . ')',
+                    'display_text' => $product->warehouseProduct->product_name.' (SKU: '.$product->sku.')',
                 ];
             });
 

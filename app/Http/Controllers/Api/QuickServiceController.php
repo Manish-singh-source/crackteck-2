@@ -3,12 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
-use App\Models\DeliveryMan;
-use App\Models\Engineer;
 use App\Models\QuickService;
 use App\Models\QuickServiceRequest;
-use App\Models\SalesPerson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
@@ -16,16 +12,6 @@ use Illuminate\Support\Facades\Validator;
 class QuickServiceController extends Controller
 {
     //
-    protected function getModelByRoleId($roleId)
-    {
-        return [
-            1 => Engineer::class,
-            2 => DeliveryMan::class,
-            3 => SalesPerson::class,
-            4 => Customer::class,
-        ][$roleId] ?? null;
-    }
-
     protected function getRoleId($roleId)
     {
         return [
@@ -84,7 +70,7 @@ class QuickServiceController extends Controller
         if ($staffRole == 'customers') {
             $quickService = QuickService::where('id', $id)->first();
 
-            if (!$quickService) {
+            if (! $quickService) {
                 return response()->json(['success' => false, 'message' => 'Quick service not found.'], 404);
             }
 

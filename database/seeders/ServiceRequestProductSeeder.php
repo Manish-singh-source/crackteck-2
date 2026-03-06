@@ -2,13 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\ServiceRequest;
 use App\Models\CoveredItem;
 use App\Models\Product;
+use App\Models\ServiceRequest;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ServiceRequestProductSeeder extends Seeder
 {
@@ -38,7 +37,7 @@ class ServiceRequestProductSeeder extends Seeder
                     'item_code_id' => $covered[$index % max(1, count($covered))] ?? null,
                     'service_charge' => 999.00,
                     'purchase_date' => '2024-10-15',
-                    'status' => "pending",
+                    'status' => 'pending',
                     'created_at' => $now,
                     'updated_at' => $now,
                 ],
@@ -55,7 +54,7 @@ class ServiceRequestProductSeeder extends Seeder
                     'item_code_id' => $covered[$index % max(1, count($covered))] ?? null,
                     'service_charge' => 2500.00,
                     'purchase_date' => '2024-08-01',
-                    'status' => "pending",
+                    'status' => 'pending',
                     'created_at' => $now,
                     'updated_at' => $now,
                 ],

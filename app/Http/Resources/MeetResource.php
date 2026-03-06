@@ -38,7 +38,7 @@ class MeetResource extends JsonResource
             'updated_at' => $this->updated_at->toDateTimeString(),
             'lead' => [
                 'id' => $lead->id,
-                'name' => $customer->first_name . ' ' . $customer->last_name,
+                'name' => $customer->first_name.' '.$customer->last_name,
                 'phone' => $customer->phone,
                 'email' => $customer->email,
                 'company_name' => $lead->company_name,

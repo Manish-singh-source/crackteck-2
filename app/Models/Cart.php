@@ -12,7 +12,7 @@ class Cart extends Model
     protected $fillable = [
         'customer_id',
         'ecommerce_product_id',
-        'quantity'
+        'quantity',
     ];
 
     protected $casts = [
@@ -54,8 +54,8 @@ class Cart extends Model
     public static function isInCart($userId, $productId)
     {
         return self::where('customer_id', $userId)
-                   ->where('ecommerce_product_id', $productId)
-                   ->exists();
+            ->where('ecommerce_product_id', $productId)
+            ->exists();
     }
 
     /**
@@ -64,8 +64,8 @@ class Cart extends Model
     public static function getCartItem($userId, $productId)
     {
         return self::where('customer_id', $userId)
-                   ->where('ecommerce_product_id', $productId)
-                   ->first();
+            ->where('ecommerce_product_id', $productId)
+            ->first();
     }
 
     /**
@@ -82,19 +82,19 @@ class Cart extends Model
     public static function getCartTotal($userId)
     {
         return self::with('ecommerceProduct.warehouseProduct')
-                   ->where('customer_id', $userId)
-                   ->get()
-                   ->sum(function ($cartItem) {
-                       // Ensure we have valid relationships and price
-                       if (!$cartItem->ecommerceProduct || !$cartItem->ecommerceProduct->warehouseProduct) {
-                           return 0;
-                       }
+            ->where('customer_id', $userId)
+            ->get()
+            ->sum(function ($cartItem) {
+                // Ensure we have valid relationships and price
+                if (! $cartItem->ecommerceProduct || ! $cartItem->ecommerceProduct->warehouseProduct) {
+                    return 0;
+                }
 
-                       $price = $cartItem->ecommerceProduct->warehouseProduct->selling_price ?? 0;
-                       $price = is_numeric($price) ? (float)$price : 0;
-                       $quantity = is_numeric($cartItem->quantity) ? (int)$cartItem->quantity : 0;
+                $price = $cartItem->ecommerceProduct->warehouseProduct->selling_price ?? 0;
+                $price = is_numeric($price) ? (float) $price : 0;
+                $quantity = is_numeric($cartItem->quantity) ? (int) $cartItem->quantity : 0;
 
-                       return $price * $quantity;
-                   });
+                return $price * $quantity;
+            });
     }
 }

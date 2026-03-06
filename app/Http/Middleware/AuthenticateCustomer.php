@@ -16,10 +16,10 @@ class AuthenticateCustomer
      */
     public function handle(Request $request, Closure $next, string $guard = 'customer'): Response
     {
-        if (!Auth::guard($guard)->check()) {
+        if (! Auth::guard($guard)->check()) {
             // Store the intended URL to redirect after login
             session()->put('url.intended', $request->fullUrl());
-            
+
             return redirect()->route('login');
         }
 

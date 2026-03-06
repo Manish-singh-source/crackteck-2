@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
-use Spatie\Permission\Models\Role;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\CausesActivity;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Permission\Models\Role;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Staff extends Authenticatable implements JWTSubject
 {
-    use HasFactory, AuthenticationLoggable, Notifiable;  
+    use AuthenticationLoggable, HasFactory, Notifiable, LogsActivity, CausesActivity;
 
     protected $fillable = [
         'staff_code',
@@ -27,10 +30,10 @@ class Staff extends Authenticatable implements JWTSubject
         'joining_date',
         'assigned_area',
         'status',
-        'kyc_status'
+        'kyc_status',
     ];
 
-        /**
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -42,7 +45,31 @@ class Staff extends Authenticatable implements JWTSubject
             'password' => 'hashed',
         ];
     }
-    
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'staff_code',
+                'staff_role',
+                'first_name',
+                'last_name',
+                'phone',
+                'email',
+                'dob',
+                'gender',
+                'marital_status',
+                'employment_type',
+                'joining_date',
+                'assigned_area',
+                'status',
+                'kyc_status',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "User {$eventName}");
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -53,7 +80,7 @@ class Staff extends Authenticatable implements JWTSubject
         return [];
     }
 
-    // Get Role 
+    // Get Role
     public function role()
     {
         return $this->belongsTo(Role::class, 'staff_role');

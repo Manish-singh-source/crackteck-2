@@ -16,112 +16,112 @@ class ProductVariantAttributeValuesSeeder extends Seeder
         DB::table('product_variant_attribute_values')->insert([
             // Color (attribute_id = 1)
             [
-                'attribute_id' => 1, 
+                'attribute_id' => 1,
                 'value' => 'Black',
-                'status' => "active",
+                'status' => 'active',
             ],
             [
-                'attribute_id' => 1, 
+                'attribute_id' => 1,
                 'value' => 'White',
-                'status' => "active",
+                'status' => 'active',
             ],
             [
-                'attribute_id' => 1, 
+                'attribute_id' => 1,
                 'value' => 'Blue',
-                'status' => "inactive",
+                'status' => 'inactive',
             ],
             [
-                'attribute_id' => 1, 
+                'attribute_id' => 1,
                 'value' => 'Red',
-                'status' => "active",
+                'status' => 'active',
             ],
             [
-                'attribute_id' => 1, 
+                'attribute_id' => 1,
                 'value' => 'Silver',
-                'status' => "inactive",
+                'status' => 'inactive',
             ],
 
             // Size (attribute_id = 2)
             [
-                'attribute_id' => 2, 
+                'attribute_id' => 2,
                 'value' => 'Small',
-                'status' => "inactive",
+                'status' => 'inactive',
             ],
             [
-                'attribute_id' => 2, 
+                'attribute_id' => 2,
                 'value' => 'Medium',
-                'status' => "active",
+                'status' => 'active',
             ],
             [
-                'attribute_id' => 2, 
+                'attribute_id' => 2,
                 'value' => 'Large',
-                'status' => "active",
+                'status' => 'active',
             ],
 
             // Storage (attribute_id = 3)
             [
-                'attribute_id' => 3, 
+                'attribute_id' => 3,
                 'value' => '64GB',
-                'status' => "inactive",
+                'status' => 'inactive',
             ],
             [
-                'attribute_id' => 3, 
+                'attribute_id' => 3,
                 'value' => '128GB',
-                'status' => "active",
+                'status' => 'active',
             ],
             [
-                'attribute_id' => 3, 
+                'attribute_id' => 3,
                 'value' => '256GB',
-                'status' => "active",
+                'status' => 'active',
             ],
             [
-                'attribute_id' => 3, 
+                'attribute_id' => 3,
                 'value' => '512GB',
-                'status' => "inactive",
+                'status' => 'inactive',
             ],
 
             // RAM (attribute_id = 4)
             [
-                'attribute_id' => 4, 
+                'attribute_id' => 4,
                 'value' => '4GB',
-                'status' => "active",
+                'status' => 'active',
             ],
             [
-                'attribute_id' => 4, 
+                'attribute_id' => 4,
                 'value' => '6GB',
-                'status' => "active",
+                'status' => 'active',
             ],
             [
-                'attribute_id' => 4, 
+                'attribute_id' => 4,
                 'value' => '8GB',
-                'status' => "inactive",
+                'status' => 'inactive',
             ],
             [
-                'attribute_id' => 4, 
+                'attribute_id' => 4,
                 'value' => '12GB',
-                'status' => "active",
+                'status' => 'active',
             ],
 
             // Warranty (attribute_id = 5)
             [
-                'attribute_id' => 5, 
+                'attribute_id' => 5,
                 'value' => '1 Year',
-                'status' => "active",
+                'status' => 'active',
             ],
             [
-                'attribute_id' => 5, 
+                'attribute_id' => 5,
                 'value' => '2 Years',
-                'status' => "active",
+                'status' => 'active',
             ],
             [
-                'attribute_id' => 5, 
+                'attribute_id' => 5,
                 'value' => '3 Years',
-                'status' => "inactive",
+                'status' => 'inactive',
             ],
             [
-                'attribute_id' => 5, 
+                'attribute_id' => 5,
                 'value' => 'No Warranty',
-                'status' => "active",
+                'status' => 'active',
             ],
 
             // You can continue for other attributes like Battery, Processor, Brand, etc.

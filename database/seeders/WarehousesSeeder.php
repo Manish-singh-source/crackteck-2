@@ -149,7 +149,7 @@ class WarehousesSeeder extends Seeder
 
         foreach ($warehouses as $w) {
             DB::table('warehouses')->updateOrInsert([
-                'warehouse_code' => $w['warehouse_code']
+                'warehouse_code' => $w['warehouse_code'],
             ], $w);
         }
     }

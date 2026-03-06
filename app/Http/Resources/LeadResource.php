@@ -15,14 +15,14 @@ class LeadResource extends JsonResource
     public function toArray(Request $request): array
     {
         $customer = $this->whenLoaded('customer');
-        $company  = $this->whenLoaded('companyDetails');
+        $company = $this->whenLoaded('companyDetails');
 
         return [
             'id' => $this->id,
             'lead_number' => $this->lead_number,
 
             'name' => $customer
-                ? trim($customer->first_name . ' ' . $customer->last_name)
+                ? trim($customer->first_name.' '.$customer->last_name)
                 : null,
 
             'phone' => $customer?->phone,

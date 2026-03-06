@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::table('orders', function (Blueprint $table) {
             // Add new status column for delivery tracking
             $table->enum('status', ['pending', 'admin_approved', 'assigned_delivery_man', 'order_accepted', 'product_taken', 'delivered', 'cancelled', 'returned'])
-                  ->default('pending')
-                  ->after('order_status')
-                  ->comment('New status for delivery tracking: pending, admin_approved, assigned_delivery_man, order_accepted, product_taken, delivered, cancelled, returned');
+                ->default('pending')
+                ->after('order_status')
+                ->comment('New status for delivery tracking: pending, admin_approved, assigned_delivery_man, order_accepted, product_taken, delivered, cancelled, returned');
 
             // Add assigned_at after confirmed_at
             $table->timestamp('assigned_at')->nullable()->after('confirmed_at');

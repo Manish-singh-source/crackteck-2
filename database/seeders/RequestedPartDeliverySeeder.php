@@ -2,12 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\ServiceRequestProductRequestPart;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\ServiceRequestProductRequestPart;
-use App\Models\ProductSerial;
 
 class RequestedPartDeliverySeeder extends Seeder
 {
@@ -51,7 +49,7 @@ class RequestedPartDeliverySeeder extends Seeder
             ];
         }
 
-        if (!empty($deliveries)) {
+        if (! empty($deliveries)) {
             DB::table('requested_part_deliveries')->insert($deliveries);
         }
     }

@@ -11,7 +11,10 @@ use App\Models\ServiceRequestProductReturn;
 use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\{Auth, DB, Log, Validator};
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Rappasoft\LaravelAuthenticationLog\Models\AuthenticationLog;
 use Spatie\Permission\Models\Role;
 
@@ -47,7 +50,7 @@ class StaffController extends Controller
 
                 // 1. Staff (main)
                 $nextNumber = (Staff::max('id') ?? 0) + 1;
-                $staffCode = 'STF' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+                $staffCode = 'STF'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
                 $staff = Staff::create([
                     'staff_code' => $staffCode,
@@ -81,9 +84,9 @@ class StaffController extends Controller
                     $passbookPath = null;
                     if ($request->hasFile('passbook_pic')) {
                         $file = $request->file('passbook_pic');
-                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $filename = time().'_'.$file->getClientOriginalName();
                         $file->move(public_path('staff/passbook'), $filename);
-                        $passbookPath = 'staff/passbook/' . $filename;
+                        $passbookPath = 'staff/passbook/'.$filename;
                     }
 
                     $staff->bankDetails()->create([
@@ -101,9 +104,9 @@ class StaffController extends Controller
                     $certPath = null;
                     if ($request->hasFile('certifications')) {
                         $file = $request->file('certifications');
-                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $filename = time().'_'.$file->getClientOriginalName();
                         $file->move(public_path('staff/certifications'), $filename);
-                        $certPath = 'staff/certifications/' . $filename;
+                        $certPath = 'staff/certifications/'.$filename;
                     }
 
                     $staff->workSkills()->create([
@@ -119,23 +122,22 @@ class StaffController extends Controller
                 }
                 // End
 
-
                 // 5. Aadhar
                 if ($validated['aadhar_number'] || $request->hasFile('aadhar_front_path') || $request->hasFile('aadhar_back_path')) {
                     $aadharFront = null;
                     if ($request->hasFile('aadhar_front_path')) {
                         $file = $request->file('aadhar_front_path');
-                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $filename = time().'_'.$file->getClientOriginalName();
                         $file->move(public_path('staff/aadhar'), $filename);
-                        $aadharFront = 'staff/aadhar/' . $filename;
+                        $aadharFront = 'staff/aadhar/'.$filename;
                     }
 
                     $aadharBack = null;
                     if ($request->hasFile('aadhar_back_path')) {
                         $file = $request->file('aadhar_back_path');
-                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $filename = time().'_'.$file->getClientOriginalName();
                         $file->move(public_path('staff/aadhar'), $filename);
-                        $aadharBack = 'staff/aadhar/' . $filename;
+                        $aadharBack = 'staff/aadhar/'.$filename;
                     }
 
                     $staff->aadharDetails()->create([
@@ -150,17 +152,17 @@ class StaffController extends Controller
                     $panFront = null;
                     if ($request->hasFile('pan_card_front_path')) {
                         $file = $request->file('pan_card_front_path');
-                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $filename = time().'_'.$file->getClientOriginalName();
                         $file->move(public_path('staff/pan'), $filename);
-                        $panFront = 'staff/pan/' . $filename;
+                        $panFront = 'staff/pan/'.$filename;
                     }
 
                     $panBack = null;
                     if ($request->hasFile('pan_card_back_path')) {
                         $file = $request->file('pan_card_back_path');
-                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $filename = time().'_'.$file->getClientOriginalName();
                         $file->move(public_path('staff/pan'), $filename);
-                        $panBack = 'staff/pan/' . $filename;
+                        $panBack = 'staff/pan/'.$filename;
                     }
 
                     $staff->panDetails()->create([
@@ -175,17 +177,17 @@ class StaffController extends Controller
                     $dlFront = null;
                     if ($request->hasFile('driving_license_front_path')) {
                         $file = $request->file('driving_license_front_path');
-                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $filename = time().'_'.$file->getClientOriginalName();
                         $file->move(public_path('staff/license'), $filename);
-                        $dlFront = 'staff/license/' . $filename;
+                        $dlFront = 'staff/license/'.$filename;
                     }
 
                     $dlBack = null;
                     if ($request->hasFile('driving_license_back_path')) {
                         $file = $request->file('driving_license_back_path');
-                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $filename = time().'_'.$file->getClientOriginalName();
                         $file->move(public_path('staff/license'), $filename);
-                        $dlBack = 'staff/license/' . $filename;
+                        $dlBack = 'staff/license/'.$filename;
                     }
 
                     $staff->vehicleDetails()->create([
@@ -202,9 +204,9 @@ class StaffController extends Controller
                     $policeCert = null;
                     if ($request->hasFile('police_certificate')) {
                         $file = $request->file('police_certificate');
-                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $filename = time().'_'.$file->getClientOriginalName();
                         $file->move(public_path('staff/police'), $filename);
-                        $policeCert = 'staff/police/' . $filename;
+                        $policeCert = 'staff/police/'.$filename;
                     }
 
                     $staff->policeVerification()->create([
@@ -219,7 +221,7 @@ class StaffController extends Controller
 
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Error creating staff: ' . $e->getMessage());
+                ->with('error', 'Error creating staff: '.$e->getMessage());
         }
 
         return redirect()->route('staff.index')->with('success', 'Staff created successfully.');
@@ -255,8 +257,8 @@ class StaffController extends Controller
         $totalServiceRequestTasks = ServiceRequest::withWhereHas('activeAssignment', function ($q) use ($id) {
             $q->where('engineer_id', $id);
         })
-        ->whereIn('status', ['engineer_approved', 'in_progress', 'completed'])
-        ->count();
+            ->whereIn('status', ['engineer_approved', 'in_progress', 'completed'])
+            ->count();
 
         $totalPickupRequestTasks = ServiceRequestProductPickup::where('assigned_person_id', $id)->count();
         $totalReturnRequestTasks = ServiceRequestProductReturn::where('assigned_person_id', $id)->count();
@@ -268,8 +270,8 @@ class StaffController extends Controller
         $completedServiceRequestTasks = ServiceRequest::withWhereHas('activeAssignment', function ($q) use ($id) {
             $q->where('engineer_id', $id);
         })
-        ->where('status', 'completed')
-        ->count();
+            ->where('status', 'completed')
+            ->count();
         $completedPickupRequestTasks = ServiceRequestProductPickup::where('assigned_person_id', $id)->where('status', 'completed')->count();
         $completedReturnRequestTasks = ServiceRequestProductReturn::where('assigned_person_id', $id)->where('status', 'completed')->count();
 
@@ -280,34 +282,31 @@ class StaffController extends Controller
         $pendingServiceRequestTasks = ServiceRequest::withWhereHas('activeAssignment', function ($q) use ($id) {
             $q->where('engineer_id', $id);
         })
-        ->where('status', 'engineer_approved')
-        ->count();
+            ->where('status', 'engineer_approved')
+            ->count();
         $pendingPickupRequestTasks = ServiceRequestProductPickup::where('assigned_person_id', $id)->where('status', 'approved')->count();
         $pendingReturnRequestTasks = ServiceRequestProductReturn::where('assigned_person_id', $id)->where('status', 'accepted')->count();
 
         $pendingTasks = $pendingServiceRequestTasks + $pendingPickupRequestTasks + $pendingReturnRequestTasks;
         // Pending Tasks End
 
-
         // In progress Tasks
-         $inProgressServiceRequestTasks = ServiceRequest::withWhereHas('activeAssignment', function ($q) use ($id) {
+        $inProgressServiceRequestTasks = ServiceRequest::withWhereHas('activeAssignment', function ($q) use ($id) {
             $q->where('engineer_id', $id);
         })
-        ->where('status', 'in_progress')
-        ->count();
+            ->where('status', 'in_progress')
+            ->count();
         $inProgressPickupRequestTasks = ServiceRequestProductPickup::where('assigned_person_id', $id)->where('status', 'picked')->count();
         $inProgressReturnRequestTasks = ServiceRequestProductReturn::where('assigned_person_id', $id)->where('status', 'picked')->count();
 
         $inProgressTasks = $inProgressServiceRequestTasks + $inProgressPickupRequestTasks + $inProgressReturnRequestTasks;
         // In progress Tasks End
 
-
         $stockInHand = ServiceRequestProductRequestPart::with('product', 'serviceRequest', 'serviceRequest.customer')
-        ->where('engineer_id', $id)
-        ->where('status', 'picked')
-        ->where('request_type', 'stock_in_hand')
-        ->get();
-
+            ->where('engineer_id', $id)
+            ->where('status', 'picked')
+            ->where('request_type', 'stock_in_hand')
+            ->get();
 
         $loginLogs = AuthenticationLog::forUser($staff)->get();
         // dd($loginLogs);
@@ -325,7 +324,7 @@ class StaffController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'nullable|string|max:255',
             'phone' => 'required|string|max:20',
-            'email' => 'required|email|unique:staff,email,' . $id . ',id',
+            'email' => 'required|email|unique:staff,email,'.$id.',id',
             'dob' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',
             'marital_status' => 'nullable|in:unmarried,married,divorced',
@@ -369,8 +368,8 @@ class StaffController extends Controller
 
             // Vehicle
             'vehicle_type' => 'nullable|in:two_wheeler,three_wheeler,four_wheeler,other',
-            'vehicle_number' => 'nullable|string|max:50|unique:staff_vehicle_details,vehicle_number,' . $id . ',staff_id',
-            'driving_license_no' => 'nullable|string|max:50|unique:staff_vehicle_details,driving_license_no,' . $id . ',staff_id',
+            'vehicle_number' => 'nullable|string|max:50|unique:staff_vehicle_details,vehicle_number,'.$id.',staff_id',
+            'driving_license_no' => 'nullable|string|max:50|unique:staff_vehicle_details,driving_license_no,'.$id.',staff_id',
             'driving_license_front_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             'driving_license_back_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
 
@@ -413,63 +412,63 @@ class StaffController extends Controller
                 $passbookPath = null;
                 if ($request->hasFile('passbook_pic')) {
                     $file = $request->file('passbook_pic');
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $passbookPath = $file->storeAs('staff/passbook', $filename, 'public');
                 }
 
                 $certPath = null;
                 if ($request->hasFile('certifications')) {
                     $file = $request->file('certifications');
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $certPath = $file->storeAs('staff/certifications', $filename, 'public');
                 }
 
                 $aadharFront = null;
                 if ($request->hasFile('aadhar_front_path')) {
                     $file = $request->file('aadhar_front_path');
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $aadharFront = $file->storeAs('staff/aadhar', $filename, 'public');
                 }
 
                 $aadharBack = null;
                 if ($request->hasFile('aadhar_back_path')) {
                     $file = $request->file('aadhar_back_path');
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $aadharBack = $file->storeAs('staff/aadhar', $filename, 'public');
                 }
 
                 $panFront = null;
                 if ($request->hasFile('pan_card_front_path')) {
                     $file = $request->file('pan_card_front_path');
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $panFront = $file->storeAs('staff/pan', $filename, 'public');
                 }
 
                 $panBack = null;
                 if ($request->hasFile('pan_card_back_path')) {
                     $file = $request->file('pan_card_back_path');
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $panBack = $file->storeAs('staff/pan', $filename, 'public');
                 }
 
                 $dlFront = null;
                 if ($request->hasFile('driving_license_front_path')) {
                     $file = $request->file('driving_license_front_path');
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $dlFront = $file->storeAs('staff/license', $filename, 'public');
                 }
 
                 $dlBack = null;
                 if ($request->hasFile('driving_license_back_path')) {
                     $file = $request->file('driving_license_back_path');
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $dlBack = $file->storeAs('staff/license', $filename, 'public');
                 }
 
                 $policeCert = null;
                 if ($request->hasFile('police_certificate')) {
                     $file = $request->file('police_certificate');
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $policeCert = $file->storeAs('staff/police', $filename, 'public');
                 }
 
@@ -526,6 +525,7 @@ class StaffController extends Controller
             });
         } catch (\Exception $e) {
             dd($e);
+
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['error' => 'An error occurred while updating the staff data. Please try again.']);
@@ -593,11 +593,11 @@ class StaffController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Task approval error: ' . $e->getMessage());
+            Log::error('Task approval error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error approving task: ' . $e->getMessage(),
+                'message' => 'Error approving task: '.$e->getMessage(),
             ], 500);
         }
     }

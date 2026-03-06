@@ -51,7 +51,7 @@ class ServiceRequestController extends Controller
 
         $nextNumber = $lastService ? (intval(substr($lastService->request_id, -4)) + 1) : 1;
 
-        return 'SRV-' . $year . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        return 'SRV-'.$year.'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     //
@@ -140,17 +140,17 @@ class ServiceRequestController extends Controller
             // Handle profile image upload
             if ($request->hasFile('profile_image')) {
                 $file = $request->file('profile_image');
-                $filename = time() . '_profile.' . $file->getClientOriginalExtension();
+                $filename = time().'_profile.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/amc/profiles'), $filename);
-                $amcService->profile_image = 'uploads/crm/amc/profiles/' . $filename;
+                $amcService->profile_image = 'uploads/crm/amc/profiles/'.$filename;
             }
 
             // Handle customer image upload
             if ($request->hasFile('customer_image')) {
                 $file = $request->file('customer_image');
-                $filename = time() . '_customer.' . $file->getClientOriginalExtension();
+                $filename = time().'_customer.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/amc/customers'), $filename);
-                $amcService->customer_image = 'uploads/crm/amc/customers/' . $filename;
+                $amcService->customer_image = 'uploads/crm/amc/customers/'.$filename;
             }
 
             // AMC Details
@@ -223,9 +223,9 @@ class ServiceRequestController extends Controller
                     // Handle product image upload
                     if (isset($productData['product_image']) && $productData['product_image'] instanceof \Illuminate\Http\UploadedFile) {
                         $file = $productData['product_image'];
-                        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                        $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
                         $file->move(public_path('uploads/crm/amc/products'), $filename);
-                        $product->product_image = 'uploads/crm/amc/products/' . $filename;
+                        $product->product_image = 'uploads/crm/amc/products/'.$filename;
                     }
 
                     $product->save();
@@ -238,7 +238,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Something went wrong: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Something went wrong: '.$e->getMessage())->withInput();
         }
     }
 
@@ -311,9 +311,9 @@ class ServiceRequestController extends Controller
                 }
 
                 $file = $request->file('profile_image');
-                $filename = time() . '_profile.' . $file->getClientOriginalExtension();
+                $filename = time().'_profile.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/amc/profiles'), $filename);
-                $amcService->profile_image = 'uploads/crm/amc/profiles/' . $filename;
+                $amcService->profile_image = 'uploads/crm/amc/profiles/'.$filename;
             }
 
             // Handle customer image upload
@@ -324,9 +324,9 @@ class ServiceRequestController extends Controller
                 }
 
                 $file = $request->file('customer_image');
-                $filename = time() . '_customer.' . $file->getClientOriginalExtension();
+                $filename = time().'_customer.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/amc/customers'), $filename);
-                $amcService->customer_image = 'uploads/crm/amc/customers/' . $filename;
+                $amcService->customer_image = 'uploads/crm/amc/customers/'.$filename;
             }
 
             // AMC Details
@@ -455,7 +455,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Something went wrong: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Something went wrong: '.$e->getMessage())->withInput();
         }
     }
 
@@ -485,7 +485,7 @@ class ServiceRequestController extends Controller
 
             return redirect()->route('service-request.index')->with('success', 'AMC Request deleted successfully.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+            return back()->with('error', 'Something went wrong: '.$e->getMessage());
         }
     }
 
@@ -558,7 +558,7 @@ class ServiceRequestController extends Controller
                 ]);
 
                 $engineer = Engineer::find($request->engineer_id);
-                $message = 'Engineer ' . $engineer->first_name . ' ' . $engineer->last_name . ' assigned successfully';
+                $message = 'Engineer '.$engineer->first_name.' '.$engineer->last_name.' assigned successfully';
             } else {
                 // Group assignment
                 $assignment = AmcEngineerAssignment::create([
@@ -579,7 +579,7 @@ class ServiceRequestController extends Controller
                     ]);
                 }
 
-                $message = 'Group "' . $request->group_name . '" assigned successfully with ' . count($request->engineer_ids) . ' engineers';
+                $message = 'Group "'.$request->group_name.'" assigned successfully with '.count($request->engineer_ids).' engineers';
             }
 
             DB::commit();
@@ -597,7 +597,7 @@ class ServiceRequestController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error assigning engineer: ' . $e->getMessage(),
+                'message' => 'Error assigning engineer: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -668,17 +668,17 @@ class ServiceRequestController extends Controller
             // Handle profile image upload
             if ($request->hasFile('profile_image')) {
                 $file = $request->file('profile_image');
-                $filename = time() . '_profile_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $filename = time().'_profile_'.uniqid().'.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/non-amc/profiles'), $filename);
-                $nonAmcService->profile_image = 'uploads/crm/non-amc/profiles/' . $filename;
+                $nonAmcService->profile_image = 'uploads/crm/non-amc/profiles/'.$filename;
             }
 
             // Handle customer image upload
             if ($request->hasFile('customer_image')) {
                 $file = $request->file('customer_image');
-                $filename = time() . '_customer_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $filename = time().'_customer_'.uniqid().'.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/non-amc/customers'), $filename);
-                $nonAmcService->customer_image = 'uploads/crm/non-amc/customers/' . $filename;
+                $nonAmcService->customer_image = 'uploads/crm/non-amc/customers/'.$filename;
             }
 
             $nonAmcService->service_type = $request->service_type ?? 'Offline';
@@ -707,9 +707,9 @@ class ServiceRequestController extends Controller
                     // Handle product image upload
                     if (isset($productData['product_image']) && $productData['product_image'] instanceof \Illuminate\Http\UploadedFile) {
                         $file = $productData['product_image'];
-                        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                        $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
                         $file->move(public_path('uploads/crm/non-amc/products'), $filename);
-                        $product->product_image = 'uploads/crm/non-amc/products/' . $filename;
+                        $product->product_image = 'uploads/crm/non-amc/products/'.$filename;
                     }
 
                     $product->save();
@@ -722,7 +722,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Something went wrong: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Something went wrong: '.$e->getMessage())->withInput();
         }
     }
 
@@ -791,9 +791,9 @@ class ServiceRequestController extends Controller
                 }
 
                 $file = $request->file('profile_image');
-                $filename = time() . '_profile_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $filename = time().'_profile_'.uniqid().'.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/non-amc/profiles'), $filename);
-                $nonAmcService->profile_image = 'uploads/crm/non-amc/profiles/' . $filename;
+                $nonAmcService->profile_image = 'uploads/crm/non-amc/profiles/'.$filename;
             }
 
             // Handle customer image upload
@@ -804,9 +804,9 @@ class ServiceRequestController extends Controller
                 }
 
                 $file = $request->file('customer_image');
-                $filename = time() . '_customer_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $filename = time().'_customer_'.uniqid().'.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/non-amc/customers'), $filename);
-                $nonAmcService->customer_image = 'uploads/crm/non-amc/customers/' . $filename;
+                $nonAmcService->customer_image = 'uploads/crm/non-amc/customers/'.$filename;
             }
 
             $nonAmcService->service_type = $request->service_type ?? 'Offline';
@@ -875,9 +875,9 @@ class ServiceRequestController extends Controller
                     // Handle product image upload
                     if (isset($productData['product_image']) && $productData['product_image'] instanceof \Illuminate\Http\UploadedFile) {
                         $file = $productData['product_image'];
-                        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                        $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
                         $file->move(public_path('uploads/crm/non-amc/products'), $filename);
-                        $product->product_image = 'uploads/crm/non-amc/products/' . $filename;
+                        $product->product_image = 'uploads/crm/non-amc/products/'.$filename;
                     }
 
                     $product->save();
@@ -900,7 +900,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Something went wrong: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Something went wrong: '.$e->getMessage())->withInput();
         }
     }
 
@@ -930,7 +930,7 @@ class ServiceRequestController extends Controller
 
             return redirect()->route('service-request.index')->with('success', 'Non-AMC Service Request deleted successfully.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting service request: ' . $e->getMessage());
+            return back()->with('error', 'Error deleting service request: '.$e->getMessage());
         }
     }
 
@@ -1000,7 +1000,7 @@ class ServiceRequestController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Engineer ' . $engineer->first_name . ' ' . $engineer->last_name . ' updated successfully',
+                'message' => 'Engineer '.$engineer->first_name.' '.$engineer->last_name.' updated successfully',
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -1008,7 +1008,7 @@ class ServiceRequestController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error: ' . $e->getMessage(),
+                'message' => 'Error: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -1117,7 +1117,7 @@ class ServiceRequestController extends Controller
                     'service_type' => $request->service_type,
                     'customer_id' => $customer->id,
                     'customer_address_id' => $customerAddress->id ?? null,
-                    'request_date' => now()->addDays(5), // after 5 days of current date 
+                    'request_date' => now()->addDays(5), // after 5 days of current date
                     'request_source' => 'system',
                     'visit_date' => $request->visit_date,
                     'reschedule_date' => null,
@@ -1198,7 +1198,7 @@ class ServiceRequestController extends Controller
             DB::rollBack();
             dd($e->getMessage());
 
-            return redirect()->back()->with('error', 'Error creating service request: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error creating service request: '.$e->getMessage());
         }
     }
 
@@ -1276,7 +1276,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             return redirect()
                 ->route('service-request.index')
-                ->with('error', 'Quick Service Request not found: ' . $e->getMessage());
+                ->with('error', 'Quick Service Request not found: '.$e->getMessage());
         }
     }
 
@@ -1322,10 +1322,9 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Error updating AMC Service Request: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Error updating AMC Service Request: '.$e->getMessage())->withInput();
         }
     }
-
 
     // ---------------------------------------------------------- Installation Service Request Methods -----------------------------------------------------------
 
@@ -1436,7 +1435,7 @@ class ServiceRequestController extends Controller
             DB::rollBack();
             dd($e->getMessage());
 
-            return redirect()->back()->with('error', 'Error creating service request: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error creating service request: '.$e->getMessage());
         }
     }
 
@@ -1457,6 +1456,7 @@ class ServiceRequestController extends Controller
             'inactiveAssignments.transferredTo',
         ])->findOrFail($id);
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
+
         return view('crm/service-request/view-installation-service-request', compact('request', 'engineers'));
     }
 
@@ -1501,7 +1501,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             return redirect()
                 ->route('service-request.index')
-                ->with('error', 'Installation Service Request not found: ' . $e->getMessage());
+                ->with('error', 'Installation Service Request not found: '.$e->getMessage());
         }
     }
 
@@ -1597,9 +1597,9 @@ class ServiceRequestController extends Controller
                 // Handle product image upload
                 if (isset($prod['product_image']) && $prod['product_image'] instanceof \Illuminate\Http\UploadedFile) {
                     $file = $prod['product_image'];
-                    $imageName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $imageName = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
                     $file->move(public_path('uploads/service-request-products'), $imageName);
-                    $imagePath = 'uploads/service-request-products/' . $imageName;
+                    $imagePath = 'uploads/service-request-products/'.$imageName;
                 }
 
                 // If an id is provided, try to update the existing product
@@ -1630,6 +1630,7 @@ class ServiceRequestController extends Controller
 
                         $product->update($updateData);
                         $incomingProductIds[] = $product->id;
+
                         continue;
                     }
                 }
@@ -1669,7 +1670,7 @@ class ServiceRequestController extends Controller
             activity()
                 ->performedOn($serviceRequest)
                 ->causedBy(Auth::user())
-                ->log('Updated Installation Service Request #' . $serviceRequest->id);
+                ->log('Updated Installation Service Request #'.$serviceRequest->id);
 
             return redirect()
                 ->route('service-request.view-installation-service-request', $serviceRequest->id)
@@ -1679,7 +1680,7 @@ class ServiceRequestController extends Controller
 
             return redirect()
                 ->back()
-                ->with('error', 'Error updating Quick Service Request: ' . $e->getMessage())
+                ->with('error', 'Error updating Quick Service Request: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -1793,7 +1794,7 @@ class ServiceRequestController extends Controller
             DB::rollBack();
             dd($e->getMessage());
 
-            return redirect()->back()->with('error', 'Error creating service request: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error creating service request: '.$e->getMessage());
         }
     }
 
@@ -1814,6 +1815,7 @@ class ServiceRequestController extends Controller
             'inactiveAssignments.transferredTo',
         ])->findOrFail($id);
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
+
         return view('crm/service-request/view-repairing-service-request', compact('request', 'engineers'));
     }
 
@@ -1858,7 +1860,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             return redirect()
                 ->route('service-request.index')
-                ->with('error', 'Repairing Service Request not found: ' . $e->getMessage());
+                ->with('error', 'Repairing Service Request not found: '.$e->getMessage());
         }
     }
 
@@ -1954,9 +1956,9 @@ class ServiceRequestController extends Controller
                 // Handle product image upload
                 if (isset($prod['product_image']) && $prod['product_image'] instanceof \Illuminate\Http\UploadedFile) {
                     $file = $prod['product_image'];
-                    $imageName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $imageName = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
                     $file->move(public_path('uploads/service-request-products'), $imageName);
-                    $imagePath = 'uploads/service-request-products/' . $imageName;
+                    $imagePath = 'uploads/service-request-products/'.$imageName;
                 }
 
                 // If an id is provided, try to update the existing product
@@ -1987,6 +1989,7 @@ class ServiceRequestController extends Controller
 
                         $product->update($updateData);
                         $incomingProductIds[] = $product->id;
+
                         continue;
                     }
                 }
@@ -2026,7 +2029,7 @@ class ServiceRequestController extends Controller
             activity()
                 ->performedOn($serviceRequest)
                 ->causedBy(Auth::user())
-                ->log('Updated Repairing Service Request #' . $serviceRequest->id);
+                ->log('Updated Repairing Service Request #'.$serviceRequest->id);
 
             return redirect()
                 ->route('service-request.view-repairing-service-request', $serviceRequest->id)
@@ -2036,7 +2039,7 @@ class ServiceRequestController extends Controller
 
             return redirect()
                 ->back()
-                ->with('error', 'Error updating Quick Service Request: ' . $e->getMessage())
+                ->with('error', 'Error updating Quick Service Request: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -2061,7 +2064,7 @@ class ServiceRequestController extends Controller
     {
         // $customerCode = 'CUST' . str_pad((Customer::max('id') ?? 0) + 1, 4, '0', STR_PAD_LEFT);
         // mujhe is format me chahiye
-        $customerCode = 'CUST' . str_pad((Customer::max('id') ?? 0) + 1, 4, '0', STR_PAD_LEFT);
+        $customerCode = 'CUST'.str_pad((Customer::max('id') ?? 0) + 1, 4, '0', STR_PAD_LEFT);
 
         return $customerCode;
     }
@@ -2073,24 +2076,25 @@ class ServiceRequestController extends Controller
     {
         $email = $request->email;
 
-        \Log::info('Fetching customer addresses for email: ' . $email);
+        \Log::info('Fetching customer addresses for email: '.$email);
 
         $customer = Customer::where('email', $email)->first();
 
-        if (!$customer) {
-            \Log::warning('Customer not found for email: ' . $email);
+        if (! $customer) {
+            \Log::warning('Customer not found for email: '.$email);
+
             return response()->json(['error' => 'Customer not found'], 404);
         }
 
-        \Log::info('Customer found: ' . $customer->id . ', fetching addresses...');
+        \Log::info('Customer found: '.$customer->id.', fetching addresses...');
 
         $addresses = CustomerAddressDetail::where('customer_id', $customer->id)->get();
 
-        \Log::info('Addresses found: ' . $addresses->count());
+        \Log::info('Addresses found: '.$addresses->count());
 
         return response()->json([
             'customer' => $customer,
-            'addresses' => $addresses
+            'addresses' => $addresses,
         ]);
     }
 
@@ -2195,7 +2199,7 @@ class ServiceRequestController extends Controller
             DB::rollBack();
             dd($e->getMessage());
 
-            return redirect()->back()->with('error', 'Error creating service request: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error creating service request: '.$e->getMessage());
         }
     }
 
@@ -2272,7 +2276,7 @@ class ServiceRequestController extends Controller
                 ->first();
 
             // If no record exists, create a new one
-            if (!$requestPart) {
+            if (! $requestPart) {
                 // Check if there's any record at all for this engineer and part
                 $existingRecord = ServiceRequestProductRequestPart::where('engineer_id', $request->engineer_id)
                     ->where('part_id', $request->part_id)
@@ -2325,12 +2329,11 @@ class ServiceRequestController extends Controller
                 $message = 'Request rejected successfully.';
             }
 
-
             return redirect()->route('service-request.view-quick-service-request', $request->request_id)
                 ->with('success', $message);
         } catch (\Exception $e) {
             return redirect()->route('service-request.view-quick-service-request', $request->request_id)
-                ->with('error', 'Error processing request: ' . $e->getMessage());
+                ->with('error', 'Error processing request: '.$e->getMessage());
         }
     }
 
@@ -2350,7 +2353,7 @@ class ServiceRequestController extends Controller
         try {
             $requestPart = ServiceRequestProductRequestPart::find($request->request_part_id);
 
-            if (!$requestPart) {
+            if (! $requestPart) {
                 throw new \Exception('Request part not found.');
             }
 
@@ -2371,7 +2374,7 @@ class ServiceRequestController extends Controller
                 ->with('success', 'Part assigned successfully.');
         } catch (\Exception $e) {
             return redirect()->route('service-request.view-quick-service-request', $request->request_id)
-                ->with('error', 'Error assigning part: ' . $e->getMessage());
+                ->with('error', 'Error assigning part: '.$e->getMessage());
         }
     }
 
@@ -2419,7 +2422,7 @@ class ServiceRequestController extends Controller
         } catch (\Exception $e) {
             return redirect()
                 ->route('service-request.index')
-                ->with('error', 'Quick Service Request not found: ' . $e->getMessage());
+                ->with('error', 'Quick Service Request not found: '.$e->getMessage());
         }
     }
 
@@ -2516,9 +2519,9 @@ class ServiceRequestController extends Controller
                 // Handle product image upload
                 if (isset($prod['product_image']) && $prod['product_image'] instanceof \Illuminate\Http\UploadedFile) {
                     $file = $prod['product_image'];
-                    $imageName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $imageName = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
                     $file->move(public_path('uploads/service-request-products'), $imageName);
-                    $imagePath = 'uploads/service-request-products/' . $imageName;
+                    $imagePath = 'uploads/service-request-products/'.$imageName;
                 }
 
                 // If an id is provided, try to update the existing product
@@ -2553,6 +2556,7 @@ class ServiceRequestController extends Controller
                         // Do not force status change for existing products
                         $product->update($updateData);
                         $incomingProductIds[] = $product->id;
+
                         continue;
                     }
                 }
@@ -2598,7 +2602,7 @@ class ServiceRequestController extends Controller
             activity()
                 ->performedOn($serviceRequest)
                 ->causedBy(Auth::user())
-                ->log('Updated Quick Service Request #' . $serviceRequest->id);
+                ->log('Updated Quick Service Request #'.$serviceRequest->id);
 
             return redirect()
                 ->route('service-request.view-quick-service-request', $serviceRequest->id)
@@ -2608,7 +2612,7 @@ class ServiceRequestController extends Controller
 
             return redirect()
                 ->back()
-                ->with('error', 'Error updating Quick Service Request: ' . $e->getMessage())
+                ->with('error', 'Error updating Quick Service Request: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -2632,13 +2636,13 @@ class ServiceRequestController extends Controller
             activity()
                 ->performedOn($quickServiceRequest)
                 ->causedBy(Auth::user())
-                ->log('Deleted Quick Service Request #' . $quickServiceRequest->id);
+                ->log('Deleted Quick Service Request #'.$quickServiceRequest->id);
 
             return redirect()->route('service-request.index')->with('success', 'Quick Service Request deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return redirect()->back()->with('error', 'Error deleting Quick Service Request: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error deleting Quick Service Request: '.$e->getMessage());
         }
     }
 
@@ -2661,7 +2665,7 @@ class ServiceRequestController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation error: ' . $validator->errors()->first(),
+                'message' => 'Validation error: '.$validator->errors()->first(),
             ], 422);
         }
 
@@ -2696,17 +2700,17 @@ class ServiceRequestController extends Controller
             $engineerId = $activeAssignment->engineer_id ?? null;
 
             // If no engineer from active assignment, try to get from pickup
-            if (!$engineerId && $pickup->engineer_id) {
+            if (! $engineerId && $pickup->engineer_id) {
                 $engineerId = $pickup->engineer_id;
             }
 
             // If still no engineer, use the assigned person if they're an engineer
-            if (!$engineerId && $pickup->assigned_person_type === 'engineer' && $pickup->assigned_person_id) {
+            if (! $engineerId && $pickup->assigned_person_type === 'engineer' && $pickup->assigned_person_id) {
                 $engineerId = $pickup->assigned_person_id;
             }
 
             // If still no engineer found, use current logged in user or 0 as fallback
-            if (!$engineerId) {
+            if (! $engineerId) {
                 $engineerId = Auth::id() ?? 0;
             }
 
@@ -2726,7 +2730,7 @@ class ServiceRequestController extends Controller
                 ->first();
 
             // If no existing diagnosis found, return error
-            if (!$diagnosis) {
+            if (! $diagnosis) {
                 return response()->json([
                     'success' => false,
                     'message' => 'No existing diagnosis found for this product. Please contact administrator.',
@@ -2767,18 +2771,17 @@ class ServiceRequestController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error submitting diagnosis: ' . $e->getMessage(),
+                'message' => 'Error submitting diagnosis: '.$e->getMessage(),
             ], 500);
         }
     }
-
 
     public function assignQuickServiceEngineer(Request $request)
     {
         /** ---------------- VALIDATION ---------------- */
         $rules = [
             'service_type' => 'required|in:amc,quick_service,installation,repair',
-            'assignment_type'    => 'required|in:individual,group',
+            'assignment_type' => 'required|in:individual,group',
         ];
 
         if ($request->service_type == 'amc') {
@@ -2792,10 +2795,10 @@ class ServiceRequestController extends Controller
         }
 
         if ($request->assignment_type === 'group') {
-            $rules['group_name']     = 'required|string|max:255';
-            $rules['engineer_ids']   = 'required|array|min:1';
+            $rules['group_name'] = 'required|string|max:255';
+            $rules['engineer_ids'] = 'required|array|min:1';
             $rules['engineer_ids.*'] = 'exists:staff,id';
-            $rules['supervisor_id']  = 'required|exists:staff,id';
+            $rules['supervisor_id'] = 'required|exists:staff,id';
         }
 
         $validator = Validator::make($request->all(), $rules);
@@ -2831,12 +2834,11 @@ class ServiceRequestController extends Controller
                     'amc_plan_id' => $amc->amc_plan_id,
                 ]);
 
-
                 // Create Service Request Products in service_request_products table
                 $products = $amc->amcProducts;
                 foreach ($products as $productData) {
 
-                    // add logic for getting item_code_id using product_type 
+                    // add logic for getting item_code_id using product_type
                     \App\Models\ServiceRequestProduct::create([
                         'service_requests_id' => $serviceRequest->id,
                         'name' => $productData->name,
@@ -2858,14 +2860,14 @@ class ServiceRequestController extends Controller
 
             /** Only approved requests can be assigned */
             if ($serviceRequest->service_type == 'amc') {
-                if (!in_array($serviceRequest->status, ['active', 'pending'])) {
+                if (! in_array($serviceRequest->status, ['active', 'pending'])) {
                     return response()->json([
-                        'success' => false, 
+                        'success' => false,
                         'message' => 'Engineer can only be assigned to active AMC requests.',
                     ], 422);
                 }
             } else {
-                if (!in_array($serviceRequest->status, ['active', 'admin_approved', 'engineer_not_approved', 'in_transfer'])) {
+                if (! in_array($serviceRequest->status, ['active', 'admin_approved', 'engineer_not_approved', 'in_transfer'])) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Engineer can only be assigned to approved requests.',
@@ -2892,35 +2894,34 @@ class ServiceRequestController extends Controller
                 ]);
             }
 
-
             /** ---------------- ASSIGN ENGINEER ---------------- */
             if ($request->assignment_type === 'individual') {
 
                 $assignment = AssignedEngineer::create([
                     'service_request_id' => $serviceRequest->id,
                     'amc_schedule_meeting_id' => $serviceRequest->service_type == 'amc' ? $amcScheduleMeeting->id ?? null : null,
-                    'engineer_id'        => $request->engineer_id,
-                    'assignment_type'    => 'individual',
-                    'assigned_at'        => now(),
-                    'status'             => 'active',
+                    'engineer_id' => $request->engineer_id,
+                    'assignment_type' => 'individual',
+                    'assigned_at' => now(),
+                    'status' => 'active',
                 ]);
 
                 if ($previousAssignment) {
                     $previousAssignment->update([
-                        'transferred_to' => $request->engineer_id
+                        'transferred_to' => $request->engineer_id,
                     ]);
                 }
 
                 $engineer = Staff::find($request->engineer_id);
-                $message = 'Engineer ' . $engineer->first_name . ' ' . $engineer->last_name . ' assigned successfully';
+                $message = 'Engineer '.$engineer->first_name.' '.$engineer->last_name.' assigned successfully';
 
                 /** ---------------- CASE TRANSFER UPDATE ---------------- */
                 $caseTransfers = CaseTransferRequest::where('service_request_id', $serviceRequest->id)->get();
                 foreach ($caseTransfers as $caseTransfer) {
                     $caseTransfer->update([
                         'new_engineer_id' => $request->engineer_id,
-                        'status'          => 'approved',
-                        'approved_at'     => now(),
+                        'status' => 'approved',
+                        'approved_at' => now(),
                     ]);
                 }
             } else {
@@ -2928,11 +2929,11 @@ class ServiceRequestController extends Controller
                 $assignment = AssignedEngineer::create([
                     'service_request_id' => $serviceRequest->id,
                     'amc_schedule_meeting_id' => $serviceRequest->service_type == 'amc' ? $amcScheduleMeeting->id ?? null : null,
-                    'engineer_id'        => $request->supervisor_id,
-                    'assignment_type'    => 'group',
-                    'group_name'         => $request->group_name,
-                    'assigned_at'        => now(),
-                    'status'             => 'active',
+                    'engineer_id' => $request->supervisor_id,
+                    'assignment_type' => 'group',
+                    'group_name' => $request->group_name,
+                    'assigned_at' => now(),
+                    'status' => 'active',
                 ]);
 
                 foreach ($request->engineer_ids as $engineerId) {
@@ -2941,16 +2942,16 @@ class ServiceRequestController extends Controller
                     ]);
                 }
 
-                $message = 'Group "' . $request->group_name .
-                    '" assigned successfully with ' . count($request->engineer_ids) . ' engineers';
+                $message = 'Group "'.$request->group_name.
+                    '" assigned successfully with '.count($request->engineer_ids).' engineers';
 
                 /** ---------------- CASE TRANSFER UPDATE ---------------- */
                 $caseTransfer = CaseTransferRequest::where('service_request_id', $serviceRequest->id)->first();
                 if ($caseTransfer) {
                     $caseTransfer->update([
                         'new_engineer_id' => $request->supervisor_id,
-                        'status'          => 'approved',
-                        'approved_at'     => now(),
+                        'status' => 'approved',
+                        'approved_at' => now(),
                     ]);
                 }
             }
@@ -2960,7 +2961,7 @@ class ServiceRequestController extends Controller
 
             $serviceRequest->update([
                 'status' => 'assigned_engineer',
-                'is_engineer_assigned' => 'assigned'
+                'is_engineer_assigned' => 'assigned',
             ]);
 
             // Update all products from 'approved' to 'processing' when engineer is assigned
@@ -2973,7 +2974,7 @@ class ServiceRequestController extends Controller
                 'service_request_id' => $serviceRequest->id,
                 'old_status' => $oldStatus,
                 'new_status' => 'assigned_engineer',
-                'assignment_id' => $assignment->id
+                'assignment_id' => $assignment->id,
             ]);
 
             activity()
@@ -2982,7 +2983,7 @@ class ServiceRequestController extends Controller
                 ->withProperties([
                     'old_status' => $oldStatus,
                     'new_status' => 'assigned_engineer',
-                    'assignment_id' => $assignment->id
+                    'assignment_id' => $assignment->id,
                 ])
                 ->log('Engineer assigned to service request');
 
@@ -2999,12 +3000,12 @@ class ServiceRequestController extends Controller
             DB::rollBack();
 
             Log::error('Engineer Assignment Failed', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error assigning engineer: ' . $e->getMessage(),
+                'message' => 'Error assigning engineer: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -3045,7 +3046,7 @@ class ServiceRequestController extends Controller
                 ->where('status', 'active')
                 ->first();
 
-            if (!$activeAssignment) {
+            if (! $activeAssignment) {
                 return response()->json([
                     'success' => false,
                     'message' => 'No active engineer assignment found for this service request.',
@@ -3066,14 +3067,14 @@ class ServiceRequestController extends Controller
                             if (isset($item['status']) && $item['status'] === 'picking') {
                                 $pickingProductIds[] = $diagnosis->service_request_product_id;
                                 // Extract component names and reports as reason
-                                $reasonParts[] = ($item['name'] ?? '') . ': ' . ($item['report'] ?? '');
+                                $reasonParts[] = ($item['name'] ?? '').': '.($item['report'] ?? '');
                             }
                         }
                     }
                 }
             }
 
-            if (!empty($reasonParts)) {
+            if (! empty($reasonParts)) {
                 $reason = implode('; ', $reasonParts);
             }
 
@@ -3091,9 +3092,9 @@ class ServiceRequestController extends Controller
                 ]);
             } else {
                 // Create new pickup record - use first picking product or first product
-                $productId = !empty($pickingProductIds) ? $pickingProductIds[0] : ($serviceRequest->products->first()->id ?? null);
+                $productId = ! empty($pickingProductIds) ? $pickingProductIds[0] : ($serviceRequest->products->first()->id ?? null);
 
-                if (!$productId) {
+                if (! $productId) {
                     return response()->json([
                         'success' => false,
                         'message' => 'No products found for this service request.',
@@ -3123,12 +3124,12 @@ class ServiceRequestController extends Controller
             DB::rollBack();
 
             Log::error('Pickup Assignment Failed', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error assigning pickup: ' . $e->getMessage(),
+                'message' => 'Error assigning pickup: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -3181,19 +3182,19 @@ class ServiceRequestController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Pickup request ' . $request->action . ' successfully.',
+                'message' => 'Pickup request '.$request->action.' successfully.',
                 'pickup' => $pickup,
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
 
             Log::error('Pickup Admin Action Failed', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error processing admin action: ' . $e->getMessage(),
+                'message' => 'Error processing admin action: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -3261,12 +3262,12 @@ class ServiceRequestController extends Controller
             DB::rollBack();
 
             Log::error('Pickup Received Action Failed', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error processing received action: ' . $e->getMessage(),
+                'message' => 'Error processing received action: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -3278,7 +3279,7 @@ class ServiceRequestController extends Controller
     {
         // Validate assigned_person_type first
         $assignedPersonType = $request->assigned_person_type;
-        if (!in_array($assignedPersonType, ['delivery_man', 'engineer'])) {
+        if (! in_array($assignedPersonType, ['delivery_man', 'engineer'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Please select an Assigned Person Type (Delivery Man or Engineer)',
@@ -3328,7 +3329,7 @@ class ServiceRequestController extends Controller
             if (empty($assignedPersonId)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Please select a ' . ($assignedPersonType === 'delivery_man' ? 'Delivery Man' : 'Engineer'),
+                    'message' => 'Please select a '.($assignedPersonType === 'delivery_man' ? 'Delivery Man' : 'Engineer'),
                 ], 422);
             }
 
@@ -3389,12 +3390,12 @@ class ServiceRequestController extends Controller
             DB::rollBack();
 
             Log::error('Return Assignment Failed', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error assigning return: ' . $e->getMessage(),
+                'message' => 'Error assigning return: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -3446,12 +3447,12 @@ class ServiceRequestController extends Controller
             DB::rollBack();
 
             Log::error('Return Picked Update Failed', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating return status: ' . $e->getMessage(),
+                'message' => 'Error updating return status: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -3478,10 +3479,10 @@ class ServiceRequestController extends Controller
 
             // Check if status allows picking (should be after assigned or ap_approved)
             $allowedStatuses = ['assigned', 'ap_approved', 'warehouse_approved'];
-            if (!in_array($requestPart->status, $allowedStatuses)) {
+            if (! in_array($requestPart->status, $allowedStatuses)) {
                 return redirect()
                     ->back()
-                    ->with('error', 'Part cannot be picked in current status: ' . $requestPart->status);
+                    ->with('error', 'Part cannot be picked in current status: '.$requestPart->status);
             }
 
             // Update status to picked and set picked_at timestamp
@@ -3500,12 +3501,12 @@ class ServiceRequestController extends Controller
 
             Log::error('Part Picked Update Failed', [
                 'error' => $e->getMessage(),
-                'request_part_id' => $request->request_part_id
+                'request_part_id' => $request->request_part_id,
             ]);
 
             return redirect()
                 ->back()
-                ->with('error', 'Error updating part status: ' . $e->getMessage());
+                ->with('error', 'Error updating part status: '.$e->getMessage());
         }
     }
 }

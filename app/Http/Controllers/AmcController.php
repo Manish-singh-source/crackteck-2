@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileUpload;
 use App\Models\Amc;
 use App\Models\AmcPlan;
 use App\Models\AmcScheduleMeeting;
@@ -38,6 +39,7 @@ class AmcController extends Controller
             ->orderBy('service_type')
             ->orderBy('service_name')
             ->get();
+
         return view('/crm/amc-plans/create', compact('coveredItems'));
     }
 
@@ -82,7 +84,7 @@ class AmcController extends Controller
                 // $filename = time() . '.' . $file->getClientOriginalExtension();
                 // $file->move(public_path('uploads/crm/amc/brochure'), $filename);
                 // $amc->brochure = 'uploads/crm/amc/brochure/' . $filename;
-                $amc->brochure = fileUpload($request->file('brochure'), 'uploads/crm/amc/brochure/');
+                $amc->brochure = FileUpload::fileUpload($request->file('brochure'), 'uploads/crm/amc/brochure/');
             }
 
             $amc->tandc = $request->tandc;
@@ -93,8 +95,9 @@ class AmcController extends Controller
 
             return redirect()->route('amc-plans.index')->with('success', 'AMC Plan added successfully.');
         } catch (\Exception $e) {
-            Log::error('AMC Plan Store Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Error creating AMC Plan: ' . $e->getMessage())->withInput();
+            Log::error('AMC Plan Store Error: '.$e->getMessage());
+
+            return redirect()->back()->with('error', 'Error creating AMC Plan: '.$e->getMessage())->withInput();
         }
     }
 
@@ -165,7 +168,7 @@ class AmcController extends Controller
                     $coveredIds = array_values(
                         array_filter(
                             array_map('intval', $decoded),
-                            fn($id) => $id > 0
+                            fn ($id) => $id > 0
                         )
                     );
                 }
@@ -174,7 +177,7 @@ class AmcController extends Controller
 
             // Brochure upload (replace old if new uploaded)
             if ($request->hasFile('brochure')) {
-                $amc->brochure = app('App\Helpers\FileUpload')->updateFileUpload(
+                $amc->brochure = FileUpload::updateFileUpload(
                     $request->file('brochure'),
                     $amc->brochure,
                     'uploads/crm/amc/brochure/'
@@ -191,11 +194,11 @@ class AmcController extends Controller
                 ->route('amc-plans.index')
                 ->with('success', 'AMC Plan updated successfully.');
         } catch (\Exception $e) {
-            Log::error('AMC Plan Update Error: ' . $e->getMessage());
+            Log::error('AMC Plan Update Error: '.$e->getMessage());
 
             return redirect()
                 ->back()
-                ->with('error', 'Error updating AMC Plan: ' . $e->getMessage())
+                ->with('error', 'Error updating AMC Plan: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -207,8 +210,6 @@ class AmcController extends Controller
 
         return redirect()->route('amc-plans.index')->with('success', 'AMC Plan deleted successfully.');
     }
-
-
 
     public function coveredItems()
     {
@@ -228,6 +229,7 @@ class AmcController extends Controller
         $deviceSpecificDiagnosis = DeviceSpecificDiagnosis::where('status', 'active')
             ->orderBy('device_type')
             ->get();
+
         return view('/crm/amc-plans/covered-items/create', compact('deviceSpecificDiagnosis'));
     }
 
@@ -250,7 +252,6 @@ class AmcController extends Controller
 
             $data = $validated;
 
-
             // Default status = Active (1) if not sent
             $data['status'] = $request->input('status', 'active');
 
@@ -264,14 +265,14 @@ class AmcController extends Controller
                 }
             }
 
-            // 
+            //
             // Handle image upload
             $filePath = null;
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
-                $filename = time() . '_covered_item.' . $file->getClientOriginalExtension();
+                $filename = time().'_covered_item.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/covered-items'), $filename);
-                $filePath = 'uploads/crm/covered-items/' . $filename;
+                $filePath = 'uploads/crm/covered-items/'.$filename;
             }
 
             // Create record (CoveredItem model with JSON cast for diagnosis_list)
@@ -288,7 +289,7 @@ class AmcController extends Controller
                 'device_specific_diagnosis_id' => $data['device_specific_diagnosis_id'] ?? null,
             ]);
 
-            if (!$coveredItem) {
+            if (! $coveredItem) {
                 DB::rollBack();
 
                 return redirect()
@@ -305,7 +306,7 @@ class AmcController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            Log::error('Error creating covered item: ' . $e->getMessage(), [
+            Log::error('Error creating covered item: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
 
@@ -313,7 +314,7 @@ class AmcController extends Controller
                 ->back()
                 ->withInput()
                 ->withErrors([
-                    'error' => 'An error occurred while creating the service: ' . $e->getMessage(),
+                    'error' => 'An error occurred while creating the service: '.$e->getMessage(),
                 ]);
         }
     }
@@ -324,6 +325,7 @@ class AmcController extends Controller
         $deviceSpecificDiagnosis = DeviceSpecificDiagnosis::where('status', 'active')
             ->orderBy('device_type')
             ->get();
+
         return view('/crm/amc-plans/covered-items/edit', compact('coveredItem', 'deviceSpecificDiagnosis'));
     }
 
@@ -363,9 +365,9 @@ class AmcController extends Controller
             }
 
             $file = $request->file('image');
-            $filename = time() . '_covered_item.' . $file->getClientOriginalExtension();
+            $filename = time().'_covered_item.'.$file->getClientOriginalExtension();
             $file->move(public_path('uploads/crm/covered-items'), $filename);
-            $filePath = 'uploads/crm/covered-items/' . $filename;
+            $filePath = 'uploads/crm/covered-items/'.$filename;
         }
 
         $coveredItem->update([
@@ -392,7 +394,6 @@ class AmcController extends Controller
 
         return redirect()->route('covered-items.index')->with('success', 'Covered Item deleted successfully.');
     }
-
 
     // Device Specific Diagnosis methods will be similar to Covered Items, but using DeviceSpecificDiagnosis model and views
     public function deviceSpecificDiagnosis()
@@ -438,7 +439,7 @@ class AmcController extends Controller
             'diagnosis_list' => $request->input('diagnosis_list') ? json_decode($request->input('diagnosis_list'), true) : [],
         ]);
 
-        if (!$diagnosis) {
+        if (! $diagnosis) {
             return redirect()
                 ->back()
                 ->with('error', 'An error occurred while creating the diagnosis.')
@@ -453,6 +454,7 @@ class AmcController extends Controller
     public function editDeviceSpecificDiagnosis($id)
     {
         $diagnosis = DeviceSpecificDiagnosis::findOrFail($id);
+
         return view('/crm/amc-plans/device-specific-diagnosis/edit', compact('diagnosis'));
     }
 
@@ -517,10 +519,7 @@ class AmcController extends Controller
         }
     }
 
-
-
-
-    // AMC of customers 
+    // AMC of customers
 
     // 1. List AMC requests (with filters)
     public function listAmcRequests(Request $request)
@@ -529,7 +528,7 @@ class AmcController extends Controller
 
         if ($request->filled('customer_name')) {
             $query->whereHas('customer', function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->customer_name . '%');
+                $q->where('name', 'like', '%'.$request->customer_name.'%');
             });
         }
 
@@ -562,7 +561,7 @@ class AmcController extends Controller
             'customer',
             'customerAddress',
             'amcPlan',
-            'amcProducts'
+            'amcProducts',
         ])->findOrFail($id);
 
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
@@ -573,14 +572,14 @@ class AmcController extends Controller
         return view('/crm/active-amcs/view', compact('amcRequest', 'engineers', 'amcTickets'));
     }
 
-    // 4. Reschedule AMC request 
+    // 4. Reschedule AMC request
     public function rescheduleAmcRequest(Request $request)
     {
         if ($request->filled('request_type') == 'amc') {
 
             $amcScheduleMeeting = AmcScheduleMeeting::with('serviceRequest')->findOrFail($request->amc_schedule_meeting_id);
 
-            if (!$amcScheduleMeeting) {
+            if (! $amcScheduleMeeting) {
                 return redirect()->back()->with('error', 'AMC Schedule Meeting not found.');
             }
 
@@ -593,7 +592,7 @@ class AmcController extends Controller
         } else {
             $serviceRequest = ServiceRequest::findOrFail($request->service_request_id);
 
-            if (!$serviceRequest) {
+            if (! $serviceRequest) {
                 return redirect()->back()->with('error', 'Service Request not found.');
             }
 
@@ -630,7 +629,7 @@ class AmcController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating ticket status: ' . $e->getMessage(),
+                'message' => 'Error updating ticket status: '.$e->getMessage(),
             ], 500);
         }
     }

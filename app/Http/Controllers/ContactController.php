@@ -10,12 +10,14 @@ class ContactController extends Controller
     public function index()
     {
         $contacts = Contact::all();
+
         return view('/e-commerce/contacts/index', compact('contacts'));
     }
 
     public function view($id)
     {
         $contact = Contact::find($id);
+
         return view('/e-commerce/contacts/view', compact('contact'));
     }
 

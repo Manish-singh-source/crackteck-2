@@ -67,7 +67,7 @@ Route::prefix('beta')->group(function () {
     Route::post('/api/amc/get-customer-data', [FrontendController::class, 'getCustomerData'])->name('amc.get-customer-data');
     Route::post('/api/amc/submit', [FrontendController::class, 'submitAmcRequest'])->name('amc.submit');
     Route::post('/api/non-amc/submit', [FrontendController::class, 'submitNonAmcRequest'])->name('non-amc.submit');
-    
+
     // Customer Check Login API Route
     Route::get('/api/customer/check-login', [FrontendController::class, 'checkCustomerLogin'])->name('customer.check-login');
 
@@ -242,7 +242,7 @@ Route::prefix('beta')->group(function () {
 
     // My Account AMC
     Route::get('/my-account-ticket', [MyAccountController::class, 'ticket'])
-        ->name('my-account-ticket')->middleware('auth:customer_web');    
+        ->name('my-account-ticket')->middleware('auth:customer_web');
 
     // Store AMC Ticket
     Route::post('/my-account-amc/ticket', [MyAccountController::class, 'storeAmcTicket'])

@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use App\Models\AssignedEngineer;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
-use App\Models\AssignedEngineer;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class EngineerDiagnosisDetailSeeder extends Seeder
 {
@@ -57,19 +57,19 @@ class EngineerDiagnosisDetailSeeder extends Seeder
                 'assigned_engineer_id' => $assignment->id,
                 'covered_item_id' => $coveredItemId,
                 'diagnosis_list' => json_encode(['visual_inspection', 'power_test']),
-                'diagnosis_photos' => json_encode(['diag_' . $req->id . '.jpg']),
+                'diagnosis_photos' => json_encode(['diag_'.$req->id.'.jpg']),
                 'diagnosis_videos' => json_encode([]),
                 'diagnosis_notes' => json_encode('Seeder diagnosis notes. Unit shows intermittent power issue.'),
                 'diagnosis_report' => null,
                 'after_photos' => json_encode([]),
-                'before_photos' => json_encode(['before_' . $req->id . '.jpg']),
+                'before_photos' => json_encode(['before_'.$req->id.'.jpg']),
                 'completed_at' => $now->subDays(rand(0, 10))->toDateTimeString(),
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
         }
 
-        if (!empty($diagnoses)) {
+        if (! empty($diagnoses)) {
             DB::table('engineer_diagnosis_details')->insert($diagnoses);
         }
     }

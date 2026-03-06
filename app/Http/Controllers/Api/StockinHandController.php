@@ -3,27 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
-use App\Models\DeliveryMan;
-use App\Models\Engineer;
-use App\Models\SalesPerson;
 use App\Models\StockinHand;
 use Illuminate\Http\Request;
 
 class StockinHandController extends Controller
 {
     //
-
-    protected function getModelByRoleId($roleId)
-    {
-        return [
-            1 => Engineer::class,
-            2 => DeliveryMan::class,
-            3 => SalesPerson::class,
-            4 => Customer::class,
-        ][$roleId] ?? null;
-    }
-
     protected function getRoleId($roleId)
     {
         return [
@@ -36,9 +21,7 @@ class StockinHandController extends Controller
 
     public function index(Request $request)
     {
-        // List of the stock available in the engineer hand
         $validated = request()->validate([
-            // validation rules if any
             'user_id' => 'required',
         ]);
 
@@ -53,17 +36,5 @@ class StockinHandController extends Controller
 
         return response()->json(['stockin_hand' => $stockinHand], 200);
     }
-
-    // public function show(Request $request, $id)
-    // {
-    //     // List of the stock available in the engineer hand
-    //     return response()->json(['message' => 'Stock in hand'], 200);
-    // }
-
-    // public function store(Request $request)
-    // {
-    //     // List of the products available in warehouse
-    //     return response()
-    // }
 
 }

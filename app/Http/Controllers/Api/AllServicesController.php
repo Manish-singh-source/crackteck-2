@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\AuthorizeUser;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\QuotationDetailResource;
 use App\Http\Resources\QuotationResource;
 use App\Models\Amc;
 use App\Models\AmcPlan;
@@ -72,13 +72,13 @@ class AllServicesController extends Controller
             [
                 'id' => '4',
                 'name' => 'Repair Services',
-            ]
+            ],
         ];
 
         if (empty($services)) {
             return response()->json([
                 'success' => false,
-                'message' => 'No services found.'
+                'message' => 'No services found.',
             ], 404);
         }
 
@@ -187,7 +187,7 @@ class AllServicesController extends Controller
         if ($request->service_type == 'amc') {
             $rules = [
                 'role_id' => 'required|in:4',
-                'customer_id' => 'required|integer|exists:customers,id',
+                'user_id' => 'required|integer|exists:customers,id',
                 'customer_address_id' => 'required|integer|exists:customer_address_details,id',
                 'service_type' => 'required|in:amc',
                 'products' => 'required|array|min:1',
@@ -206,7 +206,7 @@ class AllServicesController extends Controller
         } else {
             $rules = [
                 'role_id' => 'required|in:4',
-                'customer_id' => 'required|integer|exists:customers,id',
+                'user_id' => 'required|integer|exists:customers,id',
                 'customer_address_id' => 'required|integer|exists:customer_address_details,id',
                 'service_type' => 'required|in:quick_service,installation,repairing',
                 'products' => 'required|array|min:1',
@@ -246,7 +246,7 @@ class AllServicesController extends Controller
                     $amc = Amc::create([
                         'request_id' => $serviceRequest,
                         'service_type' => $request->service_type,
-                        'customer_id' => $request->customer_id,
+                        'customer_id' => $request->user_id,
                         'customer_address_id' => $request->customer_address_id,
                         'amc_plan_id' => $request->amc_plan_id,
                         'request_date' => now(),
@@ -258,53 +258,21 @@ class AllServicesController extends Controller
                     $servicesRequest = ServiceRequest::create([
                         'request_id' => $serviceRequest,
                         'service_type' => $request->service_type,
-                        'customer_id' => $request->customer_id,
+                        'customer_id' => $request->user_id,
                         'customer_address_id' => $request->customer_address_id,
-                        'created_by' => $request->customer_id,
+                        'created_by' => $request->user_id,
                         'request_date' => now(),
                         'amc_plan_id' => $request->filled('amc_plan_id')
                             ? $request->amc_plan_id
                             : null,
                         // 'request_status' => 'pending',
                         'request_source' => 'customer',
-                        // 'is_engineer_assigned' => '0',   
+                        // 'is_engineer_assigned' => '0',
                         'status' => $request->service_type == 'amc' ? 'active' : 'pending',
                     ]);
                 }
 
-
-                if ($request->service_type == 'amc')
-                //     {
-                //     $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
-
-                //     // Calculate the month gap between visits as an integer (avoid fractional months)
-                //     $monthGapFloat = intval($amcPlan->duration) / max(1, intval($amcPlan->total_visits));
-                //     $monthGap = (int) round($monthGapFloat);
-
-                //     // Ensure we have a Carbon instance for dates
-                //     $startVisitDate = $servicesRequest->visit_date ? \Carbon\Carbon::parse($servicesRequest->visit_date) : \Carbon\Carbon::now();
-
-                //     // Start from the next visit after the initial visit date
-                //     $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
-
-                //     foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
-                //         // Create a service request visit for each visit
-                //         $servicesRequest->amcScheduleMeetings()->create([
-                //             'service_request_id' => $servicesRequest->id,
-                //             'amc_id' => $amc->id,
-                //             'scheduled_at' => $nextVisitDate,
-                //             'completed_at' => null,
-                //             'remarks' => null,
-                //             'report' => null,
-                //             'visits_count' => $visitNumber,
-                //             'status' => 'scheduled',
-                //         ]);
-
-                //         // Update the next visit date for the next iteration
-                //         $nextVisitDate = $nextVisitDate->addMonths($monthGap);
-                //     }
-                // } else 
-                {
+                if ($request->service_type == 'amc') {
                     $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
 
                     // Calculate the month gap between visits as an integer (avoid fractional months)
@@ -375,21 +343,21 @@ class AllServicesController extends Controller
                     }
 
                     $images = $serviceProduct->images ?? [];
-                    if (!empty($product['images']) && is_array($product['images'])) {
+                    if (! empty($product['images']) && is_array($product['images'])) {
                         foreach ($product['images'] as $file) {
 
-                            if (!$file || !($file instanceof \Illuminate\Http\UploadedFile)) {
+                            if (! $file || ! ($file instanceof \Illuminate\Http\UploadedFile)) {
                                 continue;
                             }
 
-                            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
 
                             $file->move(
                                 public_path('uploads/crm/quick-service/products'),
                                 $filename
                             );
 
-                            $images[] = 'uploads/crm/quick-service/products/' . $filename;
+                            $images[] = 'uploads/crm/quick-service/products/'.$filename;
                         }
                     }
 
@@ -408,12 +376,13 @@ class AllServicesController extends Controller
                     $data = $servicesRequest->load('products');
                 }
 
-
                 DB::commit();
+
                 return response()->json(['quick_service_request' => $data], 200);
             }
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json(['success' => false, 'message' => 'Transaction failed.', 'errors' => $e->getMessage()], 500);
         }
     }
@@ -422,7 +391,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
@@ -437,7 +406,7 @@ class AllServicesController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $serviceRequests = ServiceRequest::where('customer_id', $validated['customer_id'])->orderBy('created_at', 'desc')->get();
+            $serviceRequests = ServiceRequest::where('customer_id', $validated['user_id'])->orderBy('created_at', 'desc')->get();
 
             return response()->json(['service_requests' => $serviceRequests], 200);
         }
@@ -447,7 +416,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
@@ -462,7 +431,7 @@ class AllServicesController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $serviceRequest = ServiceRequest::with('products', 'customer', 'quotations')->where('id', $id)->where('customer_id', $validated['customer_id'])->first();
+            $serviceRequest = ServiceRequest::with('products', 'customer', 'quotations')->where('id', $id)->where('customer_id', $validated['user_id'])->first();
 
             if (! $serviceRequest) {
                 return response()->json(['success' => false, 'message' => 'Service request not found.'], 404);
@@ -476,7 +445,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
@@ -492,7 +461,7 @@ class AllServicesController extends Controller
 
         if ($staffRole == 'customers') {
             $serviceRequest = ServiceRequest::where('id', $id)
-                ->where('customer_id', $validated['customer_id'])
+                ->where('customer_id', $validated['user_id'])
                 ->first();
 
             if (! $serviceRequest) {
@@ -505,7 +474,7 @@ class AllServicesController extends Controller
                 ->where('service_requests_id', $id)
                 ->first();
 
-            if (!$serviceRequestProduct) {
+            if (! $serviceRequestProduct) {
                 return response()->json(['success' => false, 'message' => 'Product not found.'], 404);
             }
 
@@ -520,7 +489,7 @@ class AllServicesController extends Controller
                 $dummydata = [];
                 foreach ($diagnosisList as $key => $diagnosisListData) {
                     if (isset($diagnosisListData['part_id'])) {
-                        // product data 
+                        // product data
                         $partRequest = ServiceRequestProductRequestPart::where('request_id', $id)
                             ->where('product_id', $product_id)
                             ->where('part_id', $diagnosisListData['part_id'])
@@ -528,7 +497,7 @@ class AllServicesController extends Controller
 
                         $diagnosisList[$key]['part_status'] = $partRequest ? $partRequest->status : 'pending';
 
-                        // product data 
+                        // product data
                         $productData = Product::where('id', $diagnosisListData['part_id'])->first();
                         if ($productData) {
                             $data = [
@@ -551,23 +520,6 @@ class AllServicesController extends Controller
                 ];
             }
 
-            // Get request parts for this product
-            // $requestParts = ServiceRequestProductRequestPart::where('product_id', $product_id)
-            //     ->where('request_id', $id)
-            //     ->get();
-
-            // $parts = [];
-            // foreach ($requestParts as $part) {
-            //     $parts[] = [
-            //         'id' => $part->id,
-            //         'part_id' => $part->part_id,
-            //         'requested_quantity' => $part->requested_quantity,
-            //         'request_type' => $part->request_type,
-            //         'status' => $part->status,
-            //         'requires_customer_action' => in_array($part->status, ['admin_approved', 'warehouse_approved']),
-            //     ];
-            // }
-
             return response()->json([
                 'product' => [
                     'id' => $serviceRequestProduct->id,
@@ -587,7 +539,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
             'service_request_id' => 'required|integer|exists:service_requests,id',
             'product_id' => 'required|integer|exists:service_request_products,id',
             'part_id' => 'required|integer',
@@ -609,10 +561,10 @@ class AllServicesController extends Controller
         if ($staffRole == 'customers') {
             // Verify the service request belongs to this customer
             $serviceRequest = ServiceRequest::where('id', $validated['service_request_id'])
-                ->where('customer_id', $validated['customer_id'])
+                ->where('customer_id', $validated['user_id'])
                 ->first();
 
-            if (!$serviceRequest) {
+            if (! $serviceRequest) {
                 return response()->json(['success' => false, 'message' => 'Service request not found or does not belong to this customer.'], 404);
             }
 
@@ -621,13 +573,13 @@ class AllServicesController extends Controller
                 ->where('product_id', $validated['product_id'])
                 ->first();
 
-            if (!$requestPart) {
+            if (! $requestPart) {
                 return response()->json(['success' => false, 'message' => 'Request part not found.'], 404);
             }
 
             // Check if customer action is allowed (only for admin_approved or warehouse_approved status)
-            if (!in_array($requestPart->status, ['admin_approved', 'warehouse_approved'])) {
-                return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: ' . $requestPart->status], 400);
+            if (! in_array($requestPart->status, ['admin_approved', 'warehouse_approved'])) {
+                return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: '.$requestPart->status], 400);
             }
 
             // Update the status based on customer action
@@ -637,7 +589,7 @@ class AllServicesController extends Controller
                     'customer_approved_at' => now(),
                 ]);
                 $message = 'Part approved successfully.';
-            } else if($validated['action'] === 'customer_rejected') {
+            } elseif ($validated['action'] === 'customer_rejected') {
                 $requestPart->update([
                     'status' => 'customer_rejected',
                     'customer_rejected_at' => now(),
@@ -676,9 +628,9 @@ class AllServicesController extends Controller
 
         // Pending to implement quotation list logic
         $leadQuotations = Lead::with(['quotation.products', 'customer', 'quotation' => function ($query) {
-                $query->where('status', '!=', 'draft');
-                $query->withCount('products');
-            }])
+            $query->where('status', '!=', 'draft');
+            $query->withCount('products');
+        }])
             ->where('customer_id', $validated['user_id'])
             ->whereHas('quotation', function ($query) {
                 $query->where('status', '!=', 'draft');
@@ -690,6 +642,7 @@ class AllServicesController extends Controller
         if ($data) {
             return response()->json(['data' => $data, 'success' => true], 200);
         }
+
         return response()->json(['data' => [], 'success' => false], 200);
     }
 
@@ -720,7 +673,6 @@ class AllServicesController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => $quotationDetails], 200);
-
     }
 
     public function acceptQuotation(Request $request, $id)
@@ -729,7 +681,6 @@ class AllServicesController extends Controller
             'role_id' => 'required|in:4',
             'user_id' => 'required|integer|exists:customers,id',
         ]);
-
 
         if ($validated->fails()) {
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
@@ -807,7 +758,6 @@ class AllServicesController extends Controller
 
         try {
 
-
             // Find the quotation invoice
             $invoice = QuotationInvoice::with(['quoteDetails.products', 'quoteDetails.amcDetail'])->where('id', $id)->first();
 
@@ -828,22 +778,6 @@ class AllServicesController extends Controller
             }
 
             $uniqId = uniqid();
-
-            // $serviceRequest = new ServiceRequest();
-            // $serviceRequest->request_id = $uniqId;
-            // $serviceRequest->service_type = 'amc';
-            // $serviceRequest->customer_id = $invoice->customer_id ?? null;
-            // $serviceRequest->customer_address_id = $invoice->quoteDetails->leadDetails->customer_address_id ?? null;
-            // $serviceRequest->request_date = now();
-            // $serviceRequest->request_source = 'lead_won'; // lead_won
-            // $serviceRequest->visit_date = now()->addDays(5); // after 5 days of current date
-            // $serviceRequest->reschedule_date = null;
-            // $serviceRequest->created_by = $invoice->staff_id ?? null;
-            // $serviceRequest->is_engineer_assigned = 'not_assigned';
-            // $serviceRequest->status = 'active';
-            // $serviceRequest->amc_plan_id = $invoice->amc_plan_id ?? null;
-            // $serviceRequest->save();
-
             $amc = Amc::create([
                 'request_id' => $uniqId,
                 'service_type' => 'amc',
@@ -858,7 +792,7 @@ class AllServicesController extends Controller
 
             $amcPlan = AmcPlan::where('id', $invoice->amc_plan_id)->first();
 
-            $monthGap = $amcPlan->duration / $amcPlan->total_visits; // Calculate the month gap between visits 
+            $monthGap = $amcPlan->duration / $amcPlan->total_visits; // Calculate the month gap between visits
             $startVisitDate = now()->addDays(5); // Start visit date is the initial visit date of the service request
             $nextVisitDate = $startVisitDate->addMonths($monthGap); // Set the next visit date based on the month gap
 
@@ -881,20 +815,6 @@ class AllServicesController extends Controller
 
             // add service request products according to quotation products
             foreach ($invoice->items as $item) {
-                // $serviceRequest->products()->create([
-                //     'service_requests_id' => $serviceRequest->id,
-                //     'item_code_id' => $item->item_code_id ?? null,
-                //     'name' => $item->name ?? 'N/A',
-                //     'type' => $item->type ?? 'N/A',
-                //     'model_no' => $item->model_no ?? 'N/A',
-                //     'sku' => $item->sku ?? 'N/A',
-                //     'hsn' => $item->hsn ?? 'N/A',
-                //     'purchase_date' => $item->purchase_date ?? 'N/A',
-                //     'brand' => $item->brand ?? 'N/A',
-                //     'description' => $item->description ?? 'N/A',
-                //     'service_charge' => $item->service_charge ?? '100',
-                // ]);
-
                 AmcProduct::create([
                     'amc_id' => $amc->id,
                     'name' => $item->name ?? 'N/A',
@@ -914,7 +834,7 @@ class AllServicesController extends Controller
         }
     }
 
-    // display invoice to the customer according to quotation id 
+    // display invoice to the customer according to quotation id
     public function serviceRequestInvoicesList(Request $request)
     {
         $validated = Validator::make($request->all(), [
@@ -932,6 +852,11 @@ class AllServicesController extends Controller
         if (! $staffRole) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
+
+        // $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
+        // if (! $userAuthorize) {
+        //     return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        // }
 
         // Find all quotation invoices for the customer
         $invoices = QuotationInvoice::with('quoteDetails.leadDetails', 'items')
@@ -962,8 +887,13 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
+        // $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
+        // if (! $userAuthorize) {
+        //     return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        // }
+
         // Find the quotation invoice according to quotation id
-        $invoice = QuotationInvoice::with('items')->where('quote_id', $id)->first();
+        $invoice = QuotationInvoice::with('items')->where('id', $id)->first();
 
         if (! $invoice) {
             return response()->json(['success' => false, 'message' => 'Invoice not found.'], 404);
@@ -989,6 +919,11 @@ class AllServicesController extends Controller
         if (! $staffRole) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
+
+        // $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
+        // if (! $userAuthorize) {
+        //     return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        // }
 
         // Find the quotation invoice
         $invoice = QuotationInvoice::where('id', $id)->first();
@@ -1021,6 +956,11 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
+        // $userAuthorize = AuthorizeUser::authorizeUser($request->user_id, 'staff_api');
+        // if (! $userAuthorize) {
+        //     return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        // }
+
         // Find the quotation invoice
         $invoice = QuotationInvoice::where('id', $id)->first();
 
@@ -1034,14 +974,13 @@ class AllServicesController extends Controller
         return response()->json(['success' => true, 'message' => 'Invoice rejected successfully.'], 200);
     }
 
-
     // Give Feedback APIs only for that services who status is completed
     public function giveFeedback(Request $request)
     {
         // Store only that feedback whose status is completed
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
             'service_type' => 'required|in:amc,repairing,installation,quick_service',
             'service_id' => 'required|integer',
             'rating' => 'required|numeric|min:1|max:5',
@@ -1065,14 +1004,14 @@ class AllServicesController extends Controller
         $comments = $validated['comments'] ?? null;
 
         $service = null;
-        $service = ServiceRequest::where('id', $serviceId)->where('customer_id', $validated['customer_id'])->first();
+        $service = ServiceRequest::where('id', $serviceId)->where('customer_id', $validated['user_id'])->first();
 
         if (! $service) {
             return response()->json(['success' => false, 'message' => 'Service not found.'], 404);
         }
 
         // If  feedback already exists for same service
-        $existingFeedback = Feedback::where('customer_id', $validated['customer_id'])
+        $existingFeedback = Feedback::where('customer_id', $validated['user_id'])
             ->where('service_type', $validated['service_type'])
             ->where('service_id', $validated['service_id'])
             ->first();
@@ -1092,7 +1031,7 @@ class AllServicesController extends Controller
         }
 
         $feedback = Feedback::create([
-            'customer_id' => $validated['customer_id'],
+            'customer_id' => $validated['user_id'],
             'service_type' => $validated['service_type'],
             'service_id' => $validated['service_id'],
             'rating' => $validated['rating'],
@@ -1110,7 +1049,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
@@ -1124,7 +1063,7 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        $feedbacks = Feedback::with('serviceRequest')->where('customer_id', $validated['customer_id'])->get();
+        $feedbacks = Feedback::with('serviceRequest')->where('customer_id', $validated['user_id'])->get();
 
         return response()->json(['success' => true, 'data' => $feedbacks], 200);
     }
@@ -1133,7 +1072,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
         ]);
 
         if ($validated->fails()) {
@@ -1149,7 +1088,7 @@ class AllServicesController extends Controller
 
         $feedback = Feedback::with('serviceRequest')
             ->where('id', $feedback_id)
-            ->where('customer_id', $validated['customer_id'])
+            ->where('customer_id', $validated['user_id'])
             ->first();
 
         if (! $feedback) {
@@ -1166,7 +1105,7 @@ class AllServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
-            'customer_id' => 'required|integer|exists:customers,id',
+            'user_id' => 'required|integer|exists:customers,id',
             'service_request_id' => 'required|integer|exists:service_request_product_pickups,request_id',
             'product_id' => 'required|integer|exists:service_request_product_pickups,product_id',
             'action' => 'required|in:customer_approved,customer_rejected',
@@ -1179,7 +1118,7 @@ class AllServicesController extends Controller
         $validated = $validated->validated();
         $staffRole = $this->getRoleId($validated['role_id']);
 
-        if (!$staffRole || $staffRole !== 'customers') {
+        if (! $staffRole || $staffRole !== 'customers') {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
@@ -1188,18 +1127,18 @@ class AllServicesController extends Controller
             ->where('product_id', $validated['product_id'])
             ->first();
 
-        if (!$pickup) {
+        if (! $pickup) {
             return response()->json(['success' => false, 'message' => 'Pickup request not found.'], 404);
         }
 
         // Verify the pickup belongs to this customer
-        if ($pickup->serviceRequest->customer_id != $validated['customer_id']) {
+        if ($pickup->serviceRequest->customer_id != $validated['user_id']) {
             return response()->json(['success' => false, 'message' => 'Pickup request does not belong to this customer.'], 403);
         }
 
         // Check if customer action is allowed (only for admin_approved status)
         if ($pickup->status !== 'admin_approved') {
-            return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: ' . $pickup->status], 400);
+            return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: '.$pickup->status], 400);
         }
 
         // Update the status based on customer action

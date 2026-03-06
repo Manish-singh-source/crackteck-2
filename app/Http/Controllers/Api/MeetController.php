@@ -64,8 +64,6 @@ class MeetController extends Controller
         $validated['follow_up_action'] = $validated['followUp'] ?? null;
         unset($validated['followUp']);
 
-
-
         $meet = Meet::create($validated);
 
         if (! $meet) {

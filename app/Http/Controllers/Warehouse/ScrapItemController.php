@@ -2,19 +2,17 @@
 
 namespace App\Http\Controllers\Warehouse;
 
+use App\Http\Controllers\Controller;
+use App\Models\ProductSerial;
 use App\Models\ScrapItem;
 use Illuminate\Http\Request;
-use App\Models\ProductSerial;
-use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ScrapItemController extends Controller
 {
     //
-
-
 
     public function index()
     {
@@ -23,7 +21,7 @@ class ScrapItemController extends Controller
             ->get();
         // dd($scrapItems);
 
-        return view('/warehouse/scrap-items/index',  compact('scrapItems'));
+        return view('/warehouse/scrap-items/index', compact('scrapItems'));
     }
 
     public function addToScrap(Request $request)
@@ -62,16 +60,18 @@ class ScrapItemController extends Controller
 
                 if (! $productSerial) {
                     $errors[] = "Serial ID '{$serialId}' not found or already inactive";
+
                     continue;
                 }
 
                 $product = $productSerial;
                 if (! $product) {
                     $errors[] = "Product not found for serial ID '{$serialId}'";
+
                     continue;
                 }
 
-                // Create scrap item record 
+                // Create scrap item record
 
                 ScrapItem::create([
                     'product_id' => $product->product_id,
@@ -98,9 +98,9 @@ class ScrapItemController extends Controller
             DB::commit();
 
             if ($scrappedCount > 0) {
-                $message = $scrappedCount . ' item(s) scrapped successfully';
+                $message = $scrappedCount.' item(s) scrapped successfully';
                 if (! empty($errors)) {
-                    $message .= '. Some items had errors: ' . implode(', ', $errors);
+                    $message .= '. Some items had errors: '.implode(', ', $errors);
                 }
 
                 return response()->json([
@@ -111,7 +111,7 @@ class ScrapItemController extends Controller
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No items were scrapped. Errors: ' . implode(', ', $errors),
+                    'message' => 'No items were scrapped. Errors: '.implode(', ', $errors),
                 ], 400);
             }
         } catch (\Exception $e) {
@@ -119,7 +119,7 @@ class ScrapItemController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while scrapping items: ' . $e->getMessage(),
+                'message' => 'An error occurred while scrapping items: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -155,7 +155,8 @@ class ScrapItemController extends Controller
             return redirect()->back()->with('success', 'Item removed from scrap successfully');
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('error', 'An error occurred while removing item from scrap: ' . $e->getMessage());
+
+            return redirect()->back()->with('error', 'An error occurred while removing item from scrap: '.$e->getMessage());
         }
     }
 }

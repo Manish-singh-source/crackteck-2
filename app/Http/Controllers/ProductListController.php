@@ -9,7 +9,6 @@ use App\Models\ParentCategory;
 use App\Models\Product;
 use App\Models\ProductSerial;
 use App\Models\ProductVariantAttribute;
-use App\Models\ScrapItem;
 use App\Models\SubCategory;
 use App\Models\Vendor;
 use App\Models\VendorPurchaseOrder;
@@ -21,7 +20,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
 class ProductListController extends Controller
@@ -29,7 +27,6 @@ class ProductListController extends Controller
     /**
      * Products List
      *
-     * @param Request $request
      * @return void
      */
     public function index(Request $request)
@@ -47,7 +44,6 @@ class ProductListController extends Controller
 
     /**
      * Create new product
-     * 
      */
     public function create()
     {
@@ -79,8 +75,7 @@ class ProductListController extends Controller
 
     /**
      * Store new product
-     * 
-     * @param StoreProductRequest $request
+     *
      * @return void
      */
     public function store(StoreProductRequest $request)
@@ -109,18 +104,18 @@ class ProductListController extends Controller
             // Main image
             if ($request->hasFile('main_product_image')) {
                 $file = $request->file('main_product_image');
-                $filename = time() . '_' . $file->getClientOriginalName();
+                $filename = time().'_'.$file->getClientOriginalName();
                 $file->move(public_path('uploads/products/images'), $filename);
-                $data['main_product_image'] = 'uploads/products/images/' . $filename;
+                $data['main_product_image'] = 'uploads/products/images/'.$filename;
             }
 
             // Additional images
             if ($request->hasFile('additional_product_images')) {
                 $images = [];
                 foreach ($request->file('additional_product_images') as $file) {
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
                     $file->move(public_path('uploads/products/images'), $filename);
-                    $images[] = 'uploads/products/images/' . $filename;
+                    $images[] = 'uploads/products/images/'.$filename;
                 }
                 $data['additional_product_images'] = json_encode($images);
             }
@@ -128,9 +123,9 @@ class ProductListController extends Controller
             // Datasheet
             if ($request->hasFile('datasheet_manual')) {
                 $file = $request->file('datasheet_manual');
-                $filename = time() . '_' . $file->getClientOriginalName();
+                $filename = time().'_'.$file->getClientOriginalName();
                 $file->move(public_path('uploads/products/datasheets'), $filename);
-                $data['datasheet_manual'] = 'uploads/products/datasheets/' . $filename;
+                $data['datasheet_manual'] = 'uploads/products/datasheets/'.$filename;
             }
 
             $product = Product::create($data);
@@ -154,8 +149,8 @@ class ProductListController extends Controller
 
     /**
      * View product details
-     * 
-     * @param int $id
+     *
+     * @param  int  $id
      * @return void
      */
     public function view($id)
@@ -177,8 +172,8 @@ class ProductListController extends Controller
 
     /**
      * Edit product
-     * 
-     * @param int $id
+     *
+     * @param  int  $id
      * @return void
      */
     public function edit($id)
@@ -220,9 +215,8 @@ class ProductListController extends Controller
 
     /**
      * Update product
-     * 
-     * @param UpdateProductRequest $request
-     * @param int $id
+     *
+     * @param  int  $id
      * @return void
      */
     public function update(UpdateProductRequest $request, $id)
@@ -276,14 +270,15 @@ class ProductListController extends Controller
             return redirect()->route('products.index')->with('success', 'Product updated successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error updating product: ' . $e->getMessage())->withInput();
+
+            return back()->with('error', 'Error updating product: '.$e->getMessage())->withInput();
         }
     }
 
     /**
      * Delete product
-     * 
-     * @param int $id
+     *
+     * @param  int  $id
      * @return void
      */
     public function destroy($id)
@@ -312,10 +307,9 @@ class ProductListController extends Controller
 
             return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete product: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete product: '.$e->getMessage());
         }
     }
-
 
     /**
      * Ensure product serials exist for the product based on stock quantity
@@ -348,7 +342,6 @@ class ProductListController extends Controller
             }
         }
     }
-
 
     /**
      * Save or update a product serial number
@@ -425,7 +418,8 @@ class ProductListController extends Controller
                 'data' => $productSerial,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error fetching serial data: ' . $e->getMessage());
+            Log::error('Error fetching serial data: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to load serial data',
@@ -491,18 +485,18 @@ class ProductListController extends Controller
             // Handle main product image upload
             if ($request->hasFile('main_product_image')) {
                 $mainImage = $request->file('main_product_image');
-                $mainImageName = time() . '_main_' . $mainImage->getClientOriginalName();
+                $mainImageName = time().'_main_'.$mainImage->getClientOriginalName();
                 $mainImage->move(public_path('uploads/product_serials'), $mainImageName);
-                $productSerial->main_product_image = 'uploads/product_serials/' . $mainImageName;
+                $productSerial->main_product_image = 'uploads/product_serials/'.$mainImageName;
             }
 
             // Handle additional product images upload
             if ($request->hasFile('additional_product_images')) {
                 $additionalImages = [];
                 foreach ($request->file('additional_product_images') as $image) {
-                    $imageName = time() . '_' . uniqid() . '_' . $image->getClientOriginalName();
+                    $imageName = time().'_'.uniqid().'_'.$image->getClientOriginalName();
                     $image->move(public_path('uploads/product_serials'), $imageName);
-                    $additionalImages[] = 'uploads/product_serials/' . $imageName;
+                    $additionalImages[] = 'uploads/product_serials/'.$imageName;
                 }
                 $productSerial->additional_product_images = $additionalImages;
             }
@@ -524,10 +518,11 @@ class ProductListController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error updating serial: ' . $e->getMessage());
+            Log::error('Error updating serial: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while updating the serial number: ' . $e->getMessage(),
+                'message' => 'An error occurred while updating the serial number: '.$e->getMessage(),
             ], 500);
         }
     }

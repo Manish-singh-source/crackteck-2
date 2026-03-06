@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Amc extends Model
 {
+    use LogsActivity;
     //
     protected $fillable = [
         'request_id',
@@ -20,8 +23,34 @@ class Amc extends Model
         'request_date',
         'request_source',
         'status',
-        'created_by'
+        'created_by',
     ];
+
+    /**
+     * Configure activity logging options.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'request_id',
+                'service_type',
+                'customer_id',
+                'customer_address_id',
+                'amc_plan_id',
+                'otp',
+                'otp_expiry',
+                'visit_date',
+                'reschedule_date',
+                'request_date',
+                'request_source',
+                'status',
+                'created_by',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "AMC {$eventName}");
+    }
 
     public function customer()
     {
@@ -47,5 +76,4 @@ class Amc extends Model
     {
         return $this->hasMany(AmcScheduleMeeting::class, 'amc_id');
     }
-
 }

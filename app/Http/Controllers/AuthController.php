@@ -25,9 +25,11 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+
             return redirect()->intended('demo/crm/index');
         } elseif (Auth::guard('staff_web')->attempt($credentials)) {
             $request->session()->regenerate();
+
             return redirect()->intended('demo/crm/index');
         }
 
@@ -72,9 +74,10 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        if (Auth::logout() || Auth::guard('staff_web')->logout()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         return redirect()->route('login');
     }

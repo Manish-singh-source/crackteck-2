@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
-use App\Models\Coupon;
-use Illuminate\Http\Request;
-use App\Models\ParentCategory;
-use App\Models\EcommerceProduct;
-use Illuminate\Http\JsonResponse;
 use App\Http\Requests\StoreCouponRequest;
 use App\Http\Requests\UpdateCouponRequest;
-use Illuminate\Support\Facades\{Auth, DB, Log, Validator};
+use App\Models\Brand;
+use App\Models\Coupon;
+use App\Models\EcommerceProduct;
+use App\Models\ParentCategory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CouponsController extends Controller
 {
@@ -36,6 +38,7 @@ class CouponsController extends Controller
             $query->where('status', $status);
         }
         $coupons = $query->orderBy('created_at', 'desc')->paginate(15);
+
         return view('e-commerce.coupons.index', compact('coupons'));
     }
 
@@ -87,11 +90,11 @@ class CouponsController extends Controller
                 ->with('success', 'Coupon created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Coupon Store Error: ' . $e->getMessage());
+            Log::error('Coupon Store Error: '.$e->getMessage());
 
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Something went wrong: ' . $e->getMessage());
+                ->with('error', 'Something went wrong: '.$e->getMessage());
         }
     }
 
@@ -101,13 +104,13 @@ class CouponsController extends Controller
     public function edit($id)
     {
         $coupon = Coupon::findOrFail($id);
+
         return view('e-commerce.coupons.edit', compact('coupon'));
     }
 
     /**
      * Update the specified coupon.
      */
-
     public function update(UpdateCouponRequest $request, $id)
     {
         DB::beginTransaction();
@@ -148,7 +151,6 @@ class CouponsController extends Controller
         }
     }
 
-
     /**
      * Remove the specified coupon.
      */
@@ -175,10 +177,11 @@ class CouponsController extends Controller
                 ->with('success', 'Coupon deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Coupon Delete Error: ' . $e->getMessage());
+            Log::error('Coupon Delete Error: '.$e->getMessage());
+
             return redirect()->back()->with([
                 'success' => false,
-                'message' => 'Error deleting coupon: ' . $e->getMessage(),
+                'message' => 'Error deleting coupon: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -192,13 +195,14 @@ class CouponsController extends Controller
             $query = $request->get('q', '');
 
             $categories = ParentCategory::where('name', 'LIKE', "%$query%")
-                ->where('status', "active")
+                ->where('status', 'active')
                 ->select('id', 'name')
                 ->get();
 
             return response()->json($categories);
         } catch (\Exception $e) {
-            Log::error('Category Search Error: ' . $e->getMessage());
+            Log::error('Category Search Error: '.$e->getMessage());
+
             return response()->json(['error' => 'Search failed'], 500);
         }
     }
@@ -212,14 +216,15 @@ class CouponsController extends Controller
             $query = $request->get('q', '');
 
             $brands = Brand::where('name', 'LIKE', "%$query%")
-                ->where('status', "active")
+                ->where('status', 'active')
                 ->select('id', 'name')
                 ->limit(20)
                 ->get();
 
             return response()->json($brands);
         } catch (\Exception $e) {
-            Log::error('Brand Search Error: ' . $e->getMessage());
+            Log::error('Brand Search Error: '.$e->getMessage());
+
             return response()->json(['error' => 'Search failed'], 500);
         }
     }
@@ -237,7 +242,7 @@ class CouponsController extends Controller
                     $q->where('product_name', 'like', "%{$query}%")
                         ->orWhere('sku', 'like', "%{$query}%");
                 })
-                ->where('status', "active") // 1 = Active
+                ->where('status', 'active') // 1 = Active
                 ->limit(20)
                 ->get()
                 ->map(function ($product) {
@@ -250,7 +255,8 @@ class CouponsController extends Controller
 
             return response()->json($products);
         } catch (\Exception $e) {
-            Log::error('Product Search Error: ' . $e->getMessage());
+            Log::error('Product Search Error: '.$e->getMessage());
+
             return response()->json(['error' => 'Search failed'], 500);
         }
     }

@@ -225,7 +225,7 @@ class FrontendController extends Controller
 
         $customer = \App\Models\Customer::where('email', $email)->first();
 
-        if (!$customer) {
+        if (! $customer) {
             return response()->json([
                 'success' => false,
                 'message' => 'Customer not found.',
@@ -311,9 +311,9 @@ class FrontendController extends Controller
             // Check if customer exists or create new one
             $customer = \App\Models\Customer::where('email', $request->email)->first();
 
-            if (!$customer) {
+            if (! $customer) {
                 // Generate customer code
-                $customerCode = 'CUST-' . strtoupper(uniqid());
+                $customerCode = 'CUST-'.strtoupper(uniqid());
 
                 $customer = \App\Models\Customer::create([
                     'customer_code' => $customerCode,
@@ -335,7 +335,7 @@ class FrontendController extends Controller
                 $customerAddress = \App\Models\CustomerAddressDetail::find($selectedAddressId);
             }
 
-            if (!$customerAddress) {
+            if (! $customerAddress) {
                 // Create new address only if no existing address selected
                 $customerAddress = \App\Models\CustomerAddressDetail::create([
                     'customer_id' => $customer->id,
@@ -387,8 +387,7 @@ class FrontendController extends Controller
             //     'visit_date' => $request->preferred_start_date,
             // ]);
 
-
-            // AMC Add 
+            // AMC Add
             $amc = Amc::create([
                 'request_id' => $uniqId,
                 'service_type' => 'amc',
@@ -587,7 +586,7 @@ class FrontendController extends Controller
 
         $nextNumber = $lastService ? (intval(substr($lastService->request_id, -4)) + 1) : 1;
 
-        return 'SRV-' . $year . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        return 'SRV-'.$year.'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -639,7 +638,7 @@ class FrontendController extends Controller
             $contact->first_name = $request->first_name;
             $contact->last_name = $request->last_name;
             $contact->email = $request->email;
-            // The data come static data 
+            // The data come static data
             $contact->subject = 'Inquiry From E-Commerce Website';
             $contact->phone = $request->phone;
             $contact->description = $request->description;

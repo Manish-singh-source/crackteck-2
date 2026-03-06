@@ -98,7 +98,7 @@ class MyAccountController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error adding address: ' . $e->getMessage());
+            Log::error('Error adding address: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -207,7 +207,7 @@ class MyAccountController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error updating address: ' . $e->getMessage());
+            Log::error('Error updating address: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -250,7 +250,7 @@ class MyAccountController extends Controller
                 'message' => 'Address deleted successfully!',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error deleting address: ' . $e->getMessage());
+            Log::error('Error deleting address: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -305,6 +305,7 @@ class MyAccountController extends Controller
             ->whereNotNull('amc_plan_id')
             ->orderBy('created_at', 'desc')
             ->get();
+
         // dd($servicesRequest);
         return view('frontend.my-account-amc', compact('servicesRequest'));
     }
@@ -330,22 +331,22 @@ class MyAccountController extends Controller
         }
 
         try {
-            
+
             $amcService = Amc::with([
                 'amcPlan',
                 'customer',
                 'customer.companyDetails',
                 'customer.branches',
                 'amcProducts',
-                'amcScheduleMeetings',  
+                'amcScheduleMeetings',
                 'amcScheduleMeetings.activeAssignment.engineer',
             ])
-            ->withCount('amcProducts')
-            ->where('id', $id)->where('customer_id', $customerId)->firstOrFail();
+                ->withCount('amcProducts')
+                ->where('id', $id)->where('customer_id', $customerId)->firstOrFail();
 
             return view('frontend.my-account-amc-view', compact('amcService'));
         } catch (\Exception $e) {
-            Log::error('Error viewing AMC service: ' . $e->getMessage());
+            Log::error('Error viewing AMC service: '.$e->getMessage());
 
             return redirect()->route('my-account-amc')->with('error', 'Error loading AMC service details.');
         }
@@ -379,7 +380,7 @@ class MyAccountController extends Controller
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . Auth::id(),
+            'email' => 'required|email|unique:users,email,'.Auth::id(),
             'phone' => 'nullable|string|max:20',
         ]);
 
@@ -389,7 +390,7 @@ class MyAccountController extends Controller
             $user->update([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
-                'name' => $request->first_name . ' ' . $request->last_name, // Update full name
+                'name' => $request->first_name.' '.$request->last_name, // Update full name
                 'email' => $request->email,
                 'phone' => $request->phone,
             ]);
@@ -399,11 +400,11 @@ class MyAccountController extends Controller
                 'message' => 'Profile updated successfully.',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating profile: ' . $e->getMessage());
+            Log::error('Error updating profile: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating profile: ' . $e->getMessage(),
+                'message' => 'Error updating profile: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -466,7 +467,7 @@ class MyAccountController extends Controller
                 'message' => 'Password updated successfully. Please login again with your new password.',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating password: ' . $e->getMessage());
+            Log::error('Error updating password: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -475,7 +476,7 @@ class MyAccountController extends Controller
         }
     }
 
-    // Ticket Page 
+    // Ticket Page
     public function ticket()
     {
         if (! Auth::guard('customer_web')->check()) {
@@ -517,7 +518,7 @@ class MyAccountController extends Controller
         try {
             $amc = Amc::where('id', $request->amc_id)->where('customer_id', $customerId)->first();
 
-            if (!$amc) {
+            if (! $amc) {
                 return response()->json([
                     'success' => false,
                     'message' => 'AMC service not found.',
@@ -541,11 +542,11 @@ class MyAccountController extends Controller
                 'ticket' => $ticket,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error creating AMC ticket: ' . $e->getMessage());
+            Log::error('Error creating AMC ticket: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error creating ticket: ' . $e->getMessage(),
+                'message' => 'Error creating ticket: '.$e->getMessage(),
             ], 500);
         }
     }

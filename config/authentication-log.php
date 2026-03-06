@@ -109,19 +109,19 @@ return [
     'purge' => 365,
 
     // Prevent session restorations from being logged as new logins
-    // When Laravel restores a session (e.g., page refresh, remember me cookie), 
+    // When Laravel restores a session (e.g., page refresh, remember me cookie),
     // it fires the Login event. This setting prevents those from creating duplicate log entries.
     'prevent_session_restoration_logging' => env('AUTH_LOG_PREVENT_SESSION_RESTORATION', true),
-    
+
     // Time window (in minutes) to consider a login as a session restoration
     // If an active session exists for the same device within this window, update it instead of creating a new entry
     'session_restoration_window_minutes' => env('AUTH_LOG_SESSION_RESTORATION_WINDOW', 5),
 
     // If you are behind an CDN proxy, set 'behind_cdn.http_header_field' to the corresponding http header field of your cdn
     // For cloudflare you can have look at: https://developers.cloudflare.com/fundamentals/get-started/reference/http-request-headers/
-//    'behind_cdn' => [
-//        'http_header_field' => 'HTTP_CF_CONNECTING_IP' // used by Cloudflare
-//    ],
+    //    'behind_cdn' => [
+    //        'http_header_field' => 'HTTP_CF_CONNECTING_IP' // used by Cloudflare
+    //    ],
 
     // If you are not a cdn user, use false
     'behind_cdn' => false,

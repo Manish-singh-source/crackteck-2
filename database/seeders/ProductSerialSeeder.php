@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use App\Models\Product;
 use App\Models\ProductSerial;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ProductSerialSeeder extends Seeder
 {
@@ -28,7 +28,7 @@ class ProductSerialSeeder extends Seeder
             'SKU48757',
             'SKU48758',
             'SKU48759',
-            'SKU48760'
+            'SKU48760',
         ];
 
         $products = Product::whereIn('sku', $skus)->get()->keyBy('sku');
@@ -49,7 +49,7 @@ class ProductSerialSeeder extends Seeder
                 'main_product_image' => $product->main_product_image,
                 'additional_product_images' => json_encode([$product->main_product_image]),
                 'variations' => json_encode(['color' => 'Black']),
-                'status' => "active",
+                'status' => 'active',
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
@@ -58,7 +58,7 @@ class ProductSerialSeeder extends Seeder
             $inserts[] = [
                 'product_id' => $product->id,
                 'auto_generated_serial' => ProductSerial::generateAutoSerial($product->sku),
-                'manual_serial' => 'MAN-' . $product->sku . '-001',
+                'manual_serial' => 'MAN-'.$product->sku.'-001',
                 'cost_price' => $product->cost_price ?? 0,
                 'selling_price' => $product->selling_price ?? 0,
                 'discount_price' => $product->discount_price ?? null,
@@ -67,13 +67,13 @@ class ProductSerialSeeder extends Seeder
                 'main_product_image' => $product->main_product_image,
                 'additional_product_images' => json_encode([$product->main_product_image]),
                 'variations' => json_encode(['color' => 'White']),
-                'status' => "active",
+                'status' => 'active',
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
         }
 
-        if (!empty($inserts)) {
+        if (! empty($inserts)) {
             DB::table('product_serials')->insert($inserts);
         }
     }

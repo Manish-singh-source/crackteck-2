@@ -2312,3 +2312,22 @@ service_request_products table
 service_requests_id (service_requests table id),name,type,model_no,sku,hsn,purchase_date,brand,status(pending)
 
 6. Review & Submit
+
+
+
+success response: 
+
+{
+  "success": true,
+  "message": "User created successfully",
+  "data": { }
+}
+
+
+error response: 
+
+{
+  "success": false,
+  "message": "Error creating user",
+  "data": { }
+}

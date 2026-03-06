@@ -2,28 +2,22 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Order;
-use App\Models\Product;
-use App\Models\Customer;
-use App\Models\Engineer;
-use App\Models\OrderItem;
-use App\Models\DeliveryMan;
-use App\Models\SalesPerson;
-use App\Models\StockRequest;
-use App\Models\ReturnOrder;
-use Illuminate\Http\Request;
-use App\Models\EcommerceOrder;
-use App\Models\ParentCategory;
-use App\Models\EcommerceProduct;
-use App\Models\StockRequestItem;
-use App\Models\EcommerceOrderItem;
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
+use App\Models\EcommerceProduct;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\OrderPayment;
+use App\Models\ParentCategory;
+use App\Models\Product;
+use App\Models\ReturnOrder;
+use App\Models\StockRequest;
+use App\Models\StockRequestItem;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
-
     protected function getRoleId($roleId)
     {
         return [
@@ -38,7 +32,7 @@ class OrderController extends Controller
     public function listProducts(Request $request)
     {
         $roleValidated = Validator::make($request->all(), ([
-            'role_id' => 'required|in:1,3,4',   
+            'role_id' => 'required|in:1,3,4',
         ]));
 
         if ($roleValidated->fails()) {
@@ -95,7 +89,6 @@ class OrderController extends Controller
         }
     }
 
-
     public function product(Request $request, $product_id)
     {
         $roleValidated = Validator::make($request->all(), ([
@@ -124,14 +117,12 @@ class OrderController extends Controller
     }
 
     // Buy Product
-    // role_id, product_id, quantity
     public function buyProduct(Request $request, $product_id)
     {
-        // return response()->json(['message' => $request->all()], 501);
         $roleValidated = Validator::make($request->all(), ([
             'role_id' => 'required|in:4',
             'quantity' => 'required|integer|min:1',
-            'customer_id' => 'required',
+            'user_id' => 'required',
             'shipping_address_id' => 'required',
         ]));
 
@@ -153,7 +144,7 @@ class OrderController extends Controller
             }
 
             // Store Order in Order Table
-            $customer = Customer::with('addressDetails')->where('id', $request->customer_id)->first();
+            $customer = Customer::with('addressDetails')->where('id', $request->user_id)->first();
             if (! $customer) {
                 return response()->json(['message' => 'Customer not found'], 404);
             }
@@ -163,8 +154,8 @@ class OrderController extends Controller
             $total = $quantity * $price;
 
             $order = Order::create([
-                'customer_id' => $request->customer_id,
-                'order_number' => 'ORD-' . date('YmdHis') . '-' . $request->customer_id,
+                'customer_id' => $request->user_id,
+                'order_number' => 'ORD-'.date('YmdHis').'-'.$request->user_id,
                 'total_items' => $quantity,
                 'subtotal' => $product->warehouseProduct->final_price,
                 'discount_amount' => 0,
@@ -176,8 +167,8 @@ class OrderController extends Controller
                 'billing_address_id' => null,
                 'shipping_address_id' => $request->shipping_address_id,
                 'billing_same_as_shipping' => true,
-                'status' => "pending",
-                'payment_status' => "pending",
+                'status' => 'pending',
+                'payment_status' => 'pending',
                 'expected_delivery_date' => null,
                 'customer_notes' => null,
                 'admin_notes' => null,
@@ -194,11 +185,10 @@ class OrderController extends Controller
                 'is_gift' => false,
                 'assigned_person_type' => 'delivery_man',
             ]);
-            
 
             OrderItem::create([
                 'order_id' => $order->id,
-                'product_id' => $product->id,   
+                'product_id' => $product->id,
                 'product_serial_id' => null,
                 'product_name' => $product->warehouseProduct->product_name,
                 'product_sku' => $product->warehouseProduct->sku,
@@ -215,8 +205,8 @@ class OrderController extends Controller
 
             OrderPayment::create([
                 'order_id' => $order->id,
-                'payment_id' => 'PMT-' . strtoupper(uniqid()),
-                'transaction_id' => 'TXN-' . strtoupper(uniqid()),
+                'payment_id' => 'PMT-'.strtoupper(uniqid()),
+                'transaction_id' => 'TXN-'.strtoupper(uniqid()),
                 'payment_method' => 'online',
                 'payment_gateway' => 'phonepe',
                 'amount' => $total,
@@ -224,7 +214,6 @@ class OrderController extends Controller
                 'status' => 'Completed',
                 'processed_at' => now(),
             ]);
-
 
             return response()->json([
                 'success' => true,
@@ -240,7 +229,7 @@ class OrderController extends Controller
     public function listOrders(Request $request)
     {
         $roleValidated = Validator::make($request->all(), ([
-            'customer_id' => 'required',
+            'user_id' => 'required',
             'role_id' => 'required|in:4',
         ]));
 
@@ -255,7 +244,10 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $orders = Order::with('orderItems','orderItems.product')->where('customer_id', $request->customer_id)->get();
+            $orders = Order::with('orderItems', 'orderItems.product')
+                ->where('customer_id', $request->user_id)
+                ->orderBy('created_at', 'desc')
+                ->get();
 
             return response()->json(['orders' => $orders], 200);
         }
@@ -320,11 +312,7 @@ class OrderController extends Controller
         }
     }
 
-    // Product requested by engineer
-    // in this function engineer can request multiple products at once
-    // and store in stock_requests table
-
-    // but request submit by engineer so in by requested_by field store engineer_id
+    
     public function requestProduct(Request $request)
     {
         $roleValidated = Validator::make($request->all(), ([
@@ -384,7 +372,7 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $order = Order::with('orderItems','orderItems.product')->where('id', $order_id)->first();
+            $order = Order::with('orderItems', 'orderItems.product')->where('id', $order_id)->first();
 
             if (! $order) {
                 return response()->json(['message' => 'Order not found'], 404);
@@ -410,15 +398,15 @@ class OrderController extends Controller
             ->where('customer_id', $request->customer_id)
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
         }
 
         // Check if order can be cancelled
         $cancellableStatuses = ['pending', 'admin_approved', 'assigned_delivery_man', 'order_accepted', 'product_taken'];
 
-        if (!in_array($order->status, $cancellableStatuses)) {
-            return response()->json(['success' => false, 'message' => 'This order cannot be cancelled. Current status: ' . $order->status], 400);
+        if (! in_array($order->status, $cancellableStatuses)) {
+            return response()->json(['success' => false, 'message' => 'This order cannot be cancelled. Current status: '.$order->status], 400);
         }
 
         // Update order status to cancelled
@@ -433,8 +421,8 @@ class OrderController extends Controller
             'data' => [
                 'order_id' => $order->id,
                 'order_number' => $order->order_number,
-                'status' => $order->status
-            ]
+                'status' => $order->status,
+            ],
         ]);
     }
 
@@ -454,7 +442,7 @@ class OrderController extends Controller
             ->where('customer_id', $request->customer_id)
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
         }
 
@@ -464,7 +452,7 @@ class OrderController extends Controller
         }
 
         // Check if order is returnable
-        if (!$order->is_returnable) {
+        if (! $order->is_returnable) {
             return response()->json(['success' => false, 'message' => 'This order is not returnable.'], 400);
         }
 
@@ -510,8 +498,8 @@ class OrderController extends Controller
                     'return_order_id' => $returnOrder->id,
                     'return_order_number' => $returnOrder->return_order_number,
                     'order_number' => $returnOrder->order_number,
-                    'status' => $returnOrder->status
-                ]
+                    'status' => $returnOrder->status,
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Failed to initiate return. Please try again.'], 500);

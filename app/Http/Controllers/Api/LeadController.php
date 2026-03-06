@@ -94,7 +94,7 @@ class LeadController extends Controller
             $lastCustomerCode = $lastCustomer?->customer_code ?? 'CUST0000';
             $customerCode = str_replace('CUST', '', $lastCustomerCode);
             $customerCode = (int) $customerCode + 1;
-            $customerCode = 'CUST' . str_pad($customerCode, 4, '0', STR_PAD_LEFT);
+            $customerCode = 'CUST'.str_pad($customerCode, 4, '0', STR_PAD_LEFT);
 
             // 1. Create or find customer
             $customer = Customer::firstOrCreate(
@@ -128,13 +128,13 @@ class LeadController extends Controller
             $filePath = null;
             if ($request->hasFile('file')) {
                 $file = $request->file('file');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $filename = time().'.'.$file->getClientOriginalExtension();
                 $file->move(public_path('uploads/crm/lead/file'), $filename);
-                $filePath = 'uploads/crm/lead/file/' . $filename;
+                $filePath = 'uploads/crm/lead/file/'.$filename;
             }
 
             // 3. Create lead with customer_id and customer_address_id
-            $leadNumber = 'LD-' . date('YmdHis') . '-' . $request->user_id;
+            $leadNumber = 'LD-'.date('YmdHis').'-'.$request->user_id;
 
             $lead = Lead::create([
                 'customer_id' => $customer->id,
@@ -160,6 +160,7 @@ class LeadController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json(['success' => false, 'message' => 'Failed to create lead.', 'error' => $e->getMessage()], 500);
         }
     }
@@ -202,11 +203,11 @@ class LeadController extends Controller
         if (! $lead) {
             return response()->json(['message' => 'Lead not found'], 404);
         }
-        
+
         $lead->update($request->all());
 
         $lead->load('customer', 'companyDetails');
-        
+
         return new LeadResource($lead);
     }
 

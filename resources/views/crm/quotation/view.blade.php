@@ -15,7 +15,7 @@
                                     Customer Details
                                 </h5>
                                 <div class="fw-bold text-dark">
-                                    {{ $quotation->quote_id }}
+                                    {{ $quotation->quote_number }}
                                 </div>
                             </div>
                         </div>

@@ -300,12 +300,13 @@
                     </a>
                 </li>
 
+                {{-- 
                 <li>
                     <a class='tp-link' href="{{ route('in-hand-products.index') }}">
                         <i class="fas fa-user-check"></i>
                         <span>Assign Products </span>
                     </a>
-                </li>
+                </li> --}}
                 <li class="menu-title mt-2">Customer Care Executives</li>
 
                 <li>

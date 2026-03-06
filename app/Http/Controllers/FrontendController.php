@@ -31,7 +31,7 @@ class FrontendController extends Controller
             ->get();
 
         // Get active parent categories for e-commerce display, ordered by sort_order
-        $categories = ParentCategory::where('status', '1')
+        $categories = ParentCategory::where('status', 'active')
             ->orderBy('sort_order', 'asc')
             ->get();
 

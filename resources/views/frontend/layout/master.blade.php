@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8">
     <title>Crakteck </title>
-    <meta name="author" content="Technofra.com">
+    <meta name="author" content="Crackteck">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="description" content="Technofra crackteck, Multipurpose eCommerce ">
     <meta name="csrf-token" content="{{ csrf_token() }}">

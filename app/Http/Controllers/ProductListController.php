@@ -252,7 +252,7 @@ class ProductListController extends Controller
                 $additional = [];
                 foreach ($request->file('additional_product_images') as $file) {
                     // $additional[] = $file->store('products/images', 'public');
-                    $additional[] = FileUpload::updateFileUpload($file, '','products/images');
+                    $additional[] = FileUpload::updateFileUpload($file, '','products/additional-images');
                 }
                 $data['additional_product_images'] = $additional;
             }

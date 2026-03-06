@@ -54,11 +54,12 @@
                                                                         @endif
                                                                     </td>
                                                                     <td>
-                                                                        @if ($activity->causer && $activity->causer->getRoleNames())
+                                                                        {{-- @if ($activity->causer && $activity->causer->getRoleNames())
                                                                             {{ $activity->causer->getRoleNames() }}
                                                                         @else
                                                                             N/A
-                                                                        @endif
+                                                                        @endif --}}
+                                                                        N/A
                                                                     </td>
                                                                     <td>
                                                                         <span

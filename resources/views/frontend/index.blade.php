@@ -722,16 +722,16 @@
                                     <a href="{{ route('collection.details', $collection->id) }}"
                                         class="img-style d-block">
                                         @if ($collection->image_url)
-                                            <img src="{{ asset($collection->image_url) }}" alt="{{ $collection->title }}">
+                                            <img src="{{ asset($collection->image_url) }}" alt="{{ $collection->name }}">
                                         @else
                                             <img src="{{ asset('frontend-assets/images/collection/default-collection.jpg') }}"
-                                                alt="{{ $collection->title }}">
+                                                alt="{{ $collection->name }}">
                                         @endif
                                     </a>
                                     <div class="content">
                                         <h6 class="fw-normal">
                                             <a href="{{ route('collection.details', $collection->id) }}" class="link">
-                                                {{ $collection->title }}
+                                                {{ $collection->name }}
                                             </a>
                                         </h6>
                                         @if ($collection->description)

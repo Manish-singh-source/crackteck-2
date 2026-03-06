@@ -77,8 +77,7 @@
                                             </div>
 
                                             @if (
-                                                $product->warehouseProduct->additional_product_images &&
-                                                    count($product->warehouseProduct->additional_product_images) > 0)
+                                                $product->warehouseProduct->additional_product_images)
                                                 @foreach ($product->warehouseProduct->additional_product_images as $index => $image)
                                                     <div class="swiper-slide" data-color="additional-{{ $index }}">
                                                         <a href="{{ asset($image) }}" target="_blank" class="item"
@@ -124,8 +123,7 @@
                                             </div>
 
                                             @if (
-                                                $product->warehouseProduct->additional_product_images &&
-                                                    count($product->warehouseProduct->additional_product_images) > 0)
+                                                $product->warehouseProduct->additional_product_images)
                                                 @foreach ($product->warehouseProduct->additional_product_images as $index => $image)
                                                     <div class="swiper-slide stagger-item"
                                                         data-color="additional-{{ $index }}">
@@ -836,8 +834,7 @@
                                                                     data-src="{{ asset($recentProduct->warehouseProduct->main_product_image) }}"
                                                                     alt="{{ $recentProduct->warehouseProduct->product_name }}">
                                                                 @if (
-                                                                    $recentProduct->warehouseProduct->additional_product_images &&
-                                                                        count($recentProduct->warehouseProduct->additional_product_images) > 0)
+                                                                    $recentProduct->warehouseProduct->additional_product_images)
                                                                     <img class="img-hover lazyload"
                                                                         src="{{ asset($recentProduct->warehouseProduct->additional_product_images[0]) }}"
                                                                         data-src="{{ asset($recentProduct->warehouseProduct->additional_product_images[0]) }}"

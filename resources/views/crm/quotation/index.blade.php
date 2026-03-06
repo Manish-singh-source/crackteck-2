@@ -64,7 +64,7 @@
                                                                         </a>
                                                                     </td>
                                                                     <td>{{ $quotation->leadDetails->staff->first_name ?? 'N/A' }} {{ $quotation->leadDetails->staff->last_name}}</td>
-                                                                    <td>{{ $quotation->quote_id }}</td>
+                                                                    <td>{{ $quotation->quote_number }}</td>
                                                                     <td>{{ $quotation->quote_date }}</td>
                                                                     <td>{{ $quotation->expiry_date }}</td>
                                                                     <td>{{ $quotation->leadDetails->customer->first_name }}

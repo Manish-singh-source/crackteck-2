@@ -1251,12 +1251,12 @@
                     const quantity = $('.quantity-input').val() || 1;
 
                     // Check if user is authenticated
-                    @guest
+                    @if(Auth::guard('customer_web')->user())
                         // Show login modal for unauthenticated users
                         console.log("Error");
                         showLoginModal();
                         return;
-                    @endguest
+                    @endif
 
                     // Show loading state
                     const originalText = $button.html(); $button.html(

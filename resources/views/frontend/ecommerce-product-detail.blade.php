@@ -78,7 +78,7 @@
                                             @if ($product->warehouseProduct->additional_product_images)
                                                 @php
                                                     $product->warehouseProduct->additional_product_images = json_decode(
-                                                        $product->warehouseProduct->additional_product_images,
+                                                        $product->warehouseProduct->additional_product_images ?? '[]', true
                                                     );
                                                 @endphp
 
@@ -128,7 +128,7 @@
                                             @if ($product->warehouseProduct->additional_product_images)
                                                 @php
                                                     $product->warehouseProduct->additional_product_images = json_decode(
-                                                        $product->warehouseProduct->additional_product_images,
+                                                        $product->warehouseProduct->additional_product_images ?? '[]', true
                                                     );
                                                 @endphp
                                                 @foreach ($product->warehouseProduct->additional_product_images as $index => $image)
@@ -843,7 +843,7 @@
                                                                     @php
                                                                         $recentProduct->warehouseProduct->additional_product_images = json_decode(
                                                                             $recentProduct->warehouseProduct
-                                                                                ->additional_product_images,
+                                                                                ->additional_product_images ?? '[]', true
                                                                         );
                                                                     @endphp
                                                                     <img class="img-hover lazyload"

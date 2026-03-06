@@ -87,6 +87,7 @@ class QuotationController extends Controller
 
             foreach ($request->products as $productData) {
                 // image store
+                $path = null;
                 if (isset($productData['images'])) {
                     $file = $productData['images'];
                     $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();

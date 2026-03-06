@@ -981,12 +981,12 @@ class FieldEngineerController extends Controller
                     }
 
                     // Generate PDF
-                    $pdf = PDF::loadView('crm.invoice.service-request-invoice-pdf', compact('quotation'));
-                    $pdfPath = 'invoices/service-request/' . $invoiceNumber . '.pdf';
-                    Storage::disk('public')->put($pdfPath, $pdf->output());
+                    // $pdf = PDF::loadView('crm.invoice.service-request-invoice-pdf', compact('quotation'));
+                    // $pdfPath = 'invoices/service-request/' . $invoiceNumber . '.pdf';
+                    // Storage::disk('public')->put($pdfPath, $pdf->output());
 
-                    // Update quotation with PDF path
-                    $quotation->update(['invoice_pdf' => $pdfPath]);
+                    // // Update quotation with PDF path
+                    // $quotation->update(['invoice_pdf' => $pdfPath]);
                 }
             }
 

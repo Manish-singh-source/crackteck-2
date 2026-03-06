@@ -826,6 +826,8 @@ Route::prefix('/demo')->group(function () {
     Route::controller(InvoiceController::class)->group(function () {
         // Invoice Page
         Route::get('/crm/invoice', 'index')->name('invoice.index');
+        // Service Request Quotation Invoice
+        Route::get('/crm/invoice/service-request/{id}', 'viewServiceRequestInvoice')->name('invoice.service-request');
     });
 
     // route::get('/warehouse/track-product', [TrackProductController::class, 'index'])->name('track-product.index');

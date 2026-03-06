@@ -19,6 +19,8 @@ use App\Models\Staff;
 use Illuminate\Support\Facades\{Auth, DB, Log, Storage, Validator};
 use App\Models\AmcScheduleMeeting;
 use App\Models\Product;
+use App\Models\ServiceRequestQuotation;
+use Barryvdh\DomPDF\Facade\PDF;
 
 class FieldEngineerController extends Controller
 {
@@ -811,7 +813,7 @@ class FieldEngineerController extends Controller
 
                     if ($requestPart) {
 
-                        if($requestPart->requested_quantity > $diagnosis['quantity']) {
+                        if ($requestPart->requested_quantity > $diagnosis['quantity']) {
                             $requestPart->requested_quantity = $requestPart->requested_quantity - $diagnosis['quantity'];
                         } else {
                             $requestPart->requested_quantity = 0;
@@ -926,6 +928,71 @@ class FieldEngineerController extends Controller
                         $amcScheduleMeeting->status = 'completed';
                         $amcScheduleMeeting->save();
                     }
+
+                    // Generate invoice for the service request quotation
+                    $invoiceDate = now();
+                    $dueDate = $invoiceDate->copy()->addDays(7);
+
+                    // Check if quotation already exists
+                    $existingQuotation = ServiceRequestQuotation::where('request_id', $service_request_id)->first();
+
+                    // Get service request with products and customer
+                    $serviceRequestWithRelations = ServiceRequest::with(['customer', 'products', 'products.requestParts' => function ($query) {
+                        $query->where('status', 'used');
+                    }])->find($service_request_id);
+
+                    // Calculate totals
+                    $serviceChargeTotal = $serviceRequestWithRelations->products->sum('service_charge');
+                    $productPriceTotal = 0;
+                    $partCount = 0;
+
+                    foreach ($serviceRequestWithRelations->products as $product) {
+                        if ($product->requestParts) {
+                            foreach ($product->requestParts as $part) {
+                                $productPriceTotal += ($part->product->selling_price ?? 0) * $part->requested_quantity;
+                                $partCount += $part->requested_quantity;
+                            }
+                        }
+                    }
+
+                    $subtotal = $serviceChargeTotal + $productPriceTotal;
+                    $grandTotal = $subtotal; // Add tax, discount etc. as needed
+
+                    // Generate invoice number
+                    $invoiceNumber = 'SRQ-' . date('Ymd') . '-' . str_pad($service_request_id, 4, '0', STR_PAD_LEFT);
+
+                    // Create or update quotation first
+                    $quotationData = [
+                        'invoice_number' => $invoiceNumber,
+                        'invoice_date' => $invoiceDate,
+                        'due_date' => $dueDate,
+                        'service_charge_total' => $serviceChargeTotal,
+                        'product_price_total' => $productPriceTotal,
+                        'part_count' => $partCount,
+                        'subtotal' => $subtotal,
+                        'grand_total' => $grandTotal,
+                        'payment_status' => 'unpaid',
+                    ];
+
+                    if ($existingQuotation) {
+                        $existingQuotation->update([
+                            'invoice_number' => $invoiceNumber,
+                            'invoice_date' => $invoiceDate,
+                            'due_date' => $dueDate,
+                        ]);
+                        $quotation = $existingQuotation;
+                    } else {
+                        $quotationData['request_id'] = $service_request_id;
+                        $quotation = ServiceRequestQuotation::create($quotationData);
+                    }
+
+                    // Generate PDF
+                    $pdf = PDF::loadView('crm.invoice.service-request-invoice-pdf', compact('quotation'));
+                    $pdfPath = 'invoices/service-request/' . $invoiceNumber . '.pdf';
+                    Storage::disk('public')->put($pdfPath, $pdf->output());
+
+                    // Update quotation with PDF path
+                    $quotation->update(['invoice_pdf' => $pdfPath]);
                 }
             }
 
@@ -976,7 +1043,9 @@ class FieldEngineerController extends Controller
                 'data' => [
                     'diagnosis_id' => $diagnosis->id,
                     'product_status' => $productStatus,
-                    'service_request_status' => $newServiceStatus ?? 'unchanged'
+                    'service_request_status' => $newServiceStatus ?? 'unchanged',
+                    'invoice_generated' => ($newServiceStatus === 'completed') ? true : false,
+                    'invoice_number' => ($newServiceStatus === 'completed' && isset($invoiceNumber)) ? $invoiceNumber : null,
                 ]
             ], 200);
         } catch (\Exception $e) {

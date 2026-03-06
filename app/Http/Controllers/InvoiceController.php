@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\QuotationInvoice;
 use App\Models\Order;
+use App\Models\ServiceRequestQuotation;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -19,6 +20,28 @@ class InvoiceController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('/crm/invoice/index', compact('quotationInvoices', 'ecommerceOrders'));
+        $serviceRequestQuotations = ServiceRequestQuotation::with(['serviceRequest', 'billingAddress', 'shippingAddress'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('/crm/invoice/index', compact('quotationInvoices', 'ecommerceOrders', 'serviceRequestQuotations'));
+    }
+
+    //
+    public function viewServiceRequestInvoice($id)
+    {
+        $quotation = ServiceRequestQuotation::with([
+            'serviceRequest.customer',
+            'serviceRequest.products',
+            'serviceRequest.products.requestParts' => function($query) {
+                $query->where('status', 'used');
+            },
+            'serviceRequest.products.requestParts.product',
+            'billingAddress',
+            'shippingAddress'
+        ])
+            ->findOrFail($id);
+
+        return view('/crm/invoice/service-request-invoice', compact('quotation'));
     }
 }

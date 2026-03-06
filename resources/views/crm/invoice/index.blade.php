@@ -252,31 +252,67 @@
                                             <div class="card shadow-none">
                                                 <div class="card-body">
                                                     <table
-                                                        class="table table-striped table-borderless dt-responsive nowrap service-datatable">
+                                                        class="table table-striped table-borderless dt-responsive nowrap service-datatable" style="width:100%">
                                                         <thead>
                                                             <tr>
+                                                                <th>ID</th>
+                                                                <th>Invoice Number</th>
                                                                 <th>Request ID</th>
-                                                                <th>Customer Name</th>
-                                                                <th>Request Date</th>
-                                                                <th>Product Name / Model No</th>
-                                                                <th>Request Status</th>
-                                                                <th>Request Source</th>
-                                                                <th>Assign Engineer</th>
-                                                                <th>Status</th>
+                                                                <th>Request Part Count</th>
+                                                                <th>Part Count</th>
+                                                                <th>Payment Status</th>
+                                                                <th>Invoice Date</th>
+                                                                <th>Due Date</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td colspan="9" class="text-center text-muted py-4">
-                                                                    <div class="text-muted">
-                                                                        <i class="mdi mdi-information-outline fs-1"></i>
-                                                                        <p class="mt-2">
-                                                                            No Services Invoices found.
-                                                                        </p>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                            @forelse($serviceRequestQuotations as $quotation)
+                                                                <tr>
+                                                                    <td>{{ $quotation->id }}</td>
+                                                                    <td>
+                                                                        <span class="fw-semibold">
+                                                                            {{ $quotation->invoice_number ?? 'N/A' }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>{{ $quotation->request_id ?? 'N/A' }}</td>
+                                                                    <td>{{ $quotation->request_part_count ?? 0 }}</td>
+                                                                    <td>{{ $quotation->part_count ?? 0 }}</td>
+                                                                    <td>
+                                                                        @php
+                                                                            $paymentStatusColors = [
+                                                                                'pending' => 'warning',
+                                                                                'paid' => 'success',
+                                                                                'partial' => 'info',
+                                                                                'overdue' => 'danger',
+                                                                                'cancelled' => 'secondary',
+                                                                            ];
+                                                                        @endphp
+                                                                        <span class="badge bg-{{ $paymentStatusColors[$quotation->payment_status ?? 'pending'] ?? 'secondary' }}-subtle text-{{ $paymentStatusColors[$quotation->payment_status ?? 'pending'] ?? 'secondary' }}">
+                                                                            {{ ucfirst($quotation->payment_status ?? 'Pending') }}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>{{ $quotation->invoice_date ? $quotation->invoice_date->format('d-m-Y') : 'N/A' }}</td>
+                                                                    <td>{{ $quotation->due_date ? $quotation->due_date->format('d-m-Y') : 'N/A' }}</td>
+                                                                    <td>
+                                                                        <a href="{{ route('invoice.service-request', $quotation->id) }}" target="_blank"
+                                                                            class="btn btn-sm btn-outline-primary">
+                                                                            <i class="fas fa-file-pdf me-1"></i> View
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="9" class="text-center text-muted py-4">
+                                                                        <div class="text-muted">
+                                                                            <i class="mdi mdi-information-outline fs-1"></i>
+                                                                            <p class="mt-2">
+                                                                                No Services Invoices found.
+                                                                            </p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
                                                         </tbody>
                                                     </table>
                                                 </div>

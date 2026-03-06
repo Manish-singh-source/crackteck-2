@@ -19,6 +19,7 @@ use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestProductPickup;
 use App\Models\ServiceRequestProductRequestPart;
+use App\Models\ServiceRequestQuotation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -461,7 +462,7 @@ class AllServicesController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $serviceRequest = ServiceRequest::with('products', 'customer')->where('id', $id)->where('customer_id', $validated['customer_id'])->first();
+            $serviceRequest = ServiceRequest::with('products', 'customer', 'quotations')->where('id', $id)->where('customer_id', $validated['customer_id'])->first();
 
             if (! $serviceRequest) {
                 return response()->json(['success' => false, 'message' => 'Service request not found.'], 404);
@@ -1221,6 +1222,70 @@ class AllServicesController extends Controller
             'message' => $message,
             'pickup_id' => $pickup->id,
             'status' => $pickup->status,
+        ], 200);
+    }
+
+    /**
+     * Make payment for service request quotation invoice.
+     */
+    public function makeServiceRequestQuotationPayment(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|integer',
+            'customer_id' => 'required|integer|exists:customers,id',
+            'service_request_quotations_id' => 'required|integer|exists:service_request_quotations,id',
+            'amount' => 'required|numeric|min:0.01',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+
+        // Find the quotation
+        $quotation = ServiceRequestQuotation::find($validated['service_request_quotations_id']);
+
+        if (!$quotation) {
+            return response()->json(['success' => false, 'message' => 'Service request quotation not found.'], 404);
+        }
+
+        // Verify the quotation belongs to the customer's service request
+        $serviceRequest = ServiceRequest::where('id', $quotation->request_id)
+            ->where('customer_id', $validated['customer_id'])
+            ->first();
+
+        if (!$serviceRequest) {
+            return response()->json(['success' => false, 'message' => 'Service request quotation does not belong to this customer.'], 403);
+        }
+
+        // Update the quotation with payment details
+        $newPaidAmount = ($quotation->paid_amount ?? 0) + $validated['amount'];
+        
+        // Determine payment status based on paid amount
+        $paymentStatus = 'partial';
+        if ($newPaidAmount >= $quotation->grand_total) {
+            $paymentStatus = 'paid';
+        } elseif ($newPaidAmount <= 0) {
+            $paymentStatus = 'pending';
+        }
+
+        $quotation->update([
+            'paid_amount' => $newPaidAmount,
+            'payment_status' => $paymentStatus,
+            'payment_method' => 'phonepe',
+            'paid_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment successful.',
+            'quotation_id' => $quotation->id,
+            'paid_amount' => $newPaidAmount,
+            'grand_total' => $quotation->grand_total,
+            'payment_status' => $paymentStatus,
+            'payment_method' => 'phonepe',
+            'paid_at' => $quotation->paid_at,
         ], 200);
     }
 }

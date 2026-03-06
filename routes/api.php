@@ -271,6 +271,8 @@ Route::prefix('v1')->group(function () {
             // service request quotation details
             Route::get('/service-request-quotations', 'serviceRequestQuotations');
             Route::get('/service-request-quotation-details/{id}', 'serviceRequestQuotationDetails');
+            // Make payment for service request quotation
+            Route::post('/service-request-quotation-payment', 'makeServiceRequestQuotationPayment');
 
 
             // accept or reject quotation

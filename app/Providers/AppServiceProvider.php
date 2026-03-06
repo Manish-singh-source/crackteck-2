@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\ServiceRequest;
+use App\Models\ServiceRequestProduct;
+use App\Models\ServiceRequestProductRequestPart;
+use App\Observers\ServiceRequestObserver;
+use App\Observers\ServiceRequestProductObserver;
+use App\Observers\ServiceRequestProductRequestPartObserver;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -21,6 +27,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register observers
+        ServiceRequest::observe(ServiceRequestObserver::class);
+        ServiceRequestProduct::observe(ServiceRequestProductObserver::class);
+        ServiceRequestProductRequestPart::observe(ServiceRequestProductRequestPartObserver::class);
+
         Gate::before(function ($user, $ability) {
             return $user->hasRole('Super Admin') ? true : null;
         });

@@ -7,21 +7,37 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ServiceRequestQuotation extends Model
 {
-    //
     use SoftDeletes;
 
     protected $fillable = [
-        'service_request_id',
-        'service_request_product_request_part_id',
-        'requested_part_id',
-        'product_price',
-        'service_charge',
+        'request_id',
+        'request_part_count',
+        'service_charge_total',
+        'part_count',
+        'product_price_total',
+        'subtotal',
         'delivery_charge',
-        'total_amount',
-        'discount',
-        'quotation_file',
-        'quotation_status',
-        'quotation_date',
+        'total_discount',
+        'total_tax',
+        'round_off',
+        'grand_total',
+        'currency',
+        'paid_amount',
+        'payment_status',
+        'payment_method',
+        'paid_at',
+        'billing_address_id',
+        'shipping_address_id',
+        'invoice_number',
+        'invoice_date',
+        'due_date',
+        'invoice_pdf',
+    ];
+
+    protected $casts = [
+        'invoice_date' => 'date',
+        'due_date' => 'date',
+        'paid_at' => 'datetime',
     ];
 
     public function serviceRequest()
@@ -29,8 +45,13 @@ class ServiceRequestQuotation extends Model
         return $this->belongsTo(ServiceRequest::class, 'request_id');
     }
 
-    public function serviceRequestPart()
+    public function billingAddress()
     {
-        return $this->belongsTo(ServiceRequestProductRequestPart::class, 'request_part_id');
+        return $this->belongsTo(CustomerAddressDetail::class, 'billing_address_id');
+    }
+
+    public function shippingAddress()
+    {
+        return $this->belongsTo(CustomerAddressDetail::class, 'shipping_address_id');
     }
 }

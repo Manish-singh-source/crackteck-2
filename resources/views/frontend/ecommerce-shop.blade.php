@@ -379,14 +379,14 @@
                                                     <span class="tooltip">Compare</span>
                                                 </a>
                                             </li>
-                                            <li>
+                                            {{-- <li>
                                                 <a href="{{ route('product.detail', $product->id) }}"
                                                     data-bs-toggle="modal" data-product-id="{{ $product->id }}"
                                                     class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
                                                     <span class="icon icon-view"></span>
                                                     <span class="tooltip">Quick View</span>
                                                 </a>
-                                            </li>
+                                            </li> --}}
                                         </ul>
                                         @if (
                                             $product->warehouseProduct &&

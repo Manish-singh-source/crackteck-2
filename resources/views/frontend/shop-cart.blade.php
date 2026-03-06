@@ -170,10 +170,12 @@
                                     <span>Subtotal:</span>
                                     <span id="cart_subtotal">₹{{ number_format($subtotal ?? 0, 2) }}</span>
                                 </div>
+                                @if(isset($tax)) 
                                 <div class="d-flex justify-content-between mb-2">
                                     <span>Tax:</span>
-                                    <span>{{ $tax }}%</span>
+                                    <span>{{ $tax ?? 0 }}%</span>
                                 </div>
+                                @endif 
                                 <div id="discount_row" class="d-flex justify-content-between mb-2 text-success"
                                     style="display: none;">
                                     <span>Discount:</span>

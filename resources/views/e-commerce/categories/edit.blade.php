@@ -323,7 +323,7 @@
                                                                     'name' => 'name',
                                                                     'type' => 'text',
                                                                     'placeholder' => 'Enter Sub Categorie',
-                                                                    'model' => $subCategory->name,
+                                                                    'model' => $subCategory?->name ?? '',
                                                                 ])
                                                             </div>
 
@@ -356,7 +356,7 @@
                                                                         '0' => 'Inactive',
                                                                         '1' => 'Active',
                                                                     ],
-                                                                    'model' => $subCategory,
+                                                                    'model' => $subCategory ?? '',
                                                                     'required' => true,
                                                                 ])
                                                             </div>
@@ -370,7 +370,7 @@
                                                                         '0' => 'Inactive',
                                                                         '1' => 'Active',
                                                                     ],
-                                                                    'model' => $subCategory,
+                                                                    'model' => $subCategory ?? '',
                                                                     'required' => true,
                                                                 ])
                                                             </div>
@@ -439,7 +439,7 @@
                                     'name' => 'name',
                                     'type' => 'text',
                                     // 'placeholder' => 'Enter Sub Categorie',
-                                    'model' => $subCategory->name,
+                                    'model' => $subCategory?->name ?? '',
                                     'required' => true,
                                 ])
                             </div>

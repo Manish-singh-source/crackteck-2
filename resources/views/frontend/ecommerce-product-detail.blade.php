@@ -76,11 +76,12 @@
                                             </div>
 
                                             @if ($product->warehouseProduct->additional_product_images)
+                                                {{-- 
                                                 @php
                                                     $product->warehouseProduct->additional_product_images = json_decode(
                                                         $product->warehouseProduct->additional_product_images ?? '[]', true
                                                     );
-                                                @endphp
+                                                @endphp --}}
 
                                                 @foreach ($product->warehouseProduct->additional_product_images as $index => $image)
                                                     <div class="swiper-slide" data-color="additional-{{ $index }}">
@@ -126,11 +127,12 @@
                                             </div>
 
                                             @if ($product->warehouseProduct->additional_product_images)
+                                                {{-- 
                                                 @php
                                                     $product->warehouseProduct->additional_product_images = json_decode(
                                                         $product->warehouseProduct->additional_product_images ?? '[]', true
                                                     );
-                                                @endphp
+                                                @endphp --}}
                                                 @foreach ($product->warehouseProduct->additional_product_images as $index => $image)
                                                     <div class="swiper-slide stagger-item"
                                                         data-color="additional-{{ $index }}">
@@ -840,12 +842,14 @@
                                                                     data-src="{{ asset($recentProduct->warehouseProduct->main_product_image) }}"
                                                                     alt="{{ $recentProduct->warehouseProduct->product_name }}">
                                                                 @if ($recentProduct->warehouseProduct->additional_product_images)
+                                                                    {{-- 
                                                                     @php
                                                                         $recentProduct->warehouseProduct->additional_product_images = json_decode(
                                                                             $recentProduct->warehouseProduct
                                                                                 ->additional_product_images ?? '[]', true
                                                                         );
-                                                                    @endphp
+                                                                    @endphp 
+                                                                    --}}
                                                                     <img class="img-hover lazyload"
                                                                         src="{{ asset($recentProduct->warehouseProduct->additional_product_images[0]) }}"
                                                                         data-src="{{ asset($recentProduct->warehouseProduct->additional_product_images[0]) }}"

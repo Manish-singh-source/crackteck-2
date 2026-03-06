@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileUpload;
 use App\Http\Requests\StoreWebsiteBannerRequest;
 use App\Http\Requests\UpdateWebsiteBannerRequest;
 use App\Models\WebsiteBanner;
@@ -50,10 +51,12 @@ class BannerController extends Controller
             // Image upload
             $path = null;
             if ($request->hasFile('image')) {
-                $file = $request->file('image');
-                $filename = time().'_'.$file->getClientOriginalName();
-                $file->move(public_path('uploads/e-commerce/banner/website_banner'), $filename);
-                $path = 'uploads/e-commerce/banner/website_banner/'.$filename;
+                // $file = $request->file('image');
+                // $filename = time().'_'.$file->getClientOriginalName();
+                // $file->move(public_path('uploads/e-commerce/banner/website_banner'), $filename);
+                // $path = 'uploads/e-commerce/banner/website_banner/'.$filename;
+
+                $path = FileUpload::fileUpload($request->file('image'), 'uploads/e-commerce/banner/website_banner/');
             }
 
             $banner = WebsiteBanner::create([
@@ -132,14 +135,15 @@ class BannerController extends Controller
             // Image upload
             $path = $banner->image_url;
             if ($request->hasFile('image')) {
-                if ($path && File::exists(public_path($path))) {
-                    File::delete(public_path($path));
-                }
+                // if ($path && File::exists(public_path($path))) {
+                //     File::delete(public_path($path));
+                // }
 
-                $file = $request->file('image');
-                $filename = time().'_'.$file->getClientOriginalName();
-                $file->move(public_path('uploads/e-commerce/banner/website_banner'), $filename);
-                $path = 'uploads/e-commerce/banner/website_banner/'.$filename;
+                // $file = $request->file('image');
+                // $filename = time().'_'.$file->getClientOriginalName();
+                // $file->move(public_path('uploads/e-commerce/banner/website_banner'), $filename);
+                // $path = 'uploads/e-commerce/banner/website_banner/'.$filename;
+                $path = FileUpload::updateFileUpload($request->file('image'), $banner->image_url, 'uploads/e-commerce/banner/website_banner/');
             }
 
             $banner->update([

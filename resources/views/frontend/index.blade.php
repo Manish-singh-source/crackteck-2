@@ -43,7 +43,7 @@
                 @foreach ($banners as $index => $banner)
                     <!-- Slide {{ $index + 1 }} -->
                     <div class="carousel-item {{ $index === 0 ? 'active' : '' }}"
-                        style="background-image: url('{{ $banner->image_url }}');">
+                        style="background-image: url('{{ asset($banner->image_url) ?? asset('frontend-assets/images/banner/main-banner-1.jpg') }}');">
                         <div class="container">
                             <div class="carousel-caption">
                                 @if ($banner->title)

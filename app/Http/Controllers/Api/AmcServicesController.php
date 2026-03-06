@@ -24,7 +24,7 @@ class AmcServicesController extends Controller
     {
         $validated = Validator::make($request->all(), [
             // validation rules if any
-            'role_id' => 'required|in:4',
+            'role_id' => 'required|in:3,4',
         ]);
 
         if ($validated->fails()) {
@@ -39,7 +39,7 @@ class AmcServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        if ($staffRole == 'customers') {
+        if ($staffRole == 'customers' || $staffRole == 'sales_person') {
             $amcPlans = AmcPlan::where('status', 'active')->get();
             $amcPlansCoveredItems = [];
             foreach ($amcPlans as $plan) {

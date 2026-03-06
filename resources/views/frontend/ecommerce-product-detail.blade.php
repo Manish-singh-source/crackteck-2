@@ -30,8 +30,7 @@
                             itemtype="https://schema.org/ListItem">
                             <a href="{{ route('shop') }}?category={{ $product->warehouseProduct->parentCategorie->id }}"
                                 class="body-small link" itemprop="item">
-                                <span
-                                    itemprop="name">{{ $product->warehouseProduct->parentCategorie->name }}</span>
+                                <span itemprop="name">{{ $product->warehouseProduct->parentCategorie->name }}</span>
                             </a>
                             <meta itemprop="position" content="3" />
                         </li>
@@ -76,15 +75,19 @@
                                                 </a>
                                             </div>
 
-                                            @if (
-                                                $product->warehouseProduct->additional_product_images)
+                                            @if ($product->warehouseProduct->additional_product_images)
+                                                @php
+                                                    $recentProduct->warehouseProduct->additional_product_images = json_decode(
+                                                        $recentProduct->warehouseProduct->additional_product_images,
+                                                    );
+                                                @endphp
+
                                                 @foreach ($product->warehouseProduct->additional_product_images as $index => $image)
                                                     <div class="swiper-slide" data-color="additional-{{ $index }}">
                                                         <a href="{{ asset($image) }}" target="_blank" class="item"
                                                             data-pswp-width="600px" data-pswp-height="800px">
                                                             <img class="tf-image-zoom ls-is-cached lazyload"
-                                                                src="{{ asset($image) }}"
-                                                                data-zoom="{{ asset($image) }}"
+                                                                src="{{ asset($image) }}" data-zoom="{{ asset($image) }}"
                                                                 data-src="{{ asset($image) }}"
                                                                 alt="{{ $product->warehouseProduct->product_name }} - Image {{ $index + 1 }}">
                                                         </a>
@@ -122,8 +125,12 @@
                                                 </div>
                                             </div>
 
-                                            @if (
-                                                $product->warehouseProduct->additional_product_images)
+                                            @if ($product->warehouseProduct->additional_product_images)
+                                                @php
+                                                    $recentProduct->warehouseProduct->additional_product_images = json_decode(
+                                                        $recentProduct->warehouseProduct->additional_product_images,
+                                                    );
+                                                @endphp
                                                 @foreach ($product->warehouseProduct->additional_product_images as $index => $image)
                                                     <div class="swiper-slide stagger-item"
                                                         data-color="additional-{{ $index }}">
@@ -234,9 +241,7 @@
                                                     <h4 class="text-primary">
                                                         ₹{{ number_format($product->warehouseProduct->final_price, 2) }}
                                                     </h4>
-                                                    @if (
-                                                        $product->warehouseProduct->discount_price &&
-                                                            $product->warehouseProduct->discount_price > 0)
+                                                    @if ($product->warehouseProduct->discount_price && $product->warehouseProduct->discount_price > 0)
                                                         <span
                                                             class="price-text text-main-2 old-price">₹{{ number_format($product->warehouseProduct->final_price + $product->warehouseProduct->discount_price, 2) }}</span>
                                                     @endif
@@ -335,14 +340,15 @@
                                             <li>
                                                 <p class="body-md-2 fw-semibold">Return</p>
                                                 <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
-                                                     7 Day Return
+                                                    7 Day Return
                                                 </span>
                                             </li>
                                         @else
                                             <li>
                                                 <p class="body-md-2 fw-semibold">Return</p>
-                                                <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
-                                                     Non-Returnable
+                                                <span
+                                                    class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
+                                                    Non-Returnable
                                                 </span>
                                             </li>
                                         @endif
@@ -363,14 +369,14 @@
                                             </div> --}}
                                             <div class="product-box-btn">
                                                 <a href="#;" class="tf-btn text-white add-to-cart-btn"
-                                                   data-product-id="{{ $product->id }}"
-                                                   data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                    data-product-id="{{ $product->id }}"
+                                                    data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
                                                     Add to cart
                                                     <i class="icon-cart-2"></i>
                                                 </a>
                                                 <a href="#;" class="tf-btn text-white btn-gray buy-now-btn"
-                                                   data-product-id="{{ $product->id }}"
-                                                   data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                    data-product-id="{{ $product->id }}"
+                                                    data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
                                                     Buy now
                                                 </a>
                                             </div>
@@ -833,8 +839,13 @@
                                                                     src="{{ asset($recentProduct->warehouseProduct->main_product_image) }}"
                                                                     data-src="{{ asset($recentProduct->warehouseProduct->main_product_image) }}"
                                                                     alt="{{ $recentProduct->warehouseProduct->product_name }}">
-                                                                @if (
-                                                                    $recentProduct->warehouseProduct->additional_product_images)
+                                                                @if ($recentProduct->warehouseProduct->additional_product_images)
+                                                                    @php
+                                                                        $recentProduct->warehouseProduct->additional_product_images = json_decode(
+                                                                            $recentProduct->warehouseProduct
+                                                                                ->additional_product_images,
+                                                                        );
+                                                                    @endphp
                                                                     <img class="img-hover lazyload"
                                                                         src="{{ asset($recentProduct->warehouseProduct->additional_product_images[0]) }}"
                                                                         data-src="{{ asset($recentProduct->warehouseProduct->additional_product_images[0]) }}"
@@ -1178,115 +1189,116 @@
 @section('script')
     <script>
         $(document).ready(function() {
-            // Quantity selector functionality
-            $('.btn-quantity-decrease').on('click', function() {
-                const input = $(this).siblings('.quantity-input');
-                const currentValue = parseInt(input.val());
-                const minValue = parseInt(input.attr('min')) || 1;
+                // Quantity selector functionality
+                $('.btn-quantity-decrease').on('click', function() {
+                    const input = $(this).siblings('.quantity-input');
+                    const currentValue = parseInt(input.val());
+                    const minValue = parseInt(input.attr('min')) || 1;
 
-                if (currentValue > minValue) {
-                    input.val(currentValue - 1);
-                    updatePriceDisplay();
-                }
-            });
-
-            $('.btn-quantity-increase').on('click', function() {
-                const input = $(this).siblings('.quantity-input');
-                const currentValue = parseInt(input.val());
-                const maxValue = parseInt(input.attr('max'));
-
-                if (!maxValue || currentValue < maxValue) {
-                    input.val(currentValue + 1);
-                    updatePriceDisplay();
-                }
-            });
-
-            $('.quantity-input').on('change', function() {
-                const minValue = parseInt($(this).attr('min')) || 1;
-                const maxValue = parseInt($(this).attr('max'));
-                let currentValue = parseInt($(this).val());
-
-                if (currentValue < minValue) {
-                    $(this).val(minValue);
-                } else if (maxValue && currentValue > maxValue) {
-                    $(this).val(maxValue);
-                }
-
-                updatePriceDisplay();
-            });
-
-            // Update price display based on quantity
-            function updatePriceDisplay() {
-                const quantity = parseInt($('.quantity-input').val()) || 1;
-                const basePrice = parseFloat($('.current-price').text().replace('₹', '').replace(',', '')) || 0;
-                const totalPrice = basePrice * quantity;
-
-                $('.price-display').text('- ₹' + totalPrice.toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }));
-            }
-
-            // Add to Cart functionality
-            $('.add-to-cart-btn, .add-to-cart').on('click', function(e) {
-                e.preventDefault();
-
-                const $button = $(this);
-                const productId = $button.data('product-id');
-                const quantity = $('.quantity-input').val() || 1;
-
-                // Check if user is authenticated
-                @guest
-                    // Show login modal for unauthenticated users
-                    showLoginModal();
-                    return;
-                @endguest
-
-                // Show loading state
-                const originalText = $button.html();
-                $button.html('<i class="spinner-border spinner-border-sm me-2"></i>Adding...');
-                $button.prop('disabled', true);
-
-                // Make AJAX request
-                $.ajax({
-                    url: '{{ route("cart.add") }}',
-                    method: 'POST',
-                    data: {
-                        ecommerce_product_id: productId,
-                        quantity: quantity
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            showNotification(response.message, 'success');
-
-                            // Update button state
-                            $button.html('Added to Cart <i class="icon-cart-2"></i>');
-                            $button.addClass('in-cart');
-
-                            // Update cart count and sidebar
-                            updateCartCount();
-                            updateCartSidebar();
-                        } else {
-                            showNotification(response.message, 'error');
-                            // Reset button state
-                            $button.html(originalText);
-                        }
-                    },
-                    error: function(xhr) {
-                        if (xhr.status === 401 && xhr.responseJSON && xhr.responseJSON.requires_auth) {
-                            showLoginModal();
-                        } else {
-                            console.log(xhr.responseText);
-                            showNotification('Error adding product to cart. Please try again.', 'error');
-                            // Reset button state
-                            $button.html(originalText);
-                        }
-                    },
-                    complete: function() {
-                        $button.prop('disabled', false);
+                    if (currentValue > minValue) {
+                        input.val(currentValue - 1);
+                        updatePriceDisplay();
                     }
                 });
-            });
+
+                $('.btn-quantity-increase').on('click', function() {
+                    const input = $(this).siblings('.quantity-input');
+                    const currentValue = parseInt(input.val());
+                    const maxValue = parseInt(input.attr('max'));
+
+                    if (!maxValue || currentValue < maxValue) {
+                        input.val(currentValue + 1);
+                        updatePriceDisplay();
+                    }
+                });
+
+                $('.quantity-input').on('change', function() {
+                    const minValue = parseInt($(this).attr('min')) || 1;
+                    const maxValue = parseInt($(this).attr('max'));
+                    let currentValue = parseInt($(this).val());
+
+                    if (currentValue < minValue) {
+                        $(this).val(minValue);
+                    } else if (maxValue && currentValue > maxValue) {
+                        $(this).val(maxValue);
+                    }
+
+                    updatePriceDisplay();
+                });
+
+                // Update price display based on quantity
+                function updatePriceDisplay() {
+                    const quantity = parseInt($('.quantity-input').val()) || 1;
+                    const basePrice = parseFloat($('.current-price').text().replace('₹', '').replace(',', '')) || 0;
+                    const totalPrice = basePrice * quantity;
+
+                    $('.price-display').text('- ₹' + totalPrice.toLocaleString('en-IN', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }));
+                }
+
+                // Add to Cart functionality
+                $('.add-to-cart-btn, .add-to-cart').on('click', function(e) {
+                        e.preventDefault();
+
+                        const $button = $(this);
+                        const productId = $button.data('product-id');
+                        const quantity = $('.quantity-input').val() || 1;
+
+                        // Check if user is authenticated
+                        @guest
+                        // Show login modal for unauthenticated users
+                        showLoginModal();
+                        return;
+                    @endguest
+
+                    // Show loading state
+                    const originalText = $button.html(); $button.html(
+                        '<i class="spinner-border spinner-border-sm me-2"></i>Adding...'); $button.prop('disabled',
+                        true);
+
+                    // Make AJAX request
+                    $.ajax({
+                        url: '{{ route('cart.add') }}',
+                        method: 'POST',
+                        data: {
+                            ecommerce_product_id: productId,
+                            quantity: quantity
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                showNotification(response.message, 'success');
+
+                                // Update button state
+                                $button.html('Added to Cart <i class="icon-cart-2"></i>');
+                                $button.addClass('in-cart');
+
+                                // Update cart count and sidebar
+                                updateCartCount();
+                                updateCartSidebar();
+                            } else {
+                                showNotification(response.message, 'error');
+                                // Reset button state
+                                $button.html(originalText);
+                            }
+                        },
+                        error: function(xhr) {
+                            if (xhr.status === 401 && xhr.responseJSON && xhr.responseJSON.requires_auth) {
+                                showLoginModal();
+                            } else {
+                                console.log(xhr.responseText);
+                                showNotification('Error adding product to cart. Please try again.',
+                                    'error');
+                                // Reset button state
+                                $button.html(originalText);
+                            }
+                        },
+                        complete: function() {
+                            $button.prop('disabled', false);
+                        }
+                    });
+                });
 
             // Buy Now functionality
             $('.buy-now-btn').on('click', function(e) {
@@ -1301,7 +1313,8 @@
                 $(this).prop('disabled', true);
 
                 // Redirect to checkout with buy_now parameters
-                const checkoutUrl = '{{ route("checkout") }}' + '?source=buy_now&product_id=' + productId + '&quantity=' + quantity;
+                const checkoutUrl = '{{ route('checkout') }}' + '?source=buy_now&product_id=' + productId +
+                    '&quantity=' + quantity;
 
                 showNotification('Redirecting to checkout...', 'info');
 
@@ -1313,27 +1326,26 @@
 
             // Wishlist functionality
             $('.wishlist-btn').on('click', function(e) {
-                e.preventDefault();
+                    e.preventDefault();
 
-                const productId = $(this).data('product-id');
-                const $button = $(this);
-                const $icon = $button.find('i');
-                const $text = $button.find('.wishlist-text');
+                    const productId = $(this).data('product-id');
+                    const $button = $(this);
+                    const $icon = $button.find('i');
+                    const $text = $button.find('.wishlist-text');
 
-                // Check if user is authenticated
-                @guest
+                    // Check if user is authenticated
+                    @guest
                     showNotification('Please login to add products to your wishlist.', 'warning');
                     return;
                 @endguest
 
                 // Show loading state
-                const originalIconClass = $icon.attr('class');
-                $icon.removeClass('fas far').addClass('icon-loading');
-                $button.prop('disabled', true);
+                const originalIconClass = $icon.attr('class'); $icon.removeClass('fas far').addClass(
+                    'icon-loading'); $button.prop('disabled', true);
 
                 // Make AJAX request
                 $.ajax({
-                    url: '{{ route("wishlist.toggle") }}',
+                    url: '{{ route('wishlist.toggle') }}',
                     method: 'POST',
                     data: {
                         ecommerce_product_id: productId
@@ -1382,50 +1394,50 @@
                 });
             });
 
-            // Image zoom functionality (if not already implemented)
-            $('.tf-image-zoom').on('mouseenter', function() {
-                $(this).css('transform', 'scale(1.2)');
-            }).on('mouseleave', function() {
-                $(this).css('transform', 'scale(1)');
-            });
+        // Image zoom functionality (if not already implemented)
+        $('.tf-image-zoom').on('mouseenter', function() {
+            $(this).css('transform', 'scale(1.2)');
+        }).on('mouseleave', function() {
+            $(this).css('transform', 'scale(1)');
+        });
 
-            // Tab switching with URL hash support
-            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
-                const target = $(e.target).attr('data-bs-target');
-                window.location.hash = target;
-            });
+        // Tab switching with URL hash support
+        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+            const target = $(e.target).attr('data-bs-target');
+            window.location.hash = target;
+        });
 
-            // Load tab from URL hash on page load
-            if (window.location.hash) {
-                const hash = window.location.hash;
-                const tabButton = $('button[data-bs-target="' + hash + '"]');
-                if (tabButton.length) {
-                    tabButton.tab('show');
-                }
+        // Load tab from URL hash on page load
+        if (window.location.hash) {
+            const hash = window.location.hash;
+            const tabButton = $('button[data-bs-target="' + hash + '"]');
+            if (tabButton.length) {
+                tabButton.tab('show');
             }
+        }
 
-            // Smooth scroll to tabs when clicking from external links
-            $('.scroll-to-tabs').on('click', function(e) {
-                e.preventDefault();
-                const target = $(this).attr('href');
-                $('html, body').animate({
-                    scrollTop: $(target).offset().top - 100
-                }, 500);
-            });
+        // Smooth scroll to tabs when clicking from external links
+        $('.scroll-to-tabs').on('click', function(e) {
+            e.preventDefault();
+            const target = $(this).attr('href');
+            $('html, body').animate({
+                scrollTop: $(target).offset().top - 100
+            }, 500);
+        });
 
-            // Recently viewed products hover effects
-            $('.product-card-hover').on('mouseenter', function() {
-                $(this).find('.img-hover').css('opacity', '1');
-                $(this).find('.img-product').css('opacity', '0');
-            }).on('mouseleave', function() {
-                $(this).find('.img-hover').css('opacity', '0');
-                $(this).find('.img-product').css('opacity', '1');
-            });
+        // Recently viewed products hover effects
+        $('.product-card-hover').on('mouseenter', function() {
+            $(this).find('.img-hover').css('opacity', '1');
+            $(this).find('.img-product').css('opacity', '0');
+        }).on('mouseleave', function() {
+            $(this).find('.img-hover').css('opacity', '0');
+            $(this).find('.img-product').css('opacity', '1');
+        });
 
-            // Utility functions
-            function showNotification(message, type = 'info') {
-                // Create notification element
-                const notification = $(`
+        // Utility functions
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = $(`
             <div class="alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show position-fixed"
                  style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
                 ${message}
@@ -1433,69 +1445,69 @@
             </div>
         `);
 
-                // Add to body
-                $('body').append(notification);
+            // Add to body
+            $('body').append(notification);
 
-                // Auto remove after 3 seconds
-                setTimeout(() => {
-                    notification.alert('close');
-                }, 3000);
-            }
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                notification.alert('close');
+            }, 3000);
+        }
 
-            // Cart count function is now global in master layout
+        // Cart count function is now global in master layout
 
-            // Initialize tooltips
-            if (typeof bootstrap !== 'undefined') {
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-                    return new bootstrap.Tooltip(tooltipTriggerEl);
-                });
-            }
+        // Initialize tooltips
+        if (typeof bootstrap !== 'undefined') {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }
 
-            // Initialize product image gallery swiper if not already done
-            if (typeof Swiper !== 'undefined') {
-                // Main gallery swiper
-                const galleryMain = new Swiper('.tf-product-media-main', {
-                    spaceBetween: 10,
-                    navigation: {
-                        nextEl: '.thumbs-next',
-                        prevEl: '.thumbs-prev',
-                    },
-                    thumbs: {
-                        swiper: {
-                            el: '.tf-product-media-thumbs',
-                            spaceBetween: 10,
-                            slidesPerView: 4,
-                            freeMode: true,
-                            watchSlidesProgress: true,
-                        }
+        // Initialize product image gallery swiper if not already done
+        if (typeof Swiper !== 'undefined') {
+            // Main gallery swiper
+            const galleryMain = new Swiper('.tf-product-media-main', {
+                spaceBetween: 10,
+                navigation: {
+                    nextEl: '.thumbs-next',
+                    prevEl: '.thumbs-prev',
+                },
+                thumbs: {
+                    swiper: {
+                        el: '.tf-product-media-thumbs',
+                        spaceBetween: 10,
+                        slidesPerView: 4,
+                        freeMode: true,
+                        watchSlidesProgress: true,
                     }
-                });
+                }
+            });
 
-                // Recently viewed products swiper
-                const recentlyViewedSwiper = new Swiper('.recently-viewed-products .tf-sw-products', {
-                    slidesPerView: 2,
-                    spaceBetween: 15,
-                    navigation: {
-                        nextEl: '.recently-viewed-products .swiper-button-next',
-                        prevEl: '.recently-viewed-products .swiper-button-prev',
+            // Recently viewed products swiper
+            const recentlyViewedSwiper = new Swiper('.recently-viewed-products .tf-sw-products', {
+                slidesPerView: 2,
+                spaceBetween: 15,
+                navigation: {
+                    nextEl: '.recently-viewed-products .swiper-button-next',
+                    prevEl: '.recently-viewed-products .swiper-button-prev',
+                },
+                breakpoints: {
+                    640: {
+                        slidesPerView: 3,
+                        spaceBetween: 20,
                     },
-                    breakpoints: {
-                        640: {
-                            slidesPerView: 3,
-                            spaceBetween: 20,
-                        },
-                        768: {
-                            slidesPerView: 4,
-                            spaceBetween: 20,
-                        },
-                        1024: {
-                            slidesPerView: 5,
-                            spaceBetween: 30,
-                        },
-                    }
-                });
-            }
+                    768: {
+                        slidesPerView: 4,
+                        spaceBetween: 20,
+                    },
+                    1024: {
+                        slidesPerView: 5,
+                        spaceBetween: 30,
+                    },
+                }
+            });
+        }
         });
 
         // Load more reviews functionality
@@ -1520,7 +1532,7 @@
         // Function to update cart sidebar
         function updateCartSidebar() {
             $.ajax({
-                url: '{{ route("cart.data") }}',
+                url: '{{ route('cart.data') }}',
                 method: 'GET',
                 success: function(response) {
                     if (response.success) {

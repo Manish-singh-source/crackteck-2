@@ -43,6 +43,7 @@ class FrontendController extends Controller
             ->limit(8) // Limit to 8 collections for homepage display
             ->get();
 
+        //
         // Get active deals that are currently running
         // $activeDeals = ProductDeal::with([
         //     'dealItems.ecommerceProduct.warehouseProduct.brand',

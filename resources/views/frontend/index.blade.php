@@ -721,8 +721,8 @@
                                 <div class="wg-cls hover-img type-abs wow fadeInUp" data-wow-delay="0s">
                                     <a href="{{ route('collection.details', $collection->id) }}"
                                         class="img-style d-block">
-                                        @if ($collection->image)
-                                            <img src="{{ asset($collection->image) }}" alt="{{ $collection->title }}">
+                                        @if ($collection->image_url)
+                                            <img src="{{ asset($collection->image_url) }}" alt="{{ $collection->title }}">
                                         @else
                                             <img src="{{ asset('frontend-assets/images/collection/default-collection.jpg') }}"
                                                 alt="{{ $collection->title }}">

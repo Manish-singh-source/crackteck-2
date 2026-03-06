@@ -76,12 +76,12 @@
                                             </div>
 
                                             @if ($product->warehouseProduct->additional_product_images)
-                                                {{-- 
+                                                
                                                 @php
                                                     $product->warehouseProduct->additional_product_images = json_decode(
                                                         $product->warehouseProduct->additional_product_images ?? '[]', true
                                                     );
-                                                @endphp --}}
+                                                @endphp
 
                                                 @foreach ($product->warehouseProduct->additional_product_images as $index => $image)
                                                     <div class="swiper-slide" data-color="additional-{{ $index }}">

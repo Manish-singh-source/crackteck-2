@@ -818,26 +818,6 @@
                             </a>
                         </p>
                     </form>
-                    {{-- <div class=" orther-log text-center">
-                        <span class="br-line bg-gray-5"></span>
-                        <p class="caption text-main-2 ">
-                            Or login with
-                        </p>
-                    </div>
-                    <ul class="list-log">
-                        <li>
-                            <a href="https://www.facebook.com/" class="tf-btn btn-line w-100">
-                                <i class="icon icon-facebook-2"></i>
-                                <span class="body-md-2 fw-semibold">Facebook</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://www.google.com/" class="tf-btn btn-line w-100">
-                                <i class="icon icon-google"></i>
-                                <span class="body-md-2 fw-semibold">Google</span>
-                            </a>
-                        </li>
-                    </ul> --}}
                 </div>
             </div>
         </div>

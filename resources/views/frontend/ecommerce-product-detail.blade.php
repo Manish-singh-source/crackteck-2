@@ -76,10 +76,10 @@
                                             </div>
 
                                             @if ($product->warehouseProduct->additional_product_images)
-                                                
                                                 @php
                                                     $product->warehouseProduct->additional_product_images = json_decode(
-                                                        $product->warehouseProduct->additional_product_images ?? '[]', true
+                                                        $product->warehouseProduct->additional_product_images ?? '[]',
+                                                        true,
                                                     );
                                                 @endphp
 
@@ -1554,23 +1554,47 @@
         function showLoginModal() {
             // Create and show login modal
             const modalHtml = `
-                <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="loginModalLabel">Login Required</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body text-center">
-                                <p>Please login to add products to your cart.</p>
-                                <div class="d-flex gap-2 justify-content-center">
-                                    <a href="{{ route('ecommerce.login') }}" class="btn btn-primary">Login</a>
-                                    <a href="{{ route('ecommerce.signup') }}" class="btn btn-outline-primary">Sign Up</a>
-                                </div>
-                            </div>
+                <div class="modal modalCentered fade modal-log" id="log">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <span class="icon icon-close btn-hide-popup" data-bs-dismiss="modal"></span>
+                <div class="modal-log-wrap list-file-delete">
+                    <h5 class="title fw-semibold">Log In</h5>
+                    <form class="form-log" action="{{ route('frontend.login') }}" method="POST">
+                        @csrf
+                        <div class="form-content">
+                            <fieldset>
+                                <label class="fw-semibold body-md-2" id="email">
+                                    Email Id
+                                </label>
+                                <input type="email" name="email" placeholder="Your email" autocomplete="off"
+                                    required>
+                            </fieldset>
+                            <fieldset>
+                                <label class="fw-semibold body-md-2" id="password">
+                                    Password
+                                </label>
+                                <input type="password" placeholder="Enter your password" autocomplete="off"
+                                    name="password" required>
+                            </fieldset>
+                            <a href="#" class="link text-end body-text-3">
+                                Forgot password ?
+                            </a>
                         </div>
-                    </div>
+                        <button type="submit" class="tf-btn w-100 text-white">
+                            Login
+                        </button>
+                        <p class="body-text-3 text-center">
+                            Don't you have an account?
+                            <a href="#register" data-bs-toggle="modal" class="text-primary">
+                                Register
+                            </a>
+                        </p>
+                    </form>
                 </div>
+            </div>
+        </div>
+    </div>
             `;
 
             // Remove existing modal if any

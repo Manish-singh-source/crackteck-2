@@ -47,10 +47,19 @@ use App\Http\Controllers\TrackRequestController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\WithdrawController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\SocialController;
 
 Route::get('/', function () {
     return view('comming-soon');
 })->name('comming-soon');
+
+Route::get('/auth/{provider}/redirect', [SocialController::class, 'redirectToProvider'])
+    ->whereIn('provider', ['google', 'facebook', 'github'])
+    ->name('auth.redirect');
+
+Route::get('/auth/{provider}/callback', [SocialController::class, 'handleProviderCallback'])
+    ->whereIn('provider', ['google', 'facebook', 'github'])
+    ->name('auth.callback');
 
 Route::prefix('/demo')->group(function () {
 

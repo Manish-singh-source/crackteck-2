@@ -172,7 +172,7 @@ class FieldEngineerController extends Controller
         ]);
 
         if ($validated->fails()) {
-            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+            return ApiResponse::error('Validation failed.', $validated->errors(), 422);
         }
 
         $serviceRequest = ServiceRequest::with([
@@ -188,7 +188,8 @@ class FieldEngineerController extends Controller
             ->where('status', 'active')
             ->first();
 
-        return response()->json(['serviceRequest' => $serviceRequest, 'activeAssignment' => $activeAssignment], 200);
+        // return response()->json(['serviceRequest' => $serviceRequest, 'activeAssignment' => $activeAssignment], 200);
+        return ApiResponse::success([['serviceRequests' => $serviceRequest, 'activeAssignment' => $activeAssignment]]);
     }
 
     public function serviceRequestProductDetails(Request $request, $id, $product_id)

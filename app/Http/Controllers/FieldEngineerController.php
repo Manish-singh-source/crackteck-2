@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ApiResponse;
 use App\Models\AmcScheduleMeeting;
 use App\Models\AssignedEngineer;
 use App\Models\CaseTransferRequest;
@@ -148,7 +149,7 @@ class FieldEngineerController extends Controller
         ]);
 
         if ($validated->fails()) {
-            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+            return ApiResponse::error('Validation failed.', $validated->errors(), 422);
         }
 
         $serviceRequests = ServiceRequest::with(['customer', 'products'])
@@ -160,7 +161,7 @@ class FieldEngineerController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return response()->json(['serviceRequests' => $serviceRequests], 200);
+        return ApiResponse::success(['serviceRequests' => $serviceRequests]);
     }
 
     public function serviceRequestDetails(Request $request, $id)

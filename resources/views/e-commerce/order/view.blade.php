@@ -53,7 +53,7 @@
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Order Date:</span>
-                                            <span>{{ $order->created_at->format('d M Y h:i A') }}</span>
+                                            <span>{{ $order->created_at ? \App\Helpers\DateFormat::formatDateTime($order->created_at) : 'N/A' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Order Source:</span>
@@ -115,7 +115,7 @@
                                             </li>
                                             <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                                 <span class="fw-semibold">Expected Delivery Date:</span>
-                                                <span>{{ $order->expected_delivery_date ?? 'N/A' }}</span>
+                                                <span>{{ $order->expected_delivery_date ? \App\Helpers\DateFormat::formatDateTime($order->expected_delivery_date) : 'N/A' }}</span>
                                             </li>
                                         @endif
                                         <!-- Return Delivery Status Display - Show for all return order statuses -->
@@ -160,7 +160,7 @@
 
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Confirmed At:</span>
-                                            <span>{{ $order->confirmed_at ?? 'N/A' }}</span>
+                                            <span>{{ \App\Helpers\DateFormat::formatDateTime($order->confirmed_at) ?? 'N/A' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Assigned Person:</span>
@@ -169,33 +169,33 @@
 
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Assigned At:</span>
-                                            <span>{{ $order->assigned_at ?? 'N/A' }}</span>
+                                            <span>{{ $order->assigned_at ? \App\Helpers\DateFormat::formatDateTime($order->assigned_at) : 'N/A' }}</span>
                                         </li>
 
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Accepted At:</span>
-                                            <span>{{ $order->accepted_at ?? 'N/A' }}</span>
+                                            <span>{{ $order->accepted_at ? \App\Helpers\DateFormat::formatDateTime($order->accepted_at) : 'N/A' }}</span>
                                         </li>
 
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Shipped At:</span>
-                                            <span>{{ $order->shipped_at ?? 'N/A' }}</span>
+                                            <span>{{ $order->shipped_at ? \App\Helpers\DateFormat::formatDateTime($order->shipped_at) : 'N/A' }}</span>
                                         </li>
 
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Delivered At:</span>
-                                            <span>{{ $order->delivered_at ?? 'N/A' }}</span>
+                                            <span>{{ $order->delivered_at ? \App\Helpers\DateFormat::formatDateTime($order->delivered_at) : 'N/A' }}</span>
                                         </li>
 
                                         <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                             <span class="fw-semibold">Cancelled At:</span>
-                                            <span>{{ $order->cancelled_at ?? 'N/A' }}</span>
+                                            <span>{{ $order->cancelled_at ? \App\Helpers\DateFormat::formatDateTime($order->cancelled_at) : 'N/A' }}</span>
                                         </li>
 
                                         @if ($order->expected_delivery_date)
                                             <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                                 <span class="fw-semibold">Expected Delivery:</span>
-                                                <span>{{ $order->expected_delivery_date->format('d M Y') }}</span>
+                                                <span>{{ $order->expected_delivery_date ? \App\Helpers\DateFormat::formatDateTime($order->expected_delivery_date) : 'N/A' }}</span>
                                             </li>
                                         @endif
 
@@ -211,23 +211,23 @@
                                             </li>
                                             <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                                 <span class="fw-semibold">Return Assigned At:</span>
-                                                <span>{{ $returnOrder->return_assigned_at ? $returnOrder->return_assigned_at->format('d M Y h:i A') : 'N/A' }}</span>
+                                                <span>{{ $returnOrder->return_assigned_at ? \App\Helpers\DateFormat::formatDateTime($returnOrder->return_assigned_at): 'N/A' }}</span>
                                             </li>
                                             <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                                 <span class="fw-semibold">Return Accepted At:</span>
-                                                <span>{{ $returnOrder->return_accepted_at ? $returnOrder->return_accepted_at->format('d M Y h:i A') : 'N/A' }}</span>
+                                                <span>{{ $returnOrder->return_accepted_at ? \App\Helpers\DateFormat::formatDateTime($returnOrder->return_accepted_at): 'N/A' }}</span>
                                             </li>
                                             <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                                 <span class="fw-semibold">Return Picked At:</span>
-                                                <span>{{ $returnOrder->return_picked_at ? $returnOrder->return_picked_at->format('d M Y h:i A') : 'N/A' }}</span>
+                                                <span>{{ $returnOrder->return_picked_at ? \App\Helpers\DateFormat::formatDateTime($returnOrder->return_picked_at): 'N/A' }}</span>
                                             </li>
                                             <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                                 <span class="fw-semibold">Return Received At:</span>
-                                                <span>{{ $returnOrder->return_delivered_at ? $returnOrder->return_delivered_at->format('d M Y h:i A') : 'N/A' }}</span>
+                                                <span>{{ $returnOrder->return_delivered_at ? \App\Helpers\DateFormat::formatDateTime($returnOrder->return_delivered_at): 'N/A' }}</span>
                                             </li>
                                             <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                                 <span class="fw-semibold">Return Completed At:</span>
-                                                <span>{{ $returnOrder->return_completed_at ? $returnOrder->return_completed_at->format('d M Y h:i A') : 'N/A' }}</span>
+                                                <span>{{ $returnOrder->return_completed_at ? \App\Helpers\DateFormat::formatDateTime($returnOrder->return_completed_at): 'N/A' }}</span>
                                             </li>
                                         @endif
 

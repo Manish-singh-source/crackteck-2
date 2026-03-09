@@ -42,7 +42,6 @@ use App\Http\Controllers\SparePartController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StockReportController;
 use App\Http\Controllers\SupportTicketController;
-use App\Http\Controllers\TrackProductController;
 use App\Http\Controllers\TrackRequestController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\WithdrawController;
@@ -172,7 +171,23 @@ Route::prefix('/demo')->group(function () {
     Route::get('/crm/payments', [PaymentController::class, 'index'])->name('payments');
 
     // Reimbursement Page
-    Route::get('/crm/reimbursement', [ReimbursementController::class, 'index'])->name('reimbursement');
+    Route::controller(ReimbursementController::class)->group(function () {
+        Route::get('/crm/reimbursement', 'index')->name('reimbursement');
+        // Expenses Create Page
+        Route::get('/crm/reimbursement-expenses', 'create')->name('reimbursement.create');
+        // Store Expense
+        Route::post('/crm/store-reimbursements', 'store')->name('reimbursement.store');
+        // View Expense
+        Route::get('/crm/view-reimbursement/{id}', 'view')->name('reimbursement.view');
+        // Edit Expense
+        Route::get('/crm/edit-reimbursement/{id}', 'edit')->name('reimbursement.edit');
+        // Update Expense
+        Route::put('/crm/update-reimbursement/{id}', 'update')->name('reimbursement.update');
+        // Delete Expense
+        Route::delete('/crm/delete-reimbursement/{id}', 'delete')->name('reimbursement.delete');
+        // Update Expense Status
+        Route::post('/crm/update-reimbursement-status/{id}', 'updateStatus')->name('reimbursement.update-status');
+    });
 
     // Withdraw Page
     Route::get('/crm/withdraw', [WithdrawController::class, 'index'])->name('withdraw');
@@ -240,20 +255,18 @@ Route::prefix('/demo')->group(function () {
     Route::controller(ExpensesController::class)->group(function () {
         // Expenses List Page
         Route::get('/crm/expenses', 'index')->name('expenses.index');
-        // Expenses Create Page
+        // Create Expenses List Page
         Route::get('/crm/create-expenses', 'create')->name('expenses.create');
-        // Store Expense
+        // Store Expenses List Page
         Route::post('/crm/store-expenses', 'store')->name('expenses.store');
-        // View Expense
-        Route::get('/crm/view-expenses/{id}', 'view')->name('expenses.view');
-        // Edit Expense
-        Route::get('/crm/edit-expenses/{id}', 'edit')->name('expenses.edit');
-        // Update Expense
-        Route::put('/crm/update-expenses/{id}', 'update')->name('expenses.update');
-        // Delete Expense
-        Route::delete('/crm/delete-expenses/{id}', 'delete')->name('expenses.delete');
-        // Update Expense Status
-        Route::post('/crm/update-expense-status/{id}', 'updateStatus')->name('expenses.update-status');
+        // View Expenses List Page
+        Route::get('/crm/view-expenses', 'view')->name('expenses.view');
+        // Edit Expenses List Page
+        Route::get('/crm/edit-expenses', 'edit')->name('expenses.edit');
+        // Update Expenses List Page
+        Route::put('/crm/update-expenses', 'update')->name('expenses.update');
+        // Delete Expenses List Page
+        Route::delete('/crm/delete-expenses', 'delete')->name('expenses.delete');
     });
 
     // ######################## Stock Request  ########################
@@ -531,7 +544,6 @@ Route::prefix('/demo')->group(function () {
             Route::post('/amcs-request/ticket-status/{id}', 'updateTicketStatus')->name('amcs-request.ticket-status');
             // Reschedule AMC
             Route::post('/amcs-request/reschedule', 'rescheduleAmcRequest')->name('amcs-request.reschedule');
-
         });
     });
 

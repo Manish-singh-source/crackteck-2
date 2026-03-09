@@ -12,7 +12,7 @@
 
             <div class="row">
                 <div class="col-12">
-                    <form action="{{ route('jobs.update', $job->id) }}" method="POST">
+                    <form action="{{ route('jobs.update', 1) }}" method="POST">
                         @csrf
                         @method('PUT')
                         <div class="card">
@@ -28,7 +28,7 @@
                                                     'name' => 'customer_type',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Customer Type',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
                                         <div class="col-xl-4 col-lg-6">
@@ -38,7 +38,7 @@
                                                     'name' => 'first_name',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Your First Name',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
                                         <div class="col-xl-4 col-lg-6">
@@ -48,7 +48,7 @@
                                                     'name' => 'last_name',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Your Last Name',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
 
@@ -59,7 +59,7 @@
                                                     'name' => 'phone',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Your Phone Number',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
 
@@ -70,7 +70,7 @@
                                                     'name' => 'email',
                                                     'type' => 'email',
                                                     'placeholder' => 'Enter Your Email',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
 
@@ -81,7 +81,7 @@
                                                     'name' => 'dob',
                                                     'type' => 'date',
                                                     'placeholder' => 'Enter Your Date Of Birth',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
 
@@ -92,7 +92,7 @@
                                                     'name' => 'address',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Your Address Line 1',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
                                         <div class="col-xl-4 col-lg-6">
@@ -102,7 +102,7 @@
                                                     'name' => 'address2',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Your Address Line 2',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
                                         <div class="col-xl-4 col-lg-6">
@@ -112,7 +112,7 @@
                                                     'name' => 'country',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Your Country',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
                                         <div class="col-xl-4 col-lg-6">
@@ -122,7 +122,7 @@
                                                     'name' => 'state',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Your State',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
                                         <div class="col-xl-4 col-lg-6">
@@ -132,7 +132,7 @@
                                                     'name' => 'city',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Your City',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
                                         <div class="col-xl-4 col-lg-6">
@@ -142,18 +142,9 @@
                                                     'name' => 'pin_code',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Your Pin Code',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
-
-                                        <!-- <div class="col-xl-4 col-lg-6">
-                                                                        <div>
-                                                                            <label for="address" class="form-label">
-                                                                                Priority Level
-                                                                            </label>
-                                                                            <input type="text" name="address" value="" class="form-control" placeholder="Enter your Priority Level" id="address">
-                                                                        </div>
-                                                                    </div> -->
                                     </div>
                             </div>
 
@@ -166,7 +157,7 @@
                                                 'name' => 'company_name',
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your Company Name',
-                                                'model' => $job])
+                                                'model' => []])
                                         </div>
                                     </div>
                                     <div class="col-xl-4 col-lg-6">
@@ -176,7 +167,7 @@
                                                 'name' => 'company_address',
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your Company Address',
-                                                'model' => $job])
+                                                'model' => []])
                                         </div>
                                     </div>
                                     <div class="col-xl-4 col-lg-6">
@@ -186,7 +177,7 @@
                                                 'name' => 'gst_no',
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your GST Number',
-                                                'model' => $job])
+                                                'model' => []])
                                         </div>
                                     </div>
                                     <div class="col-xl-4 col-lg-6">
@@ -196,7 +187,7 @@
                                                 'name' => 'pan_no',
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your PAN Number',
-                                                'model' => $job])
+                                                'model' => []])
                                         </div>
                                     </div>
                                     <div class="col-xl-4 col-lg-6">
@@ -205,7 +196,7 @@
                                                 'label' => 'Profile Image',
                                                 'name' => 'profile_img',
                                                 'type' => 'file',
-                                                'model' => $job])
+                                                'model' => []])
                                         </div>
                                     </div>
                                     <div class="col-xl-4 col-lg-6">
@@ -214,7 +205,7 @@
                                                 'label' => 'Image',
                                                 'name' => 'image',
                                                 'type' => 'file',
-                                                'model' => $job])
+                                                'model' => []])
                                         </div>
                                         <div id="image-preview-section">
 
@@ -231,7 +222,7 @@
                                                     'Medium' => 'Medium',
                                                     'Low' => 'Low',
                                                 ],
-                                                'model' => $job])
+                                                'model' => []])
                                         </div>
                                     </div>
                                 </div>
@@ -251,7 +242,7 @@
                                                     'name' => 'product_name',
                                                     'type' => 'text',
                                                     'placeholder' => 'Dell Inspiron 15 Laptop Windows 11',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
 
@@ -266,7 +257,7 @@
                                                         'Laptop' => 'Laptop',
                                                         'Accessories' => 'Accessories',
                                                     ],
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
 
@@ -277,7 +268,7 @@
                                                     'name' => 'product_brand',
                                                     'type' => 'text',
                                                     'placeholder' => 'Dell, HP, Asus',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
 
@@ -288,7 +279,7 @@
                                                     'name' => 'model_no',
                                                     'type' => 'text',
                                                     'placeholder' => 'Inspiron 3511',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
 
@@ -299,7 +290,7 @@
                                                     'name' => 'serial_no',
                                                     'type' => 'text',
                                                     'placeholder' => 'B0BB7FQBBS',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
 
@@ -309,7 +300,7 @@
                                                     'label' => 'Purchase Date',
                                                     'name' => 'purchase_date',
                                                     'type' => 'date',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
                                         <div class="col-xl-4 col-lg-6">
@@ -318,7 +309,7 @@
                                                     'label' => 'Image',
                                                     'name' => 'image',
                                                     'type' => 'file',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                             <div id="image-preview-section">
 
@@ -331,7 +322,7 @@
                                                     'name' => 'issue_type',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Issue',
-                                                    'model' => $job])
+                                                    'model' => []])
                                             </div>
                                         </div>
                                         <div class="col-xl-4 col-lg-6">

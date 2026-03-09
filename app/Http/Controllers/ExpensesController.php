@@ -13,29 +13,7 @@ class ExpensesController extends Controller
      */
     public function index(Request $request)
     {
-        $query = StaffWallet::with('staff');
-
-        // Apply filters
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->whereHas('staff', function ($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('staff_code', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->has('status') && $request->status) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->has('staff_type') && $request->staff_type) {
-            $query->where('staff_type', $request->staff_type);
-        }
-
-        $expenses = $query->orderBy('created_at', 'desc')->paginate(10);
-
-        return view('/crm/accounts/expenses/index', compact('expenses'));
+        return view('/crm/accounts/expenses/index');
     }
 
     /**

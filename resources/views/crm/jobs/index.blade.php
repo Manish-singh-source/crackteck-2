@@ -19,8 +19,6 @@
             <div class="row">
                 <div class="col-12">
                     <div class="card">
-
-
                         <div class="card-body pt-0">
                             <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
                                 <li class="nav-item" role="presentation">
@@ -30,7 +28,6 @@
                                         <span class="d-none d-sm-block">All Jobs</span>
                                     </a>
                                 </li>
-
                             </ul>
 
                             <div class="tab-content text-muted">
@@ -41,7 +38,8 @@
                                                 <div class="card-header border-bottom-dashed">
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         <h5 class="card-title mb-0">Jobs List</h5>
-                                                        <button type="button" class="btn btn-danger btn-sm" id="bulk-delete-jobs-btn" style="display: none;">
+                                                        <button type="button" class="btn btn-danger btn-sm"
+                                                            id="bulk-delete-jobs-btn" style="display: none;">
                                                             <i class="mdi mdi-delete"></i> Delete Selected
                                                         </button>
                                                     </div>
@@ -52,7 +50,8 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>
-                                                                    <input type="checkbox" id="select-all-jobs" class="form-check-input">
+                                                                    <input type="checkbox" id="select-all-jobs"
+                                                                        class="form-check-input">
                                                                 </th>
                                                                 <th>Job Id</th>
                                                                 <th>Customer Name</th>
@@ -65,7 +64,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($jobs as $job)
+                                                            {{-- @foreach ($jobs as $job)
                                                                 <tr class="job-row" data-job-id="{{ $job->id }}">
                                                                     <td>
                                                                         <input type="checkbox" class="form-check-input job-checkbox" value="{{ $job->id }}">
@@ -114,7 +113,60 @@
                                                                         </form>
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            @endforeach --}}
+                                                            <tr class="job-row" data-job-id="">
+                                                                <td>
+                                                                    <input type="checkbox"
+                                                                        class="form-check-input job-checkbox"
+                                                                        value="">
+                                                                </td>
+                                                                <td>
+                                                                    1
+                                                                </td>
+                                                                <td>John Doe</td>
+                                                                <td>Tech</td>
+                                                                <td>PC Not Working</td>
+                                                                <td>Hign</td>
+                                                                <td>2026/03/07</td>
+                                                                <td>
+                                                                    <span
+                                                                        class="badge bg-warning-subtle text-warning fw-semibold">Open</span>
+                                                                </td>
+                                                                <td>
+                                                                    <a aria-label="anchor"
+                                                                        href="{{ route('jobs.view', 1) }}"
+                                                                        class="btn btn-icon btn-sm bg-primary-subtle me-1"
+                                                                        data-bs-toggle="tooltip"
+                                                                        data-bs-original-title="View">
+                                                                        <i
+                                                                            class="mdi mdi-eye-outline fs-14 text-primary"></i>
+                                                                    </a>
+                                                                    <a aria-label="anchor"
+                                                                        href="{{ route('jobs.edit', 1) }}"
+                                                                        class="btn btn-icon btn-sm bg-warning-subtle me-1"
+                                                                        data-bs-toggle="tooltip"
+                                                                        data-bs-original-title="Edit">
+                                                                        <i
+                                                                            class="mdi mdi-pencil-outline fs-14 text-warning"></i>
+                                                                    </a>
+                                                                    <form style="display: inline-block"
+                                                                        action="{{ route('jobs.delete', 1) }}"
+                                                                        method="POST"
+                                                                        onsubmit="return confirm('Are you sure?')">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                        <button type="submit"
+                                                                            class="btn btn-icon btn-sm bg-danger-subtle delete-row"
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-original-title="Delete"><i
+                                                                                class="mdi mdi-delete fs-14 text-danger"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="8">No records found</td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -126,72 +178,73 @@
                         </div>
                     </div>
                 </div>
-            </div> <!-- container-fluid -->
-        </div> <!-- content -->
+            </div>
+        </div>
+    </div>
 
-<script>
-    $(document).ready(function() {
-        // Select all jobs checkbox
-        $('#select-all-jobs').on('change', function() {
-            const isChecked = $(this).is(':checked');
-            $('.job-checkbox').prop('checked', isChecked);
-            toggleBulkDeleteButton();
-        });
-
-        // Individual job checkbox
-        $('.job-checkbox').on('change', function() {
-            const totalCheckboxes = $('.job-checkbox').length;
-            const checkedCheckboxes = $('.job-checkbox:checked').length;
-
-            $('#select-all-jobs').prop('checked', totalCheckboxes === checkedCheckboxes);
-            toggleBulkDeleteButton();
-        });
-
-        // Toggle bulk delete button visibility
-        function toggleBulkDeleteButton() {
-            const checkedCount = $('.job-checkbox:checked').length;
-            if (checkedCount > 0) {
-                $('#bulk-delete-jobs-btn').show();
-            } else {
-                $('#bulk-delete-jobs-btn').hide();
-            }
-        }
-
-        // Bulk delete jobs
-        $('#bulk-delete-jobs-btn').on('click', function() {
-            const selectedJobs = [];
-            $('.job-checkbox:checked').each(function() {
-                selectedJobs.push($(this).val());
+    <script>
+        $(document).ready(function() {
+            // Select all jobs checkbox
+            $('#select-all-jobs').on('change', function() {
+                const isChecked = $(this).is(':checked');
+                $('.job-checkbox').prop('checked', isChecked);
+                toggleBulkDeleteButton();
             });
 
-            if (selectedJobs.length === 0) {
-                alert('Please select at least one job to delete.');
-                return;
+            // Individual job checkbox
+            $('.job-checkbox').on('change', function() {
+                const totalCheckboxes = $('.job-checkbox').length;
+                const checkedCheckboxes = $('.job-checkbox:checked').length;
+
+                $('#select-all-jobs').prop('checked', totalCheckboxes === checkedCheckboxes);
+                toggleBulkDeleteButton();
+            });
+
+            // Toggle bulk delete button visibility
+            function toggleBulkDeleteButton() {
+                const checkedCount = $('.job-checkbox:checked').length;
+                if (checkedCount > 0) {
+                    $('#bulk-delete-jobs-btn').show();
+                } else {
+                    $('#bulk-delete-jobs-btn').hide();
+                }
             }
 
-            if (confirm('Are you sure you want to delete ' + selectedJobs.length + ' job(s)? This will also delete all associated devices.')) {
-                $.ajax({
-                    url: '/crm/bulk-delete-jobs',
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        job_ids: selectedJobs
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            alert(response.message);
-                            location.reload();
-                        } else {
-                            alert('Error: ' + response.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        alert('Error deleting jobs. Please try again.');
-                    }
+            // Bulk delete jobs
+            $('#bulk-delete-jobs-btn').on('click', function() {
+                const selectedJobs = [];
+                $('.job-checkbox:checked').each(function() {
+                    selectedJobs.push($(this).val());
                 });
-            }
-        });
-    });
-</script>
 
-    @endsection
+                if (selectedJobs.length === 0) {
+                    alert('Please select at least one job to delete.');
+                    return;
+                }
+
+                if (confirm('Are you sure you want to delete ' + selectedJobs.length +
+                        ' job(s)? This will also delete all associated devices.')) {
+                    $.ajax({
+                        url: '/crm/bulk-delete-jobs',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            job_ids: selectedJobs
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                alert(response.message);
+                                location.reload();
+                            } else {
+                                alert('Error: ' + response.message);
+                            }
+                        },
+                        error: function(xhr) {
+                            alert('Error deleting jobs. Please try again.');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+@endsection

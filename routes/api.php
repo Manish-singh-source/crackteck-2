@@ -39,6 +39,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/signup', [ApiAuthController::class, 'signup']);
     Route::post('/send-otp', [ApiAuthController::class, 'login']);
     Route::post('/verify-otp', [ApiAuthController::class, 'verifyOtp']);
+    Route::post('/google-login', [ApiAuthController::class, 'googleLogin']);
 
     // Public route for staff wallet status update (used by admin panel)
     Route::put('/staff-expenses/{id}/status', [StaffWalletController::class, 'updateStatus']);
@@ -390,13 +391,13 @@ Route::prefix('v1')->group(function () {
         // Staff Wallet / Expense APIs for Engineer and Delivery Man
         Route::controller(StaffWalletController::class)->group(function () {
             // Get expense details
-            Route::get('/staff-expenses', 'index');
+            Route::get('/staff-reimbursements', 'index');
             // Submit expense form
-            Route::post('/staff-expenses', 'store');
+            Route::post('/staff-reimbursements', 'store');
             // Get single expense details
-            Route::get('/staff-expenses/{id}', 'show');
+            Route::get('/staff-reimbursements/{id}', 'show');
             // Get expense history
-            Route::get('/staff-expenses-history', 'history');
+            Route::get('/staff-reimbursements-history', 'history');
         });
     });
 });

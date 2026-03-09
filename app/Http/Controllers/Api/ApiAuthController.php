@@ -678,8 +678,8 @@ class ApiAuthController extends Controller
         }
 
         // $token = $user->createToken('mobile_token')->plainTextToken;
-        $token = auth('customers')->login($user);
-        
+        $token = auth('customer_api')->login($user);
+
         return response()->json([
             'status' => true,
             'message' => 'Login successful',

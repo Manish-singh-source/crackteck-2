@@ -53,7 +53,7 @@
             </ul>
 
             <ul class="list-unstyled topnav-menu mb-0 d-flex align-items-center">
-                <li class="d-none d-lg-block">
+                {{-- <li class="d-none d-lg-block">
                     <form class="app-search d-none d-xxl-block me-auto">
                         <div class="position-relative topbar-search">
                             <input type="text" class="form-control ps-4" placeholder="Search..." />
@@ -61,25 +61,26 @@
                                 class="mdi mdi-magnify fs-16 position-absolute text-muted top-50 translate-middle-y ms-2"></i>
                         </div>
                     </form>
-                </li>
+                </li> --}}
 
                 <!-- Button Trigger Customizer Offcanvas -->
-                <li class="d-none d-sm-flex">
+                {{-- <li class="d-none d-sm-flex">
                     <button type="button" class="btn nav-link" data-toggle="fullscreen">
                         <i data-feather="maximize" class="align-middle fullscreen noti-icon"></i>
                     </button>
-                </li>
+                </li> --}}
 
                 <!-- Light/Dark Mode Button Themes -->
-                <li class="d-none d-sm-flex">
+                {{-- <li class="d-none d-sm-flex">
                     <button type="button" class="btn nav-link" id="light-dark-mode">
                         <i data-feather="moon" class="align-middle dark-mode"></i>
                         <i data-feather="sun" class="align-middle light-mode"></i>
                     </button>
-                </li>
+                </li> --}}
 
-                <li class="d-none d-sm-flex nav-item dropdown">
-                    <a class="nav-link text-dark dropdown-toggle dropdown-toggle-nocaret show" data-bs-auto-close="outside" data-bs-toggle="dropdown" href="javascript:;" aria-expanded="true">
+                {{-- <li class="d-none d-sm-flex nav-item dropdown">
+                    <a class="nav-link text-dark dropdown-toggle dropdown-toggle-nocaret show"
+                        data-bs-auto-close="outside" data-bs-toggle="dropdown" href="javascript:;" aria-expanded="true">
                         <i data-feather="grid" class="align-middle dots-grid"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end dropdown-apps shadow-lg p-3 " data-bs-popper="static">
@@ -88,7 +89,8 @@
                                 <div class="col border-end">
                                     <div class="app-wrapper d-flex flex-column gap-2 text-center">
                                         <div class="app-icon">
-                                            <img src="https://codervent.com/maxton/demo/vertical-menu/assets/images/apps/01.png" width="36" alt="">
+                                            <img src="https://codervent.com/maxton/demo/vertical-menu/assets/images/apps/01.png"
+                                                width="36" alt="">
                                         </div>
                                         <div class="app-name">
                                             <p class="mb-0">Gmail</p>
@@ -98,7 +100,8 @@
                                 <div class="col border-end">
                                     <div class="app-wrapper d-flex flex-column gap-2 text-center">
                                         <div class="app-icon">
-                                            <img src="https://codervent.com/maxton/demo/vertical-menu/assets/images/apps/02.png" width="36" alt="">
+                                            <img src="https://codervent.com/maxton/demo/vertical-menu/assets/images/apps/02.png"
+                                                width="36" alt="">
                                         </div>
                                         <div class="app-name">
                                             <p class="mb-0">Skype</p>
@@ -108,7 +111,8 @@
                                 <div class="col">
                                     <div class="app-wrapper d-flex flex-column gap-2 text-center">
                                         <div class="app-icon">
-                                            <img src="https://codervent.com/maxton/demo/vertical-menu/assets/images/apps/03.png" width="36" alt="">
+                                            <img src="https://codervent.com/maxton/demo/vertical-menu/assets/images/apps/03.png"
+                                                width="36" alt="">
                                         </div>
                                         <div class="app-name">
                                             <p class="mb-0">Slack</p>
@@ -121,7 +125,8 @@
                                 <div class="col border-end">
                                     <div class="app-wrapper d-flex flex-column gap-2 text-center">
                                         <div class="app-icon">
-                                            <img src="https://codervent.com/maxton/demo/vertical-menu/assets/images/apps/01.png" width="36" alt="">
+                                            <img src="https://codervent.com/maxton/demo/vertical-menu/assets/images/apps/01.png"
+                                                width="36" alt="">
                                         </div>
                                         <div class="app-name">
                                             <p class="mb-0">Gmail</p>
@@ -131,7 +136,8 @@
                                 <div class="col border-end">
                                     <div class="app-wrapper d-flex flex-column gap-2 text-center">
                                         <div class="app-icon">
-                                            <img src="https://codervent.com/maxton/demo/vertical-menu/assets/images/apps/02.png" width="36" alt="">
+                                            <img src="https://codervent.com/maxton/demo/vertical-menu/assets/images/apps/02.png"
+                                                width="36" alt="">
                                         </div>
                                         <div class="app-name">
                                             <p class="mb-0">Skype</p>
@@ -141,7 +147,8 @@
                                 <div class="col">
                                     <div class="app-wrapper d-flex flex-column gap-2 text-center">
                                         <div class="app-icon">
-                                            <img src="https://codervent.com/maxton/demo/vertical-menu/assets/images/apps/03.png" width="36" alt="">
+                                            <img src="https://codervent.com/maxton/demo/vertical-menu/assets/images/apps/03.png"
+                                                width="36" alt="">
                                         </div>
                                         <div class="app-name">
                                             <p class="mb-0">Slack</p>
@@ -153,7 +160,7 @@
 
                         </div>
                     </div>
-                </li>
+                </li> --}}
 
                 <li class="d-none d-sm-flex dropdown notification-list topbar-dropdown">
                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
@@ -175,8 +182,8 @@
                             <a href="javascript:void(0);"
                                 class="dropdown-item notify-item text-muted link-primary active">
                                 <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-12.jpg') }}" class="img-fluid rounded-circle"
-                                        alt="" />
+                                    <img src="{{ asset('assets/images/users/user-12.jpg') }}"
+                                        class="img-fluid rounded-circle" alt="" />
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between">
                                     <p class="notify-details">Carl Steadham</p>
@@ -189,11 +196,10 @@
                             </a>
 
                             <!-- item-->
-                            <a href="javascript:void(0);"
-                                class="dropdown-item notify-item text-muted link-primary">
+                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
                                 <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-2.jpg') }}" class="img-fluid rounded-circle"
-                                        alt="" />
+                                    <img src="{{ asset('assets/images/users/user-2.jpg') }}"
+                                        class="img-fluid rounded-circle" alt="" />
                                 </div>
                                 <div class="notify-content">
                                     <div class="d-flex align-items-center justify-content-between">
@@ -215,11 +221,10 @@
                             </a>
 
                             <!-- item-->
-                            <a href="javascript:void(0);"
-                                class="dropdown-item notify-item text-muted link-primary">
+                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
                                 <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-3.jpg') }}" class="img-fluid rounded-circle"
-                                        alt="" />
+                                    <img src="{{ asset('assets/images/users/user-3.jpg') }}"
+                                        class="img-fluid rounded-circle" alt="" />
                                 </div>
                                 <div class="notify-content">
                                     <div class="d-flex align-items-center justify-content-between">
@@ -234,11 +239,10 @@
                             </a>
 
                             <!-- item-->
-                            <a href="javascript:void(0);"
-                                class="dropdown-item notify-item text-muted link-primary">
+                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
                                 <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-8.jpg') }}" class="img-fluid rounded-circle"
-                                        alt="" />
+                                    <img src="{{ asset('assets/images/users/user-8.jpg') }}"
+                                        class="img-fluid rounded-circle" alt="" />
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between">
                                     <p class="notify-details">Violette Lasky</p>
@@ -251,11 +255,10 @@
                             </a>
 
                             <!-- item-->
-                            <a href="javascript:void(0);"
-                                class="dropdown-item notify-item text-muted link-primary">
+                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
                                 <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-5.jpg') }}" class="img-fluid rounded-circle"
-                                        alt="" />
+                                    <img src="{{ asset('assets/images/users/user-5.jpg') }}"
+                                        class="img-fluid rounded-circle" alt="" />
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between">
                                     <p class="notify-details">Ralph Edwards</p>
@@ -268,11 +271,10 @@
                             </a>
 
                             <!-- item-->
-                            <a href="javascript:void(0);"
-                                class="dropdown-item notify-item text-muted link-primary">
+                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
                                 <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-6.jpg') }}" class="img-fluid rounded-circle"
-                                        alt="" />
+                                    <img src="{{ asset('assets/images/users/user-6.jpg') }}"
+                                        class="img-fluid rounded-circle" alt="" />
                                 </div>
                                 <div class="notify-content">
                                     <div class="d-flex align-items-center justify-content-between">
@@ -298,8 +300,10 @@
                 <li class="dropdown notification-list topbar-dropdown">
                     <a class="nav-link dropdown-toggle nav-user me-0" data-bs-toggle="dropdown" href="#"
                         role="button" aria-haspopup="false" aria-expanded="false">
-                        <img src="{{ asset('assets/images/users/user-13.jp') }}g" alt="user-image" class="rounded-circle" />
-                        <span class="d-none d-sm-inline-block pro-user-name ms-1">Alex <i class="mdi mdi-chevron-down"></i></span>
+                        <img src="{{ Auth::guard('staff_web')->user()->avatar ?? asset('assets/images/users/user-13.jpg') }}" alt="user-image"
+                            class="rounded-circle" />
+                        <span class="d-none d-sm-inline-block pro-user-name ms-1">{{ Auth::guard('staff_web')->user()->first_name .' '. Auth::guard('staff_web')->user()->last_name ?? 'Guest' }} <i
+                                class="mdi mdi-chevron-down"></i></span>    
                     </a>
                     <div class="dropdown-menu dropdown-menu-end profile-dropdown">
                         <!-- item-->
@@ -308,7 +312,7 @@
                         </div>
 
                         <!-- item-->
-                        <a class='dropdown-item notify-item' href='javascript:void(0)'>
+                        <a class='dropdown-item notify-item' href='{{ route('profile') }}'>
                             <i class="mdi mdi-account-circle-outline fs-16 align-middle"></i>
                             <span>My Account</span>
                         </a>
@@ -316,10 +320,14 @@
                         <div class="dropdown-divider"></div>
 
                         <!-- item-->
-                        <a class='dropdown-item notify-item' href="{{ route('login') }}">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button class='dropdown-item notify-item' type="submit"> <i class="mdi mdi-location-exit fs-16 align-middle"></i> Logout</button>
+                        </form>
+                        {{-- <a class='dropdown-item notify-item' href="{{ route('login') }}">
                             <i class="mdi mdi-location-exit fs-16 align-middle"></i>
                             <span>Logout</span>
-                        </a>
+                        </a> --}}
                     </div>
                 </li>
             </ul>

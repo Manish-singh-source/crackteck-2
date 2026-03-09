@@ -26,7 +26,7 @@
 
                             <div class="hando-main-sections">
                                 <div class="hando-profile-main">
-                                    <img src="assets/images/users/user-11.jpg" class="rounded-circle img-fluid avatar-xxl img-thumbnail float-start" alt="image profile">
+                                    <img src="{{ Auth::guard('web')->user()->avatar ?? asset('assets/images/users/user-13.jpg') }}" class="rounded-circle img-fluid avatar-xxl img-thumbnail float-start" alt="image profile">
 
                                     <span class="sil-profile_main-pic-change img-thumbnail">
                                         <i class="mdi mdi-camera text-white"></i>
@@ -34,7 +34,7 @@
                                 </div>
 
                                 <div class="overflow-hidden ms-md-4 ms-0">
-                                    <h4 class="m-0 text-dark fs-20 mt-2 mt-md-0">{{ $users->name }}</h4>
+                                    <h4 class="m-0 text-dark fs-20 mt-2 mt-md-0">{{ Auth::guard('web')->user()->first_name .' '. Auth::guard('web')->user()->last_name ?? 'Guest' }}</h4>
                                     <p class="my-1 text-muted fs-16">
                                         <span class="badge bg-primary-subtle text-primary px-2 py-1 fs-13 fw-normal">
                                             Superadmin

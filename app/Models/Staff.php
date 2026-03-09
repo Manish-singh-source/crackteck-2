@@ -31,6 +31,9 @@ class Staff extends Authenticatable implements JWTSubject
         'assigned_area',
         'status',
         'kyc_status',
+        'provider',
+        'provider_id',
+        'avatar',
     ];
 
     /**

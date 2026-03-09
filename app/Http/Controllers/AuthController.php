@@ -14,20 +14,38 @@ class AuthController extends Controller
         return view('login');
     }
 
+    // public function loginStore(Request $request)
+    // {
+    //     $credentials = $request->only('email', 'password');
+
+    //     $request->validate([
+    //         'email' => 'required|email',
+    //         'password' => 'required',
+    //     ]);
+
+    //     if (Auth::attempt($credentials)) {
+    //         $request->session()->regenerate();
+
+    //         return redirect()->intended('demo/crm/index');
+    //     } elseif (Auth::guard('staff_web')->attempt($credentials)) {
+    //         $request->session()->regenerate();
+
+    //         return redirect()->intended('demo/crm/index');
+    //     }
+
+    //     return back()->withErrors([
+    //         'email' => 'The provided credentials do not match.',
+    //     ]);
+    // }
+
     public function loginStore(Request $request)
     {
-        $credentials = $request->only('email', 'password');
-
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
-            return redirect()->intended('demo/crm/index');
-        } elseif (Auth::guard('staff_web')->attempt($credentials)) {
+        if (Auth::guard('staff_web')->attempt($credentials)) {
             $request->session()->regenerate();
 
             return redirect()->intended('demo/crm/index');
@@ -35,7 +53,7 @@ class AuthController extends Controller
 
         return back()->withErrors([
             'email' => 'The provided credentials do not match.',
-        ]);
+        ])->onlyInput('email');
     }
 
     public function signup()

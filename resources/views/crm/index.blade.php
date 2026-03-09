@@ -19,10 +19,10 @@
                 <div class="row">
                   <div class="col-12 col-sm-7">
                     <div class="d-flex align-items-center gap-3 mb-5">
-                      <img src="https://codervent.com/maxton/demo/vertical-menu/assets/images/avatars/01.png" class="rounded-circle bg-grd-info p-1" width="60" height="60" alt="user">
+                      <img src="{{ Auth::guard('staff_web')->user()->avatar ?? asset('assets/images/users/user-13.jpg') }}" class="rounded-circle bg-grd-info p-1" width="60" height="60" alt="user">
                       <div class="">
                         <p class="mb-0 fw-semibold">Welcome back</p>
-                        <h4 class="fw-semibold mb-0 fs-4 mb-0">Manish Singh</h4>
+                        <h4 class="fw-semibold mb-0 fs-4 mb-0">{{ Auth::guard('staff_web')->user()->first_name .' '. Auth::guard('staff_web')->user()->last_name ?? 'Guest' }}</h4>
                       </div>
                     </div>
                     <div class="d-flex align-items-center gap-5">

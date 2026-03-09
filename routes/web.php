@@ -66,6 +66,8 @@ Route::prefix('/demo')->group(function () {
         // Login Page
         Route::get('/admin/login', 'login')->name('login');
         Route::post('/admin/login', 'loginStore')->name('loginStore');
+        // Send OTP for Phone Login
+        Route::post('/admin/send-otp', 'sendOtp')->name('send-otp');
         // Sign Up Page
         Route::get('/admin/signup', 'signup')->name('signup');
         Route::post('/admin/signup', 'register')->name('register');

@@ -69,72 +69,135 @@
                                                 </div>
                                             </div>
 
-                                            <div class="saprator my-4"><span>or continue with email</span></div>
+                                            <div class="saprator my-4"><span>or continue</span></div>
 
-                                            <div class="pt-0">
-                                                <form action="{{ route('loginStore') }}" method="POST" class="my-4">
-                                                    @csrf
-                                                    <div class="form-group mb-3">
-                                                        <label for="email" class="form-label">Email address</label>
-                                                        <input class="form-control @error('email') is-invalid @enderror"
-                                                         type="email" id="email" name="email"
-                                                         value="{{ old('email') }}" required
-                                                         placeholder="Enter your email">
+                                            <!-- Login Type Toggle -->
+                                            <div class="login-type-toggle mb-4">
+                                                <ul class="nav nav-pills nav-justified bg-light rounded p-1" id="loginTypeTab" role="tablist">
+                                                    <li class="nav-item" role="presentation">
+                                                        <button class="nav-link active" id="email-tab" data-bs-toggle="tab" data-bs-target="#email-login" type="button" role="tab">
+                                                            <i class="mdi mdi-email-outline me-1"></i>Email
+                                                        </button>
+                                                    </li>
+                                                    <li class="nav-item" role="presentation">
+                                                        <button class="nav-link" id="phone-tab" data-bs-toggle="tab" data-bs-target="#phone-login" type="button" role="tab">
+                                                            <i class="mdi mdi-phone-outline me-1"></i>Phone
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
 
-                                                         @error('email')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                         @enderror
-                                                    </div>
+                                            <div class="tab-content" id="loginTypeTabContent">
+                                                <!-- Email Login Tab -->
+                                                <div class="tab-pane fade show active" id="email-login" role="tabpanel">
+                                                    <form action="{{ route('loginStore') }}" method="POST" class="my-4">
+                                                        @csrf
+                                                        <div class="form-group mb-3">
+                                                            <label for="email" class="form-label">Email address</label>
+                                                            <input class="form-control @error('email') is-invalid @enderror"
+                                                             type="email" id="email" name="email"
+                                                             value="{{ old('email') }}" required
+                                                             placeholder="Enter your email">
 
-                                                    <div class="form-group mb-3">
-                                                        <label for="password" class="form-label">Password</label>
-                                                        <input class="form-control @error('password') is-invalid @enderror"
-                                                         type="password" required id="password"
-                                                         name="password"
-                                                         placeholder="Enter your password">
+                                                             @error('email')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                             @enderror
+                                                        </div>
 
-                                                         @error('password')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                         @enderror
-                                                    </div>
+                                                        <div class="form-group mb-3">
+                                                            <label for="password" class="form-label">Password</label>
+                                                            <input class="form-control @error('password') is-invalid @enderror"
+                                                             type="password" required id="password"
+                                                             name="password"
+                                                             placeholder="Enter your password">
 
-                                                    <!-- 
-                                                    <div class="otp from-group mb-3">
-                                                        <label for="otp" class="form-label"><strong> We need to verify you </strong> </label>
-                                                        <p>code has been send to ****@gmail.com</p>
-                                                        <input style="width: 25px;" type="text">
-                                                        <input style="width: 25px;" type="text">
-                                                        <input style="width: 25px;" type="text">
-                                                        <input style="width: 25px;" type="text">
-                                                    </div> 
-                                                    -->
+                                                             @error('password')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                             @enderror
+                                                        </div>
 
-                                                    <div class="form-group d-flex mb-3">
-                                                        <div class="col-sm-6">
-                                                            <div class="form-check">
-                                                                <input type="checkbox" class="form-check-input" id="checkbox-signin" checked>
-                                                                <label class="form-check-label" for="checkbox-signin">Remember me</label>
+                                                        <div class="form-group d-flex mb-3">
+                                                            <div class="col-sm-6">
+                                                                <div class="form-check">
+                                                                    <input type="checkbox" class="form-check-input" id="checkbox-signin" checked>
+                                                                    <label class="form-check-label" for="checkbox-signin">Remember me</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6 text-end">
+                                                                <a class='text-muted fs-14' href="{{ route('recover-password') }}">Forgot password?</a>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6 text-end">
-                                                            <a class='text-muted fs-14' href="{{ route('recover-password') }}">Forgot password?</a>
-                                                        </div>
-                                                    </div>
 
-                                                    <div class="form-group mb-0 row">
-                                                        <div class="col-12">
-                                                            <div class="d-grid">
-                                                                <button class="btn btn-primary fw-semibold" type="submit"> Log In </button>
+                                                        <div class="form-group mb-0 row">
+                                                            <div class="col-12">
+                                                                <div class="d-grid">
+                                                                    <button class="btn btn-primary fw-semibold" type="submit"> Log In </button>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </form>
-
-                                                <div class="text-center text-muted">
-                                                    <p class="mb-0">Don't have an account ?<a class='text-primary ms-2 fw-medium' href="{{ route('signup') }}">Sign up</a></p>
+                                                    </form>
                                                 </div>
 
+                                                <!-- Phone Login Tab -->
+                                                <div class="tab-pane fade" id="phone-login" role="tabpanel">
+                                                    <form action="{{ route('loginStore') }}" method="POST" class="my-4" id="phoneLoginForm">
+                                                        @csrf
+                                                        <input type="hidden" name="login_type" value="phone">
+                                                        
+                                                        <div class="form-group mb-3">
+                                                            <label for="phone" class="form-label">Phone Number</label>
+                                                            <div class="input-group">
+                                                                <span class="input-group-text">+91</span>
+                                                                <input class="form-control @error('phone') is-invalid @enderror"
+                                                                 type="tel" id="phone" name="phone"
+                                                                 value="{{ old('phone') }}" required
+                                                                 placeholder="Enter your phone number"
+                                                                 pattern="[0-9]{10}" maxlength="10">
+                                                            </div>
+                                                            @error('phone')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+
+                                                        <div class="form-group mb-3" id="otpSection" style="display: none;">
+                                                            <label for="otp" class="form-label">OTP (4 digit)</label>
+                                                            <div class="otp-input-wrapper d-flex gap-2">
+                                                                <input type="text" class="form-control text-center otp-digit @error('otp') is-invalid @enderror"
+                                                                 id="otp1" name="otp[]" maxlength="1" pattern="[0-9]" required>
+                                                                <input type="text" class="form-control text-center otp-digit @error('otp') is-invalid @enderror"
+                                                                 id="otp2" name="otp[]" maxlength="1" pattern="[0-9]" required>
+                                                                <input type="text" class="form-control text-center otp-digit @error('otp') is-invalid @enderror"
+                                                                 id="otp3" name="otp[]" maxlength="1" pattern="[0-9]" required>
+                                                                <input type="text" class="form-control text-center otp-digit @error('otp') is-invalid @enderror"
+                                                                 id="otp4" name="otp[]" maxlength="1" pattern="[0-9]" required>
+                                                            </div>
+                                                            <input type="hidden" id="otp" name="otp">
+                                                            @error('otp')
+                                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+
+                                                        <div class="form-group mb-3" id="sendOtpBtn">
+                                                            <button type="button" class="btn btn-info w-100" onclick="sendOTP()">
+                                                                <i class="mdi mdi-send me-1"></i> Send OTP
+                                                            </button>
+                                                        </div>
+
+                                                        <div class="form-group mb-0 row" id="phoneLoginBtn" style="display: none;">
+                                                            <div class="col-12">
+                                                                <div class="d-grid">
+                                                                    <button class="btn btn-primary fw-semibold" type="submit"> Log In </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
                                             </div>
+
+                                            <div class="text-center text-muted">
+                                                <p class="mb-0">Don't have an account ?<a class='text-primary ms-2 fw-medium' href="{{ route('signup') }}">Sign up</a></p>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -215,6 +278,144 @@
 
     <!-- App js-->
     <script src="assets/js/app.js"></script>
+
+    <script>
+        // Custom Tab Switching for Login Type
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailTab = document.getElementById('email-tab');
+            const phoneTab = document.getElementById('phone-tab');
+            const emailLogin = document.getElementById('email-login');
+            const phoneLogin = document.getElementById('phone-login');
+            
+            // Email Tab Click
+            if (emailTab) {
+                emailTab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Remove active class from phone tab, add to email tab
+                    phoneTab.classList.remove('active');
+                    emailTab.classList.add('active');
+                    
+                    // Hide phone login, show email login
+                    phoneLogin.classList.remove('show', 'active');
+                    emailLogin.classList.add('show', 'active');
+                });
+            }
+            
+            // Phone Tab Click
+            if (phoneTab) {
+                phoneTab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Remove active class from email tab, add to phone tab
+                    emailTab.classList.remove('active');
+                    phoneTab.classList.add('active');
+                    
+                    // Hide email login, show phone login
+                    emailLogin.classList.remove('show', 'active');
+                    phoneLogin.classList.add('show', 'active');
+                });
+            }
+            
+            // OTP Input Auto-focus and Navigation
+            const otpInputs = document.querySelectorAll('.otp-digit');
+            
+            otpInputs.forEach((input, index) => {
+                input.addEventListener('input', function(e) {
+                    // Only allow numbers
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    
+                    if (this.value.length === 1 && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                    
+                    // Combine OTP values
+                    combineOTP();
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                });
+                
+                input.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pasteData = e.clipboardData.getData('text');
+                    const digits = pasteData.replace(/[^0-9]/g, '').split('').slice(0, 4);
+                    
+                    digits.forEach((digit, i) => {
+                        if (otpInputs[i]) {
+                            otpInputs[i].value = digit;
+                        }
+                    });
+                    
+                    if (digits.length > 0 && digits.length < 4) {
+                        otpInputs[digits.length].focus();
+                    } else if (digits.length === 4) {
+                        otpInputs[3].focus();
+                    }
+                    
+                    combineOTP();
+                });
+            });
+        });
+        
+        function combineOTP() {
+            const otp1 = document.getElementById('otp1').value;
+            const otp2 = document.getElementById('otp2').value;
+            const otp3 = document.getElementById('otp3').value;
+            const otp4 = document.getElementById('otp4').value;
+            const combinedOTP = otp1 + otp2 + otp3 + otp4;
+            document.getElementById('otp').value = combinedOTP;
+        }
+        
+        function sendOTP() {
+            const phone = document.getElementById('phone').value;
+            
+            if (!phone || phone.length !== 10) {
+                alert('Please enter a valid 10-digit phone number');
+                return;
+            }
+            
+            // Show loading state
+            const sendOtpBtn = document.getElementById('sendOtpBtn');
+            sendOtpBtn.innerHTML = '<button type="button" class="btn btn-info w-100" disabled><span class="spinner-border spinner-border-sm me-1"></span> Sending...</button>';
+            
+            // Make AJAX request to send OTP
+            fetch('/demo/admin/send-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ phone: phone })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show OTP section and login button
+                    document.getElementById('otpSection').style.display = 'block';
+                    document.getElementById('phoneLoginBtn').style.display = 'block';
+                    document.getElementById('sendOtpBtn').style.display = 'none';
+                    
+                    // Show the OTP for demo purposes
+                    alert('OTP sent! Demo OTP: ' + data.otp);
+                    
+                    // Focus on first OTP input
+                    setTimeout(() => {
+                        document.getElementById('otp1').focus();
+                    }, 100);
+                } else {
+                    alert(data.message || 'Failed to send OTP');
+                    sendOtpBtn.innerHTML = '<button type="button" class="btn btn-info w-100" onclick="sendOTP()"><i class="mdi mdi-send me-1"></i> Send OTP</button>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message + '. Please check console for details.');
+                sendOtpBtn.innerHTML = '<button type="button" class="btn btn-info w-100" onclick="sendOTP()"><i class="mdi mdi-send me-1"></i> Send OTP</button>';
+            });
+        }
+    </script>
 
 </body>
 

@@ -29,6 +29,8 @@ class Staff extends Authenticatable implements JWTSubject
         'employment_type',
         'joining_date',
         'assigned_area',
+        'otp',
+        'otp_expiry',
         'status',
         'kyc_status',
         'provider',

@@ -26,7 +26,7 @@
 
                             <div class="hando-main-sections">
                                 <div class="hando-profile-main">
-                                    <img src="{{ Auth::guard('web')->user()->avatar ?? asset('assets/images/users/user-13.jpg') }}" class="rounded-circle img-fluid avatar-xxl img-thumbnail float-start" alt="image profile">
+                                    <img src="{{ Auth::guard('staff_web')->user()->avatar ?? asset('assets/images/users/user-13.jpg') }}" class="rounded-circle img-fluid avatar-xxl img-thumbnail float-start" alt="image profile">
 
                                     <span class="sil-profile_main-pic-change img-thumbnail">
                                         <i class="mdi mdi-camera text-white"></i>
@@ -34,17 +34,18 @@
                                 </div>
 
                                 <div class="overflow-hidden ms-md-4 ms-0">
-                                    <h4 class="m-0 text-dark fs-20 mt-2 mt-md-0">{{ Auth::guard('web')->user()->first_name .' '. Auth::guard('web')->user()->last_name ?? 'Guest' }}</h4>
-                                    <p class="my-1 text-muted fs-16">
+                                    <h4 class="m-0 text-dark fs-20 my-2 mt-md-0">{{ Auth::guard('staff_web')->user()->first_name .' '. Auth::guard('staff_web')->user()->last_name ?? 'Guest' }}</h4>
+                                    {{-- <p class="my-1 text-muted fs-16">
                                         <span class="badge bg-primary-subtle text-primary px-2 py-1 fs-13 fw-normal">
                                             Superadmin
                                         </span>
+                                    </p> --}}
+                                    <p>
+                                        <span class="fw-bold">Contact No:</span> {{ Auth::guard('staff_web')->user()->phone }}
+                                        <br>
+                                        <span class="fw-bold">E-mail:</span> {{ Auth::guard('staff_web')->user()->email }}
                                     </p>
                                     <p>
-                                        <span class="fw-bold">Contact No:</span> +91 8888889999
-                                    </p>
-                                    <p>
-                                        <span class="fw-bold">E-mail:</span> {{ $users->email }}
                                     </p>
                                 </div>
                             </div>
@@ -88,14 +89,14 @@
                                                     <div class="form-group mb-3 row">
                                                         <label class="form-label">First Name</label>
                                                         <div class="col-lg-12 col-xl-12">
-                                                            <input class="form-control" type="text" value={{ $users->name }}>
+                                                            <input class="form-control" type="text" value={{ Auth::guard('staff_web')->user()->first_name }}>
                                                         </div>
                                                     </div>
 
                                                     <div class="form-group mb-3 row">
                                                         <label class="form-label">Last Name</label>
                                                         <div class="col-lg-12 col-xl-12">
-                                                            <input class="form-control" type="text" value="Doe">
+                                                            <input class="form-control" type="text" value={{ Auth::guard('staff_web')->user()->last_name }}>
                                                         </div>
                                                     </div>
 
@@ -104,7 +105,7 @@
                                                         <div class="col-lg-12 col-xl-12">
                                                             <div class="input-group">
                                                                 <span class="input-group-text"><i class="mdi mdi-phone-outline"></i></span>
-                                                                <input class="form-control" type="text" placeholder="Phone" aria-describedby="basic-addon1" value="+91 8888889999">
+                                                                <input class="form-control" type="text" placeholder="Phone" aria-describedby="basic-addon1" value={{ Auth::guard('staff_web')->user()->phone }}>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -114,29 +115,8 @@
                                                         <div class="col-lg-12 col-xl-12">
                                                             <div class="input-group">
                                                                 <span class="input-group-text"><i class="mdi mdi-email"></i></span>
-                                                                <input type="text" class="form-control" value="example@gmail.com" placeholder="Email" aria-describedby="basic-addon1">
+                                                                <input type="text" class="form-control" value={{ Auth::guard('staff_web')->user()->email }} placeholder="Email" aria-describedby="basic-addon1">
                                                             </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-group mb-3 row">
-                                                        <label class="form-label">Company</label>
-                                                        <div class="col-lg-12 col-xl-12">
-                                                            <input class="form-control" type="text" value="Technofra">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-group mb-3 row">
-                                                        <label class="form-label">City</label>
-                                                        <div class="col-lg-12 col-xl-12">
-                                                            <input class="form-control" type="text" value="Mumbai">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-group mb-3 row">
-                                                        <label class="form-label">Address</label>
-                                                        <div class="col-lg-12 col-xl-12">
-                                                            <input class="form-control" type="text" value="India">
                                                         </div>
                                                     </div>
 

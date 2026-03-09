@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Validator;
 class StaffWalletController extends Controller
 {
     /**
-     * Get expense details for engineer or delivery man.
+     * Get reimbursements details for engineer or delivery man.
      *
-     * GET /api/v1/staff-expenses
+     * GET /api/v1/staff-reimbursements
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -46,17 +46,17 @@ class StaffWalletController extends Controller
         // Get staff_type from staff_role in staff table
         $staffType = $staff->staff_role;
 
-        // Get all expense submissions for this staff
-        $expenses = StaffWallet::where('staff_id', $staffId)
+        // Get all reimbursements submissions for this staff
+        $reimbursements = StaffWallet::where('staff_id', $staffId)
             ->where('staff_type', $staffType)
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(function ($expense) {
-                if ($expense->receipt) {
-                    $expense->receipt_url = url('api/v1/receipts/'.basename($expense->receipt));
+            ->map(function ($reimbursements) {
+                if ($reimbursements->receipt) {
+                    $reimbursements->receipt_url = url('api/v1/receipts/' . basename($reimbursements->receipt));
                 }
 
-                return $expense;
+                return $reimbursements;
             });
 
         // Calculate totals
@@ -82,17 +82,17 @@ class StaffWalletController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Expense details retrieved successfully',
+            'message' => 'Reimbursements details retrieved successfully',
             'data' => [
                 'staff' => [
                     'id' => $staff->id,
-                    'name' => $staff->first_name.' '.$staff->last_name,
+                    'name' => $staff->first_name . ' ' . $staff->last_name,
                     'staff_code' => $staff->staff_code,
                     'staff_role' => $staff->staff_role,
                     'phone' => $staff->phone,
                     'email' => $staff->email,
                 ],
-                'expenses' => $expenses,
+                'reimbursements' => $reimbursements,
                 'summary' => [
                     'total_pending' => $totalPending,
                     'total_approved' => $totalApproved,
@@ -104,9 +104,9 @@ class StaffWalletController extends Controller
     }
 
     /**
-     * Submit expense form for engineer or delivery man.
+     * Submit reimbursements form for engineer or delivery man.
      *
-     * POST /api/v1/staff-expenses
+     * POST /api/v1/staff-reimbursements
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -147,7 +147,7 @@ class StaffWalletController extends Controller
         if (! in_array($staffType, $validStaffTypes)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid staff role. Only engineer or delivery_man can submit expenses.',
+                'message' => 'Invalid staff role. Only engineer or delivery_man can submit reimbursements.',
             ], 422);
         }
 
@@ -155,13 +155,13 @@ class StaffWalletController extends Controller
         $receiptPath = null;
         if ($request->hasFile('receipt')) {
             $receipt = $request->file('receipt');
-            $receiptName = time().'_'.$receipt->getClientOriginalName();
+            $receiptName = time() . '_' . $receipt->getClientOriginalName();
             $receipt->move(public_path('public/receipts'), $receiptName);
-            $receiptPath = 'receipts/'.$receiptName;
+            $receiptPath = 'receipts/' . $receiptName;
         }
 
-        // Create new expense entry with auto-determined staff_type
-        $expense = StaffWallet::create([
+        // Create new reimbursements entry with auto-determined staff_type
+        $reimbursements = StaffWallet::create([
             'staff_type' => $staffType,
             'staff_id' => $staffId,
             'amount' => $request->amount,
@@ -173,65 +173,65 @@ class StaffWalletController extends Controller
         // Build receipt URL if exists
         $receiptUrl = null;
         if ($receiptPath) {
-            $receiptUrl = url('api/v1/receipts/'.basename($receiptPath));
+            $receiptUrl = url('api/v1/receipts/' . basename($receiptPath));
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Expense submitted successfully',
+            'message' => 'Reimbursements submitted successfully',
             'data' => [
-                'id' => $expense->id,
-                'staff_type' => $expense->staff_type,
-                'staff_id' => $expense->staff_id,
-                'amount' => $expense->amount,
-                'reason' => $expense->reason,
-                'receipt' => $expense->receipt,
+                'id' => $reimbursements->id,
+                'staff_type' => $reimbursements->staff_type,
+                'staff_id' => $reimbursements->staff_id,
+                'amount' => $reimbursements->amount,
+                'reason' => $reimbursements->reason,
+                'receipt' => $reimbursements->receipt,
                 'receipt_url' => $receiptUrl,
-                'status' => $expense->status,
-                'created_at' => $expense->created_at,
+                'status' => $reimbursements->status,
+                'created_at' => $reimbursements->created_at,
             ],
         ], 201);
     }
 
     /**
-     * Get single expense details.
+     * Get single reimbursements details.
      *
-     * GET /api/v1/staff-expenses/{id}
+     * GET /api/v1/staff-reimbursements/{id}
      *
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
-        $expense = StaffWallet::with('staff')->find($id);
+        $reimbursements = StaffWallet::with('staff')->find($id);
 
-        if (! $expense) {
+        if (! $reimbursements) {
             return response()->json([
                 'success' => false,
-                'message' => 'Expense not found',
+                'message' => 'reimbursements not found',
             ], 404);
         }
 
         // Build receipt URL if exists
         $receiptUrl = null;
-        if ($expense->receipt) {
-            $receiptUrl = url('api/v1/receipts/'.basename($expense->receipt));
+        if ($reimbursements->receipt) {
+            $receiptUrl = url('api/v1/receipts/' . basename($reimbursements->receipt));
         }
 
-        $expenseData = $expense->toArray();
-        $expenseData['receipt_url'] = $receiptUrl;
+        $reimbursementsData = $reimbursements->toArray();
+        $reimbursementsData['receipt_url'] = $receiptUrl;
 
         return response()->json([
             'success' => true,
-            'message' => 'Expense details retrieved successfully',
-            'data' => $expenseData,
+            'message' => 'reimbursements details retrieved successfully',
+            'data' => $reimbursementsData,
         ], 200);
     }
 
     /**
-     * Get expense history for a specific staff.
+     * Get reimbursements history for a specific staff.
      *
-     * GET /api/v1/staff-expenses/history
+     * GET /api/v1/staff-reimbursements/history
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -239,7 +239,7 @@ class StaffWalletController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer',
-            'status' => 'nullable|string|in:pending,admin_approved,admin_rejected,paid',
+            'status' => 'nullable|string|in:admin_rejected,paid',
         ]);
 
         if ($validator->fails()) {
@@ -270,21 +270,23 @@ class StaffWalletController extends Controller
 
         if ($request->has('status')) {
             $query->where('status', $request->status);
+        }else {
+            $query->whereIn('status', ['admin_rejected', 'paid']);
         }
 
-        $expenses = $query->orderBy('created_at', 'desc')->get();
+        $reimbursements = $query->orderBy('created_at', 'desc')->get();
 
         return response()->json([
             'success' => true,
-            'message' => 'Expense history retrieved successfully',
-            'data' => $expenses,
+            'message' => 'Reimbursements history retrieved successfully',
+            'data' => $reimbursements,
         ], 200);
     }
 
     /**
-     * Update expense status.
+     * Update reimbursements status.
      *
-     * PUT /api/v1/staff-expenses/{id}/status
+     * PUT /api/v1/staff-reimbursements/{id}/status
      *
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
@@ -303,24 +305,24 @@ class StaffWalletController extends Controller
             ], 422);
         }
 
-        $expense = StaffWallet::find($id);
+        $reimbursements = StaffWallet::find($id);
 
-        if (! $expense) {
+        if (! $reimbursements) {
             return response()->json([
                 'success' => false,
-                'message' => 'Expense not found',
+                'message' => 'Reimbursements not found',
             ], 404);
         }
 
-        $expense->status = $request->status;
-        $expense->save();
+        $reimbursements->status = $request->status;
+        $reimbursements->save();
 
         return response()->json([
             'success' => true,
-            'message' => 'Expense status updated successfully',
+            'message' => 'Reimbursements status updated successfully',
             'data' => [
-                'id' => $expense->id,
-                'status' => $expense->status,
+                'id' => $reimbursements->id,
+                'status' => $reimbursements->status,
             ],
         ], 200);
     }

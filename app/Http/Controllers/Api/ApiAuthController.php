@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class ApiAuthController extends Controller
@@ -79,7 +80,7 @@ class ApiAuthController extends Controller
 
             return false;
         } catch (\Exception $e) {
-            Log::error('Fast2SMS Exception: '.$e->getMessage());
+            Log::error('Fast2SMS Exception: ' . $e->getMessage());
 
             return false;
         }
@@ -313,7 +314,7 @@ class ApiAuthController extends Controller
 
         // Create Staff
         $staff = Staff::create([
-            'staff_code' => 'STF'.time().rand(100, 999),
+            'staff_code' => 'STF' . time() . rand(100, 999),
             'staff_role' => $staffRole,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -474,7 +475,7 @@ class ApiAuthController extends Controller
                     'otp' => $otp, // For testing only
                 ], 200);
             } else {
-                Log::error('OTP sending failed for phone: '.$user->phone);
+                Log::error('OTP sending failed for phone: ' . $user->phone);
 
                 return response()->json([
                     'success' => false,
@@ -486,7 +487,7 @@ class ApiAuthController extends Controller
         } catch (ValidationException $e) {
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            Log::error('Login error: '.$e->getMessage());
+            Log::error('Login error: ' . $e->getMessage());
 
             return response()->json(['success' => false, 'message' => 'An error occurred during login', 'error' => $e->getMessage()], 500);
         }
@@ -617,9 +618,9 @@ class ApiAuthController extends Controller
         } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
             return ApiResponse::error('Invalid token provided. Please login again.', 401);
         } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-            return ApiResponse::error('Token error: '.$e->getMessage(), 401);
+            return ApiResponse::error('Token error: ' . $e->getMessage(), 401);
         } catch (\Exception $e) {
-            Log::error('Token refresh error: '.$e->getMessage());
+            Log::error('Token refresh error: ' . $e->getMessage());
 
             return ApiResponse::error('An error occurred while refreshing token.', 500);
         }
@@ -635,6 +636,55 @@ class ApiAuthController extends Controller
             $number = 1;
         }
 
-        return 'CUST-'.str_pad($number, 6, '0', STR_PAD_LEFT);
+        return 'CUST-' . str_pad($number, 6, '0', STR_PAD_LEFT);
+    }
+
+    // Login with google from App
+    public function googleLogin(Request $request)
+    {
+        $request->validate([
+            'accessToken' => 'required'
+        ]);
+
+        $googleResponse = Http::get(
+            'https://www.googleapis.com/oauth2/v3/userinfo',
+            [
+                'access_token' => $request->accessToken
+            ]
+        );
+
+        if ($googleResponse->failed()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid Google token'
+            ], 401);
+        }
+
+        $googleUser = $googleResponse->json();
+
+        $user = Customer::where('provider_id', $googleUser['sub'])->first();
+
+        if (!$user) {
+
+            $user = Customer::create([
+                'customer_code' => $this->generateCustomerCode(),
+                'first_name' => $googleUser['name'],
+                'last_name' => $googleUser['name'],
+                'email' => $googleUser['email'],
+                'provider_id' => $googleUser['sub'],
+                'avatar' => $googleUser['picture'] ?? null,
+                'password' => bcrypt(Str::random(16))
+            ]);
+        }
+
+        // $token = $user->createToken('mobile_token')->plainTextToken;
+        $token = auth('customers')->login($user);
+        
+        return response()->json([
+            'status' => true,
+            'message' => 'Login successful',
+            'token' => $token,
+            'user' => $user
+        ]);
     }
 }

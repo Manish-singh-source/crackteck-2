@@ -5,21 +5,175 @@ namespace App\Http\Controllers;
 use App\Models\ReturnOrder;
 use Illuminate\Http\Request;
 
+use App\Models\Staff;
+use App\Models\StaffWallet;
+
+
 class ReimbursementController extends Controller
 {
-    //
+    // /**
+    //  * Display a listing of the staff wallet expenses.
+    //  */
     public function index(Request $request)
     {
-        $status = $request->get('status', 'all');
+        $query = StaffWallet::with('staff');
 
-        $query = ReturnOrder::with('customer');
-
-        if ($status !== 'all') {
-            $query->where('refund_status', $status);
+        // Apply filters
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->whereHas('staff', function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('staff_code', 'like', "%{$search}%");
+            });
         }
 
-        $returnOrders = $query->orderBy('created_at', 'desc')->get();
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
 
-        return view('/crm/accounts/reimbursement', compact('returnOrders', 'status'));
+        if ($request->has('staff_type') && $request->staff_type) {
+            $query->where('staff_type', $request->staff_type);
+        }
+
+        $reimbursements = $query->orderBy('created_at', 'desc')->paginate(10);
+        return view('/crm/accounts/reimbursement/index', compact('reimbursements'));
+    }
+
+    /**
+     * Show the form for creating a new expense.
+     */
+    public function create()
+    {
+        $staffTypes = [
+            'engineer' => 'Engineer',
+            'delivery_man' => 'Delivery Man',
+        ];
+
+        $staff = Staff::whereIn('staff_role', ['engineer', 'delivery_man'])
+            ->where('status', 'active')
+            ->get();
+
+        return view('/crm/accounts/reimbursement/create', compact('staff', 'staffTypes'));
+    }
+
+    /**
+     * Store a newly created expense in storage.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'staff_type' => 'required|string|in:engineer,delivery_man',
+            'staff_id' => 'required|integer|exists:staff,id',
+            'amount' => 'required|numeric|min:0',
+            'reason' => 'required|string',
+            'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ]);
+
+        // Handle receipt file upload
+        $receiptPath = null;
+        if ($request->hasFile('receipt')) {
+            $receipt = $request->file('receipt');
+            $receiptName = time() . '_' . $receipt->getClientOriginalName();
+            $receipt->storeAs('public/receipts', $receiptName);
+            $receiptPath = 'receipts/' . $receiptName;
+        }
+
+        StaffWallet::create([
+            'staff_type' => $validated['staff_type'],
+            'staff_id' => $validated['staff_id'],
+            'amount' => $validated['amount'],
+            'reason' => $validated['reason'],
+            'receipt' => $receiptPath,
+            'status' => 'admin_approved',
+        ]);
+
+        return redirect()->route('reimbursement')->with('success', 'Expense submitted successfully');
+    }
+
+    // /**
+    //  * Display the specified expense.
+    //  */
+    public function view($id)
+    {
+        $reimbursement = StaffWallet::with('staff')->findOrFail($id);
+
+        return view('/crm/accounts/reimbursement/view', compact('reimbursement'));
+    }
+
+    // /**
+    //  * Show the form for editing the specified expense.
+    //  */
+    public function edit($id)
+    {
+        $expense = StaffWallet::findOrFail($id);
+
+        $staffTypes = [
+            'engineer' => 'Engineer',
+            'delivery_man' => 'Delivery Man',
+        ];
+
+        $staff = Staff::whereIn('staff_role', ['engineer', 'delivery_man'])
+            ->where('status', 'active')
+            ->get();
+
+        return view('/crm/accounts/reimbursement/edit', compact('expense', 'staff', 'staffTypes'));
+    }
+
+    // /**
+    //  * Update the specified expense in storage.
+    //  */
+    public function update(Request $request, $id)
+    {
+        $expense = StaffWallet::findOrFail($id);
+
+        $validated = $request->validate([
+            // 'staff_type' => 'required|string|in:engineer,delivery_man',
+            // 'staff_id' => 'required|integer|exists:staff,id',
+            'amount' => 'required|numeric|min:0',
+            // 'reason' => 'required|string',
+            'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'status' => 'required|string|in:pending,admin_approved,admin_rejected,paid',
+        ]);
+
+        // Handle receipt file upload
+        if ($request->hasFile('receipt')) {
+            $receipt = $request->file('receipt');
+            $receiptName = time() . '_' . $receipt->getClientOriginalName();
+            $receipt->storeAs('public/receipts', $receiptName);
+            $validated['receipt'] = 'receipts/' . $receiptName;
+        } else {
+            unset($validated['receipt']);
+        }
+
+        $expense->update($validated);
+
+        return redirect()->route('reimbursement')->with('success', 'Reimbursement updated successfully');
+    }
+
+    // /**
+    //  * Remove the specified expense from storage.
+    //  */
+    public function delete($id)
+    {
+        $expense = StaffWallet::findOrFail($id);
+        $expense->delete();
+
+        return redirect()->route('reimbursement')->with('success', 'Reimbursement deleted successfully');
+    }
+
+    // /**
+    //  * Update expense status (approve/reject/pay).
+    //  */
+    public function updateStatus(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'status' => 'required|string|in:pending,admin_approved,admin_rejected,paid',
+        ]);
+
+        $expense = StaffWallet::findOrFail($id);
+        $expense->update(['status' => $validated['status']]);
+
+        return redirect()->route('reimbursement')->with('success', 'Reimbursement status updated successfully');
     }
 }

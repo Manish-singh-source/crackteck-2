@@ -12,70 +12,9 @@
             </div>
         </div>
 
-
         <div class="row">
             <div class="col-12">
                 <div class="card">
-
-                    
-
-                    <!-- <div class="col-xl-2 col-sm-3 col-6">
-                                    <div>
-                                        <select class="form-select" name="type" id="">
-
-                                            <option selected="" value="0">
-                                                All
-                                            </option>
-                                            <option value="1">
-                                                Laptops
-                                            </option>
-                                            <option value="2">
-                                                Computers
-                                            </option>
-                                            <option value="3">
-                                                Accessories
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-xl-2 col-md-2 col-sm-3 col-3">
-                                    <div>
-                                        <button type="submit" class="btn btn-primary w-100 waves ripple-light">
-                                            <span class="d-none d-md-inline-flex"> Search </span>
-                                            <i class="fa-solid fa-magnifying-glass "></i>
-
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-xl-2 col-sm-3 col-6">
-                                    <div>
-                                        <a href="#" class="btn btn-primary w-50 waves ripple-light">
-                                            <i class="ri-refresh-line me-1 align-bottom"></i>
-                                            Sort
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="col-xl-2 col-md-2 col-sm-3 col-3 btn-group" role="group">
-                                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span class="d-none d-md-inline-flex"> Brand </span>
-                                        <i class="mdi mdi-chevron-down"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Dell</a></li>
-                                        <li><a class="dropdown-item" href="#">Hp</a></li>
-                                    </ul>
-                                </div>
-                                <div class="col-xl-2 col-md-2 col-sm-3 col-3 btn-group" role="group">
-                                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span class="d-none d-md-inline-flex"> Status </span>
-                                        <i class="mdi mdi-chevron-down"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Approved</a></li>
-                                        <li><a class="dropdown-item" href="#">Pending</a></li>
-                                        <li><a class="dropdown-item" href="#">Rejected</a></li>
-                                    </ul>
-                                </div> -->
                     <div class="card-body pt-0">
                         <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
                             <li class="nav-item" role="presentation">
@@ -110,6 +49,25 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                1
+                                                            </td>
+                                                            <td>John Doe</td>
+                                                            <td>Tech</td>
+                                                            <td>PC Not Working</td>
+                                                            <td>Hign</td>
+                                                            <td>2026/03/07</td>
+                                                            <td>
+                                                                Pending
+                                                            </td>
+                                                            <td>
+                                                                <a class="btn btn-sm btn-primary" href="{{ route('assigned-jobs.view', 1)  }}">View</a>
+                                                                <a class="btn btn-sm btn-success" href="#">Edit</a>
+                                                                <a class="btn btn-sm btn-danger" href="#">Delete</a>
+                                                            </td>
+                                                        </tr>
+                                                        {{-- 
                                                         @forelse($assignedJobs as $assignment)
                                                         <tr>
                                                             <td>
@@ -165,7 +123,8 @@
                                                         <tr>
                                                             <td colspan="8" class="text-center">No assigned jobs found</td>
                                                         </tr>
-                                                        @endforelse
+                                                        @endforelse 
+                                                        --}}
                                                     </tbody>
                                                 </table>
                                             </div>

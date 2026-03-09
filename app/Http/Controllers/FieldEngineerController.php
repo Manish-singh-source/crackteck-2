@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ApiResponse;
 use App\Models\AmcScheduleMeeting;
 use App\Models\AssignedEngineer;
 use App\Models\CaseTransferRequest;
@@ -149,7 +148,7 @@ class FieldEngineerController extends Controller
         ]);
 
         if ($validated->fails()) {
-            return ApiResponse::error('Validation failed.', $validated->errors(), 422);
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
         $serviceRequests = ServiceRequest::with(['customer', 'products'])
@@ -161,7 +160,7 @@ class FieldEngineerController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return ApiResponse::success(['serviceRequests' => $serviceRequests]);
+        return response()->json(['serviceRequests' => $serviceRequests], 200);
     }
 
     public function serviceRequestDetails(Request $request, $id)
@@ -172,7 +171,7 @@ class FieldEngineerController extends Controller
         ]);
 
         if ($validated->fails()) {
-            return ApiResponse::error('Validation failed.', $validated->errors(), 422);
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
         $serviceRequest = ServiceRequest::with([
@@ -188,8 +187,7 @@ class FieldEngineerController extends Controller
             ->where('status', 'active')
             ->first();
 
-        // return response()->json(['serviceRequest' => $serviceRequest, 'activeAssignment' => $activeAssignment], 200);
-        return ApiResponse::success([['serviceRequests' => $serviceRequest, 'activeAssignment' => $activeAssignment]]);
+        return response()->json(['serviceRequest' => $serviceRequest, 'activeAssignment' => $activeAssignment], 200);
     }
 
     public function serviceRequestProductDetails(Request $request, $id, $product_id)

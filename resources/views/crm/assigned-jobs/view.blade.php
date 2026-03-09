@@ -48,7 +48,7 @@
                                                 <span class="fw-semibold text-break">Customer Name :
                                                 </span>
                                                 <span>
-                                                    {{ $assignment->job->first_name }} {{ $assignment->job->last_name }}
+                                                    John Doe
                                                 </span>
                                             </li>
 
@@ -56,7 +56,7 @@
                                                 <span class="fw-semibold text-break">Contact no :
                                                 </span>
                                                 <span>
-                                                    {{ $assignment->job->phone ?? 'N/A' }}
+                                                    +91 1234567890
                                                 </span>
                                             </li>
                                         </ul>
@@ -68,7 +68,7 @@
                                                 <span class="fw-semibold text-break">Email :
                                                 </span>
                                                 <span>
-                                                    {{ $assignment->job->email ?? 'N/A' }}
+                                                    example@gmail.com
                                                 </span>
                                             </li>
 
@@ -76,7 +76,7 @@
                                                 <span class="fw-semibold text-break">Address :
                                                 </span>
                                                 <span>
-                                                    {{ $assignment->job->address }}, {{ $assignment->job->city }}, {{ $assignment->job->state }} {{ $assignment->job->pincode }}
+                                                    123 Main Street, City, Country
                                                 </span>
                                             </li>
                                         </ul>
@@ -540,7 +540,7 @@
 
 
 <script>
-    const assignmentId = {{ $assignment->id }};
+    const assignmentId = 1;
     let workflowStatus = {
         startJob: false,
         diagnosis: false,
@@ -867,8 +867,7 @@
 
     // Load existing workflow data
     function loadWorkflowData() {
-        @if($assignment->workflow)
-            const workflow = {!! json_encode($assignment->workflow) !!};
+            const workflow = {!! json_encode([]) !!};
 
             // Load Start Job data
             if (workflow.start_job_completed_at) {
@@ -921,7 +920,6 @@
                 $(".action-taken-section").hide();
                 $(".action-taken-details-section").show();
             }
-        @endif
     }
 </script>
 

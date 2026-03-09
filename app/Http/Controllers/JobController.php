@@ -14,10 +14,7 @@ class JobController extends Controller
     //
     public function index()
     {
-        $jobs = Job::all();
-        $engineer = Engineer::all();
-
-        return view('/crm/jobs/index', compact('jobs', 'engineer'));
+        return view('/crm/jobs/index');
     }
 
     public function create()
@@ -136,18 +133,12 @@ class JobController extends Controller
 
     public function view($id)
     {
-        $job = Job::with('devices')->find($id);
-        $engineers = Engineer::all();
-        $assignment = $job->assignment;
-
-        return view('crm/jobs/view', compact('job', 'engineers', 'assignment'));
+        return view('crm/jobs/view');
     }
 
     public function edit($id)
     {
-        $job = Job::with('devices')->find($id);
-
-        return view('crm/jobs/edit', compact('job'));
+        return view('crm/jobs/edit');
     }
 
     public function update(Request $request, $id)

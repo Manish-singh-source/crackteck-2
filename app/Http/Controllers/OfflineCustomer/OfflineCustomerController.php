@@ -16,7 +16,6 @@ class OfflineCustomerController extends Controller
     public function index()
     {
         $customer = Auth::guard('customer_web')->user();
-
         return view('offline-users-dashboard.index', compact('customer'));
     }
 
@@ -26,10 +25,6 @@ class OfflineCustomerController extends Controller
             return redirect()->route('login')->with('error', 'Please login to access your account.');
         }
 
-        // Debug: Check what Auth::id() returns
-        $customerId = Auth::guard('customer_web')->id();
-
-        // If using Customer model, get the actual customer ID
         $customer = Auth::guard('customer_web')->user();
         if ($customer instanceof \App\Models\Customer) {
             $customerId = $customer->id;
@@ -42,7 +37,6 @@ class OfflineCustomerController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // dd($servicesRequest);
         return view('offline-users-dashboard.amc', compact('servicesRequest'));
     }
 
@@ -82,7 +76,6 @@ class OfflineCustomerController extends Controller
 
             return view('offline-users-dashboard.amc-view', compact('amcService'));
         } catch (\Exception $e) {
-            dd($e->getMessage());
             Log::error('Error viewing AMC service: '.$e->getMessage());
 
             return redirect()->back()->with('error', 'Error loading AMC service details.');

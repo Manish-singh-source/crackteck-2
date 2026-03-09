@@ -13,16 +13,13 @@ class AssignedJobController extends Controller
     //
     public function index()
     {
-        $assignedJobs = JobAssignment::with(['job', 'engineer'])->get();
-
-        return view('/crm/assigned-jobs/index', compact('assignedJobs'));
+        return view('/crm/assigned-jobs/index');
     }
 
     public function view($id)
     {
-        $assignment = JobAssignment::with(['job', 'engineer', 'workflow'])->findOrFail($id);
 
-        return view('/crm/assigned-jobs/view', compact('assignment'));
+        return view('/crm/assigned-jobs/view');
     }
 
     public function edit($id)

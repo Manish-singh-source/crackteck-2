@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -40,6 +41,49 @@ class AuthController extends Controller
 
     public function loginStore(Request $request)
     {
+        // Check if this is a phone login
+        if ($request->has('login_type') && $request->login_type == 'phone') {
+            $request->validate([
+                'phone' => 'required|digits:10',
+                'otp' => 'required|digits:4',
+            ]);
+
+            // Find staff by phone number
+            $staff = Staff::where('phone', $request->phone)->first();
+
+            if (!$staff) {
+                return back()->withErrors([
+                    'phone' => 'Phone number not found.',
+                ])->withInput();
+            }
+
+            // Check if OTP is valid and not expired
+            if ($staff->otp != $request->otp) {
+                return back()->withErrors([
+                    'otp' => 'Invalid OTP.',
+                ])->withInput();
+            }
+
+            if (!$staff->otp_expiry || $staff->otp_expiry < now()) {
+                return back()->withErrors([
+                    'otp' => 'OTP has expired. Please request a new OTP.',
+                ])->withInput();
+            }
+
+            // Clear OTP after successful verification
+            $staff->update([
+                'otp' => null,
+                'otp_expiry' => null,
+            ]);
+
+            // Login the staff
+            Auth::guard('staff_web')->login($staff);
+            $request->session()->regenerate();
+
+            return redirect()->intended('demo/crm/index');
+        }
+
+        // Regular email/password login
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -54,6 +98,43 @@ class AuthController extends Controller
         return back()->withErrors([
             'email' => 'The provided credentials do not match.',
         ])->onlyInput('email');
+    }
+
+    public function sendOtp(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|digits:10',
+        ]);
+
+        // Check if phone exists in staff table
+        $staff = Staff::where('phone', $request->phone)->first();
+
+        if (!$staff) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Phone number not found in our records.',
+            ], 422);
+        }
+
+        // Generate 4-digit OTP
+        $otp = rand(1000, 9999);
+
+        // OTP expires in 10 minutes
+        $otpExpiry = now()->addMinutes(10);
+
+        // Save OTP to staff table
+        $staff->update([
+            'otp' => $otp,
+            'otp_expiry' => $otpExpiry,
+        ]);
+
+        // In production, you would send SMS here
+        // For demo, return the OTP in response
+        return response()->json([
+            'success' => true,
+            'message' => 'OTP sent successfully!',
+            'otp' => $otp, // Remove this in production
+        ]);
     }
 
     public function signup()

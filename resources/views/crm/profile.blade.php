@@ -1,4 +1,4 @@
-@extends('crm/layouts/master')
+@extends('crm/layouts.master')
 
 @section('content')
 <div class="content">
@@ -86,45 +86,62 @@
                                                 </div>
 
                                                 <div class="card-body">
-                                                    <div class="form-group mb-3 row">
-                                                        <label class="form-label">First Name</label>
-                                                        <div class="col-lg-12 col-xl-12">
-                                                            <input class="form-control" type="text" value={{ Auth::guard('staff_web')->user()->first_name }}>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-group mb-3 row">
-                                                        <label class="form-label">Last Name</label>
-                                                        <div class="col-lg-12 col-xl-12">
-                                                            <input class="form-control" type="text" value={{ Auth::guard('staff_web')->user()->last_name }}>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-group mb-3 row">
-                                                        <label class="form-label">Contact Phone</label>
-                                                        <div class="col-lg-12 col-xl-12">
-                                                            <div class="input-group">
-                                                                <span class="input-group-text"><i class="mdi mdi-phone-outline"></i></span>
-                                                                <input class="form-control" type="text" placeholder="Phone" aria-describedby="basic-addon1" value={{ Auth::guard('staff_web')->user()->phone }}>
+                                                    <form action="{{ route('staff.profile.update') }}" method="POST">
+                                                        @csrf
+                                                        <div class="form-group mb-3 row">
+                                                            <label class="form-label">First Name</label>
+                                                            <div class="col-lg-12 col-xl-12">
+                                                                <input class="form-control" type="text" 
+                                                                    name="first_name"
+                                                                    value="{{ Auth::guard('staff_web')->user()->first_name }}"
+                                                                    {{ Auth::guard('staff_web')->user()->first_name ? 'readonly' : '' }}>
                                                             </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div class="form-group mb-3 row">
-                                                        <label class="form-label">Email Address</label>
-                                                        <div class="col-lg-12 col-xl-12">
-                                                            <div class="input-group">
-                                                                <span class="input-group-text"><i class="mdi mdi-email"></i></span>
-                                                                <input type="text" class="form-control" value={{ Auth::guard('staff_web')->user()->email }} placeholder="Email" aria-describedby="basic-addon1">
+                                                        <div class="form-group mb-3 row">
+                                                            <label class="form-label">Last Name</label>
+                                                            <div class="col-lg-12 col-xl-12">
+                                                                <input class="form-control" type="text" 
+                                                                    name="last_name"
+                                                                    value="{{ Auth::guard('staff_web')->user()->last_name }}"
+                                                                    {{ Auth::guard('staff_web')->user()->last_name ? 'readonly' : '' }}>
                                                             </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div class="form-group mb-3 row">
-                                                        <div class="text-end">
-                                                            <button class="btn btn-sm btn-success">Update</button>
+                                                        <div class="form-group mb-3 row">
+                                                            <label class="form-label">Contact Phone</label>
+                                                            <div class="col-lg-12 col-xl-12">
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text"><i class="mdi mdi-phone-outline"></i></span>
+                                                                    <input class="form-control" type="text" 
+                                                                        name="phone"
+                                                                        placeholder="Phone" 
+                                                                        value="{{ Auth::guard('staff_web')->user()->phone }}"
+                                                                        {{ Auth::guard('staff_web')->user()->phone ? 'readonly' : '' }}>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </div>
+
+                                                        <div class="form-group mb-3 row">
+                                                            <label class="form-label">Email Address</label>
+                                                            <div class="col-lg-12 col-xl-12">
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text"><i class="mdi mdi-email"></i></span>
+                                                                    <input type="text" class="form-control" 
+                                                                        name="email"
+                                                                        value="{{ Auth::guard('staff_web')->user()->email }}"
+                                                                        placeholder="Email" 
+                                                                        {{ Auth::guard('staff_web')->user()->email ? 'readonly' : '' }}>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group mb-3 row">
+                                                            <div class="text-end">
+                                                                <button type="submit" class="btn btn-sm btn-success">Update</button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
                                                 </div><!--end card-body-->
                                             </div>
                                         </div>
@@ -141,32 +158,43 @@
                                                 </div>
 
                                                 <div class="card-body mb-0">
-                                                    <div class="form-group mb-3 row">
-                                                        <label class="form-label">Old Password</label>
-                                                        <div class="col-lg-12 col-xl-12">
-                                                            <input class="form-control" type="password" placeholder="Old Password">
+                                                    <form action="{{ route('staff.password.update') }}" method="POST" id="passwordForm">
+                                                        @csrf
+                                                        
+                                                        @php
+                                                            $hasPassword = !empty(Auth::guard('staff_web')->user()->password);
+                                                        @endphp
+                                                        
+                                                        @if($hasPassword)
+                                                        <div class="form-group mb-3 row">
+                                                            <label class="form-label">Old Password</label>
+                                                            <div class="col-lg-12 col-xl-12">
+                                                                <input class="form-control" type="password" name="old_password" placeholder="Old Password">
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="form-group mb-3 row">
-                                                        <label class="form-label">New Password</label>
-                                                        <div class="col-lg-12 col-xl-12">
-                                                            <input class="form-control" type="password" placeholder="New Password">
+                                                        @endif
+                                                        
+                                                        <div class="form-group mb-3 row">
+                                                            <label class="form-label">New Password</label>
+                                                            <div class="col-lg-12 col-xl-12">
+                                                                <input class="form-control" type="password" name="new_password" placeholder="New Password">
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="form-group mb-3 row">
-                                                        <label class="form-label">Confirm Password</label>
-                                                        <div class="col-lg-12 col-xl-12">
-                                                            <input class="form-control" type="password" placeholder="Confirm Password">
+                                                        <div class="form-group mb-3 row">
+                                                            <label class="form-label">Confirm Password</label>
+                                                            <div class="col-lg-12 col-xl-12">
+                                                                <input class="form-control" type="password" name="new_password_confirmation" placeholder="Confirm Password">
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div class="form-group row">
-                                                        <div class="col-lg-12 col-xl-12">
-                                                            <button type="submit" class="btn btn-primary mb-2 mb-md-0">Change Password</button>
-                                                            <button type="button" class="btn btn-danger">Cancel</button>
+                                                        <div class="form-group row">
+                                                            <div class="col-lg-12 col-xl-12">
+                                                                <button type="submit" class="btn btn-primary mb-2 mb-md-0">Change Password</button>
+                                                                <button type="button" class="btn btn-danger">Cancel</button>
+                                                            </div>
                                                         </div>
-                                                    </div>
 
+                                                    </form>
                                                 </div><!--end card-body-->
                                             </div>
                                         </div>
@@ -183,4 +211,23 @@
         </div>
     </div> <!-- container-fluid -->
 </div> <!-- content -->
+
+<script>
+    // Show validation errors
+    @if($errors->any())
+        @foreach($errors->all() as $error)
+            toastr.error('{{ $error }}');
+        @endforeach
+    @endif
+
+    // Show success message
+    @if(session('success'))
+        toastr.success('{{ session('success') }}');
+    @endif
+
+    // Show error message
+    @if(session('error'))
+        toastr.error('{{ session('error') }}');
+    @endif
+</script>
 @endsection

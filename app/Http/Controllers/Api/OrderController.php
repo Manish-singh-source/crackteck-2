@@ -386,7 +386,7 @@ class OrderController extends Controller
     public function cancelOrder(Request $request, $order_id)
     {
         $validator = Validator::make($request->all(), [
-            'customer_id' => 'required|exists:customers,id',
+            'user_id' => 'required|exists:customers,id',
             'customer_notes' => 'nullable|string|max:1000',
         ]);
 
@@ -395,7 +395,7 @@ class OrderController extends Controller
         }
 
         $order = Order::where('id', $order_id)
-            ->where('customer_id', $request->customer_id)
+            ->where('customer_id', $request->user_id)
             ->first();
 
         if (! $order) {
@@ -430,7 +430,7 @@ class OrderController extends Controller
     public function returnOrder(Request $request, $order_id)
     {
         $validator = Validator::make($request->all(), [
-            'customer_id' => 'required|exists:customers,id',
+            'user_id' => 'required|exists:customers,id',
             'customer_notes' => 'nullable|string|max:1000',
         ]);
 
@@ -439,7 +439,7 @@ class OrderController extends Controller
         }
 
         $order = Order::where('id', $order_id)
-            ->where('customer_id', $request->customer_id)
+            ->where('customer_id', $request->user_id)
             ->first();
 
         if (! $order) {
@@ -466,7 +466,7 @@ class OrderController extends Controller
 
         // Check if a return order already exists
         $existingReturn = ReturnOrder::where('order_number', $order->order_number)
-            ->where('customer_id', $request->customer_id)
+            ->where('customer_id', $request->user_id)
             ->first();
 
         if ($existingReturn) {

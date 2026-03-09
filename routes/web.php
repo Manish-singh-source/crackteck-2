@@ -75,6 +75,10 @@ Route::prefix('/demo')->group(function () {
         Route::get('/admin/recover-password', 'recover_password')->name('recover-password');
         // Profile Page
         Route::get('/crm/profile', 'profile')->name('profile');
+        // Update Profile
+        Route::post('/crm/profile/update', 'updateProfile')->name('staff.profile.update');
+        // Update Password
+        Route::post('/crm/profile/password-update', 'updatePassword')->name('staff.password.update');
         // Logout Page
         Route::post('/admin/logout', 'logout')->name('logout');
     });

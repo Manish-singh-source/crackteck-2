@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -147,6 +148,70 @@ class AuthController extends Controller
         $users = Auth::user();
 
         return view('/crm/profile', compact('users'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $staff = Auth::guard('staff_web')->user();
+
+        // Validate the request
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'phone' => 'required|digits:10|unique:staff,phone,' . $staff->id,
+            'email' => 'required|email|unique:staff,email,' . $staff->id,
+        ]);
+
+        // Update the staff profile
+        $staff->update([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'phone' => $request->phone,
+            'email' => $request->email,
+        ]);
+
+        return redirect()->route('profile')->with('success', 'Profile updated successfully!');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $staff = Auth::guard('staff_web')->user();
+
+        // Check if staff has old password
+        if ($staff->password) {
+            // Validate with old password
+            $request->validate([
+                'old_password' => 'required|string',
+                'new_password' => 'required|string|min:6|different:old_password',
+                'new_password_confirmation' => 'required|string|same:new_password',
+            ]);
+
+            // Verify old password
+            if (!Hash::check($request->old_password, $staff->password)) {
+                return redirect()->route('profile')->with('error', 'Old password is incorrect.');
+            }
+        } else {
+            // No old password, just validate new password
+            $request->validate([
+                'new_password' => 'required|string|min:6',
+                'new_password_confirmation' => 'required|string|same:new_password',
+            ]);
+        }
+        // dd($staff);
+
+        // $staff = Staff::find($staff->id);
+
+        // Update password
+        $staff->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        // Logout the user after password change
+        Auth::guard('staff_web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('success', 'Password changed successfully! Please login with your new password.');
     }
 
     public function register(Request $request)

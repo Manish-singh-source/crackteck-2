@@ -83,6 +83,9 @@
                         ];
                     @endphp
                     <li>Order Status: <strong>{{ $status[$order->status] }}</strong></li>
+                    <li>Expected Delivery Date:
+                        <strong>{{ \App\Helpers\DateFormat::formatDate($order->expected_delivery_date) ?? 'Order will Delivery within a 7 days'}}</strong>
+                    </li>
                 </ul>
                 <div class="order-detail-wrap">
                     <h5 class="fw-bold">Order details</h5>
@@ -256,7 +259,6 @@
                         'admin_approved',
                         'assigned_delivery_man',
                         'order_accepted',
-                        'product_taken',
                     ];
                     $canCancel = in_array($order->status, $cancellableStatuses);
                     $canReturn = false;

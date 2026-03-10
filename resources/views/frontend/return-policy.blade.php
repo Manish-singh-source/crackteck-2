@@ -14,7 +14,7 @@
                     <i class="icon icon-arrow-right"></i>
                 </li>
                 <li>
-                    <span class="body-small">Shipping Policy</span>
+                    <span class="body-small">Return Policy</span>
                 </li>
             </ul>
         </div>
@@ -26,7 +26,7 @@
             <div class="container">
                 <div class="content">
                     <div class="box-title text-center">
-                        <h2 class="title fw-semibold text-white" style="filter: drop-shadow(2px 4px 6px black);"> Shipping
+                        <h2 class="title fw-semibold text-white" style="filter: drop-shadow(2px 4px 6px black);">Return
                             Policy</h2>
                     </div>
                 </div>
@@ -51,8 +51,8 @@
                             <i class="icon icon-document"></i>
                         </div>
                         <div class="policy-content">
-                            <h5 class="fw-semibold">Shipping Policy</h5>
-                            <p class="text-muted mb-0">Please read these Shipping Policy carefully before using our
+                            <h5 class="fw-semibold">Return Policy</h5>
+                            <p class="text-muted mb-0">Please read these Return Policy carefully before using our
                                 platform.</p>
                         </div>
                     </div>
@@ -64,15 +64,17 @@
                             <div class="term-content">
                                 {{-- <h6 class="fw-semibold mb-2">Electronic Record</h6> --}}
                                 <p class="text-muted mb-0">
-                                    The orders for the user are shipped through registered domestic courier companies and/or
-                                    speed post only. Orders are shipped within 5 days from the date of the order and/or
-                                    payment or as per the delivery date agreed at the time of order confirmation and
-                                    delivering of the shipment, subject to courier company / post office norms. Platform
-                                    Owner shall not be liable for any delay in delivery by the courier company / postal
-                                    authority. Delivery of all orders will be made to the address provided by the buyer at
-                                    the time of purchase. Delivery of our services will be confirmed on your email ID as
-                                    specified at the time of registration. If there are any shipping cost(s) levied by the
-                                    seller or the Platform Owner (as the case be), the same is not refundable.
+                                    We offer refund / exchange within first 3 days from the date of your purchase. If 3 days have passed since your purchase, you will not be offered a return, exchange or refund of any kind. In order to become eligible for a return or an exchange, (i) the purchased item should be unused and in the same condition as you received it, (ii) the item must have original packaging, (iii) if the item that you purchased on a sale, then the item may not be eligible for a return / exchange. Further, only such items are replaced by us (based on an exchange request), if such items are found defective or damaged.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="term-item">
+                            <div class="term-number">2</div>
+                            <div class="term-content">
+                                {{-- <h6 class="fw-semibold mb-2">Platform Ownership</h6> --}}
+                                <p class="text-muted mb-0">
+                                    You agree that there may be a certain category of products / items that are exempted from returns or refunds. Such categories of the products would be identified to you at the item of purchase. For exchange / return accepted request(s) (as applicable), once your returned product / item is received and inspected by us, we will send you an email to notify you about receipt of the returned / exchanged product. Further. If the same has been approved after the quality check at our end, your request (i.e. return / exchange) will be processed in accordance with our policies.
                                 </p>
                             </div>
                         </div>
@@ -88,14 +90,14 @@
 
     <style>
         /* .policy-card {
-                        display: flex;
-                        align-items: flex-start;
-                        gap: 16px;
-                        padding: 24px;
-                        background: #fff;
-                        border-radius: 12px;
-                        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-                    } */
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 16px;
+                    padding: 24px;
+                    background: #fff;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+                } */
 
 
         .policy-card.bg-light {
@@ -141,23 +143,23 @@
         }
 
         /* .term-item:hover {
-                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-                    transform: translateY(-2px);
-                } */
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                transform: translateY(-2px);
+            } */
 
         /* .term-number {
-                    width: 36px;
-                    height: 36px;
-                    min-width: 36px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%);
-                    border-radius: 50%;
-                    font-weight: 600;
-                    font-size: 14px;
-                    color: #fff;
-                } */
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%);
+                border-radius: 50%;
+                font-weight: 600;
+                font-size: 14px;
+                color: #fff;
+            } */
 
         .term-content h6 {
             color: #2c3e50;
@@ -187,9 +189,9 @@
             }
 
             /* .term-item {
-                    flex-direction: column;
-                    padding: 16px;
-                } */
+                flex-direction: column;
+                padding: 16px;
+            } */
 
             .term-number {
                 width: 32px;

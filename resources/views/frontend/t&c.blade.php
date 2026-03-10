@@ -1,137 +1,528 @@
 @extends('frontend/layout/master')
 
 @section('main-content')
-
-<!-- Breakcrumbs -->
-<div class="tf-sp-1 pb-3">
-    <div class="container">
-        <ul class="breakcrumbs">
-            <li>
-                <a href="{{ route('website') }}" class="body-small link">
-                    Home
-                </a>
-            </li>
-            <li class="d-flex align-items-center">
-                <i class="icon icon-arrow-right"></i>
-            </li>
-            <li>
-                <span class="body-small">Terms & Conditions</span>
-            </li>
-        </ul>
-    </div>
-</div>
-<!-- /Breakcrumbs -->
-
-<section class="s-search-faq">
-    <div class="wrap">
+    <!-- Breakcrumbs -->
+    <div class="tf-sp-1 pb-3">
         <div class="container">
-            <div class="content">
-                <div class="box-title text-center">
-                    <h2 class="title fw-semibold text-white" style="filter: drop-shadow(2px 4px 6px black);"> Terms & Conditions</h2>
+            <ul class="breakcrumbs">
+                <li>
+                    <a href="{{ route('website') }}" class="body-small link">
+                        Home
+                    </a>
+                </li>
+                <li class="d-flex align-items-center">
+                    <i class="icon icon-arrow-right"></i>
+                </li>
+                <li>
+                    <span class="body-small">Terms & Conditions</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- /Breakcrumbs -->
+
+    <section class="s-search-faq">
+        <div class="wrap">
+            <div class="container">
+                <div class="content">
+                    <div class="box-title text-center">
+                        <h2 class="title fw-semibold text-white" style="filter: drop-shadow(2px 4px 6px black);"> Terms &
+                            Conditions</h2>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="parallax-image">
-        <img src="{{ asset('frontend-assets/images/banner/t&c.png') }}" data-src="{{ asset('frontend-assets/images/banner/t&c.png') }}" alt=""
-            class="lazyload effect-paralax">
-    </div>
-</section>
+        <div class="parallax-image">
+            <img src="{{ asset('frontend-assets/images/banner/bg-banner-1.jpg') }}"
+                data-src="{{ asset('frontend-assets/images/banner/bg-banner-1.jpg') }}" alt=""
+                class="lazyload effect-paralax">
+        </div>
+    </section>
 
-<!-- Privacy -->
-<section class="tf-sp-2">
-    <div class="container">
-        <div class="privary-wrap">
-            <div class="entry-privary">
-                <div class="wrap">
-                    <h5 class="fw-semibold">Welcome to Our Electronics Store</h5>
-                    <p class="title-sidebar-2 text-main-2">By accessing and using our website, you agree to be bound by the following Terms and Conditions. Please read them carefully before making a purchase.</p>
-                </div>
-                <div class="wrap">
-                    <h5 class="fw-semibold">Use of the Website</h5>
-                    <ul class="text-list">
-                        <li>
-                            <p class="title-sidebar-2 text-main-2">
-                                You agree to use this site only for lawful purposes.
-                            </p>
-                        </li>
-                        <li>
-                            <p class="title-sidebar-2 text-main-2">
-                                You must not misuse our website by introducing viruses or attempting unauthorized access.
-                            </p>
-                        </li>
-                    </ul>
-                </div>
-                <div class="wrap">
-                    <h5 class="fw-semibold">Product Information</h5>
-                    <ul class="text-list">
-                        <li>
-                            <p class="title-sidebar-2 text-main-2">
-                                We strive to display accurate product descriptions and images.
-                            </p>
-                        </li>
-                        <li>
-                            <p class="title-sidebar-2 text-main-2">
-                                Product specifications and availability are subject to change without notice.
-                            </p>
-                        </li>
-                    </ul>
-                </div>
-                <div class="wrap">
-                    <h5 class="fw-semibold">Pricing</h5>
-                    <ul class="text-list">
-                        <li>
-                            <p class="title-sidebar-2 text-main-2">
-                                All prices are listed in [Currency] and include applicable taxes unless stated otherwise.
-                            </p>
-                        </li>
-                        <li>
-                            <p class="title-sidebar-2 text-main-2">
-                                Prices and promotions are subject to change without prior notice.
-                            </p>
-                        </li>
-                    </ul>
-                </div>
-                <div class="wrap">
-                    <h5 class="fw-semibold">Orders & Payments</h5>
-                    <ul class="text-list">
-                        <li>
-                            <p class="title-sidebar-2 text-main-2">
-                                Orders are confirmed only after payment is successfully processed.
-                            </p>
-                        </li>
-                        <li>
-                            <p class="title-sidebar-2 text-main-2">
-                                We reserve the right to cancel orders due to pricing errors or stock unavailability.
-                            </p>
-                        </li>
-                    </ul>
-                </div>
-                <div class="wrap">
-                    <h5 class="fw-semibold">Intellectual Property</h5>
-                    <ul class="text-list">
-                        <li>
-                            <p class="title-sidebar-2 text-main-2">
-                                All content, logos, images, and designs are the property of our store and may not be reproduced without permission.
-                            </p>
-                        </li>
-                    </ul>
-                </div>
-                <div class="wrap">
-                    <h5 class="fw-semibold">Privacy</h5>
-                    <ul class="text-list">
-                        <li>
-                            <p class="title-sidebar-2 text-main-2">
-                                Your data is handled in accordance with our <a href="{{ route('privacy') }}">Privacy Police</a>.
-                            </p>
-                        </li>
-                    </ul>
-                </div>
+    <!-- Terms & Conditions -->
+    <section class="tf-sp-2">
+        <div class="container">
+            <div class="privary-wrap">
+                <div class="entry-privary">
 
+                    <!-- Introduction Card -->
+                    <div class="policy-card mb-4">
+                        <div class="policy-icon">
+                            <i class="icon icon-document"></i>
+                        </div>
+                        <div class="policy-content">
+                            <h5 class="fw-semibold">Terms & Conditions</h5>
+                            <p class="text-muted mb-0">Please read these Terms & Conditions carefully before using our
+                                platform.</p>
+                        </div>
+                    </div>
+
+                    <!-- Terms List -->
+                    <div class="terms-section">
+                        <div class="term-item">
+                            <div class="term-number">1</div>
+                            <div class="term-content">
+                                {{-- <h6 class="fw-semibold mb-2">Electronic Record</h6> --}}
+                                <p class="text-muted mb-0">
+                                    This document is an electronic record in terms of Information Technology Act, 2000 and
+                                    rules there under as applicable and the amended provisions pertaining to electronic
+                                    records in various statutes as amended by the Information Technology Act, 2000. This
+                                    electronic record is generated by a computer system and does not require any physical or
+                                    digital signatures.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="term-item">
+                            <div class="term-number">2</div>
+                            <div class="term-content">
+                                {{-- <h6 class="fw-semibold mb-2">Platform Ownership</h6> --}}
+                                <p class="text-muted mb-0">
+                                    This document is published in accordance with the provisions of Rule 3 (1) of the
+                                    InformationTechnology (Intermediaries guidelines) Rules, 2011 that require publishing
+                                    the rules and regulations, privacy policy and Terms of Use for access or usage of domain
+                                    name www.srbcomputers.com ('Website'), including the related mobile site and mobile
+                                    application (hereinafter referred to as 'Platform').
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="term-item">
+                            <div class="term-number">3</div>
+                            <div class="term-content">
+                                {{-- <h6 class="fw-semibold mb-2">Company Information</h6> --}}
+                                <p class="text-muted mb-0">
+                                    The Platform is owned by 9607788836, a company incorporated under the Companies Act,
+                                    1956 with its registered office at GROUND, SHOP NO-12, VAGHEAL PADA, RAJIVALI ROAD,
+                                    SATIVALI, VASAI EAST, Palghar, Maharashtra, 401208 (hereinafter referred to as ‘Platform
+                                    Owner’, 'we', 'us', 'our').
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="term-item">
+                            <div class="term-number">4</div>
+                            <div class="term-content">
+                                {{-- <h6 class="fw-semibold mb-2">User Agreement</h6> --}}
+                                <p class="text-muted mb-0">
+                                    Your use of the Platform and services and tools are governed by the following terms and
+                                    conditions (“Terms of Use”) as applicable to the Platform including the applicable
+                                    policies which are incorporated herein by way of reference. If You transact on the
+                                    Platform, You shall be subject to the policies that are applicable to the Platform for
+                                    such transaction. By mere use of the Platform, You shall be contracting with the
+                                    Platform Owner and these terms and conditions including the policies constitute Your
+                                    binding obligations, with Platform Owner. These Terms of Use relate to your use of our
+                                    website, goods (as applicable) or services (as applicable) (collectively, 'Services').
+                                    Any terms and conditions proposed by You which are in addition to or which conflict with
+                                    these Terms of Use are expressly rejected by the Platform Owner and shall be of no force
+                                    or effect. These Terms of Use can be modified at any time without assigning any reason.
+                                    It is your responsibility to periodically review these Terms of Use to stay informed of
+                                    updates.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="term-item">
+                            <div class="term-number">5</div>
+                            <div class="term-content">
+                                {{-- <h6 class="fw-semibold mb-2">Acceptance of Terms</h6> --}}
+                                <p class="text-muted mb-0">
+                                    For the purpose of these Terms of Use, wherever the context so requires ‘you’, 'your' or
+                                    ‘user’ shall mean any natural or legal person who has agreed to become a user/buyer on
+                                    the Platform.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="term-item">
+                            <div class="term-number">6</div>
+                            <div class="term-content">
+                                {{-- <h6 class="fw-semibold mb-2">Modification of Terms</h6> --}}
+                                <p class="text-muted mb-0">
+                                    ACCESSING, BROWSING OR OTHERWISE USING THE PLATFORM INDICATES YOUR AGREEMENT TO ALL THE
+                                    TERMS AND CONDITIONS UNDER THESE TERMS OF USE, SO PLEASE READ THE TERMS OF USE CAREFULLY
+                                    BEFORE PROCEEDING.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="term-item">
+                            <div class="term-number">7</div>
+                            <div class="term-content">
+                                {{-- <h6 class="fw-semibold mb-2">User Obligations</h6> --}}
+                                <p class="text-muted mb-0">
+                                    The use of Platform and/or availing of our Services is subject to the following Terms of
+                                    Use:
+                                </p>
+
+                                <ol class="inner-terms-list mt-2">
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">1</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Account Responsibility</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    To access and use the Services, you agree to provide true, accurate and
+                                                    complete information to us during and after registration, and you shall
+                                                    be responsible for all acts done through the use of your registered
+                                                    account on the Platform.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">2</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Disclaimer</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    Neither we nor any third parties provide any warranty or guarantee as to
+                                                    the accuracy,
+                                                    timeliness, performance, completeness or suitability of the information
+                                                    and materials offered on
+                                                    this website or through the Services, for any specific purpose. You
+                                                    acknowledge that such
+                                                    information and materials may contain inaccuracies or errors and we
+                                                    expressly exclude liability
+                                                    for any such inaccuracies or errors to the fullest extent permitted by
+                                                    law.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">3</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Risk & Liability</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    Your use of our Services and the Platform is solely and entirely at your
+                                                    own risk and discretion
+                                                    for which we shall not be liable to you in any manner. You are required
+                                                    to independently assess
+                                                    and ensure that the Services meet your requirements.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">4</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Intellectual Property</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    The contents of the Platform and the Services are proprietary to us and
+                                                    are licensed to us. You
+                                                    will not have any authority to claim any intellectual property rights,
+                                                    title, or interest in its
+                                                    contents. The contents includes and is not limited to the design,
+                                                    layout, look and graphics.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">5</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Unauthorized Use</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    You acknowledge that unauthorized use of the Platform and/or the
+                                                    Services may lead to action
+                                                    against you as per these Terms of Use and/or applicable laws.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">6</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Service Charges</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    You agree to pay us the charges associated with availing the Services.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">7</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Legal Compliance</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    You agree not to use the Platform and/ or Services for any purpose that
+                                                    is unlawful, illegal or
+                                                    forbidden by these Terms, or Indian or local laws that might apply to
+                                                    you.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">8</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Third Party Links</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    You agree and acknowledge that website and the Services may contain
+                                                    links to other third party
+                                                    websites. On accessing these links, you will be governed by the terms of
+                                                    use, privacy policy and
+                                                    such other policies of such third party websites. These links are
+                                                    provided for your convenience
+                                                    for provide further information.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">9</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Binding Contract</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    You understand that upon initiating a transaction for availing the
+                                                    Services you are entering
+                                                    into a legally binding and enforceable contract with the Platform Owner
+                                                    for the Services.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">10</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Indemnification</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    You shall indemnify and hold harmless Platform Owner, its affiliates,
+                                                    group companies (as
+                                                    applicable) and their respective officers, directors, agents, and
+                                                    employees, from any claim or
+                                                    demand, or actions including reasonable attorney's fees, made by any
+                                                    third party or penalty
+                                                    imposed due to or arising out of Your breach of this Terms of Use,
+                                                    privacy Policy and other
+                                                    Policies, or Your violation of any law, rules or regulations or the
+                                                    rights (including
+                                                    infringement of intellectual property rights) of a third party.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">11</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Force Majeure</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    Notwithstanding anything contained in these Terms of Use, the parties
+                                                    shall not be liable for
+                                                    any failure to perform an obligation under these Terms if performance is
+                                                    prevented or delayed by
+                                                    a force majeure event.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">12</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Governing Law</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    These Terms and any dispute or claim relating to it, or its
+                                                    enforceability, shall be governed by
+                                                    and construed in accordance with the laws of India.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">13</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Jurisdiction</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    All disputes arising out of or in connection with these Terms shall be
+                                                    subject to the exclusive
+                                                    jurisdiction of the courts in Vasai and Maharashtra.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="term-item">
+                                            <div class="term-number">14</div>
+                                            <div class="term-content">
+                                                {{-- <h6 class="fw-semibold mb-2">Contact Information</h6> --}}
+                                                <p class="text-muted mb-0">
+                                                    All concerns or communications relating to these Terms must be
+                                                    communicated to us using the
+                                                    contact information provided on this website
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</section>
-<!-- /Privacy -->
+    </section>
+    <!-- /Terms & Conditions -->
 
+    <style>
+        /* .policy-card {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 16px;
+                    padding: 24px;
+                    background: #fff;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+                } */
+
+
+        .policy-card.bg-light {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+        }
+
+        .policy-icon {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--theme-color, #5oo9e8);
+            border-radius: 10px;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .policy-icon.bg-primary {
+            background: #5c6bc0 !important;
+        }
+
+        .policy-content h5,
+        .policy-content h6 {
+            color: #333;
+        }
+
+        .terms-section {
+            display: flex;
+            flex-direction: column;
+            /* gap: 16px; */
+        }
+
+        .term-item {
+            display: flex;
+            gap: 16px;
+            padding: 10px 20px;
+            background: #fff;
+            border-radius: 10px;
+            /* box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06); */
+            transition: all 0.3s ease;
+        }
+
+        /* .term-item:hover {
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                transform: translateY(-2px);
+            } */
+
+        /* .term-number {
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%);
+                border-radius: 50%;
+                font-weight: 600;
+                font-size: 14px;
+                color: #fff;
+            } */
+
+        .term-content h6 {
+            color: #2c3e50;
+            font-size: 15px;
+        }
+
+        .term-content p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #6c757d;
+        }
+
+        .btn-primary {
+            background: #5c6bc0;
+            border-color: #5c6bc0;
+        }
+
+        .btn-primary:hover {
+            background: #3949ab;
+            border-color: #3949ab;
+        }
+
+        @media (max-width: 768px) {
+            .policy-card {
+                flex-direction: column;
+                padding: 16px;
+            }
+
+            /* .term-item {
+                flex-direction: column;
+                padding: 16px;
+            } */
+
+            .term-number {
+                width: 32px;
+                height: 32px;
+                min-width: 32px;
+                font-size: 12px;
+            }
+
+            .tf-sp-2 {
+                padding-top: 0px;
+                padding-bottom: 0px;
+            }
+
+            .entry-privary {
+                display: grid;
+                gap: 0px;
+            }
+
+            .s-search-faq .parallax-image {
+                height: 200px;
+            }
+
+            .term-item {
+                display: flex;
+                gap: 0px;
+                padding: 10px 0px;
+                background: #fff;
+                border-radius: 10px;
+                /* box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06); */
+                transition: all 0.3s ease;
+            }
+        }
+    </style>
 @endsection

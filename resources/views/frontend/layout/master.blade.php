@@ -473,15 +473,11 @@
                                     <h6 class="ft-heading footer-heading-mobile fw-semibold">Get help</h6>
                                     <div class="tf-collapse-content">
                                         <ul class="ft-menu-list">
-                                            <li><a href="{{ route('t&c') }}" class="link">Terms & Conditions</a>
-                                            </li>
-                                            <li><a href="{{ route('shipping-info') }}" class="link">Shipping
-                                                    Information</a></li>
-                                            <li><a href="{{ route('return-refund-policy') }}" class="link">Returns
-                                                    & Refunds</a></li>
-                                            <li><a href="{{ route('privacy') }}" class="link">Privacy Notice</a>
-                                            </li>
-                                            <li><a href="{{ route('faq') }}" class="link">FAQs</a></li>
+                                            <li><a href="{{ route('t&c') }}" class="link">Terms & Conditions</a></li>
+                                            <li><a href="{{ route('privacy') }}" class="link">Privacy Policy</a></li>
+                                            <li><a href="{{ route('refund-cancellation-policy') }}" class="link">Refunds & Cancellation Policy</a></li>
+                                            <li><a href="{{ route('return-policy') }}" class="link">Return Policy</a></li>
+                                            <li><a href="{{ route('shipping-info') }}" class="link">Shipping Policy</a></li>
                                         </ul>
                                     </div>
                                 </li>
@@ -515,6 +511,7 @@
                                                     Order</a>
                                             </li>
                                             <li><a href="{{ route('contact') }}" class="link">Contact US</a></li>
+                                            <li><a href="{{ route('faq') }}" class="link">FAQs</a></li>
                                         </ul>
                                     </div>
                                 </li>

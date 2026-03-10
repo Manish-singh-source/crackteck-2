@@ -621,6 +621,7 @@ Route::prefix('/demo')->group(function () {
 
         //
         Route::post('/crm/service-request/assign-quick-service-engineer', 'assignQuickServiceEngineer')->name('service-request.assign-quick-service-engineer');
+        // Route::post('/crm/service-request/assign-quick-service-engineer', 'assignQuickServiceEngineer')->name('service-request.assign-quick-service-engineer');
         Route::post('/crm/service-request/assign-non-amc-engineer', 'assignNonAmcEngineer')->name('service-request.assign-non-amc-engineer');      // / need to check
 
         // Assign Pickup for Quick Service Request

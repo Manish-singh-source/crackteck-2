@@ -936,16 +936,18 @@ $isProcessed = in_array($currentStatus, [
 
                     <!-- Assign Engineer Card -->
                     @if (
+                        $request->status === 'pending' ||
                         $request->status === 'admin_approved' ||
                             $request->status === 'in_transfer' ||
                             $request->status === 'engineer_not_approved')
                         <div class="card">
                             <div class="card-header border-bottom-dashed">
-                                <h5 class="card-title mb-0">Assign Engineer</h5>
+                                <h5 class="card-title mb-0">Assign Remote Engineer</h5>
                             </div>
+                            {{-- 
                             <div class="card-body">
-                                <form id="assignEngineerForm">
-                                    @csrf
+                                <form id="assignRemoteEngineerForm">
+                                    @csrf   
                                     <input type="hidden" name="service_request_id" value="{{ $request->id }}">
                                     <input type="hidden" name="service_type"
                                                                 value="{{ $request->service_type }}">
@@ -1014,6 +1016,30 @@ $isProcessed = in_array($currentStatus, [
                                         </div>
                                     </div>
 
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="mdi mdi-account-plus"></i> Assign Engineer
+                                    </button>
+                                </form>
+                            </div>
+                            --}}
+                            <div class="card-body">
+                                <form method="POST" action="{{ route('service-request.assign-quick-service-engineer') }}" >
+                                    @csrf   
+                                    <input type="hidden" name="service_request_id" value="{{ $request->id }}">
+                                    
+                                    <div id="individualSection">
+                                        <div class="mb-3">
+                                            <label for="engineer_id" class="form-label">Select Remote Engineer</label>
+                                            <select name="engineer_id" id="engineer_id" class="form-select">
+                                                <option value="">--Select Remote Engineer--</option>
+                                                @foreach ($remoteEngineers as $engineer)
+                                                    <option value="{{ $engineer->id }}">
+                                                        {{ $engineer->first_name }} {{ $engineer->last_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                     <button type="submit" class="btn btn-primary">
                                         <i class="mdi mdi-account-plus"></i> Assign Engineer
                                     </button>
@@ -1845,6 +1871,37 @@ $isProcessed = in_array($currentStatus, [
                         </div>
                     @endif
 
+                    @if($logs)
+                        <div class="card">
+                            <div class="card-body p-4">
+                                <ul class="simple-timeline mb-0">
+                                    @foreach ($logs as $log)
+                                        <li class="timeline-item timeline-item-transparent">
+                                            <span class="timeline-dot timeline-dot-purple"></span>
+                                            <div class="timeline-time mt-3">
+                                                <div class="timeline-header-section mb-2">
+                                                    <h5 class="mb-0">{{ $log->event }}</h5>
+                                                    <small class="text-muted">{{ \App\Helpers\DateFormat::formatDateTime($log->created_at) }}</small>
+                                                </div>
+                                                <p class="mb-2">
+                                                    {{ $log->description }}
+                                                </p>
+                                            </div>
+                                        </li>
+                                    @endforeach
+
+                                    <li>
+                                        <div class="timeline-time mt-3">
+                                            <div class="timeline-header-section mb-2">
+                                                <a href="#" class="mb-0 btn btn-sm btn-primary">View All History</a>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -1893,7 +1950,7 @@ $isProcessed = in_array($currentStatus, [
                 }
             });
 
-            // Form submission
+            // Form submission Old
             $('#assignEngineerForm').submit(function(e) {
                 e.preventDefault();
 
@@ -1933,6 +1990,52 @@ $isProcessed = in_array($currentStatus, [
                     data: formData,
                     success: function(response) {
                         // console.log('Assignment Response:', response);
+                        if (response.success) {
+                            let message = response.message;
+                            if (response.status_updated) {
+                                message += '\n\nStatus Updated:';
+                                message += '\nOld Status: ' + response.old_status;
+                                message += '\nNew Status: ' + response.new_status +
+                                    ' (Assigned Engineer)';
+                            }
+                            alert(message);
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Assignment Error:', xhr);
+                        const error = xhr.responseJSON?.message ||
+                            'Error assigning engineer. Please try again.';
+                        alert(error);
+                    }
+                });
+            });
+            
+            // Form submission New
+            $('#assignRemoteEngineerForm').submit(function(e) {
+                e.preventDefault();
+
+                const assignmentType = $('input[name="assignment_type"]:checked').val();
+
+                // Validation
+                if (assignmentType === 'individual') {
+                    if (!$('#engineer_id').val()) {
+                        alert('Please select an engineer');
+                        return;
+                    }
+                } 
+
+                // Submit via AJAX
+                const formData = $(this).serialize();
+
+                $.ajax({
+                    url: '{{ route('service-request.assign-quick-service-engineer') }}',
+                    method: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        
                         if (response.success) {
                             let message = response.message;
                             if (response.status_updated) {

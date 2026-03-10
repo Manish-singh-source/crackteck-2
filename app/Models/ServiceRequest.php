@@ -3,10 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class ServiceRequest extends Model
 {
     //
+    use LogsActivity;
+
     protected $casts = [
         // 'request_date' => 'date',
     ];
@@ -30,6 +34,37 @@ class ServiceRequest extends Model
         'preferred_start_date',
         'additional_notes',
     ];
+
+
+    /**
+     * Configure activity logging options.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'request_id',
+                // 'item_code_id',
+                'service_type',
+                'customer_id',
+                'customer_address_id',
+                'request_date',
+                'request_source',
+                'visit_date',
+                'reschedule_date',
+                'created_by',
+                'is_engineer_assigned',
+                'status',
+                'amc_plan_id',
+                'otp',
+                'otp_expiry',
+                'preferred_start_date',
+                'additional_notes',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "Service Request {$eventName}");
+    }
 
     public function customer()
     {

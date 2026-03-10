@@ -47,7 +47,7 @@
 
                                             <div class="row">
                                                 <div class="col-6 mt-2">
-                                                    <a href="{{ route('auth.redirect', ['provider' => 'google']) }}" class="btn text-dark border fw-normal d-flex align-items-center justify-content-center">
+                                                    <a href="{{ route('auth.redirect', ['provider' => 'google', 'source' => 'admin']) }}" class="btn text-dark border fw-normal d-flex align-items-center justify-content-center">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" class="me-2">
                                                             <path fill="#ffc107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917" />
                                                             <path fill="#ff3d00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691" />
@@ -59,7 +59,7 @@
                                                 </div>
 
                                                 <div class="col-6 mt-2">
-                                                    <a href="{{ route('auth.redirect', ['provider' => 'facebook']) }}" class="btn text-dark border fw-normal d-flex align-items-center justify-content-center">
+                                                    <a href="{{ route('auth.redirect', ['provider' => 'facebook', 'source' => 'admin']) }}" class="btn text-dark border fw-normal d-flex align-items-center justify-content-center">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256" class="me-2">
                                                             <path fill="#1877f2" d="M256 128C256 57.308 198.692 0 128 0S0 57.308 0 128c0 63.888 46.808 116.843 108 126.445V165H75.5v-37H108V99.8c0-32.08 19.11-49.8 48.348-49.8C170.352 50 185 52.5 185 52.5V84h-16.14C152.959 84 148 93.867 148 103.99V128h35.5l-5.675 37H148v89.445c61.192-9.602 108-62.556 108-126.445" />
                                                             <path fill="#fff" d="m177.825 165l5.675-37H148v-24.01C148 93.866 152.959 84 168.86 84H185V52.5S170.352 50 156.347 50C127.11 50 108 67.72 108 99.8V128H75.5v37H108v89.445A129 129 0 0 0 128 256a129 129 0 0 0 20-1.555V165z" />
@@ -72,7 +72,7 @@
                                             <div class="saprator my-4"><span>or continue</span></div>
 
                                             <!-- Login Type Toggle -->
-                                            <div class="login-type-toggle mb-4">
+                                            <div class="login-type-toggle">
                                                 <ul class="nav nav-pills nav-justified bg-light rounded p-1" id="loginTypeTab" role="tablist">
                                                     <li class="nav-item" role="presentation">
                                                         <button class="nav-link active" id="email-tab" data-bs-toggle="tab" data-bs-target="#email-login" type="button" role="tab">

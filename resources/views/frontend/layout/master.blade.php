@@ -565,7 +565,7 @@
                                 <li><a href="https://web.whatsapp.com/"><i class="icon-whatapp"></i></a></li>
                             </ul>
                             <p class="nocopy caption text-center">
-                                <span class="fw-medium">crackteck.</span>© 2025. All right reserved - Designed by
+                                <span class="fw-medium">Crackteck </span>© <script>document.write(new Date().getFullYear());</script>. All right reserved - Designed by
                                 Technofra
                             </p>
                         </div>
@@ -783,38 +783,111 @@
             <div class="modal-content">
                 <span class="icon icon-close btn-hide-popup" data-bs-dismiss="modal"></span>
                 <div class="modal-log-wrap list-file-delete">
-                    <h5 class="title fw-semibold">Log In</h5>
-                    <form class="form-log" action="{{ route('frontend.login') }}" method="POST">
-                        @csrf
-                        <div class="form-content">
-                            <fieldset>
-                                <label class="fw-semibold body-md-2" id="email">
-                                    Email Id
-                                </label>
-                                <input type="email" name="email" placeholder="Your email" autocomplete="off"
-                                    required>
-                            </fieldset>
-                            <fieldset>
-                                <label class="fw-semibold body-md-2" id="password">
-                                    Password
-                                </label>
-                                <input type="password" placeholder="Enter your password" autocomplete="off"
-                                    name="password" required>
-                            </fieldset>
-                            <a href="#" class="link text-end body-text-3">
-                                Forgot password ?
-                            </a>
+                    <h5 class="title fw-semibold text-center">Log In</h5>
+                    
+                    <!-- Login Tabs -->
+                    <ul class="nav nav-tabs justify-content-center mb-4" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="login-email-tab" data-bs-toggle="tab" data-bs-target="#login-email" type="button" role="tab">
+                                <i class="fa-solid fa-envelope"></i> Email
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="login-social-tab" data-bs-toggle="tab" data-bs-target="#login-social" type="button" role="tab">
+                                <i class="fa-solid fa-globe"></i> Social
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="login-phone-tab" data-bs-toggle="tab" data-bs-target="#login-phone" type="button" role="tab">
+                                <i class="fa-solid fa-phone"></i> Phone
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content">
+                        <!-- Tab 1: Login with Email and Password -->
+                        <div class="tab-pane fade show active" id="login-email" role="tabpanel">
+                            <form class="form-log" action="{{ route('frontend.login') }}" method="POST">
+                                @csrf
+                                <div class="form-content">
+                                    <fieldset>
+                                        <label class="fw-semibold body-md-2">
+                                            Email Id
+                                        </label>
+                                        <input type="email" name="email" placeholder="Your email" autocomplete="off"
+                                            required>
+                                    </fieldset>
+                                    <fieldset>
+                                        <label class="fw-semibold body-md-2">
+                                            Password
+                                        </label>
+                                        <input type="password" placeholder="Enter your password" autocomplete="off"
+                                            name="password" required>
+                                    </fieldset>
+                                    <a href="#" class="link text-end body-text-3">
+                                        Forgot password ?
+                                    </a>
+                                </div>
+                                <button type="submit" class="tf-btn w-100 text-white">
+                                    Login
+                                </button>
+                            </form>
                         </div>
-                        <button type="submit" class="tf-btn w-100 text-white">
-                            Login
-                        </button>
-                        <p class="body-text-3 text-center">
-                            Don't you have an account?
-                            <a href="#register" data-bs-toggle="modal" class="text-primary">
-                                Register
-                            </a>
-                        </p>
-                    </form>
+                        
+                        <!-- Tab 2: Login with Google or Facebook -->
+                        <div class="tab-pane fade" id="login-social" role="tabpanel">
+                            <div class="text-center mb-4">
+                                <p class="body-text-3 text-main-2">Login with your social account</p>
+                            </div>
+                            <div class="d-flex flex-column gap-3">
+                                <a href="{{ route('auth.redirect', ['provider' => 'google', 'source' => 'customer']) }}" class="tf-btn btn-line w-100 d-flex align-items-center justify-content-center gap-2">
+                                    <img width="20" height="20" src="https://img.icons8.com/color/48/google-logo.png" alt="google-logo" />
+                                    <span class="body-md-2 fw-semibold">Continue with Google</span>
+                                </a>
+                                <a href="{{ route('auth.redirect', ['provider' => 'facebook', 'source' => 'customer']) }}" class="tf-btn btn-line w-100 d-flex align-items-center justify-content-center gap-2">
+                                    <img width="20" height="20" src="https://img.icons8.com/color/48/facebook-new.png" alt="facebook-new" />
+                                    <span class="body-md-2 fw-semibold">Continue with Facebook</span>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Tab 3: Login with Phone and OTP -->
+                        <div class="tab-pane fade" id="login-phone" role="tabpanel">
+                            <form class="form-log" action="{{ route('frontend.login.verify-otp') }}" method="POST" id="phone-login-form">
+                                @csrf
+                                <div class="form-content">
+                                    <fieldset>
+                                        <label class="fw-semibold body-md-2">
+                                            Phone Number
+                                        </label>
+                                        <input type="tel" name="phone" placeholder="Enter phone number" autocomplete="off"
+                                            required id="login-phone-input">
+                                    </fieldset>
+                                    <div id="otp-section" style="display: none;">
+                                        <fieldset>
+                                            <label class="fw-semibold body-md-2">
+                                                OTP
+                                            </label>
+                                            <input type="text" name="otp" placeholder="Enter OTP" autocomplete="off">
+                                        </fieldset>
+                                    </div>
+                                </div>
+                                <button type="button" class="tf-btn w-100 text-white" id="send-otp-btn" onclick="sendLoginOTP()">
+                                    Send OTP
+                                </button>
+                                <button type="submit" class="tf-btn w-100 text-white mt-2" id="login-with-otp-btn" style="display: none;">
+                                    Login with OTP
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <p class="body-text-3 text-center mt-3">
+                        Don't you have an account?
+                        <a href="#register" data-bs-toggle="modal" class="text-primary">
+                            Register
+                        </a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -827,83 +900,101 @@
             <div class="modal-content">
                 <span class="icon icon-close btn-hide-popup" data-bs-dismiss="modal"></span>
                 <div class="modal-log-wrap list-file-delete">
-                    <h5 class="title fw-semibold">Sign Up</h5>
-                    <form class="form-log" action="{{ route('frontend.register') }}" method="POST">
-                        @csrf
-                        <div class="form-content">
-                            <fieldset>
-                                <label class="fw-semibold body-md-2">
-                                    First Name
-                                </label>
-                                <input type="text" name="first_name" placeholder="Enter First Name"
-                                    autocomplete="off" required>
-                            </fieldset>
-                            <fieldset>
-                                <label class="fw-semibold body-md-2">
-                                    Last Name
-                                </label>
-                                <input type="text" name="last_name" placeholder="Enter Last Name"
-                                    autocomplete="off" required>
-                            </fieldset>
-                            <fieldset>
-                                <label class="fw-semibold body-md-2">
-                                    Phone Number
-                                </label>
-                                <input type="tel" name="phone" placeholder="Enter Phone Number"
-                                    autocomplete="off" required>
-                            </fieldset>
-                            <fieldset>
-                                <label class="fw-semibold body-md-2">
-                                    Email Id
-                                </label>
-                                <input type="email" name="email" placeholder="Enter Your email"
-                                    autocomplete="off" required>
-                            </fieldset>
-                            <fieldset>
-                                <label class="fw-semibold body-md-2">
-                                    Password
-                                </label>
-                                <input type="password" name="password" placeholder="Enter Your Password"
-                                    autocomplete="off" required>
-                            </fieldset>
-                            <fieldset>
-                                <label class="fw-semibold body-md-2">
-                                    Confirm Password
-                                </label>
-                                <input type="password" name="password_confirmation"
-                                    placeholder="Confirm Your Password" autocomplete="off" required>
-                            </fieldset>
+                    <h5 class="title fw-semibold text-center">Sign Up</h5>
+                    
+                    <!-- Register Tabs -->
+                    <ul class="nav nav-tabs justify-content-center mb-4" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="register-manual-tab" data-bs-toggle="tab" data-bs-target="#register-manual" type="button" role="tab">
+                                <i class="fa-solid fa-user"></i> Manual
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="register-social-tab" data-bs-toggle="tab" data-bs-target="#register-social" type="button" role="tab">
+                                <i class="fa-solid fa-globe"></i> Google
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content">
+                        <!-- Tab 1: Register with Manual (First Name, Last Name, etc.) -->
+                        <div class="tab-pane fade show active" id="register-manual" role="tabpanel">
+                            <form class="form-log" action="{{ route('frontend.register') }}" method="POST">
+                                @csrf
+                                <div class="form-content">
+                                    <fieldset>
+                                        <label class="fw-semibold body-md-2">
+                                            First Name
+                                        </label>
+                                        <input type="text" name="first_name" placeholder="Enter First Name"
+                                            autocomplete="off" required>
+                                    </fieldset>
+                                    <fieldset>
+                                        <label class="fw-semibold body-md-2">
+                                            Last Name
+                                        </label>
+                                        <input type="text" name="last_name" placeholder="Enter Last Name"
+                                            autocomplete="off" required>
+                                    </fieldset>
+                                    <fieldset>
+                                        <label class="fw-semibold body-md-2">
+                                            Phone Number
+                                        </label>
+                                        <input type="tel" name="phone" placeholder="Enter Phone Number"
+                                            autocomplete="off" required>
+                                    </fieldset>
+                                    <fieldset>
+                                        <label class="fw-semibold body-md-2">
+                                            Email Id
+                                        </label>
+                                        <input type="email" name="email" placeholder="Enter Your email"
+                                            autocomplete="off" required>
+                                    </fieldset>
+                                    <fieldset>
+                                        <label class="fw-semibold body-md-2">
+                                            Password
+                                        </label>
+                                        <input type="password" name="password" placeholder="Enter Your Password"
+                                            autocomplete="off" required>
+                                    </fieldset>
+                                    <fieldset>
+                                        <label class="fw-semibold body-md-2">
+                                            Confirm Password
+                                        </label>
+                                        <input type="password" name="password_confirmation"
+                                            placeholder="Confirm Your Password" autocomplete="off" required>
+                                    </fieldset>
+                                </div>
+                                <button type="submit" class="tf-btn w-100 text-white">
+                                    Sign Up
+                                </button>
+                            </form>
                         </div>
-                        <button type="submit" class="tf-btn w-100 text-white">
-                            Sign Up
-                        </button>
-                        <p class="body-text-3 text-center">
-                            Already have an account?
-                            <a href="#log" data-bs-toggle="modal" class="text-primary">
-                                Login
-                            </a>
-                        </p>
-                    </form>
-                    {{-- <div class="orther-log text-center">
-                        <span class="br-line bg-gray-5"></span>
-                        <p class="caption text-main-2 ">
-                            Or login with
-                        </p>
+                        
+                        <!-- Tab 2: Register with Google or Facebook -->
+                        <div class="tab-pane fade" id="register-social" role="tabpanel">
+                            <div class="text-center mb-4">
+                                <p class="body-text-3 text-main-2">Register with your social account</p>
+                            </div>
+                            <div class="d-flex flex-column gap-3">
+                                <a href="{{ route('auth.redirect', ['provider' => 'google', 'source' => 'customer']) }}" class="tf-btn btn-line w-100 d-flex align-items-center justify-content-center gap-2">
+                                    <img width="20" height="20" src="https://img.icons8.com/color/48/google-logo.png" alt="google-logo" />
+                                    <span class="body-md-2 fw-semibold">Continue with Google</span>
+                                </a>
+                                <a href="{{ route('auth.redirect', ['provider' => 'facebook', 'source' => 'customer']) }}" class="tf-btn btn-line w-100 d-flex align-items-center justify-content-center gap-2">
+                                    <img width="20" height="20" src="https://img.icons8.com/color/48/facebook-new.png" alt="facebook-new" />
+                                    <span class="body-md-2 fw-semibold">Continue with Facebook</span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <ul class="list-log">
-                        <li>
-                            <a href="https://www.facebook.com/" class="tf-btn btn-line w-100">
-                                <i class="icon icon-facebook-2"></i>
-                                <span class="body-md-2 fw-semibold">Facebook</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://www.google.com/" class="tf-btn btn-line w-100">
-                                <i class="icon icon-google"></i>
-                                <span class="body-md-2 fw-semibold">Google</span>
-                            </a>
-                        </li>
-                    </ul> --}}
+                    
+                    <p class="body-text-3 text-center mt-3">
+                        Already have an account?
+                        <a href="#log" data-bs-toggle="modal" class="text-primary">
+                            Login
+                        </a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -1950,6 +2041,56 @@
     </script>
 
     @yield('script')
+    <!-- Phone OTP Login JavaScript -->
+    <script>
+        function sendLoginOTP() {
+            const phoneInput = document.getElementById('login-phone-input');
+            const phone = phoneInput.value;
+            
+            if (!phone || phone.length < 10) {
+                alert('Please enter a valid phone number');
+                return;
+            }
+            
+            // Show OTP section and change button
+            document.getElementById('otp-section').style.display = 'block';
+            document.getElementById('send-otp-btn').style.display = 'none';
+            document.getElementById('login-with-otp-btn').style.display = 'block';
+            
+            // Submit the form to send OTP
+            const form = document.getElementById('phone-login-form');
+            const formData = new FormData(form);
+            
+            fetch('{{ route('frontend.login.send-otp') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('OTP sent successfully!');
+                } else {
+                    alert(data.message || 'Failed to send OTP');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while sending OTP');
+            });
+        }
+        
+        // Reset phone login form when modal is closed
+        document.getElementById('log').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('otp-section').style.display = 'none';
+            document.getElementById('send-otp-btn').style.display = 'block';
+            document.getElementById('login-with-otp-btn').style.display = 'none';
+            document.getElementById('login-phone-input').value = '';
+        });
+    </script>
 
 </body>
 

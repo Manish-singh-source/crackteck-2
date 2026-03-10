@@ -7,10 +7,114 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use App\Services\Fast2smsService;
 
 class FrontendAuthController extends Controller
 {
-    //
+    /**
+     * Login with phone number.
+     */
+    public function loginWithPhone(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string|min:10',
+        ]);
+        
+        $customer = Customer::where('phone', $request->phone)->first();
+        
+        if (!$customer) {
+            return back()->with('error', 'No account found with this phone number');
+        }
+        
+        // Generate and send OTP
+        return $this->sendLoginOtp($request);
+    }
+
+    /**
+     * Send OTP for phone login.
+     */
+    public function sendLoginOtp(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string|min:10',
+        ]);
+        
+        $otp = rand(1000, 9999);
+        $phone = $request->phone;
+        
+        // Find customer and update OTP in database
+        $customer = Customer::where('phone', $phone)->first();
+        
+        if (!$customer) {
+            return back()->with('error', 'No account found with this phone number');
+        }
+        
+        // Save OTP and expiry in customer record
+        $customer->otp = $otp;
+        $customer->otp_expiry = now()->addMinutes(5);
+        $customer->save();
+        
+        // Also store in session for convenience
+        $request->session()->put('login_otp', $otp);
+        $request->session()->put('login_phone', $phone);
+        
+        // Send OTP via SMS (using Fast2SMS or similar)
+        // For now, we'll just return success and log the OTP
+        // In production, integrate with SMS service
+        Log::info("Login OTP for {$phone}: {$otp}");
+        
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully',
+            ]);
+        }
+        
+        return back()->with('success', 'OTP sent to your phone number');
+    }
+
+    /**
+     * Verify OTP for phone login.
+     */
+    public function verifyLoginOtp(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string|min:10',
+            'otp' => 'required|string|size:4',
+        ]);
+        
+        // Find customer by phone
+        $customer = Customer::where('phone', $request->phone)->first();
+        
+        if (!$customer) {
+            return back()->with('error', 'No account found');
+        }
+        
+        // Check if OTP is valid and not expired
+        if ($customer->otp != $request->otp) {
+            return back()->with('error', 'Invalid OTP');
+        }
+        
+        if ($customer->otp_expiry && now()->gt($customer->otp_expiry)) {
+            // Clear OTP after expiry
+            $customer->otp = null;
+            $customer->otp_expiry = null;
+            $customer->save();
+            return back()->with('error', 'OTP has expired. Please request a new one.');
+        }
+        
+        // Clear OTP after successful login
+        $customer->otp = null;
+        $customer->otp_expiry = null;
+        $customer->save();
+        
+        // Login the customer
+        Auth::guard('customer_web')->login($customer);
+        $request->session()->forget(['login_otp', 'login_phone']);
+        
+        return redirect()->intended('/beta')->with('success', 'Login successful');
+    }
 
     public function register(Request $request)
     {
@@ -58,8 +162,8 @@ class FrontendAuthController extends Controller
         if (Auth::guard('customer_web')->attempt($credentials)) {
             $request->session()->regenerate();
 
-            // return redirect()->intended('beta/'); // customer dashboard
-            return redirect()->intended('/'); // Beta Removed
+            return redirect()->intended('beta/'); // customer dashboard
+            // return redirect()->intended('/'); // Beta Removed
         }
 
         return back()->withErrors([
@@ -74,7 +178,7 @@ class FrontendAuthController extends Controller
         $request->session()->regenerateToken();
 
         // return redirect()->intended('beta/'); // Beta Removed
-        return redirect()->intended('/');
+        return redirect()->intended('/beta');
     }
 
     /**

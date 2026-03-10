@@ -643,7 +643,8 @@ class ApiAuthController extends Controller
     public function googleLogin(Request $request)
     {
         $request->validate([
-            'accessToken' => 'required'
+            'accessToken' => 'required',
+            'role_id' => 'required|in:1,2,3,4',
         ]);
 
         $googleResponse = Http::get(
@@ -662,23 +663,49 @@ class ApiAuthController extends Controller
 
         $googleUser = $googleResponse->json();
 
-        $user = Customer::where('provider_id', $googleUser['sub'])->first();
+        $staffRole = $this->getRoleId($request->role_id);
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
 
-        if (!$user) {
+        if ($staffRole == 'customers') {
+            $user = Customer::where('provider_id', $googleUser['sub'])->first();
 
-            $user = Customer::create([
-                'customer_code' => $this->generateCustomerCode(),
-                'first_name' => $googleUser['name'],
-                'last_name' => $googleUser['name'],
-                'email' => $googleUser['email'],
-                'provider_id' => $googleUser['sub'],
-                'avatar' => $googleUser['picture'] ?? null,
-                'password' => bcrypt(Str::random(16))
-            ]);
+            if (!$user) {
+
+                $user = Customer::create([
+                    'customer_code' => $this->generateCustomerCode(),
+                    'first_name' => $googleUser['name'],
+                    'last_name' => $googleUser['name'],
+                    'email' => $googleUser['email'],
+                    'provider_id' => $googleUser['sub'],
+                    'avatar' => $googleUser['picture'] ?? null,
+                    'password' => bcrypt(Str::random(16))
+                ]);
+            }
+        } else {
+            $user = Staff::where('provider_id', $googleUser['sub'])->where('staff_role', $staffRole)->first();
+
+            if (!$user) {
+                $user = Staff::create([
+                    'staff_code' => $this->generateCustomerCode(),
+                    'staff_role' => $staffRole,
+                    'first_name' => $googleUser['name'],
+                    'last_name' => $googleUser['name'],
+                    'email' => $googleUser['email'],
+                    'provider_id' => $googleUser['sub'],
+                    'avatar' => $googleUser['picture'] ?? null,
+                    'password' => bcrypt(Str::random(16))
+                ]);
+            }
         }
 
         // $token = $user->createToken('mobile_token')->plainTextToken;
-        $token = auth('customer_api')->login($user);
+        if ($staffRole == 'customers') {
+            $token = auth('customer_api')->login($user);
+        } else {
+            $token = auth('staff_api')->login($user);
+        }
 
         return response()->json([
             'status' => true,

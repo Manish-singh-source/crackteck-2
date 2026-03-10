@@ -154,13 +154,18 @@ Route::prefix('beta')->group(function () {
         return view('frontend/shipping-info');
     })->name('shipping-info');
 
-    // Return & Refund Policy
-    Route::get('/return-refund-policy', function () {
-        return view('frontend/return-refund-policy');
-    })->name('return-refund-policy');
+    // Refund & Cancellation Policy
+    Route::get('/refund-cancellation-policy', function () {
+        return view('frontend/refund-cancellation-policy');
+    })->name('refund-cancellation-policy');
+
+    // Return Policy
+    Route::get('/return-policy', function () {
+        return view('frontend/return-policy');
+    })->name('return-policy');
 
     // Privacy Policy
-    Route::get('/privacy', function () {
+    Route::get('/privacy-policy', function () {
         return view('frontend/privacy');
     })->name('privacy');
 

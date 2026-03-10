@@ -9322,7 +9322,8 @@ html:not([dir=rtl]) .noUi-horizontal .noUi-handle {
     padding: 30px;
   }
   .s-search-faq .parallax-image {
-    height: 490px;
+    /* height: 490px; */
+    height: 250px;
   }
   .tab-review {
     width: 100%;

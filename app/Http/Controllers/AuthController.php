@@ -217,18 +217,31 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'username' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users',
+            'firstname' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'email' => 'required|string|email|unique:staff,email',
             'password' => 'required|string|min:6',
         ]);
 
-        User::create([
-            'name' => $request->username,
+        $staff = new Staff();
+            $nextNumber = (Staff::max('id') ?? 0) + 1;
+            $staffCode = 'STF' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            $staff->staff_code = $staffCode;
+
+        Staff::create([
+            'staff_code' => $staffCode,
+            'first_name' => $request->firstname,
+            'last_name' => $request->lastname,
+            'phone' => $request->phone,
+            'staff_role' => 'staff',
             'email' => $request->email,
-            'password' => $request->password,
+            'email_verified_at' => now(),
+            'password' => Hash::make($request->password),
+            'status' => 'active',
         ]);
 
-        return redirect()->route('login')->with('success', 'Registration successful.');
+        return redirect()->route('login')->with('success', 'Registration successful. Please login.');
     }
 
     public function recover_password()

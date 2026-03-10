@@ -52,7 +52,7 @@
 
                                             <div class="row">
                                                 <div class="col-6 mt-2">
-                                                    <a
+                                                    <a href="{{ route('auth.redirect', ['provider' => 'google']) }}"
                                                         class="btn text-dark border fw-normal d-flex align-items-center justify-content-center">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                                             height="24" viewBox="0 0 48 48" class="me-2">
@@ -70,7 +70,7 @@
                                                 </div>
 
                                                 <div class="col-6 mt-2">
-                                                    <a
+                                                    <a href="{{ route('auth.redirect', ['provider' => 'facebook']) }}"
                                                         class="btn text-dark border fw-normal d-flex align-items-center justify-content-center">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                                             height="24" viewBox="0 0 256 256" class="me-2">
@@ -84,24 +84,49 @@
                                                 </div>
                                             </div>
 
-                                            <div class="saprator my-4"><span>or continue with email</span></div>
+                                            <div class="saprator my-4"><span>or continue </span></div>
 
                                             <div class="pt-0">
                                                 <form action="{{ route('register') }}" method="POST" class="my-4">
                                                     @csrf
                                                     <div class="form-group mb-3">
-                                                        <label for="username" class="form-label">Username</label>
+                                                        <label for="firstname" class="form-label">First Name</label>
                                                         <input
-                                                            class="form-control @error('username') is-invalid @enderror"
-                                                            name="username" type="text" id="username"
-                                                            value="{{ old('username') }}" required
-                                                            placeholder="Enter your Username">
+                                                            class="form-control @error('firstname') is-invalid @enderror"
+                                                            name="firstname" type="text" id="firstname"
+                                                            value="{{ old('firstname') }}" required
+                                                            placeholder="Enter your First Name">
 
-                                                        @error('username')
+                                                        @error('firstname')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                    
+                                                    <div class="form-group mb-3">
+                                                        <label for="lastname" class="form-label">Last Name</label>
+                                                        <input
+                                                            class="form-control @error('lastname') is-invalid @enderror"
+                                                            name="lastname" type="text" id="lastname"
+                                                            value="{{ old('lastname') }}" required
+                                                            placeholder="Enter your Last Name">
+
+                                                        @error('lastname')
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
 
+                                                    <div class="form-group mb-3">
+                                                        <label for="phone" class="form-label">Phone No</label>
+                                                        <input
+                                                            class="form-control @error('phone') is-invalid @enderror"
+                                                            name="phone" type="text" id="phone"
+                                                            value="{{ old('phone') }}" required
+                                                            placeholder="Enter your Phone No">
+
+                                                        @error('phone')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
 
                                                     <div class="form-group mb-3">
                                                         <label for="email" class="form-label">Email Id</label>
@@ -127,7 +152,7 @@
                                                         @enderror
                                                     </div>
 
-                                                    <div class="form-group d-flex mb-3">
+                                                    {{-- <div class="form-group d-flex mb-3">
                                                         <div class="col-12">
                                                             <div class="form-check">
                                                                 <input type="checkbox" class="form-check-input"
@@ -137,8 +162,8 @@
                                                                         class="text-primary fw-medium"> Terms and
                                                                         Conditions</a></label>
                                                             </div>
-                                                        </div><!--end col-->
-                                                    </div>
+                                                        </div>
+                                                    </div> --}}
 
                                                     <div class="form-group mb-0 row">
                                                         <div class="col-12">

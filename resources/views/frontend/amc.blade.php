@@ -1790,7 +1790,8 @@
         // Check if customer is logged in
         async function checkCustomerLogin() {
             try {
-                const response = await fetch('/beta/api/customer/check-login', {
+                // const response = await fetch('/beta/api/customer/check-login', {
+                const response = await fetch('/api/customer/check-login', {
                     method: 'GET',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
@@ -1908,7 +1909,8 @@
         // Check email exists in database
         async function checkEmailExists(email) {
             try {
-                const response = await fetch('/beta/api/amc/check-email', {
+                // const response = await fetch('/beta/api/amc/check-email', {
+                const response = await fetch('/api/amc/check-email', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1933,21 +1935,24 @@
         // Load dropdown data from API
         async function loadDropdownData() {
             try {
-                const categoriesResponse = await fetch('/beta/api/amc/categories');
+                // const categoriesResponse = await fetch('/beta/api/amc/categories');
+                const categoriesResponse = await fetch('/api/amc/categories');
                 const categoriesResult = await categoriesResponse.json();
                 if (categoriesResult.success) {
                     categoriesData = categoriesResult.data;
                     populateAllProductDropdowns();
                 }
 
-                const brandsResponse = await fetch('/beta/api/amc/brands');
+                // const brandsResponse = await fetch('/beta/api/amc/brands');
+                const brandsResponse = await fetch('/api/amc/brands');
                 const brandsResult = await brandsResponse.json();
                 if (brandsResult.success) {
                     brandsData = brandsResult.data;
                     populateAllProductDropdowns();
                 }
 
-                const plansResponse = await fetch('/beta/api/amc/plans');
+                // const plansResponse = await fetch('/beta/api/amc/plans');
+                const plansResponse = await fetch('/api/amc/plans');
                 const plansResult = await plansResponse.json();
                 if (plansResult.success) {
                     plansData = plansResult.data;
@@ -2430,7 +2435,8 @@
                 };
                 console.log('Submitting data:', submitData);
 
-                const response = await fetch('/beta/api/amc/submit', {
+                // const response = await fetch('/beta/api/amc/submit', {
+                const response = await fetch('/api/amc/submit', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

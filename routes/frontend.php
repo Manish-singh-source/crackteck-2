@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CompareController;
@@ -21,6 +22,19 @@ Route::prefix('beta')->group(function () {
     Route::post('/login', [FrontendAuthController::class, 'login'])->name('frontend.login');
 
     Route::post('/frontend-logout', [FrontendAuthController::class, 'logout'])->name('frontend.logout');
+
+    // Social Login Routes (using Auth\SocialController for customer login)
+    Route::get('/auth/redirect/{provider}', [SocialController::class, 'redirectToProvider'])
+        ->where('provider', 'google|facebook|github')
+        ->name('auth.redirect');
+    Route::get('/auth/callback/{provider}', [SocialController::class, 'handleProviderCallback'])
+        ->where('provider', 'google|facebook|github')
+        ->name('auth.callback');
+
+    // Phone OTP Login Route
+    Route::post('/login/phone', [FrontendAuthController::class, 'loginWithPhone'])->name('frontend.login.phone');
+    Route::post('/login/send-otp', [FrontendAuthController::class, 'sendLoginOtp'])->name('frontend.login.send-otp');
+    Route::post('/login/verify-otp', [FrontendAuthController::class, 'verifyLoginOtp'])->name('frontend.login.verify-otp');
 
     // E-commerce Authentication Routes
     Route::get('/e-commerce/login', [FrontendAuthController::class, 'showEcommerceLogin'])->name('ecommerce.login');

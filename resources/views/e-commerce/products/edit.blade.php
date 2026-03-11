@@ -109,42 +109,6 @@
                                         <textarea class="form-control" id="technical_specification" name="technical_specification" rows="5"
                                             placeholder="Enter technical specifications for e-commerce">{{ old('technical_specification', $product->technical_specification) }}</textarea>
                                     </div>
-                                    <div class="row justify-content-end align-items-end mt-3">
-                                        <div class="col-11">
-                                            <div class="mb-3">
-                                                <label for="installation_option" class="form-label">
-                                                    With Installation Options
-                                                </label>
-                                                <input type="text" class="form-control" id="installation_option"
-                                                    placeholder="Enter installation option (e.g., Basic Installation, Premium Setup)">
-                                            </div>
-                                        </div>
-                                        <div class="col-1">
-                                            <div class="mb-3">
-                                                <button type="button" class="btn btn-primary w-100 add-installation">
-                                                    Add
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <table class="table table-bordered table-hover table-sm align-middle"
-                                            id="installationTable" style="display: none;">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th class="text-start">Installation Option</th>
-                                                    <th class="text-end" style="width: 60px;">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="installation_tbody">
-                                                <!-- JS will inject rows here -->
-                                            </tbody>
-                                        </table>
-
-                                        {{-- Hidden field to hold existing options as JSON/array --}}
-                                        <input type="hidden" id="installation_options_initial"
-                                            value='@json(old('installation_options', $product->with_installation ?? []))'>
-                                    </div>
-
                                     <div class="col-md-6">
                                         <label class="form-label" for="brand_warranty">Brand Warranty</label>
                                         <input type="text" class="form-control" id="brand_warranty"
@@ -554,6 +518,18 @@
                                         ],
                                     ])
                                 </div>
+                                <div class="mb-3">
+                                    @include('components.form.select', [
+                                        'label' => 'With Installation Options',
+                                        'name' => 'with_installation',
+                                        'value' => old('with_installation', $product->with_installation),
+                                        'options' => [
+                                            '' => '--Select--',
+                                            '0' => 'No',
+                                            '1' => 'Yes',
+                                        ],
+                                    ])
+                                </div>
 
                             </div>
                         </div>
@@ -599,14 +575,6 @@
         //         e.target.value = value;
         //     }
         // });
-
-        // Handle installation options
-        document.querySelectorAll('input[name="installation_options[]"]').forEach(function(checkbox) {
-            checkbox.addEventListener('change', function() {
-                // You can add any additional logic here if needed
-                console.log('Installation option changed:', this.value, this.checked);
-            });
-        });
 
         // Handle image removal
         function removeImage(index) {
@@ -818,116 +786,6 @@
         });
     </script>
 
-    <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const input        = document.getElementById('installation_option');
-    const addBtn       = document.querySelector('.add-installation');
-    const table        = document.getElementById('installationTable');
-    const tbody        = document.getElementById('installation_tbody');
-    const initialField = document.getElementById('installation_options_initial');
-
-    if (!input || !addBtn || !table || !tbody || !initialField) {
-        return;
-    }
-
-    let installationOptions = [];
-
-    // 1) Load existing options (old() / product->with_installation)
-    try {
-        const existing = initialField.value ? JSON.parse(initialField.value) : [];
-        if (Array.isArray(existing)) {
-            installationOptions = existing;
-        }
-    } catch (e) {
-        installationOptions = [];
-    }
-
-    function renderInstallationTable() {
-        tbody.innerHTML = '';
-
-        // Purane hidden inputs remove karo
-        document
-            .querySelectorAll('input[name="installation_options[]"]')
-            .forEach(el => el.remove());
-
-        if (!installationOptions.length) {
-            table.style.display = 'none';
-            return;
-        }
-
-        table.style.display = '';
-
-        installationOptions.forEach(function (option, index) {
-            const tr = document.createElement('tr');
-            tr.className = 'align-middle';
-
-            tr.innerHTML = `
-                <td class="py-2">
-                    <span class="fw-medium text-dark">${option}</span>
-                </td>
-                <td class="text-end py-2">
-                    <button type="button"
-                            class="btn btn-sm btn-outline-danger remove-installation"
-                            data-index="${index}"
-                            title="Remove">
-                        <i class="mdi mdi-delete"></i>
-                    </button>
-                </td>
-            `;
-
-            tbody.appendChild(tr);
-
-            // Hidden input as array for backend
-            const hidden = document.createElement('input');
-            hidden.type  = 'hidden';
-            hidden.name  = 'installation_options[]';
-            hidden.value = option;
-            tbody.appendChild(hidden);
-        });
-    }
-
-    function addInstallationFromInput() {
-        const value = input.value.trim();
-        if (!value) return;
-
-        // Optional: avoid duplicate options (case-insensitive)
-        const exists = installationOptions
-            .some(opt => opt.toLowerCase() === value.toLowerCase());
-        if (!exists) {
-            installationOptions.push(value);
-            renderInstallationTable();
-        }
-
-        input.value = '';
-        input.focus();
-    }
-
-    // Add button
-    addBtn.addEventListener('click', addInstallationFromInput);
-
-    // Enter key support
-    input.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            addInstallationFromInput();
-        }
-    });
-
-    // Delete clicked row
-    tbody.addEventListener('click', function (e) {
-        const btn = e.target.closest('.remove-installation');
-        if (!btn) return;
-
-        const index = parseInt(btn.getAttribute('data-index'), 10);
-        if (!isNaN(index) && installationOptions[index] !== undefined) {
-            installationOptions.splice(index, 1);
-            renderInstallationTable();
-        }
-    });
-
-    // Initial render from existing data
-    renderInstallationTable();
-});
-</script>
+    </script>
 
 @endsection

@@ -239,54 +239,6 @@
                                                         id="ecommerce_technical_specification">
                                                 </div>
                                             </div>
-                                            <div class="col-xl-12 col-lg-6">
-                                                <div class="row justify-content-end align-items-end">
-                                                    <div class="col-11">
-                                                        <div class="mb-3">
-                                                            <label for="installation_option" class="form-label">With
-                                                                Installation Options</label>
-                                                            <input type="text" class="form-control"
-                                                                id="installation_option"
-                                                                placeholder="Enter installation option (e.g., Basic Installation, Premium Setup)">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-1">
-                                                        <div class="mb-3">
-                                                            <button type="button"
-                                                                class="btn btn-primary w-100 add-installation">Add</button>
-                                                        </div>
-                                                    </div>
-
-                                                    {{-- <table class="table mt-4" id="installationTable"
-                                                        style="display: none;">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Installation Options</th>
-                                                                <th>Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <!-- Selected values will appear here -->
-                                                        </tbody>
-                                                    </table> --}}
-
-                                                    <table class="table table-bordered table-hover table-sm align-middle"
-                                                        id="installationTable" style="display: none;">
-                                                        <thead class="table-light">
-                                                            <tr>
-                                                                <th class="text-start">Installation Option</th>
-                                                                <th class="text-end" style="width: 60px;">Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="installation_tbody">
-                                                            <!-- JS will inject rows here -->
-                                                        </tbody>
-                                                    </table>
-
-
-                                                </div>
-                                            </div>
-
                                             <div class="col-xl-6 col-lg-6">
                                                 <div class="mb-3">
                                                     <label for="brand_warranty" class="form-label">Brand Warranty</label>
@@ -640,6 +592,18 @@
                                                 ],
                                             ])
                                         </div>
+                                        <div class="mb-3">
+                                            @include('components.form.select', [
+                                                'label' => 'With Installation Options',
+                                                'name' => 'with_installation',
+                                                'value' => '',
+                                                'options' => [
+                                                    '' => '--Select--',
+                                                    '0' => 'No',
+                                                    '1' => 'Yes',
+                                                ],
+                                            ])
+                                        </div>
                                     </div>
                                 </div>
 
@@ -668,7 +632,6 @@
         $(document).ready(function() {
             let searchTimeout;
             let selectedProductId = null;
-            let installationOptions = [];
 
             // Initialize Quill editors
             const quillShort = new Quill('#quill-editor-short', {
@@ -943,54 +906,6 @@
                     '<p class="text-muted">Select warehouse product to view datasheet</p>');
             });
 
-            // Installation options management
-            $('.add-installation').on('click', function(e) {
-                e.preventDefault();
-                const installationValue = $('#installation_option').val().trim();
-
-                if (installationValue && !installationOptions.includes(installationValue)) {
-                    installationOptions.push(installationValue);
-                    updateInstallationTable();
-                    $('#installation_option').val('');
-                }
-            });
-
-            function updateInstallationTable() {
-                if (installationOptions.length === 0) {
-                    $('#installationTable').hide();
-                    return;
-                }
-
-                let html = '';
-                installationOptions.forEach(function(option, index) {
-                    html += `
-                        <tr>
-                            <td class="py-2">
-                                <span class="fw-medium text-dark">${option}</span>
-                            </td>
-                            <td class="text-end py-2">
-                                <button type="button"
-                                        class="btn btn-sm btn-outline-danger remove-installation"
-                                        data-index="${index}"
-                                        title="Remove">
-                                    <i class="mdi mdi-delete"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                $('#installation_tbody').html(html);
-                $('#installationTable').show();
-            }
-
-            // Remove installation option
-            $(document).on('click', '.remove-installation', function() {
-                const index = $(this).data('index');
-                installationOptions.splice(index, 1);
-                updateInstallationTable();
-            });
-
             // Handle product tags
             $('#product_tags_input').on('blur', function() {
                 const tags = $(this).val().split(',').map(tag => tag.trim()).filter(tag => tag);
@@ -1017,11 +932,6 @@
 
                 // Ensure CSRF token is present (in case @csrf not in form)
                 fd.set('_token', '{{ csrf_token() }}');
-
-                // Append installation options as an array
-                installationOptions.forEach(function(option, index) {
-                    fd.append(`installation_options[${index}]`, option);
-                });
 
                 // Add product tags (send as JSON string so controller can accept string or array)
                 const tags = $('#product_tags_input').val() ? $('#product_tags_input').val().split(',').map(tag => tag.trim()).filter(tag => tag) : [];

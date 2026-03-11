@@ -25,6 +25,12 @@ class Product extends Model
         'brand_warranty',
         'company_warranty',
 
+        'weight',
+        'dimensions',
+        'shipping_time',
+        'cod',
+        'installation',
+
         'cost_price',
         'selling_price',
         'discount_price',

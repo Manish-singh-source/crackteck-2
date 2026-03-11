@@ -359,7 +359,8 @@
 
                                 {{-- Product Variations --}}
                                 <div class="card">
-                                    <div class="card-header border-bottom-dashed d-flex justify-content-between align-items-center">
+                                    <div
+                                        class="card-header border-bottom-dashed d-flex justify-content-between align-items-center">
                                         <h5 class="card-title mb-0">Product Variations</h5>
                                         <span class="badge bg-primary">Multiple Select Enabled</span>
                                     </div>
@@ -369,22 +370,26 @@
                                             @foreach ($variationAttributes as $attribute)
                                                 <div class="col-md-12">
                                                     <div class="variation-group">
-                                                        <label for="variation_{{ $attribute->id }}" class="form-label fw-semibold">
+                                                        <label for="variation_{{ $attribute->id }}"
+                                                            class="form-label fw-semibold">
                                                             {{ $attribute->name }}
                                                             <span class="text-muted fw-normal">(Select Multiple)</span>
                                                         </label>
                                                         <select id="variation_{{ $attribute->id }}"
-                                                                name="variations[{{ $attribute->name }}][]"
-                                                                class="form-select variation-select"
-                                                                multiple
-                                                                data-attribute="{{ $attribute->name }}">
+                                                            name="variations[{{ $attribute->name }}][]"
+                                                            class="form-select variation-select" multiple
+                                                            data-attribute="{{ $attribute->name }}">
                                                             @foreach ($attribute->values as $value)
                                                                 @php
-                                                                    $selectedValues = $selectedVariations[$attribute->name] ?? [];
-                                                                    $isSelected = in_array($value->value, $selectedValues);
+                                                                    $selectedValues =
+                                                                        $selectedVariations[$attribute->name] ?? [];
+                                                                    $isSelected = in_array(
+                                                                        $value->value,
+                                                                        $selectedValues,
+                                                                    );
                                                                 @endphp
                                                                 <option value="{{ $value->value }}"
-                                                                        @if($isSelected) selected @endif>
+                                                                    @if ($isSelected) selected @endif>
                                                                     {{ $value->value }}
                                                                 </option>
                                                             @endforeach
@@ -394,34 +399,95 @@
                                             @endforeach
                                         </div>
 
-                                        @if($variationAttributes->isEmpty())
+                                        @if ($variationAttributes->isEmpty())
                                             <div class="alert alert-info mb-0">
                                                 <i class="bx bx-info-circle me-2"></i>
-                                                No product variations available. Please add variations from the E-commerce section.
+                                                No product variations available. Please add variations from the E-commerce
+                                                section.
                                             </div>
                                         @endif
                                     </div>
                                 </div>
 
-
+                                {{-- Shipping Information --}}
                                 <div class="card">
                                     <div class="card-header border-bottom-dashed">
                                         <h5 class="card-title mb-0">
-                                            Status
+                                            Shipping Information
                                         </h5>
                                     </div>
                                     <div class="card-body">
-                                        <div>
-                                            @include('components.form.select', [
-                                                'label' => 'Product Status',
-                                                'name' => 'status',
-                                                'value' => 'active',
-                                                'options' => [
-                                                    '' => '--Select--',
-                                                    'inactive' => 'Inactive',
-                                                    'active' => 'Active',
-                                                ],
-                                            ])
+                                        <div class="row g-3">
+                                            <div class="col-xl-6 col-lg-6">
+                                                <div class="mb-3">
+                                                    @include('components.form.input', [
+                                                        'label' => 'Weight',
+                                                        'name' => 'weight',
+                                                        'type' => 'text',
+                                                        'placeholder' => 'Enter Weight (e.g., 5kg)',
+                                                    ])
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6">
+                                                <div class="mb-3">
+                                                    @include('components.form.input', [
+                                                        'label' => 'Dimensions',
+                                                        'name' => 'dimensions',
+                                                        'type' => 'text',
+                                                        'placeholder' => 'Enter Dimensions (e.g., 10x20x30 cm)',
+                                                    ])
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6">
+                                                <div class="mb-3">
+                                                    @include('components.form.input', [
+                                                        'label' => 'Shipping Time',
+                                                        'name' => 'shipping_time',
+                                                        'type' => 'text',
+                                                        'placeholder' => 'Enter Shipping Time (e.g., 2-3 days)',
+                                                    ])
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6">
+                                                <div class="mb-3">
+                                                    @include('components.form.select', [
+                                                        'label' => 'Cash on Delivery (COD)',
+                                                        'name' => 'cod',
+                                                        'options' => [
+                                                            '' => '--Select--',
+                                                            'yes' => 'Yes',
+                                                            'no' => 'No',
+                                                        ],
+                                                    ])
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6">
+                                                <div class="mb-3">
+                                                    @include('components.form.select', [
+                                                        'label' => 'Installation',
+                                                        'name' => 'installation',
+                                                        'options' => [
+                                                            '' => '--Select--',
+                                                            'yes' => 'Yes',
+                                                            'no' => 'No',
+                                                        ],
+                                                    ])
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6">
+                                                <div class="mb-3">
+                                                    @include('components.form.select', [
+                                                        'label' => 'Product Status',
+                                                        'name' => 'status',
+                                                        'value' => 'active',
+                                                        'options' => [
+                                                            '' => '--Select--',
+                                                            'inactive' => 'Inactive',
+                                                            'active' => 'Active',
+                                                        ],
+                                                    ])
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -754,11 +820,11 @@
         }
 
         /* Choices.js Custom Styling */
-        .variation-select + .choices {
+        .variation-select+.choices {
             margin-bottom: 0;
         }
 
-        .variation-select + .choices .choices__inner {
+        .variation-select+.choices .choices__inner {
             min-height: 50px;
             padding: 6px 10px;
             border: 2px solid #e9ecef;
@@ -767,18 +833,18 @@
             transition: all 0.3s ease;
         }
 
-        .variation-select + .choices .choices__inner:hover {
+        .variation-select+.choices .choices__inner:hover {
             border-color: #0d6efd;
         }
 
-        .variation-select + .choices.is-focused .choices__inner,
-        .variation-select + .choices.is-open .choices__inner {
+        .variation-select+.choices.is-focused .choices__inner,
+        .variation-select+.choices.is-open .choices__inner {
             border-color: #0d6efd;
             box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
         }
 
         /* Selected Items (Chips/Tags) */
-        .variation-select + .choices .choices__list--multiple .choices__item {
+        .variation-select+.choices .choices__list--multiple .choices__item {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
             color: #fff;
@@ -793,13 +859,13 @@
             transition: all 0.2s ease;
         }
 
-        .variation-select + .choices .choices__list--multiple .choices__item:hover {
+        .variation-select+.choices .choices__list--multiple .choices__item:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
         }
 
         /* Remove Button (×) */
-        .variation-select + .choices .choices__list--multiple .choices__item .choices__button {
+        .variation-select+.choices .choices__list--multiple .choices__item .choices__button {
             background-color: rgba(255, 255, 255, 0.2);
             border: none;
             color: #fff;
@@ -817,14 +883,14 @@
             justify-content: center;
         }
 
-        .variation-select + .choices .choices__list--multiple .choices__item .choices__button:hover {
+        .variation-select+.choices .choices__list--multiple .choices__item .choices__button:hover {
             background-color: rgba(255, 255, 255, 0.3);
             opacity: 1;
             transform: rotate(90deg);
         }
 
         /* Dropdown List */
-        .variation-select + .choices .choices__list--dropdown {
+        .variation-select+.choices .choices__list--dropdown {
             border: 2px solid #e9ecef;
             border-radius: 8px;
             margin-top: 4px;
@@ -832,33 +898,33 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        .variation-select + .choices .choices__list--dropdown .choices__item--selectable {
+        .variation-select+.choices .choices__list--dropdown .choices__item--selectable {
             padding: 10px 14px;
             font-size: 0.9rem;
             transition: all 0.2s ease;
         }
 
-        .variation-select + .choices .choices__list--dropdown .choices__item--selectable:hover,
-        .variation-select + .choices .choices__list--dropdown .choices__item--selectable.is-highlighted {
+        .variation-select+.choices .choices__list--dropdown .choices__item--selectable:hover,
+        .variation-select+.choices .choices__list--dropdown .choices__item--selectable.is-highlighted {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
         }
 
         /* Placeholder */
-        .variation-select + .choices .choices__placeholder {
+        .variation-select+.choices .choices__placeholder {
             opacity: 0.6;
             color: #6c757d;
         }
 
         /* Input field inside dropdown */
-        .variation-select + .choices .choices__input {
+        .variation-select+.choices .choices__input {
             background-color: transparent;
             margin-bottom: 0;
             padding: 4px 0;
         }
 
         /* Empty state */
-        .variation-select + .choices .choices__list--dropdown .choices__item--choice.has-no-results {
+        .variation-select+.choices .choices__list--dropdown .choices__item--choice.has-no-results {
             color: #6c757d;
             font-style: italic;
         }

@@ -435,6 +435,80 @@
                                     </div>
                                 </div>
 
+                                {{-- Shipping Information --}}
+                                <div class="card">
+                                    <div class="card-header border-bottom-dashed">
+                                        <h5 class="card-title mb-0">
+                                            Shipping Information
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-xl-6 col-lg-6">
+                                                <div class="mb-3">
+                                                    @include('components.form.input', [
+                                                        'label' => 'Weight',
+                                                        'name' => 'weight',
+                                                        'type' => 'text',
+                                                        'placeholder' => 'Enter Weight (e.g., 5dddkg)',
+                                                        'model' => $product,
+                                                    ])
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6">
+                                                <div class="mb-3">
+                                                    @include('components.form.input', [
+                                                        'label' => 'Dimensions',
+                                                        'name' => 'dimensions',
+                                                        'type' => 'text',
+                                                        'placeholder' => 'Enter Dimensions (e.g., 10x20x30 cm)',
+                                                        'model' => $product,
+                                                    ])
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6">
+                                                <div class="mb-3">
+                                                    @include('components.form.input', [
+                                                        'label' => 'Shipping Time',
+                                                        'name' => 'shipping_time',
+                                                        'type' => 'text',
+                                                        'placeholder' => 'Enter Shipping Time (e.g., 2-3 days)',
+                                                        'model' => $product,
+                                                    ])
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6">
+                                                <div class="mb-3">
+                                                    @include('components.form.select', [
+                                                        'label' => 'Cash on Delivery (COD)',
+                                                        'name' => 'cod',
+                                                        'options' => [
+                                                            '' => '--Select--',
+                                                            'yes' => 'Yes',
+                                                            'no' => 'No',
+                                                        ],
+                                                        'model' => $product,
+                                                    ])
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6">
+                                                <div class="mb-3">
+                                                    @include('components.form.select', [
+                                                        'label' => 'Installation',
+                                                        'name' => 'installation',
+                                                        'options' => [
+                                                            '' => '--Select--',
+                                                            'yes' => 'Yes',
+                                                            'no' => 'No',
+                                                        ],
+                                                        'model' => $product,
+                                                    ])
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {{-- Product Variations --}}
                                 <div class="card">
                                     <div class="card-header border-bottom-dashed d-flex justify-content-between align-items-center">
@@ -472,6 +546,7 @@
                                                 </div>
                                             @endforeach
                                         </div>
+                                        
 
                                         @if($variationAttributes->isEmpty())
                                             <div class="alert alert-info mb-0">
@@ -482,6 +557,7 @@
                                     </div>
                                 </div>
 
+                                
 
                                 {{-- Status --}}
                                 <div class="card">

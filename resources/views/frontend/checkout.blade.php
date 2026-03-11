@@ -336,6 +336,11 @@
                                             ₹{{ number_format($warehouseProduct->final_price, 2) }}
                                             <span class="body-md-2 text-main-2 fw-normal">X{{ $item->quantity }}</span>
                                         </p>
+                                        <span>
+                                            Installation: 
+                                            <span
+                                                class="body-md-2 text-main-2 fw-normal">{{ ucfirst($warehouseProduct->installation) }}</span>
+                                        </span>
                                         @if ($warehouseProduct->color)
                                             <p class="body-md-2 text-main-2">{{ $warehouseProduct->color }}</p>
                                         @endif
@@ -414,7 +419,7 @@
                                     @endif
                                 </div>
                             @endif --}}
-                            <li>
+                            {{-- <li>
                                 <span class="body-text-3">Weight</span>
                                 <span class="body-text-3" id="weight">{{ $warehouseProduct->weight }} kg</span>
                             </li>
@@ -426,12 +431,8 @@
                             <li>
                                 <span class="body-text-3">COD</span>
                                 <span class="body-text-3" id="cod">{{ ucfirst($warehouseProduct->cod) }}</span>
-                            </li>
-                            <li>
-                                <span class="body-text-3">Installation</span>
-                                <span class="body-text-3"
-                                    id="installation">{{ ucfirst($warehouseProduct->installation) }}</span>
-                            </li>
+                            </li> --}}
+
                             <li>
                                 <span class="body-text-3">Subtotal</span>
                                 <span class="body-text-3"

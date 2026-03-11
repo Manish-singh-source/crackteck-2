@@ -43,8 +43,11 @@ class StoreEcommerceProductRequest extends FormRequest
             'max_order_qty' => 'nullable|integer|min:1|gte:min_order_qty',
 
             // Shipping Details
-            'product_weight' => 'nullable|string|max:100',
-            'product_dimensions' => 'nullable|string|max:255',
+            'weight' => 'nullable|string|max:100',
+            'dimensions' => 'nullable|string|max:255',
+            'shipping_time' => 'nullable|string|max:255',
+            'cod' => 'nullable|in:0,1,yes,no',
+            'installation' => 'nullable|in:0,1,yes,no',
             'shipping_charges' => 'nullable|numeric|min:0',
             'shipping_class' => 'nullable|in:0,1,2,3,Light,Medium,Heavy,Fragile',
 

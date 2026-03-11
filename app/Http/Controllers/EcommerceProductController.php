@@ -68,12 +68,17 @@ class EcommerceProductController extends Controller
             $data['technical_specification'] = $request->input('ecommerce_technical_specification');
 
             // 1) with_installation (JSON array)
-            // Frontend se: installation_options[] (text list) + hidden field nahi
-            if ($request->has('installation_options')) {
-                // remove empty values
-                $data['with_installation'] = array_values(array_filter(
-                    (array) $request->input('installation_options', [])
-                ));
+            // Frontend se: installation field (Yes/No) - convert to array for with_installation
+            if ($request->has('installation')) {
+                $installationValue = $request->input('installation');
+                // Convert '1'/'0'/'yes'/'no' to array format
+                if (in_array($installationValue, ['1', 'yes', true], true)) {
+                    $data['with_installation'] = ['Yes'];
+                } else {
+                    $data['with_installation'] = ['No'];
+                }
+            } else {
+                $data['with_installation'] = [];
             }
 
             // 2) product_tags (JSON array)
@@ -120,7 +125,7 @@ class EcommerceProductController extends Controller
                 while (
                     EcommerceProduct::where('meta_product_url_slug', $data['meta_product_url_slug'])->exists()
                 ) {
-                    $data['meta_product_url_slug'] = $original.'-'.$counter++;
+                    $data['meta_product_url_slug'] = $original . '-' . $counter++;
                 }
             }
 
@@ -138,7 +143,15 @@ class EcommerceProductController extends Controller
             $data['is_todays_deal'] = $request->boolean('is_todays_deal');
             $data['is_returnable'] = $request->boolean('is_returnable');
 
-            // 7) Create record
+            // 7) Convert cod and installation from '0'/'1' to boolean
+            if (isset($data['cod'])) {
+                $data['cod'] = in_array($data['cod'], ['1', 'yes', true], true);
+            }
+            if (isset($data['installation'])) {
+                $data['installation'] = in_array($data['installation'], ['1', 'yes', true], true);
+            }
+
+            // 8) Create record
             $ecommerceProduct = EcommerceProduct::create($data);
 
             DB::commit();
@@ -164,7 +177,7 @@ class EcommerceProductController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'An error occurred while creating the product: '.$e->getMessage(),
+                    'message' => 'An error occurred while creating the product: ' . $e->getMessage(),
                     'errors' => method_exists($e, 'errors') ? $e->errors() : null,
                 ], 500);
             }
@@ -173,7 +186,7 @@ class EcommerceProductController extends Controller
                 ->back()
                 ->withInput()
                 ->withErrors([
-                    'error' => 'An error occurred while creating the product: '.$e->getMessage(),
+                    'error' => 'An error occurred while creating the product: ' . $e->getMessage(),
                 ]);
         }
     }
@@ -259,6 +272,14 @@ class EcommerceProductController extends Controller
             $data['is_todays_deal'] = $request->boolean('is_todays_deal');
             $data['is_returnable'] = $request->boolean('is_returnable');
 
+            // 2.1) Convert cod and installation from '0'/'1' to boolean
+            if (isset($data['cod'])) {
+                $data['cod'] = in_array($data['cod'], ['1', 'yes', true], true);
+            }
+            if (isset($data['installation'])) {
+                $data['installation'] = in_array($data['installation'], ['1', 'yes', true], true);
+            }
+
             // 3) Normalize shipping_class to 0..3
             if ($request->filled('shipping_class')) {
                 $val = $request->input('shipping_class');
@@ -286,8 +307,16 @@ class EcommerceProductController extends Controller
                 $data['shipping_class'] = $product->shipping_class ?? '0';
             }
 
-            // 4) With installation
-            if ($request->has('installation_options')) {
+            // 4) With installation - handle both installation (Yes/No) and installation_options
+            if ($request->has('installation')) {
+                $installationValue = $request->input('installation');
+                // Convert '1'/'0'/'yes'/'no' to array format for with_installation
+                if (in_array($installationValue, ['1', 'yes', true], true)) {
+                    $data['with_installation'] = ['Yes'];
+                } else {
+                    $data['with_installation'] = ['No'];
+                }
+            } elseif ($request->has('installation_options')) {
                 $data['with_installation'] = array_values(
                     array_filter((array) $request->input('installation_options', []))
                 );
@@ -353,10 +382,10 @@ class EcommerceProductController extends Controller
                 $counter = 1;
                 while (
                     EcommerceProduct::where('meta_product_url_slug', $slug)
-                        ->where('id', '!=', $product->id)
-                        ->exists()
+                    ->where('id', '!=', $product->id)
+                    ->exists()
                 ) {
-                    $slug = $original.'-'.$counter++;
+                    $slug = $original . '-' . $counter++;
                 }
 
                 $data['meta_product_url_slug'] = $slug;
@@ -380,14 +409,14 @@ class EcommerceProductController extends Controller
                 ->with('success', 'E-commerce product updated successfully!');
         } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Error updating e-commerce product: '.$e->getMessage(), [
+            Log::error('Error updating e-commerce product: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
 
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'An error occurred while updating the product: '.$e->getMessage(),
+                    'message' => 'An error occurred while updating the product: ' . $e->getMessage(),
                 ], 500);
             }
 
@@ -395,7 +424,7 @@ class EcommerceProductController extends Controller
                 ->back()
                 ->withInput()
                 ->withErrors([
-                    'error' => 'An error occurred while updating the product: '.$e->getMessage(),
+                    'error' => 'An error occurred while updating the product: ' . $e->getMessage(),
                 ]);
         }
     }
@@ -414,11 +443,11 @@ class EcommerceProductController extends Controller
                 'message' => 'E-commerce product deleted successfully!',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error deleting e-commerce product: '.$e->getMessage());
+            Log::error('Error deleting e-commerce product: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while deleting the product: '.$e->getMessage(),
+                'message' => 'An error occurred while deleting the product: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -465,11 +494,16 @@ class EcommerceProductController extends Controller
                 'stock_status' => $product->stock_status,
                 'main_product_image' => $product->main_product_image,
                 'additional_product_images' => $product->additional_product_images,
+                'weight' => $product->weight,
+                'dimensions' => $product->dimensions,
+                'shipping_time' => $product->shipping_time,
+                'cod' => $product->cod,
+                'installation' => $product->installation,
                 // 'brand_id' => $product->brand_id,
                 // 'model_no' => $product->model_no,
                 'hsn_code' => $product->hsn_code,
                 'status' => $product->status,
-                'display_text' => $product->product_name.' - '.$product->sku.($product->brand ? ' ('.$product->brand->brand_title.')' : ''),
+                'display_text' => $product->product_name . ' - ' . $product->sku . ($product->brand ? ' (' . $product->brand->brand_title . ')' : ''),
             ];
         });
 
@@ -515,6 +549,12 @@ class EcommerceProductController extends Controller
                     'sub_category_id' => $product->sub_category_id,
                     'model_no' => $product->model_no,
                     'hsn_code' => $product->hsn_code,
+                    // Shipping fields from warehouse product
+                    'weight' => $product->weight,
+                    'dimensions' => $product->dimensions,
+                    'shipping_time' => $product->shipping_time,
+                    'cod' => $product->cod,
+                    'installation' => $product->installation,
                 ],
             ]);
         } catch (\Exception $e) {

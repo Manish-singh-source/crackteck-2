@@ -113,14 +113,14 @@
                                         <label class="form-label" for="brand_warranty">Brand Warranty</label>
                                         <input type="text" class="form-control" id="brand_warranty"
                                             name="brand_warranty"
-                                            value="{{ old('brand_warranty', $product->brand_warranty) }}"
+                                            value="{{ old('brand_warranty', $product->warehouseProduct->brand_warranty) }}"
                                             placeholder="Enter Brand Warranty details">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label" for="company_warranty">Company Warranty</label>
                                         <input type="text" class="form-control" id="company_warranty"
                                             name="company_warranty"
-                                            value="{{ old('company_warranty', $product->company_warranty) }}"
+                                            value="{{ old('company_warranty', $product->warehouseProduct->company_warranty) }}"
                                             placeholder="Enter Company Warranty details">
                                     </div>
                                 </div>
@@ -414,6 +414,39 @@
                                             ],
                                         ])
                                     </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label" for="weight">Weight (kg)</label>
+                                        <input type="number" step="0.01" class="form-control" id="weight"
+                                            name="weight"
+                                            value="{{ old('weight', $product->weight) }}"
+                                            placeholder="Enter product weight in kg">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label" for="dimensions">Dimensions (L x B x H)</label>
+                                        <input type="text" class="form-control" id="dimensions"
+                                            name="dimensions"
+                                            value="{{ old('dimensions', $product->dimensions) }}"
+                                            placeholder="e.g., 10 x 5 x 2 cm">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label" for="shipping_time">Shipping Time</label>
+                                        <input type="text" class="form-control" id="shipping_time"
+                                            name="shipping_time"
+                                            value="{{ old('shipping_time', $product->shipping_time) }}"
+                                            placeholder="e.g., 2-3 business days">
+                                    </div>
+                                    <div class="col-md-12">
+                                        @include('components.form.select', [
+                                            'label' => 'Cash on Delivery (COD)',
+                                            'name' => 'cod',
+                                            'value' => old('cod', $product->cod ? '1' : '0'),
+                                            'options' => [
+                                                '' => '--Select--',
+                                                '0' => 'No',
+                                                '1' => 'Yes',
+                                            ],
+                                        ])
+                                    </div>
                                     {{-- Featured Product --}}
                                     <div class="col-md-12">
                                         @include('components.form.select', [
@@ -507,10 +540,16 @@
                                         value='@json(old('product_tags', $product->product_tags ?? []))'>
                                 </div>
                                 <div class="mb-3">
+                                    @php
+                                        $isReturnableValue = old('is_returnable');
+                                        if ($isReturnableValue === null) {
+                                            $isReturnableValue = $product->is_returnable == 1 ? '1' : '0';
+                                        }
+                                    @endphp
                                     @include('components.form.select', [
                                         'label' => 'Is Returnable',
                                         'name' => 'is_returnable',
-                                        'value' => old('is_returnable', $product->is_returnable),
+                                        'value' => $isReturnableValue,
                                         'options' => [
                                             '' => '--Select--',
                                             '0' => 'No',
@@ -519,10 +558,21 @@
                                     ])
                                 </div>
                                 <div class="mb-3">
+                                    @php
+                                        $installationValue = old('installation');
+                                        if ($installationValue === null) {
+                                            $withInstallation = $product->with_installation;
+                                            if (is_array($withInstallation) && in_array('Yes', $withInstallation)) {
+                                                $installationValue = '1';
+                                            } else {
+                                                $installationValue = '0';
+                                            }
+                                        }
+                                    @endphp
                                     @include('components.form.select', [
                                         'label' => 'With Installation Options',
-                                        'name' => 'with_installation',
-                                        'value' => old('with_installation', $product->with_installation),
+                                        'name' => 'installation',
+                                        'value' => $installationValue,
                                         'options' => [
                                             '' => '--Select--',
                                             '0' => 'No',

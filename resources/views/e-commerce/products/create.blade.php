@@ -513,7 +513,7 @@
                                         </h5>
                                     </div>
                                     <div class="card-body">
-                                        <div class="mb-3">
+                                        {{-- <div class="mb-3">
                                             <label for="shipping_charges" class="form-label">Shipping Charges</label>
                                             <input name="shipping_charges" id="shipping_charges" type="number"
                                                 step="0.01" class="form-control" placeholder="0.00">
@@ -531,7 +531,7 @@
                                                     '3' => 'Fragile',
                                                 ],
                                             ])
-                                        </div>
+                                        </div> --}}
                                         <div class="mb-3">
                                             @include('components.form.select', [
                                                 'label' => 'Featured Product',
@@ -595,8 +595,47 @@
                                         <div class="mb-3">
                                             @include('components.form.select', [
                                                 'label' => 'With Installation Options',
-                                                'name' => 'with_installation',
+                                                'name' => 'installation',
                                                 'value' => '',
+                                                'options' => [
+                                                    '' => '--Select--',
+                                                    '0' => 'No',
+                                                    '1' => 'Yes',
+                                                ],
+                                            ])
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="weight" class="form-label">Weight (kg)</label>
+                                            <input name="weight" id="weight" type="number" step="0.01"
+                                                class="form-control" placeholder="Enter product weight in kg">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="dimensions" class="form-label">Dimensions (L x B x H)</label>
+                                            <input name="dimensions" id="dimensions" type="text"
+                                                class="form-control" placeholder="e.g., 10 x 5 x 2 cm">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="shipping_time" class="form-label">Shipping Time</label>
+                                            <input name="shipping_time" id="shipping_time" type="text"
+                                                class="form-control" placeholder="e.g., 2-3 business days">
+                                        </div>
+                                        <div class="mb-3">
+                                            @include('components.form.select', [
+                                                'label' => 'Cash on Delivery (COD)',
+                                                'name' => 'cod',
+                                                'value' => '0',
+                                                'options' => [
+                                                    '' => '--Select--',
+                                                    '0' => 'No',
+                                                    '1' => 'Yes',
+                                                ],
+                                            ])
+                                        </div>
+                                        <div class="mb-3">
+                                            @include('components.form.select', [
+                                                'label' => 'With Installation Options',
+                                                'name' => 'installation',
+                                                'value' => '0',
                                                 'options' => [
                                                     '' => '--Select--',
                                                     '0' => 'No',
@@ -812,6 +851,15 @@
 
                 // Fill inventory
                 $('#warehouse_stock').val(product.stock_quantity);
+                $('#weight').val(product.weight);
+                $('#dimensions').val(product.dimensions);
+                $('#shipping_time').val(product.shipping_time);
+                // Convert 'yes'/'no' to '1'/'0' for select dropdowns
+                $('#cod').val(product.cod === 'yes' ? '1' : (product.cod === 'no' ? '0' : ''));
+                $('#installation').val(product.installation === 'yes' ? '1' : (product.installation === 'no' ? '0' : ''));
+                // $('#warehouse_stock').val(product.stock_quantity);
+                // $('#warehouse_stock').val(product.stock_quantity);
+                // $('#warehouse_stock').val(product.stock_quantity);
 
                 if (product.stock_status == '0') {
                     $('#warehouse_stock_status').val('In Stock');

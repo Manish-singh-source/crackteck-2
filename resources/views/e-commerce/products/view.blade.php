@@ -547,6 +547,44 @@
                                         class="badge bg-info">{{ $shippingClass[$product->shipping_class] ?? 'N/A' }}</span>
                                 </p>
                             </div>
+                            <div class="mb-3">
+                                <label class="fw-semibold">Weight:</label>
+                                <p class="text-muted">
+                                    {{ $product->weight ? $product->weight . ' kg' : 'N/A' }}
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="fw-semibold">Dimensions:</label>
+                                <p class="text-muted">
+                                    {{ $product->dimensions ?? 'N/A' }}
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="fw-semibold">Shipping Time:</label>
+                                <p class="text-muted">
+                                    {{ $product->shipping_time ?? 'N/A' }}
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="fw-semibold">Cash on Delivery (COD):</label>
+                                <p class="text-muted">
+                                    @if ($product->cod)
+                                        <span class="badge bg-success">Yes</span>
+                                    @else
+                                        <span class="badge bg-secondary">No</span>
+                                    @endif
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="fw-semibold">With Installation:</label>
+                                <p class="text-muted">
+                                    @if ($product->with_installation && is_array($product->with_installation) && in_array('Yes', $product->with_installation))
+                                        <span class="badge bg-success">Yes</span>
+                                    @else
+                                        <span class="badge bg-secondary">No</span>
+                                    @endif
+                                </p>
+                            </div>
 
                         </div>
                     </div>
@@ -681,9 +719,9 @@
                                         <p class="text-muted">
                                             @php
                                                 $ecommerceStatus = [
-                                                    0 => 'Inactive',
-                                                    1 => 'Active',
-                                                    2 => 'Draft',
+                                                    'inactive' => 'Inactive',
+                                                    'active' => 'Active',
+                                                    'draft' => 'Draft',
                                                 ];
                                             @endphp
                                             <span

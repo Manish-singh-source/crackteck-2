@@ -303,6 +303,7 @@
                                             <th>Quantity</th>
                                             <th>Price Per Unit</th>
                                             <th>Tax Amount</th>
+                                            <th>Other Detail</th>
                                             <th>Total Price</th>
                                         </tr>
                                     </thead>
@@ -358,6 +359,32 @@
                                                     @endif --}}
                                                     <small class="fw-medium">
                                                         ₹{{ number_format($item->tax_per_unit, 2) }}</small>
+                                                </td>
+                                                <td>
+                                                    <small class="fw-medium">Weight:
+                                                        {{ $item->weight ?? 'N/A' }}</small>
+                                                    <br>
+                                                    <small class="fw-medium">Dimensions:
+                                                        {{ $item->dimensions ?? 'N/A' }}</small>
+                                                    <br>
+                                                    <small class="fw-medium">COD:
+                                                        @php
+                                                            $cod  = match ($item->cod ) {
+                                                                'no' => 'No',
+                                                                'yes' => 'Yes'
+                                                            }
+                                                        @endphp
+                                                        {{ $cod ?? 'N/A' }}</small>
+                                                    <br>
+                                                    <small class="fw-medium">Installation:
+                                                        @php
+                                                            $installation  = match ($item->installation ) {
+                                                                'no' => 'No',
+                                                                'yes' => 'Yes'
+                                                            }
+                                                        @endphp
+                                                        {{ $installation ?? 'N/A' }}</small>
+                                                    <br>
                                                 </td>
                                                 <td>
                                                     <span

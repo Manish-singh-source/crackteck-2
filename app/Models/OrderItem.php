@@ -25,6 +25,11 @@ class OrderItem extends Model
         'variant_details',
         'custom_options',
         'item_status',
+        'weight',
+        'dimensions',
+        'shipping_time',
+        'cod',
+        'installation',
     ];
 
     protected $casts = [
@@ -58,6 +63,11 @@ class OrderItem extends Model
             'variant_details' => null,
             'custom_options' => null,
             'item_status' => 'pending',
+            'weight' => $warehouseProduct->weight ?? null,
+            'dimensions' => $warehouseProduct->dimensions ?? null,
+            'shipping_time' => $warehouseProduct->shipping_time ?? null,
+            'cod' => $warehouseProduct->cod ?? 'no',
+            'installation' => $warehouseProduct->installation ?? 'no',
         ]);
     }
 
@@ -88,6 +98,11 @@ class OrderItem extends Model
             'variant_details' => null,
             'custom_options' => null,
             'item_status' => 'pending',
+            'weight' => $warehouseProduct->weight ?? null,
+            'dimensions' => $warehouseProduct->dimensions ?? null,
+            'shipping_time' => $warehouseProduct->shipping_time ?? null,
+            'cod' => $warehouseProduct->cod ?? 'no',
+            'installation' => $warehouseProduct->installation ?? 'no',
         ]);
     }
 

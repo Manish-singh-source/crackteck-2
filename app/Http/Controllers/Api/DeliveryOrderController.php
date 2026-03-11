@@ -75,7 +75,7 @@ class DeliveryOrderController extends Controller
     public function acceptOrder(Request $request, $order_id)
     {
         $roleValidated = Validator::make($request->all(), ([
-            'role_id' => 'required|in:2',
+            'role_id' => 'required|in:1,2',
             'user_id' => 'required',
         ]));
 
@@ -89,7 +89,7 @@ class DeliveryOrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        if ($staffRole == 'delivery_man') {
+        if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
             $order = Order::where('id', $order_id)->first();
 
             if (! $order) {
@@ -97,7 +97,7 @@ class DeliveryOrderController extends Controller
             }
 
             if ($order->assigned_person_id != $request->user_id) {
-                return response()->json(['message' => 'Order already accepted by another delivery man'], 400);
+                return response()->json(['message' => 'Order already accepted by another person'], 400);
             }
 
             $order->update(['status' => 'order_accepted', 'accepted_at' => now()]);
@@ -110,7 +110,7 @@ class DeliveryOrderController extends Controller
     public function allOrders(Request $request)
     {
         $roleValidated = Validator::make($request->all(), ([
-            'role_id' => 'required|in:2',
+            'role_id' => 'required|in:1,2',
             'user_id' => 'required',
         ]));
 
@@ -123,7 +123,7 @@ class DeliveryOrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        if ($staffRole == 'delivery_man') {
+        if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
             $orders = Order::with(['orderItems'])->where('assigned_person_id', $request->user_id);
             if ($request->filled('status')) {
                 $orders->where('status', $request->status);
@@ -137,7 +137,7 @@ class DeliveryOrderController extends Controller
     public function orderDetails(Request $request, $order_id)
     {
         $roleValidated = Validator::make($request->all(), ([
-            'role_id' => 'required|in:2',
+            'role_id' => 'required|in:1,2',
             'user_id' => 'required',
         ]));
 
@@ -150,7 +150,7 @@ class DeliveryOrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        if ($staffRole == 'delivery_man') {
+        if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
             $order = Order::with(['orderItems'])->where('id', $order_id)->first();
 
             if (! $order) {
@@ -164,7 +164,7 @@ class DeliveryOrderController extends Controller
     public function updateOrderProfile(Request $request, $order_id)
     {
         $roleValidated = Validator::make($request->all(), ([
-            'role_id' => 'required|in:2',
+            'role_id' => 'required|in:1,2',
             'user_id' => 'required',
             'profile' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]));
@@ -179,7 +179,7 @@ class DeliveryOrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        if ($staffRole == 'delivery_man') {
+        if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
             if ($request->hasFile('profile')) {
                 $file = $request->file('profile');
                 $filename = time().'.'.$file->getClientOriginalExtension();
@@ -202,7 +202,7 @@ class DeliveryOrderController extends Controller
     public function updateOrderOtp(Request $request, $order_id)
     {
         $roleValidated = Validator::make($request->all(), ([
-            'role_id' => 'required|in:2',
+            'role_id' => 'required|in:1,2',
             'user_id' => 'required',
         ]));
 
@@ -216,7 +216,7 @@ class DeliveryOrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        if ($staffRole == 'delivery_man') {
+        if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
             $order = Order::where('id', $order_id)->first();
 
             if (! $order) {
@@ -258,7 +258,7 @@ class DeliveryOrderController extends Controller
     public function verifyOrderOtp(Request $request, $order_id)
     {
         $roleValidated = Validator::make($request->all(), ([
-            'role_id' => 'required|in:2',
+            'role_id' => 'required|in:1,2',
             'user_id' => 'required',
             'otp' => 'required',
         ]));
@@ -273,7 +273,7 @@ class DeliveryOrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        if ($staffRole == 'delivery_man') {
+        if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
             $order = Order::where('id', $order_id)->first();
 
             if (! $order) {
@@ -301,7 +301,7 @@ class DeliveryOrderController extends Controller
     public function deliveredOrderDetails(Request $request, $order_id)
     {
         $roleValidated = Validator::make($request->all(), ([
-            'role_id' => 'required|in:2',
+            'role_id' => 'required|in:1,2',
             'user_id' => 'required',
         ]));
 
@@ -315,7 +315,7 @@ class DeliveryOrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        if ($staffRole == 'delivery_man') {
+        if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
             $order = Order::where('id', $order_id)->where('status', 'delivered')->first();
 
             if (! $order) {

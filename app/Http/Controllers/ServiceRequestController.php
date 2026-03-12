@@ -2214,7 +2214,10 @@ class ServiceRequestController extends Controller
             // 'inactiveAssignments.groupEngineers',
             'inactiveAssignments.transferredTo',
             'productReturns', // Load return diagnosis data
+            'remoteSupportJob',
+            'remoteSupportJob.engineer',
         ])->findOrFail($id);
+
 
         $logs = Activity::where('subject_type', ServiceRequest::class)
             ->where('subject_id', $id)
@@ -2994,18 +2997,23 @@ class ServiceRequestController extends Controller
      * @param Request $request
      * @return void
      */
-    public function assignQuickServiceEngineer(Request $request) {
+    public function assignQuickServiceEngineer(Request $request)
+    {
         $serviceRequest = ServiceRequest::where('id', $request->service_request_id)->first();
 
-        if($serviceRequest->status == "pending") {
+        if ($serviceRequest->status == "pending") {
             $remoteSupportJob = RemoteSupportJob::create([
-                'service_request_id' => $request->service_request_id,	
-                'amc_schedule_meeting_id' => ($serviceRequest->service_type == 'amc') ? $serviceRequest->amc_schedule_meeting_id : null,	
+                'service_request_id' => $request->service_request_id,
+                'amc_schedule_meeting_id' => ($serviceRequest->service_type == 'amc') ? $serviceRequest->amc_schedule_meeting_id : null,
                 'staff_id' => $request->engineer_id,
                 'assigned_at' => now(),
             ]);
 
-            if($remoteSupportJob) {
+            if ($remoteSupportJob) {
+                $serviceRequest->is_engineer_assigned = 'assigned';
+                $serviceRequest->status = 'assigned_engineer';
+                $serviceRequest->save();
+
                 return redirect()->back()->with('success', 'Engineer assigned successfully.');
             }
         }
@@ -3014,7 +3022,7 @@ class ServiceRequestController extends Controller
     }
 
 
-    
+
     /**
      * Assign pickup for a service request product.
      */

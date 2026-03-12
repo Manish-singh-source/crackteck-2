@@ -149,4 +149,10 @@ class ServiceRequest extends Model
     {
         return $this->hasMany(AmcScheduleMeeting::class, 'service_request_id')->orderBy('visits_count', 'asc');
     }
+
+    // Remote Jobs 
+    public function remoteSupportJob() {
+        return $this->hasOne(RemoteSupportJob::class, 'service_request_id');
+    }
+    
 }

@@ -631,12 +631,12 @@ class ApiAuthController extends Controller
         $latestCustomer = Customer::orderBy('id', 'DESC')->first();
 
         if ($latestCustomer) {
-            $number = (int) str_replace('CST-', '', $latestCustomer->customer_code) + 1;
+            $number = (int) str_replace('CUST', '', $latestCustomer->customer_code) + 1;
         } else {
             $number = 1;
         }
 
-        return 'CUST-' . str_pad($number, 6, '0', STR_PAD_LEFT);
+        return 'CUST' . str_pad($number, 6, '0', STR_PAD_LEFT);
     }
 
     // Login with google from App

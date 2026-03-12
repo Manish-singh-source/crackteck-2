@@ -21,6 +21,10 @@ class EcommerceProduct extends Model
         'max_order_qty',
         'shipping_charges',
         'shipping_class',
+        'weight',
+        'dimensions',
+        'shipping_time',
+        'cod',
         'variation_options',
         'is_featured',
         'is_best_seller',
@@ -45,7 +49,9 @@ class EcommerceProduct extends Model
         'is_suggested' => 'boolean',
         'is_todays_deal' => 'boolean',
         'is_returnable' => 'boolean',
+        'cod' => 'boolean',
         'shipping_charges' => 'decimal:2',
+        'weight' => 'decimal:2',
     ];
 
     public function warehouseProduct()

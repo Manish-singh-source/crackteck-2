@@ -239,54 +239,6 @@
                                                         id="ecommerce_technical_specification">
                                                 </div>
                                             </div>
-                                            <div class="col-xl-12 col-lg-6">
-                                                <div class="row justify-content-end align-items-end">
-                                                    <div class="col-11">
-                                                        <div class="mb-3">
-                                                            <label for="installation_option" class="form-label">With
-                                                                Installation Options</label>
-                                                            <input type="text" class="form-control"
-                                                                id="installation_option"
-                                                                placeholder="Enter installation option (e.g., Basic Installation, Premium Setup)">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-1">
-                                                        <div class="mb-3">
-                                                            <button type="button"
-                                                                class="btn btn-primary w-100 add-installation">Add</button>
-                                                        </div>
-                                                    </div>
-
-                                                    {{-- <table class="table mt-4" id="installationTable"
-                                                        style="display: none;">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Installation Options</th>
-                                                                <th>Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <!-- Selected values will appear here -->
-                                                        </tbody>
-                                                    </table> --}}
-
-                                                    <table class="table table-bordered table-hover table-sm align-middle"
-                                                        id="installationTable" style="display: none;">
-                                                        <thead class="table-light">
-                                                            <tr>
-                                                                <th class="text-start">Installation Option</th>
-                                                                <th class="text-end" style="width: 60px;">Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="installation_tbody">
-                                                            <!-- JS will inject rows here -->
-                                                        </tbody>
-                                                    </table>
-
-
-                                                </div>
-                                            </div>
-
                                             <div class="col-xl-6 col-lg-6">
                                                 <div class="mb-3">
                                                     <label for="brand_warranty" class="form-label">Brand Warranty</label>
@@ -561,7 +513,7 @@
                                         </h5>
                                     </div>
                                     <div class="card-body">
-                                        <div class="mb-3">
+                                        {{-- <div class="mb-3">
                                             <label for="shipping_charges" class="form-label">Shipping Charges</label>
                                             <input name="shipping_charges" id="shipping_charges" type="number"
                                                 step="0.01" class="form-control" placeholder="0.00">
@@ -579,7 +531,7 @@
                                                     '3' => 'Fragile',
                                                 ],
                                             ])
-                                        </div>
+                                        </div> --}}
                                         <div class="mb-3">
                                             @include('components.form.select', [
                                                 'label' => 'Featured Product',
@@ -640,6 +592,57 @@
                                                 ],
                                             ])
                                         </div>
+                                        <div class="mb-3">
+                                            @include('components.form.select', [
+                                                'label' => 'With Installation Options',
+                                                'name' => 'installation',
+                                                'value' => '',
+                                                'options' => [
+                                                    '' => '--Select--',
+                                                    '0' => 'No',
+                                                    '1' => 'Yes',
+                                                ],
+                                            ])
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="weight" class="form-label">Weight (kg)</label>
+                                            <input name="weight" id="weight" type="number" step="0.01"
+                                                class="form-control" placeholder="Enter product weight in kg">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="dimensions" class="form-label">Dimensions (L x B x H)</label>
+                                            <input name="dimensions" id="dimensions" type="text"
+                                                class="form-control" placeholder="e.g., 10 x 5 x 2 cm">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="shipping_time" class="form-label">Shipping Time</label>
+                                            <input name="shipping_time" id="shipping_time" type="text"
+                                                class="form-control" placeholder="e.g., 2-3 business days">
+                                        </div>
+                                        <div class="mb-3">
+                                            @include('components.form.select', [
+                                                'label' => 'Cash on Delivery (COD)',
+                                                'name' => 'cod',
+                                                'value' => '0',
+                                                'options' => [
+                                                    '' => '--Select--',
+                                                    '0' => 'No',
+                                                    '1' => 'Yes',
+                                                ],
+                                            ])
+                                        </div>
+                                        <div class="mb-3">
+                                            @include('components.form.select', [
+                                                'label' => 'With Installation Options',
+                                                'name' => 'installation',
+                                                'value' => '0',
+                                                'options' => [
+                                                    '' => '--Select--',
+                                                    '0' => 'No',
+                                                    '1' => 'Yes',
+                                                ],
+                                            ])
+                                        </div>
                                     </div>
                                 </div>
 
@@ -668,7 +671,6 @@
         $(document).ready(function() {
             let searchTimeout;
             let selectedProductId = null;
-            let installationOptions = [];
 
             // Initialize Quill editors
             const quillShort = new Quill('#quill-editor-short', {
@@ -849,6 +851,15 @@
 
                 // Fill inventory
                 $('#warehouse_stock').val(product.stock_quantity);
+                $('#weight').val(product.weight);
+                $('#dimensions').val(product.dimensions);
+                $('#shipping_time').val(product.shipping_time);
+                // Convert 'yes'/'no' to '1'/'0' for select dropdowns
+                $('#cod').val(product.cod === 'yes' ? '1' : (product.cod === 'no' ? '0' : ''));
+                $('#installation').val(product.installation === 'yes' ? '1' : (product.installation === 'no' ? '0' : ''));
+                // $('#warehouse_stock').val(product.stock_quantity);
+                // $('#warehouse_stock').val(product.stock_quantity);
+                // $('#warehouse_stock').val(product.stock_quantity);
 
                 if (product.stock_status == '0') {
                     $('#warehouse_stock_status').val('In Stock');
@@ -943,54 +954,6 @@
                     '<p class="text-muted">Select warehouse product to view datasheet</p>');
             });
 
-            // Installation options management
-            $('.add-installation').on('click', function(e) {
-                e.preventDefault();
-                const installationValue = $('#installation_option').val().trim();
-
-                if (installationValue && !installationOptions.includes(installationValue)) {
-                    installationOptions.push(installationValue);
-                    updateInstallationTable();
-                    $('#installation_option').val('');
-                }
-            });
-
-            function updateInstallationTable() {
-                if (installationOptions.length === 0) {
-                    $('#installationTable').hide();
-                    return;
-                }
-
-                let html = '';
-                installationOptions.forEach(function(option, index) {
-                    html += `
-                        <tr>
-                            <td class="py-2">
-                                <span class="fw-medium text-dark">${option}</span>
-                            </td>
-                            <td class="text-end py-2">
-                                <button type="button"
-                                        class="btn btn-sm btn-outline-danger remove-installation"
-                                        data-index="${index}"
-                                        title="Remove">
-                                    <i class="mdi mdi-delete"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                $('#installation_tbody').html(html);
-                $('#installationTable').show();
-            }
-
-            // Remove installation option
-            $(document).on('click', '.remove-installation', function() {
-                const index = $(this).data('index');
-                installationOptions.splice(index, 1);
-                updateInstallationTable();
-            });
-
             // Handle product tags
             $('#product_tags_input').on('blur', function() {
                 const tags = $(this).val().split(',').map(tag => tag.trim()).filter(tag => tag);
@@ -1017,11 +980,6 @@
 
                 // Ensure CSRF token is present (in case @csrf not in form)
                 fd.set('_token', '{{ csrf_token() }}');
-
-                // Append installation options as an array
-                installationOptions.forEach(function(option, index) {
-                    fd.append(`installation_options[${index}]`, option);
-                });
 
                 // Add product tags (send as JSON string so controller can accept string or array)
                 const tags = $('#product_tags_input').val() ? $('#product_tags_input').val().split(',').map(tag => tag.trim()).filter(tag => tag) : [];

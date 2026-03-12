@@ -303,6 +303,7 @@
                                             <th>Quantity</th>
                                             <th>Price Per Unit</th>
                                             <th>Tax Amount</th>
+                                            <th>Other Detail</th>
                                             <th>Total Price</th>
                                         </tr>
                                     </thead>
@@ -358,6 +359,32 @@
                                                     @endif --}}
                                                     <small class="fw-medium">
                                                         ₹{{ number_format($item->tax_per_unit, 2) }}</small>
+                                                </td>
+                                                <td>
+                                                    <small class="fw-medium">Weight:
+                                                        {{ $item->weight ?? 'N/A' }}</small>
+                                                    <br>
+                                                    <small class="fw-medium">Dimensions:
+                                                        {{ $item->dimensions ?? 'N/A' }}</small>
+                                                    <br>
+                                                    <small class="fw-medium">COD:
+                                                        @php
+                                                            $cod  = match ($item->cod ) {
+                                                                'no' => 'No',
+                                                                'yes' => 'Yes'
+                                                            }
+                                                        @endphp
+                                                        {{ $cod ?? 'N/A' }}</small>
+                                                    <br>
+                                                    <small class="fw-medium">Installation:
+                                                        @php
+                                                            $installation  = match ($item->installation ) {
+                                                                'no' => 'No',
+                                                                'yes' => 'Yes'
+                                                            }
+                                                        @endphp
+                                                        {{ $installation ?? 'N/A' }}</small>
+                                                    <br>
                                                 </td>
                                                 <td>
                                                     <span
@@ -674,6 +701,10 @@
 
                     <!-- Assign Delivery Man Card - Show only when status is admin_approved -->
                     @if ($order->status === 'admin_approved')
+                        @php
+                            // Check if any product in the order requires installation
+                            $hasInstallation = $order->orderItems->contains('installation', 'yes');
+                        @endphp
                         <div class="card">
                             <div class="card-header border-bottom-dashed">
                                 <div class="d-flex">
@@ -684,6 +715,18 @@
                             </div>
 
                             <div class="card-body">
+                                @if($hasInstallation)
+                                    <div class="alert alert-info mb-3">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        This order contains product(s) requiring installation. Only Engineer can be assigned.
+                                    </div>
+                                @else
+                                    <div class="alert alert-info mb-3">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        This order does not contain any product requiring installation. You can assign either Engineer or Delivery Man.
+                                    </div>
+                                @endif
+                                
                                 <form action="{{ route('order.assign-person', $order->id) }}" method="POST"
                                     id="assign-delivery-man-form">
                                     @csrf
@@ -691,16 +734,43 @@
 
                                     <div class="mb-3">
                                         <label for="assigned_person_type" class="form-label">Select Assignment Type</label>
-                                        <select class="form-select @error('assigned_person_type') is-invalid @enderror"
-                                            id="assigned_person_type" name="assigned_person_type" required disabled>
-                                            <option value="delivery_man" selected>Delivery Man</option>
-                                        </select>
-                                        <input type="hidden" name="assigned_person_type" value="delivery_man">
+                                        @if($hasInstallation)
+                                            <select class="form-select @error('assigned_person_type') is-invalid @enderror"
+                                                id="assigned_person_type" name="assigned_person_type" required>
+                                                <option value="engineer" selected>Engineer</option>
+                                            </select>
+                                            <input type="hidden" name="assigned_person_type" value="engineer">
+                                        @else
+                                            <select class="form-select @error('assigned_person_type') is-invalid @enderror"
+                                                id="assigned_person_type" name="assigned_person_type" required>
+                                                <option value="" selected disabled>-- Select Person Type --</option>
+                                                <option value="engineer" {{ $order->assigned_person_type == 'engineer' ? 'selected' : '' }}>Engineer</option>
+                                                <option value="delivery_man" {{ $order->assigned_person_type == 'delivery_man' ? 'selected' : '' }}>Delivery Man</option>
+                                            </select>
+                                        @endif
                                         @error('assigned_person_type')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
 
+                                    @if($hasInstallation)
+                                    <div class="mb-3" id="engineerSection" style="display: block;">
+                                        <label for="engineer_id" class="form-label">Select Engineer</label>
+                                        <select class="form-select @error('engineer_id') is-invalid @enderror"
+                                            id="engineer_id" name="engineer_id" required>
+                                            <option value="" selected disabled>-- Select Engineer --</option>
+                                            @foreach ($engineers as $engineer)
+                                                <option value="{{ $engineer->id }}"
+                                                    @if ($order->assigned_person_id == $engineer->id) selected @endif>
+                                                    {{ $engineer->first_name }} {{ $engineer->last_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('engineer_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    @else
                                     <div class="mb-3" id="deliveryManSection" style="display: {{ $order->assigned_person_type == 'delivery_man' ? 'block' : 'none' }};">
                                         <label for="delivery_man_id" class="form-label">Select Delivery Man</label>
                                         <select class="form-select @error('delivery_man_id') is-invalid @enderror"
@@ -734,6 +804,7 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
+                                    @endif
 
                                     <button type="submit" class="btn btn-primary w-100 mt-3">
                                         <i class="mdi mdi-check-circle me-2"></i>Assign Person
@@ -1050,5 +1121,26 @@
                 document.getElementById('complete-refund-form-' + returnOrderId).submit();
             }
         }
+
+        // Handle Assign Person Type Dropdown Change
+        $(document).ready(function() {
+            $('#assigned_person_type').on('change', function() {
+                const selectedType = $(this).val();
+                
+                if (selectedType === 'engineer') {
+                    $('#engineerSection').show();
+                    $('#deliveryManSection').hide();
+                    // Make engineer_id required, delivery_man_id not required
+                    $('#engineer_id').prop('required', true);
+                    $('#delivery_man_id').prop('required', false);
+                } else if (selectedType === 'delivery_man') {
+                    $('#deliveryManSection').show();
+                    $('#engineerSection').hide();
+                    // Make delivery_man_id required, engineer_id not required
+                    $('#delivery_man_id').prop('required', true);
+                    $('#engineer_id').prop('required', false);
+                }
+            });
+        });
     </script>
 @endsection

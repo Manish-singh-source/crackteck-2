@@ -251,19 +251,6 @@
                                             @else
                                                 <span class="new-price price-text fw-medium">₹0.00</span>
                                             @endif
-                                            <!-- Shipping Information -->
-                                            <div class="shipping-info d-flex align-items-center gap-2">
-                                                <i class="icon-delivery-2 text-success"></i>
-                                                @if ($product->shipping_charges && $product->shipping_charges > 0)
-                                                    <span class="text-muted">Shipping:
-                                                        ₹{{ number_format($product->shipping_charges, 2) }}</span>
-                                                @else
-                                                    <span class="text-success fw-semibold">Free shipping</span>
-                                                @endif
-                                                <span class="text-muted">• Delivery in 2-5 business days</span>
-                                            </div>
-
-
                                         </div>
                                         <div class="product-delivery">
                                             <div class="tf-product-info-choose-option flex-xl-nowrap my-2">
@@ -282,6 +269,18 @@
                                                         </button>
                                                     </div>
                                                 </div>
+                                            </div>
+
+                                            <!-- Shipping Information -->
+                                            <div class="shipping-info d-flex align-items-center gap-2">
+                                                <i class="icon-delivery-2 text-success"></i>
+                                                @if ($product->shipping_charges && $product->shipping_charges > 0)
+                                                    <span class="text-muted">Shipping Charges:
+                                                        ₹{{ number_format($product->shipping_charges, 2) }}</span>
+                                                @else
+                                                    <span class="text-success fw-semibold">Free shipping</span>
+                                                @endif
+                                                <span class="text-muted">• Delivery in {{ $product->shipping_time ?? 0 }}  business days</span>
                                             </div>
                                         </div>
                                     </div>
@@ -309,17 +308,17 @@
                                             </li>
                                         @endif
 
-                                        @if ($product->product_weight)
+                                        @if ($product->weight)
                                             <li>
                                                 <p class="body-md-2 fw-semibold">Weight</p>
-                                                <span class="body-text-3">{{ $product->product_weight }}</span>
+                                                <span class="body-text-3">{{ $product->weight }} Kg</span>
                                             </li>
                                         @endif
 
-                                        @if ($product->product_dimensions)
+                                        @if ($product->dimensions)
                                             <li>
                                                 <p class="body-md-2 fw-semibold">Dimensions</p>
-                                                <span class="body-text-3">{{ $product->product_dimensions }}</span>
+                                                <span class="body-text-3">{{ $product->dimensions }} (L*W*H)</span>
                                             </li>
                                         @endif
 
@@ -351,6 +350,40 @@
                                                 <span
                                                     class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
                                                     Non-Returnable
+                                                </span>
+                                            </li>
+                                        @endif
+
+                                        @if ($product->with_installation)
+                                            <li>
+                                                <p class="body-md-2 fw-semibold">Installation</p>
+                                                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                                                    With Installation
+                                                </span>
+                                            </li>
+                                        @else
+                                            <li>
+                                                <p class="body-md-2 fw-semibold">Installation</p>
+                                                <span
+                                                    class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
+                                                    No Installation
+                                                </span>
+                                            </li>
+                                        @endif
+
+                                        @if ($product->cod)
+                                            <li>
+                                                <p class="body-md-2 fw-semibold">COD</p>
+                                                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                                                    Yes
+                                                </span>
+                                            </li>
+                                        @else
+                                            <li>
+                                                <p class="body-md-2 fw-semibold">COD</p>
+                                                <span
+                                                    class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
+                                                    No
                                                 </span>
                                             </li>
                                         @endif
@@ -488,7 +521,7 @@
     </section>
 
     <!-- Product Description -->
-    <section class="flat-spacing-17 pt_0">
+    <section class="flat-spacing-17 pt_0 pb-5">
         <div class="container">
             <div class="row">
                 <div class="col-12">

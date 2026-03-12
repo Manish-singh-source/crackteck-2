@@ -507,6 +507,63 @@
 
                     </div>
 
+                    <!-- Shipping Information -->
+                    <div class="card">
+                        <div class="card-header border-bottom-dashed">
+                            <h5 class="card-title mb-0">Shipping Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="fw-semibold">Weight:</label>
+                                        <p class="text-muted">{{ $product->weight ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="fw-semibold">Dimensions:</label>
+                                        <p class="text-muted">{{ $product->dimensions ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="fw-semibold">Shipping Time:</label>
+                                        <p class="text-muted">{{ $product->shipping_time ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="fw-semibold">Cash on Delivery (COD):</label>
+                                        <p class="text-muted">
+                                            @if($product->cod == 'yes')
+                                                <span class="badge bg-success">Yes</span>
+                                            @elseif($product->cod == 'no')
+                                                <span class="badge bg-secondary">No</span>
+                                            @else
+                                                N/A
+                                            @endif
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="fw-semibold">Installation:</label>
+                                        <p class="text-muted">
+                                            @if($product->installation == 'yes')
+                                                <span class="badge bg-success">Yes</span>
+                                            @elseif($product->installation == 'no')
+                                                <span class="badge bg-secondary">No</span>
+                                            @else
+                                                N/A
+                                            @endif
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Product Status -->
                     <div class="card">
                         <div class="card-header border-bottom-dashed">

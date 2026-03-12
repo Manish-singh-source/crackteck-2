@@ -336,6 +336,11 @@
                                             ₹{{ number_format($warehouseProduct->final_price, 2) }}
                                             <span class="body-md-2 text-main-2 fw-normal">X{{ $item->quantity }}</span>
                                         </p>
+                                        <span>
+                                            Installation: 
+                                            <span
+                                                class="body-md-2 text-main-2 fw-normal">{{ ucfirst($warehouseProduct->installation) }}</span>
+                                        </span>
                                         @if ($warehouseProduct->color)
                                             <p class="body-md-2 text-main-2">{{ $warehouseProduct->color }}</p>
                                         @endif
@@ -344,7 +349,9 @@
                             @endforeach
                             @php
                                 // Get last item's warehouse product for tax display
-                                $lastWarehouseProduct = $lastItem ? $lastItem->ecommerceProduct->warehouseProduct : null;
+                                $lastWarehouseProduct = $lastItem
+                                    ? $lastItem->ecommerceProduct->warehouseProduct
+                                    : null;
                             @endphp
                         </ul>
 
@@ -378,6 +385,54 @@
 
                         <!-- Price Summary -->
                         <ul class="sec-total-price">
+
+                            <!-- Product Additional Details -->
+                            {{-- @if ($warehouseProduct->weight || $warehouseProduct->dimensions || $warehouseProduct->shipping_time || $warehouseProduct->cod || $warehouseProduct->installation)
+                                <div class="product-details mt-2 pt-2" style="border-top: 1px dashed #ddd;">
+                                    @if ($warehouseProduct->weight)
+                                        <p class="body-md-2 text-main-2 mb-1">
+                                            <span class="fw-semibold">Weight:</span> {{ $warehouseProduct->weight }}
+                                        </p>
+                                    @endif
+                                    @if ($warehouseProduct->dimensions)
+                                        <p class="body-md-2 text-main-2 mb-1">
+                                            <span class="fw-semibold">Dimensions:</span>
+                                            {{ $warehouseProduct->dimensions }}
+                                        </p>
+                                    @endif
+                                    @if ($warehouseProduct->shipping_time)
+                                        <p class="body-md-2 text-main-2 mb-1">
+                                            <span class="fw-semibold">Shipping Time:</span>
+                                            {{ $warehouseProduct->shipping_time }}
+                                        </p>
+                                    @endif
+                                    @if ($warehouseProduct->cod)
+                                        <p class="body-md-2 text-main-2 mb-1">
+                                            <span class="fw-semibold">COD:</span> {{ ucfirst($warehouseProduct->cod) }}
+                                        </p>
+                                    @endif
+                                    @if ($warehouseProduct->installation)
+                                        <p class="body-md-2 text-main-2 mb-1">
+                                            <span class="fw-semibold">Installation:</span>
+                                            {{ ucfirst($warehouseProduct->installation) }}
+                                        </p>
+                                    @endif
+                                </div>
+                            @endif --}}
+                            {{-- <li>
+                                <span class="body-text-3">Weight</span>
+                                <span class="body-text-3" id="weight">{{ $warehouseProduct->weight }} kg</span>
+                            </li>
+                            <li>
+                                <span class="body-text-3">Shipping Time</span>
+                                <span class="body-text-3" id="shipping_time">{{ $warehouseProduct->shipping_time }}
+                                    Days</span>
+                            </li>
+                            <li>
+                                <span class="body-text-3">COD</span>
+                                <span class="body-text-3" id="cod">{{ ucfirst($warehouseProduct->cod) }}</span>
+                            </li> --}}
+
                             <li>
                                 <span class="body-text-3">Subtotal</span>
                                 <span class="body-text-3"

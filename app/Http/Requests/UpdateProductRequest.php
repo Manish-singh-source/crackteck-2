@@ -40,6 +40,12 @@ class UpdateProductRequest extends FormRequest
             'brand_warranty' => 'nullable|string|max:255',
             'company_warranty' => 'nullable|string|max:255',
 
+            'weight' => 'nullable|string|max:255',
+            'dimensions' => 'nullable|string|max:255',
+            'shipping_time' => 'nullable|string|max:255',
+            'cod' => 'nullable|in:yes,no',
+            'installation' => 'nullable|in:yes,no',
+
             'cost_price' => 'nullable|numeric|min:0',
             'selling_price' => 'nullable|numeric|min:0',
             'discount_price' => 'nullable|numeric|min:0',

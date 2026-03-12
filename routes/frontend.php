@@ -68,6 +68,12 @@ Route::prefix('beta')->group(function () {
 
     // AMC Plans
     Route::get('/amc', [FrontendController::class, 'amcPlans'])->name('amc');
+    
+    // Remote AMC Plans
+    Route::get('/remote-amc', [FrontendController::class, 'remoteAmcPlans'])->name('remote-amc');
+    
+    // Onsite AMC Plans
+    Route::get('/onsite-amc', [FrontendController::class, 'onsiteAmcPlans'])->name('onsite-amc');
 
     Route::get('/non-amc', function () {
         return view('frontend/non-amc');

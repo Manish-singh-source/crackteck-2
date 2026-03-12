@@ -626,7 +626,7 @@
                     <i class="icon icon-arrow-right"></i>
                 </li>
                 <li>
-                    <span class="body-small">AMC</span>
+                    <span class="body-small">Onsite AMC</span>
                 </li>
             </ul>
         </div>
@@ -661,13 +661,13 @@
                                 <div class="plan-header">
                                     <h4 class="plan-name">{{ $plan->plan_name }}</h4>
                                     {{-- <span class="plan-code">{{ $plan->plan_code }}</span> --}}
-                                    <div class="plan-price">
+                                    {{-- <div class="plan-price">
                                         <span class="currency">₹</span>{{ number_format($plan->total_cost) }}
                                         <span class="period">/ {{ $plan->duration }}</span>
                                     </div>
                                     @if ($plan->pay_terms)
                                         <div class="pay-terms">{{ $plan->pay_terms }}</div>
-                                    @endif
+                                    @endif --}}
                                 </div>
 
                                 <div class="plan-details">
@@ -687,7 +687,7 @@
                                         <span class="detail-label">Total Visits</span>
                                         <span class="detail-value">{{ $plan->total_visits }}</span>
                                     </div>
-                                    <div class="plan-detail-item">
+                                    {{-- <div class="plan-detail-item">
                                         <span class="detail-label">Plan Cost</span>
                                         <span class="detail-value">₹{{ number_format($plan->plan_cost) }}</span>
                                     </div>
@@ -696,7 +696,7 @@
                                             <span class="detail-label">Tax</span>
                                             <span class="detail-value">₹{{ number_format($plan->tax) }}</span>
                                         </div>
-                                    @endif
+                                    @endif --}}
 
                                     @php $coveredItems = $plan->coveredItems()->get(); @endphp
                                     @if ($coveredItems && $coveredItems->count() > 0)

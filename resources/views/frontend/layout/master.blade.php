@@ -149,8 +149,14 @@
                                         </a>
                                     </li>
                                     <li class="nav-item relative">
-                                        <a href="{{ route('amc') }}" class="item-link body-md-2 fw-semibold">
-                                            <span class="text-uppercase">AMC</span>
+                                        <a href="{{ route('onsite-amc') }}" class="item-link body-md-2 fw-semibold">
+                                            <span class="text-uppercase">Onsite AMC</span>
+                                            <!-- <i class="icon icon-arrow-down"></i> -->
+                                        </a>
+                                    </li>
+                                    <li class="nav-item relative">
+                                        <a href="{{ route('remote-amc') }}" class="item-link body-md-2 fw-semibold">
+                                            <span class="text-uppercase">Remote AMC</span>
                                             <!-- <i class="icon icon-arrow-down"></i> -->
                                         </a>
                                     </li>
@@ -506,7 +512,8 @@
                                         <ul class="ft-menu-list">
                                             <li><a href="{{ route('my-account') }}" class="link">My Account</a>
                                             </li>
-                                            <li><a href="{{ route('amc') }}" class="link">AMC</a></li>
+                                            <li><a href="{{ route('onsite-amc') }}" class="link">Onsite AMC</a></li>
+                                            <li><a href="{{ route('remote-amc') }}" class="link">Remote AMC</a></li>
                                             <li><a href="{{ route('track-your-order') }}" class="link">Track your
                                                     Order</a>
                                             </li>

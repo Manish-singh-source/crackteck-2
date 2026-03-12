@@ -66,7 +66,7 @@ class DeliveryOrderController extends Controller
 
             return false;
         } catch (\Exception $e) {
-            Log::error('Fast2SMS Exception: '.$e->getMessage());
+            Log::error('Fast2SMS Exception: ' . $e->getMessage());
 
             return false;
         }
@@ -124,11 +124,23 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
-            $orders = Order::with(['orderItems'])->where('assigned_person_id', $request->user_id);
+            $orders = Order::with(['orderItems.productSerial'])
+                ->where('assigned_person_id', $request->user_id);
+
             if ($request->filled('status')) {
                 $orders->where('status', $request->status);
             }
+
             $orders = $orders->get();
+
+            $orders->transform(function ($order) {
+                $order->orderItems->transform(function ($item) {
+                    $item->product_serial_code = $item->productSerial->auto_generated_serial ?? null;
+                    return $item;
+                });
+
+                return $order;
+            });
 
             return response()->json(['orders' => $orders], 200);
         }
@@ -151,11 +163,20 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
-            $order = Order::with(['orderItems'])->where('id', $order_id)->first();
 
-            if (! $order) {
+            $order = Order::with(['orderItems.productSerial'])
+                ->where('id', $order_id)
+                ->first();
+
+            if (!$order) {
                 return response()->json(['message' => 'Order not found'], 404);
             }
+
+            $order->orderItems->transform(function ($item) {
+                $item->product_serial_code = $item->productSerial->auto_generated_serial ?? null;
+                unset($item->productSerial);
+                return $item;
+            });
 
             return response()->json(['order' => $order], 200);
         }
@@ -182,9 +203,9 @@ class DeliveryOrderController extends Controller
         if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
             if ($request->hasFile('profile')) {
                 $file = $request->file('profile');
-                $filename = time().'.'.$file->getClientOriginalExtension();
+                $filename = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/orders/profile'), $filename);
-                $request->merge(['profile' => 'uploads/e-commerce/orders/profile/'.$filename]);
+                $request->merge(['profile' => 'uploads/e-commerce/orders/profile/' . $filename]);
             }
 
             $order = Order::where('id', $order_id)->first();
@@ -294,6 +315,12 @@ class DeliveryOrderController extends Controller
             $order->delivered_at = now();
             $order->save();
 
+            // Update all order items status to delivered
+            foreach ($order->orderItems as $orderItem) {
+                $orderItem->item_status = 'delivered';
+                $orderItem->save();
+            }
+
             return response()->json(['message' => 'OTP verified successfully'], 200);
         }
     }
@@ -379,18 +406,18 @@ class DeliveryOrderController extends Controller
         if ($staffRole == 'delivery_man') {
             if ($request->hasFile('driving_license_front_path')) {
                 $file = $request->file('driving_license_front_path');
-                $filename = time().'.'.$file->getClientOriginalExtension();
+                $filename = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/vehicles'), $filename);
-                $request->merge(['driving_license_front_path' => 'uploads/e-commerce/delivery/vehicles/'.$filename]);
-                $driving_license_front_path = 'uploads/e-commerce/delivery/vehicles/'.$filename;
+                $request->merge(['driving_license_front_path' => 'uploads/e-commerce/delivery/vehicles/' . $filename]);
+                $driving_license_front_path = 'uploads/e-commerce/delivery/vehicles/' . $filename;
             }
 
             if ($request->hasFile('driving_license_back_path')) {
                 $file = $request->file('driving_license_back_path');
-                $filename = time().'_back.'.$file->getClientOriginalExtension();
+                $filename = time() . '_back.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/vehicles'), $filename);
-                $request->merge(['driving_license_back_path' => 'uploads/e-commerce/delivery/vehicles/'.$filename]);
-                $driving_license_back_path = 'uploads/e-commerce/delivery/vehicles/'.$filename;
+                $request->merge(['driving_license_back_path' => 'uploads/e-commerce/delivery/vehicles/' . $filename]);
+                $driving_license_back_path = 'uploads/e-commerce/delivery/vehicles/' . $filename;
             }
 
             $deliveryMan = Staff::where('id', $request->user_id)->first();
@@ -460,18 +487,18 @@ class DeliveryOrderController extends Controller
 
             if ($request->hasFile('driving_license_front_path')) {
                 $file = $request->file('driving_license_front_path');
-                $filename = time().'.'.$file->getClientOriginalExtension();
+                $filename = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/vehicles'), $filename);
-                $request->merge(['driving_license_front_path' => 'uploads/e-commerce/delivery/vehicles/'.$filename]);
-                $driving_license_front_path = 'uploads/e-commerce/delivery/vehicles/'.$filename;
+                $request->merge(['driving_license_front_path' => 'uploads/e-commerce/delivery/vehicles/' . $filename]);
+                $driving_license_front_path = 'uploads/e-commerce/delivery/vehicles/' . $filename;
             }
 
             if ($request->hasFile('driving_license_back_path')) {
                 $file = $request->file('driving_license_back_path');
-                $filename = time().'_back.'.$file->getClientOriginalExtension();
+                $filename = time() . '_back.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/vehicles'), $filename);
-                $request->merge(['driving_license_back_path' => 'uploads/e-commerce/delivery/vehicles/'.$filename]);
-                $driving_license_back_path = 'uploads/e-commerce/delivery/vehicles/'.$filename;
+                $request->merge(['driving_license_back_path' => 'uploads/e-commerce/delivery/vehicles/' . $filename]);
+                $driving_license_back_path = 'uploads/e-commerce/delivery/vehicles/' . $filename;
             }
 
             $vehicalRegistration->save();
@@ -537,18 +564,18 @@ class DeliveryOrderController extends Controller
         if ($staffRole == 'delivery_man') {
             if ($request->hasFile('aadhar_front_path')) {
                 $file = $request->file('aadhar_front_path');
-                $frontFile = time().'.'.$file->getClientOriginalExtension();
+                $frontFile = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/aadhar'), $frontFile);
-                $request->merge(['aadhar_front_path' => 'uploads/e-commerce/delivery/aadhar/'.$frontFile]);
-                $aadhar_front_path = 'uploads/e-commerce/delivery/aadhar/'.$frontFile;
+                $request->merge(['aadhar_front_path' => 'uploads/e-commerce/delivery/aadhar/' . $frontFile]);
+                $aadhar_front_path = 'uploads/e-commerce/delivery/aadhar/' . $frontFile;
             }
 
             if ($request->hasFile('aadhar_back_path')) {
                 $file = $request->file('aadhar_back_path');
-                $backFile = time().'_back.'.$file->getClientOriginalExtension();
+                $backFile = time() . '_back.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/aadhar'), $backFile);
-                $request->merge(['aadhar_back_path' => 'uploads/e-commerce/delivery/aadhar/'.$backFile]);
-                $aadhar_back_path = 'uploads/e-commerce/delivery/aadhar/'.$backFile;
+                $request->merge(['aadhar_back_path' => 'uploads/e-commerce/delivery/aadhar/' . $backFile]);
+                $aadhar_back_path = 'uploads/e-commerce/delivery/aadhar/' . $backFile;
             }
 
             $deliveryMan = Staff::where('id', $request->user_id)->first();
@@ -610,16 +637,16 @@ class DeliveryOrderController extends Controller
 
             if ($request->hasFile('aadhar_front_path')) {
                 $file = $request->file('aadhar_front_path');
-                $frontFile = time().'.'.$file->getClientOriginalExtension();
+                $frontFile = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/aadhar'), $frontFile);
-                $aadharDetails->aadhar_front_path = 'uploads/e-commerce/delivery/aadhar/'.$frontFile;
+                $aadharDetails->aadhar_front_path = 'uploads/e-commerce/delivery/aadhar/' . $frontFile;
             }
 
             if ($request->hasFile('aadhar_back_path')) {
                 $file = $request->file('aadhar_back_path');
-                $backFile = time().'_back.'.$file->getClientOriginalExtension();
+                $backFile = time() . '_back.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/aadhar'), $backFile);
-                $aadharDetails->aadhar_back_path = 'uploads/e-commerce/delivery/aadhar/'.$backFile;
+                $aadharDetails->aadhar_back_path = 'uploads/e-commerce/delivery/aadhar/' . $backFile;
             }
 
             $aadharDetails->save();
@@ -687,18 +714,18 @@ class DeliveryOrderController extends Controller
         if ($staffRole == 'delivery_man') {
             if ($request->hasFile('pan_card_front_path')) {
                 $file = $request->file('pan_card_front_path');
-                $panFrontFile = time().'_front.'.$file->getClientOriginalExtension();
+                $panFrontFile = time() . '_front.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/pan'), $panFrontFile);
-                $request->merge(['pan_card_front_path' => 'uploads/e-commerce/delivery/pan/'.$panFrontFile]);
-                $pan_card_front_path = 'uploads/e-commerce/delivery/pan/'.$panFrontFile;
+                $request->merge(['pan_card_front_path' => 'uploads/e-commerce/delivery/pan/' . $panFrontFile]);
+                $pan_card_front_path = 'uploads/e-commerce/delivery/pan/' . $panFrontFile;
             }
 
             if ($request->hasFile('pan_card_back_path')) {
                 $file = $request->file('pan_card_back_path');
-                $panBackFile = time().'_back.'.$file->getClientOriginalExtension();
+                $panBackFile = time() . '_back.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/pan'), $panBackFile);
-                $request->merge(['pan_card_back_path' => 'uploads/e-commerce/delivery/pan/'.$panBackFile]);
-                $pan_card_back_path = 'uploads/e-commerce/delivery/pan/'.$panBackFile;
+                $request->merge(['pan_card_back_path' => 'uploads/e-commerce/delivery/pan/' . $panBackFile]);
+                $pan_card_back_path = 'uploads/e-commerce/delivery/pan/' . $panBackFile;
             }
 
             $deliveryMan = Staff::where('id', $request->user_id)->first();
@@ -718,8 +745,8 @@ class DeliveryOrderController extends Controller
             $panCardDetails = new StaffPanCardDetail;
             $panCardDetails->staff_id = $request->user_id;
             $panCardDetails->pan_number = $request->pan_number;
-            $panCardDetails->pan_card_front_path = 'uploads/e-commerce/delivery/pan/'.$panFrontFile;
-            $panCardDetails->pan_card_back_path = 'uploads/e-commerce/delivery/pan/'.$panBackFile;
+            $panCardDetails->pan_card_front_path = 'uploads/e-commerce/delivery/pan/' . $panFrontFile;
+            $panCardDetails->pan_card_back_path = 'uploads/e-commerce/delivery/pan/' . $panBackFile;
             $panCardDetails->save();
 
             return response()->json(['message' => 'PAN card details added successfully'], 200);
@@ -755,16 +782,16 @@ class DeliveryOrderController extends Controller
             $panCardDetails->pan_number = $request->pan_number;
             if ($request->hasFile('pan_card_front_path')) {
                 $file = $request->file('pan_card_front_path');
-                $panFrontFile = time().'_front.'.$file->getClientOriginalExtension();
+                $panFrontFile = time() . '_front.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/pan'), $panFrontFile);
-                $panCardDetails->pan_card_front_path = 'uploads/e-commerce/delivery/pan/'.$panFrontFile;
+                $panCardDetails->pan_card_front_path = 'uploads/e-commerce/delivery/pan/' . $panFrontFile;
             }
 
             if ($request->hasFile('pan_card_back_path')) {
                 $file = $request->file('pan_card_back_path');
-                $panBackFile = time().'_back.'.$file->getClientOriginalExtension();
+                $panBackFile = time() . '_back.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/e-commerce/delivery/pan'), $panBackFile);
-                $panCardDetails->pan_card_back_path = 'uploads/e-commerce/delivery/pan/'.$panBackFile;
+                $panCardDetails->pan_card_back_path = 'uploads/e-commerce/delivery/pan/' . $panBackFile;
             }
 
             $panCardDetails->save();
@@ -873,7 +900,7 @@ class DeliveryOrderController extends Controller
             }
 
             if ($returnOrder->status != 'assigned') {
-                return response()->json(['message' => 'Return order cannot be accepted. Current status: '.$returnOrder->status], 400);
+                return response()->json(['message' => 'Return order cannot be accepted. Current status: ' . $returnOrder->status], 400);
             }
 
             if ($returnOrder->delivery_man_id != $request->user_id) {
@@ -920,7 +947,7 @@ class DeliveryOrderController extends Controller
 
             // Only allow OTP generation when status is 'accepted'
             if ($returnOrder->status != 'accepted') {
-                return response()->json(['message' => 'OTP can only be generated when return order is accepted. Current status: '.$returnOrder->status], 400);
+                return response()->json(['message' => 'OTP can only be generated when return order is accepted. Current status: ' . $returnOrder->status], 400);
             }
 
             $otp = rand(1000, 9999);
@@ -1058,7 +1085,7 @@ class DeliveryOrderController extends Controller
 
             // Only allow receiving when status is 'picked'
             if ($returnOrder->status != 'picked') {
-                return response()->json(['message' => 'Return order must be in picked status to receive in warehouse. Current status: '.$returnOrder->status], 400);
+                return response()->json(['message' => 'Return order must be in picked status to receive in warehouse. Current status: ' . $returnOrder->status], 400);
             }
 
             // Update return order status to received

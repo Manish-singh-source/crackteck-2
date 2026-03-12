@@ -60,6 +60,7 @@ Route::prefix('/demo/e-commerce')->group(function () {
         Route::post('/order/{id}/product-pickup', 'productPickup')->name('order.product-pickup');
         Route::get('/search-customers', 'searchCustomers')->name('order.search-customers');
         Route::get('/search-products', 'searchProducts')->name('order.search-products');
+        Route::get('/search-product-serials', 'searchProductSerials')->name('order.search-product-serials');
     });
 
     // // ------------------------------------------------------------ E-Commerce Orders Management -------------------------------------------------------------

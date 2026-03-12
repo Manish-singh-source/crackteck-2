@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderPayment;
 use App\Models\Product;
+use App\Models\ProductSerial;
 use App\Models\ReturnOrder;
 use App\Models\Staff;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -356,6 +357,39 @@ class OrderController extends Controller
         return response()->json($products);
     }
 
+    public function searchProductSerials(Request $request)
+    {
+        $query = $request->get('q', '');
+        $productId = $request->get('product_id', null);
+
+        if (strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        $serialsQuery = ProductSerial::where(function ($q) use ($query) {
+            $q->where('auto_generated_serial', 'LIKE', "%{$query}%")
+                ->orWhere('manual_serial', 'LIKE', "%{$query}%");
+        })->where('status', 'active');
+
+        // If product_id is provided, filter by that product
+        if ($productId) {
+            $serialsQuery->where('product_id', $productId);
+        }
+
+        $serials = $serialsQuery->limit(20)->get()->map(function ($serial) {
+            return [
+                'id' => $serial->id,
+                'auto_generated_serial' => $serial->auto_generated_serial,
+                'manual_serial' => $serial->manual_serial,
+                'product_id' => $serial->product_id,
+                'status' => $serial->status,
+                'display' => $serial->auto_generated_serial . ($serial->manual_serial ? ' (' . $serial->manual_serial . ')' : ''),
+            ];
+        });
+
+        return response()->json($serials);
+    }
+
     public function searchCustomers(Request $request)
     {
         $query = $request->query('q', '');
@@ -488,6 +522,11 @@ class OrderController extends Controller
 
             if ($request->assigned_person_type == 'engineer') {
                 $order->assigned_person_id = $request->engineer_id;
+                // Auto-update status to assigned_delivery_man when engineer is assigned
+                if ($order->status === 'admin_approved') {
+                    $order->status = 'assigned_delivery_man';
+                }
+                $order->assigned_at = now();
             } else {
                 $order->assigned_person_id = $request->delivery_man_id;
                 // Auto-update status to assigned_delivery_man when delivery man is assigned
@@ -628,10 +667,12 @@ class OrderController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'pickup_confirmation' => 'required|accepted',
+            'order_item_id' => 'required|array',
+            'product_serial_id' => 'required|array',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->with('error', 'Please confirm product pickup.');
+            return redirect()->back()->with('error', 'Please confirm product pickup and assign serial numbers.');
         }
 
         try {
@@ -642,12 +683,37 @@ class OrderController extends Controller
                 return redirect()->back()->with('error', 'Order must be in order_accepted status to mark as product taken.');
             }
 
+            // Update order items with serial numbers
+            $orderItemIds = $request->order_item_id;
+            $serialIds = $request->product_serial_id;
+            $productIds = $request->product_id;
+
+            foreach ($orderItemIds as $index => $orderItemId) {
+                $orderItem = OrderItem::find($orderItemId);
+                if ($orderItem && isset($serialIds[$index]) && $serialIds[$index]) {
+                    // Update the order item with the serial ID
+                    $orderItem->product_serial_id = $serialIds[$index];
+                    // Update item status from pending to shipped
+                    if ($orderItem->item_status === 'pending' || empty($orderItem->item_status)) {
+                        $orderItem->item_status = 'shipped';
+                    }
+                    $orderItem->save();
+
+                    // Update the serial status to sold
+                    $productSerial = ProductSerial::find($serialIds[$index]);
+                    if ($productSerial) {
+                        $productSerial->status = 'sold';
+                        $productSerial->save();
+                    }
+                }
+            }
+
             // Update status to product_taken and set shipped_at
             $order->status = 'product_taken';
             $order->shipped_at = now();
             $order->save();
 
-            return redirect()->back()->with('success', 'Product pickup confirmed. Order status updated to product_taken.');
+            return redirect()->back()->with('success', 'Product pickup confirmed with serial numbers. Order status updated to product_taken.');
         } catch (\Exception $e) {
             Log::error('Error updating product pickup: '.$e->getMessage());
 

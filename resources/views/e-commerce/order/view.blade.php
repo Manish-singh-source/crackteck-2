@@ -36,6 +36,185 @@
             </div>
 
             <div class="row">
+
+                <div class="col-12">
+                    <!-- Customer Details Card -->
+                    <div class="card">
+                        <div class="card-header border-bottom-dashed">
+                            <h5 class="card-title mb-0">Customer Information</h5>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Left Column -->
+                                <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-semibold">Customer Name:</span>
+                                            <span>{{ $order->customer ? $order->customer->first_name . ' ' . $order->customer->last_name : $order->shipping_first_name . ' ' . $order->shipping_last_name }}</span>
+                                        </li>
+
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-semibold">Email:</span>
+                                            <span>{{ $order->customer ? $order->customer->email : $order->email }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Right Column -->
+                                <div class="col-lg-6">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-semibold">Phone:</span>
+                                            <span>{{ $order->customer->phone ?? 'N/A' }}</span>
+                                        </li>
+                                        <li class="list-group-item border-0">
+                                            <span class="fw-semibold">Shipping Address:</span>
+                                            <span class="mt-1">
+                                                {{ $order->customer->first_name ?? '' }}
+                                                {{ $order->customer->last_name ?? '' }}
+                                                {{ $order->shippingAddress->address1 ?? '' }}
+                                                @if ($order->shippingAddress->address2)
+                                                    {{ $order->shippingAddress->address2 }}
+                                                @endif
+                                                {{ $order->shippingAddress->city ?? '' }},
+                                                {{ $order->shippingAddress->state ?? '' }}
+                                                {{ $order->shippingAddress->pincode ?? '' }}
+                                                {{ $order->shippingAddress->country ?? '' }}
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Items Card -->
+                    <div class="card">
+                        <div class="card-header border-bottom-dashed">
+                            <h5 class="card-title mb-0">Order Items</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>HSN & SKU Code</th>
+                                            <th>Quantity</th>
+                                            <th>Price Per Unit</th>
+                                            <th>Tax Amount</th>
+                                            <th>Other Detail</th>
+                                            <th>Total Price</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($order->orderItems as $item)
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        @if ($item->product->main_product_image)
+                                                            <img src="{{ asset($item->product->main_product_image) }}"
+                                                                alt="Product" class="rounded me-2" width="50"
+                                                                height="50">
+                                                        @else
+                                                            <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center"
+                                                                style="width: 50px; height: 50px;">
+                                                                <i class="fas fa-image text-muted"></i>
+                                                            </div>
+                                                        @endif
+                                                        <div>
+                                                            <div class="fw-medium">{{ $item->product->product_name }}
+                                                            </div>
+                                                            <small class="text-muted">Model:
+                                                                {{ $item->product->model_no ?? 'N/A' }}</small> <br>
+                                                            <small class="text-muted">Product Seria Code:
+                                                                {{ $item->productSerial->auto_generated_serial ?? 'N/A' }}</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <small class="text-muted">HSN Code:
+                                                            {{ $item->hsn_code ?? 'N/A' }}</small>
+                                                        <br>
+                                                        <small class="text-muted">SKU Code:
+                                                            {{ $item->product_sku ?? 'N/A' }}</small>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="fw-medium">{{ $item->quantity }}</span>
+                                                </td>
+                                                <td>
+                                                    <small class="fw-medium">Unit Price:
+                                                        ₹{{ number_format($item->unit_price, 2) }}</small>
+                                                    <br>
+                                                    <small class="fw-medium">Discount Price:
+                                                        ₹{{ number_format($item->discount_per_unit, 2) }}</small>
+                                                    <br>
+                                                </td>
+                                                <td>
+                                                    {{-- <span
+                                                        class="fw-medium">₹{{ number_format($item->igst_amount, 2) }}</span>
+                                                    @if ($item->tax_percentage > 0)
+                                                        <br><small
+                                                            class="text-muted">({{ $item->tax_percentage }}%)</small>
+                                                    @endif --}}
+                                                    <small class="fw-medium">
+                                                        ₹{{ number_format($item->tax_per_unit, 2) }}</small>
+                                                </td>
+                                                <td>
+                                                    <small class="fw-medium">Weight:
+                                                        {{ $item->weight ?? 'N/A' }}</small>
+                                                    <br>
+                                                    <small class="fw-medium">Dimensions:
+                                                        {{ $item->dimensions ?? 'N/A' }}</small>
+                                                    <br>
+                                                    <small class="fw-medium">COD:
+                                                        @php
+                                                            $cod  = match ($item->cod ) {
+                                                                'no' => 'No',
+                                                                'yes' => 'Yes'
+                                                            }
+                                                        @endphp
+                                                        {{ $cod ?? 'N/A' }}</small>
+                                                    <br>
+                                                    <small class="fw-medium">Installation:
+                                                        @php
+                                                            $installation  = match ($item->installation ) {
+                                                                'no' => 'No',
+                                                                'yes' => 'Yes'
+                                                            }
+                                                        @endphp
+                                                        {{ $installation ?? 'N/A' }}</small>
+                                                    <br>
+                                                </td>
+                                                <td>
+                                                    <span
+                                                        class="fw-bold text-success">₹{{ number_format($item->line_total, 2) }}</span>
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        $itemStatus = match ($item->item_status) {
+                                                            "pending" => "Pending",
+                                                            "shipped" => "Shipped",
+                                                            "delivered" => "Delivered",
+                                                            "cancelled" => "Cancelled",
+                                                            "returned" => "Returned",
+                                                        }
+                                                    @endphp
+                                                    <span class="fw-medium">{{ $itemStatus }}</span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-xl-8">
 
                     <!-- Order Summary Card -->
@@ -97,7 +276,11 @@
                                                     @elseif ($order->status === 'admin_approved')
                                                         Admin Approved
                                                     @elseif ($order->status === 'assigned_delivery_man')
-                                                        Assigned to Delivery Man
+                                                        @if ($order->assigned_person_type === 'engineer')
+                                                            Assigned to Engineer
+                                                        @else
+                                                            Assigned to Delivery Man
+                                                        @endif
                                                     @elseif ($order->status === 'order_accepted')
                                                         Order Accepted
                                                     @elseif ($order->status === 'product_taken')
@@ -235,168 +418,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Customer Details Card -->
-                    <div class="card">
-                        <div class="card-header border-bottom-dashed">
-                            <h5 class="card-title mb-0">Customer Information</h5>
-                        </div>
-
-                        <div class="card-body">
-                            <div class="row">
-                                <!-- Left Column -->
-                                <div class="col-lg-6">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                            <span class="fw-semibold">Customer Name:</span>
-                                            <span>{{ $order->customer ? $order->customer->first_name . ' ' . $order->customer->last_name : $order->shipping_first_name . ' ' . $order->shipping_last_name }}</span>
-                                        </li>
-
-                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                            <span class="fw-semibold">Email:</span>
-                                            <span>{{ $order->customer ? $order->customer->email : $order->email }}</span>
-                                        </li>
-
-                                        <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                            <span class="fw-semibold">Phone:</span>
-                                            <span>{{ $order->customer->phone ?? 'N/A' }}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <!-- Right Column -->
-                                <div class="col-lg-6">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item border-0">
-                                            <span class="fw-semibold">Shipping Address:</span>
-                                            <div class="mt-1">
-                                                {{ $order->customer->first_name ?? '' }}
-                                                {{ $order->customer->last_name ?? '' }}<br>
-                                                {{ $order->shippingAddress->address1 ?? '' }}<br>
-                                                @if ($order->shippingAddress->address2)
-                                                    {{ $order->shippingAddress->address2 }}<br>
-                                                @endif
-                                                {{ $order->shippingAddress->city ?? '' }},
-                                                {{ $order->shippingAddress->state ?? '' }}
-                                                {{ $order->shippingAddress->pincode ?? '' }}<br>
-                                                {{ $order->shippingAddress->country ?? '' }}
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Order Items Card -->
-                    <div class="card">
-                        <div class="card-header border-bottom-dashed">
-                            <h5 class="card-title mb-0">Order Items</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Product</th>
-                                            <th>HSN & SKU Code</th>
-                                            <th>Quantity</th>
-                                            <th>Price Per Unit</th>
-                                            <th>Tax Amount</th>
-                                            <th>Other Detail</th>
-                                            <th>Total Price</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($order->orderItems as $item)
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        @if ($item->product->main_product_image)
-                                                            <img src="{{ asset($item->product->main_product_image) }}"
-                                                                alt="Product" class="rounded me-2" width="50"
-                                                                height="50">
-                                                        @else
-                                                            <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center"
-                                                                style="width: 50px; height: 50px;">
-                                                                <i class="fas fa-image text-muted"></i>
-                                                            </div>
-                                                        @endif
-                                                        <div>
-                                                            <div class="fw-medium">{{ $item->product->product_name }}
-                                                            </div>
-                                                            <small class="text-muted">Model:
-                                                                {{ $item->product->model_no ?? 'N/A' }}</small>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div>
-                                                        <small class="text-muted">HSN Code:
-                                                            {{ $item->hsn_code ?? 'N/A' }}</small>
-                                                        <br>
-                                                        <small class="text-muted">SKU Code:
-                                                            {{ $item->product_sku ?? 'N/A' }}</small>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <span class="fw-medium">{{ $item->quantity }}</span>
-                                                </td>
-                                                <td>
-                                                    <small class="fw-medium">Unit Price:
-                                                        ₹{{ number_format($item->unit_price, 2) }}</small>
-                                                    <br>
-                                                    <small class="fw-medium">Discount Price:
-                                                        ₹{{ number_format($item->discount_per_unit, 2) }}</small>
-                                                    <br>
-                                                </td>
-                                                <td>
-                                                    {{-- <span
-                                                        class="fw-medium">₹{{ number_format($item->igst_amount, 2) }}</span>
-                                                    @if ($item->tax_percentage > 0)
-                                                        <br><small
-                                                            class="text-muted">({{ $item->tax_percentage }}%)</small>
-                                                    @endif --}}
-                                                    <small class="fw-medium">
-                                                        ₹{{ number_format($item->tax_per_unit, 2) }}</small>
-                                                </td>
-                                                <td>
-                                                    <small class="fw-medium">Weight:
-                                                        {{ $item->weight ?? 'N/A' }}</small>
-                                                    <br>
-                                                    <small class="fw-medium">Dimensions:
-                                                        {{ $item->dimensions ?? 'N/A' }}</small>
-                                                    <br>
-                                                    <small class="fw-medium">COD:
-                                                        @php
-                                                            $cod  = match ($item->cod ) {
-                                                                'no' => 'No',
-                                                                'yes' => 'Yes'
-                                                            }
-                                                        @endphp
-                                                        {{ $cod ?? 'N/A' }}</small>
-                                                    <br>
-                                                    <small class="fw-medium">Installation:
-                                                        @php
-                                                            $installation  = match ($item->installation ) {
-                                                                'no' => 'No',
-                                                                'yes' => 'Yes'
-                                                            }
-                                                        @endphp
-                                                        {{ $installation ?? 'N/A' }}</small>
-                                                    <br>
-                                                </td>
-                                                <td>
-                                                    <span
-                                                        class="fw-bold text-success">₹{{ number_format($item->line_total, 2) }}</span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                    </div>                    
 
                     <!-- Payment Information Card -->
                     <div class="card">
@@ -824,33 +846,16 @@
                                 </h5>
                             </div>
                             <div class="card-body">
-                                <form action="{{ route('order.product-pickup', $order->id) }}" method="POST"
-                                    id="product-pickup-form">
-                                    @csrf
-                                    @method('POST')
+                                <div class="alert alert-info mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Please assign serial numbers to each product before confirming pickup.
+                                </div>
 
-                                    <div class="alert alert-info mb-3">
-                                        <i class="fas fa-info-circle me-2"></i>
-                                        Please confirm that the product has been picked up from the warehouse.
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="pickup_confirmation" class="form-label">Confirmation</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox"
-                                                id="pickup_confirmation" name="pickup_confirmation" value="1" required>
-                                            <label class="form-check-label" for="pickup_confirmation">
-                                                I confirm that the product has been picked up from the warehouse
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <div class="d-flex justify-content-end">
-                                        <button type="submit" class="btn btn-success" id="submit-btn">
-                                            <i class="fas fa-check me-1"></i>Confirm Product Pickup
-                                        </button>
-                                    </div>
-                                </form>
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assignSerialModal">
+                                        <i class="fas fa-barcode me-1"></i>Assign Product
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     @endif
@@ -874,6 +879,88 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-danger" id="confirmDelete">Delete Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Serial Modal -->
+    <div class="modal fade" id="assignSerialModal" tabindex="-1" aria-labelledby="assignSerialModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="assignSerialModalLabel">
+                        <i class="fas fa-barcode me-2"></i>Assign Serial Numbers to Products
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="assign-serial-form" action="{{ route('order.product-pickup', $order->id) }}" method="POST">
+                        @csrf
+                        @method('POST')
+                        
+                        <div class="row">
+                            <!-- Product Details Column -->
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3">Order Products</h6>
+                                <div class="list-group" id="order-products-list">
+                                    @foreach($order->orderItems as $index => $item)
+                                        <div class="list-group-item" id="product-item-{{ $index }}">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="mb-1">{{ $item->product->product_name ?? 'N/A' }}</h6>
+                                                    <small class="text-muted">SKU: {{ $item->product_sku ?? 'N/A' }}</small><br>
+                                                    <small class="text-muted">Quantity: {{ $item->quantity }}</small>
+                                                </div>
+                                                <span class="badge bg-secondary" id="serial-status-{{ $index }}">Not Assigned</span>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            
+                            <!-- Serial Assignment Column -->
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3">Assign Serial Numbers</h6>
+                                @foreach($order->orderItems as $index => $item)
+                                    <div class="card mb-3" id="serial-card-{{ $index }}">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ $item->product->product_name ?? 'N/A' }}</h6>
+                                            <input type="hidden" name="order_item_id[]" value="{{ $item->id }}">
+                                            <input type="hidden" name="product_id[]" value="{{ $item->product_id }}">
+                                            
+                                            <div class="mb-2">
+                                                <label class="form-label">Search Serial Number</label>
+                                                <input type="text" 
+                                                    class="form-control serial-search-input" 
+                                                    id="serial-search-{{ $index }}"
+                                                    data-index="{{ $index }}"
+                                                    data-product-id="{{ $item->product_id }}"
+                                                    placeholder="Search by serial number...">
+                                                <input type="hidden" name="product_serial_id[]" id="selected-serial-id-{{ $index }}">
+                                            </div>
+                                            
+                                            <div id="serial-result-{{ $index }}" class="mt-2"></div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="pickup_confirmation" name="pickup_confirmation" value="1" required>
+                                    <label class="form-check-label" for="pickup_confirmation">
+                                        I confirm that the product has been picked up from the warehouse
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-success" id="confirm-pickup-btn" disabled>
+                                <i class="fas fa-check me-1"></i>Confirm Product Pickup
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -1108,6 +1195,76 @@
                         button.prop('disabled', false).html(originalText);
                     }
                 });
+            });
+
+            // Serial number search functionality
+            let searchTimeout;
+            $('.serial-search-input').on('input', function() {
+                const input = $(this);
+                const index = input.data('index');
+                const productId = input.data('product-id');
+                const query = input.val();
+                const resultDiv = $(`#serial-result-${index}`);
+                
+                clearTimeout(searchTimeout);
+                
+                if (query.length < 2) {
+                    resultDiv.html('');
+                    $(`#selected-serial-id-${index}`).val('');
+                    updateSerialStatus(index, 'Not Assigned', 'secondary');
+                    checkAllSerialsAssigned();
+                    return;
+                }
+                
+                searchTimeout = setTimeout(() => {
+                    $.ajax({
+                        url: `{{ route('order.search-product-serials') }}`,
+                        method: 'GET',
+                        data: { q: query, product_id: productId },
+                        success: function(response) {
+                            if (response.length > 0) {
+                                const serial = response[0];
+                                if (serial.product_id == productId) {
+                                    $(`#selected-serial-id-${index}`).val(serial.id);
+                                    const barcodeHtml = `<div class="alert alert-success mt-2 p-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div><strong>Serial Found!</strong><br><small>${serial.auto_generated_serial}</small></div>
+                                            <div><img src="https://barcode.tec-it.com/barcode.php?data=${encodeURIComponent(serial.auto_generated_serial)}&code=Code128&dpi=96" alt="Barcode" style="height:40px" onerror="this.style.display='none'"></div>
+                                        </div>
+                                    </div>`;
+                                    resultDiv.html(barcodeHtml);
+                                    updateSerialStatus(index, 'Assigned', 'success');
+                                } else {
+                                    resultDiv.html('<div class="alert alert-danger mt-2 p-2"><strong>Not Found!</strong><br><small>Serial does not match product</small></div>');
+                                    $(`#selected-serial-id-${index}`).val('');
+                                    updateSerialStatus(index, 'Not Assigned', 'secondary');
+                                }
+                            } else {
+                                resultDiv.html('<div class="alert alert-warning mt-2 p-2"><strong>Not Found!</strong><br><small>No serial found</small></div>');
+                                $(`#selected-serial-id-${index}`).val('');
+                                updateSerialStatus(index, 'Not Assigned', 'secondary');
+                            }
+                            checkAllSerialsAssigned();
+                        }
+                    });
+                }, 300);
+            });
+
+            function updateSerialStatus(index, status, badgeClass) {
+                $(`#serial-status-${index}`).text(status).removeClass('bg-secondary bg-success bg-danger').addClass('bg-' + badgeClass);
+            }
+
+            function checkAllSerialsAssigned() {
+                let allAssigned = true;
+                $('.serial-search-input').each(function() {
+                    const index = $(this).data('index');
+                    if (!$(`#selected-serial-id-${index}`).val()) allAssigned = false;
+                });
+                $('#confirm-pickup-btn').prop('disabled', !allAssigned);
+            }
+
+            $('#assign-serial-form').on('submit', function() {
+                $('#confirm-pickup-btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Processing...');
             });
         });
     </script>

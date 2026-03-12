@@ -13,6 +13,7 @@ class Amc extends Model
     protected $fillable = [
         'request_id',
         'service_type',
+        'amc_type',
         'customer_id',
         'customer_address_id',
         'amc_plan_id',
@@ -35,6 +36,7 @@ class Amc extends Model
             ->logOnly([
                 'request_id',
                 'service_type',
+                'amc_type',
                 'customer_id',
                 'customer_address_id',
                 'amc_plan_id',

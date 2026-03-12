@@ -17,7 +17,7 @@
                 </div>
             </div>
 
-            <div class="py-1 d-flex align-items-sm-center flex-sm-row flex-column">
+            <div class="py-2 d-flex align-items-sm-center flex-sm-row flex-column">
                 <div class="flex-grow-1">
                     <h4 class="fs-18 fw-semibold m-0">Add AMC Plan</h4>
                 </div>
@@ -143,8 +143,8 @@
                                     </div>
                                 </div>
 
-                                {{-- Pricing --}}
-                                <div class="card mt-3">
+                                {{-- Pricing (Only for Remote Support) --}}
+                                <div class="card mt-3" id="pricing-card">
                                     <div class="card-header border-bottom-dashed">
                                         <h5 class="card-title mb-0">Pricing Details</h5>
                                     </div>
@@ -152,7 +152,7 @@
                                         <div class="row g-3">
 
                                             {{-- Plan Cost --}}
-                                            <div class="col-6">
+                                            <div class="col-6 pricing-field">
                                                 @include('components.form.input', [
                                                     'label' => 'Plan Cost (₹)',
                                                     'name' => 'plan_cost',
@@ -167,13 +167,13 @@
                                             </div>
 
                                             {{-- Tax --}}
-                                            <div class="col-6">
+                                            <div class="col-6 pricing-field">
                                                 @include('components.form.input', [
                                                     'label' => 'Tax (%)',
                                                     'name' => 'tax',
                                                     'type' => 'number',
                                                     'placeholder' => 'Enter Tax (%)',
-                                                    'value' => old('tax'),
+                                                    'value' => old('tax', 18),
                                                     'attributes' => 'step=0.01 min=0',
                                                 ])
                                                 @error('tax')
@@ -182,7 +182,7 @@
                                             </div>
 
                                             {{-- Total Cost --}}
-                                            <div class="col-6">
+                                            <div class="col-6 pricing-field">
                                                 @include('components.form.input', [
                                                     'label' => 'Total Cost (₹)',
                                                     'name' => 'total_cost',
@@ -213,6 +213,16 @@
                                                 @enderror
                                             </div>
 
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Onsite Notice --}}
+                                <div class="card mt-3" id="onsite-notice" style="display: none;">
+                                    <div class="card-body">
+                                        <div class="alert alert-info mb-0">
+                                            <i class="mdi mdi-information-outline me-2"></i>
+                                            <strong>Pricing not applicable for Onsite support.</strong> The cost will be calculated based on the actual services rendered.
                                         </div>
                                     </div>
                                 </div>
@@ -262,6 +272,9 @@
                                                         ) {
                                                             $selectedCoveredItems = $decoded;
                                                         }
+                                                    }else {
+                                                        $selectedCoveredItems = json_encode($selectedCoveredItems, true);
+
                                                     }
                                                 @endphp
 
@@ -397,17 +410,47 @@
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Toggle pricing based on support_type
+            const supportTypeSelect = document.getElementById('support_type');
+            const pricingCard = document.getElementById('pricing-card');
+            const onsiteNotice = document.getElementById('onsite-notice');
+            const pricingFields = document.querySelectorAll('.pricing-field');
+
+            function togglePricing() {
+                const supportType = supportTypeSelect?.value;
+                
+                if (supportType === 'remote' || supportType === 'both') {
+                    // Show pricing for remote
+                    if (pricingCard) pricingCard.style.display = 'block';
+                    if (onsiteNotice) onsiteNotice.style.display = 'none';
+                    pricingFields.forEach(field => field.style.display = 'block');
+                } else if (supportType === 'onsite') {
+                    // Hide pricing for onsite
+                    if (pricingCard) pricingCard.style.display = 'none';
+                    if (onsiteNotice) onsiteNotice.style.display = 'block';
+                } else {
+                    // Default - hide pricing
+                    if (pricingCard) pricingCard.style.display = 'none';
+                    if (onsiteNotice) onsiteNotice.style.display = 'none';
+                }
+            }
+
+            if (supportTypeSelect) {
+                supportTypeSelect.addEventListener('change', togglePricing);
+                togglePricing(); // Initial state
+            }
+
             // Auto calculate total_cost
             const planCostInput = document.getElementById('plan_cost');
             const taxInput = document.getElementById('tax');
             const totalCostInput = document.getElementById('total_cost');
 
             function recalcTotal() {
-                const planCost = parseFloat(planCostInput.value || 0);
-                const tax = parseFloat(taxInput.value || 0);
+                const planCost = parseFloat(planCostInput?.value || 0);
+                const tax = parseFloat(taxInput?.value || 0);
                 const taxAmt = planCost * tax / 100;
                 const total = planCost + taxAmt;
-                if (!isNaN(total)) {
+                if (!isNaN(total) && totalCostInput) {
                     totalCostInput.value = total.toFixed(2);
                 }
             }

@@ -562,7 +562,8 @@
                                         $installationValue = old('installation');
                                         if ($installationValue === null) {
                                             $withInstallation = $product->with_installation;
-                                            if (is_array($withInstallation) && in_array('Yes', $withInstallation)) {
+                                            // Now with_installation is stored as 0 or 1 (not array)
+                                            if ($withInstallation == 1 || $withInstallation === '1') {
                                                 $installationValue = '1';
                                             } else {
                                                 $installationValue = '0';

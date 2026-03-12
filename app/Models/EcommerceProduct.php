@@ -42,7 +42,6 @@ class EcommerceProduct extends Model
     protected $casts = [
         'additional_product_images' => 'array',
         'variation_options' => 'array',
-        'with_installation' => 'array',
         'product_tags' => 'array',
         'is_featured' => 'boolean',
         'is_best_seller' => 'boolean',

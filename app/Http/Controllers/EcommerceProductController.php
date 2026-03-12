@@ -67,18 +67,18 @@ class EcommerceProductController extends Controller
             $data['full_description'] = $request->input('ecommerce_full_description');
             $data['technical_specification'] = $request->input('ecommerce_technical_specification');
 
-            // 1) with_installation (JSON array)
-            // Frontend se: installation field (Yes/No) - convert to array for with_installation
+            // 1) with_installation - store as 0 or 1 (not as array)
+            // Frontend se: installation field (Yes/No) - convert to 0 or 1
             if ($request->has('installation')) {
                 $installationValue = $request->input('installation');
-                // Convert '1'/'0'/'yes'/'no' to array format
+                // Convert '1'/'0'/'yes'/'no' to 0 or 1
                 if (in_array($installationValue, ['1', 'yes', true], true)) {
-                    $data['with_installation'] = ['Yes'];
+                    $data['with_installation'] = 1;
                 } else {
-                    $data['with_installation'] = ['No'];
+                    $data['with_installation'] = 0;
                 }
             } else {
-                $data['with_installation'] = [];
+                $data['with_installation'] = 0;
             }
 
             // 2) product_tags (JSON array)
@@ -276,8 +276,8 @@ class EcommerceProductController extends Controller
             if (isset($data['cod'])) {
                 $data['cod'] = in_array($data['cod'], ['1', 'yes', true], true);
             }
-            if (isset($data['installation'])) {
-                $data['installation'] = in_array($data['installation'], ['1', 'yes', true], true);
+            if (isset($data['with_installation'])) {
+                $data['with_installation'] = in_array($data['with_installation'], ['1', 'yes', true], true);
             }
 
             // 3) Normalize shipping_class to 0..3
@@ -307,21 +307,17 @@ class EcommerceProductController extends Controller
                 $data['shipping_class'] = $product->shipping_class ?? '0';
             }
 
-            // 4) With installation - handle both installation (Yes/No) and installation_options
+            // 4) With installation - store as 0 or 1 (not as array)
             if ($request->has('installation')) {
                 $installationValue = $request->input('installation');
-                // Convert '1'/'0'/'yes'/'no' to array format for with_installation
+                // Convert '1'/'0'/'yes'/'no' to 0 or 1
                 if (in_array($installationValue, ['1', 'yes', true], true)) {
-                    $data['with_installation'] = ['Yes'];
+                    $data['with_installation'] = 1;
                 } else {
-                    $data['with_installation'] = ['No'];
+                    $data['with_installation'] = 0;
                 }
-            } elseif ($request->has('installation_options')) {
-                $data['with_installation'] = array_values(
-                    array_filter((array) $request->input('installation_options', []))
-                );
             } else {
-                $data['with_installation'] = [];
+                $data['with_installation'] = 0;
             }
 
             // 5) Product tags

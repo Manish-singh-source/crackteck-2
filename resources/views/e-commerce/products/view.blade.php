@@ -578,7 +578,7 @@
                             <div class="mb-3">
                                 <label class="fw-semibold">With Installation:</label>
                                 <p class="text-muted">
-                                    @if ($product->with_installation && is_array($product->with_installation) && in_array('Yes', $product->with_installation))
+                                    @if ($product->with_installation == 1 || $product->with_installation === '1')
                                         <span class="badge bg-success">Yes</span>
                                     @else
                                         <span class="badge bg-secondary">No</span>
@@ -625,12 +625,10 @@
                             <div class="mb-3">
                                 <label class="fw-semibold">Installation Options:</label>
                                 <p class="text-muted">
-                                    @if ($product->with_installation && is_array($product->with_installation))
-                                        @foreach ($product->with_installation as $option)
-                                            <span class="badge bg-secondary me-1">{{ $option }}</span>
-                                        @endforeach
+                                    @if ($product->with_installation == 1 || $product->with_installation === '1')
+                                        <span class="badge bg-success me-1">Yes</span>
                                     @else
-                                        N/A
+                                        <span class="badge bg-secondary me-1">No</span>
                                     @endif
                                 </p>
                             </div>

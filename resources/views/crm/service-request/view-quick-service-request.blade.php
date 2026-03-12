@@ -1125,6 +1125,40 @@ $isProcessed = in_array($currentStatus, [
                         </div>
                     @endif
 
+                    @if($request->remoteSupportJob) 
+                        <div class="card mt-3" id="assignedEngineersCard">
+                            <div class="card-header border-bottom-dashed bg-light">
+                                <h5 class="card-title mb-0">
+                                    <i class="mdi mdi-account-check"></i> Current Remote Support Assignment
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                    <!-- Individual Engineer Card -->
+                                <div class="border rounded p-3 bg-success-subtle">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1 fw-bold">
+                                                {{ $request->remoteSupportJob->engineer->first_name }}
+                                                {{ $request->remoteSupportJob->engineer->last_name }}
+                                            </h6>
+                                            <p class="mb-1 text-muted small">
+                                                <i class="mdi mdi-phone"></i>
+                                                {{ $request->remoteSupportJob->engineer->phone }}
+                                            </p>
+                                            <p class="mb-0 text-muted small">
+                                                <i class="mdi mdi-clock-outline"></i>
+                                                Assigned: {{ $request->remoteSupportJob->assigned_at ? \App\Helpers\DateFormat::formatDateTime($request->remoteSupportJob->assigned_at) : 'N/A' }}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-success">{{ ucwords(str_replace(' ', '-', $request->remoteSupportJob->status)) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Picking Assignment Section -->
                     @php
                         $pickup = isset($pickups) && $pickups->count() > 0 ? $pickups->first() : null;

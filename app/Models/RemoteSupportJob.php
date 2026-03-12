@@ -24,4 +24,19 @@ class RemoteSupportJob extends Model
         'updated_at',
         'deleted_at'
     ];
+
+    public function serviceRequest()
+    {
+        return $this->belongsTo(ServiceRequest::class, 'service_request_id');
+    }
+
+    public function amcScheduleMeeting()
+    {
+        return $this->belongsTo(AmcScheduleMeeting::class, 'amc_schedule_meeting_id');
+    }
+
+    public function engineer()
+    {
+        return $this->belongsTo(Staff::class, 'staff_id');
+    }
 }

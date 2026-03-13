@@ -184,6 +184,22 @@ class FrontendController extends Controller
     }
 
     /**
+     * Get device types from device_specific_diagnoses table
+     */
+    public function getDeviceTypes()
+    {
+        $deviceTypes = \App\Models\DeviceSpecificDiagnosis::select('id', 'device_type')
+            ->orderBy('device_type')
+            ->distinct()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $deviceTypes,
+        ]);
+    }
+
+    /**
      * Check if customer is logged in
      */
     public function checkCustomerLogin()
@@ -289,14 +305,14 @@ class FrontendController extends Controller
             'customer_type' => 'nullable',
             'source_type' => 'nullable|string',
 
-            // Step 2: Customer Address
-            'branch_name' => 'required|string|max:255',
-            'address1' => 'required|string|max:255',
+            // Step 2: Customer Address (required for onsite, optional for remote)
+            'branch_name' => 'required_if:amc_type,onsite|string|max:255|nullable',
+            'address1' => 'required_if:amc_type,onsite|string|max:255|nullable',
             'address2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:100',
-            'state' => 'required|string|max:100',
+            'city' => 'required_if:amc_type,onsite|string|max:100|nullable',
+            'state' => 'required_if:amc_type,onsite|string|max:100|nullable',
             'country' => 'nullable|string|max:100',
-            'pincode' => 'required|string|max:20',
+            'pincode' => 'required_if:amc_type,onsite|string|max:20|nullable',
 
             // Step 3: Company Details (Optional)
             'company_name' => 'nullable|string|max:255',
@@ -311,6 +327,7 @@ class FrontendController extends Controller
             // Step 4: AMC Plan Selection
             'amc_plan_id' => 'required|integer|min:1',
             'preferred_start_date' => 'required|date',
+            'amc_type' => 'required|in:remote,onsite',
 
             // Step 5: Product Information (Multiple Products)
             'products' => 'required|array|min:1',
@@ -318,6 +335,7 @@ class FrontendController extends Controller
             'products.*.product_type' => 'required|string',
             'products.*.brand_name' => 'required|string',
             'products.*.model_number' => 'required|string|max:255',
+            'products.*.mac_address' => 'required|string|max:255',
             'products.*.purchase_date' => 'required|date',
 
             // Step 6: Additional Information
@@ -356,24 +374,42 @@ class FrontendController extends Controller
             $customerAddress = null;
             $selectedAddressId = $request->input('selected_address_id');
 
-            if ($selectedAddressId) {
-                // Use existing address if selected
-                $customerAddress = \App\Models\CustomerAddressDetail::find($selectedAddressId);
-            }
-
-            if (! $customerAddress) {
-                // Create new address only if no existing address selected
+            // For remote AMC, create a placeholder address
+            // For onsite AMC, require customer address
+            if ($request->amc_type === 'remote') {
+                // For remote AMC, create a placeholder address
                 $customerAddress = \App\Models\CustomerAddressDetail::create([
                     'customer_id' => $customer->id,
-                    'branch_name' => $request->branch_name ?? 'Primary',
-                    'address1' => $request->address1,
-                    'address2' => $request->address2,
-                    'country' => $request->country ?? 'India',
-                    'state' => $request->state,
-                    'city' => $request->city,
-                    'pincode' => $request->pincode,
+                    'branch_name' => 'Remote AMC',
+                    'address1' => 'N/A - Remote Support',
+                    'address2' => '',
+                    'country' => 'India',
+                    'state' => 'N/A',
+                    'city' => 'Remote',
+                    'pincode' => '000000',
                     'is_primary' => 'yes',
                 ]);
+            } else {
+                // For onsite AMC, require customer address
+                if ($selectedAddressId) {
+                    // Use existing address if selected
+                    $customerAddress = \App\Models\CustomerAddressDetail::find($selectedAddressId);
+                }
+
+                if (! $customerAddress) {
+                    // Create new address only if no existing address selected
+                    $customerAddress = \App\Models\CustomerAddressDetail::create([
+                        'customer_id' => $customer->id,
+                        'branch_name' => $request->branch_name ?? 'Primary',
+                        'address1' => $request->address1,
+                        'address2' => $request->address2,
+                        'country' => $request->country ?? 'India',
+                        'state' => $request->state,
+                        'city' => $request->city,
+                        'pincode' => $request->pincode,
+                        'is_primary' => 'yes',
+                    ]);
+                }
             }
 
             // Create customer company details if company name is provided
@@ -417,12 +453,13 @@ class FrontendController extends Controller
             $amc = Amc::create([
                 'request_id' => $uniqId,
                 'service_type' => 'amc',
+                'amc_type' => $request->amc_type,
                 'customer_id' => $customer->id,
                 'customer_address_id' => $customerAddress->id,
                 'amc_plan_id' => $request->amc_plan_id,
                 'request_date' => now(),
                 'request_source' => $request->source_type ?? 'customer',
-                'status' => 'active',
+                'status' => $request->amc_type === 'remote' ? 'active' : 'pending',
                 'created_by' => Auth::id(),
             ]);
 
@@ -479,6 +516,7 @@ class FrontendController extends Controller
                     'purchase_date' => $productData['purchase_date'],
                     'sku' => $productData['sku'] ?? null,
                     'hsn' => $productData['hsn'] ?? null,
+                    'mac_address' => $productData['mac_address'] ?? null,
                 ]);
             }
 

@@ -772,11 +772,9 @@
         <div class="sidebar d-none d-md-flex flex-column">
             <h5 class="mb-5 d-flex justify-content-center text-center">AMC Service Request Form</h5>
             <div class="step active" id="step1">1. Customer Details</div>
-            <div class="step" id="step2">2. Customer Address</div>
-            <div class="step" id="step3">3. Company Details</div>
-            <div class="step" id="step4">4. AMC Plan Selection</div>
-            <div class="step" id="step5">5. Product Information</div>
-            <div class="step" id="step6">6. Review & Submit</div>
+            <div class="step" id="step2">2. AMC Plan Selection</div>
+            <div class="step" id="step3">3. Product Information</div>
+            <div class="step" id="step4">4. Review & Submit</div>
         </div>
 
 
@@ -788,6 +786,7 @@
                 <input type="hidden" id="customer_id" name="customer_id" value="">
                 <input type="hidden" id="selected_address_id" name="selected_address_id" value="">
                 <input type="hidden" id="source_type" name="source_type" value="ecommerce">
+                <input type="hidden" id="amc_type" name="amc_type" value="remote">
 
                 <!-- Step 1: Customer Details -->
                 <div class="form-section active" id="section1">
@@ -824,113 +823,8 @@
                     </div>
                 </div>
 
-                <!-- Step 2: Customer Address -->
+                <!-- Step 2: AMC Plan Selection -->
                 <div class="form-section" id="section2">
-                    <h3 class="mb-3">Customer Address</h3>
-                    <p class="text-muted mb-4">Please provide the service address for AMC.</p>
-                    
-                    <!-- Address Dropdown for logged in users with multiple addresses -->
-                    <div class="row g-3" id="address-selection-row" style="display: none;">
-                        <div class="col-12">
-                            <label for="address_selector" class="form-label">Select Address</label>
-                            <select class="form-select form-control-lg" id="address_selector">
-                                <option value="">Select an address</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label for="address1" class="form-label">Address Line 1 <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-lg" id="address1" name="address1"
-                                placeholder="Address Line 1" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="address2" class="form-label">Address Line 2</label>
-                            <input type="text" class="form-control form-control-lg" id="address2" name="address2"
-                                placeholder="Address Line 2">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="branch_name" class="form-label">Branch Name <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-lg" id="branch_name"
-                                name="branch_name" placeholder="Branch Name" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="city" class="form-label">City <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-lg" id="city" name="city"
-                                placeholder="City" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="state" class="form-label">State <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-lg" id="state" name="state"
-                                placeholder="State" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="country" class="form-label">Country <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-lg" id="country" name="country"
-                                placeholder="Country" value="India" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="pincode" class="form-label">Pin Code <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-lg" id="pincode" name="pincode"
-                                placeholder="Pin Code" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 3: Company Details (Optional) -->
-                <div class="form-section" id="section3">
-                    <h3 class="mb-3">Company Details</h3>
-                    <p class="text-muted mb-4">This section is optional. You can skip it if you're an individual customer.
-                    </p>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="company_name" class="form-label">Company Name</label>
-                            <input type="text" class="form-control form-control-lg" id="company_name"
-                                name="company_name" placeholder="Company Name">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="gst_no" class="form-label">GST No</label>
-                            <input type="text" class="form-control form-control-lg" id="gst_no" name="gst_no"
-                                placeholder="GST Number">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="comp_address1" class="form-label">Company Address Line 1</label>
-                            <input type="text" class="form-control form-control-lg" id="comp_address1"
-                                name="comp_address1" placeholder="Company Address Line 1">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="comp_address2" class="form-label">Company Address Line 2</label>
-                            <input type="text" class="form-control form-control-lg" id="comp_address2"
-                                name="comp_address2" placeholder="Company Address Line 2">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="comp_city" class="form-label">Company City</label>
-                            <input type="text" class="form-control form-control-lg" id="comp_city" name="comp_city"
-                                placeholder="Company City">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="comp_state" class="form-label">Company State</label>
-                            <input type="text" class="form-control form-control-lg" id="comp_state" name="comp_state"
-                                placeholder="Company State">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="comp_country" class="form-label">Company Country</label>
-                            <input type="text" class="form-control form-control-lg" id="comp_country"
-                                name="comp_country" placeholder="Company Country" value="India">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="comp_pincode" class="form-label">Company Pin Code</label>
-                            <input type="text" class="form-control form-control-lg" id="comp_pincode"
-                                name="comp_pincode" placeholder="Company Pin Code">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 4: AMC Plan Selection -->
-                <div class="form-section" id="section4">
                     <h3 class="mb-5">AMC Plan Selection</h3>
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -969,8 +863,8 @@
                     </div>
                 </div>
 
-                <!-- Step 5: Product Information -->
-                <div class="form-section" id="section5">
+                <!-- Step 3: Product Information -->
+                <div class="form-section" id="section3">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3 class="mb-0">Product Information</h3>
                         <button type="button" class="btn btn-primary" id="addProductBtn">
@@ -991,17 +885,18 @@
                                     </button>
                                 </div>
                                 <div class="row g-3">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="form-label">Product Name</label>
                                         <input type="text" class="form-control form-control-lg product-name"
                                             placeholder="Product Name" required>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="form-label">Product Type</label>
-                                        <input type="text" class="form-control form-control-lg product-type"
-                                            placeholder="Product Type" required>
+                                        <select class="form-select form-control-lg product-type" required>
+                                            <option value="">Select Product Type</option>
+                                        </select>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="form-label">Brand Name</label>
                                         <input type="text" class="form-control form-control-lg product-brand"
                                             placeholder="Brand Name" required>
@@ -1027,6 +922,11 @@
                                             placeholder="HSN Code">
                                     </div>
                                     <div class="col-md-3">
+                                        <label class="form-label">MAC Address <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control form-control-lg product-mac-address"
+                                            placeholder="MAC Address" required>
+                                    </div>
+                                    <div class="col-md-3">
                                         <label class="form-label">Purchase Date</label>
                                         <input type="date" class="form-control form-control-lg product-purchase-date"
                                             required>
@@ -1037,8 +937,8 @@
                     </div>
                 </div>
 
-                <!-- Step 6: Review & Submit -->
-                <div class="form-section" id="section6">
+                <!-- Step 4: Review & Submit -->
+                <div class="form-section" id="section4">
                     <h3 class="mb-5">Review & Submit</h3>
                     <div class="alert alert-info">
                         <h5>Please review your information before submitting:</h5>
@@ -1051,28 +951,6 @@
                                     <h6 class="card-title">Customer Information</h6>
                                     <div id="review-customer-info">
                                         <!-- Customer details will be populated here -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-12" id="review-address-section">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Customer Address</h6>
-                                    <div id="review-address-info">
-                                        <!-- Address details will be populated here -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-12" id="review-company-section" style="display: none;">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Company Information</h6>
-                                    <div id="review-company-info">
-                                        <!-- Company details will be populated here -->
                                     </div>
                                 </div>
                             </div>
@@ -1423,20 +1301,13 @@
         // Load dropdown data from API
         async function loadDropdownData() {
             try {
-                // Load categories
-                const categoriesResponse = await fetch('/beta/api/amc/categories');
-                const categoriesResult = await categoriesResponse.json();
-                if (categoriesResult.success) {
-                    categoriesData = categoriesResult.data;
-                    populateDropdown('product_type', categoriesData, 'id', 'name');
-                }
-
-                // Load brands
-                const brandsResponse = await fetch('/beta/api/amc/brands');
-                const brandsResult = await brandsResponse.json();
-                if (brandsResult.success) {
-                    brandsData = brandsResult.data;
-                    populateDropdown('brand_name', brandsData, 'id', 'name');
+                // Load device types from device_specific_diagnoses table
+                const deviceTypesResponse = await fetch('/beta/api/amc/get-device-types');
+                const deviceTypesResult = await deviceTypesResponse.json();
+                console.log('Device Types Response:', deviceTypesResult);
+                if (deviceTypesResult.success) {
+                    categoriesData = deviceTypesResult.data;
+                    populateDropdown('product_type', categoriesData, 'id', 'device_type');
                 }
 
                 // Load AMC plans
@@ -1933,22 +1804,18 @@
         // Load dropdown data from API
         async function loadDropdownData() {
             try {
-                const categoriesResponse = await fetch('/beta/api/amc/categories');
-                const categoriesResult = await categoriesResponse.json();
-                if (categoriesResult.success) {
-                    categoriesData = categoriesResult.data;
-                    populateAllProductDropdowns();
-                }
-
-                const brandsResponse = await fetch('/beta/api/amc/brands');
-                const brandsResult = await brandsResponse.json();
-                if (brandsResult.success) {
-                    brandsData = brandsResult.data;
+                // Load device types from device_specific_diagnoses table
+                const deviceTypesResponse = await fetch('/beta/api/amc/get-device-types');
+                const deviceTypesResult = await deviceTypesResponse.json();
+                console.log('Device Types Response:', deviceTypesResult);
+                if (deviceTypesResult.success) {
+                    categoriesData = deviceTypesResult.data;
                     populateAllProductDropdowns();
                 }
 
                 const plansResponse = await fetch('/beta/api/amc/plans');
                 const plansResult = await plansResponse.json();
+                console.log('Plans Response:', plansResult);
                 if (plansResult.success) {
                     plansData = plansResult.data;
                 }
@@ -1961,14 +1828,9 @@
         function populateAllProductDropdowns() {
             document.querySelectorAll('.product-entry').forEach(entry => {
                 const typeSelect = entry.querySelector('.product-type');
-                const brandSelect = entry.querySelector('.product-brand');
 
                 if (typeSelect && categoriesData.length > 0) {
-                    populateSelectElement(typeSelect, categoriesData, 'id', 'name');
-                }
-
-                if (brandSelect && brandsData.length > 0) {
-                    populateSelectElement(brandSelect, brandsData, 'id', 'name');
+                    populateSelectElement(typeSelect, categoriesData, 'id', 'device_type');
                 }
             });
         }
@@ -2007,22 +1869,21 @@
                     </button>
                 </div>
                 <div class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">Product Name</label>
                         <input type="text" class="form-control form-control-lg product-name"
                             placeholder="Product Name" required>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">Product Type</label>
                         <select class="form-select form-control-lg product-type" required>
                             <option value="">Select Product Type</option>
                         </select>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">Brand Name</label>
-                        <select class="form-select form-control-lg product-brand" required>
-                            <option value="">Select Brand</option>
-                        </select>
+                        <input type="text" class="form-control form-control-lg product-brand"
+                            placeholder="Brand Name" required>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Model Number</label>
@@ -2038,6 +1899,11 @@
                         <label class="form-label">HSN Code</label>
                         <input type="text" class="form-control form-control-lg product-hsn"
                             placeholder="HSN Code">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">MAC Address <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-lg product-mac-address"
+                            placeholder="MAC Address" required>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Purchase Date</label>
@@ -2173,13 +2039,7 @@
                 saveCurrentStepData();
 
                 if (currentStep < totalSteps - 1) {
-                    // Skip company details automatically only if Individual customer
-                    // From step 1 (Customer Address), skip step 2 (Company Details) and go to step 3 (AMC Plan)
-                    if (currentStep === 1 && shouldSkipCompanyDetails()) {
-                        currentStep += 2; // Skip company details (step 2)
-                    } else {
-                        currentStep++;
-                    }
+                    currentStep++;
 
                     if (currentStep === totalSteps - 1) {
                         populateReviewSection();
@@ -2194,12 +2054,7 @@
         // Back button
         backBtn.addEventListener('click', function() {
             if (currentStep > 0) {
-                // When going back from step 3 (AMC Plan), skip company details if Individual
-                if (currentStep === 3 && shouldSkipCompanyDetails()) {
-                    currentStep -= 2; // Go back to step 1 (Customer Address)
-                } else {
-                    currentStep--;
-                }
+                currentStep--;
                 showStep(currentStep);
                 updateNavigationButtons();
             }
@@ -2237,8 +2092,8 @@
         // Update navigation
         function updateNavigationButtons() {
             backBtn.style.display = currentStep > 0 ? 'inline-block' : 'none';
-            // Show skip button on Company Details step (step 2)
-            skipBtn.style.display = currentStep === 2 ? 'inline-block' : 'none';
+            // Hide skip button since we don't have optional sections
+            skipBtn.style.display = 'none';
             if (currentStep === totalSteps - 1) {
                 nextBtn.style.display = 'none';
                 submitBtn.style.display = 'inline-block';
@@ -2248,9 +2103,9 @@
             }
         }
 
-        // Skip company details check - always show company details since customer_type is now 'both'
+        // Skip company details check - not needed for remote AMC
         function shouldSkipCompanyDetails() {
-            return false; // Always show company details section
+            return false;
         }
 
         // Validation
@@ -2258,8 +2113,8 @@
             const currentSection = sections[currentStep];
             let isValid = true;
 
-            // Special handling for product information step (step 4 now)
-            if (currentStep === 4) { // Product Information step
+            // Special handling for product information step (step 2 now)
+            if (currentStep === 2) { // Product Information step
                 const productEntries = document.querySelectorAll('.product-entry');
 
                 if (productEntries.length === 0) {
@@ -2306,8 +2161,14 @@
         function saveCurrentStepData() {
             const currentSection = sections[currentStep];
 
-            // Special handling for product information step (step 4 now)
-            if (currentStep === 4) { // Product Information step
+            // Always include hidden fields at form level
+            const amcTypeInput = document.getElementById('amc_type');
+            if (amcTypeInput) {
+                formData.amc_type = amcTypeInput.value;
+            }
+
+            // Special handling for product information step (step 2 now)
+            if (currentStep === 2) { // Product Information step
                 productsData = [];
                 const productEntries = document.querySelectorAll('.product-entry');
 
@@ -2319,6 +2180,7 @@
                         model_number: entry.querySelector('.product-model').value,
                         sku: entry.querySelector('.product-sku').value,
                         hsn: entry.querySelector('.product-hsn').value,
+                        mac_address: entry.querySelector('.product-mac-address').value,
                         purchase_date: entry.querySelector('.product-purchase-date').value
                     };
                     productsData.push(product);
@@ -2334,6 +2196,7 @@
                         !input.classList.contains('product-model') &&
                         !input.classList.contains('product-sku') &&
                         !input.classList.contains('product-hsn') &&
+                        !input.classList.contains('product-mac-address') &&
                         !input.classList.contains('product-purchase-date')) {
 
                         if (input.type === 'radio') {
@@ -2354,33 +2217,13 @@
             <p><strong>Name:</strong> ${formData.first_name || ''} ${formData.last_name || ''}</p>
             <p><strong>Email:</strong> ${formData.email || ''}</p>
             <p><strong>Phone:</strong> ${formData.phone || ''}</p>
-            <p><strong>Customer Type:</strong> ${formData.customer_type || ''}</p>
         `;
             document.getElementById('review-customer-info').innerHTML = customerInfo;
-
-            if (formData.company_name) {
-                const companyInfo = `
-                <p><strong>Company:</strong> ${formData.company_name || ''}</p>
-                <p><strong>Address:</strong> ${formData.comp_address1 || ''} ${formData.comp_address2 || ''}</p>
-                <p><strong>City:</strong> ${formData.comp_city || ''}, ${formData.comp_state || ''} ${formData.comp_pincode || ''}</p>
-                <p><strong>GST No:</strong> ${formData.gst_no || ''}</p>
-            `;
-                document.getElementById('review-company-info').innerHTML = companyInfo;
-                document.getElementById('review-company-section').style.display = 'block';
-            }
-
-            // Customer Address
-            const addressInfo = `
-            <p><strong>Branch:</strong> ${formData.branch_name || ''}</p>
-            <p><strong>Address:</strong> ${formData.address1 || ''} ${formData.address2 || ''}</p>
-            <p><strong>City:</strong> ${formData.city || ''}, ${formData.state || ''} ${formData.pincode || ''}</p>
-        `;
-            document.getElementById('review-address-info').innerHTML = addressInfo;
 
             // Display all products
             let productInfoHtml = '';
             productsData.forEach((product, index) => {
-                const productTypeName = getTextFromData(categoriesData, product.product_type, 'id', 'name');
+                const productTypeName = getTextFromData(categoriesData, product.product_type, 'id', 'device_type');
                 const brandName = getTextFromData(brandsData, product.brand_name, 'id', 'name');
 
                 productInfoHtml += `
@@ -2389,6 +2232,9 @@
                     <p class="mb-1"><strong>Product Type:</strong> ${productTypeName}</p>
                     <p class="mb-1"><strong>Brand:</strong> ${brandName}</p>
                     <p class="mb-1"><strong>Model:</strong> ${product.model_number || ''}</p>
+                    <p class="mb-1"><strong>SKU:</strong> ${product.sku || ''}</p>
+                    <p class="mb-1"><strong>HSN Code:</strong> ${product.hsn || ''}</p>
+                    <p class="mb-1"><strong>MAC Address:</strong> ${product.mac_address || ''}</p>
                     <p class="mb-1"><strong>Purchase Date:</strong> ${product.purchase_date || ''}</p>
                 </div>
             `;
@@ -2396,9 +2242,8 @@
             document.getElementById('review-product-info').innerHTML = productInfoHtml;
 
             const planInfo = `
-            <p><strong>Plan Type:</strong> ${formData.plan_type || ''}</p>
             <p><strong>Plan:</strong> ${getSelectedText('amc_plan_id')}</p>
-            <p><strong>Duration:</strong> ${formData.plan_duration || ''}</p>
+            <p><strong>Duration:</strong> ${formData.plan_duration || ''} Months</p>
             <p><strong>Start Date:</strong> ${formData.preferred_start_date || ''}</p>
             <p><strong>Cost:</strong> ${document.getElementById('plan_cost_display').value || ''}</p>
         `;

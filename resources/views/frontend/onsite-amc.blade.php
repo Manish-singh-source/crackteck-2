@@ -788,6 +788,7 @@
                 <input type="hidden" id="customer_id" name="customer_id" value="">
                 <input type="hidden" id="selected_address_id" name="selected_address_id" value="">
                 <input type="hidden" id="source_type" name="source_type" value="ecommerce">
+                <input type="hidden" id="amc_type" name="amc_type" value="onsite">
 
                 <!-- Step 1: Customer Details -->
                 <div class="form-section active" id="section1">
@@ -998,8 +999,9 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Product Type</label>
-                                        <input type="text" class="form-control form-control-lg product-type"
-                                            placeholder="Product Type" required>
+                                        <select class="form-select form-control-lg product-type" required>
+                                            <option value="">Select Product Type</option>
+                                        </select>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Brand Name</label>
@@ -1025,6 +1027,11 @@
                                         <label class="form-label">HSN Code</label>
                                         <input type="text" class="form-control form-control-lg product-hsn"
                                             placeholder="HSN Code">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">MAC Address <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control form-control-lg product-mac-address"
+                                            placeholder="MAC Address" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Purchase Date</label>
@@ -1423,20 +1430,13 @@
         // Load dropdown data from API
         async function loadDropdownData() {
             try {
-                // Load categories
-                const categoriesResponse = await fetch('/beta/api/amc/categories');
-                const categoriesResult = await categoriesResponse.json();
-                if (categoriesResult.success) {
-                    categoriesData = categoriesResult.data;
-                    populateDropdown('product_type', categoriesData, 'id', 'name');
-                }
-
-                // Load brands
-                const brandsResponse = await fetch('/beta/api/amc/brands');
-                const brandsResult = await brandsResponse.json();
-                if (brandsResult.success) {
-                    brandsData = brandsResult.data;
-                    populateDropdown('brand_name', brandsData, 'id', 'name');
+                // Load device types from device_specific_diagnoses table
+                const deviceTypesResponse = await fetch('/beta/api/amc/get-device-types');
+                const deviceTypesResult = await deviceTypesResponse.json();
+                console.log('Device Types Response:', deviceTypesResult);
+                if (deviceTypesResult.success) {
+                    categoriesData = deviceTypesResult.data;
+                    populateDropdown('product_type', categoriesData, 'id', 'device_type');
                 }
 
                 // Load AMC plans
@@ -1933,17 +1933,12 @@
         // Load dropdown data from API
         async function loadDropdownData() {
             try {
-                const categoriesResponse = await fetch('/beta/api/amc/categories');
-                const categoriesResult = await categoriesResponse.json();
-                if (categoriesResult.success) {
-                    categoriesData = categoriesResult.data;
-                    populateAllProductDropdowns();
-                }
-
-                const brandsResponse = await fetch('/beta/api/amc/brands');
-                const brandsResult = await brandsResponse.json();
-                if (brandsResult.success) {
-                    brandsData = brandsResult.data;
+                // Load device types from device_specific_diagnoses table
+                const deviceTypesResponse = await fetch('/beta/api/amc/get-device-types');
+                const deviceTypesResult = await deviceTypesResponse.json();
+                console.log('Device Types Response:', deviceTypesResult);
+                if (deviceTypesResult.success) {
+                    categoriesData = deviceTypesResult.data;
                     populateAllProductDropdowns();
                 }
 
@@ -1961,17 +1956,16 @@
         function populateAllProductDropdowns() {
             document.querySelectorAll('.product-entry').forEach(entry => {
                 const typeSelect = entry.querySelector('.product-type');
-                const brandSelect = entry.querySelector('.product-brand');
 
                 if (typeSelect && categoriesData.length > 0) {
-                    populateSelectElement(typeSelect, categoriesData, 'id', 'name');
-                }
-
-                if (brandSelect && brandsData.length > 0) {
-                    populateSelectElement(brandSelect, brandsData, 'id', 'name');
+                    populateSelectElement(typeSelect, categoriesData, 'id', 'device_type');
                 }
             });
         }
+
+        // fetch product type from device_specific_diagnoses table using ajax and display in dropdown 
+        // there are multiple product adding funtionallay 
+
 
         // Populate a single select element
         function populateSelectElement(selectElement, data, valueField, textField) {
@@ -2020,9 +2014,8 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Brand Name</label>
-                        <select class="form-select form-control-lg product-brand" required>
-                            <option value="">Select Brand</option>
-                        </select>
+                        <input type="text" class="form-control form-control-lg product-brand"
+                            placeholder="Brand Name" required>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Model Number</label>
@@ -2038,6 +2031,11 @@
                         <label class="form-label">HSN Code</label>
                         <input type="text" class="form-control form-control-lg product-hsn"
                             placeholder="HSN Code">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">MAC Address <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-lg product-mac-address"
+                            placeholder="MAC Address" required>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Purchase Date</label>
@@ -2306,6 +2304,12 @@
         function saveCurrentStepData() {
             const currentSection = sections[currentStep];
 
+            // Always include hidden fields at form level
+            const amcTypeInput = document.getElementById('amc_type');
+            if (amcTypeInput) {
+                formData.amc_type = amcTypeInput.value;
+            }
+
             // Special handling for product information step (step 4 now)
             if (currentStep === 4) { // Product Information step
                 productsData = [];
@@ -2319,6 +2323,7 @@
                         model_number: entry.querySelector('.product-model').value,
                         sku: entry.querySelector('.product-sku').value,
                         hsn: entry.querySelector('.product-hsn').value,
+                        mac_address: entry.querySelector('.product-mac-address').value,
                         purchase_date: entry.querySelector('.product-purchase-date').value
                     };
                     productsData.push(product);
@@ -2334,6 +2339,7 @@
                         !input.classList.contains('product-model') &&
                         !input.classList.contains('product-sku') &&
                         !input.classList.contains('product-hsn') &&
+                        !input.classList.contains('product-mac-address') &&
                         !input.classList.contains('product-purchase-date')) {
 
                         if (input.type === 'radio') {
@@ -2380,7 +2386,7 @@
             // Display all products
             let productInfoHtml = '';
             productsData.forEach((product, index) => {
-                const productTypeName = getTextFromData(categoriesData, product.product_type, 'id', 'name');
+                const productTypeName = getTextFromData(categoriesData, product.product_type, 'id', 'device_type');
                 const brandName = getTextFromData(brandsData, product.brand_name, 'id', 'name');
 
                 productInfoHtml += `
@@ -2389,6 +2395,9 @@
                     <p class="mb-1"><strong>Product Type:</strong> ${productTypeName}</p>
                     <p class="mb-1"><strong>Brand:</strong> ${brandName}</p>
                     <p class="mb-1"><strong>Model:</strong> ${product.model_number || ''}</p>
+                    <p class="mb-1"><strong>SKU:</strong> ${product.sku || ''}</p>
+                    <p class="mb-1"><strong>HSN Code:</strong> ${product.hsn || ''}</p>
+                    <p class="mb-1"><strong>MAC Address:</strong> ${product.mac_address || ''}</p>
                     <p class="mb-1"><strong>Purchase Date:</strong> ${product.purchase_date || ''}</p>
                 </div>
             `;

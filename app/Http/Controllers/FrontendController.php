@@ -374,21 +374,11 @@ class FrontendController extends Controller
             $customerAddress = null;
             $selectedAddressId = $request->input('selected_address_id');
 
-            // For remote AMC, create a placeholder address
+            // For remote AMC, don't create any address
             // For onsite AMC, require customer address
             if ($request->amc_type === 'remote') {
-                // For remote AMC, create a placeholder address
-                $customerAddress = \App\Models\CustomerAddressDetail::create([
-                    'customer_id' => $customer->id,
-                    'branch_name' => 'Remote AMC',
-                    'address1' => 'N/A - Remote Support',
-                    'address2' => '',
-                    'country' => 'India',
-                    'state' => 'N/A',
-                    'city' => 'Remote',
-                    'pincode' => '000000',
-                    'is_primary' => 'yes',
-                ]);
+                // For remote AMC, no address needed - leave as null
+                $customerAddress = null;
             } else {
                 // For onsite AMC, require customer address
                 if ($selectedAddressId) {
@@ -455,7 +445,7 @@ class FrontendController extends Controller
                 'service_type' => 'amc',
                 'amc_type' => $request->amc_type,
                 'customer_id' => $customer->id,
-                'customer_address_id' => $customerAddress->id,
+                'customer_address_id' => $customerAddress ? $customerAddress->id : null,
                 'amc_plan_id' => $request->amc_plan_id,
                 'request_date' => now(),
                 'request_source' => $request->source_type ?? 'customer',

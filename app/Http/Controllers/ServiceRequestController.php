@@ -42,7 +42,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Activitylog\Models\Activity;
 
-class ServiceRequestController extends Controller
+class ServiceRequestController extends Controller  
 {
     public function generateServiceId()
     {

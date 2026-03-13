@@ -50,6 +50,7 @@
                                                                     <th>Customer Name</th>
                                                                     <th>Request Date</th>
                                                                     <th>Product Name / Model No</th>
+                                                                    <th>Amc Type</th>
                                                                     <th>Request Source</th>
                                                                     <th>Status</th>
                                                                     <th>Action</th>
@@ -77,6 +78,15 @@
                                                                                 {{ $request->amcProducts->count() }}
                                                                                 Product(s)
                                                                             </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            @php
+                                                                                $amcType = match ($request->amc_type) {
+                                                                                    'remote' => 'Remote',
+                                                                                    'onsite' => 'Onsite',
+                                                                                }
+                                                                            @endphp
+                                                                            {{ $amcType }}
                                                                         </td>
                                                                         @php
                                                                             $statusClasses = [

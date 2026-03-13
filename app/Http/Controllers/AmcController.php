@@ -600,11 +600,12 @@ class AmcController extends Controller
         ])->findOrFail($id);
 
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
+        $remoteEngineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
 
         // Get tickets for this AMC service
         $amcTickets = AmcTicket::where('amc_id', $id)->orderBy('created_at', 'desc')->get();
 
-        return view('/crm/active-amcs/view', compact('amcRequest', 'engineers', 'amcTickets'));
+        return view('/crm/active-amcs/view', compact('amcRequest', 'engineers','remoteEngineers', 'amcTickets'));
     }
 
     // 4. Reschedule AMC request

@@ -167,6 +167,7 @@ class SocialController extends Controller
         // Login the customer
         Auth::guard('customer_web')->login($customer);
 
-        return redirect()->intended('/beta')->with('success', 'Login successful via ' . ucfirst($provider));
+        // return redirect()->intended('/beta')->with('success', 'Login successful via ' . ucfirst($provider));
+        return redirect()->intended('/')->with('success', 'Login successful via ' . ucfirst($provider));
     }
 }

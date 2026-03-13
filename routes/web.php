@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\SduiSettingController;
 use App\Http\Controllers\AmcController;
 use App\Http\Controllers\AmcServicesController;
 use App\Http\Controllers\AssignedJobController;
+use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CallLogController;
 use App\Http\Controllers\CaseTransferController;
@@ -33,6 +34,7 @@ use App\Http\Controllers\QuickServiceController;
 use App\Http\Controllers\QuickServiceRequestController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\ReimbursementController;
+use App\Http\Controllers\RemoteSupportJobController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleReportController;
 use App\Http\Controllers\SalesInvoicingController;
@@ -46,7 +48,6 @@ use App\Http\Controllers\TrackRequestController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\WithdrawController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\SocialController;
 
 Route::get('/', function () {
     return view('comming-soon');
@@ -774,6 +775,10 @@ Route::prefix('/demo')->group(function () {
         Route::get('/crm/assigned-jobs', 'index')->name('assigned-jobs.index');
         // View Assigned Jobs Page
         Route::get('/crm/view-assigned-job/{id}', 'view')->name('assigned-jobs.view');
+        // Diagnose Page 
+        Route::get('/crm/diagnose-assigned-jobs/{id}/{remote_support_id}', 'diagnose')->name('assigned-jobs.diagnose');
+        // Start Diagnose 
+        Route::post('/crm/start-diagnose/{id}/{step}/{remote_support_id}', 'startDiagnose')->name('assigned-jobs.startDiagnose');
         // Edit Assigned Jobs Page
         Route::get('/crm/edit-assigned-jobs/{id}', 'edit')->name('assigned-jobs.edit');
         // Update Assigned Jobs Page

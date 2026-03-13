@@ -107,7 +107,31 @@ class FrontendController extends Controller
         $annualPlans = AmcPlan::where('status', 'Active')
             ->get();
 
-        return view('frontend.amc', compact('annualPlans'));
+        return view('remote-amc', compact('annualPlans'));
+    }
+
+    /**
+     * Display Remote AMC plans page with active plans filtered by support_type = 'remote'
+     */
+    public function remoteAmcPlans()
+    {
+        $annualPlans = AmcPlan::where('status', 'Active')
+            ->where('support_type', 'remote')
+            ->get();
+
+        return view('frontend.remote-amc', compact('annualPlans'));
+    }
+
+    /**
+     * Display Onsite AMC plans page with active plans filtered by support_type = 'onsite'
+     */
+    public function onsiteAmcPlans()
+    {
+        $annualPlans = AmcPlan::where('status', 'Active')
+            ->where('support_type', 'onsite')
+            ->get();
+
+        return view('frontend.onsite-amc', compact('annualPlans'));
     }
 
     /**

@@ -45,21 +45,27 @@ class AmcController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        // Build validation rules based on support_type
+        $rules = [
             'plan_name' => 'required|string|max:255',
             'plan_code' => 'required',
             'description' => 'nullable|string|max:255',
             'duration' => 'required|numeric|min:1',
             'total_visits' => 'required|numeric|min:1',
-            'plan_cost' => 'required|numeric|min:0',
-            'tax' => 'required|numeric|min:0',
-            'total_cost' => 'required|numeric|min:0',
-            'pay_terms' => 'required|string|max:255',
             'support_type' => 'required|string|max:255',
             'tandc' => 'nullable|string|max:255',
             'replacement_policy' => 'nullable|string|max:255',
             'status' => 'required|in:active,inactive',
-        ]);
+        ];
+
+        // If support_type is remote or both, require pricing fields
+        if (in_array($request->support_type, ['remote', 'both'])) {
+            $rules['plan_cost'] = 'required|numeric|min:0';
+            $rules['tax'] = 'required|numeric|min:0';
+            $rules['total_cost'] = 'required|numeric|min:0';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -72,10 +78,21 @@ class AmcController extends Controller
             $amc->description = $request->description;
             $amc->duration = $request->duration;
             $amc->total_visits = $request->total_visits;
-            $amc->plan_cost = $request->plan_cost;
-            $amc->tax = $request->tax;
-            $amc->total_cost = $request->total_cost;
-            $amc->pay_terms = $request->pay_terms;
+            
+            // Only save pricing if support_type is remote or both
+            if (in_array($request->support_type, ['remote', 'both'])) {
+                $amc->plan_cost = $request->plan_cost;
+                $amc->tax = $request->tax;
+                $amc->total_cost = $request->total_cost;
+                $amc->pay_terms = 'full_payment';
+            } else {
+                // For onsite, set pricing to null or 0
+                $amc->plan_cost = 0;
+                $amc->tax = 0;
+                $amc->total_cost = 0;
+                $amc->pay_terms = 'full_payment';
+            }
+            
             $amc->support_type = $request->support_type;
             $amc->covered_items = $request->covered_items_ids ?? [];
 
@@ -126,21 +143,28 @@ class AmcController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
+        // Build validation rules based on support_type
+        $rules = [
             'plan_name' => 'required|string|max:255',
             'plan_code' => 'required',
             'description' => 'nullable|string|max:255',
             'duration' => 'required|numeric|min:1',
             'total_visits' => 'required|numeric|min:1',
-            'plan_cost' => 'required|numeric|min:0',
-            'tax' => 'required|numeric|min:0',
-            'total_cost' => 'required|numeric|min:0',
             'pay_terms' => 'required|string|max:255',
             'support_type' => 'required|string|max:255',
             'tandc' => 'nullable|string|max:255',
             'replacement_policy' => 'nullable|string|max:255',
             'status' => 'required|in:active,inactive',
-        ]);
+        ];
+
+        // If support_type is remote or both, require pricing fields
+        if (in_array($request->support_type, ['remote', 'both'])) {
+            $rules['plan_cost'] = 'required|numeric|min:0';
+            $rules['tax'] = 'required|numeric|min:0';
+            $rules['total_cost'] = 'required|numeric|min:0';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -154,10 +178,21 @@ class AmcController extends Controller
             $amc->description = $request->description;
             $amc->duration = $request->duration;          // already months from form
             $amc->total_visits = $request->total_visits;
-            $amc->plan_cost = $request->plan_cost;
-            $amc->tax = $request->tax;
-            $amc->total_cost = $request->total_cost;
-            $amc->pay_terms = $request->pay_terms;
+            
+            // Only save pricing if support_type is remote or both
+            if (in_array($request->support_type, ['remote', 'both'])) {
+                $amc->plan_cost = $request->plan_cost;
+                $amc->tax = $request->tax;
+                $amc->total_cost = $request->total_cost;
+                $amc->pay_terms = 'full_payment';
+            } else {
+                // For onsite, set pricing to null
+                $amc->plan_cost = 0;
+                $amc->tax = 0;
+                $amc->total_cost = 0;
+                $amc->pay_terms = 'full_payment';
+            }
+            
             $amc->support_type = $request->support_type;
 
             // covered_items_ids: JSON string of IDs from hidden input

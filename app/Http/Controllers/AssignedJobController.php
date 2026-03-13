@@ -29,8 +29,9 @@ class AssignedJobController extends Controller
 
     public function diagnose($id, $remote_support_id)
     {
-        $serviceRequestProduct = ServiceRequestProduct::with('productDiagnose')->findOrFail($id);
+        $serviceRequestProduct = ServiceRequestProduct::with('productDiagnose', 'remoteSupportDiagnose')->findOrFail($id);
         $remoteSupportJob = RemoteSupportJob::with('diagnosis')->findOrFail($remote_support_id);
+        
         return view('/crm/assigned-jobs/diagnose', compact('serviceRequestProduct', 'remote_support_id', 'remoteSupportJob'));
     }
 
@@ -45,8 +46,12 @@ class AssignedJobController extends Controller
                 'remote_tool' => $request->remote_tool,
                 'status' => 'in_progress'
             ]);
-
+            
             if($remoteSupportDiagnose) {
+                $remoteSupportJob = RemoteSupportJob::findOrFail($remote_support_id);
+                $remoteSupportJob->status = 'in_progress';
+                $remoteSupportJob->save();
+
                 return redirect()->back()->with('success', 'Diagnosis started successfully.');
             }
             return redirect()->back()->with('error', 'Failed to start diagnosis.');
@@ -82,6 +87,7 @@ class AssignedJobController extends Controller
             $remoteSupportDiagnose = RemoteSupportDiagnosis::where('remote_support_job_id', $remote_support_id)->first();
             $remoteSupportDiagnose->time_spent = $request->time_spent;
             $remoteSupportDiagnose->client_feedback = $request->client_feedback;
+            $remoteSupportDiagnose->status = $result;
             $remoteSupportDiagnose->save();
 
             $remoteSupportJob = RemoteSupportJob::findOrFail($remote_support_id);
@@ -89,7 +95,7 @@ class AssignedJobController extends Controller
             $remoteSupportJob->save();
 
             if($remoteSupportDiagnose) {
-                return redirect()->back()->with('success', 'Diagnosis started successfully.');
+                return redirect()->back()->with('success', 'Diagnosis completed successfully.');
             }
             return redirect()->back()->with('error', 'Failed to start diagnosis.');
         } 

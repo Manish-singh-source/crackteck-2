@@ -9,7 +9,6 @@ use App\Models\WebsiteBanner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -20,7 +19,6 @@ class BannerController extends Controller
      */
     public function websiteBanner()
     {
-        //
         $status = request()->get('status') ?? 'all';
 
         $website = WebsiteBanner::query();
@@ -48,14 +46,8 @@ class BannerController extends Controller
         DB::beginTransaction();
 
         try {
-            // Image upload
             $path = null;
             if ($request->hasFile('image')) {
-                // $file = $request->file('image');
-                // $filename = time().'_'.$file->getClientOriginalName();
-                // $file->move(public_path('uploads/e-commerce/banner/website_banner'), $filename);
-                // $path = 'uploads/e-commerce/banner/website_banner/'.$filename;
-
                 $path = FileUpload::fileUpload($request->file('image'), 'uploads/e-commerce/banner/website_banner/');
             }
 
@@ -132,17 +124,8 @@ class BannerController extends Controller
         try {
             $banner = WebsiteBanner::findOrFail($id);
 
-            // Image upload
             $path = $banner->image_url;
             if ($request->hasFile('image')) {
-                // if ($path && File::exists(public_path($path))) {
-                //     File::delete(public_path($path));
-                // }
-
-                // $file = $request->file('image');
-                // $filename = time().'_'.$file->getClientOriginalName();
-                // $file->move(public_path('uploads/e-commerce/banner/website_banner'), $filename);
-                // $path = 'uploads/e-commerce/banner/website_banner/'.$filename;
                 $path = FileUpload::updateFileUpload($request->file('image'), $banner->image_url, 'uploads/e-commerce/banner/website_banner/');
             }
 
@@ -153,24 +136,17 @@ class BannerController extends Controller
                 'image_url' => $path,
                 'type' => $request->type,
                 'channel' => $request->channel,
-
-                // ?: explained here
                 'promotion_type' => $request->promotion_type ?: null,
                 'discount_type' => $request->discount_type ?: null,
-
                 'discount_value' => $request->discount_value,
                 'promo_code' => $request->promo_code,
                 'link_url' => $request->link_url,
-
-                // ?? is safer for defaults
                 'link_target' => $request->link_target ?? 1,
-
                 'position' => $request->position,
                 'display_order' => $request->display_order,
                 'start_at' => $request->start_at,
                 'end_at' => $request->end_at,
                 'is_active' => $request->is_active,
-
                 'metadata' => $request->metadata
                     ? json_decode($request->metadata, true)
                     : null,
@@ -205,9 +181,8 @@ class BannerController extends Controller
         try {
             $banner = WebsiteBanner::findOrFail($id);
 
-            // Delete image file
-            if ($banner->image_url && File::exists(public_path($banner->image_url))) {
-                File::delete(public_path($banner->image_url));
+            if ($banner->image_url) {
+                FileUpload::deleteFile($banner->image_url);
             }
 
             $banner->delete();

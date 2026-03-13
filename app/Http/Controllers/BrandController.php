@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileUpload;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -51,11 +52,12 @@ class BrandController extends Controller
         $brand->status = $request->status;
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time().'.'.$file->getClientOriginalExtension();
+            // $file = $request->file('image');
+            // $filename = time().'.'.$file->getClientOriginalExtension();
 
-            $file->move(public_path('uploads/e-commerce/brands'), $filename);
-            $brand->image = 'uploads/e-commerce/brands/'.$filename;
+            // $file->move(public_path('uploads/e-commerce/brands'), $filename);
+            // $brand->image = 'uploads/e-commerce/brands/'.$filename;
+            $brand->image = FileUpload::fileUpload($request->file('image'), 'uploads/e-commerce/brands/');
         }
 
         $brand->save();
@@ -95,15 +97,16 @@ class BrandController extends Controller
 
         if ($request->hasFile('image')) {
             // Delete old image if exists
-            if ($brand->image && File::exists(public_path($brand->image))) {
-                File::delete(public_path($brand->image));
-            }
+            // if ($brand->image && File::exists(public_path($brand->image))) {
+            //     File::delete(public_path($brand->image));
+            // }
 
-            $file = $request->file('image');
-            $filename = time().'.'.$file->getClientOriginalExtension();
+            // $file = $request->file('image');
+            // $filename = time().'.'.$file->getClientOriginalExtension();
 
-            $file->move(public_path('uploads/e-commerce/brands'), $filename);
-            $brand->image = 'uploads/e-commerce/brands/'.$filename;
+            // $file->move(public_path('uploads/e-commerce/brands'), $filename);
+            // $brand->image = 'uploads/e-commerce/brands/'.$filename;
+            $brand->image = FileUpload::updateFileUpload($request->file('image'), $brand->image, 'uploads/e-commerce/brands/');
         }
 
         $brand->save();
@@ -123,7 +126,8 @@ class BrandController extends Controller
         }
 
         if ($brand->image && File::exists(public_path($brand->image))) {
-            File::delete(public_path($brand->image));
+            // File::delete(public_path($brand->image));
+            FileUpload::deleteFile($brand->image);
         }
 
         $brand->delete();

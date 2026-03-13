@@ -2,48 +2,82 @@
 
 namespace App\Helpers;
 
+use App\Services\FirebaseStorageService;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class FileUpload
 {
-    public static function fileUpload(UploadedFile $file, string $path = ''): string
+    public static function fileUpload(?UploadedFile $file, string $path = ''): string
     {
-        // Use default path if empty
-        $path = ! empty($path) ? $path : 'uploads/crm/amc/brochure/';
-
-        // Ensure path ends with slash
-        if (! str_ends_with($path, '/')) {
-            $path .= '/';
+        if (! $file instanceof UploadedFile) {
+            return '';
         }
 
-        // Create directory if it doesn't exist
+        $path = self::normalizePath($path !== '' ? $path : 'uploads/crm/amc/brochure/');
+
+        if (self::shouldUseFirebase()) {
+            return app(FirebaseStorageService::class)->upload($file, $path);
+        }
+
         $fullPath = public_path($path);
-        if (! file_exists($fullPath)) {
-            mkdir($fullPath, 0755, true);
+        if (! File::exists($fullPath)) {
+            File::makeDirectory($fullPath, 0755, true);
         }
 
-        $filename = time().'.'.$file->getClientOriginalExtension();
+        $filename = self::generateFilename($file);
         $file->move($fullPath, $filename);
 
         return $path.$filename;
     }
 
-    /**
-     * Update an existing file by deleting the old one and uploading the new one
-     *
-     * @param  UploadedFile  $file  The new file to upload
-     * @param  string  $oldFilePath  The path of the old file to delete
-     * @param  string  $path  The directory path where the file will be stored
-     * @return string The path to the newly uploaded file
-     */
-    public static function updateFileUpload(UploadedFile $file, string $oldFilePath = '', string $path = ''): string
+    public static function updateFileUpload(?UploadedFile $file, string $oldFilePath = '', string $path = ''): string
     {
-        // Delete old file if it exists
-        if (! empty($oldFilePath) && file_exists(public_path($oldFilePath))) {
-            @unlink(public_path($oldFilePath));
+        if (! $file instanceof UploadedFile) {
+            return $oldFilePath;
         }
 
-        // Upload new file using existing method
+        self::deleteFile($oldFilePath);
+
         return self::fileUpload($file, $path);
+    }
+
+    public static function deleteFile(?string $filePath): bool
+    {
+        if (empty($filePath)) {
+            return false;
+        }
+
+        if (self::shouldUseFirebase()) {
+            return app(FirebaseStorageService::class)->delete($filePath);
+        }
+
+        $localPath = public_path($filePath);
+        if (! File::exists($localPath)) {
+            return false;
+        }
+
+        return File::delete($localPath);
+    }
+
+    public static function shouldUseFirebase(): bool
+    {
+        return config('services.firebase.upload_disk') === 'firebase';
+    }
+
+    protected static function normalizePath(string $path): string
+    {
+        return rtrim(trim($path), '/').'/';
+    }
+
+    protected static function generateFilename(UploadedFile $file): string
+    {
+        $name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $extension = $file->getClientOriginalExtension();
+        $slug = Str::slug($name);
+        $slug = $slug !== '' ? $slug : 'file';
+
+        return $slug.'-'.time().'-'.Str::lower(Str::random(8)).($extension ? '.'.$extension : '');
     }
 }

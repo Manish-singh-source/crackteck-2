@@ -13,7 +13,8 @@ use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('beta')->group(function () {
+// Route::prefix('beta')->group(function () {
+Route::prefix('/')->group(function () {
     // Login routes
     // Route::get('/register', [FrontendAuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [FrontendAuthController::class, 'register'])->name('frontend.register');

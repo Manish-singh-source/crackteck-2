@@ -49,9 +49,9 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\WithdrawController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('comming-soon');
-})->name('comming-soon');
+// Route::get('/', function () {
+//     return view('comming-soon');
+// })->name('comming-soon');
 
 Route::get('/auth/{provider}/redirect', [SocialController::class, 'redirectToProvider'])
     ->whereIn('provider', ['google', 'facebook', 'github'])

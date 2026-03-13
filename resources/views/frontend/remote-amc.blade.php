@@ -1661,7 +1661,8 @@
         // Check if customer is logged in
         async function checkCustomerLogin() {
             try {
-                const response = await fetch('/beta/api/customer/check-login', {
+                // const response = await fetch('/beta/api/customer/check-login', {
+                const response = await fetch('/api/customer/check-login', {
                     method: 'GET',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
@@ -1779,7 +1780,8 @@
         // Check email exists in database
         async function checkEmailExists(email) {
             try {
-                const response = await fetch('/beta/api/amc/check-email', {
+                // const response = await fetch('/beta/api/amc/check-email', {
+                const response = await fetch('/api/amc/check-email', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1805,7 +1807,8 @@
         async function loadDropdownData() {
             try {
                 // Load device types from device_specific_diagnoses table
-                const deviceTypesResponse = await fetch('/beta/api/amc/get-device-types');
+                // const deviceTypesResponse = await fetch('/beta/api/amc/get-device-types');
+                const deviceTypesResponse = await fetch('/api/amc/get-device-types');
                 const deviceTypesResult = await deviceTypesResponse.json();
                 console.log('Device Types Response:', deviceTypesResult);
                 if (deviceTypesResult.success) {
@@ -1813,7 +1816,8 @@
                     populateAllProductDropdowns();
                 }
 
-                const plansResponse = await fetch('/beta/api/amc/plans');
+                // const plansResponse = await fetch('/beta/api/amc/plans');
+                const plansResponse = await fetch('/api/amc/plans');
                 const plansResult = await plansResponse.json();
                 console.log('Plans Response:', plansResult);
                 if (plansResult.success) {
@@ -2275,7 +2279,8 @@
                 };
                 console.log('Submitting data:', submitData);
 
-                const response = await fetch('/beta/api/amc/submit', {
+                // const response = await fetch('/beta/api/amc/submit', {
+                const response = await fetch('/api/amc/submit', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

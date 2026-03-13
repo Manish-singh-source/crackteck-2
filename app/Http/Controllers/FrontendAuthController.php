@@ -162,8 +162,8 @@ class FrontendAuthController extends Controller
         if (Auth::guard('customer_web')->attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->intended('beta/'); // customer dashboard
-            // return redirect()->intended('/'); // Beta Removed
+            // return redirect()->intended('beta/'); // customer dashboard
+            return redirect()->intended('/'); // Beta Removed
         }
 
         return back()->withErrors([
@@ -178,7 +178,8 @@ class FrontendAuthController extends Controller
         $request->session()->regenerateToken();
 
         // return redirect()->intended('beta/'); // Beta Removed
-        return redirect()->intended('/beta');
+        // return redirect()->intended('/beta');
+        return redirect()->intended('/');
     }
 
     /**

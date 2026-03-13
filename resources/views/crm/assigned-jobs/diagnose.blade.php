@@ -133,7 +133,7 @@
                                                     <span class="fw-semibold text-break">Status :
                                                     </span>
                                                     <span>
-                                                        {{ $serviceRequestProduct->status }}
+                                                        {{ ucwords(str_replace('_', ' ', $serviceRequestProduct?->remoteSupportDiagnose?->status)) }}
                                                     </span>
                                                 </li>
                                             </ul>
@@ -429,12 +429,6 @@
                         @endif
 
                         @if ($remoteSupportJob?->diagnosis?->diagnosis_list && !$remoteSupportJob?->diagnosis?->before_screenshots)
-                            <div class="col-lg-12">
-                                <div class="text-start mb-3">
-                                    <a href="#" class="btn btn-success w-sm waves ripple-light take-action-btn">Take
-                                        Action</a>
-                                </div>
-                            </div>
                             <!-- Action Taken Section -->
                             <div class="col-lg-12">
                                 <div class="card">
@@ -574,7 +568,7 @@
                             </div>
                         @endif
 
-                        @if ($remoteSupportJob?->diagnosis?->status != 'resolved')
+                        @if ($remoteSupportJob?->diagnosis?->before_screenshots && $remoteSupportJob?->diagnosis?->status != 'resolved')
                             <!-- Complete Job Section -->
                             <div class="col-lg-12">
                                 <div class="card">

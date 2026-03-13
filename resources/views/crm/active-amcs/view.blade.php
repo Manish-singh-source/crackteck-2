@@ -143,7 +143,8 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Customer Details Card -->
+                    <!-- Customer Address Details Card -->
+                    @if($amcRequest->amc_type == 'onsite')
                     <div class="card">
                         <div class="card-header border-bottom-dashed">
                             <div class="d-flex justify-content-between align-items-center">
@@ -192,6 +193,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     {{-- Support Tickets Section --}}
                     @if(isset($amcTickets) && $amcTickets->isNotEmpty())
@@ -265,7 +267,8 @@
                     @endif
 
                     {{-- Service Visits History Details --}}
-                    <div class="card">
+                    @if($amcRequest->status == 'active')
+                        <div class="card">
                         <div class="card-header border-bottom-dashed">
                             <div class="d-flex flex-row justify-content-between align-items-center">
                                 <div>
@@ -488,6 +491,8 @@
                             </table>
                         </div>
                     </div>
+                    @endif
+                    
 
                     <!-- Re-Schedule Visit Modal -->
                     <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel"

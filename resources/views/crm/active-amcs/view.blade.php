@@ -144,140 +144,145 @@
                         </div>
                     </div>
                     <!-- Customer Address Details Card -->
-                    @if($amcRequest->amc_type == 'onsite')
-                    <div class="card">
-                        <div class="card-header border-bottom-dashed">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0">Customer Address Details</h5>
+                    @if ($amcRequest->amc_type == 'onsite')
+                        <div class="card">
+                            <div class="card-header border-bottom-dashed">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Customer Address Details</h5>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item border-0 d-flex gap-3">
-                                            <span class="fw-semibold">Branch Name:</span>
-                                            <span>{{ $amcRequest->customerAddress->branch_name ?? 'N/A' }}</span>
-                                        </li>
-                                        <li class="list-group-item border-0 d-flex gap-3">
-                                            <span class="fw-semibold">Address Line 1:</span>
-                                            <span>{{ $amcRequest->customerAddress->address1 ?? 'N/A' }}</span>
-                                        </li>
-                                        <li class="list-group-item border-0 d-flex gap-3">
-                                            <span class="fw-semibold">Address Line 2:</span>
-                                            <span>{{ $amcRequest->customerAddress->address2 ?? 'N/A' }}</span>
-                                        </li>
-                                        <li class="list-group-item border-0 d-flex gap-3">
-                                            <span class="fw-semibold">State:</span>
-                                            <span>{{ $amcRequest->customerAddress->state ?? 'N/A' }}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="col-lg-6">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item border-0 d-flex gap-3">
-                                            <span class="fw-semibold">Country:</span>
-                                            <span>{{ $amcRequest->customerAddress->country ?? 'N/A' }}</span>
-                                        </li>
-                                        <li class="list-group-item border-0 d-flex gap-3">
-                                            <span class="fw-semibold">City:</span>
-                                            <span>{{ $amcRequest->customerAddress->city ?? 'N/A' }}</span>
-                                        </li>
-                                        <li class="list-group-item border-0 d-flex gap-3">
-                                            <span class="fw-semibold">Pin Code:</span>
-                                            <span>{{ $amcRequest->customerAddress->pincode ?? 'N/A' }}</span>
-                                        </li>
-                                    </ul>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item border-0 d-flex gap-3">
+                                                <span class="fw-semibold">Branch Name:</span>
+                                                <span>{{ $amcRequest->customerAddress->branch_name ?? 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex gap-3">
+                                                <span class="fw-semibold">Address Line 1:</span>
+                                                <span>{{ $amcRequest->customerAddress->address1 ?? 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex gap-3">
+                                                <span class="fw-semibold">Address Line 2:</span>
+                                                <span>{{ $amcRequest->customerAddress->address2 ?? 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex gap-3">
+                                                <span class="fw-semibold">State:</span>
+                                                <span>{{ $amcRequest->customerAddress->state ?? 'N/A' }}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item border-0 d-flex gap-3">
+                                                <span class="fw-semibold">Country:</span>
+                                                <span>{{ $amcRequest->customerAddress->country ?? 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex gap-3">
+                                                <span class="fw-semibold">City:</span>
+                                                <span>{{ $amcRequest->customerAddress->city ?? 'N/A' }}</span>
+                                            </li>
+                                            <li class="list-group-item border-0 d-flex gap-3">
+                                                <span class="fw-semibold">Pin Code:</span>
+                                                <span>{{ $amcRequest->customerAddress->pincode ?? 'N/A' }}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     @endif
 
                     {{-- Support Tickets Section --}}
-                    @if(isset($amcTickets) && $amcTickets->isNotEmpty())
-                    <div class="card mt-3">
-                        <div class="card-header border-bottom-dashed">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0">Support Tickets</h5>
+                    @if (isset($amcTickets) && $amcTickets->isNotEmpty())
+                        <div class="card mt-3">
+                            <div class="card-header border-bottom-dashed">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Support Tickets</h5>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-nowrap card-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Ticket No</th>
+                                                <th>Subject</th>
+                                                <th>Priority</th>
+                                                <th>Status</th>
+                                                <th>Date</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($amcTickets as $ticket)
+                                                <tr>
+                                                    <td>{{ $ticket->ticket_no }}</td>
+                                                    <td>{{ $ticket->subject }}</td>
+                                                    <td>
+                                                        @php
+                                                            $priorityClass = match ($ticket->priority) {
+                                                                'high' => 'bg-danger-subtle text-danger',
+                                                                'medium' => 'bg-warning-subtle text-warning',
+                                                                'low' => 'bg-info-subtle text-info',
+                                                                default => 'bg-secondary-subtle text-secondary',
+                                                            };
+                                                        @endphp
+                                                        <span
+                                                            class="badge {{ $priorityClass }}">{{ ucfirst($ticket->priority) }}</span>
+                                                    </td>
+                                                    <td>
+                                                        @php
+                                                            $statusClass = match ($ticket->status) {
+                                                                'pending' => 'bg-danger-subtle text-danger',
+                                                                'in_progress' => 'bg-warning-subtle text-warning',
+                                                                'resolved' => 'bg-success-subtle text-success',
+                                                                default => 'bg-secondary-subtle text-secondary',
+                                                            };
+                                                        @endphp
+                                                        <span
+                                                            class="badge {{ $statusClass }}">{{ ucfirst(str_replace('_', ' ', $ticket->status)) }}</span>
+                                                    </td>
+                                                    <td>{{ $ticket->created_at->format('Y-m-d') }}</td>
+                                                    <td>
+                                                        @if ($ticket->status == 'pending')
+                                                            <button class="btn btn-sm btn-warning"
+                                                                onclick="updateTicketStatus({{ $ticket->id }}, 'in_progress')">
+                                                                <i class="mdi mdi-progress-clock"></i> In Progress
+                                                            </button>
+                                                        @elseif($ticket->status == 'in_progress')
+                                                            <button class="btn btn-sm btn-success"
+                                                                onclick="updateTicketStatus({{ $ticket->id }}, 'resolved')">
+                                                                <i class="mdi mdi-check-circle"></i> Resolve
+                                                            </button>
+                                                        @else
+                                                            <span
+                                                                class="badge bg-success-subtle text-success">Resolved</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-sm table-nowrap card-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Ticket No</th>
-                                            <th>Subject</th>
-                                            <th>Priority</th>
-                                            <th>Status</th>
-                                            <th>Date</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($amcTickets as $ticket)
-                                        <tr>
-                                            <td>{{ $ticket->ticket_no }}</td>
-                                            <td>{{ $ticket->subject }}</td>
-                                            <td>
-                                                @php
-                                                    $priorityClass = match($ticket->priority) {
-                                                        'high' => 'bg-danger-subtle text-danger',
-                                                        'medium' => 'bg-warning-subtle text-warning',
-                                                        'low' => 'bg-info-subtle text-info',
-                                                        default => 'bg-secondary-subtle text-secondary',
-                                                    };
-                                                @endphp
-                                                <span class="badge {{ $priorityClass }}">{{ ucfirst($ticket->priority) }}</span>
-                                            </td>
-                                            <td>
-                                                @php
-                                                    $statusClass = match($ticket->status) {
-                                                        'pending' => 'bg-danger-subtle text-danger',
-                                                        'in_progress' => 'bg-warning-subtle text-warning',
-                                                        'resolved' => 'bg-success-subtle text-success',
-                                                        default => 'bg-secondary-subtle text-secondary',
-                                                    };
-                                                @endphp
-                                                <span class="badge {{ $statusClass }}">{{ ucfirst(str_replace('_', ' ', $ticket->status)) }}</span>
-                                            </td>
-                                            <td>{{ $ticket->created_at->format('Y-m-d') }}</td>
-                                            <td>
-                                                @if($ticket->status == 'pending')
-                                                    <button class="btn btn-sm btn-warning" onclick="updateTicketStatus({{ $ticket->id }}, 'in_progress')">
-                                                        <i class="mdi mdi-progress-clock"></i> In Progress
-                                                    </button>
-                                                @elseif($ticket->status == 'in_progress')
-                                                    <button class="btn btn-sm btn-success" onclick="updateTicketStatus({{ $ticket->id }}, 'resolved')">
-                                                        <i class="mdi mdi-check-circle"></i> Resolve
-                                                    </button>
-                                                @else
-                                                    <span class="badge bg-success-subtle text-success">Resolved</span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
                     @endif
 
                     {{-- Service Visits History Details --}}
-                    @if($amcRequest->status == 'active')
+                    @if ($amcRequest->status == 'active')
                         <div class="card">
-                        <div class="card-header border-bottom-dashed">
-                            <div class="d-flex flex-row justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="card-title flex-grow-1 mb-0">
-                                        Service History Details
-                                    </h5>
-                                </div>
-                                <div class="d-flex flex-row justify-content-between align-items-center gap-2">
-                                    {{-- 
+                            <div class="card-header border-bottom-dashed">
+                                <div class="d-flex flex-row justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="card-title flex-grow-1 mb-0">
+                                            Service History Details
+                                        </h5>
+                                    </div>
+                                    <div class="d-flex flex-row justify-content-between align-items-center gap-2">
+                                        {{-- 
                                     <div>
                                         <span>
                                             Next Visit Date:
@@ -286,213 +291,150 @@
                                             class="p-1 rounded bg-warning-subtle text-warning fw-semibold">{{ $amcRequest->amcScheduleMeetings->first()?->scheduled_at ? \Carbon\Carbon::parse($amcRequest->amcScheduleMeetings->first()->scheduled_at)->format('d M Y') : 'N/A' }}</span>
                                     </div> 
                                     --}}
-                                    <div>
-                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#addVisitModal2">Assign Engineer</button>
-                                        <!-- Modal -->
+                                        <div>
+                                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#addVisitModal2">Assign Engineer</button>
+                                            <!-- Modal -->
 
-                                        <div class="modal fade" id="addVisitModal2" tabindex="-1"
-                                            aria-labelledby="addVisitModalLabel2" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <form id="assignEngineerModalForm">
-                                                        @csrf
+                                            <div class="modal fade" id="addVisitModal2" tabindex="-1"
+                                                aria-labelledby="addVisitModalLabel2" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
 
                                                         <div class="modal-header">
                                                             <h5 class="modal-title" id="addVisitModalLabel2">Assign
-                                                                Engineer</h5>
+                                                                Remote Engineer</h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
                                                         </div>
 
-                                                        <div class="modal-body p-2">
-                                                            <input type="hidden" name="amc_id"
-                                                                value="{{ $amcRequest->id }}">
-                                                            <input type="hidden" name="service_type"
-                                                                value="{{ $amcRequest->service_type }}">
 
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-semibold">Assignment
-                                                                    Type</label>
-                                                                <div>
-                                                                    <div class="form-check form-check-inline">
-                                                                        <input class="form-check-input" type="radio"
-                                                                            name="assignment_type" id="typeIndividualModal"
-                                                                            value="individual" checked>
-                                                                        <label class="form-check-label"
-                                                                            for="typeIndividualModal">Individual</label>
-                                                                    </div>
-                                                                    <div class="form-check form-check-inline">
-                                                                        <input class="form-check-input" type="radio"
-                                                                            name="assignment_type" id="typeGroupModal"
-                                                                            value="group">
-                                                                        <label class="form-check-label"
-                                                                            for="typeGroupModal">Group</label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                                        <div class="modal-body p-3">
+                                                            <form method="POST"
+                                                                action="{{ route('service-request.assign-quick-service-engineer') }}">
+                                                                @csrf
+                                                                <input type="hidden" name="service_request_id"
+                                                                    value="{{ $amcRequest->id }}">
 
-                                                            <!-- Individual Assignment -->
-                                                            <div id="individualSectionModal">
-                                                                <div class="mb-3">
-                                                                    <label for="engineer_id_modal"
-                                                                        class="form-label">Select Engineer</label>
-                                                                    <select name="engineer_id" id="engineer_id_modal"
-                                                                        class="form-select">
-                                                                        <option value="">--Select Engineer--</option>
-                                                                        @foreach ($engineers as $engineer)
-                                                                            <option value="{{ $engineer->id }}">
-                                                                                {{ $engineer->first_name }}
-                                                                                {{ $engineer->last_name }}
-                                                                            </option>
-                                                                        @endforeach
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Group Assignment -->
-                                                            <div id="groupSectionModal" style="display: none;">
-                                                                <div class="mb-3">
-                                                                    <label for="group_name_modal" class="form-label">Group
-                                                                        Name</label>
-                                                                    <input type="text" name="group_name"
-                                                                        id="group_name_modal" class="form-control"
-                                                                        placeholder="Enter Group Name">
-                                                                </div>
-
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Select Engineers</label>
-                                                                    <div class="border rounded p-3"
-                                                                        style="max-height: 300px; overflow-y: auto;">
-                                                                        @foreach ($engineers as $engineer)
-                                                                            <div class="form-check mb-2">
-                                                                                <input
-                                                                                    class="form-check-input engineer-checkbox-modal"
-                                                                                    type="checkbox" name="engineer_ids[]"
-                                                                                    value="{{ $engineer->id }}"
-                                                                                    id="eng_modal_{{ $engineer->id }}">
-                                                                                <label class="form-check-label"
-                                                                                    for="eng_modal_{{ $engineer->id }}">
+                                                                <div id="individualSection">
+                                                                    <div class="mb-3">
+                                                                        <label for="engineer_id" class="form-label">Select
+                                                                            Remote
+                                                                            Engineer</label>
+                                                                        <select name="engineer_id" id="engineer_id"
+                                                                            class="form-select">
+                                                                            <option value="">--Select Remote
+                                                                                Engineer--</option>
+                                                                            @foreach ($remoteEngineers as $engineer)
+                                                                                <option value="{{ $engineer->id }}">
                                                                                     {{ $engineer->first_name }}
                                                                                     {{ $engineer->last_name }}
-                                                                                </label>
-                                                                                <input class="form-check-input ms-3"
-                                                                                    type="radio" name="supervisor_id"
-                                                                                    value="{{ $engineer->id }}"
-                                                                                    id="sup_modal_{{ $engineer->id }}">
-                                                                                <label
-                                                                                    class="form-check-label small text-muted"
-                                                                                    for="sup_modal_{{ $engineer->id }}">
-                                                                                    (Supervisor)
-                                                                                </label>
-                                                                            </div>
-                                                                        @endforeach
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </select>
                                                                     </div>
-                                                                    <small class="text-muted">Check engineers to add to
-                                                                        group, select one as
-                                                                        supervisor</small>
                                                                 </div>
-                                                            </div>
-
+                                                                <div class="d-flex justify-content-end align-item-end">
+                                                                    <button type="submit" class="btn btn-primary">
+                                                                        <i class="mdi mdi-account-plus"></i> Assign
+                                                                        Engineer
+                                                                    </button>
+                                                                </div>
+                                                            </form>
                                                         </div>
-
-                                                        <div class="modal-footer">
-                                                            <button type="submit" class="btn btn-success">Assign</button>
-                                                        </div>
-                                                    </form>
-
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="card-body">
-                            <table class="table table-striped table-borderless dt-responsive nowrap">
-                                <thead>
-                                    <tr>
-                                        <th>Sr. No.</th>
-                                        <th>Engineer Name</th>
-                                        <th>Visit Date</th>
-                                        <th>Issue Type</th>
-                                        <th>Report</th>
-                                        <th>Status</th>
-                                        <th>Action </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                    @foreach ($amcRequest->amcScheduleMeetings as $index => $meeting)
-                                        <tr class="align-middle">
-                                            <td>
-                                                {{ $index + 1 }}
-                                            </td>
-                                            <td>
-                                                {{ $meeting->activeAssignment->engineer->first_name ?? 'N/A' }}
-                                            </td>
-                                            <td>{{ \Carbon\Carbon::parse($meeting->scheduled_at)->format('d M Y') }}</td>
-                                            <td>
-                                                Maintanance
-                                            </td>
-                                            <td>
-                                                @if ($meeting->status == 'completed')
-                                                    <!-- Report Button -->
-                                                    <a href="{{ route('service-request.view-amc-service-request', $meeting->service_request_id) }}"
-                                                        class="btn btn-sm btn-primary">
-                                                        View Report
-                                                    </a>
-                                                @else
-                                                    N/A
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @php
-                                                    $status = [
-                                                        'scheduled' => 'Scheduled',
-                                                        'in_progress' => 'In Progress',
-                                                        'completed' => 'Completed',
-                                                        'missed' => 'missed',
-                                                    ];
-
-                                                    $statusColor = [
-                                                        'scheduled' => 'bg-warning-subtle text-warning',
-                                                        'in_progress' => 'bg-info-subtle text-info',
-                                                        'completed' => 'bg-success-subtle text-success',
-                                                        'missed' => 'bg-danger-subtle text-danger',
-                                                    ];
-
-                                                @endphp
-                                                <span class="badge {{ $statusColor[$meeting->status] }} fw-semibold">
-                                                    {{ $status[$meeting->status] }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                @if ($meeting->status == 'completed' || !$meeting->activeAssignment)
-                                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                                        data-bs-target="#rescheduleModal" disabled>
-                                                        Re-Scheduled
-                                                    </button>
-                                                @else
-                                                    <!-- Re-Scheduled Button -->
-                                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                                        data-bs-target="#rescheduleModal"
-                                                        data-reschedule-id="{{ $meeting->id }}"
-                                                        data-scheduled-time="{{ $meeting->scheduled_at }}">
-                                                        Re-Scheduled
-                                                    </button>
-                                                @endif
-                                            </td>
+                            <div class="card-body">
+                                <table class="table table-striped table-borderless dt-responsive nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>Sr. No.</th>
+                                            <th>Engineer Name</th>
+                                            <th>Visit Date</th>
+                                            <th>Issue Type</th>
+                                            <th>Report</th>
+                                            <th>Status</th>
+                                            <th>Action </th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+
+                                        @foreach ($amcRequest->amcScheduleMeetings as $index => $meeting)
+                                            <tr class="align-middle">
+                                                <td>
+                                                    {{ $index + 1 }}
+                                                </td>
+                                                <td>
+                                                    {{ $meeting->activeAssignment->engineer->first_name ?? 'N/A' }}
+                                                </td>
+                                                <td>{{ \Carbon\Carbon::parse($meeting->scheduled_at)->format('d M Y') }}
+                                                </td>
+                                                <td>
+                                                    Maintanance
+                                                </td>
+                                                <td>
+                                                    @if ($meeting->status == 'completed')
+                                                        <!-- Report Button -->
+                                                        <a href="{{ route('service-request.view-amc-service-request', $meeting->service_request_id) }}"
+                                                            class="btn btn-sm btn-primary">
+                                                            View Report
+                                                        </a>
+                                                    @else
+                                                        N/A
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        $status = [
+                                                            'scheduled' => 'Scheduled',
+                                                            'in_progress' => 'In Progress',
+                                                            'completed' => 'Completed',
+                                                            'missed' => 'missed',
+                                                        ];
+
+                                                        $statusColor = [
+                                                            'scheduled' => 'bg-warning-subtle text-warning',
+                                                            'in_progress' => 'bg-info-subtle text-info',
+                                                            'completed' => 'bg-success-subtle text-success',
+                                                            'missed' => 'bg-danger-subtle text-danger',
+                                                        ];
+
+                                                    @endphp
+                                                    <span class="badge {{ $statusColor[$meeting->status] }} fw-semibold">
+                                                        {{ $status[$meeting->status] }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @if ($meeting->status == 'completed' || !$meeting->activeAssignment)
+                                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                                            data-bs-target="#rescheduleModal" disabled>
+                                                            Re-Scheduled
+                                                        </button>
+                                                    @else
+                                                        <!-- Re-Scheduled Button -->
+                                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                                            data-bs-target="#rescheduleModal"
+                                                            data-reschedule-id="{{ $meeting->id }}"
+                                                            data-scheduled-time="{{ $meeting->scheduled_at }}">
+                                                            Re-Scheduled
+                                                        </button>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
                     @endif
-                    
+
 
                     <!-- Re-Schedule Visit Modal -->
                     <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel"
@@ -1153,26 +1095,28 @@
             }
 
             fetch("{{ route('amcs-request.ticket-status', ['id' => ':ticketId']) }}".replace(':ticketId', ticketId), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ status: status })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert(data.message || 'Error updating status');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error updating ticket status');
-            });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        status: status
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Error updating status');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating ticket status');
+                });
         }
     </script>
 @endsection

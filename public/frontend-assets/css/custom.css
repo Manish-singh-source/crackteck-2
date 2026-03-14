@@ -195,7 +195,7 @@
         display: block;
         height: 100%;
         width: 100% 328px;
-        object-fit: cover;
+        object-fit: contain;
         object-position: center;
         transition-duration: 700ms;
     }
@@ -319,7 +319,7 @@
     .card-product {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 0px;
         padding: 10px 10px;
         background-color: #f6f6f6;
     }

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use GuzzleHttp\Client;
+use RuntimeException;
 
 class FirebaseFcmService
 {
@@ -15,8 +16,20 @@ class FirebaseFcmService
 
     public function __construct()
     {
-        $this->projectId = config('services.firebase.project_id');
-        $this->credentialsPath = config('services.firebase.credentials');
+        $this->projectId = (string) config('services.firebase.project_id');
+        $this->credentialsPath = (string) config('services.firebase.credentials');
+
+        if ($this->projectId === '') {
+            throw new RuntimeException('FIREBASE_PROJECT_ID is not configured.');
+        }
+
+        if ($this->credentialsPath === '') {
+            throw new RuntimeException('FIREBASE_CREDENTIALS is not configured.');
+        }
+
+        if (! file_exists($this->credentialsPath)) {
+            throw new RuntimeException('Firebase credentials file not found at: '.$this->credentialsPath);
+        }
 
         $this->http = new Client([
             'base_uri' => 'https://fcm.googleapis.com/v1/',
@@ -34,8 +47,13 @@ class FirebaseFcmService
         );
 
         $token = $creds->fetchAuthToken();
+        $accessToken = $token['access_token'] ?? '';
 
-        return $token['access_token'] ?? '';
+        if ($accessToken === '') {
+            throw new RuntimeException('Unable to fetch Firebase access token.');
+        }
+
+        return $accessToken;
     }
 
     public function sendToToken(string $token, string $title, string $body, array $data = []): array

@@ -200,7 +200,7 @@ class OrderController extends Controller
                 'line_total' => $total,
                 'variant_details' => null,
                 'custom_options' => null,
-                'item_status' => '0',
+                'item_status' => 'pending',
             ]);
 
             OrderPayment::create([

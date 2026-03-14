@@ -366,3 +366,26 @@ This lets you see logs when messages arrive and when user taps them.[^12][^4]
 ```
 
 3. Ensure the app is in background or foreground on device and check if notification appears.[^2][^4]
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Firebase Storage Path for Production -->
+
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

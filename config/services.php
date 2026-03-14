@@ -45,6 +45,9 @@ return [
     'firebase' => [
         'project_id' => env('FIREBASE_PROJECT_ID'),
         'credentials' => env('FIREBASE_CREDENTIALS'),
+        'storage_bucket' => env('FIREBASE_STORAGE_BUCKET'),
+        'storage_base_url' => env('FIREBASE_STORAGE_BASE_URL'),
+        'upload_disk' => env('FILE_UPLOAD_DISK', 'public'),
     ],
 
     'google' => [

@@ -8,6 +8,7 @@ use App\Models\ServiceRequestProductRequestPart;
 use App\Observers\ServiceRequestObserver;
 use App\Observers\ServiceRequestProductObserver;
 use App\Observers\ServiceRequestProductRequestPartObserver;
+use App\Services\FirebaseStorageService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -19,7 +20,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(FirebaseStorageService::class, function () {
+            return new FirebaseStorageService;
+        });
+
+        $this->app->singleton('firebase.storage', function ($app) {
+            return $app->make(FirebaseStorageService::class);
+        });
     }
 
     /**
@@ -35,8 +42,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return $user->hasRole('Super Admin') ? true : null;
         });
-        //
-        // parent::boot();
 
         Route::middleware('web')
             ->group(base_path('routes/e-commerce.php'));

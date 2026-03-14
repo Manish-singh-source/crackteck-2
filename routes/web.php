@@ -853,32 +853,6 @@ Route::prefix('/demo')->group(function () {
         Route::get('/crm/invoice/service-request/{id}', 'viewServiceRequestInvoice')->name('invoice.service-request');
     });
 
-    // route::get('/warehouse/track-product', [TrackProductController::class, 'index'])->name('track-product.index');
-
-    // *******************************************************************************************************************************************************
-    // *******************************************************************************************************************************************************
-    // ********************************************************************      SDUI ADMIN PANEL       ******************************************************
-    // *******************************************************************************************************************************************************
-    // *******************************************************************************************************************************************************
-
-    Route::prefix('admin/sdui')->middleware(['auth', 'admin'])->name('admin.sdui.')->group(function () {
-
-        // Pages Management (Page-Level SDUI Architecture)
-        Route::resource('pages', SduiPageController::class);
-        Route::get('pages/{id}/restore', [SduiPageController::class, 'restore'])->name('pages.restore');
-        Route::delete('pages/{id}/force-delete', [SduiPageController::class, 'forceDelete'])->name('pages.force-delete');
-        Route::get('pages/{id}/revert/{version}', [SduiPageController::class, 'revert'])->name('pages.revert');
-        Route::get('pages/{id}/versions', [SduiPageController::class, 'versions'])->name('pages.versions');
-        Route::get('pages/{id}/duplicate', [SduiPageController::class, 'duplicate'])->name('pages.duplicate');
-
-        // Settings Management
-        Route::get('settings', [SduiSettingController::class, 'index'])->name('settings.index');
-        Route::put('settings', [SduiSettingController::class, 'update'])->name('settings.update');
-        Route::post('settings', [SduiSettingController::class, 'store'])->name('settings.store');
-        Route::delete('settings/{id}', [SduiSettingController::class, 'destroy'])->name('settings.destroy');
-        Route::get('settings/initialize', [SduiSettingController::class, 'initializeDefaults'])->name('settings.initialize');
-    });
-
     // *******************************************************************************************************************************************************
     // *******************************************************************************************************************************************************
     // ********************************************************************      Customer App Section       **************************************************

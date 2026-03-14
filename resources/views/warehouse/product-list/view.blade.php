@@ -490,14 +490,16 @@
                                 {{-- @php 
                                     $variations = json_decode($product->variation_options, true); 
                                 @endphp --}}
-                                @foreach ($product->variation_options as $key => $attribute)
+                                @foreach ($product?->variation_options as $key => $attribute)
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label class="fw-semibold">{{ $key }}:</label>
                                             <p class="text-muted">
-                                                @foreach ($attribute as $value)
-                                                    {{ $value }},
-                                                @endforeach
+                                                @if (is_array($attribute))
+                                                    @foreach ($attribute as $value)
+                                                        {{ $value }},
+                                                    @endforeach
+                                                @endif
                                             </p>
                                         </div>
                                     </div>
@@ -536,7 +538,7 @@
                                     <div class="mb-3">
                                         <label class="fw-semibold">Cash on Delivery (COD):</label>
                                         <p class="text-muted">
-                                            @if($product->cod == 'yes')
+                                            @if ($product->cod == 'yes')
                                                 <span class="badge bg-success">Yes</span>
                                             @elseif($product->cod == 'no')
                                                 <span class="badge bg-secondary">No</span>
@@ -550,7 +552,7 @@
                                     <div class="mb-3">
                                         <label class="fw-semibold">Installation:</label>
                                         <p class="text-muted">
-                                            @if($product->installation == 'yes')
+                                            @if ($product->installation == 'yes')
                                                 <span class="badge bg-success">Yes</span>
                                             @elseif($product->installation == 'no')
                                                 <span class="badge bg-secondary">No</span>

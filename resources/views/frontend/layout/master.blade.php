@@ -1712,6 +1712,13 @@
             $('#log').modal('show');
         }
 
+        // Check for flash message to open login modal
+        @if(Session::has('open_login_modal'))
+            $(document).ready(function() {
+                showLoginModal();
+            });
+        @endif
+
         // Global function to update cart sidebar
         function updateCartSidebar() {
             $.ajax({

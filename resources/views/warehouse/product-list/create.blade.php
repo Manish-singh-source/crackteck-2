@@ -235,7 +235,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Cost Price',
                                                         'name' => 'cost_price',
-                                                        'type' => 'number',
+                                                        'type' => 'text',
                                                         'placeholder' => 'Enter Cost Price',
                                                     ])
                                                 </div>
@@ -245,7 +245,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Selling Price',
                                                         'name' => 'selling_price',
-                                                        'type' => 'number',
+                                                        'type' => 'text',
                                                         'placeholder' => 'Enter Selling Price',
                                                     ])
                                                 </div>
@@ -255,7 +255,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Discount Price',
                                                         'name' => 'discount_price',
-                                                        'type' => 'number',
+                                                        'type' => 'text',
                                                         'placeholder' => 'Enter Discount Price',
                                                     ])
                                                 </div>
@@ -265,7 +265,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Tax (%)',
                                                         'name' => 'tax',
-                                                        'type' => 'number',
+                                                        'type' => 'text',
                                                         'placeholder' => 'Enter Tax',
                                                     ])
                                                 </div>
@@ -275,7 +275,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Final Price (Calculated)',
                                                         'name' => 'final_price',
-                                                        'type' => 'number',
+                                                        'type' => 'text',
                                                         'placeholder' => 'Auto-calculated',
                                                         'readonly' => true,
                                                     ])
@@ -288,7 +288,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Stock Quantity',
                                                         'name' => 'stock_quantity',
-                                                        'type' => 'number',
+                                                        'type' => 'text',
                                                         'placeholder' => 'Enter Stock Quantity',
                                                     ])
                                                 </div>

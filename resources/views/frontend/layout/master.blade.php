@@ -1708,35 +1708,8 @@
 
         // Global function to show login modal
         function showLoginModal() {
-            // Create and show login modal
-            const modalHtml = `
-                <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="loginModalLabel">Login Required</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body text-center">
-                                <p>Please login to continue.</p>
-                                <div class="d-flex gap-2 justify-content-center">
-                                    <a href="{{ route('ecommerce.login') }}" class="btn btn-primary">Login</a>
-                                    <a href="{{ route('ecommerce.signup') }}" class="btn btn-outline-primary">Sign Up</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            // Remove existing modal if any
-            $('#loginModal').remove();
-
-            // Add modal to body
-            $('body').append(modalHtml);
-
-            // Show modal
-            $('#loginModal').modal('show');
+            // Open the existing login modal from the master layout
+            $('#log').modal('show');
         }
 
         // Global function to update cart sidebar

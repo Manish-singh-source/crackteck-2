@@ -222,22 +222,6 @@
                             </div>
                         </div>
 
-                        <!-- Pagination -->
-                        @if ($deals->hasPages())
-                            <div class="card-footer">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <p class="text-muted mb-0">
-                                            Showing {{ $deals->firstItem() }} to {{ $deals->lastItem() }} of
-                                            {{ $deals->total() }} results
-                                        </p>
-                                    </div>
-                                    <div>
-                                        {{ $deals->links() }}
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
                     </div>
                 </div>
             </div>

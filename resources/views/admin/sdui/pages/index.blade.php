@@ -156,11 +156,6 @@
                                     </tbody>
                                 </table>
                             </div>
-
-                            <!-- Pagination -->
-                            <div class="mt-3">
-                                {{ $pages->links() }}
-                            </div>
                         </div>
                     </div>
                 </div>

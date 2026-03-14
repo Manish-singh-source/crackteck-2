@@ -220,12 +220,6 @@
                                     </table>
                                 </div>
 
-                                <!-- Pagination -->
-                                @if($orders->hasPages())
-                                <div class="d-flex justify-content-end mt-3">
-                                    {{ $orders->appends(request()->query())->links() }}
-                                </div>
-                                @endif
                             </div>
                         </div>
                     </div>

@@ -231,22 +231,6 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- Pagination -->
-                                    @if ($products->hasPages())
-                                        <div class="card-footer">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div class="text-muted">
-                                                    Showing {{ $products->firstItem() }} to {{ $products->lastItem() }} of
-                                                    {{ $products->total() }} results
-                                                </div>
-                                                <div>
-                                                    {{ $products->links() }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endif
-
                                 </div>
 
                             </div>

@@ -526,12 +526,6 @@
                             @endforelse
                         </div>
                     </div>
-                    <!-- Pagination -->
-                    {{-- @if ($products->hasPages())
-                        <div class="tf-pagination-wrap view-more-button">
-                            {{ $products->links() }}
-                        </div>
-                    @endif --}}
                 </div>
             </div>
         </div>
@@ -1034,6 +1028,7 @@
             let customMinPrice = null;
             let customMaxPrice = null;
             let selectedSort = null;
+            let selectedDeal = null;
 
 
             // Category filter change
@@ -1116,18 +1111,46 @@
                 selectedPriceRanges = [];
                 customMinPrice = null;
                 customMaxPrice = null;
+                selectedDeal = null;
 
                 $('.category-filter').prop('checked', false);
                 $('.brand-filter').prop('checked', false);
                 $('.price-range-filter').prop('checked', false);
                 $('#custom-min-price').val('');
                 $('#custom-max-price').val('');
+                $('input[name="deal"]').prop('checked', false);
+
+                applyShopFilters();
+            });
+
+            // Reset filters button (mobile view)
+            $('#reset-filter').on('click', function() {
+                selectedCategories = [];
+                selectedBrands = [];
+                selectedPriceRanges = [];
+                customMinPrice = null;
+                customMaxPrice = null;
+                selectedDeal = null;
+
+                $('.category-filter').prop('checked', false);
+                $('.brand-filter').prop('checked', false);
+                $('.price-range-filter').prop('checked', false);
+                $('#custom-min-price').val('');
+                $('#custom-max-price').val('');
+                $('input[name="deal"]').prop('checked', false);
+                $('#sortBy').val('');
 
                 applyShopFilters();
             });
 
             $('#sortBy').on('change', function() {
                 selectedSort = $(this).val();
+                applyShopFilters();
+            });
+
+            // Deal filter change
+            $('input[name="deal"]').on('change', function() {
+                selectedDeal = $(this).val();
                 applyShopFilters();
             });
 
@@ -1166,22 +1189,36 @@
                     filterParams.sort_by = selectedSort;
                 }
 
+                if (selectedDeal) {
+                    filterParams.deal = selectedDeal;
+                }
+
                 // Make AJAX request
+                console.log('Applying filters with params:', filterParams);
                 $.ajax({
                     url: '{{ route('shop.filter') }}',
                     method: 'GET',
                     data: filterParams,
                     success: function(response) {
+                        console.log('Filter response:', response);
                         if (response.success) {
                             renderProducts(response.products);
                             updateFilterMeta(response.products.length);
                         } else {
-                            showError('Failed to filter products');
+                            console.error('Filter failed:', response.message, response.error);
+                            showError('Failed to filter products: ' + (response.message || ''));
                         }
                     },
                     error: function(xhr) {
                         console.error('Filter error:', xhr);
-                        showError('An error occurred while filtering products');
+                        let errorMsg = 'An error occurred while filtering products';
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            errorMsg += ' - ' + (response.message || response.error || xhr.statusText);
+                        } catch(e) {
+                            errorMsg += ' - ' + xhr.responseText;
+                        }
+                        showError(errorMsg);
                     }
                 });
             }

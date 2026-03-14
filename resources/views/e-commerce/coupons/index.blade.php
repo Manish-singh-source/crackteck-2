@@ -169,18 +169,6 @@
                                                 </table>
                                             </div>
 
-                                            <!-- Pagination -->
-                                            @if ($coupons->hasPages())
-                                                <div class="d-flex justify-content-between align-items-center mt-3 px-3">
-                                                    <div class="text-muted">
-                                                        Showing {{ $coupons->firstItem() }} to {{ $coupons->lastItem() }}
-                                                        of {{ $coupons->total() }} results
-                                                    </div>
-                                                    <div>
-                                                        {{ $coupons->links() }}
-                                                    </div>
-                                                </div>
-                                            @endif
                                         </div>
                                     </div>
                                 </div>

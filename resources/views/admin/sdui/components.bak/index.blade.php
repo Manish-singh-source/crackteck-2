@@ -126,11 +126,6 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        <!-- Pagination -->
-                        <div class="mt-3">
-                            {{ $components->links() }}
-                        </div>
                     </div>
                 </div>
             </div>

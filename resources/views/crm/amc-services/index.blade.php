@@ -122,11 +122,6 @@
                         </tbody>
                     </table>
 
-                    @if ($amcServices->hasPages())
-                        <div class="mt-3">
-                            {{ $amcServices->links() }}
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>

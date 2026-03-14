@@ -266,7 +266,7 @@
         border-radius: 3px;
         overflow: hidden;
         z-index: 20;
-        /* height: 250px; */
+        height: 250px;
     }
 
     .product-thumb-image {

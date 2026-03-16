@@ -60,7 +60,7 @@ class FirebaseStorageService
         $filename = $filename ?: $this->generateFilename($file);
         $objectPath = ltrim(($folder !== '' ? $folder.'/' : '').$filename, '/');
 
-        $stream = fopen($file->getRealPath(), 'r');
+        $stream = fopen($file->getRealPath(), 'rb');
 
         if ($stream === false) {
             throw new RuntimeException('Unable to read uploaded file for Firebase Storage upload.');
@@ -79,7 +79,9 @@ class FirebaseStorageService
 
             $this->bucket->upload($stream, $options);
         } finally {
-            fclose($stream);
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
         }
 
         return $this->publicUrl($objectPath);

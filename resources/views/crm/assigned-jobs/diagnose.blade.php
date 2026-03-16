@@ -324,23 +324,22 @@
                         @endif
 
                         @if ($remoteSupportJob?->diagnosis?->client_connected_via && !$remoteSupportJob?->diagnosis?->diagnosis_list)
-                            <div class="col-lg-12">
-                                <div class="text-start mb-3">
-                                    <a href="#" class="btn btn-success w-sm waves ripple-light">Perform
-                                        Diagnosis</a>
-                                </div>
-                            </div>
-
                             <!-- Diagnosis Section -->
                             <div class="col-lg-12">
                                 <div class="card">
                                     <div class="card-header border-bottom-dashed">
-                                        <div class="row g-4 align-items-center">
+                                        <div class="d-flex align-items-center justify-content-center">
                                             <div class="col-sm">
                                                 <h5 class="card-title mb-0">
                                                     Diagnosis Details
                                                 </h5>
                                             </div>
+                                            @if ($remoteSupportJob?->diagnosis?->status != 'resolved' && $remoteSupportJob?->diagnosis?->status != 'escalated')
+                                                <div class="text-start mb-0">
+                                                    <a href="#"
+                                                        class="btn btn-success w-sm waves ripple-light escalate-section-btn">Escalate</a>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
 
@@ -433,12 +432,18 @@
                             <div class="col-lg-12">
                                 <div class="card">
                                     <div class="card-header border-bottom-dashed">
-                                        <div class="row g-4 align-items-center">
+                                        <div class="d-flex align-items-center justify-content-center">
                                             <div class="col-sm">
                                                 <h5 class="card-title mb-0">
                                                     Action Taken
                                                 </h5>
                                             </div>
+                                            @if ($remoteSupportJob?->diagnosis?->status != 'resolved' && $remoteSupportJob?->diagnosis?->status != 'escalated')
+                                                <div class="text-start mb-0">
+                                                    <a href="#"
+                                                        class="btn btn-success w-sm waves ripple-light escalate-section-btn">Escalate</a>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
 
@@ -553,15 +558,20 @@
                             </div>
                         @endif
 
-                        @if ($remoteSupportJob?->diagnosis?->before_screenshots && $remoteSupportJob?->diagnosis?->status != 'resolved')
+                        @if (
+                            $remoteSupportJob?->diagnosis?->before_screenshots &&
+                                $remoteSupportJob?->diagnosis?->status != 'resolved' &&
+                                $remoteSupportJob?->diagnosis?->status != 'escalated')
                             <div class="col-lg-12">
                                 <div class="d-flex gap-2">
 
                                     <div class="text-start mb-3">
-                                        <a href="#" class="btn btn-success w-sm waves ripple-light">Escalate</a>
+                                        <a href="#"
+                                            class="btn btn-success w-sm waves ripple-light escalate-section-btn">Escalate</a>
                                     </div>
                                     <div class="text-start mb-3">
-                                        <a href="#" class="btn btn-success w-sm waves ripple-light">Complete
+                                        <a href="#"
+                                            class="btn btn-success w-sm waves ripple-light job-complete-section-btn">Complete
                                             Job</a>
                                     </div>
                                 </div>
@@ -570,7 +580,7 @@
 
                         @if ($remoteSupportJob?->diagnosis?->before_screenshots && $remoteSupportJob?->diagnosis?->status != 'resolved')
                             <!-- Complete Job Section -->
-                            <div class="col-lg-12">
+                            <div class="col-lg-12 job-complete-section">
                                 <div class="card">
                                     <div class="card-header border-bottom-dashed">
                                         <div class="row g-4 align-items-center">
@@ -587,7 +597,7 @@
                                             action="{{ route('assigned-jobs.startDiagnose', ['id' => $serviceRequestProduct->id, 'step' => '4', 'remote_support_id' => $remote_support_id]) }}"
                                             enctype="multipart/form-data">
                                             @csrf
-                                            <div class="row g-3">
+                                            <div class="row g-3 mb-3">
                                                 <div class="col-12">
                                                     <label for="time_spent" class="form-label">Time Spent(HH:MM) <span
                                                             class="text-danger">*</span></label>
@@ -660,7 +670,7 @@
                                                     {{ $remoteSupportJob?->diagnosis?->client_feedback }}
                                                 </div>
                                             </div>
-                                            
+
                                         </div>
                                     </div>
                                 </div>
@@ -668,7 +678,7 @@
                         @endif
 
                         <!-- Escalate Section -->
-                        <div class="col-lg-12" style="display: none">
+                        <div class="col-lg-12 escalate-section">
                             <div class="card">
                                 <div class="card-header border-bottom-dashed">
                                     <div class="row g-4 align-items-center">
@@ -681,9 +691,10 @@
                                 </div>
 
                                 <div class="card-body">
-                                    <form id="escalateForm">
+                                    <form method="POST"
+                                        action="{{ route('assigned-jobs.startDiagnose', ['id' => $serviceRequestProduct->id, 'step' => '5', 'remote_support_id' => $remote_support_id]) }}">
                                         @csrf
-                                        <div class="row g-3">
+                                        <div class="row g-3 mb-3">
                                             <div class="col-12">
                                                 <label class="form-label">Reason For Escalation <span
                                                         class="text-danger">*</span></label>
@@ -704,18 +715,16 @@
                                                     placeholder="Enter escalation reason and notes..."></textarea>
                                             </div>
                                         </div>
+
+                                        <div class="row g-3">
+                                            <div class="text-start mb-3">
+                                                <button type="submit"
+                                                    class="btn btn-success w-sm waves ripple-light">Escalate
+                                                    Product</button>
+                                            </div>
+                                        </div>
                                     </form>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-12" style="display: none">
-                            <div class="text-start mb-3">
-                                <button type="button"
-                                    class="btn btn-success w-sm waves ripple-light escalate-submit-btn">Submit</button>
-                                <button type="button"
-                                    class="btn btn-secondary w-sm waves ripple-light escalate-auto-submit-btn ms-2">Auto
-                                    Submit</button>
                             </div>
                         </div>
                     </div>
@@ -724,5 +733,25 @@
         </div>
     </div>
 
+    <script>
+        $(document).ready(function() {
+
+            $(".job-complete-section").hide();
+            $(".job-complete-section-btn").on("click", function(e) {
+                e.preventDefault();
+
+                $(".escalate-section").hide();
+                $(".job-complete-section").show();
+            });
+
+            $(".escalate-section").hide();
+            $(".escalate-section-btn").on("click", function(e) {
+                e.preventDefault();
+
+                $(".job-complete-section").hide();
+                $(".escalate-section").show();
+            });
+        });
+    </script>
 
 @endsection

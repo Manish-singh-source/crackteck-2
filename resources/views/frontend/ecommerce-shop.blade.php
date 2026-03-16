@@ -297,7 +297,7 @@
                                 </li>
                             </ul>
 
-                            <div class=" type-sort-by">
+                            <div class="type-sort-by">
                                 <select id="sortBy" class="form-select">
                                     <option value="">Sort by</option>
                                     <option value="a-z">Alphabetically, A-Z</option>
@@ -1201,23 +1201,27 @@
                     data: filterParams,
                     success: function(response) {
                         console.log('Filter response:', response);
+
                         if (response.success) {
                             renderProducts(response.products);
                             updateFilterMeta(response.products.length);
                         } else {
                             console.error('Filter failed:', response.message, response.error);
-                            showError('Failed to filter products: ' + (response.message || ''));
+                            showError('Failed to filter products: ' + (response.error || response
+                                .message || 'Unknown error'));
                         }
                     },
                     error: function(xhr) {
                         console.error('Filter error:', xhr);
+
                         let errorMsg = 'An error occurred while filtering products';
                         try {
-                            const response = JSON.parse(xhr.responseText);
-                            errorMsg += ' - ' + (response.message || response.error || xhr.statusText);
-                        } catch(e) {
-                            errorMsg += ' - ' + xhr.responseText;
+                            const response = xhr.responseJSON || JSON.parse(xhr.responseText);
+                            errorMsg += ' - ' + (response.error || response.message || xhr.statusText);
+                        } catch (e) {
+                            errorMsg += ' - ' + xhr.statusText;
                         }
+
                         showError(errorMsg);
                     }
                 });
@@ -1302,8 +1306,8 @@
                             </p>
 
                             ${shortDescription ? `<div class="product-description">
-                                                                                <p class="caption">${shortDescription}</p>
-                                                                            </div>` : ''}
+                                                                                    <p class="caption">${shortDescription}</p>
+                                                                                </div>` : ''}
                             <div class="box-infor-detail">
                                 <div class="star-review flex-wrap">
                                     <ul class="list-star">

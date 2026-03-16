@@ -279,38 +279,275 @@ class FrontendEcommerceController extends Controller
     /**
      * Filter products based on multiple criteria
      */
+    // public function filterProducts(Request $request)
+    // {
+    //     try {
+    //         // Start with base query
+    //         $query = EcommerceProduct::with([
+    //             'warehouseProduct.brand',
+    //             'warehouseProduct.parentCategorie',
+    //             'warehouseProduct.subCategorie',
+    //         ])->active();
+
+    //         // Filter by categories (multiple selection)
+    //         if ($request->has('categories') && !empty($request->categories)) {
+    //             $categoryIds = is_array($request->categories) ? $request->categories : [$request->categories];
+    //             // Cast to integers to ensure proper comparison
+    //             $categoryIds = array_map('intval', $categoryIds);
+    //             $query->whereHas('warehouseProduct', function ($q) use ($categoryIds) {
+    //                 $q->whereIn('parent_category_id', $categoryIds);
+    //             });
+    //         }
+
+    //         // Filter by brands (multiple selection)
+    //         if ($request->has('brands') && !empty($request->brands)) {
+    //             $brandIds = is_array($request->brands) ? $request->brands : [$request->brands];
+    //             // Cast to integers to ensure proper comparison
+    //             $brandIds = array_map('intval', $brandIds);
+    //             $query->whereHas('warehouseProduct', function ($q) use ($brandIds) {
+    //                 $q->whereIn('brand_id', $brandIds);
+    //             });
+    //         }
+
+    //         // Filter by price range (predefined ranges)
+    //         if ($request->has('price_range') && !empty($request->price_range)) {
+    //             $priceRanges = is_array($request->price_range) ? $request->price_range : [$request->price_range];
+
+    //             $query->where(function ($q) use ($priceRanges) {
+    //                 foreach ($priceRanges as $range) {
+    //                     switch ($range) {
+    //                         case 'under_10000':
+    //                             $q->orWhereHas('warehouseProduct', function ($wq) {
+    //                                 $wq->where(function ($pq) {
+    //                                     $pq->where('final_price', '>', 0)
+    //                                         ->where('final_price', '<', 10000);
+    //                                 })->orWhere(function ($pq) {
+    //                                     $pq->where(function ($dpq) {
+    //                                         $dpq->whereNull('final_price')
+    //                                             ->orWhere('final_price', '<=', 0);
+    //                                     })->where('selling_price', '<', 10000);
+    //                                 });
+    //                             });
+    //                             break;
+    //                         case '10000_15000':
+    //                             $q->orWhereHas('warehouseProduct', function ($wq) {
+    //                                 $wq->where(function ($pq) {
+    //                                     $pq->where('final_price', '>', 0)
+    //                                         ->whereBetween('final_price', [10000, 15000]);
+    //                                 })->orWhere(function ($pq) {
+    //                                     $pq->where(function ($dpq) {
+    //                                         $dpq->whereNull('final_price')
+    //                                             ->orWhere('final_price', '<=', 0);
+    //                                     })->whereBetween('selling_price', [10000, 15000]);
+    //                                 });
+    //                             });
+    //                             break;
+    //                         case '15000_25000':
+    //                             $q->orWhereHas('warehouseProduct', function ($wq) {
+    //                                 $wq->where(function ($pq) {
+    //                                     $pq->where('final_price', '>', 0)
+    //                                         ->whereBetween('final_price', [15000, 25000]);
+    //                                 })->orWhere(function ($pq) {
+    //                                     $pq->where(function ($dpq) {
+    //                                         $dpq->whereNull('final_price')
+    //                                             ->orWhere('final_price', '<=', 0);
+    //                                     })->whereBetween('selling_price', [15000, 25000]);
+    //                                 });
+    //                             });
+    //                             break;
+    //                         case 'above_35000':
+    //                             $q->orWhereHas('warehouseProduct', function ($wq) {
+    //                                 $wq->where(function ($pq) {
+    //                                     $pq->where('final_price', '>', 0)
+    //                                         ->where('final_price', '>=', 35000);
+    //                                 })->orWhere(function ($pq) {
+    //                                     $pq->where(function ($dpq) {
+    //                                         $dpq->whereNull('final_price')
+    //                                             ->orWhere('final_price', '<=', 0);
+    //                                     })->where('selling_price', '>=', 35000);
+    //                                 });
+    //                             });
+    //                             break;
+    //                     }
+    //                 }
+    //             });
+    //         }
+
+    //         // Filter by custom price range
+    //         if ($request->has('min_price') || $request->has('max_price')) {
+    //             $minPrice = $request->min_price ?? 0;
+    //             $maxPrice = $request->max_price ?? PHP_INT_MAX;
+
+    //             $query->whereHas('warehouseProduct', function ($q) use ($minPrice, $maxPrice) {
+    //                 $q->where(function ($pq) use ($minPrice, $maxPrice) {
+    //                     $pq->where(function ($dpq) use ($minPrice, $maxPrice) {
+    //                         $dpq->where('final_price', '>', 0)
+    //                             ->whereBetween('final_price', [$minPrice, $maxPrice]);
+    //                     })
+    //                         ->orWhere(function ($spq) use ($minPrice, $maxPrice) {
+    //                             $spq->where(function ($nullCheck) {
+    //                                 $nullCheck->whereNull('final_price')
+    //                                     ->orWhere('final_price', '<=', 0);
+    //                             })->whereBetween('selling_price', [$minPrice, $maxPrice]);
+    //                         });
+    //                 });
+    //             });
+    //         }
+
+    //         // Filter by deals (Today's Deals)
+    //         if ($request->has('deal') && !empty($request->deal)) {
+    //             $deal = $request->deal;
+    //             if ($deal === 'dealToday') {
+    //                 $query->where('is_todays_deal', true);
+    //             }
+    //         }
+
+    //         // Apply sorting using subquery to avoid join issues
+    //         $sort = $request->input('sort_by', '');
+
+    //         if (!empty($sort)) {
+    //             // Use a subquery approach for sorting to avoid eager loading issues
+    //             $query->select('ecommerce_products.*');
+
+    //             switch ($sort) {
+    //                 case 'a-z':
+    //                     $query->join('products as p', 'ecommerce_products.product_id', '=', 'p.id')
+    //                           ->orderBy('p.product_name', 'asc');
+    //                     break;
+    //                 case 'z-a':
+    //                     $query->join('products as p', 'ecommerce_products.product_id', '=', 'p.id')
+    //                           ->orderBy('p.product_name', 'desc');
+    //                     break;
+    //                 case 'price-low-high':
+    //                     $query->join('products as p', 'ecommerce_products.product_id', '=', 'p.id')
+    //                           ->orderByRaw('COALESCE(p.final_price, p.selling_price, 0) ASC');
+    //                     break;
+    //                 case 'price-high-low':
+    //                     $query->join('products as p', 'ecommerce_products.product_id', '=', 'p.id')
+    //                           ->orderByRaw('COALESCE(p.final_price, p.selling_price, 0) DESC');
+    //                     break;
+    //                 default:
+    //                     $query->orderBy('ecommerce_products.created_at', 'desc');
+    //                     break;
+    //             }
+    //         } else {
+    //             // Default ordering
+    //             $query->orderBy('ecommerce_products.created_at', 'desc');
+    //         }
+
+    //         // Get filtered products
+    //         $products = $query->paginate(12);
+
+    //         // Format products for response
+    //         $formattedProducts = $products->map(function ($product) {
+    //             try {
+    //                 $warehouseProduct = $product->warehouseProduct;
+    //                 $brand = null;
+    //                 $parentCategory = null;
+
+    //                 if ($warehouseProduct) {
+    //                     $brand = $warehouseProduct->brand;
+    //                     $parentCategory = $warehouseProduct->parentCategorie;
+    //                 }
+
+    //                 return [
+    //                     'id' => $product->id,
+    //                     'name' => $warehouseProduct->product_name ?? '',
+    //                     'sku' => $warehouseProduct->sku ?? '',
+    //                     'brand' => $brand ? $brand->brand_title : '',
+    //                     'brand_id' => $warehouseProduct->brand_id ?? null,
+    //                     'category' => $parentCategory ? $parentCategory->parent_categories : '',
+    //                     'category_id' => $warehouseProduct->parent_category_id ?? null,
+    //                     'selling_price' => $warehouseProduct->selling_price ?? 0,
+    //                     'discount_price' => $warehouseProduct->discount_price ?? 0,
+    //                     'final_price' => $warehouseProduct->final_price ?? 0,
+    //                     'main_image' => $warehouseProduct->main_product_image ?? '',
+    //                     'stock_status' => $warehouseProduct->stock_status ?? 'Out of Stock',
+    //                     'is_featured' => $product->is_featured,
+    //                     'is_best_seller' => $product->is_best_seller,
+    //                     'is_todays_deal' => $product->is_todays_deal,
+    //                     'url' => route('product.detail', $product->id),
+    //                     'short_description' => $warehouseProduct->short_description ?? '',
+    //                     'total_sold' => $product->total_sold ?? 0,
+    //                 ];
+    //             } catch (\Exception $e) {
+    //                 return [
+    //                     'id' => $product->id,
+    //                     'name' => '',
+    //                     'sku' => '',
+    //                     'brand' => '',
+    //                     'brand_id' => null,
+    //                     'category' => '',
+    //                     'category_id' => null,
+    //                     'selling_price' => 0,
+    //                     'discount_price' => 0,
+    //                     'final_price' => 0,
+    //                     'main_image' => '',
+    //                     'stock_status' => 'Unknown',
+    //                     'is_featured' => false,
+    //                     'is_best_seller' => false,
+    //                     'is_todays_deal' => false,
+    //                     'url' => route('product.detail', $product->id),
+    //                     'short_description' => '',
+    //                     'total_sold' => 0,
+    //                 ];
+    //             }
+    //         });
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'products' => $formattedProducts,
+    //             'pagination' => [
+    //                 'total' => $products->total(),
+    //                 'per_page' => $products->perPage(),
+    //                 'current_page' => $products->currentPage(),
+    //                 'last_page' => $products->lastPage(),
+    //                 'from' => $products->firstItem(),
+    //                 'to' => $products->lastItem(),
+    //             ],
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         \Illuminate\Support\Facades\Log::error('Filter products error: ' . $e->getMessage());
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to filter products',
+    //             'error' => $e->getMessage(),
+    //             'line' => $e->getLine(),
+    //         ], 500);
+    //     }
+    // }
+
     public function filterProducts(Request $request)
     {
         try {
-            // Start with base query
             $query = EcommerceProduct::with([
                 'warehouseProduct.brand',
                 'warehouseProduct.parentCategorie',
                 'warehouseProduct.subCategorie',
             ])->active();
 
-            // Filter by categories (multiple selection)
-            if ($request->has('categories') && !empty($request->categories)) {
+            // Filter by categories
+            if ($request->filled('categories')) {
                 $categoryIds = is_array($request->categories) ? $request->categories : [$request->categories];
-                // Cast to integers to ensure proper comparison
                 $categoryIds = array_map('intval', $categoryIds);
+
                 $query->whereHas('warehouseProduct', function ($q) use ($categoryIds) {
                     $q->whereIn('parent_category_id', $categoryIds);
                 });
             }
 
-            // Filter by brands (multiple selection)
-            if ($request->has('brands') && !empty($request->brands)) {
+            // Filter by brands
+            if ($request->filled('brands')) {
                 $brandIds = is_array($request->brands) ? $request->brands : [$request->brands];
-                // Cast to integers to ensure proper comparison
                 $brandIds = array_map('intval', $brandIds);
+
                 $query->whereHas('warehouseProduct', function ($q) use ($brandIds) {
                     $q->whereIn('brand_id', $brandIds);
                 });
             }
 
-            // Filter by price range (predefined ranges)
-            if ($request->has('price_range') && !empty($request->price_range)) {
+            // Filter by predefined price ranges
+            if ($request->filled('price_range')) {
                 $priceRanges = is_array($request->price_range) ? $request->price_range : [$request->price_range];
 
                 $query->where(function ($q) use ($priceRanges) {
@@ -329,6 +566,7 @@ class FrontendEcommerceController extends Controller
                                     });
                                 });
                                 break;
+
                             case '10000_15000':
                                 $q->orWhereHas('warehouseProduct', function ($wq) {
                                     $wq->where(function ($pq) {
@@ -342,6 +580,7 @@ class FrontendEcommerceController extends Controller
                                     });
                                 });
                                 break;
+
                             case '15000_25000':
                                 $q->orWhereHas('warehouseProduct', function ($wq) {
                                     $wq->where(function ($pq) {
@@ -355,6 +594,7 @@ class FrontendEcommerceController extends Controller
                                     });
                                 });
                                 break;
+
                             case 'above_35000':
                                 $q->orWhereHas('warehouseProduct', function ($wq) {
                                     $wq->where(function ($pq) {
@@ -373,130 +613,119 @@ class FrontendEcommerceController extends Controller
                 });
             }
 
-            // Filter by custom price range
-            if ($request->has('min_price') || $request->has('max_price')) {
-                $minPrice = $request->min_price ?? 0;
-                $maxPrice = $request->max_price ?? PHP_INT_MAX;
+            // Filter by custom min/max price
+            if ($request->filled('min_price') || $request->filled('max_price')) {
+                $minPrice = is_numeric($request->min_price) ? (float) $request->min_price : 0;
+                $maxPrice = is_numeric($request->max_price) ? (float) $request->max_price : PHP_INT_MAX;
 
                 $query->whereHas('warehouseProduct', function ($q) use ($minPrice, $maxPrice) {
                     $q->where(function ($pq) use ($minPrice, $maxPrice) {
                         $pq->where(function ($dpq) use ($minPrice, $maxPrice) {
                             $dpq->where('final_price', '>', 0)
                                 ->whereBetween('final_price', [$minPrice, $maxPrice]);
-                        })
-                            ->orWhere(function ($spq) use ($minPrice, $maxPrice) {
-                                $spq->where(function ($nullCheck) {
-                                    $nullCheck->whereNull('final_price')
-                                        ->orWhere('final_price', '<=', 0);
-                                })->whereBetween('selling_price', [$minPrice, $maxPrice]);
-                            });
+                        })->orWhere(function ($spq) use ($minPrice, $maxPrice) {
+                            $spq->where(function ($nullCheck) {
+                                $nullCheck->whereNull('final_price')
+                                    ->orWhere('final_price', '<=', 0);
+                            })->whereBetween('selling_price', [$minPrice, $maxPrice]);
+                        });
                     });
                 });
             }
 
-            // Filter by deals (Today's Deals)
-            if ($request->has('deal') && !empty($request->deal)) {
-                $deal = $request->deal;
-                if ($deal === 'dealToday') {
-                    $query->where('is_todays_deal', true);
-                }
+            // Today's Deal filter
+            if ($request->filled('deal') && $request->deal === 'dealToday') {
+                $query->where('is_todays_deal', true);
             }
 
-            // Apply sorting using subquery to avoid join issues
+            /*
+        |--------------------------------------------------------------------------
+        | Sorting
+        |--------------------------------------------------------------------------
+        | Join mat use karo, because pagination + eager loading + duplicate rows
+        | ki wajah se issue aata hai.
+        | Subquery based sorting use kar rahe hain.
+        */
             $sort = $request->input('sort_by', '');
-            
-            if (!empty($sort)) {
-                // Use a subquery approach for sorting to avoid eager loading issues
-                $query->select('ecommerce_products.*');
-                
-                switch ($sort) {
-                    case 'a-z':
-                        $query->join('products as p', 'ecommerce_products.product_id', '=', 'p.id')
-                              ->orderBy('p.product_name', 'asc');
-                        break;
-                    case 'z-a':
-                        $query->join('products as p', 'ecommerce_products.product_id', '=', 'p.id')
-                              ->orderBy('p.product_name', 'desc');
-                        break;
-                    case 'price-low-high':
-                        $query->join('products as p', 'ecommerce_products.product_id', '=', 'p.id')
-                              ->orderByRaw('COALESCE(p.final_price, p.selling_price, 0) ASC');
-                        break;
-                    case 'price-high-low':
-                        $query->join('products as p', 'ecommerce_products.product_id', '=', 'p.id')
-                              ->orderByRaw('COALESCE(p.final_price, p.selling_price, 0) DESC');
-                        break;
-                    default:
-                        $query->orderBy('ecommerce_products.created_at', 'desc');
-                        break;
-                }
-            } else {
-                // Default ordering
-                $query->orderBy('ecommerce_products.created_at', 'desc');
+
+            switch ($sort) {
+                case 'a-z':
+                    $query->orderBy(
+                        Product::select('product_name')
+                            ->whereColumn('products.id', 'ecommerce_products.product_id')
+                            ->limit(1),
+                        'asc'
+                    );
+                    break;
+
+                case 'z-a':
+                    $query->orderBy(
+                        Product::select('product_name')
+                            ->whereColumn('products.id', 'ecommerce_products.product_id')
+                            ->limit(1),
+                        'desc'
+                    );
+                    break;
+
+                case 'price-low-high':
+                    $query->orderByRaw("
+                    COALESCE(
+                        NULLIF((SELECT final_price FROM products WHERE products.id = ecommerce_products.product_id LIMIT 1), 0),
+                        (SELECT selling_price FROM products WHERE products.id = ecommerce_products.product_id LIMIT 1),
+                        0
+                    ) ASC
+                ");
+                    break;
+
+                case 'price-high-low':
+                    $query->orderByRaw("
+                    COALESCE(
+                        NULLIF((SELECT final_price FROM products WHERE products.id = ecommerce_products.product_id LIMIT 1), 0),
+                        (SELECT selling_price FROM products WHERE products.id = ecommerce_products.product_id LIMIT 1),
+                        0
+                    ) DESC
+                ");
+                    break;
+
+                default:
+                    $query->orderBy('ecommerce_products.created_at', 'desc');
+                    break;
             }
 
-            // Get filtered products
+            // Paginate
             $products = $query->paginate(12);
 
-            // Format products for response
-            $formattedProducts = $products->map(function ($product) {
-                try {
-                    $warehouseProduct = $product->warehouseProduct;
-                    $brand = null;
-                    $parentCategory = null;
-                    
-                    if ($warehouseProduct) {
-                        $brand = $warehouseProduct->brand;
-                        $parentCategory = $warehouseProduct->parentCategorie;
-                    }
-                    
-                    return [
-                        'id' => $product->id,
-                        'name' => $warehouseProduct->product_name ?? '',
-                        'sku' => $warehouseProduct->sku ?? '',
-                        'brand' => $brand ? $brand->brand_title : '',
-                        'brand_id' => $warehouseProduct->brand_id ?? null,
-                        'category' => $parentCategory ? $parentCategory->parent_categories : '',
-                        'category_id' => $warehouseProduct->parent_category_id ?? null,
-                        'selling_price' => $warehouseProduct->selling_price ?? 0,
-                        'discount_price' => $warehouseProduct->discount_price ?? 0,
-                        'final_price' => $warehouseProduct->final_price ?? 0,
-                        'main_image' => $warehouseProduct->main_product_image ?? '',
-                        'stock_status' => $warehouseProduct->stock_status ?? 'Out of Stock',
-                        'is_featured' => $product->is_featured,
-                        'is_best_seller' => $product->is_best_seller,
-                        'is_todays_deal' => $product->is_todays_deal,
-                        'url' => route('product.detail', $product->id),
-                        'short_description' => $warehouseProduct->short_description ?? '',
-                        'total_sold' => $product->total_sold ?? 0,
-                    ];
-                } catch (\Exception $e) {
-                    return [
-                        'id' => $product->id,
-                        'name' => '',
-                        'sku' => '',
-                        'brand' => '',
-                        'brand_id' => null,
-                        'category' => '',
-                        'category_id' => null,
-                        'selling_price' => 0,
-                        'discount_price' => 0,
-                        'final_price' => 0,
-                        'main_image' => '',
-                        'stock_status' => 'Unknown',
-                        'is_featured' => false,
-                        'is_best_seller' => false,
-                        'is_todays_deal' => false,
-                        'url' => route('product.detail', $product->id),
-                        'short_description' => '',
-                        'total_sold' => 0,
-                    ];
-                }
+            // Format products
+            $formattedProducts = $products->getCollection()->map(function ($product) {
+                $warehouseProduct = $product->warehouseProduct;
+                $brand = $warehouseProduct?->brand;
+                $parentCategory = $warehouseProduct?->parentCategorie;
+
+                return [
+                    'id' => $product->id,
+                    'name' => $warehouseProduct->product_name ?? '',
+                    'sku' => $warehouseProduct->sku ?? '',
+                    'brand' => $brand->brand_title ?? '',
+                    'brand_id' => $warehouseProduct->brand_id ?? null,
+                    'category' => $parentCategory->parent_categories ?? '',
+                    'category_id' => $warehouseProduct->parent_category_id ?? null,
+                    'selling_price' => $warehouseProduct->selling_price ?? 0,
+                    'discount_price' => $warehouseProduct->discount_price ?? 0,
+                    'final_price' => $warehouseProduct->final_price ?? 0,
+                    'main_image' => $warehouseProduct->main_product_image ?? '',
+                    'stock_status' => $warehouseProduct->stock_status ?? 'Out of Stock',
+                    'is_featured' => $product->is_featured ?? false,
+                    'is_best_seller' => $product->is_best_seller ?? false,
+                    'is_todays_deal' => $product->is_todays_deal ?? false,
+                    'url' => route('product.detail', $product->id),
+                    'short_description' => $warehouseProduct->short_description ?? '',
+                    'total_sold' => $product->total_sold ?? 0,
+                ];
             });
 
             return response()->json([
                 'success' => true,
-                'products' => $formattedProducts,
+                'products' => $formattedProducts->values(),
                 'pagination' => [
                     'total' => $products->total(),
                     'per_page' => $products->perPage(),
@@ -507,7 +736,11 @@ class FrontendEcommerceController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Filter products error: ' . $e->getMessage());
+            Log::error('Filter products error: ' . $e->getMessage(), [
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to filter products',
@@ -517,4 +750,3 @@ class FrontendEcommerceController extends Controller
         }
     }
 }
-

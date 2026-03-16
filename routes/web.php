@@ -621,8 +621,8 @@ Route::prefix('/demo')->group(function () {
         Route::delete('/crm/service-request/destroy-service-request/{id}', 'destroyQuickServiceRequest')->name('service-request.destroy-quick-service-request');
 
         //
+        Route::post('/crm/service-request/assign-quick-service-remote-engineer', 'assignQuickServiceRemoteEngineer')->name('service-request.assign-quick-service-remote-engineer');
         Route::post('/crm/service-request/assign-quick-service-engineer', 'assignQuickServiceEngineer')->name('service-request.assign-quick-service-engineer');
-        // Route::post('/crm/service-request/assign-quick-service-engineer', 'assignQuickServiceEngineer')->name('service-request.assign-quick-service-engineer');
         Route::post('/crm/service-request/assign-non-amc-engineer', 'assignNonAmcEngineer')->name('service-request.assign-non-amc-engineer');      // / need to check
 
         // Assign Pickup for Quick Service Request

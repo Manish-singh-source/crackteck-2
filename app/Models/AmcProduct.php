@@ -64,4 +64,8 @@ class AmcProduct extends Model
     {
         return $this->belongsTo(Amc::class, 'amc_id');
     }
+
+    public function productType() {
+        return $this->belongsTo(DeviceSpecificDiagnosis::class, 'type');
+    }
 }

@@ -282,15 +282,6 @@
                                         </h5>
                                     </div>
                                     <div class="d-flex flex-row justify-content-between align-items-center gap-2">
-                                        {{-- 
-                                    <div>
-                                        <span>
-                                            Next Visit Date:
-                                        </span>
-                                        <span
-                                            class="p-1 rounded bg-warning-subtle text-warning fw-semibold">{{ $amcRequest->amcScheduleMeetings->first()?->scheduled_at ? \Carbon\Carbon::parse($amcRequest->amcScheduleMeetings->first()->scheduled_at)->format('d M Y') : 'N/A' }}</span>
-                                    </div> 
-                                    --}}
                                         <div>
                                             <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
                                                 data-bs-target="#addVisitModal2">Assign Engineer</button>
@@ -311,10 +302,11 @@
 
                                                         <div class="modal-body p-3">
                                                             <form method="POST"
-                                                                action="{{ route('service-request.assign-quick-service-engineer') }}">
+                                                                action="{{ route('service-request.assign-quick-service-remote-engineer') }}">
                                                                 @csrf
                                                                 <input type="hidden" name="service_request_id"
                                                                     value="{{ $amcRequest->id }}">
+                                                                <input type="hidden" name="request_type" value="amc">
 
                                                                 <div id="individualSection">
                                                                     <div class="mb-3">
@@ -357,7 +349,8 @@
                                         <tr>
                                             <th>Sr. No.</th>
                                             <th>Engineer Name</th>
-                                            <th>Visit Date</th>
+                                            <th>Service Type</th>
+                                            <th>Visit/Remote Support Date</th>
                                             <th>Issue Type</th>
                                             <th>Report</th>
                                             <th>Status</th>
@@ -372,7 +365,18 @@
                                                     {{ $index + 1 }}
                                                 </td>
                                                 <td>
-                                                    {{ $meeting->activeAssignment->engineer->first_name ?? 'N/A' }}
+                                                    @if (empty($meeting->activeAssignment))
+                                                        {{ $meeting->remoteSupportJob->engineer->first_name ?? 'N/A' }}
+                                                    @else
+                                                        {{ $meeting->activeAssignment->engineer->first_name ?? 'N/A' }}
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if (empty($meeting->activeAssignment))
+                                                        Remote
+                                                    @else
+                                                        Onsite
+                                                    @endif
                                                 </td>
                                                 <td>{{ \Carbon\Carbon::parse($meeting->scheduled_at)->format('d M Y') }}
                                                 </td>
@@ -493,7 +497,7 @@
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $product->name }}</td>
-                                                <td>{{ $product->type ?? '-' }}</td>
+                                                <td>{{ $product->productType?->device_type ?? '-' }}</td>
                                                 <td>{{ $product->model_no ?? '-' }}</td>
                                                 <td>{{ $product->hsn ?? '-' }}</td>
                                                 <td>{{ $product->brand ?? '-' }}</td>

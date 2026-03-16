@@ -56,15 +56,15 @@
                                                                         {{ $job->serviceRequest->request_id }}
                                                                     </td>
                                                                     <td>
-                                                                        {{ $job->serviceRequest->service_type }}
+                                                                        {{ ucwords(str_replace('_', ' ', $job->serviceRequest->service_type)) }}
                                                                     </td>
                                                                     <td>{{ $job->engineer->first_name }}
                                                                         {{ $job->engineer->last_name }}</td>
                                                                     <td>{{ $job->serviceRequest->customer->first_name }}
                                                                         {{ $job->serviceRequest->customer->last_name }}</td>
-                                                                    <td>{{ $job->assigned_at }}</td>
+                                                                    <td>{{ \App\Helpers\DateFormat::formatDateTime($job->assigned_at) }}</td>
                                                                     <td>
-                                                                        {{ $job->status }}
+                                                                        {{ ucwords(str_replace('_', ' ', $job->status)) }}
                                                                     </td>
                                                                     <td>
                                                                         <a class="btn btn-sm btn-primary"

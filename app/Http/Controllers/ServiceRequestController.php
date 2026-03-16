@@ -42,7 +42,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Activitylog\Models\Activity;
 
-class ServiceRequestController extends Controller  
+class ServiceRequestController extends Controller
 {
     public function generateServiceId()
     {
@@ -1126,7 +1126,7 @@ class ServiceRequestController extends Controller
                     'is_engineer_assigned' => 'not_assigned',
                     'status' => 'active',
                     'amc_status' => 'active',
-                    'amc_plan_id' => $request->amc_plan_id,
+                    'amc_plan_id' => $request->amc_plan_id, 
                 ]);
             }
 
@@ -1220,7 +1220,9 @@ class ServiceRequestController extends Controller
             // 'inactiveAssignments.groupEngineers',
             'inactiveAssignments.transferredTo',
             'amcScheduleMeetings.activeAssignment.engineer',
+            'amcScheduleMeetings.remoteSupportJob.engineer',
         ])->findOrFail($id);
+        // dd($request);
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
 
         return view('crm/service-request/view-amc-service-request', compact('request', 'engineers'));
@@ -1236,7 +1238,6 @@ class ServiceRequestController extends Controller
                 'products',
                 'parentCategorie',
             ])->findOrFail($id);
-            // dd($request);
 
             $service_type = $service_type;
 
@@ -2218,6 +2219,7 @@ class ServiceRequestController extends Controller
             'remoteSupportJob.engineer',
         ])->findOrFail($id);
 
+        // dd($request);
 
         $logs = Activity::where('subject_type', ServiceRequest::class)
             ->where('subject_id', $id)
@@ -2767,7 +2769,7 @@ class ServiceRequestController extends Controller
         }
     }
 
-    public function assignQuickServiceEngineer1(Request $request)
+    public function assignQuickServiceEngineer(Request $request)
     {
         /** ---------------- VALIDATION ---------------- */
         $rules = [
@@ -2858,7 +2860,7 @@ class ServiceRequestController extends Controller
                     ], 422);
                 }
             } else {
-                if (! in_array($serviceRequest->status, ['active', 'admin_approved', 'engineer_not_approved', 'in_transfer'])) {
+                if (! in_array($serviceRequest->status, ['active', 'admin_approved', 'engineer_not_approved', 'in_transfer', 'escalated'])) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Engineer can only be assigned to approved requests.',
@@ -2981,7 +2983,7 @@ class ServiceRequestController extends Controller
             DB::rollBack();
 
             Log::error('Engineer Assignment Failed', [
-                'error' => $e->getMessage(),
+                'error' => 'Engineer Error' . $e->getMessage(),
             ]);
 
             return response()->json([
@@ -2997,14 +2999,61 @@ class ServiceRequestController extends Controller
      * @param Request $request
      * @return void
      */
-    public function assignQuickServiceEngineer(Request $request)
+    public function assignQuickServiceRemoteEngineer(Request $request)
     {
-        $serviceRequest = ServiceRequest::where('id', $request->service_request_id)->first();
+        if ($request->request_type == "amc") {
+            $amc = Amc::with('amcProducts')->findOrFail($request->service_request_id);
+            $amcScheduleMeet = AmcScheduleMeeting::where('amc_id', $amc->id)->where('status', 'scheduled')->first();
+
+            $serviceRequest = ServiceRequest::create([
+                'request_id' => uniqid(),
+                'service_type' => 'amc',
+                'customer_id' => $amc->customer_id,
+                'customer_address_id' => $amc->customer_address_id ?? null,
+                'request_date' => now(),
+                'request_source' => 'system',
+                'visit_date' => $amcScheduleMeet->scheduled_at,
+                'reschedule_date' => null,
+                'created_by' => Auth::guard('web')->id(),
+                'is_engineer_assigned' => 'not_assigned',
+                'status' => 'pending',
+                'amc_plan_id' => $amc->amc_plan_id,
+            ]);
+
+            $productsList = [];
+            foreach ($amc->amcProducts as $productData) {
+                $productsList = [
+                    'service_requests_id' => $serviceRequest->id,
+                    'name' => $productData->name,
+                    'type' => $productData->type,
+                    'model_no' => $productData->model_no,
+                    // 'mac_address' => $productData->mac_address ?? '',
+                    'sku' => $productData->sku ?? null,
+                    'hsn' => $productData->hsn ?? null,
+                    'purchase_date' => $productData->purchase_date,
+                    'brand' => $productData->brand,
+                    'images' => $productData->images,
+                    'description' => $productData->description,
+                    'item_code_id' => $productData->item_code_id ?? null,
+                    'service_charge' => '0',
+                    'status' => 'pending',
+                ];
+            }
+
+            $products = ServiceRequestProduct::create($productsList);
+
+            $serviceRequest = ServiceRequest::where('id', $serviceRequest->id)->first();
+
+            $amcScheduleMeet->service_request_id = $serviceRequest->id;
+            $amcScheduleMeet->save();
+        } else {
+            $serviceRequest = ServiceRequest::where('id', $request->service_request_id)->first();
+        }
 
         if ($serviceRequest->status == "pending") {
             $remoteSupportJob = RemoteSupportJob::create([
-                'service_request_id' => $request->service_request_id,
-                'amc_schedule_meeting_id' => ($serviceRequest->service_type == 'amc') ? $serviceRequest->amc_schedule_meeting_id : null,
+                'service_request_id' => $serviceRequest->id,
+                'amc_schedule_meeting_id' => ($serviceRequest->service_type == 'amc') ? $amcScheduleMeet->id : null,
                 'staff_id' => $request->engineer_id,
                 'assigned_at' => now(),
             ]);

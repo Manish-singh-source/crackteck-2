@@ -271,12 +271,14 @@
                     </a>
                 </li>
                 <li class="menu-title mt-2">Remote Support</li>
+                {{-- 
                 <li>
                     <a class='tp-link' href="{{ route('jobs.index') }}">
                         <i class="fas fa-briefcase"></i>
                         <span class="ps-1"> Jobs</span>
                     </a>
-                </li>
+                </li> 
+                --}}
                 <li>
                     <a class='tp-link' href="{{ route('assigned-jobs.index') }}">
                         <i class="fas fa-clipboard-check"></i>

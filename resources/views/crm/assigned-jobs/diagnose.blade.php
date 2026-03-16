@@ -133,7 +133,11 @@
                                                     <span class="fw-semibold text-break">Status :
                                                     </span>
                                                     <span>
-                                                        {{ ucwords(str_replace('_', ' ', $serviceRequestProduct?->remoteSupportDiagnose?->status)) }}
+                                                        @if($serviceRequestProduct?->remoteSupportDiagnose)
+                                                            {{ ucwords(str_replace('_', ' ', $serviceRequestProduct?->remoteSupportDiagnose?->status)) }}
+                                                        @else 
+                                                            Pending
+                                                        @endif
                                                     </span>
                                                 </li>
                                             </ul>

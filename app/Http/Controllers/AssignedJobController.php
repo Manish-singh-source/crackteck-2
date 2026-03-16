@@ -8,6 +8,7 @@ use App\Models\FieldIssue;
 use App\Models\JobAssignment;
 use App\Models\RemoteSupportDiagnosis;
 use App\Models\RemoteSupportJob;
+use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -31,37 +32,45 @@ class AssignedJobController extends Controller
     {
         $serviceRequestProduct = ServiceRequestProduct::with('productDiagnose', 'remoteSupportDiagnose')->findOrFail($id);
         $remoteSupportJob = RemoteSupportJob::with('diagnosis')->findOrFail($remote_support_id);
-        
+
         return view('/crm/assigned-jobs/diagnose', compact('serviceRequestProduct', 'remote_support_id', 'remoteSupportJob'));
     }
 
     public function startDiagnose(Request $request, $id, $step, $remote_support_id)
     {
-        if($step == '1') {
+        if ($step == '1') {
             $remoteSupportDiagnose = RemoteSupportDiagnosis::create([
                 'remote_support_job_id' => $remote_support_id,
                 'service_request_product_id' => $id,
                 'client_connected_via' => $request->client_connected,
-                'client_confirmation' => $request->client_confirmation,  
+                'client_confirmation' => $request->client_confirmation,
                 'remote_tool' => $request->remote_tool,
                 'status' => 'in_progress'
             ]);
-            
-            if($remoteSupportDiagnose) {
+
+            if ($remoteSupportDiagnose) {
                 $remoteSupportJob = RemoteSupportJob::findOrFail($remote_support_id);
                 $remoteSupportJob->status = 'in_progress';
                 $remoteSupportJob->save();
 
+                $serviceRequestProduct = ServiceRequestProduct::with('serviceRequest')->findOrFail($id);
+                $serviceRequestProduct->status = 'in_progress';
+                $serviceRequestProduct->save();
+
+                $serviceRequest = ServiceRequest::findOrFail($serviceRequestProduct->service_requests_id);
+                $serviceRequest->status = 'in_progress';
+                $serviceRequest->save();
+
                 return redirect()->back()->with('success', 'Diagnosis started successfully.');
             }
             return redirect()->back()->with('error', 'Failed to start diagnosis.');
-        } else if($step == '2') {
+        } else if ($step == '2') {
             $remoteSupportDiagnose = RemoteSupportDiagnosis::where('remote_support_job_id', $remote_support_id)->first();
             $remoteSupportDiagnose->diagnosis_list = $request->diagnosis_list;
             $remoteSupportDiagnose->diagnosis_notes = $request->diagnosis_notes;
             $remoteSupportDiagnose->save();
 
-            if($remoteSupportDiagnose) {
+            if ($remoteSupportDiagnose) {
                 return redirect()->back()->with('success', 'Diagnosis started successfully.');
             }
             return redirect()->back()->with('error', 'Failed to start diagnosis.');
@@ -73,15 +82,15 @@ class AssignedJobController extends Controller
             $remoteSupportDiagnose->logs = FileUpload::fileUpload($request->logs, 'assignment-workflows/logs');
             $remoteSupportDiagnose->save();
 
-            if($remoteSupportDiagnose) {
+            if ($remoteSupportDiagnose) {
                 return redirect()->back()->with('success', 'Diagnosis started successfully.');
             }
             return redirect()->back()->with('error', 'Failed to start diagnosis.');
         } else if ($step == '4') {
             $result = 'in_progress';
-            if($request->result == 'resolved') {
+            if ($request->result == 'resolved') {
                 $result = 'resolved';
-            }else if ($request->result == 'unresolved') {
+            } else if ($request->result == 'unresolved') {
                 $result = 'unresolved';
             }
             $remoteSupportDiagnose = RemoteSupportDiagnosis::where('remote_support_job_id', $remote_support_id)->first();
@@ -94,7 +103,15 @@ class AssignedJobController extends Controller
             $remoteSupportJob->status = $result;
             $remoteSupportJob->save();
 
-            if($remoteSupportDiagnose) {
+            $serviceRequestProduct = ServiceRequestProduct::with('serviceRequest')->findOrFail($id);
+            $serviceRequestProduct->status = 'diagnosis_completed';
+            $serviceRequestProduct->save();
+
+            $serviceRequest = ServiceRequest::findOrFail($serviceRequestProduct->service_requests_id);
+            $serviceRequest->status = 'completed';
+            $serviceRequest->save();
+
+            if ($remoteSupportDiagnose) {
                 return redirect()->back()->with('success', 'Diagnosis completed successfully.');
             }
             return redirect()->back()->with('error', 'Failed to start diagnosis.');
@@ -109,12 +126,11 @@ class AssignedJobController extends Controller
             $remoteSupportJob->status = 'escalated';
             $remoteSupportJob->save();
 
-            if($remoteSupportDiagnose) {
+            if ($remoteSupportDiagnose) {
                 return redirect()->back()->with('success', 'Diagnosis completed successfully.');
             }
             return redirect()->back()->with('error', 'Failed to start diagnosis.');
         }
-
     }
 
     public function edit($id)

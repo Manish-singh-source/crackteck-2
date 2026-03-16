@@ -75,7 +75,7 @@ class FirebaseFcmService
 
         $response = $this->http->post($url, [
             'headers' => [
-                'Authorization' => 'Bearer '.$accessToken,
+                'Authorization' => $accessToken,
                 'Content-Type' => 'application/json; charset=UTF-8',
             ],
             'json' => $payload,

@@ -71,4 +71,8 @@ class ServiceRequestProduct extends Model
     public function remoteSupportDiagnose() {
         return $this->hasOne(RemoteSupportDiagnosis::class, 'service_request_product_id');
     }
+
+    public function productType() {
+        return $this->belongsTo(DeviceSpecificDiagnosis::class, 'type');
+    }
 }

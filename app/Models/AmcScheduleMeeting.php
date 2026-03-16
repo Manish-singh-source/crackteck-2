@@ -54,4 +54,9 @@ class AmcScheduleMeeting extends Model
         return $this->hasOne(AssignedEngineer::class, 'amc_schedule_meeting_id')
             ->where('status', 'active');
     }
+
+    public function remoteSupportJob()
+    {
+        return $this->hasOne(RemoteSupportJob::class, 'amc_schedule_meeting_id');
+    }
 }

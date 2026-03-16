@@ -32,6 +32,7 @@
             'picked' => 'Picked',
             'completed' => 'Completed',
             'on_hold' => 'On Hold',
+            'escalated' => 'Escalated'
         ];
 
         $statusColor = [
@@ -47,6 +48,7 @@
             'picked' => 'bg-success-subtle text-success',
             'completed' => 'bg-success-subtle text-success',
             'on_hold' => 'bg-warning-subtle text-warning',
+            'escalated' => 'bg-danger-subtle text-danger'
         ];
     @endphp
 
@@ -934,12 +936,13 @@ $isProcessed = in_array($currentStatus, [
 
                 <div class="col-xl-4">
 
-                    <!-- Assign Engineer Card -->
+                    <!-- Assign Remote Engineer Card -->
                     @if (
                         $request->status === 'pending' ||
                         $request->status === 'admin_approved' ||
                             $request->status === 'in_transfer' ||
-                            $request->status === 'engineer_not_approved')
+                            $request->status === 'engineer_not_approved'
+                        )
                         <div class="card">
                             <div class="card-header border-bottom-dashed">
                                 <h5 class="card-title mb-0">Assign Remote Engineer</h5>
@@ -1047,7 +1050,7 @@ $isProcessed = in_array($currentStatus, [
                         </div>
                     @endif
 
-                    @if($request->remoteSupportJob) 
+                    @if($request->remoteSupportJob && $request->remoteSupportJob->status != 'escalated') 
                         <div class="card mt-3" id="assignedEngineersCard">
                             <div class="card-header border-bottom-dashed bg-light">
                                 <h5 class="card-title mb-0">
@@ -1077,6 +1080,92 @@ $isProcessed = in_array($currentStatus, [
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Assign Engineer Card --}}
+                    <!-- Assign Engineer Card -->
+                    @if ($request->status === 'escalated')
+                        <div class="card">
+                            <div class="card-header border-bottom-dashed">
+                                <h5 class="card-title mb-0">Assign Engineer</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="assignEngineerForm">
+                                    @csrf
+                                    <input type="hidden" name="service_request_id" value="{{ $request->id }}">
+                                    <input type="hidden" name="service_type"
+                                                                value="{{ $request->service_type }}">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Assignment Type</label>
+                                        <div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="assignment_type"
+                                                    id="typeIndividual" value="individual" checked>
+                                                <label class="form-check-label" for="typeIndividual">Individual</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="assignment_type"
+                                                    id="typeGroup" value="group">
+                                                <label class="form-check-label" for="typeGroup">Group</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Individual Assignment -->
+                                    <div id="individualSection">
+                                        <div class="mb-3">
+                                            <label for="engineer_id" class="form-label">Select Engineer</label>
+                                            <select name="engineer_id" id="engineer_id" class="form-select">
+                                                <option value="">--Select Engineer--</option>
+                                                @foreach ($engineers as $engineer)
+                                                    <option value="{{ $engineer->id }}">
+                                                        {{ $engineer->first_name }} {{ $engineer->last_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Group Assignment -->
+                                    <div id="groupSection" style="display: none;">
+                                        <div class="mb-3">
+                                            <label for="group_name" class="form-label">Group Name</label>
+                                            <input type="text" name="group_name" id="group_name" class="form-control"
+                                                placeholder="Enter Group Name">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Select Engineers</label>
+                                            <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                                                @foreach ($engineers as $engineer)
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input engineer-checkbox" type="checkbox"
+                                                            name="engineer_ids[]" value="{{ $engineer->id }}"
+                                                            id="eng_{{ $engineer->id }}">
+                                                        <label class="form-check-label" for="eng_{{ $engineer->id }}">
+                                                            {{ $engineer->first_name }} {{ $engineer->last_name }}
+                                                        </label>
+                                                        <input class="form-check-input ms-3" type="radio"
+                                                            name="supervisor_id" value="{{ $engineer->id }}"
+                                                            id="sup_{{ $engineer->id }}">
+                                                        <label class="form-check-label small text-muted"
+                                                            for="sup_{{ $engineer->id }}">
+                                                            (Supervisor)
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                            <small class="text-muted">Check engineers to add to group, select one as
+                                                supervisor</small>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="mdi mdi-account-plus"></i> Assign Engineer
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     @endif
@@ -1298,6 +1387,7 @@ $isProcessed = in_array($currentStatus, [
                                                                             'cancelled' => 'Cancelled',
                                                                             'returned' => 'Returned',
                                                                             'completed' => 'Completed',
+                                                                            'escalated' => 'Escalated'
                                                                         ];
                                                                         $pickupStatusColor = [
                                                                             'pending' => 'bg-warning',
@@ -1308,6 +1398,7 @@ $isProcessed = in_array($currentStatus, [
                                                                             'cancelled' => 'bg-danger',
                                                                             'returned' => 'bg-warning',
                                                                             'completed' => 'bg-success',
+                                                                            'escalated' => 'bg-danger'
                                                                         ];
                                                                     @endphp
                                                                     <span
@@ -1987,7 +2078,7 @@ $isProcessed = in_array($currentStatus, [
                 const formData = $(this).serialize();
 
                 $.ajax({
-                    url: '{{ route('service-request.assign-quick-service-engineer') }}',
+                    url: '{{ route('service-request.assign-quick-service-remote-engineer') }}',
                     method: 'POST',
                     data: formData,
                     success: function(response) {

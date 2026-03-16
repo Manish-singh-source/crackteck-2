@@ -52,7 +52,7 @@
                                                     <span class="fw-semibold text-break">Service Request Type :
                                                     </span>
                                                     <span>
-                                                        {{ $remoteSupportJob->serviceRequest->service_type }}
+                                                        {{ ucwords(str_replace('_', ' ', $remoteSupportJob->serviceRequest?->service_type)) }}
                                                     </span>
                                                 </li>
                                             </ul>
@@ -64,7 +64,7 @@
                                                     <span class="fw-semibold text-break">Service Request Date :
                                                     </span>
                                                     <span>
-                                                        {{ \App\Helpers\DateFormat::formatDate($remoteSupportJob->serviceRequest->request_date) }}
+                                                        {{ \App\Helpers\DateFormat::formatDateTime($remoteSupportJob->serviceRequest->request_date) }}
                                                     </span>
                                                 </li>
                                             </ul>
@@ -152,7 +152,7 @@
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $product->name }}</td>
-                                                    <td>{{ $product->type }}</td>
+                                                    <td>{{ $product->productType?->device_type }}</td>
                                                     <td>{{ $product->model_no }}</td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ $product->hsn }}</td>

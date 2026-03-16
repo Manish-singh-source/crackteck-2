@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\FileUpload;
 use App\Http\Controllers\Controller;
 use App\Models\Staff;
 use App\Models\StaffWallet;
@@ -154,10 +155,7 @@ class StaffWalletController extends Controller
         // Handle receipt file upload
         $receiptPath = null;
         if ($request->hasFile('receipt')) {
-            $receipt = $request->file('receipt');
-            $receiptName = time() . '_' . $receipt->getClientOriginalName();
-            $receipt->move(public_path('public/receipts'), $receiptName);
-            $receiptPath = 'receipts/' . $receiptName;
+            $receiptPath = FileUpload::fileUpload($request->file('receipt'), 'receipts/');
         }
 
         // Create new reimbursements entry with auto-determined staff_type

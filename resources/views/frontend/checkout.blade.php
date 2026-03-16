@@ -597,7 +597,8 @@
                     method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
-                        coupon_code: couponCode
+                        coupon_code: couponCode, 
+                        productId: {{ $checkoutData['product_id'] }}
                     },
                     success: function(response) {
                         if (response.success) {

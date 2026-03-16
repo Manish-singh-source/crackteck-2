@@ -12,6 +12,7 @@ use App\Services\FirebaseStorageService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -54,5 +55,8 @@ class AppServiceProvider extends ServiceProvider
 
         Route::middleware('web')
             ->group(base_path('routes/offline.php'));
+
+        Paginator::useBootstrapFive();
+        Paginator::useBootstrapFour();
     }
 }

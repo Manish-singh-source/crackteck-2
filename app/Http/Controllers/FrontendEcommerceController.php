@@ -22,7 +22,7 @@ class FrontendEcommerceController extends Controller
             'warehouseProduct.subCategorie',
         ])
             ->where('status', 'active')
-            ->paginate(12);
+            ->paginate(4);
 
         $categories = ParentCategory::where('status_ecommerce', 'active')
             ->whereHas('products', function ($query) {

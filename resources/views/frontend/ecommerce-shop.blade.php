@@ -101,6 +101,38 @@
         .tf-btn.in-cart:hover {
             background-color: #218838 !important;
         }
+
+        /* Pagination Styling */
+        .pagination-wrapper {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .pagination-wrapper .pagination {
+            margin: 0;
+            gap: 5px;
+        }
+        
+        .pagination-wrapper .page-link {
+            color: #333;
+            border-color: #ddd;
+            padding: 8px 12px;
+        }
+        
+        .pagination-wrapper .page-link:hover {
+            background-color: #f5f5f5;
+            border-color: #ddd;
+        }
+        
+        .pagination-wrapper .page-item.active .page-link {
+            background-color: #333;
+            border-color: #333;
+        }
+        
+        .pagination-wrapper .page-item.disabled .page-link {
+            color: #999;
+        }
     </style>
 @endpush
 
@@ -526,7 +558,10 @@
                             @endforelse
                         </div>
 
-                        {{ $products->links() }}
+                        <!-- Pagination -->
+                        <div class="pagination-wrapper d-flex justify-content-end mt-5" id="pagination-wrapper">
+                            {{ $products->links() }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1031,6 +1066,7 @@
             let customMaxPrice = null;
             let selectedSort = null;
             let selectedDeal = null;
+            let currentPage = 1;
 
 
             // Category filter change
@@ -1043,6 +1079,7 @@
                 } else {
                     selectedCategories = selectedCategories.filter(id => id !== categoryId);
                 }
+                currentPage = 1;
                 applyShopFilters();
             });
 
@@ -1056,6 +1093,7 @@
                 } else {
                     selectedBrands = selectedBrands.filter(id => id !== brandId);
                 }
+                currentPage = 1;
                 applyShopFilters();
             });
 
@@ -1074,6 +1112,7 @@
                 } else {
                     selectedPriceRanges = selectedPriceRanges.filter(range => range !== priceRange);
                 }
+                currentPage = 1;
                 applyShopFilters();
             });
 
@@ -1096,6 +1135,7 @@
                     selectedPriceRanges = [];
                     $('.price-range-filter').prop('checked', false);
 
+                    currentPage = 1;
                     applyShopFilters();
                 }
             });
@@ -1114,6 +1154,7 @@
                 customMinPrice = null;
                 customMaxPrice = null;
                 selectedDeal = null;
+                currentPage = 1;
 
                 $('.category-filter').prop('checked', false);
                 $('.brand-filter').prop('checked', false);
@@ -1133,6 +1174,7 @@
                 customMinPrice = null;
                 customMaxPrice = null;
                 selectedDeal = null;
+                currentPage = 1;
 
                 $('.category-filter').prop('checked', false);
                 $('.brand-filter').prop('checked', false);
@@ -1147,18 +1189,22 @@
 
             $('#sortBy').on('change', function() {
                 selectedSort = $(this).val();
+                currentPage = 1;
                 applyShopFilters();
             });
 
             // Deal filter change
             $('input[name="deal"]').on('change', function() {
                 selectedDeal = $(this).val();
+                currentPage = 1;
                 applyShopFilters();
             });
 
 
             // Apply filters function
-            function applyShopFilters() {
+            function applyShopFilters(page = 1) {
+                currentPage = page;
+                
                 // Show loading state
                 $('#gridLayout').html(
                     '<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>'
@@ -1195,6 +1241,9 @@
                     filterParams.deal = selectedDeal;
                 }
 
+                // Add page parameter
+                filterParams.page = page;
+
                 // Make AJAX request
                 console.log('Applying filters with params:', filterParams);
                 $.ajax({
@@ -1206,7 +1255,8 @@
 
                         if (response.success) {
                             renderProducts(response.products);
-                            updateFilterMeta(response.products.length);
+                            renderPagination(response.pagination);
+                            updateProductCountMeta(response.pagination);
                         } else {
                             console.error('Filter failed:', response.message, response.error);
                             showError('Failed to filter products: ' + (response.error || response
@@ -1227,6 +1277,68 @@
                         showError(errorMsg);
                     }
                 });
+            }
+
+            // Render pagination
+            function renderPagination(pagination) {
+                const wrapper = $('#pagination-wrapper');
+                if (!pagination || pagination.last_page <= 1) {
+                    wrapper.html('');
+                    return;
+                }
+
+                let html = '<nav><ul class="pagination justify-content-center">';
+
+                // Previous button
+                if (pagination.current_page > 1) {
+                    html += `<li class="page-item"><a href="#" class="page-link" data-page="${pagination.current_page - 1}">Previous</a></li>`;
+                } else {
+                    html += '<li class="page-item disabled"><span class="page-link">Previous</span></li>';
+                }
+
+                // Page numbers
+                for (let i = 1; i <= pagination.last_page; i++) {
+                    if (i === pagination.current_page) {
+                        html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+                    } else {
+                        // Show only first, last, and pages around current
+                        if (i === 1 || i === pagination.last_page || (i >= pagination.current_page - 2 && i <= pagination.current_page + 2)) {
+                            html += `<li class="page-item"><a href="#" class="page-link" data-page="${i}">${i}</a></li>`;
+                        } else if (i === pagination.current_page - 3 || i === pagination.current_page + 3) {
+                            html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                    }
+                }
+
+                // Next button
+                if (pagination.current_page < pagination.last_page) {
+                    html += `<li class="page-item"><a href="#" class="page-link" data-page="${pagination.current_page + 1}">Next</a></li>`;
+                } else {
+                    html += '<li class="page-item disabled"><span class="page-link">Next</span></li>';
+                }
+
+                html += '</ul></nav>';
+                wrapper.html(html);
+
+                // Add click handlers
+                wrapper.find('.page-link').on('click', function(e) {
+                    e.preventDefault();
+                    const page = $(this).data('page');
+                    if (page) {
+                        applyShopFilters(page);
+                        // Scroll to top of products
+                        $('.tf-shop-content')[0].scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            }
+
+            // Update product count meta info
+            function updateProductCountMeta(pagination) {
+                if (pagination) {
+                    $('#product-count-grid').text(`Showing ${pagination.from || 0} to ${pagination.to || 0} of ${pagination.total} products`);
+                } else {
+                    $('#product-count-grid').text('');
+                }
             }
 
             // Render products

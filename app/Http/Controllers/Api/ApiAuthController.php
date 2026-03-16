@@ -245,6 +245,9 @@ class ApiAuthController extends Controller
             'certifications' => 'nullable|string',
             'experience' => 'nullable|string',
             'languages_known' => 'nullable|string',
+            'qualification' => 'nullable|in:post-graduation,graduation,12,10',
+            'qualification_certifications' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
+            'address_proof' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
 
             // Police verification details
             'police_verifications' => 'nullable|in:verified,not_verified',
@@ -310,6 +313,14 @@ class ApiAuthController extends Controller
 
         if ($request->hasFile('police_certificate')) {
             $policeCertificate = FileUpload::fileUpload($request->file('police_certificate'), 'uploads/crm/staff/policeCertificate/');
+        }
+
+        if ($request->hasFile('qualification_certifications')) {
+            $qualificationCertifications = FileUpload::fileUpload($request->file('qualification_certifications'), 'uploads/crm/staff/qualification_certifications/');
+        }
+
+        if ($request->hasFile('address_proof')) {
+            $addressProof = FileUpload::fileUpload($request->file('address_proof'), 'uploads/crm/staff/address_proof/');
         }
 
         // Create Staff
@@ -389,13 +400,16 @@ class ApiAuthController extends Controller
         }
 
         // Store Work Skills
-        if ($request->filled('primary_skills') || $request->filled('experience')) {
+        if ($request->filled('primary_skills') || $request->filled('experience') || $request->filled('qualification') || $request->hasFile('qualification_certifications') || $request->hasFile('address_proof')) {
             StaffWorkSkill::create([
                 'staff_id' => $staff->id,
                 'primary_skills' => $request->primary_skills,
                 'certifications' => $request->certifications,
                 'experience' => $request->experience,
                 'languages_known' => $request->languages_known,
+                'qualification' => $request->qualification,
+                'qualification_certifications' => $qualificationCertifications ?? null,
+                'address_proof' => $addressProof ?? null,
             ]);
         }
 

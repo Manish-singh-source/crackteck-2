@@ -13,6 +13,9 @@ class StaffWorkSkill extends Model
         'certifications',
         'experience',
         'languages_known',
+        'qualification',
+        'qualification_certifications',
+        'address_proof',
     ];
 
     protected $casts = [

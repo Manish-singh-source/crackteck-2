@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileUpload;
 use App\Http\Requests\StoreStaffRequest;
 use App\Models\AssignedEngineer;
 use App\Models\ServiceRequest;
@@ -50,7 +51,7 @@ class StaffController extends Controller
 
                 // 1. Staff (main)
                 $nextNumber = (Staff::max('id') ?? 0) + 1;
-                $staffCode = 'STF'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+                $staffCode = 'STF' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
                 $staff = Staff::create([
                     'staff_code' => $staffCode,
@@ -83,10 +84,7 @@ class StaffController extends Controller
                 if ($validated['bank_acc_holder_name'] || $validated['bank_acc_number'] || $validated['bank_name'] || $validated['ifsc_code']) {
                     $passbookPath = null;
                     if ($request->hasFile('passbook_pic')) {
-                        $file = $request->file('passbook_pic');
-                        $filename = time().'_'.$file->getClientOriginalName();
-                        $file->move(public_path('staff/passbook'), $filename);
-                        $passbookPath = 'staff/passbook/'.$filename;
+                        $passbookPath = FileUpload::fileUpload($request->file('passbook_pic'), 'staff/passbook/');
                     }
 
                     $staff->bankDetails()->create([
@@ -100,13 +98,21 @@ class StaffController extends Controller
                 // End
 
                 // 4. Work skills
-                if ($validated['primary_skills'] || $validated['languages_known'] || $validated['certifications'] || $validated['experience']) {
+                if ($validated['primary_skills'] || $validated['languages_known'] || $validated['certifications'] || $validated['experience'] || $validated['qualification'] || $request->hasFile('qualification_certifications') || $request->hasFile('address_proof')) {
                     $certPath = null;
                     if ($request->hasFile('certifications')) {
-                        $file = $request->file('certifications');
-                        $filename = time().'_'.$file->getClientOriginalName();
-                        $file->move(public_path('staff/certifications'), $filename);
-                        $certPath = 'staff/certifications/'.$filename;
+                        $certPath = FileUpload::fileUpload($request->file('certifications'), 'staff/certifications/');
+                    }
+
+
+                    $qualCertPath = null;
+                    if ($request->hasFile('qualification_certifications')) {
+                        $qualCertPath = FileUpload::fileUpload($request->file('qualification_certifications'), 'staff/qualification_certifications/');
+                    }
+
+                    $addressProofPath = null;
+                    if ($request->hasFile('address_proof')) {
+                        $addressProofPath = FileUpload::fileUpload($request->file('address_proof'), 'staff/address_proof/');
                     }
 
                     $staff->workSkills()->create([
@@ -118,6 +124,9 @@ class StaffController extends Controller
                             : null,
                         'certifications' => $certPath,
                         'experience' => $validated['experience'] ?? null,
+                        'qualification' => $validated['qualification'] ?? null,
+                        'qualification_certifications' => $qualCertPath,
+                        'address_proof' => $addressProofPath,
                     ]);
                 }
                 // End
@@ -126,18 +135,12 @@ class StaffController extends Controller
                 if ($validated['aadhar_number'] || $request->hasFile('aadhar_front_path') || $request->hasFile('aadhar_back_path')) {
                     $aadharFront = null;
                     if ($request->hasFile('aadhar_front_path')) {
-                        $file = $request->file('aadhar_front_path');
-                        $filename = time().'_'.$file->getClientOriginalName();
-                        $file->move(public_path('staff/aadhar'), $filename);
-                        $aadharFront = 'staff/aadhar/'.$filename;
+                        $aadharFront = FileUpload::fileUpload($request->file('aadhar_front_path'), 'staff/aadhar/');
                     }
 
                     $aadharBack = null;
                     if ($request->hasFile('aadhar_back_path')) {
-                        $file = $request->file('aadhar_back_path');
-                        $filename = time().'_'.$file->getClientOriginalName();
-                        $file->move(public_path('staff/aadhar'), $filename);
-                        $aadharBack = 'staff/aadhar/'.$filename;
+                        $aadharBack = FileUpload::fileUpload($request->file('aadhar_back_path'), 'staff/aadhar/');
                     }
 
                     $staff->aadharDetails()->create([
@@ -151,18 +154,12 @@ class StaffController extends Controller
                 if ($validated['pan_number'] || $request->hasFile('pan_card_front_path') || $request->hasFile('pan_card_back_path')) {
                     $panFront = null;
                     if ($request->hasFile('pan_card_front_path')) {
-                        $file = $request->file('pan_card_front_path');
-                        $filename = time().'_'.$file->getClientOriginalName();
-                        $file->move(public_path('staff/pan'), $filename);
-                        $panFront = 'staff/pan/'.$filename;
+                        $panFront = FileUpload::fileUpload($request->file('pan_card_front_path'), 'staff/pan/');
                     }
 
                     $panBack = null;
                     if ($request->hasFile('pan_card_back_path')) {
-                        $file = $request->file('pan_card_back_path');
-                        $filename = time().'_'.$file->getClientOriginalName();
-                        $file->move(public_path('staff/pan'), $filename);
-                        $panBack = 'staff/pan/'.$filename;
+                        $panBack = FileUpload::fileUpload($request->file('pan_card_back_path'), 'staff/pan/');
                     }
 
                     $staff->panDetails()->create([
@@ -176,18 +173,12 @@ class StaffController extends Controller
                 if ($validated['vehicle_type'] || $validated['vehicle_number'] || $validated['driving_license_no']) {
                     $dlFront = null;
                     if ($request->hasFile('driving_license_front_path')) {
-                        $file = $request->file('driving_license_front_path');
-                        $filename = time().'_'.$file->getClientOriginalName();
-                        $file->move(public_path('staff/license'), $filename);
-                        $dlFront = 'staff/license/'.$filename;
+                        $dlFront = FileUpload::fileUpload($request->file('driving_license_front_path'), 'staff/license/');
                     }
 
                     $dlBack = null;
                     if ($request->hasFile('driving_license_back_path')) {
-                        $file = $request->file('driving_license_back_path');
-                        $filename = time().'_'.$file->getClientOriginalName();
-                        $file->move(public_path('staff/license'), $filename);
-                        $dlBack = 'staff/license/'.$filename;
+                        $dlBack = FileUpload::fileUpload($request->file('driving_license_back_path'), 'staff/license/');
                     }
 
                     $staff->vehicleDetails()->create([
@@ -203,10 +194,7 @@ class StaffController extends Controller
                 if ($validated['police_verification'] || $validated['police_verification_status'] || $request->hasFile('police_certificate')) {
                     $policeCert = null;
                     if ($request->hasFile('police_certificate')) {
-                        $file = $request->file('police_certificate');
-                        $filename = time().'_'.$file->getClientOriginalName();
-                        $file->move(public_path('staff/police'), $filename);
-                        $policeCert = 'staff/police/'.$filename;
+                        $policeCert = FileUpload::fileUpload($request->file('police_certificate'), 'staff/police/');
                     }
 
                     $staff->policeVerification()->create([
@@ -221,7 +209,7 @@ class StaffController extends Controller
 
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Error creating staff: '.$e->getMessage());
+                ->with('error', 'Error creating staff: ' . $e->getMessage());
         }
 
         return redirect()->route('staff.index')->with('success', 'Staff created successfully.');
@@ -324,7 +312,7 @@ class StaffController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'nullable|string|max:255',
             'phone' => 'required|string|max:20',
-            'email' => 'required|email|unique:staff,email,'.$id.',id',
+            'email' => 'required|email|unique:staff,email,' . $id . ',id',
             'dob' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',
             'marital_status' => 'nullable|in:unmarried,married,divorced',
@@ -355,6 +343,9 @@ class StaffController extends Controller
             'languages_known.*' => 'string',
             'certifications' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             'experience' => 'nullable|integer',
+            'qualification' => 'nullable|in:post-graduation,graduation,12,10',
+            'qualification_certifications' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'address_proof' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
 
             // Aadhar
             'aadhar_number' => 'nullable|string|max:20',
@@ -368,8 +359,8 @@ class StaffController extends Controller
 
             // Vehicle
             'vehicle_type' => 'nullable|in:two_wheeler,three_wheeler,four_wheeler,other',
-            'vehicle_number' => 'nullable|string|max:50|unique:staff_vehicle_details,vehicle_number,'.$id.',staff_id',
-            'driving_license_no' => 'nullable|string|max:50|unique:staff_vehicle_details,driving_license_no,'.$id.',staff_id',
+            'vehicle_number' => 'nullable|string|max:50|unique:staff_vehicle_details,vehicle_number,' . $id . ',staff_id',
+            'driving_license_no' => 'nullable|string|max:50|unique:staff_vehicle_details,driving_license_no,' . $id . ',staff_id',
             'driving_license_front_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             'driving_license_back_path' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
 
@@ -411,65 +402,58 @@ class StaffController extends Controller
                 // ---------- File uploads to public disk (storage/app/public) ----------
                 $passbookPath = null;
                 if ($request->hasFile('passbook_pic')) {
-                    $file = $request->file('passbook_pic');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $passbookPath = $file->storeAs('staff/passbook', $filename, 'public');
+                    $passbookPath = FileUpload::updateFileUpload($request->file('passbook_pic'), 'staff/passbook/');
                 }
 
                 $certPath = null;
                 if ($request->hasFile('certifications')) {
-                    $file = $request->file('certifications');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $certPath = $file->storeAs('staff/certifications', $filename, 'public');
+                    $certPath = FileUpload::updateFileUpload($request->file('certifications'), 'staff/certifications/');
                 }
 
                 $aadharFront = null;
                 if ($request->hasFile('aadhar_front_path')) {
-                    $file = $request->file('aadhar_front_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $aadharFront = $file->storeAs('staff/aadhar', $filename, 'public');
+                    $aadharFront = FileUpload::updateFileUpload($request->file('aadhar_front_path'), 'staff/aadhar/');
                 }
 
                 $aadharBack = null;
                 if ($request->hasFile('aadhar_back_path')) {
-                    $file = $request->file('aadhar_back_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $aadharBack = $file->storeAs('staff/aadhar', $filename, 'public');
+                    $aadharBack = FileUpload::updateFileUpload($request->file('aadhar_back_path'), 'staff/aadhar/');
                 }
 
                 $panFront = null;
                 if ($request->hasFile('pan_card_front_path')) {
-                    $file = $request->file('pan_card_front_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $panFront = $file->storeAs('staff/pan', $filename, 'public');
+                    $panFront = FileUpload::updateFileUpload($request->file('pan_card_front_path'), 'staff/pan/');
                 }
 
                 $panBack = null;
                 if ($request->hasFile('pan_card_back_path')) {
-                    $file = $request->file('pan_card_back_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $panBack = $file->storeAs('staff/pan', $filename, 'public');
+                    $panBack = FileUpload::updateFileUpload($request->file('pan_card_back_path'), 'staff/pan/');
                 }
 
                 $dlFront = null;
                 if ($request->hasFile('driving_license_front_path')) {
-                    $file = $request->file('driving_license_front_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $dlFront = $file->storeAs('staff/license', $filename, 'public');
+                    $dlFront = FileUpload::updateFileUpload($request->file('driving_license_front_path'), 'staff/license/');
                 }
 
                 $dlBack = null;
                 if ($request->hasFile('driving_license_back_path')) {
-                    $file = $request->file('driving_license_back_path');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $dlBack = $file->storeAs('staff/license', $filename, 'public');
+                    $dlBack = FileUpload::updateFileUpload($request->file('driving_license_back_path'), 'staff/license/');
                 }
 
                 $policeCert = null;
                 if ($request->hasFile('police_certificate')) {
-                    $file = $request->file('police_certificate');
-                    $filename = time().'_'.$file->getClientOriginalName();
-                    $policeCert = $file->storeAs('staff/police', $filename, 'public');
+                    $policeCert = FileUpload::updateFileUpload($request->file('police_certificate'), 'staff/police/');
+                }
+
+                $qualCertPath = null;
+                if ($request->hasFile('qualification_certifications')) {
+                    $qualCertPath = FileUpload::updateFileUpload($request->file('qualification_certifications'), 'staff/qualification_certifications/');
+                }
+
+
+                $addressProofPath = null;
+                if ($request->hasFile('address_proof')) {
+                    $addressProofPath = FileUpload::updateFileUpload($request->file('address_proof'), 'staff/address_proof/');
                 }
 
                 // 3. Bank
@@ -491,6 +475,9 @@ class StaffController extends Controller
                         : optional($staff->workSkills)->languages_known,
                     'certifications' => $certPath ?? optional($staff->workSkills)->certifications,
                     'experience' => $validated['experience'] ?? optional($staff->workSkills)->experience,
+                    'qualification' => $validated['qualification'] ?? optional($staff->workSkills)->qualification,
+                    'qualification_certifications' => $qualCertPath ?? optional($staff->workSkills)->qualification_certifications,
+                    'address_proof' => $addressProofPath ?? optional($staff->workSkills)->address_proof,
                 ]);
 
                 // 5. Aadhar
@@ -593,11 +580,11 @@ class StaffController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Task approval error: '.$e->getMessage());
+            Log::error('Task approval error: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error approving task: '.$e->getMessage(),
+                'message' => 'Error approving task: ' . $e->getMessage(),
             ], 500);
         }
     }

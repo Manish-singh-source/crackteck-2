@@ -323,6 +323,37 @@
 
                                     <div class="card-body">
                                         <div class="row g-3">
+
+                                            <div class="col-4">
+                                                @include('components.form.select', [
+                                                    'label' => 'Qualification Documents',
+                                                    'name' => 'qualification',
+                                                    'options' => [
+                                                        '' => '--Select--',
+                                                        'post-graduation' => 'Post-Graduation Degree',
+                                                        'graduation' => 'Graduation Degree',
+                                                        '12' => '12th Marksheet',
+                                                        '10' => '10th Marksheet',
+                                                    ],
+                                                ])
+                                            </div>
+
+                                            <div class="col-4">
+                                                @include('components.form.input', [
+                                                    'label' => 'Qualification Certifications',
+                                                    'name' => 'qualification_certifications',
+                                                    'type' => 'file',
+                                                ])
+                                            </div>
+
+                                            <div class="col-4">
+                                                @include('components.form.input', [
+                                                    'label' => 'Address Proof ( Electricity Bill )',
+                                                    'name' => 'address_proof',
+                                                    'type' => 'file',
+                                                ])
+                                            </div>
+                                            
                                             <div class="col-9">
                                                 @include('components.form.checkbox', [
                                                     'label' => 'Primary Skills',

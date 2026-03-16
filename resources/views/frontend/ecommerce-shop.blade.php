@@ -525,6 +525,8 @@
                                 </div>
                             @endforelse
                         </div>
+
+                        {{ $products->links() }}
                     </div>
                 </div>
             </div>

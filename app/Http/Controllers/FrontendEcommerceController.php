@@ -693,7 +693,7 @@ class FrontendEcommerceController extends Controller
             }
 
             // Paginate
-            $products = $query->paginate(12);
+            $products = $query->get();
 
             // Format products
             $formattedProducts = $products->getCollection()->map(function ($product) {

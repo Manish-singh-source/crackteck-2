@@ -178,7 +178,7 @@ From Flutter project root, install CLI tools:[^7][^3]
 ```bash
 dart pub global activate flutterfire_cli
 ```
-
+ 
 Configure Firebase:
 
 ```bash

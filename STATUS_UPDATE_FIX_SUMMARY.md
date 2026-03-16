@@ -148,3 +148,85 @@ After implementing this fix:
 - All future engineer assignments will automatically update the status
 - Activity logs are created for audit trail
 
+
+
+
+
+{{-- 
+<div class="card-body">
+    <form id="assignRemoteEngineerForm">
+        @csrf   
+        <input type="hidden" name="service_request_id" value="{{ $request->id }}">
+        <input type="hidden" name="service_type"
+                                    value="{{ $request->service_type }}">
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Assignment Type</label>
+            <div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="assignment_type"
+                        id="typeIndividual" value="individual" checked>
+                    <label class="form-check-label" for="typeIndividual">Individual</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="assignment_type"
+                        id="typeGroup" value="group">
+                    <label class="form-check-label" for="typeGroup">Group</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Individual Assignment -->
+        <div id="individualSection">
+            <div class="mb-3">
+                <label for="engineer_id" class="form-label">Select Engineer</label>
+                <select name="engineer_id" id="engineer_id" class="form-select">
+                    <option value="">--Select Engineer--</option>
+                    @foreach ($engineers as $engineer)
+                        <option value="{{ $engineer->id }}">
+                            {{ $engineer->first_name }} {{ $engineer->last_name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <!-- Group Assignment -->
+        <div id="groupSection" style="display: none;">
+            <div class="mb-3">
+                <label for="group_name" class="form-label">Group Name</label>
+                <input type="text" name="group_name" id="group_name" class="form-control"
+                    placeholder="Enter Group Name">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Select Engineers</label>
+                <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                    @foreach ($engineers as $engineer)
+                        <div class="form-check mb-2">
+                            <input class="form-check-input engineer-checkbox" type="checkbox"
+                                name="engineer_ids[]" value="{{ $engineer->id }}"
+                                id="eng_{{ $engineer->id }}">
+                            <label class="form-check-label" for="eng_{{ $engineer->id }}">
+                                {{ $engineer->first_name }} {{ $engineer->last_name }}
+                            </label>
+                            <input class="form-check-input ms-3" type="radio"
+                                name="supervisor_id" value="{{ $engineer->id }}"
+                                id="sup_{{ $engineer->id }}">
+                            <label class="form-check-label small text-muted"
+                                for="sup_{{ $engineer->id }}">
+                                (Supervisor)
+                            </label>
+                        </div>
+                    @endforeach
+                </div>
+                <small class="text-muted">Check engineers to add to group, select one as
+                    supervisor</small>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="mdi mdi-account-plus"></i> Assign Engineer
+        </button>
+    </form>
+</div>
+--}}

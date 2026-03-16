@@ -94,13 +94,9 @@ class AmcController extends Controller
             }
             
             $amc->support_type = $request->support_type;
-            $amc->covered_items = $request->covered_items_ids ?? [];
+            $amc->covered_items = json_decode($request->covered_items_ids) ?? [];
 
             if ($request->hasFile('brochure')) {
-                // $file = $request->file('brochure');
-                // $filename = time() . '.' . $file->getClientOriginalExtension();
-                // $file->move(public_path('uploads/crm/amc/brochure'), $filename);
-                // $amc->brochure = 'uploads/crm/amc/brochure/' . $filename;
                 $amc->brochure = FileUpload::fileUpload($request->file('brochure'), 'uploads/crm/amc/brochure/');
             }
 

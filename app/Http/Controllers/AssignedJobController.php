@@ -98,7 +98,22 @@ class AssignedJobController extends Controller
                 return redirect()->back()->with('success', 'Diagnosis completed successfully.');
             }
             return redirect()->back()->with('error', 'Failed to start diagnosis.');
-        } 
+        } else if ($step == '5') {
+            $remoteSupportDiagnose = RemoteSupportDiagnosis::where('remote_support_job_id', $remote_support_id)->first();
+            $remoteSupportDiagnose->reason_for_escalation = $request->reason_for_escalation;
+            $remoteSupportDiagnose->escalation_notes = $request->escalation_notes;
+            $remoteSupportDiagnose->status = 'escalated';
+            $remoteSupportDiagnose->save();
+
+            $remoteSupportJob = RemoteSupportJob::findOrFail($remote_support_id);
+            $remoteSupportJob->status = 'escalated';
+            $remoteSupportJob->save();
+
+            if($remoteSupportDiagnose) {
+                return redirect()->back()->with('success', 'Diagnosis completed successfully.');
+            }
+            return redirect()->back()->with('error', 'Failed to start diagnosis.');
+        }
 
     }
 

@@ -1584,59 +1584,59 @@
             });
         }
 
-        // Function to show login modal
-        function showLoginModal() {
-            // Create and show login modal
-            const modalHtml = `
-                <div class="modal modalCentered fade modal-log" id="log">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <span class="icon icon-close btn-hide-popup" data-bs-dismiss="modal"></span>
-                            <div class="modal-log-wrap list-file-delete">
-                                <h5 class="title fw-semibold">Log In</h5>
-                                <form class="form-log" action="{{ route('frontend.login') }}" method="POST">
-                                    @csrf
-                                    <div class="form-content">
-                                        <fieldset>
-                                            <label class="fw-semibold body-md-2" id="email">
-                                                Email Id
-                                            </label>
-                                            <input type="email" name="email" placeholder="Your email" autocomplete="off"
-                                                required>
-                                        </fieldset>
-                                        <fieldset>
-                                            <label class="fw-semibold body-md-2" id="password">
-                                                Password
-                                            </label>
-                                            <input type="password" placeholder="Enter your password" autocomplete="off"
-                                                name="password" required>
-                                        </fieldset>
-                                        <a href="#" class="link text-end body-text-3">
-                                            Forgot password ?
-                                        </a>
-                                    </div>
-                                    <button type="submit" class="tf-btn w-100 text-white">
-                                        Login
-                                    </button>
-                                    <p class="body-text-3 text-center">
-                                        Don't you have an account?
-                                        <a href="#register" data-bs-toggle="modal" class="text-primary">
-                                            Register
-                                        </a>
-                                    </p>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+        // // Function to show login modal
+        // function showLoginModal() {
+        //     // Create and show login modal
+        //     const modalHtml = `
+        //         <div class="modal modalCentered fade modal-log" id="log">
+        //             <div class="modal-dialog modal-dialog-centered">
+        //                 <div class="modal-content">
+        //                     <span class="icon icon-close btn-hide-popup" data-bs-dismiss="modal"></span>
+        //                     <div class="modal-log-wrap list-file-delete">
+        //                         <h5 class="title fw-semibold">Log In</h5>
+        //                         <form class="form-log" action="{{ route('frontend.login') }}" method="POST">
+        //                             @csrf
+        //                             <div class="form-content">
+        //                                 <fieldset>
+        //                                     <label class="fw-semibold body-md-2" id="email">
+        //                                         Email Id
+        //                                     </label>
+        //                                     <input type="email" name="email" placeholder="Your email" autocomplete="off"
+        //                                         required>
+        //                                 </fieldset>
+        //                                 <fieldset>
+        //                                     <label class="fw-semibold body-md-2" id="password">
+        //                                         Password
+        //                                     </label>
+        //                                     <input type="password" placeholder="Enter your password" autocomplete="off"
+        //                                         name="password" required>
+        //                                 </fieldset>
+        //                                 <a href="#" class="link text-end body-text-3">
+        //                                     Forgot password ?
+        //                                 </a>
+        //                             </div>
+        //                             <button type="submit" class="tf-btn w-100 text-white">
+        //                                 Login
+        //                             </button>
+        //                             <p class="body-text-3 text-center">
+        //                                 Don't you have an account?
+        //                                 <a href="#register" data-bs-toggle="modal" class="text-primary">
+        //                                     Register
+        //                                 </a>
+        //                             </p>
+        //                         </form>
+        //                     </div>
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     `;
 
-            // Remove existing modal if any
-            $('#loginModal').remove();
+        //     // Remove existing modal if any
+        //     $('#loginModal').remove();
 
-            // Add modal to body and show
-            $('body').append(modalHtml);
-            $('#loginModal').modal('show');
-        }
+        //     // Add modal to body and show
+        //     $('body').append(modalHtml);
+        //     $('#loginModal').modal('show');
+        // }
     </script>
 @endsection

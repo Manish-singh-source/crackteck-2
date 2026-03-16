@@ -199,7 +199,7 @@ Route::prefix('/')->group(function () {
     // Checkout Routes
     Route::controller(CheckoutController::class)->group(function () {
         // Display checkout page (requires authentication)
-        Route::get('/checkout', 'index')->name('checkout')->middleware('auth:customer_web');
+        Route::get('/checkout', 'index')->name('checkout');
 
         // AJAX routes for checkout operations (require authentication)
         Route::middleware('auth:customer_web')->group(function () {

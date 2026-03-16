@@ -707,7 +707,7 @@
 
                 // Show loading state
                 const originalHtml = $button.html();
-                $button.html('<i class="fa-solid fa-spinner fa-spin"></i> Adding...');
+                $button.html('<i class="fa-solid fa-spinner fa-spin"></i>');
                 $button.prop('disabled', true);
 
                 // Make AJAX request to toggle cart (add if not in cart, remove if in cart)
@@ -938,7 +938,7 @@
                                 // Show loading state
                                 const originalText = $button.html();
                                 $button.html(
-                                    '<i class="spinner-border spinner-border-sm me-2"></i>Adding...'
+                                    '<i class="spinner-border spinner-border-sm me-2"></i>'
                                 );
                                 $button.prop('disabled', true);
 

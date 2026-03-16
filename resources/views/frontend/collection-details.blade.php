@@ -430,10 +430,6 @@
                                         </div>
                                     @endforeach
                                 </div>
-
-                                <div class="tf-pagination-wrap view-more-button text-center">
-                                    {{ $products->links() }}
-                                </div>
                             @else
                                 <div class="text-center py-5">
                                     <h4>No products found in this collection</h4>
@@ -445,12 +441,6 @@
                             @endif
                         </div>
                     </div>
-                    <!-- Pagination -->
-                    @if ($products->hasPages())
-                        <div class="tf-pagination-wrap view-more-button">
-                            {{ $products->links() }}
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>

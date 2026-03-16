@@ -338,11 +338,24 @@
                                                     src="{{ asset($product->warehouseProduct->main_product_image) }}"
                                                     data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
                                                     alt="{{ $product->warehouseProduct->product_name }}">
-                                                @if (is_array($product->warehouseProduct->additional_product_images) &&
-                                                        count($product->warehouseProduct->additional_product_images) > 0)
-                                                    <img class="img-hover lazyload"
-                                                        src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                        data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
+                                                @php
+                                                    $images = $product->warehouseProduct->additional_product_images;
+
+                                                    // agar string hai to array bana do
+                                                    if (!is_array($images)) {
+                                                        $decoded = json_decode($images, true);
+
+                                                        if (json_last_error() === JSON_ERROR_NONE) {
+                                                            $images = $decoded; // JSON string -> array
+                                                        } else {
+                                                            $images = $images ? [$images] : []; // normal string -> array
+                                                        }
+                                                    }
+                                                @endphp
+
+                                                @if (count($images) > 0)
+                                                    <img class="img-hover lazyload" src="{{ asset($images[0]) }}"
+                                                        data-src="{{ asset($images[0]) }}"
                                                         alt="{{ $product->warehouseProduct->product_name }}">
                                                 @endif
                                             @else
@@ -400,10 +413,10 @@
                                                         100,
                                                 );
                                             @endphp
-                                            <div class="box-sale-wrap pst-default">
+                                            {{-- <div class="box-sale-wrap pst-default">
                                                 <p class="small-text">Sale</p>
                                                 <p class="title-sidebar-2">{{ $discountPercent }}%</p>
-                                            </div>
+                                            </div> --}}
                                         @endif
                                     </div>
                                     <div class="card-product-info">
@@ -513,12 +526,6 @@
                             @endforelse
                         </div>
                     </div>
-                    <!-- Pagination -->
-                    {{-- @if ($products->hasPages())
-                        <div class="tf-pagination-wrap view-more-button">
-                            {{ $products->links() }}
-                        </div>
-                    @endif --}}
                 </div>
             </div>
         </div>
@@ -705,7 +712,7 @@
 
                 // Make AJAX request to toggle cart (add if not in cart, remove if in cart)
                 $.ajax({
-                    url: '{{ route("cart.toggle") }}',
+                    url: '{{ route('cart.toggle') }}',
                     method: 'POST',
                     data: {
                         product_id: productId,
@@ -714,16 +721,18 @@
                     success: function(response) {
                         if (response.success) {
                             showNotification(response.message, 'success');
-                            
+
                             // Update button state based on action
                             if (response.action === 'added') {
                                 $button.html('<i class="icon-cart-2"></i>');
                                 $button.addClass('in-cart');
                             } else {
-                                $button.html('<span class="icon icon-cart2"></span><span class="tooltip">Add to Cart</span>');
+                                $button.html(
+                                    '<span class="icon icon-cart2"></span><span class="tooltip">Add to Cart</span>'
+                                );
                                 $button.removeClass('in-cart');
                             }
-                            
+
                             // Update cart count and sidebar
                             updateCartCount();
                             updateCartSidebar();
@@ -733,7 +742,8 @@
                         }
                     },
                     error: function(xhr) {
-                        if (xhr.status === 401 && xhr.responseJSON && xhr.responseJSON.requires_auth) {
+                        if (xhr.status === 401 && xhr.responseJSON && xhr.responseJSON
+                            .requires_auth) {
                             showLoginModal();
                         } else {
                             showNotification('Error updating cart. Please try again.', 'error');
@@ -760,7 +770,7 @@
 
                 // Make AJAX request to toggle wishlist
                 $.ajax({
-                    url: '{{ route("wishlist.toggle") }}',
+                    url: '{{ route('wishlist.toggle') }}',
                     method: 'POST',
                     data: {
                         ecommerce_product_id: productId
@@ -768,16 +778,18 @@
                     success: function(response) {
                         if (response.success) {
                             showNotification(response.message, 'success');
-                            
+
                             // Update button state based on action
                             if (response.action === 'added') {
                                 $button.addClass('in-wishlist');
-                                $button.find('i').removeClass('fa-heart').addClass('fa-solid fa-heart');
+                                $button.find('i').removeClass('fa-heart').addClass(
+                                    'fa-solid fa-heart');
                             } else {
                                 $button.removeClass('in-wishlist');
-                                $button.find('i').removeClass('fa-solid fa-heart').addClass('fa-heart');
+                                $button.find('i').removeClass('fa-solid fa-heart').addClass(
+                                    'fa-heart');
                             }
-                            
+
                             // Update wishlist count
                             updateWishlistCount();
                         } else {
@@ -786,10 +798,12 @@
                         }
                     },
                     error: function(xhr) {
-                        if (xhr.status === 401 && xhr.responseJSON && xhr.responseJSON.requires_auth) {
+                        if (xhr.status === 401 && xhr.responseJSON && xhr.responseJSON
+                            .requires_auth) {
                             showLoginModal();
                         } else {
-                            showNotification('Error updating wishlist. Please try again.', 'error');
+                            showNotification('Error updating wishlist. Please try again.',
+                                'error');
                         }
                         $button.html(originalHtml);
                     },
@@ -813,7 +827,7 @@
 
                 // Make AJAX request to toggle compare
                 $.ajax({
-                    url: '{{ route("compare.add") }}',
+                    url: '{{ route('compare.add') }}',
                     method: 'POST',
                     data: {
                         ecommerce_product_id: productId
@@ -821,14 +835,14 @@
                     success: function(response) {
                         if (response.success) {
                             showNotification(response.message, 'success');
-                            
+
                             // Update button state based on action
                             if (response.action === 'added') {
                                 $button.addClass('in-compare');
                             } else {
                                 $button.removeClass('in-compare');
                             }
-                            
+
                             // Update compare count
                             updateCompareCount();
                         } else {
@@ -837,7 +851,8 @@
                         }
                     },
                     error: function(xhr) {
-                        showNotification('Error updating compare list. Please try again.', 'error');
+                        showNotification('Error updating compare list. Please try again.',
+                            'error');
                         $button.html(originalHtml);
                     },
                     complete: function() {
@@ -848,323 +863,373 @@
 
             // Quick view functionality
             $('.quickview').on('click', function(e) {
-                    e.preventDefault();
+                e.preventDefault();
 
-                    const productId = $(this).data('product-id');
-                    console.log(productId);
+                const productId = $(this).data('product-id');
+                console.log(productId);
 
-                    // Make AJAX request to fetch product details
-                    $.ajax({
-                            url: '{{ route('product.get') }}',
-                            method: 'GET',
-                            data: {
-                                id: productId
-                            },
-                            success: function(response) {
-                                console.log(response);
-                                if (response.success) {
-                                    // Populate quick view modal with product details
-                                    // ... (your code to populate the modal goes here)
-                                    @foreach ($products as $product)
-                                        $('#quickView').modal('show');
+                // Make AJAX request to fetch product details
+                $.ajax({
+                    url: '{{ route('product.get') }}',
+                    method: 'GET',
+                    data: {
+                        id: productId
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success) {
+                            // Populate quick view modal with product details
+                            // ... (your code to populate the modal goes here)
+                            @foreach ($products as $product)
+                                $('#quickView').modal('show');
 
-                                        $('.model_product_name').html(
-                                            '<a href="/product-detail/' + response.data.id +
-                                            '" class="product-link">' +
-                                            response.data.product_name +
-                                            '</a>'
-                                        );
+                                $('.model_product_name').html(
+                                    '<a href="/product-detail/' + response.data.id +
+                                    '" class="product-link">' +
+                                    response.data.product_name +
+                                    '</a>'
+                                );
 
-                                        $('.model_product_selling_price').text('₹' + response.data
-                                            .selling_price);
-                                        $('.model_product_cost_price').text('₹' + response.data
-                                            .cost_price);
-                                        // $('.model_product_main_images').html(response.data
-                                        //     .main_product_image);
-                                        // $('.model_product_thumbs_images').html(response.data
-                                        //     .additional_product_images);
-                                        $('.model_main_product_image').attr('src', '/' + response.data
-                                            .main_product_image);
-                                        $('.model_additional_product_image').attr('src', '/' + response
-                                            .data
-                                            .additional_product_images);
-                                        $('.model_product_brand').text(response.data.brand.brand_title);
-                                        $('.model_product_model_no').text(response.data.model_no);
-                                        $('.model_product_sku').text(response.data.sku);
-                                        $('.model_product_short_description').html(response.data
-                                            .short_description);
-                                        $('.model_product_full_description').html(response.data
-                                            .full_description);
-                                        $('.model_product_technical_specification').html(response.data
-                                            .technical_specification);
-                                        $('model_product_quantity-product').val(response.data
-                                            .min_order_qty);
-                                        $('.add-to-cart-btn, .add-to-cart').data('product-id', response
-                                            .data.id);
-                                    @endforeach
+                                $('.model_product_selling_price').text('₹' + response.data
+                                    .selling_price);
+                                $('.model_product_cost_price').text('₹' + response.data
+                                    .cost_price);
+                                // $('.model_product_main_images').html(response.data
+                                //     .main_product_image);
+                                // $('.model_product_thumbs_images').html(response.data
+                                //     .additional_product_images);
+                                $('.model_main_product_image').attr('src', '/' + response.data
+                                    .main_product_image);
+                                $('.model_additional_product_image').attr('src', '/' + response
+                                    .data
+                                    .additional_product_images);
+                                $('.model_product_brand').text(response.data.brand.brand_title);
+                                $('.model_product_model_no').text(response.data.model_no);
+                                $('.model_product_sku').text(response.data.sku);
+                                $('.model_product_short_description').html(response.data
+                                    .short_description);
+                                $('.model_product_full_description').html(response.data
+                                    .full_description);
+                                $('.model_product_technical_specification').html(response.data
+                                    .technical_specification);
+                                $('model_product_quantity-product').val(response.data
+                                    .min_order_qty);
+                                $('.add-to-cart-btn, .add-to-cart').data('product-id', response
+                                    .data.id);
+                            @endforeach
 
-                                    // Add to Cart functionality
-                                    $('.add-to-cart-btn, .add-to-cart').on('click', function(e) {
-                                            e.preventDefault();
+                            // Add to Cart functionality
+                            $('.add-to-cart-btn, .add-to-cart').on('click', function(e) {
+                                e.preventDefault();
 
-                                            const $button = $(this);
-                                            const productId = $button.data('product-id');
-                                            const quantity = $('.quantity-input').val() || 1;
+                                const $button = $(this);
+                                const productId = $button.data('product-id');
+                                const quantity = $('.quantity-input').val() || 1;
 
-                                            // Check if user is authenticated
-                                            // Check if user is authenticated
-                                            @if (!auth('customer_web')) 
-                                                showNotification('Please login to add products to your wishlist.', 'warning');
-                                                return;
-                                            @endif
+                                // Check if user is authenticated
+                                // Check if user is authenticated
+                                @if (!auth('customer_web'))
+                                    showNotification(
+                                        'Please login to add products to your wishlist.',
+                                        'warning');
+                                    return;
+                                @endif
 
-                                        // Show loading state
-                                        const originalText = $button.html(); $button.html(
-                                            '<i class="spinner-border spinner-border-sm me-2"></i>Adding...'
-                                        ); $button.prop('disabled', true);
+                                // Show loading state
+                                const originalText = $button.html();
+                                $button.html(
+                                    '<i class="spinner-border spinner-border-sm me-2"></i>Adding...'
+                                );
+                                $button.prop('disabled', true);
 
-                                        // Make AJAX request
-                                        $.ajax({
-                                            url: '{{ route('cart.add') }}',
-                                            method: 'POST',
-                                            data: {
-                                                ecommerce_product_id: productId,
-                                                quantity: quantity
-                                            },
-                                            success: function(response) {
-                                                if (response.success) {
-                                                    showNotification(response.message,
-                                                        'success');
+                                // Make AJAX request
+                                $.ajax({
+                                    url: '{{ route('cart.add') }}',
+                                    method: 'POST',
+                                    data: {
+                                        ecommerce_product_id: productId,
+                                        quantity: quantity
+                                    },
+                                    success: function(response) {
+                                        if (response.success) {
+                                            showNotification(response
+                                                .message,
+                                                'success');
 
-                                                    // Update button state
-                                                    $button.html(
-                                                        'Added to Cart <i class="icon-cart-2"></i>'
-                                                    );
-                                                    $button.addClass('in-cart');
+                                            // Update button state
+                                            $button.html(
+                                                'Added to Cart <i class="icon-cart-2"></i>'
+                                            );
+                                            $button.addClass('in-cart');
 
-                                                    // Update cart count and sidebar
-                                                    updateCartCount();
-                                                    updateCartSidebar();
-                                                } else {
-                                                    showNotification(response.message,
-                                                        'error');
-                                                    // Reset button state
-                                                    $button.html(originalText);
-                                                }
-                                            },
-                                            error: function(xhr) {
-                                                if (xhr.status === 401 && xhr
-                                                    .responseJSON && xhr.responseJSON
-                                                    .requires_auth) {
-                                                    showLoginModal();
-                                                } else {
-                                                    console.log(productId)
-                                                    console.log(xhr.responseJSON);
-                                                    showNotification(
-                                                        'Error adding product to cart. Please try again.',
-                                                        'error');
-                                                    // Reset button state
-                                                    $button.html(originalText);
-                                                }
-                                            },
-                                            complete: function() {
-                                                $button.prop('disabled', false);
-                                            }
-                                        });
-                                    });
-                            }
-                        },
-                        error: function(e) {
-                            console.log(e.responseText);
-                            console.log('Error fetching product details');
+                                            // Update cart count and sidebar
+                                            updateCartCount();
+                                            updateCartSidebar();
+                                        } else {
+                                            showNotification(response
+                                                .message,
+                                                'error');
+                                            // Reset button state
+                                            $button.html(originalText);
+                                        }
+                                    },
+                                    error: function(xhr) {
+                                        if (xhr.status === 401 && xhr
+                                            .responseJSON && xhr
+                                            .responseJSON
+                                            .requires_auth) {
+                                            showLoginModal();
+                                        } else {
+                                            console.log(productId)
+                                            console.log(xhr.responseJSON);
+                                            showNotification(
+                                                'Error adding product to cart. Please try again.',
+                                                'error');
+                                            // Reset button state
+                                            $button.html(originalText);
+                                        }
+                                    },
+                                    complete: function() {
+                                        $button.prop('disabled', false);
+                                    }
+                                });
+                            });
                         }
-                    });
+                    },
+                    error: function(e) {
+                        console.log(e.responseText);
+                        console.log('Error fetching product details');
+                    }
+                });
             });
 
-        // Wishlist handler is now in product-actions.js
+            // Wishlist handler is now in product-actions.js
 
-        // Compare handler is now in product-actions.js
+            // Compare handler is now in product-actions.js
 
-        // showNotification function is now global in master layout
-        // Wishlist count function is now global in master layout
+            // showNotification function is now global in master layout
+            // Wishlist count function is now global in master layout
 
-        // Cart handler is now in product-actions.js
-        // Cart count function is now global in master layout
-        // updateCartSidebar function is now global in master layout
-        // showLoginModal function is now global in master layout
+            // Cart handler is now in product-actions.js
+            // Cart count function is now global in master layout
+            // updateCartSidebar function is now global in master layout
+            // showLoginModal function is now global in master layout
 
-        // Initialize counts on page load (handled by master layout)
-        // Button state initialization is now handled by product-actions.js
+            // Initialize counts on page load (handled by master layout)
+            // Button state initialization is now handled by product-actions.js
 
-        // ============================================
-        // SHOP FILTER FUNCTIONALITY
-        // ============================================
+            // ============================================
+            // SHOP FILTER FUNCTIONALITY
+            // ============================================
 
-        let selectedCategories = [];
-        let selectedBrands = [];
-        let selectedPriceRanges = [];
-        let customMinPrice = null;
-        let customMaxPrice = null;
-        let selectedSort = null;
+            let selectedCategories = [];
+            let selectedBrands = [];
+            let selectedPriceRanges = [];
+            let customMinPrice = null;
+            let customMaxPrice = null;
+            let selectedSort = null;
+            let selectedDeal = null;
 
 
-        // Category filter change
-        $('.category-filter').on('change', function() {
-            const categoryId = $(this).val();
-            if ($(this).is(':checked')) {
-                if (!selectedCategories.includes(categoryId)) {
-                    selectedCategories.push(categoryId);
+            // Category filter change
+            $('.category-filter').on('change', function() {
+                const categoryId = $(this).val();
+                if ($(this).is(':checked')) {
+                    if (!selectedCategories.includes(categoryId)) {
+                        selectedCategories.push(categoryId);
+                    }
+                } else {
+                    selectedCategories = selectedCategories.filter(id => id !== categoryId);
                 }
-            } else {
-                selectedCategories = selectedCategories.filter(id => id !== categoryId);
-            }
-            applyShopFilters();
-        });
+                applyShopFilters();
+            });
 
-        // Brand filter change
-        $('.brand-filter').on('change', function() {
-            const brandId = $(this).val();
-            if ($(this).is(':checked')) {
-                if (!selectedBrands.includes(brandId)) {
-                    selectedBrands.push(brandId);
+            // Brand filter change
+            $('.brand-filter').on('change', function() {
+                const brandId = $(this).val();
+                if ($(this).is(':checked')) {
+                    if (!selectedBrands.includes(brandId)) {
+                        selectedBrands.push(brandId);
+                    }
+                } else {
+                    selectedBrands = selectedBrands.filter(id => id !== brandId);
                 }
-            } else {
-                selectedBrands = selectedBrands.filter(id => id !== brandId);
-            }
-            applyShopFilters();
-        });
+                applyShopFilters();
+            });
 
-        // Price range filter change
-        $('.price-range-filter').on('change', function() {
-            const priceRange = $(this).val();
-            if ($(this).is(':checked')) {
-                if (!selectedPriceRanges.includes(priceRange)) {
-                    selectedPriceRanges.push(priceRange);
+            // Price range filter change
+            $('.price-range-filter').on('change', function() {
+                const priceRange = $(this).val();
+                if ($(this).is(':checked')) {
+                    if (!selectedPriceRanges.includes(priceRange)) {
+                        selectedPriceRanges.push(priceRange);
+                    }
+                    // Clear custom price when selecting predefined ranges
+                    customMinPrice = null;
+                    customMaxPrice = null;
+                    $('#custom-min-price').val('');
+                    $('#custom-max-price').val('');
+                } else {
+                    selectedPriceRanges = selectedPriceRanges.filter(range => range !== priceRange);
                 }
-                // Clear custom price when selecting predefined ranges
-                customMinPrice = null;
-                customMaxPrice = null;
-                $('#custom-min-price').val('');
-                $('#custom-max-price').val('');
-            } else {
-                selectedPriceRanges = selectedPriceRanges.filter(range => range !== priceRange);
-            }
-            applyShopFilters();
-        });
+                applyShopFilters();
+            });
 
-        // Custom price range
-        $('#apply-custom-price').on('click', function() {
-            const minPrice = $('#custom-min-price').val();
-            const maxPrice = $('#custom-max-price').val();
+            // Custom price range
+            $('#apply-custom-price').on('click', function() {
+                const minPrice = $('#custom-min-price').val();
+                const maxPrice = $('#custom-max-price').val();
 
-            if (minPrice || maxPrice) {
-                customMinPrice = minPrice ? parseFloat(minPrice) : null;
-                customMaxPrice = maxPrice ? parseFloat(maxPrice) : null;
+                if (minPrice || maxPrice) {
+                    customMinPrice = minPrice ? parseFloat(minPrice) : null;
+                    customMaxPrice = maxPrice ? parseFloat(maxPrice) : null;
 
-                // Validate
-                if (customMinPrice && customMaxPrice && customMinPrice > customMaxPrice) {
-                    alert('Minimum price cannot be greater than maximum price');
-                    return;
+                    // Validate
+                    if (customMinPrice && customMaxPrice && customMinPrice > customMaxPrice) {
+                        alert('Minimum price cannot be greater than maximum price');
+                        return;
+                    }
+
+                    // Clear predefined price ranges
+                    selectedPriceRanges = [];
+                    $('.price-range-filter').prop('checked', false);
+
+                    applyShopFilters();
                 }
+            });
 
-                // Clear predefined price ranges
+            // Clear custom price when clicking on input
+            $('#custom-min-price, #custom-max-price').on('focus', function() {
                 selectedPriceRanges = [];
                 $('.price-range-filter').prop('checked', false);
+            });
+
+            // Remove all filters
+            $('#remove-all').on('click', function() {
+                selectedCategories = [];
+                selectedBrands = [];
+                selectedPriceRanges = [];
+                customMinPrice = null;
+                customMaxPrice = null;
+                selectedDeal = null;
+
+                $('.category-filter').prop('checked', false);
+                $('.brand-filter').prop('checked', false);
+                $('.price-range-filter').prop('checked', false);
+                $('#custom-min-price').val('');
+                $('#custom-max-price').val('');
+                $('input[name="deal"]').prop('checked', false);
 
                 applyShopFilters();
-            }
-        });
-
-        // Clear custom price when clicking on input
-        $('#custom-min-price, #custom-max-price').on('focus', function() {
-            selectedPriceRanges = [];
-            $('.price-range-filter').prop('checked', false);
-        });
-
-        // Remove all filters
-        $('#remove-all').on('click', function() {
-            selectedCategories = [];
-            selectedBrands = [];
-            selectedPriceRanges = [];
-            customMinPrice = null;
-            customMaxPrice = null;
-
-            $('.category-filter').prop('checked', false);
-            $('.brand-filter').prop('checked', false);
-            $('.price-range-filter').prop('checked', false);
-            $('#custom-min-price').val('');
-            $('#custom-max-price').val('');
-
-            applyShopFilters();
-        });
-
-        $('#sortBy').on('change', function() {
-            selectedSort = $(this).val();
-            applyShopFilters();
-        });
-
-
-        // Apply filters function
-        function applyShopFilters() {
-            // Show loading state
-            $('#gridLayout').html(
-                '<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>'
-            );
-
-            // Build filter parameters
-            const filterParams = {};
-
-            if (selectedCategories.length > 0) {
-                filterParams.categories = selectedCategories;
-            }
-
-            if (selectedBrands.length > 0) {
-                filterParams.brands = selectedBrands;
-            }
-
-            if (selectedPriceRanges.length > 0) {
-                filterParams.price_range = selectedPriceRanges;
-            }
-
-            if (customMinPrice !== null) {
-                filterParams.min_price = customMinPrice;
-            }
-
-            if (customMaxPrice !== null) {
-                filterParams.max_price = customMaxPrice;
-            }
-
-            if (selectedSort) {
-                filterParams.sort_by = selectedSort;
-            }
-
-            // Make AJAX request
-            $.ajax({
-                url: '{{ route('shop.filter') }}',
-                method: 'GET',
-                data: filterParams,
-                success: function(response) {
-                    if (response.success) {
-                        renderProducts(response.products);
-                        updateFilterMeta(response.products.length);
-                    } else {
-                        showError('Failed to filter products');
-                    }
-                },
-                error: function(xhr) {
-                    console.error('Filter error:', xhr);
-                    showError('An error occurred while filtering products');
-                }
             });
-        }
 
-        // Render products
-        function renderProducts(products) {
-            const gridLayout = $('#gridLayout');
-            gridLayout.empty();
+            // Reset filters button (mobile view)
+            $('#reset-filter').on('click', function() {
+                selectedCategories = [];
+                selectedBrands = [];
+                selectedPriceRanges = [];
+                customMinPrice = null;
+                customMaxPrice = null;
+                selectedDeal = null;
 
-            if (products.length === 0) {
-                gridLayout.html(`
+                $('.category-filter').prop('checked', false);
+                $('.brand-filter').prop('checked', false);
+                $('.price-range-filter').prop('checked', false);
+                $('#custom-min-price').val('');
+                $('#custom-max-price').val('');
+                $('input[name="deal"]').prop('checked', false);
+                $('#sortBy').val('');
+
+                applyShopFilters();
+            });
+
+            $('#sortBy').on('change', function() {
+                selectedSort = $(this).val();
+                applyShopFilters();
+            });
+
+            // Deal filter change
+            $('input[name="deal"]').on('change', function() {
+                selectedDeal = $(this).val();
+                applyShopFilters();
+            });
+
+
+            // Apply filters function
+            function applyShopFilters() {
+                // Show loading state
+                $('#gridLayout').html(
+                    '<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>'
+                );
+
+                // Build filter parameters
+                const filterParams = {};
+
+                if (selectedCategories.length > 0) {
+                    filterParams.categories = selectedCategories;
+                }
+
+                if (selectedBrands.length > 0) {
+                    filterParams.brands = selectedBrands;
+                }
+
+                if (selectedPriceRanges.length > 0) {
+                    filterParams.price_range = selectedPriceRanges;
+                }
+
+                if (customMinPrice !== null) {
+                    filterParams.min_price = customMinPrice;
+                }
+
+                if (customMaxPrice !== null) {
+                    filterParams.max_price = customMaxPrice;
+                }
+
+                if (selectedSort) {
+                    filterParams.sort_by = selectedSort;
+                }
+
+                if (selectedDeal) {
+                    filterParams.deal = selectedDeal;
+                }
+
+                // Make AJAX request
+                console.log('Applying filters with params:', filterParams);
+                $.ajax({
+                    url: '{{ route('shop.filter') }}',
+                    method: 'GET',
+                    data: filterParams,
+                    success: function(response) {
+                        console.log('Filter response:', response);
+                        if (response.success) {
+                            renderProducts(response.products);
+                            updateFilterMeta(response.products.length);
+                        } else {
+                            console.error('Filter failed:', response.message, response.error);
+                            showError('Failed to filter products: ' + (response.message || ''));
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Filter error:', xhr);
+                        let errorMsg = 'An error occurred while filtering products';
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            errorMsg += ' - ' + (response.message || response.error || xhr.statusText);
+                        } catch(e) {
+                            errorMsg += ' - ' + xhr.responseText;
+                        }
+                        showError(errorMsg);
+                    }
+                });
+            }
+
+            // Render products
+            function renderProducts(products) {
+                const gridLayout = $('#gridLayout');
+                gridLayout.empty();
+
+                if (products.length === 0) {
+                    gridLayout.html(`
                     <div class="col-12">
                         <div class="text-center py-5">
                             <h4>No Products Found</h4>
@@ -1172,25 +1237,25 @@
                         </div>
                     </div>
                 `);
-                return;
+                    return;
+                }
+
+                products.forEach(function(product) {
+                    const productHtml = createProductCard(product);
+                    gridLayout.append(productHtml);
+                });
             }
 
-            products.forEach(function(product) {
-                const productHtml = createProductCard(product);
-                gridLayout.append(productHtml);
-            });
-        }
+            // Create product card HTML
+            function createProductCard(product) {
+                // console.log(product);
+                const shortDescription = product.short_description ? product.short_description : '';
+                // console.log(shortDescription);
+                const discountPercent = product.selling_price > product.final_price ?
+                    Math.round(((product.selling_price - product.final_price) / product.selling_price) * 100) :
+                    0;
 
-        // Create product card HTML
-        function createProductCard(product) {
-            // console.log(product);
-            const shortDescription = product.short_description ? product.short_description : '';
-            // console.log(shortDescription);
-            const discountPercent = product.selling_price > product.final_price ?
-                Math.round(((product.selling_price - product.final_price) / product.selling_price) * 100) :
-                0;
-
-            return `
+                return `
                 <div class="card-product"
                      data-brand-id="${product.brand_id || ''}"
                      data-category-id="${product.category_id || ''}"
@@ -1219,12 +1284,6 @@
                                 </a>
                             </li>
                         </ul>
-                        ${discountPercent > 0 ? `
-                                        <div class="box-sale-wrap pst-default">
-                                            <p class="small-text">Sale</p>
-                                            <p class="title-sidebar-2">${discountPercent}%</p>
-                                        </div>
-                                    ` : ''}
                     </div>
                     <div class="card-product-info">
                         <div class="box-title">
@@ -1243,8 +1302,8 @@
                             </p>
 
                             ${shortDescription ? `<div class="product-description">
-                                                                        <p class="caption">${shortDescription}</p>
-                                                                    </div>` : ''}
+                                                                                <p class="caption">${shortDescription}</p>
+                                                                            </div>` : ''}
                             <div class="box-infor-detail">
                                 <div class="star-review flex-wrap">
                                     <ul class="list-star">
@@ -1269,203 +1328,204 @@
                     </div>
                 </div>
             `;
-        }
+            }
 
-        // Update filter meta information
-        function updateFilterMeta(count) {
-            const metaFilterShop = $('.meta-filter-shop');
-            const appliedFilters = $('#applied-filters');
-            const removeAllBtn = $('#remove-all');
+            // Update filter meta information
+            function updateFilterMeta(count) {
+                const metaFilterShop = $('.meta-filter-shop');
+                const appliedFilters = $('#applied-filters');
+                const removeAllBtn = $('#remove-all');
 
-            appliedFilters.empty();
+                appliedFilters.empty();
 
-            // Add category filters
-            selectedCategories.forEach(function(categoryId) {
-                const categoryLabel = $(`#category-${categoryId}`).next('label').text();
-                appliedFilters.append(`
+                // Add category filters
+                selectedCategories.forEach(function(categoryId) {
+                    const categoryLabel = $(`#category-${categoryId}`).next('label').text();
+                    appliedFilters.append(`
                     <span class="filter-tag">${categoryLabel}
                         <span class="remove-tag icon-close" data-filter="category" data-value="${categoryId}"></span>
                     </span>
                 `);
-            });
+                });
 
-            // Add brand filters
-            selectedBrands.forEach(function(brandId) {
-                const brandLabel = $(`#brand-${brandId}`).next('label').text();
-                appliedFilters.append(`
+                // Add brand filters
+                selectedBrands.forEach(function(brandId) {
+                    const brandLabel = $(`#brand-${brandId}`).next('label').text();
+                    appliedFilters.append(`
                     <span class="filter-tag">${brandLabel}
                         <span class="remove-tag icon-close" data-filter="brand" data-value="${brandId}"></span>
                     </span>
                 `);
-            });
+                });
 
-            // Add price range filters
-            selectedPriceRanges.forEach(function(range) {
-                let rangeLabel = '';
-                switch (range) {
-                    case 'under_10000':
-                        rangeLabel = 'Under ₹10,000';
-                        break;
-                    case '10000_15000':
-                        rangeLabel = '₹10,000 to ₹15,000';
-                        break;
-                    case '15000_25000':
-                        rangeLabel = '₹15,000 to ₹25,000';
-                        break;
-                    case 'above_35000':
-                        rangeLabel = '₹35,000 & Above';
-                        break;
-                }
-                appliedFilters.append(`
+                // Add price range filters
+                selectedPriceRanges.forEach(function(range) {
+                    let rangeLabel = '';
+                    switch (range) {
+                        case 'under_10000':
+                            rangeLabel = 'Under ₹10,000';
+                            break;
+                        case '10000_15000':
+                            rangeLabel = '₹10,000 to ₹15,000';
+                            break;
+                        case '15000_25000':
+                            rangeLabel = '₹15,000 to ₹25,000';
+                            break;
+                        case 'above_35000':
+                            rangeLabel = '₹35,000 & Above';
+                            break;
+                    }
+                    appliedFilters.append(`
                     <span class="filter-tag">${rangeLabel}
                         <span class="remove-tag icon-close" data-filter="price_range" data-value="${range}"></span>
                     </span>
                 `);
-            });
+                });
 
-            // Add custom price filter
-            if (customMinPrice !== null || customMaxPrice !== null) {
-                let priceLabel = '';
-                if (customMinPrice !== null && customMaxPrice !== null) {
-                    priceLabel = `₹${customMinPrice.toLocaleString()} - ₹${customMaxPrice.toLocaleString()}`;
-                } else if (customMinPrice !== null) {
-                    priceLabel = `₹${customMinPrice.toLocaleString()} +`;
-                } else {
-                    priceLabel = `Up to ₹${customMaxPrice.toLocaleString()}`;
-                }
-                appliedFilters.append(`
+                // Add custom price filter
+                if (customMinPrice !== null || customMaxPrice !== null) {
+                    let priceLabel = '';
+                    if (customMinPrice !== null && customMaxPrice !== null) {
+                        priceLabel = `₹${customMinPrice.toLocaleString()} - ₹${customMaxPrice.toLocaleString()}`;
+                    } else if (customMinPrice !== null) {
+                        priceLabel = `₹${customMinPrice.toLocaleString()} +`;
+                    } else {
+                        priceLabel = `Up to ₹${customMaxPrice.toLocaleString()}`;
+                    }
+                    appliedFilters.append(`
                     <span class="filter-tag">${priceLabel}
                         <span class="remove-tag icon-close" data-filter="custom_price"></span>
                     </span>
                 `);
+                }
+
+                // Show/hide meta filter section
+                const hasFilters = selectedCategories.length > 0 || selectedBrands.length > 0 ||
+                    selectedPriceRanges.length > 0 || customMinPrice !== null || customMaxPrice !== null;
+
+                if (hasFilters) {
+                    metaFilterShop.show();
+                    removeAllBtn.show();
+                    $('#product-count-grid').text(`Showing ${count} products`);
+                } else {
+                    metaFilterShop.hide();
+                    removeAllBtn.hide();
+                }
             }
 
-            // Show/hide meta filter section
-            const hasFilters = selectedCategories.length > 0 || selectedBrands.length > 0 ||
-                selectedPriceRanges.length > 0 || customMinPrice !== null || customMaxPrice !== null;
+            // Remove individual filter tag
+            $(document).on('click', '.remove-tag', function() {
+                const filterType = $(this).data('filter');
+                const filterValue = $(this).data('value');
 
-            if (hasFilters) {
-                metaFilterShop.show();
-                removeAllBtn.show();
-                $('#product-count-grid').text(`Showing ${count} products`);
-            } else {
-                metaFilterShop.hide();
-                removeAllBtn.hide();
-            }
-        }
+                if (filterType === 'category') {
+                    // Uncheck the checkbox
+                    $(`.category-filter[value="${filterValue}"]`).prop('checked', false);
+                    // Remove from array (convert both to string for safety)
+                    selectedCategories = selectedCategories.filter(id => String(id) !== String(
+                        filterValue));
+                } else if (filterType === 'brand') {
+                    $(`.brand-filter[value="${filterValue}"]`).prop('checked', false);
+                    selectedBrands = selectedBrands.filter(id => String(id) !== String(filterValue));
+                } else if (filterType === 'price_range') {
+                    selectedPriceRanges = selectedPriceRanges.filter(range => range !== filterValue);
+                    $(`.price-range-filter[value="${filterValue}"]`).prop('checked', false);
+                } else if (filterType === 'custom_price') {
+                    customMinPrice = null;
+                    customMaxPrice = null;
+                    $('#custom-min-price').val('');
+                    $('#custom-max-price').val('');
+                }
 
-        // Remove individual filter tag
-        $(document).on('click', '.remove-tag', function() {
-            const filterType = $(this).data('filter');
-            const filterValue = $(this).data('value');
+                applyShopFilters();
+            });
 
-            if (filterType === 'category') {
-                // Uncheck the checkbox
-                $(`.category-filter[value="${filterValue}"]`).prop('checked', false);
-                // Remove from array (convert both to string for safety)
-                selectedCategories = selectedCategories.filter(id => String(id) !== String(filterValue));
-            } else if (filterType === 'brand') {
-                $(`.brand-filter[value="${filterValue}"]`).prop('checked', false);
-                selectedBrands = selectedBrands.filter(id => String(id) !== String(filterValue));
-            } else if (filterType === 'price_range') {
-                selectedPriceRanges = selectedPriceRanges.filter(range => range !== filterValue);
-                $(`.price-range-filter[value="${filterValue}"]`).prop('checked', false);
-            } else if (filterType === 'custom_price') {
-                customMinPrice = null;
-                customMaxPrice = null;
-                $('#custom-min-price').val('');
-                $('#custom-max-price').val('');
-            }
-
-            applyShopFilters();
-        });
-
-        // Show error message
-        function showError(message) {
-            $('#gridLayout').html(`
+            // Show error message
+            function showError(message) {
+                $('#gridLayout').html(`
                 <div class="col-12">
                     <div class="alert alert-danger text-center" role="alert">
                         ${message}
                     </div>
                 </div>
             `);
-        }
+            }
 
-        // Add to Wishlist functionality
-        $('.add-to-wishlist-btn').on('click', function(e) {
-            e.preventDefault();
+            // Add to Wishlist functionality
+            $('.add-to-wishlist-btn').on('click', function(e) {
+                e.preventDefault();
 
-            const $button = $(this);
-            const productId = $button.data('product-id');
-            const productName = $button.data('product-name');
+                const $button = $(this);
+                const productId = $button.data('product-id');
+                const productName = $button.data('product-name');
 
-            // Check if user is authenticated
-            @if (!auth('customer_web')) 
-                showNotification('Please login to add products to your wishlist.', 'warning');
-                return;
-            @endif
+                // Check if user is authenticated
+                @if (!auth('customer_web'))
+                    showNotification('Please login to add products to your wishlist.', 'warning');
+                    return;
+                @endif
 
-            // Show loading state
-            const originalIcon = $button.find('.icon').attr('class');
-            const originalTooltip = $button.find('.tooltip').text();
+                // Show loading state
+                const originalIcon = $button.find('.icon').attr('class');
+                const originalTooltip = $button.find('.tooltip').text();
 
-            $button.find('.icon').attr('class', 'icon icon-loading');
-            $button.find('.tooltip').text('Adding...');
-            $button.prop('disabled', true);
+                $button.find('.icon').attr('class', 'icon icon-loading');
+                $button.find('.tooltip').text('Adding...');
+                $button.prop('disabled', true);
 
-            // Make AJAX request
-            $.ajax({
-                url: '{{ route("wishlist.toggle") }}',
-                method: 'POST',
-                data: {
-                    ecommerce_product_id: productId
-                },
-                success: function(response) {
-                    if (response.success) {
-                        showNotification(response.message, 'success');
+                // Make AJAX request
+                $.ajax({
+                    url: '{{ route('wishlist.toggle') }}',
+                    method: 'POST',
+                    data: {
+                        ecommerce_product_id: productId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
 
-                        // Update button state based on action
-                        if (response.action === 'added') {
-                            $button.find('.icon').attr('class', 'icon icon-heart-fill');
-                            $button.find('.tooltip').text('In Wishlist');
-                            $button.addClass('in-wishlist');
-                        } else if (response.action === 'removed') {
-                            $button.find('.icon').attr('class', 'icon icon-heart2');
-                            $button.find('.tooltip').text('Add to Wishlist');
-                            $button.removeClass('in-wishlist');
+                            // Update button state based on action
+                            if (response.action === 'added') {
+                                $button.find('.icon').attr('class', 'icon icon-heart-fill');
+                                $button.find('.tooltip').text('In Wishlist');
+                                $button.addClass('in-wishlist');
+                            } else if (response.action === 'removed') {
+                                $button.find('.icon').attr('class', 'icon icon-heart2');
+                                $button.find('.tooltip').text('Add to Wishlist');
+                                $button.removeClass('in-wishlist');
+                            }
+
+                            // Update wishlist count if there's a counter
+                            updateWishlistCount();
+                        } else {
+                            showNotification(response.message, 'error');
+                            // Reset button state
+                            $button.find('.icon').attr('class', originalIcon);
+                            $button.find('.tooltip').text(originalTooltip);
+                        }
+                    },
+                    error: function(xhr) {
+                        let message = 'An error occurred while updating the wishlist.';
+
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        } else if (xhr.status === 401) {
+                            message = 'Please login to add products to your wishlist.';
+                        } else if (xhr.status === 409) {
+                            message = 'This product is already in your wishlist.';
                         }
 
-                        // Update wishlist count if there's a counter
-                        updateWishlistCount();
-                    } else {
-                        showNotification(response.message, 'error');
+                        showNotification(message, 'error');
+
                         // Reset button state
                         $button.find('.icon').attr('class', originalIcon);
                         $button.find('.tooltip').text(originalTooltip);
+                    },
+                    complete: function() {
+                        $button.prop('disabled', false);
                     }
-                },
-                error: function(xhr) {
-                    let message = 'An error occurred while updating the wishlist.';
-
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        message = xhr.responseJSON.message;
-                    } else if (xhr.status === 401) {
-                        message = 'Please login to add products to your wishlist.';
-                    } else if (xhr.status === 409) {
-                        message = 'This product is already in your wishlist.';
-                    }
-
-                    showNotification(message, 'error');
-
-                    // Reset button state
-                    $button.find('.icon').attr('class', originalIcon);
-                    $button.find('.tooltip').text(originalTooltip);
-                },
-                complete: function() {
-                    $button.prop('disabled', false);
-                }
+                });
             });
-        });
 
         });
     </script>

@@ -270,7 +270,7 @@
                                                         'label' => 'Cost Price',
                                                         'name' => 'cost_price',
                                                         'id' => 'cost_price',
-                                                        'type' => 'number',
+                                                        'type' => 'text',
                                                         'placeholder' => 'Enter Cost Price',
                                                         'model' => $product,
                                                     ])
@@ -283,7 +283,7 @@
                                                         'label' => 'Selling Price',
                                                         'name' => 'selling_price',
                                                         'id' => 'selling_price',
-                                                        'type' => 'number',
+                                                        'type' => 'text',
                                                         'placeholder' => 'Enter Selling Price',
                                                         'model' => $product,
                                                     ])
@@ -296,7 +296,7 @@
                                                         'label' => 'Discount Price',
                                                         'name' => 'discount_price',
                                                         'id' => 'discount_price',
-                                                        'type' => 'number',
+                                                        'type' => 'text',
                                                         'placeholder' => 'Enter Discount Price',
                                                         'model' => $product,
                                                     ])
@@ -309,7 +309,7 @@
                                                         'label' => 'Tax (%)',
                                                         'name' => 'tax',
                                                         'id' => 'tax',
-                                                        'type' => 'number',
+                                                        'type' => 'text',
                                                         'placeholder' => 'Enter Tax',
                                                         'model' => $product,
                                                     ])
@@ -322,7 +322,7 @@
                                                         'label' => 'Final Price',
                                                         'name' => 'final_price',
                                                         'id' => 'final_price',
-                                                        'type' => 'number',
+                                                        'type' => 'text',
                                                         'placeholder' => 'Enter Final Price',
                                                         'model' => $product,
                                                     ])
@@ -334,7 +334,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Stock Quantity',
                                                         'name' => 'stock_quantity',
-                                                        'type' => 'number',
+                                                        'type' => 'text',
                                                         'placeholder' => 'Enter Stock Quantity',
                                                         'model' => $product,
                                                     ])

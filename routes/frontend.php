@@ -111,8 +111,8 @@ Route::prefix('/')->group(function () {
 
     // Wishlist Routes
     Route::controller(WishlistController::class)->group(function () {
-        // Display wishlist page (requires authentication)
-        Route::get('/wishlist', 'index')->name('wishlist')->middleware('auth:customer_web');
+        // Display wishlist page (authentication handled in controller)
+        Route::get('/wishlist', 'index')->name('wishlist');
 
         // AJAX routes for wishlist operations (auth handled in controller)
         Route::post('/wishlist/add', 'store')->name('wishlist.add');
@@ -130,7 +130,7 @@ Route::prefix('/')->group(function () {
     // Cart Routes
     Route::controller(CartController::class)->group(function () {
         // Display cart page (requires authentication)
-        Route::get('/shop-cart', 'index')->name('shop-cart')->middleware('auth:customer_web');
+        Route::get('/shop-cart', 'index')->name('shop-cart');
 
         // AJAX routes for cart operations (auth handled in controller)
         Route::post('/cart/add', 'store')->name('cart.add');

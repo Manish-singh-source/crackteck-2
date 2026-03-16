@@ -216,10 +216,6 @@
                                                         </tbody>
                                                     </table>
 
-                                                    <!-- Pagination -->
-                                                    <div class="d-flex justify-content-center">
-                                                        {{ $reimbursements->links() }}
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

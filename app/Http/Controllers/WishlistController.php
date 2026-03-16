@@ -21,7 +21,7 @@ class WishlistController extends Controller
     {
         // Check if user is authenticated
         if (! Auth::guard('customer_web')->check()) {
-            return redirect()->route('login')->with('error', 'Please login to view your wishlist.');
+            return redirect()->back()->with('open_login_modal', true)->with('error', 'Please login to view your wishlist.');
         }
 
         // Get user's wishlist items with product relationships

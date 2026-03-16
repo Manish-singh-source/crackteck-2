@@ -15,7 +15,7 @@ class FileUpload
             return '';
         }
 
-        $path = self::normalizePath($path !== '' ? $path : 'uploads/crm/amc/brochure/');
+        $path = self::normalizePath($path !== '' ? $path : 'uploads/crm/');
 
         if (self::shouldUseFirebase()) {
             return app(FirebaseStorageService::class)->upload($file, $path);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
+use App\Models\EcommerceProduct;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -30,18 +31,28 @@ class CouponApplicationController extends Controller
         ]);
 
         $couponCode = strtoupper(trim($request->coupon_code));
-        $userId = Auth::id();
-
-        // Get user's cart items
-        $cartItems = Cart::with(['ecommerceProduct.warehouseProduct'])
-            ->where('customer_id', $userId)
-            ->get();
+        $userId = Auth::guard('customer_web')->id();
 
         // Check navigation source to determine if cart validation should be skipped
         $navigationSource = Session::get('checkout_navigation_source');
+
+        if ($navigationSource === 'cart') {
+            // Get user's cart items
+            $cartItems = Cart::with(['ecommerceProduct.warehouseProduct'])
+                ->where('customer_id', $userId)
+                ->get();
+        } elseif ($navigationSource === 'buy_now') {
+            $cartItems = EcommerceProduct::where('id', $request->productId)->get();
+        } else {
+            // Default: get cart items
+            $cartItems = Cart::with(['ecommerceProduct.warehouseProduct'])
+                ->where('customer_id', $userId)
+                ->get();
+        }
+
         $skipCartValidation = in_array($navigationSource, ['cart', 'buy_now']);
 
-        if ($cartItems->isEmpty() && ! $skipCartValidation) {
+        if ($cartItems->isEmpty() && !$skipCartValidation) {
             return response()->json([
                 'success' => false,
                 'message' => 'Your cart is empty.',
@@ -49,7 +60,7 @@ class CouponApplicationController extends Controller
         }
 
         // Find the coupon
-        $coupon = Coupon::where('coupon_code', $couponCode)->first();
+        $coupon = Coupon::where('code', $couponCode)->first();
 
         if (! $coupon) {
             return response()->json([
@@ -80,10 +91,10 @@ class CouponApplicationController extends Controller
         // Store coupon in session
         Session::put('applied_coupon', [
             'id' => $coupon->id,
-            'code' => $coupon->coupon_code,
-            'title' => $coupon->coupon_title,
+            'code' => $coupon->code,
+            'title' => $coupon->title,
             'discount_amount' => $discountAmount,
-            'discount_type' => $coupon->discount_type,
+            'discount_type' => $coupon->type,
             'discount_value' => $coupon->discount_value,
         ]);
 
@@ -91,12 +102,12 @@ class CouponApplicationController extends Controller
             'success' => true,
             'message' => 'Coupon applied successfully! You saved ₹'.number_format($discountAmount, 2),
             'coupon' => [
-                'code' => $coupon->coupon_code,
-                'title' => $coupon->coupon_title,
+                'code' => $coupon->code,
+                'title' => $coupon->title,
                 'discount_amount' => $discountAmount,
                 'formatted_discount' => '₹'.number_format($discountAmount, 2),
             ],
-            'cart_total' => $this->getCartTotalWithDiscount($cartItems, $discountAmount),
+            'cart_total' => $this->getCartTotalWithDiscount($cartItems, (float) $discountAmount),
         ]);
     }
 
@@ -114,7 +125,7 @@ class CouponApplicationController extends Controller
 
         Session::forget('applied_coupon');
 
-        $userId = Auth::id();
+        $userId = Auth::guard('customer_web')->id();
         $cartItems = Cart::with(['ecommerceProduct.warehouseProduct'])
             ->where('customer_id', $userId)
             ->get();
@@ -177,13 +188,24 @@ class CouponApplicationController extends Controller
         }
 
         // Check minimum purchase amount
-        // $cartTotal = Cart::getCartTotal($userId);
-        // if (!$coupon->meetsMinimumPurchase($cartTotal)) {
-        //     return [
-        //         'valid' => false,
-        //         'message' => "Minimum purchase amount of ₹" . number_format($coupon->min_purchase_amount, 2) . " required to use this coupon."
-        //     ];
-        // }
+        $cartTotal = 0;
+        foreach ($cartItems as $item) {
+            $price = 0;
+            if (isset($item->ecommerceProduct->warehouseProduct)) {
+                $price = $item->ecommerceProduct->warehouseProduct->selling_price ?? 0;
+            } elseif (isset($item->warehouseProduct)) {
+                $price = $item->warehouseProduct->selling_price ?? 0;
+            }
+            $quantity = $item->quantity ?? 1;
+            $cartTotal += $price * $quantity;
+        }
+
+        if (!$coupon->meetsMinimumPurchase($cartTotal)) {
+            return [
+                'valid' => false,
+                'message' => 'Minimum purchase amount of ₹' . number_format($coupon->min_purchase_amount, 2) . ' required to use this coupon. Your cart total: ₹' . number_format($cartTotal, 2)
+            ];
+        }
 
         // Check if coupon applies to any cart items (skip if cart validation is disabled)
         if (! $skipCartValidation) {
@@ -236,8 +258,8 @@ class CouponApplicationController extends Controller
         // Create usage record
         CouponUsage::create([
             'coupon_id' => $couponId,
-            'user_id' => $userId,
-            'ecommerce_order_id' => $orderId,
+            'customer_id' => $userId,
+            'order_id' => $orderId,
             'discount_amount' => $discountAmount,
             'used_at' => now(),
         ]);
@@ -245,7 +267,7 @@ class CouponApplicationController extends Controller
         // Increment coupon usage count
         $coupon = Coupon::find($couponId);
         if ($coupon) {
-            $coupon->increment('current_usage_count');
+            $coupon->increment('used_count');
         }
     }
 

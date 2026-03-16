@@ -61,6 +61,9 @@ class StoreStaffRequest extends FormRequest
             'languages_known.*' => 'nullable|string',
             'certifications' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             'experience' => 'nullable|integer',
+            'qualification' => 'nullable|in:post-graduation,graduation,12,10',
+            'qualification_certifications' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'address_proof' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
 
             // Aadhar
             'aadhar_number' => 'nullable|string|max:20',

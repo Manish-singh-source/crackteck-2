@@ -33,7 +33,7 @@ class EcommerceProductController extends Controller
             'warehouseProduct.brand',
             'warehouseProduct.parentCategorie',
             'warehouseProduct.subCategorie',
-        ])->paginate(15);
+        ])->get();
 
         return view('e-commerce.products.index', compact('products'));
     }

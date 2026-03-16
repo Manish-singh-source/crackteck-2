@@ -372,12 +372,67 @@
 
                                                             <li
                                                                 class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                                                <span class="fw-semibold text-break">Certifications :
+                                                                <span class="fw-semibold text-break">Qualification :
                                                                 </span>
                                                                 <span>
                                                                     <div>
-                                                                        {{ implode(', ', json_decode($staff->workSkills->certifications ?? '[]')) ?: 'N/A' }}
+                                                                        @if($staff->workSkills->qualification == 'post-graduation')
+                                                                            Post-Graduation Degree
+                                                                        @elseif($staff->workSkills->qualification == 'graduation')
+                                                                            Graduation Degree
+                                                                        @elseif($staff->workSkills->qualification == '12')
+                                                                            12th Marksheet
+                                                                        @elseif($staff->workSkills->qualification == '10')
+                                                                            10th Marksheet
+                                                                        @else
+                                                                            N/A
+                                                                        @endif
                                                                     </div>
+                                                                </span>
+                                                            </li>
+                                                            <li
+                                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                                                <span class="fw-semibold text-break">Qualification Certifications :
+                                                                </span>
+                                                                <span>
+                                                                    @if (!empty($staff->workSkills?->qualification_certifications))
+                                                                        <a href="{{ asset($staff->workSkills->qualification_certifications) }}"
+                                                                            target="_blank" class="btn btn-sm btn-outline-primary">
+                                                                            View
+                                                                        </a>
+                                                                    @else
+                                                                        N/A
+                                                                    @endif
+                                                                </span>
+                                                            </li>
+                                                            <li
+                                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                                                <span class="fw-semibold text-break">Address Proof :
+                                                                </span>
+                                                                <span>
+                                                                    @if (!empty($staff->workSkills?->address_proof))
+                                                                        <a href="{{ asset($staff->workSkills->address_proof) }}"
+                                                                            target="_blank" class="btn btn-sm btn-outline-primary">
+                                                                            View
+                                                                        </a>
+                                                                    @else
+                                                                        N/A
+                                                                    @endif
+                                                                </span>
+                                                            </li>
+                                                            <li
+                                                                class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                                                <span class="fw-semibold text-break">Certifications :
+                                                                </span>
+                                                                <span>
+                                                                    @if (!empty($staff->workSkills?->certifications))
+                                                                        <a href="{{ asset($staff->workSkills->certifications) }}"
+                                                                            target="_blank" class="btn btn-sm btn-outline-primary">
+                                                                            View
+                                                                        </a>
+                                                                    @else
+                                                                        N/A
+                                                                    @endif
                                                                 </span>
                                                             </li>
 

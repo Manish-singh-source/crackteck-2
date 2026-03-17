@@ -486,7 +486,7 @@ class ApiAuthController extends Controller
                     'success' => true,
                     'message' => 'OTP sent successfully',
                     // Remove 'otp' in production!
-                    // 'otp' => $otp, // For testing only
+                    'otp' => $otp, // For testing only
                 ], 200);
             } else {
                 Log::error('OTP sending failed for phone: ' . $user->phone);

@@ -86,29 +86,29 @@
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">Customer Name:</span>
                                             <span>{{ $request->customer->first_name ?? '' }}
-                                                {{ $request->customer->last_name ?? '' }}</span>
+                                                {{ $request->customer?->last_name ?? '' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">Contact No:</span>
-                                            <span>{{ $request->customer->phone ?? 'N/A' }}</span>
+                                            <span>{{ $request->customer?->phone ?? 'N/A' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">Email:</span>
-                                            <span>{{ $request->customer->email ?? 'N/A' }}</span>
+                                            <span>{{ $request->customer?->email ?? 'N/A' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">DOB:</span>
-                                            <span>{{ $request->customer->dob }}</span>
+                                            <span>{{ $request->customer?->dob }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">Customer Type:</span>
-                                            @if ($request->customer->customer_type == 'ecommerce')
+                                            @if ($request->customer?->customer_type == 'ecommerce')
                                                 <span>E-commerce</span>
-                                            @elseif ($request->customer->customer_type == 'amc')
+                                            @elseif ($request->customer?->customer_type == 'amc')
                                                 <span>AMC</span>
-                                            @elseif ($request->customer->customer_type == 'both')
+                                            @elseif ($request->customer?->customer_type == 'both')
                                                 <span>Both</span>
-                                            @elseif ($request->customer->customer_type == 'offline')
+                                            @elseif ($request->customer?->customer_type == 'offline')
                                                 <span>Offline</span>
                                             @endif
                                         </li>
@@ -118,15 +118,15 @@
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">Company Name:</span>
-                                            <span>{{ $request->customerCompany->company_name ?? 'N/A' }}</span>
+                                            <span>{{ $request->customerCompany?->company_name ?? 'N/A' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">GST No:</span>
-                                            <span>{{ $request->customerCompany->gst_no ?? 'N/A' }}</span>
+                                            <span>{{ $request->customerCompany?->gst_no ?? 'N/A' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">PAN No:</span>
-                                            <span>{{ $request->customerPan->pan_number ?? 'N/A' }}</span>
+                                            <span>{{ $request->customerPan?->pan_number ?? 'N/A' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">Status:</span>
@@ -158,19 +158,19 @@
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">Branch Name:</span>
-                                            <span>{{ $request->customerAddress->branch_name ?? 'N/A' }}</span>
+                                            <span>{{ $request->customerAddress?->branch_name ?? 'N/A' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">Address Line 1:</span>
-                                            <span>{{ $request->customerAddress->address1 ?? 'N/A' }}</span>
+                                            <span>{{ $request->customerAddress?->address1 ?? 'N/A' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">Address Line 2:</span>
-                                            <span>{{ $request->customerAddress->address2 ?? 'N/A' }}</span>
+                                            <span>{{ $request->customerAddress?->address2 ?? 'N/A' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">State:</span>
-                                            <span>{{ $request->customerAddress->state ?? 'N/A' }}</span>
+                                            <span>{{ $request->customerAddress?->state ?? 'N/A' }}</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -178,15 +178,15 @@
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">Country:</span>
-                                            <span>{{ $request->customerAddress->country ?? 'N/A' }}</span>
+                                            <span>{{ $request->customerAddress?->country ?? 'N/A' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">City:</span>
-                                            <span>{{ $request->customerAddress->city ?? 'N/A' }}</span>
+                                            <span>{{ $request->customerAddress?->city ?? 'N/A' }}</span>
                                         </li>
                                         <li class="list-group-item border-0 d-flex gap-3">
                                             <span class="fw-semibold">Pin Code:</span>
-                                            <span>{{ $request->customerAddress->pincode ?? 'N/A' }}</span>
+                                            <span>{{ $request->customerAddress?->pincode ?? 'N/A' }}</span>
                                         </li>
                                     </ul>
                                 </div>

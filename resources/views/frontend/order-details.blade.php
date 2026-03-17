@@ -175,6 +175,15 @@
                                         ₹{{ number_format($totals['shipping_charges'], 2) }}</p>
                                 </div>
                             @endif
+                            @if ($order->coupon_code)
+                                <div class="d-flex justify-content-between align-items-center border-bottom mb-2 pe-3">
+                                    <p class="mb-0">
+                                        <span class="text-success">Coupon Discount ({{ $order->coupon_code }})</span>
+                                    </p>
+                                    <p class="text-success fw-medium mb-2">
+                                        -₹{{ number_format($order->discount_amount, 2) }}</p>
+                                </div>
+                            @endif
                             <div class="d-flex justify-content-between align-items-center mb-2 pe-3">
                                 <p class="mb-0">Rounded Off</p>
                                 {{-- <p class="text-dark fw-medium mb-2">{{ $totals['rounding_off'] >= 0 ? '+' : '' }}{{ number_format($totals['rounding_off'], 2) }}</p> --}}
@@ -185,12 +194,12 @@
                             <div class="d-flex justify-content-between align-items-center mb-2 pe-3">
                                 <p class="mb-0">Total Value (in figure)</p>
                                 <p class="text-dark fw-medium mb-2">
-                                    ₹{{ number_format($order->orderItems->sum('line_total'), 2) }}</p>
+                                    ₹{{ number_format($order->total_amount, 2) }}</p>
                             </div>
-                            {{-- <div class="d-flex justify-content-between align-items-center mb-2 pe-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2 pe-3">
                                 <p class="mb-0">Total Value (in Word)</p>
-                                <p class="text-dark fw-medium mb-2">{{ $totals['total_in_words'] }}</p>
-                            </div> --}}
+                                <p class="text-dark fw-medium mb-2 w-50">{{ $totals['total_in_words'] ?? '' }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>

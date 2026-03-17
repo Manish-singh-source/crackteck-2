@@ -290,6 +290,36 @@
                             @endif
                         </div>
                         <div class="modal-footer">
+                            @php
+                                // Check if service is completed for reward eligibility
+                                $isCompleted = $service->status === 'Completed';
+                                $hasReward = false;
+                                $reward = null;
+                                
+                                if (Auth::guard('customer_web')->check() && $isCompleted) {
+                                    $reward = \App\Models\Reward::where('service_request_id', $service->id)
+                                        ->where('customer_id', Auth::guard('customer_web')->id())
+                                        ->first();
+                                    $hasReward = $reward !== null;
+                                }
+                            @endphp
+                            
+                            {{-- Reward Button - Show only when service is completed and no reward claimed yet --}}
+                            @if($isCompleted && !$hasReward)
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" 
+                                    data-bs-target="#rewardModal" onclick="window.serviceRequestId = {{ $service->id }}; window.rewardType = 'service';">
+                                    <i class="icon icon-gift"></i> Claim Reward
+                                </button>
+                            @endif
+                            
+                            {{-- Show reward details if already claimed --}}
+                            @if($hasReward && $reward)
+                                <button type="button" class="btn btn-info" data-bs-toggle="modal" 
+                                    data-bs-target="#rewardDetailsModal{{ $service->id }}">
+                                    <i class="icon icon-gift"></i> View Reward
+                                </button>
+                            @endif
+                            
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         </div>
                     </div>
@@ -297,5 +327,58 @@
             </div>
         @endforeach
     @endif
+
+    {{-- Reward Details Modal for Service Requests --}}
+    @if(!$nonAmcServices->isEmpty())
+        @foreach($nonAmcServices as $service)
+            @php
+                $reward = null;
+                if (Auth::guard('customer_web')->check()) {
+                    $reward = \App\Models\Reward::where('service_request_id', $service->id)
+                        ->where('customer_id', Auth::guard('customer_web')->id())
+                        ->first();
+                }
+            @endphp
+            @if($reward)
+                <div class="modal fade" id="rewardDetailsModal{{ $service->id }}" tabindex="-1" aria-labelledby="rewardDetailsModalLabel{{ $service->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="rewardDetailsModalLabel{{ $service->id }}">Your Reward</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                @php
+                                    $coupon = $reward->coupon;
+                                    $reward->syncStatusWithCouponUsage();
+                                @endphp
+                                @include('frontend.components.reward-details', ['reward' => $reward, 'coupon' => $coupon])
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endforeach
+    @endif
+
+    {{-- Reward Modal for Service Requests --}}
+    @include('frontend.components.reward-modal')
+
+    <script>
+        // Initialize reward system
+        window.rewardClaimed = false;
+        
+        // Handle reward button click for service requests
+        $(document).on('click', '[data-bs-target^="#rewardModal"]', function() {
+            // Check if it's a service reward button (has onclick with serviceRequestId)
+            if (window.serviceRequestId) {
+                window.rewardType = 'service';
+            }
+        });
+    </script>
+    <script src="{{ asset('frontend/js/reward.js') }}"></script>
 @endsection
 

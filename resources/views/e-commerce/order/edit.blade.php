@@ -230,7 +230,7 @@
                                     </li>
                                     <li class="list-group-item border-0 d-flex justify-content-between">
                                         <span>Coupon Applied:</span>
-                                        <span class="fw-medium">₹{{ number_format($order->coupon_code, 2) }}</span>
+                                        <span class="fw-medium">{{ $order->coupon_code }}</span>
                                     </li>
                                     <li class="list-group-item border-0 d-flex justify-content-between border-top pt-3">
                                         <span class="fw-bold">Grand Total:</span>

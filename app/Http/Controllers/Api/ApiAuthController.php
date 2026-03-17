@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ApiAuthController extends Controller
 {
@@ -486,7 +487,7 @@ class ApiAuthController extends Controller
                     'success' => true,
                     'message' => 'OTP sent successfully',
                     // Remove 'otp' in production!
-                    // 'otp' => $otp, // For testing only
+                    'otp' => $otp, // For testing only
                 ], 200);
             } else {
                 Log::error('OTP sending failed for phone: ' . $user->phone);
@@ -539,8 +540,11 @@ class ApiAuthController extends Controller
                 $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
             }
         }
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+        }
 
-        if (! $user || $user->otp != $request->otp || now()->gt($user->otp_expiry)) {
+        if ($user->otp != $request->otp || now()->gt($user->otp_expiry)) {
             return response()->json(['success' => false, 'message' => 'Invalid or expired OTP'], 401);
         }
 
@@ -548,13 +552,12 @@ class ApiAuthController extends Controller
         $user->otp_expiry = null;
         $user->save();
 
-        // Choose guard based on role
-        if ($staffRole == 'customers') {
-            $guard = 'customer_api';
-        } else {
-            $guard = 'staff_api';
+        if ($request->hasHeader('Authorization')) {
+            $request->headers->remove('Authorization');
         }
-        $token = auth($guard)->login($user); // if guard mapping in config/auth.php
+
+        JWTAuth::unsetToken();
+        $token = JWTAuth::fromUser($user);
 
         return response()->json(['token' => $token, 'user' => $user]);
     }
@@ -729,3 +732,5 @@ class ApiAuthController extends Controller
         ]);
     }
 }
+
+

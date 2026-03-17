@@ -1,5 +1,66 @@
 @extends('frontend/layout/master')
 
+<style>
+    /* Coupon Wrapper */
+.coupon-box {
+    width: 100%;
+}
+
+/* Input + Button Row */
+.coupon-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Input */
+.coupon-input {
+    flex: 1;
+    height: 45px;
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 14px;
+}
+
+/* Button */
+.coupon-btn {
+    height: 45px;
+    padding: 0 18px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+/* Success Section */
+.coupon-success {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f0fff4;
+    border: 1px solid #c6f6d5;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 576px) {
+    .coupon-input-group {
+        flex-direction: column;
+    }
+
+    .coupon-btn {
+        width: 100%;
+    }
+
+    .coupon-success {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+}
+</style>
+
 @section('main-content')
     <!-- Breakcrumbs -->
     <div class="tf-sp-3 pb-0">
@@ -337,7 +398,7 @@
                                             <span class="body-md-2 text-main-2 fw-normal">X{{ $item->quantity }}</span>
                                         </p>
                                         <span>
-                                            Installation: 
+                                            Installation:
                                             <span
                                                 class="body-md-2 text-main-2 fw-normal">{{ ucfirst($warehouseProduct->installation) }}</span>
                                         </span>
@@ -355,7 +416,7 @@
                             @endphp
                         </ul>
 
-                        <!-- Discount Code Section -->
+                        {{-- <!-- Discount Code Section -->
                         <div class="mt-3">
                             <p class="body-md-2 fw-semibold sub-type">Discount code</p>
                             <div class="ip-discount-code style-2">
@@ -381,6 +442,38 @@
                                 @endif
                             </div>
                             <div id="coupon_message" class="mt-2" style="display: none;"></div>
+                        </div> --}}
+
+                        <!-- Discount Code Section -->
+                        <div class="mt-3">
+                            <p class="body-md-2 fw-semibold sub-type">Discount Code</p>
+
+                            <div class="coupon-box">
+                                <div class="coupon-input-group">
+                                    <input type="text" id="coupon_code" class="form-control coupon-input"
+                                        placeholder="Enter coupon code"
+                                        value="{{ session('applied_coupon.code') ?? '' }}">
+
+                                    <button type="button" id="apply_coupon" class="btn btn-primary coupon-btn">
+                                        Apply
+                                    </button>
+                                </div>
+
+                                @if (session('applied_coupon'))
+                                    <div class="coupon-success">
+                                        <span>
+                                            ✅ Coupon "<strong>{{ session('applied_coupon.code') }}</strong>" applied
+                                            successfully!
+                                        </span>
+
+                                        <button type="button" id="remove_coupon" class="btn btn-sm btn-outline-danger">
+                                            Remove
+                                        </button>
+                                    </div>
+                                @endif
+
+                                <div id="coupon_message" class="mt-2" style="display: none;"></div>
+                            </div>
                         </div>
 
                         <!-- Price Summary -->
@@ -597,8 +690,10 @@
                     method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
-                        coupon_code: couponCode, 
-                        productId: {{ $checkoutData['product_id'] }}
+                        coupon_code: couponCode,
+                        @if (isset($checkoutData['product_id']) && $checkoutData['product_id'])
+                            product_id: {{ $checkoutData['product_id'] }}
+                        @endif
                     },
                     success: function(response) {
                         if (response.success) {

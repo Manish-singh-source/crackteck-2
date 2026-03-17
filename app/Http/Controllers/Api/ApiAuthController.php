@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ApiAuthController extends Controller
@@ -553,27 +552,12 @@ class ApiAuthController extends Controller
         $user->otp_expiry = null;
         $user->save();
 
-        // Choose guard based on role
-        if ($staffRole == 'customers') {
-            $guard = 'customer_api';
-        } else {
-            $guard = 'staff_api';
-        }
-
-        try {
-            if ($request->hasHeader('Authorization')) {
-                $request->headers->remove('Authorization');
-            }
-
-            JWTAuth::unsetToken();
-            auth($guard)->setRequest($request);
-            $token = auth($guard)->login($user); // if guard mapping in config/auth.php
-        } catch (TokenExpiredException $e) {
-            JWTAuth::unsetToken();
+        if ($request->hasHeader('Authorization')) {
             $request->headers->remove('Authorization');
-            auth($guard)->setRequest($request);
-            $token = auth($guard)->login($user);
         }
+
+        JWTAuth::unsetToken();
+        $token = JWTAuth::fromUser($user);
 
         return response()->json(['token' => $token, 'user' => $user]);
     }
@@ -748,4 +732,5 @@ class ApiAuthController extends Controller
         ]);
     }
 }
+
 

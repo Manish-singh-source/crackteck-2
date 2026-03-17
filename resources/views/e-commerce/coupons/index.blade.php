@@ -85,10 +85,10 @@
                                                                 </td>
                                                                 <td>{{ $coupon->title }}</td>
                                                                 <td>
-                                                                    @if ($coupon->type == 0)
+                                                                    @if ($coupon->type == 'percentage')
                                                                         <span
                                                                             class="badge bg-info-subtle text-info fw-semibold">Percentage</span>
-                                                                    @elseif($coupon->type == 1)
+                                                                    @elseif($coupon->type == 'fixed')
                                                                         <span
                                                                             class="badge bg-success-subtle text-success fw-semibold">Fixed</span>
                                                                     @else

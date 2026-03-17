@@ -50,9 +50,28 @@ class StoreCouponRequest extends FormRequest
     public function withValidator(Validator $validator)
     {
         $validator->after(function ($validator) {
-            // Custom validation: percentage cannot exceed 100
-            if ($this->type === 'percentage' && $this->discount_value > 100) {
-                $validator->errors()->add('discount_value', 'Percentage discount cannot exceed 100%.');
+            $type = $this->type;
+            $discountValue = $this->discount_value;
+            
+            // Custom validation based on discount type
+            if ($type === 'percentage') {
+                // Percentage cannot exceed 100
+                if ($discountValue > 100) {
+                    $validator->errors()->add('discount_value', 'Percentage discount cannot exceed 100%.');
+                }
+                if ($discountValue < 0) {
+                    $validator->errors()->add('discount_value', 'Percentage discount cannot be negative.');
+                }
+            } elseif ($type === 'fixed') {
+                // Fixed amount must be positive
+                if ($discountValue <= 0) {
+                    $validator->errors()->add('discount_value', 'Fixed discount must be greater than 0.');
+                }
+            } elseif ($type === 'buy_x_get_y') {
+                // Buy X Get Y - validate format (e.g., "2,1" for Buy 2 Get 1)
+                if (empty($discountValue)) {
+                    $validator->errors()->add('discount_value', 'Please specify the Buy X Get Y value.');
+                }
             }
         });
     }

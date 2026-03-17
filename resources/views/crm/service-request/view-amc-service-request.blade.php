@@ -211,9 +211,11 @@
                                             class="p-1 rounded bg-warning-subtle text-warning fw-semibold">{{ $request->amcScheduleMeetings->first()?->scheduled_at ? \Carbon\Carbon::parse($request->amcScheduleMeetings->first()->scheduled_at)->format('d M Y') : 'N/A' }}</span>
                                     </div>
                                     <div>
+                                        @if(!empty($request->amcScheduleMeetings->first()?->remoteSupportJob->status == 'escalated') && empty($request->amcScheduleMeetings->first()?->activeAssignment))
                                         <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
                                             data-bs-target="#addVisitModal2">Assign Engineer</button>
                                         <!-- Modal -->
+                                        @endif
 
                                         <div class="modal fade" id="addVisitModal2" tabindex="-1"
                                             aria-labelledby="addVisitModalLabel2" aria-hidden="true">
@@ -232,6 +234,8 @@
                                                         <div class="modal-body p-2">
                                                             <input type="hidden" name="service_request_id"
                                                                 value="{{ $request->id }}">
+                                                            <input type="hidden" name="service_type" value="amc">
+                                                            <input type="hidden" name="amc_id" value="{{ $request->amcScheduleMeetings->first()?->amc_id }}">
 
                                                             <div class="mb-3">
                                                                 <label class="form-label fw-semibold">Assignment
@@ -338,6 +342,7 @@
                                     <tr>
                                         <th>Sr. No.</th>
                                         <th>Engineer Name</th>
+                                        <th>Service Type</th>
                                         <th>Visit Date</th>
                                         <th>Issue Type</th>
                                         <th>Report</th>
@@ -353,7 +358,18 @@
                                                 {{ $index + 1 }}
                                             </td>
                                             <td>
-                                                {{ $meeting->activeAssignment->engineer->first_name ?? 'N/A' }}
+                                                @if(empty($meeting->activeAssignment))
+                                                    {{ $meeting->remoteSupportJob?->engineer->first_name }} {{ $meeting->remoteSupportJob?->engineer->last_name }}
+                                                @else
+                                                    {{  $meeting->activeAssignment->engineer->first_name ?? 'N/A' }} {{  $meeting->activeAssignment->engineer->last_name ?? 'N/A' }}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if(empty($meeting->activeAssignment))
+                                                    Remote
+                                                @else
+                                                    Onsite
+                                                @endif
                                             </td>
                                             <td>{{ \Carbon\Carbon::parse($meeting->scheduled_at)->format('d M Y') }}</td>
                                             <td>
@@ -478,65 +494,9 @@
                                                 <td>{{ $product->model_no ?? '-' }}</td>
                                                 <td>{{ $product->hsn ?? '-' }}</td>
                                                 <td>{{ $product->brand ?? '-' }}</td>
-                                                {{-- 
-                                                <td>
-                                                    @php
-                                                        $status = [
-                                                            // enum('pending', 'approved', 'rejected', 'processing', 'in_progress', 'on_hold', 'diagnosis_completed', 'processed', 'picking', 'picked', 'completed')
-                                                            'pending' => 'Pending',
-                                                            'approved' => 'Approved',
-                                                            'rejected' => 'Rejected',
-                                                            'processing' => 'Processing',
-                                                            'in_progress' => 'In Progress',
-                                                            'on_hold' => 'On Hold',
-                                                            'diagnosis_completed' => 'Diagnosis Completed',
-                                                            'processed' => 'Processed',
-                                                            'picking' => 'Picking',
-                                                            'picked' => 'Picked',
-                                                            'completed' => 'Completed',
-                                                        ];
-
-                                                        $statusColor = [
-                                                            // i want all unique status colors here
-                                                            'pending' => 'bg-warning-subtle text-warning',
-                                                            'approved' => 'bg-success-subtle text-success',
-                                                            'rejected' => 'bg-danger-subtle text-danger',
-                                                            'processing' => 'bg-info-subtle text-info',
-                                                            'in_progress' => 'bg-primary-subtle text-primary',
-                                                            'on_hold' => 'bg-warning-subtle text-warning',
-                                                            'diagnosis_completed' => 'bg-success-subtle text-success',
-                                                            'processed' => 'bg-info-subtle text-info',
-                                                            'picking' => 'bg-primary-subtle text-primary',
-                                                            'picked' => 'bg-success-subtle text-success',
-                                                            'completed' => 'bg-success-subtle text-success',
-                                                        ];
-                                                    @endphp
-                                                    <span
-                                                        class="badge {{ $statusColor[$product->status ?? '-'] ?? 'bg-secondary-subtle text-secondary' }}">{{ $status[$product->status ?? '-'] ?? '-' }}</span>
-                                                </td>
-                                                <td>
-                                                    @php
-                                                        $serviceType = [
-                                                            'amc' => 'AMC',
-                                                            'quick_service' => 'Quick Service',
-                                                            'repairing' => 'Repairing Service',
-                                                            'installation' => 'Installation Service',
-                                                        ];
-                                                    @endphp
-                                                    {{ $serviceType[$product->itemCode->service_type ?? '-'] ?? '-' }}
-                                                </td>
-                                                <td>{{ $product->service_charge ?? '-' }}</td> --}}
                                             </tr>
                                         @endforeach
                                     </tbody>
-                                    {{-- 
-                                    <tfoot>
-                                        <tr>
-                                            <td colspan="8" class="text-end"><strong>Total</strong></td>
-                                            <td><strong>{{ $request->products->sum('service_charge') }}</strong></td>
-                                        </tr>
-                                    </tfoot> 
-                                    --}}
                                 </table>
                             </div>
                         </div>

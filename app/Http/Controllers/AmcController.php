@@ -592,7 +592,9 @@ class AmcController extends Controller
             'customer',
             'customerAddress',
             'amcPlan',
-            'amcProducts',
+            'amcProducts.productType',
+            'amcScheduleMeetings.remoteSupportJob.engineer',
+            'amcScheduleMeetings.activeAssignment.engineer',
         ])->findOrFail($id);
 
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();

@@ -1758,7 +1758,7 @@
                     // Make fields readonly for logged in users
                     document.getElementById('first_name').readOnly = true;
                     document.getElementById('last_name').readOnly = true;
-                    document.getElementById('phone').readOnly = true;
+                    // document.getElementById('phone').readOnly = true;
                     document.getElementById('email').readOnly = true;
                 }
             } catch (error) {

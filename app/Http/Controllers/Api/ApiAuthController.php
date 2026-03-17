@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ApiAuthController extends Controller
 {
@@ -539,8 +541,11 @@ class ApiAuthController extends Controller
                 $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
             }
         }
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+        }
 
-        if (! $user || $user->otp != $request->otp || now()->gt($user->otp_expiry)) {
+        if ($user->otp != $request->otp || now()->gt($user->otp_expiry)) {
             return response()->json(['success' => false, 'message' => 'Invalid or expired OTP'], 401);
         }
 
@@ -554,7 +559,21 @@ class ApiAuthController extends Controller
         } else {
             $guard = 'staff_api';
         }
-        $token = auth($guard)->login($user); // if guard mapping in config/auth.php
+
+        try {
+            if ($request->hasHeader('Authorization')) {
+                $request->headers->remove('Authorization');
+            }
+
+            JWTAuth::unsetToken();
+            auth($guard)->setRequest($request);
+            $token = auth($guard)->login($user); // if guard mapping in config/auth.php
+        } catch (TokenExpiredException $e) {
+            JWTAuth::unsetToken();
+            $request->headers->remove('Authorization');
+            auth($guard)->setRequest($request);
+            $token = auth($guard)->login($user);
+        }
 
         return response()->json(['token' => $token, 'user' => $user]);
     }
@@ -729,3 +748,4 @@ class ApiAuthController extends Controller
         ]);
     }
 }
+

@@ -159,9 +159,11 @@
                                                     <td>{{ \App\Helpers\DateFormat::formatDate($product->purchase_date) }}</td>
                                                     <td>{{ $product->brand }}</td>
                                                     <td>{{ $product->description }}</td>
-                                                    <td>{{ $product->status }}</td>
+                                                    <td>{{ ucwords(str_replace('_', ' ', $product->status)) }}</td>
                                                     <td>
-                                                        <a href="{{ route('assigned-jobs.diagnose', [$product->id, $id]) }}" class="btn btn-sm btn-primary">Diagnose</a>
+                                                        <a href="{{ route('assigned-jobs.diagnose', [$product->id, $id]) }}" class="btn btn-sm btn-primary">
+                                                            {{ ($product->status == 'diagnosis_completed' || $product->status == 'escalated') ? 'View' : 'Start Diagnose'}}
+                                                        </a>
                                                     </td>
                                                 </tr>
                                             @empty

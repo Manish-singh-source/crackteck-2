@@ -147,6 +147,7 @@ Route::prefix('/')->group(function () {
         Route::post('/cart/apply-coupon', 'applyCoupon')->name('cart.apply-coupon');
         Route::post('/cart/remove-coupon', 'removeCoupon')->name('cart.remove-coupon');
         Route::get('/cart/applied-coupon', 'getAppliedCoupon')->name('cart.applied-coupon');
+        Route::post('/cart/validate-coupon', 'validateCoupon')->name('cart.validate-coupon');
     });
 
     // Cart count route (can be accessed without auth, returns 0 for guests)

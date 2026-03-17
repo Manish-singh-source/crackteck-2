@@ -16,9 +16,23 @@ class CouponApplicationController extends Controller
 {
     /**
      * Apply a coupon to the user's cart.
+     * 
+     * Validates all coupon conditions:
+     * 1. Coupon code exists
+     * 2. Coupon is active
+     * 3. Current date is within start_date and end_date
+     * 4. Minimum purchase amount is satisfied
+     * 5. Usage limit has not been exceeded
+     * 6. Used count is within allowed limit
+     * 7. Usage per customer has not been exceeded
+     * 8. Discount value is valid
+     * 9. Applicable categories match (if set)
+     * 10. Applicable brands match (if set)
+     * 11. Product is not in excluded_products
      */
     public function applyCoupon(Request $request): JsonResponse
     {
+        // Check if user is authenticated
         if (! Auth::guard('customer_web')->check()) {
             return response()->json([
                 'success' => false,
@@ -26,6 +40,7 @@ class CouponApplicationController extends Controller
             ], 401);
         }
 
+        // Validate request
         $request->validate([
             'coupon_code' => 'required|string',
         ]);
@@ -33,35 +48,27 @@ class CouponApplicationController extends Controller
         $couponCode = strtoupper(trim($request->coupon_code));
         $userId = Auth::guard('customer_web')->id();
 
-        // Check navigation source to determine if cart validation should be skipped
-        $navigationSource = Session::get('checkout_navigation_source');
+        // Check navigation source to determine cart validation approach
+        $navigationSource = Session::get('checkout_navigation_source', 'cart');
+        
+        // Get cart items based on navigation source
+        $cartItems = $this->getCartItems($request, $userId, $navigationSource);
+        
+        // For buy_now, we need to wrap the product in a collection-like object
+        $isBuyNow = $navigationSource === 'buy_now';
 
-        if ($navigationSource === 'cart') {
-            // Get user's cart items
-            $cartItems = Cart::with(['ecommerceProduct.warehouseProduct'])
-                ->where('customer_id', $userId)
-                ->get();
-        } elseif ($navigationSource === 'buy_now') {
-            $cartItems = EcommerceProduct::where('id', $request->productId)->get();
-        } else {
-            // Default: get cart items
-            $cartItems = Cart::with(['ecommerceProduct.warehouseProduct'])
-                ->where('customer_id', $userId)
-                ->get();
-        }
-
-        $skipCartValidation = in_array($navigationSource, ['cart', 'buy_now']);
-
-        if ($cartItems->isEmpty() && !$skipCartValidation) {
+        // If cart is empty (for cart navigation), return error
+        if ($cartItems->isEmpty() && !$isBuyNow) {
             return response()->json([
                 'success' => false,
-                'message' => 'Your cart is empty.',
+                'message' => 'Your cart is empty. Add some products to apply a coupon.',
             ]);
         }
 
-        // Find the coupon
+        // Find the coupon by code
         $coupon = Coupon::where('code', $couponCode)->first();
 
+        // Check if coupon exists
         if (! $coupon) {
             return response()->json([
                 'success' => false,
@@ -69,24 +76,33 @@ class CouponApplicationController extends Controller
             ]);
         }
 
-        // Validate coupon
-        $validation = $this->validateCoupon($coupon, $userId, $cartItems, $skipCartValidation);
-        if (! $validation['valid']) {
+        // Calculate cart total
+        $cartTotal = $this->calculateCartTotal($cartItems, $isBuyNow);
+
+        // Validate all coupon conditions
+        $validationErrors = $coupon->getValidationErrors($userId, $cartItems, $cartTotal);
+
+        if (! empty($validationErrors)) {
             return response()->json([
                 'success' => false,
-                'message' => $validation['message'],
+                'message' => $validationErrors[0],
+                'errors' => $validationErrors, // Include all errors for debugging
             ]);
         }
 
         // Calculate discount
         $discountAmount = $coupon->calculateDiscount($cartItems);
 
-        if ($discountAmount <= 0 && ! $skipCartValidation) {
+        // Validate discount amount
+        if ($discountAmount <= 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'This coupon is not applicable to items in your cart.',
+                'message' => 'This coupon cannot be applied to your current order.',
             ]);
         }
+
+        // Ensure discount doesn't exceed cart total
+        $discountAmount = min($discountAmount, $cartTotal);
 
         // Store coupon in session
         Session::put('applied_coupon', [
@@ -96,18 +112,23 @@ class CouponApplicationController extends Controller
             'discount_amount' => $discountAmount,
             'discount_type' => $coupon->type,
             'discount_value' => $coupon->discount_value,
+            'max_discount' => $coupon->max_discount,
         ]);
+
+        // Calculate totals with discount
+        $totals = $this->getCartTotals($cartItems, $discountAmount, $isBuyNow);
 
         return response()->json([
             'success' => true,
-            'message' => 'Coupon applied successfully! You saved ₹'.number_format($discountAmount, 2),
+            'message' => 'Coupon applied successfully! You saved ₹' . number_format($discountAmount, 2),
             'coupon' => [
+                'id' => $coupon->id,
                 'code' => $coupon->code,
                 'title' => $coupon->title,
                 'discount_amount' => $discountAmount,
-                'formatted_discount' => '₹'.number_format($discountAmount, 2),
+                'formatted_discount' => '₹' . number_format($discountAmount, 2),
             ],
-            'cart_total' => $this->getCartTotalWithDiscount($cartItems, (float) $discountAmount),
+            'cart_total' => $totals,
         ]);
     }
 
@@ -123,17 +144,31 @@ class CouponApplicationController extends Controller
             ], 401);
         }
 
+        $userId = Auth::guard('customer_web')->id();
+
+        // Remove coupon from session
         Session::forget('applied_coupon');
 
-        $userId = Auth::guard('customer_web')->id();
-        $cartItems = Cart::with(['ecommerceProduct.warehouseProduct'])
-            ->where('customer_id', $userId)
-            ->get();
+        // Get current cart total
+        $navigationSource = Session::get('checkout_navigation_source', 'cart');
+        $isBuyNow = $navigationSource === 'buy_now';
+        
+        $cartItems = $this->getCartItems(new Request(), $userId, $navigationSource);
+        $cartTotal = $this->calculateCartTotal($cartItems, $isBuyNow);
 
         return response()->json([
             'success' => true,
             'message' => 'Coupon removed successfully.',
-            'cart_total' => Cart::getCartTotal($userId),
+            'cart_total' => [
+                'subtotal' => $cartTotal,
+                'discount' => 0,
+                'total' => $cartTotal,
+                'formatted' => [
+                    'subtotal' => '₹' . number_format($cartTotal, 2),
+                    'discount' => '₹0.00',
+                    'total' => '₹' . number_format($cartTotal, 2),
+                ],
+            ],
         ]);
     }
 
@@ -158,94 +193,85 @@ class CouponApplicationController extends Controller
     }
 
     /**
-     * Validate if a coupon can be applied.
+     * Get cart items based on navigation source.
+     * Properly loads warehouseProduct relationship.
      */
-    private function validateCoupon(Coupon $coupon, int $userId, $cartItems, bool $skipCartValidation = false): array
+    private function getCartItems(Request $request, int $userId, string $navigationSource)
     {
-        // Check if coupon is active
-        if ($coupon->status !== 'active') {
-            return ['valid' => false, 'message' => 'This coupon is currently inactive.'];
-        }
+        if ($navigationSource === 'cart') {
+            // Get cart items from cart table
+            return Cart::with(['ecommerceProduct.warehouseProduct'])
+                ->where('customer_id', $userId)
+                ->get();
+        } elseif ($navigationSource === 'buy_now') {
+            // Get single product for buy now
+            $productId = $request->product_id ?? $request->productId ?? null;
+            
+            if ($productId) {
+                $ecommerceProduct = EcommerceProduct::with('warehouseProduct')
+                    ->where('id', $productId)
+                    ->first();
 
-        // Check date validity
-        $now = Carbon::now();
-        if ($coupon->start_date > $now) {
-            return ['valid' => false, 'message' => 'This coupon is not yet active.'];
-        }
-
-        if ($coupon->end_date < $now) {
-            return ['valid' => false, 'message' => 'This coupon has expired.'];
-        }
-
-        // Check total usage limit
-        if ($coupon->hasReachedTotalLimit()) {
-            return ['valid' => false, 'message' => 'This coupon has reached its usage limit.'];
-        }
-
-        // Check user usage limit
-        if ($coupon->hasUserReachedLimit($userId)) {
-            return ['valid' => false, 'message' => 'You have already used this coupon the maximum number of times.'];
-        }
-
-        // Check minimum purchase amount
-        $cartTotal = 0;
-        foreach ($cartItems as $item) {
-            $price = 0;
-            if (isset($item->ecommerceProduct->warehouseProduct)) {
-                $price = $item->ecommerceProduct->warehouseProduct->selling_price ?? 0;
-            } elseif (isset($item->warehouseProduct)) {
-                $price = $item->warehouseProduct->selling_price ?? 0;
-            }
-            $quantity = $item->quantity ?? 1;
-            $cartTotal += $price * $quantity;
-        }
-
-        if (!$coupon->meetsMinimumPurchase($cartTotal)) {
-            return [
-                'valid' => false,
-                'message' => 'Minimum purchase amount of ₹' . number_format($coupon->min_purchase_amount, 2) . ' required to use this coupon. Your cart total: ₹' . number_format($cartTotal, 2)
-            ];
-        }
-
-        // Check if coupon applies to any cart items (skip if cart validation is disabled)
-        if (! $skipCartValidation) {
-            $hasApplicableItems = false;
-            foreach ($cartItems as $item) {
-                if ($coupon->appliesToProduct($item->ecommerceProduct)) {
-                    $hasApplicableItems = true;
-                    break;
+                if ($ecommerceProduct) {
+                    // Create a collection-like object for single product
+                    return collect([
+                        (object) [
+                            'ecommerceProduct' => $ecommerceProduct,
+                            'quantity' => (int) ($request->quantity ?? 1),
+                        ]
+                    ]);
                 }
             }
-
-            if (! $hasApplicableItems) {
-                return ['valid' => false, 'message' => 'This coupon is not applicable to items in your cart.'];
-            }
+            
+            return collect([]);
         }
 
-        return ['valid' => true, 'message' => 'Coupon is valid.'];
+        // Default: get cart items
+        return Cart::with(['ecommerceProduct.warehouseProduct'])
+            ->where('customer_id', $userId)
+            ->get();
     }
 
     /**
-     * Calculate cart total with discount applied.
+     * Calculate cart total amount.
      */
-    private function getCartTotalWithDiscount($cartItems, float $discountAmount): array
+    private function calculateCartTotal($cartItems, bool $isBuyNow = false): float
     {
-        $subtotal = 0;
+        $total = 0;
+
         foreach ($cartItems as $item) {
-            $price = $item->ecommerceProduct->warehouseProduct->selling_price ?? 0;
-            $subtotal += $price * $item->quantity;
+            $product = $item->ecommerceProduct ?? null;
+            
+            if (! $product || ! $product->warehouseProduct) {
+                continue;
+            }
+
+            $price = $product->warehouseProduct->selling_price ?? 0;
+            $price = is_numeric($price) ? (float) $price : 0;
+            $quantity = isset($item->quantity) ? (int) $item->quantity : 1;
+            
+            $total += $price * $quantity;
         }
 
+        return $total;
+    }
+
+    /**
+     * Get cart totals with discount applied.
+     */
+    private function getCartTotals($cartItems, float $discountAmount, bool $isBuyNow = false): array
+    {
+        $subtotal = $this->calculateCartTotal($cartItems, $isBuyNow);
         $finalTotal = max(0, $subtotal - $discountAmount);
 
         return [
-            'subtotal' => $subtotal,
-            'discount' => $discountAmount,
-            'total' => $finalTotal,
+            'subtotal' => round($subtotal, 2),
+            'discount' => round($discountAmount, 2),
+            'total' => round($finalTotal, 2),
             'formatted' => [
-                'subtotal' => '₹'.number_format($subtotal, 2),
-                'discount' => '₹'.number_format($discountAmount, 2),
-                'total' => '₹'.number_format($finalTotal, 2),
+                'subtotal' => '₹' . number_format($subtotal, 2),
+                'discount' => '₹' . number_format($discountAmount, 2),
+                'total' => '₹' . number_format($finalTotal, 2),
             ],
         ];
     }
@@ -271,6 +297,9 @@ class CouponApplicationController extends Controller
         }
     }
 
+    /**
+     * Get cart count for AJAX requests.
+     */
     public function getCartCount(): JsonResponse
     {
         if (! Auth::guard('customer_web')->check()) {
@@ -281,6 +310,65 @@ class CouponApplicationController extends Controller
 
         return response()->json([
             'cart_count' => Cart::getCartCount(Auth::id()),
+        ]);
+    }
+
+    /**
+     * Validate coupon without applying it.
+     * Useful for showing validation errors before application.
+     */
+    public function validateCoupon(Request $request): JsonResponse
+    {
+        if (! Auth::guard('customer_web')->check()) {
+            return response()->json([
+                'success' => false,
+                'valid' => false,
+                'message' => 'Please login to validate coupons.',
+            ], 401);
+        }
+
+        $request->validate([
+            'coupon_code' => 'required|string',
+        ]);
+
+        $couponCode = strtoupper(trim($request->coupon_code));
+        $userId = Auth::guard('customer_web')->id();
+
+        $coupon = Coupon::where('code', $couponCode)->first();
+
+        if (! $coupon) {
+            return response()->json([
+                'success' => false,
+                'valid' => false,
+                'message' => 'Invalid coupon code.',
+            ]);
+        }
+
+        $navigationSource = Session::get('checkout_navigation_source', 'cart');
+        $cartItems = $this->getCartItems($request, $userId, $navigationSource);
+        $isBuyNow = $navigationSource === 'buy_now';
+        $cartTotal = $this->calculateCartTotal($cartItems, $isBuyNow);
+
+        $errors = $coupon->getValidationErrors($userId, $cartItems, $cartTotal);
+
+        if (! empty($errors)) {
+            return response()->json([
+                'success' => false,
+                'valid' => false,
+                'message' => $errors[0],
+                'errors' => $errors,
+            ]);
+        }
+
+        // Calculate potential discount
+        $discountAmount = $coupon->calculateDiscount($cartItems);
+
+        return response()->json([
+            'success' => true,
+            'valid' => true,
+            'message' => 'Coupon is valid!',
+            'potential_discount' => $discountAmount,
+            'formatted_discount' => '₹' . number_format($discountAmount, 2),
         ]);
     }
 }

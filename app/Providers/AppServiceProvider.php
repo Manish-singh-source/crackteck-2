@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\CouponUsage;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestProductRequestPart;
+use App\Observers\CouponUsageObserver;
 use App\Observers\ServiceRequestObserver;
 use App\Observers\ServiceRequestProductObserver;
 use App\Observers\ServiceRequestProductRequestPartObserver;
@@ -39,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
         ServiceRequest::observe(ServiceRequestObserver::class);
         ServiceRequestProduct::observe(ServiceRequestProductObserver::class);
         ServiceRequestProductRequestPart::observe(ServiceRequestProductRequestPartObserver::class);
+        CouponUsage::observe(CouponUsageObserver::class);
 
         Gate::before(function ($user, $ability) {
             return $user->hasRole('Super Admin') ? true : null;

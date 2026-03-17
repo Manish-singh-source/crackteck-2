@@ -9,6 +9,7 @@ use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\FrontendEcommerceController;
 use App\Http\Controllers\MyAccountController;
 use App\Http\Controllers\OrderTrackingController;
+use App\Http\Controllers\RewardController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
@@ -217,6 +218,27 @@ Route::prefix('/')->group(function () {
 
         // Return order (requires authentication)
         Route::post('/order/return', 'returnOrder')->name('order.return')->middleware('auth:customer_web');
+    });
+
+    // Reward Routes
+    Route::controller(RewardController::class)->group(function () {
+        // Check order eligibility (AJAX)
+        Route::post('/reward/check-order-eligibility', 'checkOrderEligibility')->name('reward.check-order-eligibility')->middleware('auth:customer_web');
+
+        // Check service eligibility (AJAX)
+        Route::post('/reward/check-service-eligibility', 'checkServiceEligibility')->name('reward.check-service-eligibility')->middleware('auth:customer_web');
+
+        // Claim order reward (AJAX)
+        Route::post('/reward/claim-order', 'claimOrderReward')->name('reward.claim-order')->middleware('auth:customer_web');
+
+        // Claim service reward (AJAX)
+        Route::post('/reward/claim-service', 'claimServiceReward')->name('reward.claim-service')->middleware('auth:customer_web');
+
+        // Get order reward details (AJAX)
+        Route::post('/reward/order-details', 'getOrderReward')->name('reward.order-details')->middleware('auth:customer_web');
+
+        // Get service reward details (AJAX)
+        Route::post('/reward/service-details', 'getServiceReward')->name('reward.service-details')->middleware('auth:customer_web');
     });
 
     // Product Detail

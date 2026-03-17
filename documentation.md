@@ -2331,3 +2331,52 @@ error response:
   "message": "Error creating user",
   "data": { }
 }
+
+
+
+<!-- task 1.
+create reward table
+- id
+- coupon_id
+- customer_id
+- start_date
+- end_date
+- order_id
+- service_request_id
+- status ( active, used, expired )
+- used_order_id
+- used_service_request_id
+- used_at
+- created_at
+- updated_at
+- deleted_at
+
+task 2.
+mujeh customer ko har order complete hone aur service complete hone ke baad coupon code dena hai as a reward jo customer next order ya next service me use kar sakte
+
+so uske liye kuch rules hai
+customer ko reward milega order delivered hone ke baad ( status->delivered ) ya
+customer ko reward milega service request completed hone ke baad ( status-> completed )
+customer ko coupon random jayega mere coupons table se but ek condition hai coupon jane se pahle check karo ki coupon_usages table me same coupon_id same customer_id ko agar already diya hoga to wo coupon customer ko nahi jaye, jo bhi coupon_id customer me use kar kiya hai to wo nahi jayega dura coupon do
+
+task 3. 
+jise ho order complete hoga tab /order-details page me cancel button ke pass me ek reward ka button chahiye jise hi button kar click kare tab ek pop aye jisem congratulations message ho aur usme coupon code display ho aur coupon ke sara detail wahi par display hojaye ki coupon kon se categories ,brand par apply hoga aur kon se product par nahi , start date and end date nahi
+aur agar reward button par ek baar click hogya to reward button hide kardo aur /order-details page hi ek section display hojaye coupon code aur coupon ke pure detail ke sath 
+
+
+jise hi order ( /order-details me reward button par click ho tabhi reward table me data aajaye )
+
+- id (auto)
+- coupon_id ( /order-details page me jo random code aaye hoga uska id )
+- customer_id ( jis customer ko reward mila hoga )
+- start_date ( mila huaa coupon code ka start date )
+- end_date ( mila huaa coupon code ka end date )
+- order_id ( jise order me mila code uska id ) (agar order se hoga to)
+- service_request_id ( jise service me mila code uska id ) (agar service se hoga to)
+- status ( active, used, expired ) ( by default active ) ( end_date ke baad expired) ( aur agar used kiya to used ( coupon_usages table me already store ho raha hai to yaha par bhi update hona chahiye) )
+- used_order_id ( jisem used kiya hoga coupon_usages table se mil jayega )
+- used_service_request_id
+- used_at ( used time )
+- created_at
+- updated_at
+- deleted_at -->

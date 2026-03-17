@@ -285,12 +285,26 @@
                     } elseif ($order->status === 'delivered' && !$order->is_returnable) {
                         $returnMessage = 'This order is not returnable.';
                     }
+
+                    // Check if order is delivered for reward eligibility
+                    $isDelivered = $order->status === 'delivered';
+
+                    // Check if reward already exists for this order
+                    $reward = null;
+                    if (Auth::guard('customer_web')->check()) {
+                        $reward = \App\Models\Reward::where('order_id', $order->id)
+                            ->where('customer_id', Auth::guard('customer_web')->id())
+                            ->first();
+                    }
+
+                    $hasReward = $reward !== null;
+                    $canClaimReward = $isDelivered && !$hasReward;
                 @endphp
 
-                @if ($canCancel || $canReturn)
+                @if ($canCancel || $canReturn || $canClaimReward || $hasReward)
                     <div class="row mt-4">
                         <div class="col-12">
-                            <div class="order-action-buttons d-flex gap-3">
+                            <div class="order-action-buttons d-flex gap-3 flex-wrap">
                                 @if ($canCancel)
                                     <button type="button" class="btn btn-danger" id="cancelOrderBtn" data-bs-toggle="modal"
                                         data-bs-target="#cancelOrderModal">
@@ -308,14 +322,37 @@
                                         <small>{{ $returnMessage }}</small>
                                     </div>
                                 @endif
+
+                                {{-- Reward Button - Show only when order is delivered and no reward claimed yet --}}
+                                @if ($canClaimReward)
+                                    <button type="button" class="btn btn-success" id="rewardBtn" data-bs-toggle="modal"
+                                        data-bs-target="#rewardModal">
+                                        <i class="icon icon-gift"></i> Claim Reward
+                                    </button>
+                                @endif
                             </div>
                         </div>
                     </div>
+                @endif
+
+                {{-- Reward Details Section - Show when reward is already claimed --}}
+                @if ($hasReward && $reward)
+                    @php
+                        // Sync status with coupon usage
+                        $reward->syncStatusWithCouponUsage();
+                        $coupon = $reward->coupon;
+                    @endphp
+                    @include('frontend.components.reward-details', ['reward' => $reward, 'coupon' => $coupon])
                 @endif
             </div>
         </div>
     </section>
     <!-- /Check Out Cart -->
+
+    {{-- Reward Modal --}}
+    @if ($canClaimReward || $hasReward)
+        @include('frontend.components.reward-modal')
+    @endif
 
     <!-- Cancel Order Modal -->
     @if ($canCancel)
@@ -512,6 +549,15 @@
             });
         }
     </script>
+    
+    {{-- Reward System JavaScript --}}
+    <script>
+        // Set global variables for reward system
+        window.orderId = {{ $order->id }};
+        window.rewardType = 'order';
+        window.rewardClaimed = false;
+    </script>
+    <script src="{{ asset('frontend/js/reward.js') }}"></script>
 @endsection
 
 @endsection

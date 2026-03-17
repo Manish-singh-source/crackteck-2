@@ -255,7 +255,7 @@ Route::prefix('v1')->group(function () {
             // customer approve/reject for stock_in_hand, request_part
             Route::post('/customer-approve-reject-part', 'customerApproveRejectPart');
 
-            Route::post('/part-apply-coupon', 'partApplyCoupon');
+            Route::get('/part-apply-coupon', 'partApplyCoupon');
 
             // Customer approve/reject for pickup
             Route::post('/customer-approve-reject-pickup', 'customerApproveRejectPickup');

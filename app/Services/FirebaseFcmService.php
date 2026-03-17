@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use RuntimeException;
 
 class FirebaseFcmService
@@ -73,13 +74,28 @@ class FirebaseFcmService
             ],
         ];
 
-        $response = $this->http->post($url, [
-            'headers' => [
-                'Authorization' => $accessToken,
-                'Content-Type' => 'application/json; charset=UTF-8',
-            ],
-            'json' => $payload,
-        ]);
+        try {
+            $response = $this->http->post($url, [
+                'headers' => [
+                    'Authorization' => 'Bearer '.$accessToken,
+                    'Content-Type' => 'application/json; charset=UTF-8',
+                ],
+                'json' => $payload,
+            ]);
+        } catch (GuzzleException $e) {
+            $message = $e->getMessage();
+
+            if (method_exists($e, 'getResponse') && $e->getResponse()) {
+                $firebaseResponse = json_decode((string) $e->getResponse()->getBody(), true);
+                $firebaseMessage = $firebaseResponse['error']['message'] ?? null;
+
+                if ($firebaseMessage) {
+                    $message = 'Firebase FCM error: '.$firebaseMessage;
+                }
+            }
+
+            throw new RuntimeException($message, (int) $e->getCode(), $e);
+        }
 
         return json_decode((string) $response->getBody(), true);
     }

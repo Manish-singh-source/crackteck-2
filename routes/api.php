@@ -61,9 +61,9 @@ Route::prefix('v1')->group(function () {
         return response()->file($path);
     });
 
-    Route::middleware(['throttle:60,1', 'jwt.verify'])->group(function () {
+    Route::post('/test-fcm', [FcmTestController::class, 'send'])->middleware('throttle:60,1');
 
-        Route::post('/test-fcm', [FcmTestController::class, 'send']);
+    Route::middleware(['throttle:60,1', 'jwt.verify'])->group(function () {
 
         Route::post('/logout', [ApiAuthController::class, 'logout']);
         Route::post('/refresh-token', [ApiAuthController::class, 'refreshToken']);
@@ -401,3 +401,4 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
+

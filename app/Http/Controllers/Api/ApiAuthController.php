@@ -473,20 +473,20 @@ class ApiAuthController extends Controller
             // Send OTP via Fast2SMS DLT
             // Template ID from .env (191040) - DLT approved template
             // Template message: "Your OTP is {#var#}. Valid for 5 minutes. - CRCTK"
-            // $templateId = env('FAST2SMS_TEMPLATE_ID'); // 191040
+            $templateId = env('FAST2SMS_TEMPLATE_ID'); // 191040
 
-            // $success = $this->sendDltSms(
-            //     $user->phone,           // Phone number
-            //     $templateId,            // Template ID (191040)
-            //     $otp                    // OTP value to replace {#var#}
-            // );
+            $success = $this->sendDltSms(
+                $user->phone,           // Phone number
+                $templateId,            // Template ID (191040)
+                $otp                    // OTP value to replace {#var#}
+            );
 
-            if ($user) {
+            if ($success) {
                 return response()->json([
                     'success' => true,
                     'message' => 'OTP sent successfully',
                     // Remove 'otp' in production!
-                    'otp' => $otp, // For testing only
+                    // 'otp' => $otp, // For testing only
                 ], 200);
             } else {
                 Log::error('OTP sending failed for phone: ' . $user->phone);

@@ -157,7 +157,8 @@
                                                     <td>{{ $product->model_no }}</td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ $product->hsn }}</td>
-                                                    <td>{{ $product->purchase_date ? \App\Helpers\DateFormat::formatDateTime($product->purchase_date) : 'N/A' }}</td>
+                                                    {{-- <td>{{ $product->purchase_date ? \App\Helpers\DateFormat::formatDateTime($product->purchase_date) : 'N/A' }}</td> --}}
+                                                    <td>{{ $product->purchase_date }}</td>
                                                     <td>{{ $product->brand }}</td>
                                                     <td>{{ $product->description }}</td>
                                                     <td>{{ ucwords(str_replace('_', ' ', $product->status)) }}</td>

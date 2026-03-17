@@ -64,7 +64,8 @@
                                                     <span class="fw-semibold text-break">Service Request Date :
                                                     </span>
                                                     <span>
-                                                        {{ $remoteSupportJob->serviceRequest?->request_date ? \App\Helpers\DateFormat::formatDateTime($remoteSupportJob->serviceRequest->request_date) : 'N/A' }}
+                                                        {{-- {{ $remoteSupportJob->serviceRequest?->request_date ? \App\Helpers\DateFormat::formatDateTime($remoteSupportJob->serviceRequest?->request_date) : 'N/A' }} --}}
+                                                        {{ $remoteSupportJob->serviceRequest?->request_date }}
                                                     </span>
                                                 </li>
                                             </ul>

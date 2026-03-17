@@ -50,6 +50,7 @@ class StoreProductRequest extends FormRequest
             'selling_price' => 'nullable|numeric|min:0',
             'discount_price' => 'nullable|numeric|min:0',
             'tax' => 'nullable|numeric|min:0|max:100',
+            'final_price' => 'nullable|numeric|min:0',
 
             'stock_quantity' => 'nullable|integer|min:0',
             'stock_status' => 'nullable|in:in_stock,out_of_stock,low_stock,scrap',

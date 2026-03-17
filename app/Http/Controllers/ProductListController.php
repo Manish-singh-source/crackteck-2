@@ -97,10 +97,10 @@ class ProductListController extends Controller
             }
 
             // Calculate final price (DO NOT trust client)
-            $data['final_price'] =
-                ($data['selling_price'] ?? 0)
-                - ($data['discount_price'] ?? 0)
-                + (($data['selling_price'] ?? 0) * ($data['tax'] ?? 0) / 100);
+            // $data['final_price'] =
+            //     ($data['selling_price'] ?? 0)
+            //     - ($data['discount_price'] ?? 0)
+            //     + (($data['selling_price'] ?? 0) * ($data['tax'] ?? 0) / 100);
 
             // Main image
             if ($request->hasFile('main_product_image')) {
@@ -231,11 +231,6 @@ class ProductListController extends Controller
             // Handle variations
             $data['variation_options'] = $data['variations'] ?? null;
             unset($data['variations']);
-
-            // Final price calculation (optional)
-            $data['final_price'] = ($data['selling_price'] ?? 0)
-                - ($data['discount_price'] ?? 0)
-                + (($data['selling_price'] ?? 0) * ($data['tax'] ?? 0) / 100);
 
             // Main image
             if ($request->hasFile('main_product_image')) {

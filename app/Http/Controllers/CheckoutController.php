@@ -644,11 +644,14 @@ class CheckoutController extends Controller
      */
     private function calculateOrderTotals($order)
     {
-        $subtotal = $order->orderItems->sum('taxable_value');
+        $subtotal = $order->orderItems->sum('line_total');
         $totalTax = $order->orderItems->sum('igst_amount');
-        $totalAmount = $order->orderItems->sum('final_amount');
-        $shippingCharges = $order->shipping_charges;
-        $grandTotal = $totalAmount + $shippingCharges;
+        $totalAmount = $order->orderItems->sum('line_total');
+        $shippingCharges = $order->shipping_charges ?? 0;
+        $discountAmount = $order->discount_amount ?? 0;
+        
+        // Calculate grand total with discount
+        $grandTotal = $totalAmount + $shippingCharges - $discountAmount;
 
         // Calculate rounding off
         $roundedTotal = round($grandTotal);
@@ -659,6 +662,7 @@ class CheckoutController extends Controller
             'total_tax' => $totalTax,
             'total_amount' => $totalAmount,
             'shipping_charges' => $shippingCharges,
+            'discount_amount' => $discountAmount,
             'grand_total' => $grandTotal,
             'rounded_total' => $roundedTotal,
             'rounding_off' => $roundingOff,

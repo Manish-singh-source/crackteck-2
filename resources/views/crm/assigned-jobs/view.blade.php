@@ -64,7 +64,7 @@
                                                     <span class="fw-semibold text-break">Service Request Date :
                                                     </span>
                                                     <span>
-                                                        {{ \App\Helpers\DateFormat::formatDateTime($remoteSupportJob->serviceRequest->request_date) }}
+                                                        {{ $remoteSupportJob->serviceRequest?->request_date ? \App\Helpers\DateFormat::formatDateTime($remoteSupportJob->serviceRequest->request_date) : 'N/A' }}
                                                     </span>
                                                 </li>
                                             </ul>
@@ -156,7 +156,7 @@
                                                     <td>{{ $product->model_no }}</td>
                                                     <td>{{ $product->sku }}</td>
                                                     <td>{{ $product->hsn }}</td>
-                                                    <td>{{ \App\Helpers\DateFormat::formatDate($product->purchase_date) }}</td>
+                                                    <td>{{ $product->purchase_date ? \App\Helpers\DateFormat::formatDateTime($product->purchase_date) : 'N/A' }}</td>
                                                     <td>{{ $product->brand }}</td>
                                                     <td>{{ $product->description }}</td>
                                                     <td>{{ ucwords(str_replace('_', ' ', $product->status)) }}</td>

@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ApiAuthController extends Controller
 {
@@ -540,6 +539,7 @@ class ApiAuthController extends Controller
                 $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
             }
         }
+        
         if (! $user) {
             return response()->json(['success' => false, 'message' => 'User not found.'], 404);
         }
@@ -552,12 +552,13 @@ class ApiAuthController extends Controller
         $user->otp_expiry = null;
         $user->save();
 
-        if ($request->hasHeader('Authorization')) {
-            $request->headers->remove('Authorization');
+        // Choose guard based on role
+        if ($staffRole == 'customers') {
+            $guard = 'customer_api';
+        } else {
+            $guard = 'staff_api';
         }
-
-        JWTAuth::unsetToken();
-        $token = JWTAuth::fromUser($user);
+        $token = auth($guard)->login($user); // if guard mapping in config/auth.php
 
         return response()->json(['token' => $token, 'user' => $user]);
     }

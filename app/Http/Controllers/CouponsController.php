@@ -192,6 +192,16 @@ class CouponsController extends Controller
     public function searchCategories(Request $request): JsonResponse
     {
         try {
+            // Check if searching by ID
+            if ($request->has('id')) {
+                $id = is_numeric($request->id) ? (int) $request->id : $request->id;
+                $category = ParentCategory::where('id', $id)
+                    ->select('id', 'name')
+                    ->first();
+                
+                return response()->json($category ? [$category] : []);
+            }
+
             $query = $request->get('q', '');
 
             $categories = ParentCategory::where('name', 'LIKE', "%$query%")
@@ -213,6 +223,16 @@ class CouponsController extends Controller
     public function searchBrands(Request $request): JsonResponse
     {
         try {
+            // Check if searching by ID
+            if ($request->has('id')) {
+                $id = is_numeric($request->id) ? (int) $request->id : $request->id;
+                $brand = Brand::where('id', $id)
+                    ->select('id', 'name')
+                    ->first();
+                
+                return response()->json($brand ? [$brand] : []);
+            }
+
             $query = $request->get('q', '');
 
             $brands = Brand::where('name', 'LIKE', "%$query%")
@@ -235,6 +255,24 @@ class CouponsController extends Controller
     public function searchProducts(Request $request): JsonResponse
     {
         try {
+            // Check if searching by ID
+            if ($request->has('id')) {
+                $id = is_numeric($request->id) ? (int) $request->id : $request->id;
+                $product = EcommerceProduct::with(['warehouseProduct'])
+                    ->where('id', $id)
+                    ->where('status', 'active')
+                    ->first();
+                
+                if ($product) {
+                    return response()->json([[
+                        'id' => $product->id,
+                        'name' => $product->warehouseProduct->product_name ?? 'N/A',
+                        'sku' => $product->warehouseProduct->sku ?? 'N/A',
+                    ]]);
+                }
+                return response()->json([]);
+            }
+
             $query = $request->get('q', '');
 
             $products = EcommerceProduct::with(['warehouseProduct'])

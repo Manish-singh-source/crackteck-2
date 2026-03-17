@@ -76,11 +76,14 @@
                                         <select name="type" class="form-select @error('type') is-invalid @enderror"
                                             required>
                                             <option value="">Select Type</option>
-                                            <option value="percentage" {{ old('type') == 'percentage' ? 'selected' : '' }}>Percentage (%)
+                                            <option value="percentage" {{ old('type') == 'percentage' ? 'selected' : '' }}>
+                                                Percentage (%)
                                             </option>
-                                            <option value="fixed" {{ old('type') == 'fixed' ? 'selected' : '' }}>Fixed Amount
+                                            <option value="fixed" {{ old('type') == 'fixed' ? 'selected' : '' }}>Fixed
+                                                Amount
                                             </option>
-                                            <option value="buy_x_get_y" {{ old('type') == 'buy_x_get_y' ? 'selected' : '' }}>Buy X Get Y
+                                            <option value="buy_x_get_y"
+                                                {{ old('type') == 'buy_x_get_y' ? 'selected' : '' }}>Buy X Get Y
                                             </option>
                                         </select>
                                         @error('type')
@@ -97,7 +100,7 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <div class="col-lg-6">
+                                    {{-- <div class="col-lg-6">
                                         <label class="form-label">Max Discount</label>
                                         <input type="number" name="max_discount"
                                             class="form-control @error('max_discount') is-invalid @enderror"
@@ -106,17 +109,10 @@
                                         @error('max_discount')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <label class="form-label">Min Purchase Amount</label>
-                                        <input type="number" name="min_purchase_amount"
-                                            class="form-control @error('min_purchase_amount') is-invalid @enderror"
-                                            value="{{ old('min_purchase_amount') }}" step="0.01" min="0"
-                                            placeholder="500.00">
-                                        @error('min_purchase_amount')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                    </div> --}}
+
+
+
                                 </div>
                             </div>
                         </div>
@@ -133,8 +129,7 @@
                                             placeholder="Search categories...">
                                     </div>
                                     <div class="col-lg-3">
-                                        <button type="button" id="add_category_btn" class="btn btn-success w-100"
-                                            disabled>
+                                        <button type="button" id="add_category_btn" class="btn btn-success w-100" disabled>
                                             <i class="mdi mdi-plus me-1"></i> Add
                                         </button>
                                     </div>
@@ -256,6 +251,16 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+                                <div class="">
+                                    <label class="form-label">Min Purchase Amount</label>
+                                    <input type="number" name="min_purchase_amount"
+                                        class="form-control @error('min_purchase_amount') is-invalid @enderror"
+                                        value="{{ old('min_purchase_amount') }}" step="0.01" min="0"
+                                        placeholder="500.00">
+                                    @error('min_purchase_amount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 
@@ -271,9 +276,11 @@
                                         required>
                                         <option value="active" {{ old('status', 1) == 'active' ? 'selected' : '' }}>Active
                                         </option>
-                                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive
+                                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>
+                                            Inactive
                                         </option>
-                                        <option value="expired" {{ old('status') == 'expired' ? 'selected' : '' }}>Inactive
+                                        <option value="expired" {{ old('status') == 'expired' ? 'selected' : '' }}>
+                                            Inactive
                                         </option>
                                     </select>
                                     @error('status')
@@ -293,7 +300,7 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                
+
                             </div>
                         </div>
 
@@ -318,6 +325,58 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
+            // Discount Type dependent Discount Value behavior
+            const discountTypeSelect = $('select[name="type"]');
+            const discountValueInput = $('input[name="discount_value"]');
+            const discountValueLabel = discountValueInput.closest('.col-lg-4').find('label');
+
+            function updateDiscountValueBehavior() {
+                const type = discountTypeSelect.val();
+
+                if (type === 'percentage') {
+                    // For percentage: max 100
+                    discountValueInput.attr('max', '100');
+                    discountValueInput.attr('placeholder', '10 (max 100%)');
+                    discountValueLabel.html('Discount Value <span class="text-danger">*</span> <small>(%)</small>');
+                } else if (type === 'fixed') {
+                    // For fixed: no max, show currency
+                    discountValueInput.removeAttr('max');
+                    discountValueInput.attr('placeholder', '100.00');
+                    discountValueLabel.html('Discount Value <span class="text-danger">*</span> <small>(₹)</small>');
+                } else if (type === 'buy_x_get_y') {
+                    // For buy_x_get_y: special format
+                    discountValueInput.removeAttr('max');
+                    discountValueInput.attr('placeholder', 'Buy 2 Get 1');
+                    discountValueLabel.html(
+                        'Discount Value <span class="text-danger">*</span> <small>(Buy X Get Y)</small>');
+                } else {
+                    // Default
+                    discountValueInput.removeAttr('max');
+                    discountValueInput.attr('placeholder', '10.00');
+                    discountValueLabel.html('Discount Value <span class="text-danger">*</span>');
+                }
+            }
+
+            // Initialize on page load
+            updateDiscountValueBehavior();
+
+            // Listen for changes
+            discountTypeSelect.on('change', function() {
+                updateDiscountValueBehavior();
+                // Reset discount value when type changes
+                discountValueInput.val('');
+            });
+
+            // Validate discount_value on input
+            discountValueInput.on('input', function() {
+                const type = discountTypeSelect.val();
+                const value = parseFloat($(this).val());
+
+                if (type === 'percentage' && value > 100) {
+                    $(this).val(100);
+                }
+            });
+
             let selectedCategories = [];
             let selectedCategoryData = null;
             let selectedBrands = [];
@@ -582,6 +641,37 @@
                     e.preventDefault();
                     alert('End date must be after start date');
                     return false;
+                }
+            });
+
+            // Dynamic discount value validation based on discount type
+            $('select[name="type"]').on('change', function() {
+                const type = $(this).val();
+                const discountInput = $('input[name="discount_value"]');
+                const discountLabel = discountInput.closest('.mb-3').find('label');
+
+                if (type === 'percentage') {
+                    discountInput.attr('max', '100');
+                    discountInput.attr('placeholder', '0-100');
+                    discountLabel.html(
+                        'Discount Value <span class="text-danger">*</span> <small class="text-muted">(0-100%)</small>'
+                        );
+                } else if (type === 'fixed') {
+                    discountInput.removeAttr('max');
+                    discountInput.attr('placeholder', '100.00');
+                    discountLabel.html(
+                        'Discount Value <span class="text-danger">*</span> <small class="text-muted">(₹)</small>'
+                        );
+                } else if (type === 'buy_x_get_y') {
+                    discountInput.removeAttr('max');
+                    discountInput.attr('placeholder', 'Buy X Get Y');
+                    discountLabel.html(
+                        'Discount Value <span class="text-danger">*</span> <small class="text-muted">(Buy X Get Y)</small>'
+                        );
+                } else {
+                    discountInput.removeAttr('max');
+                    discountInput.attr('placeholder', '10.00');
+                    discountLabel.html('Discount Value <span class="text-danger">*</span>');
                 }
             });
 

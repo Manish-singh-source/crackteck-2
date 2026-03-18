@@ -1598,13 +1598,13 @@
             <div class="flat-title wow fadeInUp" data-wow-delay="0s">
                 <h5 class="fw-semibold">Trending Products</h5>
                 <!-- <div class="box-btn-slide relative">
-                            <div class="swiper-button-prev nav-swiper nav-prev-products">
-                                <i class="icon-arrow-left-lg"></i>
-                            </div>
-                            <div class="swiper-button-next nav-swiper nav-next-products">
-                                <i class="icon-arrow-right-lg"></i>
-                            </div>
-                        </div> -->
+                                <div class="swiper-button-prev nav-swiper nav-prev-products">
+                                    <i class="icon-arrow-left-lg"></i>
+                                </div>
+                                <div class="swiper-button-next nav-swiper nav-next-products">
+                                    <i class="icon-arrow-right-lg"></i>
+                                </div>
+                            </div> -->
             </div>
             <div class="swiper tf-sw-products" data-preview="5" data-tablet="4" data-mobile-sm="3" data-mobile="1"
                 data-space-lg="30" data-space-md="20" data-space="15" data-pagination="1" data-pagination-sm="3"
@@ -1770,10 +1770,29 @@
                                                             data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
                                                             alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
                                                         @if (!empty($product->warehouseProduct->additional_product_images))
-                                                            <img class="img-hover lazyload"
-                                                                src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                                data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                                alt="image-product">
+                                                            @php
+                                                                $images =
+                                                                    $product->warehouseProduct
+                                                                        ->additional_product_images;
+
+                                                                // agar string hai to array bana do
+                                                                if (!is_array($images)) {
+                                                                    $decoded = json_decode($images, true);
+
+                                                                    if (json_last_error() === JSON_ERROR_NONE) {
+                                                                        $images = $decoded; // JSON string -> array
+                                                                    } else {
+                                                                        $images = $images ? [$images] : []; // normal string -> array
+                                                                    }
+                                                                }
+                                                            @endphp
+
+                                                            @if (count($images) > 0)
+                                                                <img class="img-hover lazyload"
+                                                                    src="{{ asset($images[0]) }}"
+                                                                    data-src="{{ asset($images[0]) }}"
+                                                                    alt="{{ $product->warehouseProduct->product_name }}">
+                                                            @endif
                                                         @else
                                                             <img class="img-hover lazyload"
                                                                 src="{{ asset($product->warehouseProduct->main_product_image) }}"
@@ -2623,8 +2642,8 @@
                             </p>
 
                             ${shortDescription ? `<div class="product-description">
-                                                                                            <p class="caption">${shortDescription}</p>
-                                                                                        </div>` : ''}
+                                                                                                <p class="caption">${shortDescription}</p>
+                                                                                            </div>` : ''}
                             <div class="box-infor-detail">
                                 <div class="star-review flex-wrap">
                                     <ul class="list-star">

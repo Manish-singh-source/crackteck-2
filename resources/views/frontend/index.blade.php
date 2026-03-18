@@ -1003,7 +1003,7 @@
                                                         <p class="caption text-main-2 font-2">
                                                             {{ $product->warehouseProduct->brand->name ?? 'Brand' }}</p>
                                                         <a href="{{ route('ecommerce.product.detail', $product->id) }}"
-                                                            class="name-product body-md-2 fw-semibold text-secondary link text-truncate">
+                                                            class="name-product body-md-2 fw-semibold text-secondary link">
                                                             {{ $product->warehouseProduct->product_name ?? 'Product Name' }}
                                                         </a>
                                                     </div>
@@ -1074,7 +1074,7 @@
                                                 <div class="d-flex flex-column">
                                                     <p class="caption text-main-2 font-2">CCTV</p>
                                                     <a href="{{ route('product-detail') }}"
-                                                        class="name-product body-md-2 fw-semibold text-secondary link text-truncate">
+                                                        class="name-product body-md-2 fw-semibold text-secondary link">
                                                         No Featured Products Available
                                                     </a>
                                                 </div>
@@ -1191,7 +1191,7 @@
                                                         <p class="caption text-main-2 font-2">
                                                             {{ $product->warehouseProduct->brand->name ?? 'Brand' }}</p>
                                                         <a href="{{ route('ecommerce.product.detail', $product->id) }}"
-                                                            class="name-product body-md-2 fw-semibold text-secondary link text-truncate">
+                                                            class="name-product body-md-2 fw-semibold text-secondary link">
                                                             {{ $product->warehouseProduct->product_name ?? 'Product Name' }}
                                                         </a>
                                                     </div>
@@ -1262,7 +1262,7 @@
                                                 <div class="d-flex flex-column">
                                                     <p class="caption text-main-2 font-2">CCTV</p>
                                                     <a href="{{ route('product-detail') }}"
-                                                        class="name-product body-md-2 fw-semibold text-secondary link text-truncate">
+                                                        class="name-product body-md-2 fw-semibold text-secondary link">
                                                         No Suggested Products Available
                                                     </a>
                                                 </div>
@@ -1380,7 +1380,7 @@
                                                         <p class="caption text-main-2 font-2">
                                                             {{ $product->warehouseProduct->brand->name ?? 'Brand' }}</p>
                                                         <a href="{{ route('ecommerce.product.detail', $product->id) }}"
-                                                            class="name-product body-md-2 fw-semibold text-secondary link text-truncate">
+                                                            class="name-product body-md-2 fw-semibold text-secondary link">
                                                             {{ $product->warehouseProduct->product_name ?? 'Product Name' }}
                                                         </a>
                                                     </div>
@@ -1451,7 +1451,7 @@
                                                 <div class="d-flex flex-column">
                                                     <p class="caption text-main-2 font-2">No Products</p>
                                                     <a href="{{ route('product-detail') }}"
-                                                        class="name-product body-md-2 fw-semibold text-secondary link text-truncate">
+                                                        class="name-product body-md-2 fw-semibold text-secondary link">
                                                         No deals available
                                                     </a>
                                                 </div>
@@ -1569,7 +1569,7 @@
                                                         <p class="caption text-main-2 font-2">
                                                             {{ $product->warehouseProduct->brand->name ?? 'Brand' }}</p>
                                                         <a href="{{ route('ecommerce.product.detail', $product->id) }}"
-                                                            class="name-product body-md-2 fw-semibold text-secondary link text-truncate">
+                                                            class="name-product body-md-2 fw-semibold text-secondary link">
                                                             {{ $product->warehouseProduct->product_name ?? 'Product Name' }}
                                                         </a>
                                                     </div>
@@ -1640,7 +1640,7 @@
                                                 <div class="d-flex flex-column">
                                                     <p class="caption text-main-2 font-2">No Products</p>
                                                     <a href="{{ route('product-detail') }}"
-                                                        class="name-product body-md-2 fw-semibold text-secondary link text-truncate">
+                                                        class="name-product body-md-2 fw-semibold text-secondary link">
                                                         No deals available
                                                     </a>
                                                 </div>
@@ -1910,7 +1910,7 @@
                                                             {{ $product->warehouseProduct->brand->name ?? 'Brand' }}
                                                         </p>
                                                         <a href="{{ route('ecommerce.product.detail', $product->id) }}"
-                                                            class="name-product body-md-2 fw-semibold text-secondary link text-truncate">
+                                                            class="name-product body-md-2 fw-semibold text-secondary link">
                                                             {{ $product->warehouseProduct->product_name ?? 'Product Name' }}
                                                         </a>
                                                     </div>

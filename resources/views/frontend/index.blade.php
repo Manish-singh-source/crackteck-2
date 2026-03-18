@@ -11,7 +11,8 @@
                         @if (isset($categories) && $categories->count() > 0)
                             @foreach ($categories as $category)
                                 <div class="category-item swiper-slide">
-                                    <a href="{{ route('shop') }}?category={{ $category->id }}" class="hover-img" style="text-decoration: none;">
+                                    <a href="{{ route('shop') }}?category={{ $category->id }}" class="hover-img"
+                                        style="text-decoration: none;">
                                         <img src="{{ $category->image ? asset($category->image) : asset('frontend-assets/images/new-products/default-category.png') }}"
                                             alt="{{ $category->name }}"
                                             style="width: 100%; height: auto; object-fit: cover;">
@@ -271,7 +272,7 @@
                                                         <p class="caption text-main-2 font-2">
                                                             {{ $dealItem->ecommerceProduct->warehouseProduct->brand->brand_title ?? 'Brand' }}
                                                         </p>
-                                                        <a href="{{ route('ecommerce-product-detail', $dealItem->ecommerceProduct->id) }}"
+                                                        <a href="{{ route('ecommerce.product.detail', $dealItem->ecommerceProduct->id) }}"
                                                             class="name-product body-md-2 fw-semibold text-secondary link text-truncate"
                                                             style="max-width: 230px;">
                                                             {{ $dealItem->ecommerceProduct->warehouseProduct->product_name }}
@@ -722,7 +723,8 @@
                                     <a href="{{ route('collection.details', $collection->id) }}"
                                         class="img-style d-block">
                                         @if ($collection->image_url)
-                                            <img src="{{ asset($collection->image_url) }}" alt="{{ $collection->name }}">
+                                            <img src="{{ asset($collection->image_url) }}"
+                                                alt="{{ $collection->name }}">
                                         @else
                                             <img src="{{ asset('frontend-assets/images/collection/default-collection.jpg') }}"
                                                 alt="{{ $collection->name }}">
@@ -866,323 +868,169 @@
                         data-mobile="1" data-space-lg="30" data-space-md="20" data-space="15" data-pagination="1"
                         data-pagination-sm="3" data-pagination-md="4" data-pagination-lg="5">
                         <div class="swiper-wrapper">
-                            <!-- item 1 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
+                            @if (isset($featuredProducts) && $featuredProducts->count() > 0)
+                                @foreach ($featuredProducts as $index => $product)
+                                    <div class="swiper-slide">
+                                        <div class="card-product style-img-border wow fadeInLeft"
+                                            data-wow-delay="{{ $index * 0.1 }}s">
+                                            <div class="card-product-wrapper">
+                                                <a href="{{ route('ecommerce.product.detail', $product->id) }}"
+                                                    class="product-img">
+                                                    @if ($product->warehouseProduct && $product->warehouseProduct->main_product_image)
+                                                        <img class="img-product lazyload"
+                                                            src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                            data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                            alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                        @if (!empty($product->warehouseProduct->additional_product_images))
+                                                            <img class="img-hover lazyload"
+                                                                src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
+                                                                data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
+                                                                alt="image-product">
+                                                        @else
+                                                            <img class="img-hover lazyload"
+                                                                src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                                data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                                alt="image-product">
+                                                        @endif
+                                                    @else
+                                                        <img class="img-product lazyload"
+                                                            src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                            data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                            alt="Product Image">
+                                                        <img class="img-hover lazyload"
+                                                            src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                            data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                            alt="image-product">
+                                                    @endif
                                                 </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info px-">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">CCTV</p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    Qubo Smart Cam 360 Q100 by HERO GROUP 3MP 1296p WiFi CCTV 2 Way Talk
-                                                    Night Vision Security Camera (1 Channel)
-                                                </a>
+                                                <ul class="list-product-btn">
+                                                    <li>
+                                                        <a href="#;"
+                                                            class="box-icon add-to-cart-btn btn-icon-action hover-tooltip tooltip-left"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span class="icon icon-cart2"></span>
+                                                            <span class="tooltip">Add to Cart</span>
+                                                        </a>
+                                                    </li>
+                                                    <li class="d-none d-sm-block wishlist">
+                                                        <a href="#;"
+                                                            class="box-icon btn-icon-action hover-tooltip tooltip-left add-to-wishlist-btn"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span class="icon icon-heart2"></span>
+                                                            <span class="tooltip">Add to Wishlist</span>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#quickView{{ $product->id }}" data-bs-toggle="modal"
+                                                            data-product-id="{{ $product->id }}"
+                                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                            <span class="icon icon-view"></span>
+                                                            <span class="tooltip">Quick View</span>
+                                                        </a>
+                                                    </li>
+                                                    <li class="d-none d-sm-block">
+                                                        <a href="#;"
+                                                            class="box-icon btn-icon-action hover-tooltip tooltip-left compare-btn"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span class="icon icon-compare1"></span>
+                                                            <span class="tooltip">Compare</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
                                             </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹72.000</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹92.750</span>
-                                            </p>
+                                            <div class="card-product-info px-">
+                                                <div class="box-title">
+                                                    <div class="d-flex flex-column">
+                                                        <p class="caption text-main-2 font-2">
+                                                            {{ $product->warehouseProduct->brand->name ?? 'Brand' }}</p>
+                                                        <a href="{{ route('ecommerce.product.detail', $product->id) }}"
+                                                            class="name-product body-md-2 fw-semibold text-secondary link">
+                                                            {{ $product->warehouseProduct->product_name ?? 'Product Name' }}
+                                                        </a>
+                                                    </div>
+                                                    <p class="price-wrap fw-medium">
+                                                        @if ($product->warehouseProduct && $product->warehouseProduct->discount_price > 0)
+                                                            <span
+                                                                class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->final_price ?? 0, 0) }}</span>
+                                                            <span
+                                                                class="old-price body-md-2 text-main-2 fw-normal">₹{{ number_format($product->warehouseProduct->final_price + $product->warehouseProduct->discount_price, 2) }}</span>
+                                                        @else
+                                                            <span
+                                                                class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->selling_price ?? 0, 0) }}</span>
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <!-- Fallback when no featured products are available -->
+                                <div class="swiper-slide">
+                                    <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0s">
+                                        <div class="card-product-wrapper">
+                                            <a href="{{ route('product-detail') }}" class="product-img">
+                                                <img class="img-product lazyload"
+                                                    src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                    data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                    alt="image-product">
+                                                <img class="img-hover lazyload"
+                                                    src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                    data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                    alt="image-product">
+                                            </a>
+                                            <ul class="list-product-btn">
+                                                <li>
+                                                    <a href="#shoppingCart" data-bs-toggle="offcanvas"
+                                                        class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-cart2"></span>
+                                                        <span class="tooltip">Add to Cart</span>
+                                                    </a>
+                                                </li>
+                                                <li class="d-none d-sm-block wishlist">
+                                                    <a href="#;"
+                                                        class="box-icon btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-heart2"></span>
+                                                        <span class="tooltip">Add to Wishlist</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="#quickView" data-bs-toggle="modal"
+                                                        class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-view"></span>
+                                                        <span class="tooltip">Quick View</span>
+                                                    </a>
+                                                </li>
+                                                <li class="d-none d-sm-block">
+                                                    <a href="#compare" data-bs-toggle="offcanvas"
+                                                        class="box-icon btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-compare1"></span>
+                                                        <span class="tooltip">Compare</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-product-info px-">
+                                            <div class="box-title">
+                                                <div class="d-flex flex-column">
+                                                    <p class="caption text-main-2 font-2">CCTV</p>
+                                                    <a href="{{ route('product-detail') }}"
+                                                        class="name-product body-md-2 fw-semibold text-secondary link">
+                                                        No Featured Products Available
+                                                    </a>
+                                                </div>
+                                                <p class="price-wrap fw-medium">
+                                                    <span class="new-price price-text fw-medium mb-0">₹0</span>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- item 2 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.1s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-2-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-2-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">Printer</p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    HP MFP 1188W Multi-function WiFi Monochrome Laser Printer (Toner
-                                                    Cartridge, 1 Ink Bottle Included)
-                                                </a>
-                                            </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹36.500</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹45.900</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- item 3 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.2s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-3-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-3-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-3-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-3-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">Bio-metric</p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    RICH POLO Biometric RS 9w with WiFi Access Control, Time & Attendance
-                                                    (Fingerprint)
-                                                </a>
-                                            </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹87.500</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹92.750</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- item 4 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.3s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-4-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-4-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-4-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-4-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">Laptop</p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    HP Victus Intel Core i5 13th Gen 13420H - (16 GB/512 GB SSD/Windows 11
-                                                    Home/6 GB Graphics/NVIDIA GeForce RTX 4050/144 Hz) fa1278TX Gaming
-                                                    Laptop
-                                                </a>
-                                            </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹42.700</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹53.990</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- item 5 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.4s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-5-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-5-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-5-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-5-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">Desktop</p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    ASUS AiO A3 Series All in One Desktop, Intel 12th Gen Core i3
-                                                </a>
-                                            </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹45.500</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹56.800</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            @endif
                         </div>
-                        <div class="sw-dot-default sw-pagination-products justify-content-center"></div>
                     </div>
                 </div>
                 <div class="tab-pane" id="toprate" role="tabpanel">
@@ -1190,321 +1038,168 @@
                         data-mobile="1" data-space-lg="30" data-space-md="20" data-space="15" data-pagination="1"
                         data-pagination-sm="3" data-pagination-md="4" data-pagination-lg="5">
                         <div class="swiper-wrapper">
-                            <!-- item 1 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.2s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-3-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-3-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-3-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-3-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
+                            @if (isset($suggestedProducts) && $suggestedProducts->count() > 0)
+                                @foreach ($suggestedProducts as $index => $product)
+                                    <div class="swiper-slide">
+                                        <div class="card-product style-img-border wow fadeInLeft"
+                                            data-wow-delay="{{ $index * 0.1 }}s">
+                                            <div class="card-product-wrapper">
+                                                <a href="{{ route('ecommerce.product.detail', $product->id) }}"
+                                                    class="product-img">
+                                                    @if ($product->warehouseProduct && $product->warehouseProduct->main_product_image)
+                                                        <img class="img-product lazyload"
+                                                            src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                            data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                            alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                        @if (!empty($product->warehouseProduct->additional_product_images))
+                                                            <img class="img-hover lazyload"
+                                                                src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
+                                                                data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
+                                                                alt="image-product">
+                                                        @else
+                                                            <img class="img-hover lazyload"
+                                                                src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                                data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                                alt="image-product">
+                                                        @endif
+                                                    @else
+                                                        <img class="img-product lazyload"
+                                                            src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                            data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                            alt="Product Image">
+                                                        <img class="img-hover lazyload"
+                                                            src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                            data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                            alt="image-product">
+                                                    @endif
                                                 </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">Bio-metric</p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    RICH POLO Biometric RS 9w with WiFi Access Control, Time & Attendance
-                                                    (Fingerprint)
-                                                </a>
+                                                <ul class="list-product-btn">
+                                                    <li>
+                                                        <a href="#;"
+                                                            class="box-icon add-to-cart-btn btn-icon-action hover-tooltip tooltip-left"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span class="icon icon-cart2"></span>
+                                                            <span class="tooltip">Add to Cart</span>
+                                                        </a>
+                                                    </li>
+                                                    <li class="d-none d-sm-block wishlist">
+                                                        <a href="#;"
+                                                            class="box-icon btn-icon-action hover-tooltip tooltip-left add-to-wishlist-btn"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span class="icon icon-heart2"></span>
+                                                            <span class="tooltip">Add to Wishlist</span>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#quickView{{ $product->id }}" data-bs-toggle="modal"
+                                                            data-product-id="{{ $product->id }}"
+                                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                            <span class="icon icon-view"></span>
+                                                            <span class="tooltip">Quick View</span>
+                                                        </a>
+                                                    </li>
+                                                    <li class="d-none d-sm-block">
+                                                        <a href="#;"
+                                                            class="box-icon btn-icon-action hover-tooltip tooltip-left compare-btn"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span class="icon icon-compare1"></span>
+                                                            <span class="tooltip">Compare</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
                                             </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹87.500</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹92.750</span>
-                                            </p>
+                                            <div class="card-product-info px-">
+                                                <div class="box-title">
+                                                    <div class="d-flex flex-column">
+                                                        <p class="caption text-main-2 font-2">
+                                                            {{ $product->warehouseProduct->brand->name ?? 'Brand' }}</p>
+                                                        <a href="{{ route('ecommerce.product.detail', $product->id) }}"
+                                                            class="name-product body-md-2 fw-semibold text-secondary link">
+                                                            {{ $product->warehouseProduct->product_name ?? 'Product Name' }}
+                                                        </a>
+                                                    </div>
+                                                    <p class="price-wrap fw-medium">
+                                                        @if ($product->warehouseProduct && $product->warehouseProduct->discount_price > 0)
+                                                            <span
+                                                                class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->final_price ?? 0, 0) }}</span>
+                                                            <span
+                                                                class="old-price body-md-2 text-main-2 fw-normal">₹{{ number_format($product->warehouseProduct->final_price + $product->warehouseProduct->discount_price, 2) }}</span>
+                                                        @else
+                                                            <span
+                                                                class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->selling_price ?? 0, 0) }}</span>
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <!-- Fallback when no suggested products are available -->
+                                <div class="swiper-slide">
+                                    <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0s">
+                                        <div class="card-product-wrapper">
+                                            <a href="{{ route('product-detail') }}" class="product-img">
+                                                <img class="img-product lazyload"
+                                                    src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                    data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                    alt="image-product">
+                                                <img class="img-hover lazyload"
+                                                    src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                    data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                    alt="image-product">
+                                            </a>
+                                            <ul class="list-product-btn">
+                                                <li>
+                                                    <a href="#shoppingCart" data-bs-toggle="offcanvas"
+                                                        class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-cart2"></span>
+                                                        <span class="tooltip">Add to Cart</span>
+                                                    </a>
+                                                </li>
+                                                <li class="d-none d-sm-block wishlist">
+                                                    <a href="#;"
+                                                        class="box-icon btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-heart2"></span>
+                                                        <span class="tooltip">Add to Wishlist</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="#quickView" data-bs-toggle="modal"
+                                                        class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-view"></span>
+                                                        <span class="tooltip">Quick View</span>
+                                                    </a>
+                                                </li>
+                                                <li class="d-none d-sm-block">
+                                                    <a href="#compare" data-bs-toggle="offcanvas"
+                                                        class="box-icon btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-compare1"></span>
+                                                        <span class="tooltip">Compare</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-product-info px-">
+                                            <div class="box-title">
+                                                <div class="d-flex flex-column">
+                                                    <p class="caption text-main-2 font-2">CCTV</p>
+                                                    <a href="{{ route('product-detail') }}"
+                                                        class="name-product body-md-2 fw-semibold text-secondary link">
+                                                        No Suggested Products Available
+                                                    </a>
+                                                </div>
+                                                <p class="price-wrap fw-medium">
+                                                    <span class="new-price price-text fw-medium mb-0">₹0</span>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- item 2 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.4s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-5-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-5-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-5-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-5-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">Desktop </p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    ASUS AiO A3 Series All in One Desktop, Intel 12th Gen Core i3
-                                                </a>
-                                            </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹45.500</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹56.800</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- item 3 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">CCTV</p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    Qubo Smart Cam 360 Q100 by HERO GROUP 3MP 1296p WiFi CCTV 2 Way Talk
-                                                    Night Vision Security Camera (1 Channel)
-                                                </a>
-                                            </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹72.000</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹92.750</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- item 4 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.1s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-2-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-2-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">Printer</p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    HP MFP 1188W Multi-function WiFi Monochrome Laser Printer (Toner
-                                                    Cartridge, 1 Ink Bottle Included)
-                                                </a>
-                                            </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹36.500</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹45.900</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- item 5 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.3s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-4-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-4-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-4-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-4-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">Laptop</p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    HP Victus Intel Core i5 13th Gen 13420H - (16 GB/512 GB SSD/Windows 11
-                                                    Home/6 GB Graphics/NVIDIA GeForce RTX 4050/144 Hz) fa1278TX Gaming
-                                                    Laptop
-                                                </a>
-                                            </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹42.700</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹53.990</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            @endif
                         </div>
                         <div class="sw-dot-default sw-pagination-products justify-content-center"></div>
                     </div>
@@ -1514,321 +1209,339 @@
                         data-mobile="1" data-space-lg="30" data-space-md="20" data-space="15" data-pagination="1"
                         data-pagination-sm="3" data-pagination-md="4" data-pagination-lg="5">
                         <div class="swiper-wrapper">
-                            <!-- item 1 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.1s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-2-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-2-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
+                            @if (isset($todaysDealProducts) && $todaysDealProducts->count() > 0)
+                                @foreach ($todaysDealProducts as $index => $product)
+                                    <div class="swiper-slide">
+                                        <div class="card-product style-img-border wow fadeInLeft"
+                                            data-wow-delay="{{ $index * 0.1 }}s">
+                                            <div class="card-product-wrapper">
+                                                <a href="{{ route('ecommerce.product.detail', $product->id) }}"
+                                                    class="product-img">
+                                                    @if ($product->warehouseProduct && $product->warehouseProduct->main_product_image)
+                                                        <img class="img-product lazyload"
+                                                            src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                            data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                            alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                        @if (!empty($product->warehouseProduct->additional_product_images))
+                                                            <img class="img-hover lazyload"
+                                                                src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
+                                                                data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
+                                                                alt="image-product">
+                                                        @else
+                                                            <img class="img-hover lazyload"
+                                                                src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                                data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                                alt="image-product">
+                                                        @endif
+                                                    @else
+                                                        <img class="img-product lazyload"
+                                                            src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                            data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                            alt="Product Image">
+                                                        <img class="img-hover lazyload"
+                                                            src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                            data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                            alt="image-product">
+                                                    @endif
                                                 </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">Printer</p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    HP MFP 1188W Multi-function WiFi Monochrome Laser Printer (Toner
-                                                    Cartridge, 1 Ink Bottle Included)
-                                                </a>
+                                                <ul class="list-product-btn">
+                                                    <li>
+                                                        <a href="#;"
+                                                            class="box-icon add-to-cart-btn btn-icon-action hover-tooltip tooltip-left"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span class="icon icon-cart2"></span>
+                                                            <span class="tooltip">Add to Cart</span>
+                                                        </a>
+                                                    </li>
+                                                    <li class="d-none d-sm-block wishlist">
+                                                        <a href="#;"
+                                                            class="box-icon btn-icon-action hover-tooltip tooltip-left add-to-wishlist-btn"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span class="icon icon-heart2"></span>
+                                                            <span class="tooltip">Add to Wishlist</span>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#quickView{{ $product->id }}" data-bs-toggle="modal"
+                                                            data-product-id="{{ $product->id }}"
+                                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                            <span class="icon icon-view"></span>
+                                                            <span class="tooltip">Quick View</span>
+                                                        </a>
+                                                    </li>
+                                                    <li class="d-none d-sm-block">
+                                                        <a href="#;"
+                                                            class="box-icon btn-icon-action hover-tooltip tooltip-left compare-btn"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span class="icon icon-compare1"></span>
+                                                            <span class="tooltip">Compare</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
                                             </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹36.500</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹45.900</span>
-                                            </p>
+                                            <div class="card-product-info px-">
+                                                <div class="box-title">
+                                                    <div class="d-flex flex-column">
+                                                        <p class="caption text-main-2 font-2">
+                                                            {{ $product->warehouseProduct->brand->name ?? 'Brand' }}</p>
+                                                        <a href="{{ route('ecommerce.product.detail', $product->id) }}"
+                                                            class="name-product body-md-2 fw-semibold text-secondary link">
+                                                            {{ $product->warehouseProduct->product_name ?? 'Product Name' }}
+                                                        </a>
+                                                    </div>
+                                                    <p class="price-wrap fw-medium">
+                                                        @if ($product->warehouseProduct && $product->warehouseProduct->discount_price > 0)
+                                                            <span
+                                                                class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->final_price ?? 0, 0) }}</span>
+                                                            <span
+                                                                class="old-price body-md-2 text-main-2 fw-normal">₹{{ number_format($product->warehouseProduct->final_price + $product->warehouseProduct->discount_price, 2) }}</span>
+                                                        @else
+                                                            <span
+                                                                class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->selling_price ?? 0, 0) }}</span>
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <!-- Fallback when no todays deal products are available -->
+                                <div class="swiper-slide">
+                                    <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0s">
+                                        <div class="card-product-wrapper">
+                                            <a href="{{ route('product-detail') }}" class="product-img">
+                                                <img class="img-product lazyload"
+                                                    src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                    data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                    alt="image-product">
+                                                <img class="img-hover lazyload"
+                                                    src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                    data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                    alt="image-product">
+                                            </a>
+                                            <ul class="list-product-btn">
+                                                <li>
+                                                    <a href="#shoppingCart" data-bs-toggle="offcanvas"
+                                                        class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-cart2"></span>
+                                                        <span class="tooltip">Add to Cart</span>
+                                                    </a>
+                                                </li>
+                                                <li class="d-none d-sm-block wishlist">
+                                                    <a href="#;"
+                                                        class="box-icon btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-heart2"></span>
+                                                        <span class="tooltip">Add to Wishlist</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="#quickView" data-bs-toggle="modal"
+                                                        class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-view"></span>
+                                                        <span class="tooltip">Quick View</span>
+                                                    </a>
+                                                </li>
+                                                <li class="d-none d-sm-block">
+                                                    <a href="#compare" data-bs-toggle="offcanvas"
+                                                        class="box-icon btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-compare1"></span>
+                                                        <span class="tooltip">Compare</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-product-info">
+                                            <div class="box-title">
+                                                <div class="d-flex flex-column">
+                                                    <p class="caption text-main-2 font-2">No Products</p>
+                                                    <a href="{{ route('product-detail') }}"
+                                                        class="name-product body-md-2 fw-semibold text-secondary link">
+                                                        No deals available
+                                                    </a>
+                                                </div>
+                                                <p class="price-wrap fw-medium">
+                                                    <span class="new-price price-text fw-medium mb-0">₹0</span>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- item 2 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.3s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-4-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-4-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-4-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-4-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
+                            @endif
+                        </div>
+                        <div class="sw-dot-default sw-pagination-products justify-content-center"></div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="on-sale" role="tabpanel">
+                    <div class="swiper tf-sw-products" data-preview="5" data-tablet="4" data-mobile-sm="3"
+                        data-mobile="1" data-space-lg="30" data-space-md="20" data-space="15" data-pagination="1"
+                        data-pagination-sm="3" data-pagination-md="4" data-pagination-lg="5">
+                        <div class="swiper-wrapper">
+                            @if (isset($todaysDealProducts) && $todaysDealProducts->count() > 0)
+                                @foreach ($todaysDealProducts as $index => $product)
+                                    <div class="swiper-slide">
+                                        <div class="card-product style-img-border wow fadeInLeft"
+                                            data-wow-delay="{{ $index * 0.1 }}s">
+                                            <div class="card-product-wrapper">
+                                                <a href="{{ route('ecommerce.product.detail', $product->id) }}"
+                                                    class="product-img">
+                                                    @if ($product->warehouseProduct && $product->warehouseProduct->main_product_image)
+                                                        <img class="img-product lazyload"
+                                                            src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                            data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                            alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                        @if (!empty($product->warehouseProduct->additional_product_images))
+                                                            <img class="img-hover lazyload"
+                                                                src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
+                                                                data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
+                                                                alt="image-product">
+                                                        @else
+                                                            <img class="img-hover lazyload"
+                                                                src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                                data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                                alt="image-product">
+                                                        @endif
+                                                    @else
+                                                        <img class="img-product lazyload"
+                                                            src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                            data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                            alt="Product Image">
+                                                        <img class="img-hover lazyload"
+                                                            src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                            data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                            alt="image-product">
+                                                    @endif
                                                 </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">Laptop</p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    HP Victus Intel Core i5 13th Gen 13420H - (16 GB/512 GB SSD/Windows 11
-                                                    Home/6 GB Graphics/NVIDIA GeForce RTX 4050/144 Hz) fa1278TX Gaming
-                                                    Laptop
-                                                </a>
+                                                <ul class="list-product-btn">
+                                                    <li>
+                                                        <a href="#;"
+                                                            class="box-icon add-to-cart-btn btn-icon-action hover-tooltip tooltip-left"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span class="icon icon-cart2"></span>
+                                                            <span class="tooltip">Add to Cart</span>
+                                                        </a>
+                                                    </li>
+                                                    <li class="d-none d-sm-block wishlist">
+                                                        <a href="#;"
+                                                            class="box-icon btn-icon-action hover-tooltip tooltip-left add-to-wishlist-btn"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span class="icon icon-heart2"></span>
+                                                            <span class="tooltip">Add to Wishlist</span>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#quickView{{ $product->id }}" data-bs-toggle="modal"
+                                                            data-product-id="{{ $product->id }}"
+                                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                            <span class="icon icon-view"></span>
+                                                            <span class="tooltip">Quick View</span>
+                                                        </a>
+                                                    </li>
+                                                    <li class="d-none d-sm-block">
+                                                        <a href="#;"
+                                                            class="box-icon btn-icon-action hover-tooltip tooltip-left compare-btn"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span class="icon icon-compare1"></span>
+                                                            <span class="tooltip">Compare</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
                                             </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹42.700</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹53.990</span>
-                                            </p>
+                                            <div class="card-product-info px-">
+                                                <div class="box-title">
+                                                    <div class="d-flex flex-column">
+                                                        <p class="caption text-main-2 font-2">
+                                                            {{ $product->warehouseProduct->brand->name ?? 'Brand' }}</p>
+                                                        <a href="{{ route('ecommerce.product.detail', $product->id) }}"
+                                                            class="name-product body-md-2 fw-semibold text-secondary link">
+                                                            {{ $product->warehouseProduct->product_name ?? 'Product Name' }}
+                                                        </a>
+                                                    </div>
+                                                    <p class="price-wrap fw-medium">
+                                                        @if ($product->warehouseProduct && $product->warehouseProduct->discount_price > 0)
+                                                            <span
+                                                                class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->final_price ?? 0, 0) }}</span>
+                                                            <span
+                                                                class="old-price body-md-2 text-main-2 fw-normal">₹{{ number_format($product->warehouseProduct->final_price + $product->warehouseProduct->discount_price, 2) }}</span>
+                                                        @else
+                                                            <span
+                                                                class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->selling_price ?? 0, 0) }}</span>
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <!-- Fallback when no todays deal products are available -->
+                                <div class="swiper-slide">
+                                    <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0s">
+                                        <div class="card-product-wrapper">
+                                            <a href="{{ route('product-detail') }}" class="product-img">
+                                                <img class="img-product lazyload"
+                                                    src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                    data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                    alt="image-product">
+                                                <img class="img-hover lazyload"
+                                                    src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                    data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                    alt="image-product">
+                                            </a>
+                                            <ul class="list-product-btn">
+                                                <li>
+                                                    <a href="#shoppingCart" data-bs-toggle="offcanvas"
+                                                        class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-cart2"></span>
+                                                        <span class="tooltip">Add to Cart</span>
+                                                    </a>
+                                                </li>
+                                                <li class="d-none d-sm-block wishlist">
+                                                    <a href="#;"
+                                                        class="box-icon btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-heart2"></span>
+                                                        <span class="tooltip">Add to Wishlist</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="#quickView" data-bs-toggle="modal"
+                                                        class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-view"></span>
+                                                        <span class="tooltip">Quick View</span>
+                                                    </a>
+                                                </li>
+                                                <li class="d-none d-sm-block">
+                                                    <a href="#compare" data-bs-toggle="offcanvas"
+                                                        class="box-icon btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-compare1"></span>
+                                                        <span class="tooltip">Compare</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-product-info">
+                                            <div class="box-title">
+                                                <div class="d-flex flex-column">
+                                                    <p class="caption text-main-2 font-2">No Products</p>
+                                                    <a href="{{ route('product-detail') }}"
+                                                        class="name-product body-md-2 fw-semibold text-secondary link">
+                                                        No deals available
+                                                    </a>
+                                                </div>
+                                                <p class="price-wrap fw-medium">
+                                                    <span class="new-price price-text fw-medium mb-0">₹0</span>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- item 3 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">CCTV</p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    Qubo Smart Cam 360 Q100 by HERO GROUP 3MP 1296p WiFi CCTV 2 Way Talk
-                                                    Night Vision Security Camera (1 Channel)
-                                                </a>
-                                            </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹72.000</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹92.750</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- item 4 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.4s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-5-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-5-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-5-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-5-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">Desktop </p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    ASUS AiO A3 Series All in One Desktop, Intel 12th Gen Core i3
-                                                </a>
-                                            </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹45.500</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹56.800</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- item 5 -->
-                            <div class="swiper-slide">
-                                <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.2s">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-3-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-3-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-3-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-3-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                        <ul class="list-product-btn">
-                                            <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-cart2"></span>
-                                                    <span class="tooltip">Add to Cart</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block wishlist">
-                                                <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
-                                                    <span class="tooltip">Add to Wishlist</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#quickView" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
-                                            <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-compare1"></span>
-                                                    <span class="tooltip">Compare</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="d-flex flex-column">
-                                                <p class="caption text-main-2 font-2">Bio-metric</p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    RICH POLO Biometric RS 9w with WiFi Access Control, Time & Attendance
-                                                    (Fingerprint)
-                                                </a>
-                                            </div>
-                                            <p class="price-wrap fw-medium">
-                                                <span class="new-price price-text fw-medium mb-0">₹87.500</span>
-                                                <span class="old-price body-md-2 text-main-2 fw-normal">₹92.750</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            @endif
                         </div>
                         <div class="sw-dot-default sw-pagination-products justify-content-center"></div>
                     </div>
@@ -1851,389 +1564,106 @@
             <div class="flat-title wow fadeInUp" data-wow-delay="0s">
                 <h5 class="fw-semibold">Trending Products</h5>
                 <!-- <div class="box-btn-slide relative">
-                                            <div class="swiper-button-prev nav-swiper nav-prev-products">
-                                                <i class="icon-arrow-left-lg"></i>
-                                            </div>
-                                            <div class="swiper-button-next nav-swiper nav-next-products">
-                                                <i class="icon-arrow-right-lg"></i>
-                                            </div>
-                                        </div> -->
+                                                                <div class="swiper-button-prev nav-swiper nav-prev-products">
+                                                                    <i class="icon-arrow-left-lg"></i>
+                                                                </div>
+                                                                <div class="swiper-button-next nav-swiper nav-next-products">
+                                                                    <i class="icon-arrow-right-lg"></i>
+                                                                </div>
+                                                            </div> -->
             </div>
             <div class="swiper tf-sw-products" data-preview="5" data-tablet="4" data-mobile-sm="3" data-mobile="1"
                 data-space-lg="30" data-space-md="20" data-space="15" data-pagination="1" data-pagination-sm="3"
                 data-pagination-md="4" data-pagination-lg="5">
                 <div class="swiper-wrapper">
-                    <!-- item 1 -->
-                    <div class="swiper-slide">
-                        <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0s">
-                            <div class="card-product-wrapper">
-                                <a href="{{ route('product-detail') }}" class="product-img">
-                                    <img class="img-product lazyload"
-                                        src="{{ asset('frontend-assets/images/new-products/2-5-1.png') }}"
-                                        data-src="{{ asset('frontend-assets/images/new-products/2-5-1.png') }}"
-                                        alt="image-product">
-                                    <img class="img-hover lazyload"
-                                        src="{{ asset('frontend-assets/images/new-products/2-5-2.png') }}"
-                                        data-src="{{ asset('frontend-assets/images/new-products/2-5-2.png') }}"
-                                        alt="image-product">
-                                </a>
-                                <ul class="list-product-btn">
-                                    <li>
-                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                            class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-cart2"></span>
-                                            <span class="tooltip">Add to Cart</span>
+                    @if (isset($trendingProducts) && $trendingProducts->count() > 0)
+                        @foreach ($trendingProducts as $index => $product)
+                            <div class="swiper-slide">
+                                <div class="card-product style-img-border wow fadeInLeft"
+                                    data-wow-delay="{{ $index * 0.1 }}s">
+                                    <div class="card-product-wrapper">
+                                        <a href="{{ route('ecommerce.product.detail', $product->id) }}"
+                                            class="product-img">
+                                            @if ($product->warehouseProduct && $product->warehouseProduct->main_product_image)
+                                                <img class="img-product lazyload"
+                                                    src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                    data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                    alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                @if (isset($product->warehouseProduct->additional_product_images[0]))
+                                                    <img class="img-hover lazyload"
+                                                        src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
+                                                        data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
+                                                        alt="image-product">
+                                                @endif
+                                            @else
+                                                <img class="img-product lazyload"
+                                                    src="{{ asset('frontend-assets/images/product/product-1.jpg') }}"
+                                                    data-src="{{ asset('frontend-assets/images/product/product-1.jpg') }}"
+                                                    alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                            @endif
                                         </a>
-                                    </li>
-                                    <li class="d-none d-sm-block wishlist">
-                                        <a href="#;" class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-heart2"></span>
-                                            <span class="tooltip">Add to Wishlist</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#quickView" data-bs-toggle="modal"
-                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-view"></span>
-                                            <span class="tooltip">Quick View</span>
-                                        </a>
-                                    </li>
-                                    <li class="d-none d-sm-block">
-                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                            class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-compare1"></span>
-                                            <span class="tooltip">Compare</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="card-product-info">
-                                <div class="box-title">
-                                    <div class="d-flex flex-column">
-                                        <p class="caption text-main-2 font-2">Desktop</p>
-                                        <a href="{{ route('product-detail') }}"
-                                            class="name-product body-md-2 fw-semibold text-secondary link">
-                                            ASUS AiO A3 Series All in One Desktop, Intel 12th Gen Core i3
-                                        </a>
+                                        <ul class="list-product-btn">
+                                            <li>
+                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
+                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
+                                                    <span class="icon icon-cart2"></span>
+                                                    <span class="tooltip">Add to Cart</span>
+                                                </a>
+                                            </li>
+                                            <li class="d-none d-sm-block wishlist">
+                                                <a href="#;"
+                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
+                                                    <span class="icon icon-heart2"></span>
+                                                    <span class="tooltip">Add to Wishlist</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#quickView{{ $product->id }}" data-bs-toggle="modal"
+                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                    <span class="icon icon-view"></span>
+                                                    <span class="tooltip">Quick View</span>
+                                                </a>
+                                            </li>
+                                            <li class="d-none d-sm-block">
+                                                <a href="#compare" data-bs-toggle="offcanvas"
+                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
+                                                    <span class="icon icon-compare1"></span>
+                                                    <span class="tooltip">Compare</span>
+                                                </a>
+                                            </li>
+                                        </ul>
                                     </div>
-                                    <p class="price-wrap fw-medium">
-                                        <span class="new-price price-text fw-medium mb-0">₹15.400</span>
-                                        <span class="old-price body-md-2 text-main-2 fw-normal">₹19.800</span>
-                                    </p>
+                                    <div class="card-product-info">
+                                        <div class="box-title">
+                                            <div class="d-flex flex-column">
+                                                <p class="caption text-main-2 font-2">
+                                                    {{ optional($product->warehouseProduct->parentCategorie)->name ?? 'Category' }}
+                                                </p>
+                                                <a href="{{ route('ecommerce.product.detail', $product->id) }}"
+                                                    class="name-product body-md-2 fw-semibold text-secondary link text-truncate"
+                                                    style="max-width: 230px;">
+                                                    {{ $product->warehouseProduct->product_name ?? 'Product Name' }}
+                                                </a>
+                                            </div>
+                                            <p class="price-wrap fw-medium">
+                                                @if ($product->warehouseProduct && $product->warehouseProduct->discount_price > 0)
+                                                    <span
+                                                        class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->final_price ?? 0, 0) }}</span>
+                                                    <span
+                                                        class="old-price body-md-2 text-main-2 fw-normal">₹{{ number_format($product->warehouseProduct->final_price + $product->warehouseProduct->discount_price, 2) }}</span>
+                                                @else
+                                                    <span
+                                                        class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->selling_price ?? 0, 0) }}</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <!-- item 2 -->
-                    <div class="swiper-slide">
-                        <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.1s">
-                            <div class="card-product-wrapper">
-                                <a href="{{ route('product-detail') }}" class="product-img">
-                                    <img class="img-product lazyload"
-                                        src="{{ asset('frontend-assets/images/new-products/2-3-1.png') }}"
-                                        data-src="{{ asset('frontend-assets/images/new-products/2-3-1.png') }}"
-                                        alt="image-product">
-                                    <img class="img-hover lazyload"
-                                        src="{{ asset('frontend-assets/images/new-products/2-3-2.png') }}"
-                                        data-src="{{ asset('frontend-assets/images/new-products/2-3-2.png') }}"
-                                        alt="image-product">
-                                </a>
-                                <ul class="list-product-btn">
-                                    <li>
-                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                            class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-cart2"></span>
-                                            <span class="tooltip">Add to Cart</span>
-                                        </a>
-                                    </li>
-                                    <li class="d-none d-sm-block wishlist">
-                                        <a href="#;" class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-heart2"></span>
-                                            <span class="tooltip">Add to Wishlist</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#quickView" data-bs-toggle="modal"
-                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-view"></span>
-                                            <span class="tooltip">Quick View</span>
-                                        </a>
-                                    </li>
-                                    <li class="d-none d-sm-block">
-                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                            class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-compare1"></span>
-                                            <span class="tooltip">Compare</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="card-product-info">
-                                <div class="box-title">
-                                    <div class="d-flex flex-column">
-                                        <p class="caption text-main-2 font-2">Bio-metric</p>
-                                        <a href="{{ route('product-detail') }}"
-                                            class="name-product body-md-2 fw-semibold text-secondary link">
-                                            RICH POLO Biometric RS 9w with WiFi Access Control, Time & Attendance
-                                            (Fingerprint)
-                                        </a>
-                                    </div>
-                                    <p class="price-wrap fw-medium">
-                                        <span class="new-price price-text fw-medium mb-0">₹35.200</span>
-                                        <span class="old-price body-md-2 text-main-2 fw-normal">₹28.000</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- item 3 -->
-                    <div class="swiper-slide">
-                        <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.2s">
-                            <div class="card-product-wrapper">
-                                <a href="{{ route('product-detail') }}" class="product-img">
-                                    <img class="img-product lazyload"
-                                        src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                        data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                        alt="image-product">
-                                    <img class="img-hover lazyload"
-                                        src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                        data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                        alt="image-product">
-                                </a>
-                                <ul class="list-product-btn">
-                                    <li>
-                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                            class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-cart2"></span>
-                                            <span class="tooltip">Add to Cart</span>
-                                        </a>
-                                    </li>
-                                    <li class="d-none d-sm-block wishlist">
-                                        <a href="#;" class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-heart2"></span>
-                                            <span class="tooltip">Add to Wishlist</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#quickView" data-bs-toggle="modal"
-                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-view"></span>
-                                            <span class="tooltip">Quick View</span>
-                                        </a>
-                                    </li>
-                                    <li class="d-none d-sm-block">
-                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                            class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-compare1"></span>
-                                            <span class="tooltip">Compare</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="card-product-info">
-                                <div class="box-title">
-                                    <div class="d-flex flex-column">
-                                        <p class="caption text-main-2 font-2">CCTV</p>
-                                        <a href="{{ route('product-detail') }}"
-                                            class="name-product body-md-2 fw-semibold text-secondary link">
-                                            Qubo Smart Cam 360 Q100 by HERO GROUP 3MP 1296p WiFi CCTV 2 Way Talk Night
-                                            Vision Security Camera (1 Channel)
-                                        </a>
-                                    </div>
-                                    <p class="price-wrap fw-medium">
-                                        <span class="new-price price-text fw-medium mb-0">₹38.400</span>
-                                        <span class="old-price body-md-2 text-main-2 fw-normal">₹48.990</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- item 4 -->
-                    <div class="swiper-slide">
-                        <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.3s">
-                            <div class="card-product-wrapper">
-                                <a href="{{ route('product-detail') }}" class="product-img">
-                                    <img class="img-product lazyload"
-                                        src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                        data-src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                        alt="image-product">
-                                    <img class="img-hover lazyload"
-                                        src="{{ asset('frontend-assets/images/new-products/2-2-2.png') }}"
-                                        data-src="{{ asset('frontend-assets/images/new-products/2-2-2.png') }}"
-                                        alt="image-product">
-                                </a>
-                                <ul class="list-product-btn">
-                                    <li>
-                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                            class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-cart2"></span>
-                                            <span class="tooltip">Add to Cart</span>
-                                        </a>
-                                    </li>
-                                    <li class="d-none d-sm-block wishlist">
-                                        <a href="#;" class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-heart2"></span>
-                                            <span class="tooltip">Add to Wishlist</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#quickView" data-bs-toggle="modal"
-                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-view"></span>
-                                            <span class="tooltip">Quick View</span>
-                                        </a>
-                                    </li>
-                                    <li class="d-none d-sm-block">
-                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                            class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-compare1"></span>
-                                            <span class="tooltip">Compare</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="card-product-info">
-                                <div class="box-title">
-                                    <div class="d-flex flex-column">
-                                        <p class="caption text-main-2 font-2">Printer</p>
-                                        <a href="{{ route('product-detail') }}"
-                                            class="name-product body-md-2 fw-semibold text-secondary link">
-                                            HP MFP 1188W Multi-function WiFi Monochrome Laser Printer (Toner Cartridge, 1
-                                            Ink Bottle Included)
-                                        </a>
-                                    </div>
-                                    <p class="price-wrap fw-medium">
-                                        <span class="new-price price-text fw-medium mb-0">₹26.900</span>
-                                        <span class="old-price body-md-2 text-main-2 fw-normal">₹33.800</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- item 5 -->
-                    <div class="swiper-slide">
-                        <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0.4s">
-                            <div class="card-product-wrapper">
-                                <a href="{{ route('product-detail') }}" class="product-img">
-                                    <img class="img-product lazyload"
-                                        src="{{ asset('frontend-assets/images/new-products/2-4-1.png') }}"
-                                        data-src="{{ asset('frontend-assets/images/new-products/2-4-1.png') }}"
-                                        alt="image-product">
-                                    <img class="img-hover lazyload"
-                                        src="{{ asset('frontend-assets/images/new-products/2-4-2.png') }}"
-                                        data-src="{{ asset('frontend-assets/images/new-products/2-4-2.png') }}"
-                                        alt="image-product">
-                                </a>
-                                <ul class="list-product-btn">
-                                    <li>
-                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                            class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-cart2"></span>
-                                            <span class="tooltip">Add to Cart</span>
-                                        </a>
-                                    </li>
-                                    <li class="d-none d-sm-block wishlist">
-                                        <a href="#;" class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-heart2"></span>
-                                            <span class="tooltip">Add to Wishlist</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#quickView" data-bs-toggle="modal"
-                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-view"></span>
-                                            <span class="tooltip">Quick View</span>
-                                        </a>
-                                    </li>
-                                    <li class="d-none d-sm-block">
-                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                            class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-compare1"></span>
-                                            <span class="tooltip">Compare</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="card-product-info">
-                                <div class="box-title">
-                                    <div class="d-flex flex-column">
-                                        <p class="caption text-main-2 font-2">Laptop</p>
-                                        <a href="{{ route('product-detail') }}"
-                                            class="name-product body-md-2 fw-semibold text-secondary link">
-                                            HP Victus Intel Core i5 13th Gen 13420H - (16 GB/512 GB SSD/Windows 11 Home/6 GB
-                                            Graphics/NVIDIA GeForce RTX 4050/144 Hz) fa1278TX Gaming Laptop
-                                        </a>
-                                    </div>
-                                    <p class="price-wrap fw-medium">
-                                        <span class="new-price price-text fw-medium mb-0">₹64.999</span>
-                                        <span class="old-price body-md-2 text-main-2 fw-normal">₹79.999</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- item 6 -->
-                    <div class="swiper-slide">
-                        <div class="card-product style-img-border wow fadeInLeft" data-wow-delay="0s">
-                            <div class="card-product-wrapper ">
-                                <a href="{{ route('product-detail') }}" class="product-img">
-                                    <img class="img-product lazyload"
-                                        src="{{ asset('frontend-assets/images/product/product-11.jpg') }}"
-                                        data-src="{{ asset('frontend-assets/images/product/product-11.jpg') }}"
-                                        alt="image-product">
-                                    <img class="img-hover lazyload"
-                                        src="{{ asset('frontend-assets/images/product/product-38.jpg') }}"
-                                        data-src="{{ asset('frontend-assets/images/product/product-38.jpg') }}"
-                                        alt="image-product">
-                                </a>
-                                <ul class="list-product-btn">
-                                    <li>
-                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                            class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-cart2"></span>
-                                            <span class="tooltip">Add to Cart</span>
-                                        </a>
-                                    </li>
-                                    <li class="d-none d-sm-block wishlist">
-                                        <a href="#;" class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-heart2"></span>
-                                            <span class="tooltip">Add to Wishlist</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#quickView" data-bs-toggle="modal"
-                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-view"></span>
-                                            <span class="tooltip">Quick View</span>
-                                        </a>
-                                    </li>
-                                    <li class="d-none d-sm-block">
-                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                            class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                            <span class="icon icon-compare1"></span>
-                                            <span class="tooltip">Compare</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="card-product-info">
-                                <div class="box-title">
-                                    <div class="d-flex flex-column">
-                                        <p class="caption text-main-2 font-2">Gaming Mice</p>
-                                        <a href="{{ route('product-detail') }}"
-                                            class="name-product body-md-2 fw-semibold text-secondary link">
-                                            Klim Blaze Rechargeable Wireless Gaming Mouse – RGB Lighting,
-                                            High-Precision Sensor & Long-Lasting Battery
-                                        </a>
-                                    </div>
-                                    <p class="price-wrap fw-medium">
-                                        <span class="new-price price-text fw-medium mb-0">₹15.400</span>
-                                        <span class="old-price body-md-2 text-main-2 fw-normal">₹19.800</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        @endforeach
+                    @else
+                        <p class="text-center">No trending products available</p>
+                    @endif
                 </div>
                 <div class="d-flex d-lg-none sw-dot-default sw-pagination-products justify-content-center"></div>
             </div>
@@ -2280,711 +1710,119 @@
         <div class="container">
             <div class="flat-title wow fadeInUp" data-wow-delay="0s">
                 <h5 class="fw-semibold">Best Selling Products</h5>
-                <!-- <div class="box-btn-slide relative">
-                                            <div class="swiper-button-prev nav-swiper nav-prev-products">
-                                                <i class="icon-arrow-left-lg"></i>
-                                            </div>
-                                            <div class="swiper-button-next nav-swiper nav-next-products">
-                                                <i class="icon-arrow-right-lg"></i>
-                                            </div>
-                                        </div> -->
             </div>
             <div class="swiper tf-sw-products" data-preview="4" data-tablet="3" data-mobile-sm="2" data-mobile="1"
                 data-space-lg="30" data-space-md="20" data-space="15" data-pagination="1" data-pagination-sm="2"
                 data-pagination-md="3" data-pagination-lg="4">
                 <div class="swiper-wrapper">
-                    <!-- item 1 -->
-                    <div class="swiper-slide">
-                        <ul class="product-list-wrap wow fadeInUp" data-wow-delay="0s">
-                            <li>
-                                <div class="card-product style-row row-small-2 ">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="relative z-5">
-                                                <p class="caption text-main-2 font-2">
-                                                    CCTV
-                                                </p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    Qubo Smart Cam 360 Q100 by HERO GROUP 3MP 1296p WiFi CCTV 2 Way Talk
-                                                    Night Vision Security Camera
+                    @if (isset($bestSellerProducts) && $bestSellerProducts->count() > 0)
+                        @foreach ($bestSellerProducts as $index => $product)
+                            <div class="swiper-slide">
+                                <ul class="product-list-wrap wow fadeInUp" data-wow-delay="{{ $index * 0.1 }}s">
+                                    <li>
+                                        <div class="card-product style-row row-small-2 ">
+                                            <div class="card-product-wrapper">
+                                                <a href="{{ route('ecommerce.product.detail', $product->id) }}"
+                                                    class="product-img">
+                                                    @if ($product->warehouseProduct && $product->warehouseProduct->main_product_image)
+                                                        <img class="img-product lazyload"
+                                                            src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                            data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                            alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                        @if (!empty($product->warehouseProduct->additional_product_images))
+                                                            <img class="img-hover lazyload"
+                                                                src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
+                                                                data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
+                                                                alt="image-product">
+                                                        @else
+                                                            <img class="img-hover lazyload"
+                                                                src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                                data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
+                                                                alt="image-product">
+                                                        @endif
+                                                    @else
+                                                        <img class="img-product lazyload"
+                                                            src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                            data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
+                                                            alt="Product Image">
+                                                        <img class="img-hover lazyload"
+                                                            src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                            data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
+                                                            alt="image-product">
+                                                    @endif
                                                 </a>
                                             </div>
+                                            <div class="card-product-info">
+                                                <div class="box-title">
+                                                    <div class="relative z-5">
+                                                        <p class="caption text-main-2 font-2">
+                                                            {{ $product->warehouseProduct->brand->name ?? 'Brand' }}
+                                                        </p>
+                                                        <a href="{{ route('ecommerce.product.detail', $product->id) }}"
+                                                            class="name-product body-md-2 fw-semibold text-secondary link">
+                                                            {{ $product->warehouseProduct->product_name ?? 'Product Name' }}
+                                                        </a>
+                                                    </div>
 
-                                            <div class="group-btn">
-                                                <p class="price-wrap fw-medium">
-                                                    <span class="new-price price-text fw-medium">₹14.500</span>
-                                                    <span class="old-price body-md-2 text-main-2">₹18.600</span>
-                                                </p>
-                                                <ul class="list-product-btn flex-row">
-                                                    <li>
-                                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                            class="box-icon add-to-cart btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-cart2"></span>
-                                                            <span class="tooltip">Add to Cart</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class=" wishlist">
-                                                        <a href="#;"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-heart2"></span>
-                                                            <span class="tooltip">Add to Wishlist</span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#quickView" data-bs-toggle="modal"
-                                                            class="box-icon quickview btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-view"></span>
-                                                            <span class="tooltip">Quick View</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class="">
-                                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-compare1"></span>
-                                                            <span class="tooltip">Compare</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
+                                                    <div class="group-btn">
+                                                        <p class="price-wrap fw-medium">
+                                                            @if ($product->warehouseProduct && $product->warehouseProduct->discount_price > 0)
+                                                                <span
+                                                                    class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->final_price ?? 0, 0) }}</span>
+                                                                <span
+                                                                    class="old-price body-md-2 text-main-2 fw-normal">₹{{ number_format($product->warehouseProduct->final_price + $product->warehouseProduct->discount_price, 2) }}</span>
+                                                            @else
+                                                                <span
+                                                                    class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->selling_price ?? 0, 0) }}</span>
+                                                            @endif
+                                                        </p>
+                                                        <ul class="list-product-btn flex-row">
+                                                            <li>
+                                                                <a href="#;"
+                                                                    class="box-icon add-to-cart-btn btn-icon-action hover-tooltip"
+                                                                    data-product-id="{{ $product->id }}"
+                                                                    data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                                    <span class="icon icon-cart2"></span>
+                                                                    <span class="tooltip">Add to Cart</span>
+                                                                </a>
+                                                            </li>
+                                                            <li class="wishlist">
+                                                                <a href="#;"
+                                                                    class="box-icon btn-icon-action hover-tooltip add-to-wishlist-btn"
+                                                                    data-product-id="{{ $product->id }}"
+                                                                    data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                                    <span class="icon icon-heart2"></span>
+                                                                    <span class="tooltip">Add to Wishlist</span>
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="#quickView{{ $product->id }}"
+                                                                    data-bs-toggle="modal"
+                                                                    data-product-id="{{ $product->id }}"
+                                                                    class="box-icon quickview btn-icon-action hover-tooltip">
+                                                                    <span class="icon icon-view"></span>
+                                                                    <span class="tooltip">Quick View</span>
+                                                                </a>
+                                                            </li>
+                                                            <li class="">
+                                                                <a href="#;"
+                                                                    class="box-icon btn-icon-action hover-tooltip compare-btn"
+                                                                    data-product-id="{{ $product->id }}"
+                                                                    data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                                    <span class="icon icon-compare1"></span>
+                                                                    <span class="tooltip">Compare</span>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="card-product style-row row-small-2 ">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="relative z-5">
-                                                <p class="caption text-main-2 font-2">
-                                                    Printer
-                                                </p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    HP MFP 1188W Multi-function WiFi Monochrome Laser Printer (Toner
-                                                    Cartridge, 1 Ink Bottle Included)
-                                                </a>
-                                            </div>
-                                            <div class="group-btn">
-                                                <p class="price-wrap fw-medium">
-                                                    <span class="new-price price-text fw-medium">₹49.900</span>
-                                                    <span class="old-price body-md-2 text-main-2">₹62.300</span>
-                                                </p>
-                                                <ul class="list-product-btn flex-row">
-                                                    <li>
-                                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                            class="box-icon add-to-cart btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-cart2"></span>
-                                                            <span class="tooltip">Add to Cart</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class=" wishlist">
-                                                        <a href="#;"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-heart2"></span>
-                                                            <span class="tooltip">Add to Wishlist</span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#quickView" data-bs-toggle="modal"
-                                                            class="box-icon quickview btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-view"></span>
-                                                            <span class="tooltip">Quick View</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class="">
-                                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-compare1"></span>
-                                                            <span class="tooltip">Compare</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- item 2 -->
-                    <div class="swiper-slide">
-                        <ul class="product-list-wrap wow fadeInUp" data-wow-delay="0.1s">
-                            <li>
-                                <div class="card-product style-row row-small-2 ">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-4-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-4-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-4-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-4-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="relative z-5">
-                                                <p class="caption text-main-2 font-2">
-                                                    Laptop
-                                                </p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    HP Victus Intel Core i5 13th Gen 13420H - (16 GB/512 GB SSD/Windows 11
-                                                    Home/6 GB Graphics/NVIDIA GeForce RTX 4050/144 Hz) fa1278TX Gaming
-                                                    Laptop
-                                                </a>
-                                            </div>
-
-                                            <div class="group-btn">
-                                                <p class="price-wrap fw-medium">
-                                                    <span class="new-price price-text fw-medium">₹60.200</span>
-                                                    <span class="old-price body-md-2 text-main-2">₹76.900</span>
-                                                </p>
-                                                <ul class="list-product-btn flex-row">
-                                                    <li>
-                                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                            class="box-icon add-to-cart btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-cart2"></span>
-                                                            <span class="tooltip">Add to Cart</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class=" wishlist">
-                                                        <a href="#;"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-heart2"></span>
-                                                            <span class="tooltip">Add to Wishlist</span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#quickView" data-bs-toggle="modal"
-                                                            class="box-icon quickview btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-view"></span>
-                                                            <span class="tooltip">Quick View</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class="">
-                                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-compare1"></span>
-                                                            <span class="tooltip">Compare</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="card-product style-row row-small-2 ">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="relative z-5">
-                                                <p class="caption text-main-2 font-2">
-                                                    CCTV
-                                                </p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    Qubo Smart Cam 360 Q100 by HERO GROUP 3MP 1296p WiFi CCTV 2 Way Talk
-                                                    Night Vision Security Camera
-                                                </a>
-                                            </div>
-                                            <div class="group-btn">
-                                                <p class="price-wrap fw-medium">
-                                                    <span class="new-price price-text fw-medium">₹33.000</span>
-                                                    <span class="old-price body-md-2 text-main-2">₹41.600</span>
-                                                </p>
-                                                <ul class="list-product-btn flex-row">
-                                                    <li>
-                                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                            class="box-icon add-to-cart btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-cart2"></span>
-                                                            <span class="tooltip">Add to Cart</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class=" wishlist">
-                                                        <a href="#;"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-heart2"></span>
-                                                            <span class="tooltip">Add to Wishlist</span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#quickView" data-bs-toggle="modal"
-                                                            class="box-icon quickview btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-view"></span>
-                                                            <span class="tooltip">Quick View</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class="">
-                                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-compare1"></span>
-                                                            <span class="tooltip">Compare</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- item 3 -->
-                    <div class="swiper-slide">
-                        <ul class="product-list-wrap wow fadeInUp" data-wow-delay="0.2s">
-                            <li>
-                                <div class="card-product style-row row-small-2 ">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-3-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-3-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-3-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-3-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="relative z-5">
-                                                <p class="caption text-main-2 font-2">
-                                                    Bio-metric
-                                                </p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    RICH POLO Biometric RS 9w with WiFi Access Control, Time & Attendance
-                                                    (Fingerprint)
-                                                </a>
-                                            </div>
-
-                                            <div class="group-btn">
-                                                <p class="price-wrap fw-medium">
-                                                    <span class="new-price price-text fw-medium">₹73.200</span>
-                                                    <span class="old-price body-md-2 text-main-2">₹91.450</span>
-                                                </p>
-                                                <ul class="list-product-btn flex-row">
-                                                    <li>
-                                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                            class="box-icon add-to-cart btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-cart2"></span>
-                                                            <span class="tooltip">Add to Cart</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class=" wishlist">
-                                                        <a href="#;"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-heart2"></span>
-                                                            <span class="tooltip">Add to Wishlist</span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#quickView" data-bs-toggle="modal"
-                                                            class="box-icon quickview btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-view"></span>
-                                                            <span class="tooltip">Quick View</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class="">
-                                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-compare1"></span>
-                                                            <span class="tooltip">Compare</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="card-product style-row row-small-2 ">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-4-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-4-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-4-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-4-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="relative z-5">
-                                                <p class="caption text-main-2 font-2">
-                                                    Laptop
-                                                </p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    HP Victus Intel Core i5 13th Gen 13420H - (16 GB/512 GB SSD/Windows 11
-                                                    Home/6 GB Graphics/NVIDIA GeForce RTX 4050/144 Hz) fa1278TX Gaming
-                                                    Laptop
-                                                </a>
-                                            </div>
-                                            <div class="group-btn">
-                                                <p class="price-wrap fw-medium">
-                                                    <span class="new-price price-text fw-medium">₹47.500</span>
-                                                    <span class="old-price body-md-2 text-main-2">₹59.300</span>
-                                                </p>
-                                                <ul class="list-product-btn flex-row">
-                                                    <li>
-                                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                            class="box-icon add-to-cart btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-cart2"></span>
-                                                            <span class="tooltip">Add to Cart</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class=" wishlist">
-                                                        <a href="#;"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-heart2"></span>
-                                                            <span class="tooltip">Add to Wishlist</span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#quickView" data-bs-toggle="modal"
-                                                            class="box-icon quickview btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-view"></span>
-                                                            <span class="tooltip">Quick View</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class="">
-                                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-compare1"></span>
-                                                            <span class="tooltip">Compare</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- item 4 -->
-                    <div class="swiper-slide">
-                        <ul class="product-list-wrap wow fadeInUp" data-wow-delay="0.3s">
-                            <li>
-                                <div class="card-product style-row row-small-2 ">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-2-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-2-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="relative z-5">
-                                                <p class="caption text-main-2 font-2">
-                                                    Printer
-                                                </p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    HP MFP 1188W Multi-function WiFi Monochrome Laser Printer (Toner
-                                                    Cartridge, 1 Ink Bottle Included)
-                                                </a>
-                                            </div>
-
-                                            <div class="group-btn">
-                                                <p class="price-wrap fw-medium">
-                                                    <span class="new-price price-text fw-medium">₹65.800</span>
-                                                    <span class="old-price body-md-2 text-main-2">₹82.600</span>
-                                                </p>
-                                                <ul class="list-product-btn flex-row">
-                                                    <li>
-                                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                            class="box-icon add-to-cart btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-cart2"></span>
-                                                            <span class="tooltip">Add to Cart</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class=" wishlist">
-                                                        <a href="#;"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-heart2"></span>
-                                                            <span class="tooltip">Add to Wishlist</span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#quickView" data-bs-toggle="modal"
-                                                            class="box-icon quickview btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-view"></span>
-                                                            <span class="tooltip">Quick View</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class="">
-                                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-compare1"></span>
-                                                            <span class="tooltip">Compare</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="card-product style-row row-small-2 ">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-3-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-3-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-3-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-3-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="relative z-5">
-                                                <p class="caption text-main-2 font-2">
-                                                    Bio-metric
-                                                </p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    RICH POLO Biometric RS 9w with WiFi Access Control, Time & Attendance
-                                                    (Fingerprint)
-                                                </a>
-                                            </div>
-                                            <div class="group-btn">
-                                                <p class="price-wrap fw-medium">
-                                                    <span class="new-price price-text fw-medium">₹29.100</span>
-                                                    <span class="old-price body-md-2 text-main-2">₹36.450</span>
-                                                </p>
-                                                <ul class="list-product-btn flex-row">
-                                                    <li>
-                                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                            class="box-icon add-to-cart btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-cart2"></span>
-                                                            <span class="tooltip">Add to Cart</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class=" wishlist">
-                                                        <a href="#;"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-heart2"></span>
-                                                            <span class="tooltip">Add to Wishlist</span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#quickView" data-bs-toggle="modal"
-                                                            class="box-icon quickview btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-view"></span>
-                                                            <span class="tooltip">Quick View</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class="">
-                                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-compare1"></span>
-                                                            <span class="tooltip">Compare</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- item 5 -->
-                    <div class="swiper-slide">
-                        <ul class="product-list-wrap wow fadeInUp" data-wow-delay="0s">
-                            <li>
-                                <div class="card-product style-row row-small-2 ">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-1-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-1-2.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="relative z-5">
-                                                <p class="caption text-main-2 font-2">
-                                                    CCTV
-                                                </p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    Qubo Smart Cam 360 Q100 by HERO GROUP 3MP 1296p WiFi CCTV 2 Way Talk
-                                                    Night Vision Security Camera
-                                                </a>
-                                            </div>
-
-                                            <div class="group-btn">
-                                                <p class="price-wrap fw-medium">
-                                                    <span class="new-price price-text fw-medium">₹14.500</span>
-                                                    <span class="old-price body-md-2 text-main-2">₹18.600</span>
-                                                </p>
-                                                <ul class="list-product-btn flex-row">
-                                                    <li>
-                                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                            class="box-icon add-to-cart btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-cart2"></span>
-                                                            <span class="tooltip">Add to Cart</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class=" wishlist">
-                                                        <a href="#;"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-heart2"></span>
-                                                            <span class="tooltip">Add to Wishlist</span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#quickView" data-bs-toggle="modal"
-                                                            class="box-icon quickview btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-view"></span>
-                                                            <span class="tooltip">Quick View</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class="">
-                                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-compare1"></span>
-                                                            <span class="tooltip">Compare</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="card-product style-row row-small-2 ">
-                                    <div class="card-product-wrapper">
-                                        <a href="{{ route('product-detail') }}" class="product-img">
-                                            <img class="img-product lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                alt="image-product">
-                                            <img class="img-hover lazyload"
-                                                src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                data-src="{{ asset('frontend-assets/images/new-products/2-2-1.png') }}"
-                                                alt="image-product">
-                                        </a>
-                                    </div>
-                                    <div class="card-product-info">
-                                        <div class="box-title">
-                                            <div class="relative z-5">
-                                                <p class="caption text-main-2 font-2">
-                                                    Printer
-                                                </p>
-                                                <a href="{{ route('product-detail') }}"
-                                                    class="name-product body-md-2 fw-semibold text-secondary link">
-                                                    HP MFP 1188W Multi-function WiFi Monochrome Laser Printer (Toner
-                                                    Cartridge, 1 Ink Bottle Included)
-                                                </a>
-                                            </div>
-                                            <div class="group-btn">
-                                                <p class="price-wrap fw-medium">
-                                                    <span class="new-price price-text fw-medium">₹49.900</span>
-                                                    <span class="old-price body-md-2 text-main-2">₹62.300</span>
-                                                </p>
-                                                <ul class="list-product-btn flex-row">
-                                                    <li>
-                                                        <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                            class="box-icon add-to-cart btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-cart2"></span>
-                                                            <span class="tooltip">Add to Cart</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class=" wishlist">
-                                                        <a href="#;"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-heart2"></span>
-                                                            <span class="tooltip">Add to Wishlist</span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#quickView" data-bs-toggle="modal"
-                                                            class="box-icon quickview btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-view"></span>
-                                                            <span class="tooltip">Quick View</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class="">
-                                                        <a href="#compare" data-bs-toggle="offcanvas"
-                                                            class="box-icon btn-icon-action hover-tooltip">
-                                                            <span class="icon icon-compare1"></span>
-                                                            <span class="tooltip">Compare</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        @endforeach
+                    @endif
                 </div>
                 <div class="sw-dot-default sw-pagination-products justify-content-center"></div>
 
@@ -2998,7 +1836,7 @@
     <div class="modal modalCentered fade auto-popup modal-def modal-newleter" id="newsletterModal">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content text-center">
-                <span class="icon icon-close icon-close-popup link btn-hide-popup" data-bs-dismiss="modal"></span>
+                <span class="icon-close icon-close-popup link btn-hide-popup" data-bs-dismiss="modal"></span>
                 <div class="heading">
                     <h5 class="fw-semibold">Join our newsletter for ₹10 offs</h5>
                     <p class="body-md-2">Register now to get latest updates on promotions & coupons. <br>
@@ -3309,83 +2147,85 @@
 
     <script>
         $(document).ready(function() {
-                // CSRF token setup for AJAX requests
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            // CSRF token setup for AJAX requests
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            // Quick view functionality
+            $('.quickview').on('click', function(e) {
+                e.preventDefault();
+
+                const productId = $(this).data('product-id');
+                console.log(productId);
+
+                // Make AJAX request to fetch product details
+                $.ajax({
+                    url: '{{ route('product.get') }}',
+                    method: 'GET',
+                    data: {
+                        id: productId
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success) {
+                            // Populate quick view modal with product details
+                            // ... (your code to populate the modal goes here)
+                            @foreach ($products as $product)
+                                $('#quickView').modal('show');
+
+                                $('.model_product_name').html(
+                                    '<a href="/product-detail/' + response.data.id +
+                                    '" class="product-link">' +
+                                    response.data.product_name +
+                                    '</a>'
+                                );
+
+                                $('.model_product_selling_price').text('₹' + response.data
+                                    .selling_price);
+                                $('.model_product_cost_price').text('₹' + response.data
+                                    .cost_price);
+                                // $('.model_product_main_images').html(response.data
+                                //     .main_product_image);
+                                // $('.model_product_thumbs_images').html(response.data
+                                //     .additional_product_images);
+                                $('.model_main_product_image').attr('src', response.data
+                                    .main_product_image);
+                                $('.model_additional_product_image').attr('src', response.data
+                                    .additional_product_images);
+                                $('.model_product_brand').text(response.data.brand.brand_title);
+                                $('.model_product_model_no').text(response.data.model_no);
+                                $('.model_product_sku').text(response.data.sku);
+                                $('.model_product_short_description').html(response.data
+                                    .short_description);
+                                $('.model_product_full_description').html(response.data
+                                    .full_description);
+                                $('.model_product_technical_specification').html(response.data
+                                    .technical_specification);
+                                $('model_product_quantity-product').val(response.data
+                                    .min_order_qty);
+                                $('.add-to-cart-btn, .add-to-cart').data('product-id', response
+                                    .data.id);
+                            @endforeach
+
+                            // Note: Add to Cart, Wishlist, and Compare functionality is handled by product-actions.js
+                        }
+                    },
+                    error: function(e) {
+                        console.log(e.responseText);
+                        console.log('Error fetching product details');
                     }
                 });
-
-                // Quick view functionality
-                $('.quickview').on('click', function(e) {
-                        e.preventDefault();
-
-                        const productId = $(this).data('product-id');
-                        console.log(productId);
-
-                        // Make AJAX request to fetch product details
-                        $.ajax({
-                                url: '{{ route('product.get') }}',
-                                method: 'GET',
-                                data: {
-                                    id: productId
-                                },
-                                success: function(response) {
-                                    console.log(response);
-                                    if (response.success) {
-                                        // Populate quick view modal with product details
-                                        // ... (your code to populate the modal goes here)
-                                        @foreach ($products as $product)
-                                            $('#quickView').modal('show');
-
-                                            $('.model_product_name').html(
-                                                '<a href="/product-detail/' + response.data.id +
-                                                '" class="product-link">' +
-                                                response.data.product_name +
-                                                '</a>'
-                                            );
-
-                                            $('.model_product_selling_price').text('₹' + response.data
-                                                .selling_price);
-                                            $('.model_product_cost_price').text('₹' + response.data
-                                                .cost_price);
-                                            // $('.model_product_main_images').html(response.data
-                                            //     .main_product_image);
-                                            // $('.model_product_thumbs_images').html(response.data
-                                            //     .additional_product_images);
-                                            $('.model_main_product_image').attr('src', response.data
-                                                .main_product_image);
-                                            $('.model_additional_product_image').attr('src', response.data
-                                                .additional_product_images);
-                                            $('.model_product_brand').text(response.data.brand.brand_title);
-                                            $('.model_product_model_no').text(response.data.model_no);
-                                            $('.model_product_sku').text(response.data.sku);
-                                            $('.model_product_short_description').html(response.data
-                                                .short_description);
-                                            $('.model_product_full_description').html(response.data
-                                                .full_description);
-                                            $('.model_product_technical_specification').html(response.data
-                                                .technical_specification);
-                                            $('model_product_quantity-product').val(response.data.min_order_qty);
-                                            $('.add-to-cart-btn, .add-to-cart').data('product-id', response.data.id);
-                                        @endforeach
-
-                                        // Note: Add to Cart, Wishlist, and Compare functionality is handled by product-actions.js
-                                }
-                            },
-                            error: function(e) {
-                                console.log(e.responseText);
-                                console.log('Error fetching product details');
-                            }
-                        });
-                });
+            });
 
             // Note: Add to Wishlist functionality is handled by product-actions.js
 
-        // Function to show notifications
-        function showNotification(message, type) {
-            // Create notification element
-            const notification = $(`
+            // Function to show notifications
+            function showNotification(message, type) {
+                // Create notification element
+                const notification = $(`
             <div class="notification notification-${type}" style="
                 position: fixed;
                 top: 20px;
@@ -3403,49 +2243,49 @@
             </div>
         `);
 
-            // Add to body
-            $('body').append(notification);
+                // Add to body
+                $('body').append(notification);
 
-            // Auto remove after 5 seconds
-            setTimeout(function() {
-                notification.fadeOut(300, function() {
-                    $(this).remove();
+                // Auto remove after 5 seconds
+                setTimeout(function() {
+                    notification.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                }, 5000);
+
+                // Allow manual close on click
+                notification.on('click', function() {
+                    $(this).fadeOut(300, function() {
+                        $(this).remove();
+                    });
                 });
-            }, 5000);
+            }
 
-            // Allow manual close on click
-            notification.on('click', function() {
-                $(this).fadeOut(300, function() {
-                    $(this).remove();
-                });
-            });
-        }
+            // Note: Cart, Wishlist, and Compare functionality is handled by product-actions.js
+            // Wishlist count function is now global in master layout
+            // Cart count function is now global in master layout
 
-        // Note: Cart, Wishlist, and Compare functionality is handled by product-actions.js
-        // Wishlist count function is now global in master layout
-        // Cart count function is now global in master layout
-
-        // Function to update cart sidebar
-        function updateCartSidebar() {
-            $.ajax({
-                url: '{{ route('cart.data') }}',
-                method: 'GET',
-                success: function(response) {
-                    if (response.success) {
-                        // Update cart sidebar content
-                        updateCartSidebarContent(response);
+            // Function to update cart sidebar
+            function updateCartSidebar() {
+                $.ajax({
+                    url: '{{ route('cart.data') }}',
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.success) {
+                            // Update cart sidebar content
+                            updateCartSidebarContent(response);
+                        }
+                    },
+                    error: function() {
+                        console.log('Error updating cart sidebar');
                     }
-                },
-                error: function() {
-                    console.log('Error updating cart sidebar');
-                }
-            });
-        }
+                });
+            }
 
-        // Function to show login modal
-        function showLoginModal() {
-            // Create and show login modal
-            const modalHtml = `
+            // Function to show login modal
+            function showLoginModal() {
+                // Create and show login modal
+                const modalHtml = `
             <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -3465,93 +2305,92 @@
             </div>
         `;
 
-            // Remove existing modal if any
-            $('#loginModal').remove();
+                // Remove existing modal if any
+                $('#loginModal').remove();
 
-            // Add modal to body and show
-            $('body').append(modalHtml);
-            $('#loginModal').modal('show');
-        }
+                // Add modal to body and show
+                $('body').append(modalHtml);
+                $('#loginModal').modal('show');
+            }
 
-        // Initialize counts on page load
-        updateWishlistCount();
-        updateCartCount();
+            // Initialize counts on page load
+            updateWishlistCount();
+            updateCartCount();
 
-        // Add to Wishlist functionality
-        $('.add-to-wishlist-btn').on('click', function(e) {
-            e.preventDefault();
+            // Add to Wishlist functionality
+            $('.add-to-wishlist-btn').on('click', function(e) {
+                    e.preventDefault();
 
-            const $button = $(this);
-            const productId = $button.data('product-id');
-            const productName = $button.data('product-name');
+                    const $button = $(this);
+                    const productId = $button.data('product-id');
+                    const productName = $button.data('product-name');
 
-            // Check if user is authenticated
-            @guest
-                showNotification('Please login to add products to your wishlist.', 'warning');
-                return;
-            @endguest
+                    // Check if user is authenticated
+                    @guest
+                    showNotification('Please login to add products to your wishlist.', 'warning');
+                    return;
+                @endguest
 
-            // Show loading state
-            const originalIcon = $button.find('.icon').attr('class');
-            const originalTooltip = $button.find('.tooltip').text();
+                // Show loading state
+                const originalIcon = $button.find('.icon').attr('class');
+                const originalTooltip = $button.find('.tooltip').text();
 
-            $button.find('.icon').attr('class', 'icon icon-loading');
-            $button.find('.tooltip').text('Adding...');
-            $button.prop('disabled', true);
+                $button.find('.icon').attr('class', 'icon icon-loading'); $button.find('.tooltip').text(
+                    'Adding...'); $button.prop('disabled', true);
 
-            // Make AJAX request
-            $.ajax({
-                url: '{{ route("wishlist.toggle") }}',
-                method: 'POST',
-                data: {
-                    ecommerce_product_id: productId
-                },
-                success: function(response) {
-                    if (response.success) {
-                        showNotification(response.message, 'success');
+                // Make AJAX request
+                $.ajax({
+                    url: '{{ route('wishlist.toggle') }}',
+                    method: 'POST',
+                    data: {
+                        ecommerce_product_id: productId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
 
-                        // Update button state based on action
-                        if (response.action === 'added') {
-                            $button.find('.icon').attr('class', 'icon icon-heart-fill');
-                            $button.find('.tooltip').text('In Wishlist');
-                            $button.addClass('in-wishlist');
-                        } else if (response.action === 'removed') {
-                            $button.find('.icon').attr('class', 'icon icon-heart2');
-                            $button.find('.tooltip').text('Add to Wishlist');
-                            $button.removeClass('in-wishlist');
+                            // Update button state based on action
+                            if (response.action === 'added') {
+                                $button.find('.icon').attr('class', 'icon icon-heart-fill');
+                                $button.find('.tooltip').text('In Wishlist');
+                                $button.addClass('in-wishlist');
+                            } else if (response.action === 'removed') {
+                                $button.find('.icon').attr('class', 'icon icon-heart2');
+                                $button.find('.tooltip').text('Add to Wishlist');
+                                $button.removeClass('in-wishlist');
+                            }
+
+                            // Update wishlist count if there's a counter
+                            updateWishlistCount();
+                        } else {
+                            showNotification(response.message, 'error');
+                            // Reset button state
+                            $button.find('.icon').attr('class', originalIcon);
+                            $button.find('.tooltip').text(originalTooltip);
+                        }
+                    },
+                    error: function(xhr) {
+                        let message = 'An error occurred while updating the wishlist.';
+
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        } else if (xhr.status === 401) {
+                            message = 'Please login to add products to your wishlist.';
+                        } else if (xhr.status === 409) {
+                            message = 'This product is already in your wishlist.';
                         }
 
-                        // Update wishlist count if there's a counter
-                        updateWishlistCount();
-                    } else {
-                        showNotification(response.message, 'error');
+                        showNotification(message, 'error');
+
                         // Reset button state
                         $button.find('.icon').attr('class', originalIcon);
                         $button.find('.tooltip').text(originalTooltip);
+                    },
+                    complete: function() {
+                        $button.prop('disabled', false);
                     }
-                },
-                error: function(xhr) {
-                    let message = 'An error occurred while updating the wishlist.';
-
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        message = xhr.responseJSON.message;
-                    } else if (xhr.status === 401) {
-                        message = 'Please login to add products to your wishlist.';
-                    } else if (xhr.status === 409) {
-                        message = 'This product is already in your wishlist.';
-                    }
-
-                    showNotification(message, 'error');
-
-                    // Reset button state
-                    $button.find('.icon').attr('class', originalIcon);
-                    $button.find('.tooltip').text(originalTooltip);
-                },
-                complete: function() {
-                    $button.prop('disabled', false);
-                }
+                });
             });
-        });
 
         });
     </script>

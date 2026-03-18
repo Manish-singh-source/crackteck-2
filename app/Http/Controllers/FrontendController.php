@@ -8,6 +8,7 @@ use App\Models\AmcProduct;
 use App\Models\Brand;
 use App\Models\Collection;
 use App\Models\Contact;
+use App\Models\EcommerceProduct;
 use App\Models\ParentCategory;
 use App\Models\Product;
 use App\Models\ProductDeal;
@@ -55,9 +56,58 @@ class FrontendController extends Controller
         //     ->orderBy('offer_start_date', 'desc')
         //     ->get();
 
+        // Get featured products from ecommerce_products table
+        $featuredProducts = EcommerceProduct::with(['warehouseProduct.brand', 'warehouseProduct.parentCategorie'])
+            ->where('is_featured', true)
+            ->where('status', 'active')
+            ->orderBy('id', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Get suggested products from ecommerce_products table (for Toprate tab)
+        $suggestedProducts = EcommerceProduct::with(['warehouseProduct.brand', 'warehouseProduct.parentCategorie'])
+            ->where('is_suggested', true)
+            ->where('status', 'active')
+            ->orderBy('id', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Get today's deal products from ecommerce_products table (for Toprate tab)
+        $todaysDealProducts = EcommerceProduct::with(['warehouseProduct.brand', 'warehouseProduct.parentCategorie'])
+            ->where('is_todays_deal', true)
+            ->where('status', 'active')
+            ->orderBy('id', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Get sale products (products with discount) for On-Sale tab
+        $saleProducts = EcommerceProduct::with(['warehouseProduct.brand', 'warehouseProduct.parentCategorie'])
+            ->whereHas('warehouseProduct', function ($query) {
+                $query->where('discount_price', '>', 0);
+            })
+            ->where('status', 'active')
+            ->orderBy('id', 'desc')
+            ->limit(10)
+            ->get();
+
         $products = Product::with(['brand', 'parentCategorie', 'subCategorie'])->get();
 
-        return view('frontend.index', compact('banners', 'categories', 'products', 'collections'));
+        // Get trending products (recently added products from ecommerce_products table, sorted by created_at descending)
+        $trendingProducts = EcommerceProduct::with(['warehouseProduct.brand', 'warehouseProduct.parentCategorie'])
+            ->where('status', 'active')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Get best seller products from ecommerce_products table
+        $bestSellerProducts = EcommerceProduct::with(['warehouseProduct.brand', 'warehouseProduct.parentCategorie'])
+            ->where('is_best_seller', true)
+            ->where('status', 'active')
+            ->orderBy('id', 'desc')
+            ->limit(10)
+            ->get();
+
+        return view('frontend.index', compact('banners', 'categories', 'products', 'collections', 'featuredProducts', 'suggestedProducts', 'todaysDealProducts', 'saleProducts', 'trendingProducts', 'bestSellerProducts'));
     }
 
     /**

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
+use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\EcommerceProduct;
 use App\Models\Order;
@@ -11,8 +13,10 @@ use App\Models\OrderPayment;
 use App\Models\ParentCategory;
 use App\Models\Product;
 use App\Models\ReturnOrder;
+use App\Models\Reward;
 use App\Models\StockRequest;
 use App\Models\StockRequestItem;
+use App\Models\SubCategory;
 use App\Services\FirebaseFcmService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -387,7 +391,60 @@ class OrderController extends Controller
                 return response()->json(['message' => 'Order not found'], 404);
             }
 
-            return response()->json(['order' => $order], 200);
+            // Check if reward already exists for this order
+            $reward = Reward::where('customer_id', $order->customer_id)
+                ->where('order_id', $order_id)
+                ->first();
+
+            $coupon = $reward ? $reward->coupon : null;
+
+            // Build reward response
+            $rewardData = null;
+            if ($reward && $coupon) {
+                $rewardData = [
+                    'reward_available' => true,
+                    'reward_claimed' => true,
+                    'reward_details' => [
+                        'reward_id' => $reward->id,
+                        'coupon_id' => $reward->coupon_id,
+                        'coupon_code' => $coupon->code,
+                        'title' => $coupon->title,
+                        'description' => $coupon->description,
+                        'discount_type' => $coupon->type,
+                        'discount_value' => $coupon->discount_value,
+                        'min_purchase_amount' => $coupon->min_purchase_amount,
+                        'usage_limit' => $coupon->usage_limit,
+                        'used_count' => $coupon->used_count,
+                        'usage_per_customer' => $coupon->usage_per_customer,
+                        'status' => $coupon->status,
+                        'applicable_categories' => $this->getApplicableCategoriesData($coupon),
+                        'applicable_brands' => $this->getApplicableBrandsData($coupon),
+                        'excluded_products' => $this->getExcludedProductsData($coupon),
+                        'reward_status' => $reward->status,
+                        'reward_start_date' => $reward->start_date,
+                        'reward_end_date' => $reward->end_date,
+                        'used_at' => $reward->used_at,
+                        'used_order_id' => $reward->used_order_id,
+                        'used_service_request_id' => $reward->used_service_request_id,
+                    ],
+                ];
+            } else {
+                // Check if order is eligible for reward
+                $eligibleStatuses = ['delivered'];
+                $isEligible = in_array($order->status, $eligibleStatuses);
+                
+                $rewardData = [
+                    'reward_available' => $isEligible,
+                    'reward_claimed' => false,
+                    'reward_details' => null,
+                ];
+            }
+
+            // Merge reward data into order response
+            $orderArray = $order->toArray();
+            $orderArray['reward'] = $rewardData;
+
+            return response()->json(['order' => $orderArray], 200);
         }
     }
 
@@ -513,5 +570,99 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Failed to initiate return. Please try again.'], 500);
         }
+    }
+
+    /**
+     * Get applicable categories with full data
+     */
+    private function getApplicableCategoriesData(Coupon $coupon): array
+    {
+        $categoryIds = $coupon->applicable_categories ?? [];
+        
+        if (empty($categoryIds)) {
+            return [];
+        }
+        
+        $categories = [];
+        
+        foreach ($categoryIds as $id) {
+            // Try to find in ParentCategory first
+            $parentCategory = ParentCategory::find($id);
+            if ($parentCategory) {
+                $categories[] = [
+                    'id' => $parentCategory->id,
+                    'type' => 'parent_category',
+                    'name' => $parentCategory->name,
+                    'slug' => $parentCategory->slug,
+                ];
+                continue;
+            }
+            
+            // Try to find in SubCategory
+            $subCategory = SubCategory::find($id);
+            if ($subCategory) {
+                $categories[] = [
+                    'id' => $subCategory->id,
+                    'type' => 'sub_category',
+                    'name' => $subCategory->name,
+                    'slug' => $subCategory->slug,
+                    'parent_category_id' => $subCategory->parent_category_id,
+                ];
+            }
+        }
+        
+        return $categories;
+    }
+
+    /**
+     * Get applicable brands with full data
+     */
+    private function getApplicableBrandsData(Coupon $coupon): array
+    {
+        $brandIds = $coupon->applicable_brands ?? [];
+        
+        if (empty($brandIds)) {
+            return [];
+        }
+        
+        $brands = Brand::whereIn('id', $brandIds)->get(['id', 'name', 'slug']);
+        
+        return $brands->toArray();
+    }
+
+    /**
+     * Get excluded products with full data
+     */
+    private function getExcludedProductsData(Coupon $coupon): array
+    {
+        $productIds = $coupon->excluded_products ?? [];
+        
+        if (empty($productIds)) {
+            return [];
+        }
+        
+        $products = EcommerceProduct::whereIn('id', $productIds)
+            ->with(['warehouseProduct:id,product_name,sku,brand_id,parent_category_id,sub_category_id'])
+            ->get(['id', 'sku', 'product_id']);
+        
+        $result = [];
+        foreach ($products as $product) {
+            $item = [
+                'id' => $product->id,
+                'sku' => $product->sku,
+                'product_id' => $product->product_id,
+            ];
+            
+            if ($product->warehouseProduct) {
+                $item['product_name'] = $product->warehouseProduct->product_name;
+                $item['brand_id'] = $product->warehouseProduct->brand_id;
+                $item['parent_category_id'] = $product->warehouseProduct->parent_category_id;
+                $item['sub_category_id'] = $product->warehouseProduct->sub_category_id;
+            }
+            
+            $result[] = $item;
+        }
+        
+        return $result;
     }
 }

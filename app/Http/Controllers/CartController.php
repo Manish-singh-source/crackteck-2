@@ -30,7 +30,7 @@ class CartController extends Controller
             'ecommerceProduct.warehouseProduct.parentCategorie',
             'ecommerceProduct.warehouseProduct.subCategorie',
         ])
-            ->where('customer_id', Auth::id())
+            ->where('customer_id', Auth::guard('customer_web')->id())
             ->orderBy('created_at', 'desc')
             ->get();
 

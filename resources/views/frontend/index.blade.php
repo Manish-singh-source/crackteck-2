@@ -720,7 +720,7 @@
                         @foreach ($collections as $collection)
                             <div class="swiper-slide" style="background-color: #d1d1d1; padding: 15px">
                                 <div class="wg-cls hover-img type-abs wow fadeInUp" data-wow-delay="0s">
-                                    <a href="{{ route('collection.details', $collection->id) }}"
+                                    <a href=""
                                         class="img-style d-block">
                                         @if ($collection->image_url)
                                             <img src="{{ asset($collection->image_url) }}"
@@ -732,9 +732,10 @@
                                     </a>
                                     <div class="content">
                                         <h6 class="fw-normal">
-                                            <a href="{{ route('collection.details', $collection->id) }}" class="link">
+                                            {{-- <a href="{{ route('collection.details', $collection->id) }}" class="link">
                                                 {{ $collection->name }}
-                                            </a>
+                                            </a> --}}
+                                            {{ $collection->name }}
                                         </h6>
                                         @if ($collection->description)
                                             <p class="text-muted small">{{ Str::limit($collection->description, 50) }}</p>
@@ -778,7 +779,7 @@
                 <div class="swiper-wrapper">
                     <!-- item 1 -->
                     <div class="swiper-slide">
-                        <a href="{{ route('product-detail') }}"
+                        <a href="{{ route('shop') }}"
                             class="banner-image-product-2 style-2 type-sp-2 hover-img d-block">
                             <div class="item-image img-style overflow-visible position3">
                                 <img src="{{ asset('frontend-assets/images/item/camera-1.webp') }}"
@@ -807,7 +808,7 @@
                     </div>
                     <!-- item 2 -->
                     <div class="swiper-slide">
-                        <a href="{{ route('product-detail') }}"
+                        <a href="{{ route('shop') }}"
                             class="banner-image-product-2 type-sp-2 hover-img d-block">
                             <div class="item-image img-style overflow-visible position2">
                                 <img src="{{ asset('frontend-assets/images/item/laptop.webp') }}"
@@ -882,10 +883,29 @@
                                                             data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
                                                             alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
                                                         @if (!empty($product->warehouseProduct->additional_product_images))
-                                                            <img class="img-hover lazyload"
-                                                                src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                                data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                                alt="image-product">
+                                                            @php
+                                                                $images =
+                                                                    $product->warehouseProduct
+                                                                        ->additional_product_images;
+
+                                                                // agar string hai to array bana do
+                                                                if (!is_array($images)) {
+                                                                    $decoded = json_decode($images, true);
+
+                                                                    if (json_last_error() === JSON_ERROR_NONE) {
+                                                                        $images = $decoded; // JSON string -> array
+                                                                    } else {
+                                                                        $images = $images ? [$images] : []; // normal string -> array
+                                                                    }
+                                                                }
+                                                            @endphp
+
+                                                            @if (count($images) > 0)
+                                                                <img class="img-hover lazyload"
+                                                                    src="{{ asset($images[0]) }}"
+                                                                    data-src="{{ asset($images[0]) }}"
+                                                                    alt="{{ $product->warehouseProduct->product_name }}">
+                                                            @endif
                                                         @else
                                                             <img class="img-hover lazyload"
                                                                 src="{{ asset($product->warehouseProduct->main_product_image) }}"
@@ -903,7 +923,7 @@
                                                             alt="image-product">
                                                     @endif
                                                 </a>
-                                                <ul class="list-product-btn">
+                                                {{-- <ul class="list-product-btn">
                                                     <li>
                                                         <a href="#;"
                                                             class="box-icon add-to-cart-btn btn-icon-action hover-tooltip tooltip-left"
@@ -939,6 +959,43 @@
                                                             <span class="tooltip">Compare</span>
                                                         </a>
                                                     </li>
+                                                </ul> --}}
+
+                                                <ul class="list-product-btn top-0 end-0">
+                                                    <li>
+                                                        <a href="#;"
+                                                            class="box-icon add-to-cart-btn btn-icon-action hover-tooltip tooltip-left"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span class="icon icon-cart2"></span>
+                                                            <span class="tooltip">Add to Cart</span>
+                                                        </a>
+                                                    </li>
+                                                    <li class="wishlist">
+                                                        <a href="#;"
+                                                            class="box-icon btn-icon-action hover-tooltip tooltip-left add-to-wishlist-btn"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <span><i class="fa-solid fa-heart"></i></span>
+                                                            <span class="tooltip">Add to Wishlist</span>
+                                                        </a>
+                                                    </li>
+                                                    <li class="d-none d-sm-block">
+                                                        <a href="#;" id="compare"
+                                                            class="box-icon btn-icon-action hover-tooltip tooltip-left compare-btn"
+                                                            data-product-id="{{ $product->id }}">
+                                                            <span class="icon icon-compare1"></span>
+                                                            <span class="tooltip">Compare</span>
+                                                        </a>
+                                                    </li>
+                                                    {{-- <li>
+                                                        <a href="{{ route('product.detail', $product->id) }}"
+                                                            data-bs-toggle="modal" data-product-id="{{ $product->id }}"
+                                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                            <span class="icon icon-view"></span>
+                                                            <span class="tooltip">Quick View</span>
+                                                        </a>
+                                                    </li> --}}
                                                 </ul>
                                             </div>
                                             <div class="card-product-info px-">
@@ -1052,10 +1109,29 @@
                                                             data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
                                                             alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
                                                         @if (!empty($product->warehouseProduct->additional_product_images))
-                                                            <img class="img-hover lazyload"
-                                                                src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                                data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                                alt="image-product">
+                                                            @php
+                                                                $images =
+                                                                    $product->warehouseProduct
+                                                                        ->additional_product_images;
+
+                                                                // agar string hai to array bana do
+                                                                if (!is_array($images)) {
+                                                                    $decoded = json_decode($images, true);
+
+                                                                    if (json_last_error() === JSON_ERROR_NONE) {
+                                                                        $images = $decoded; // JSON string -> array
+                                                                    } else {
+                                                                        $images = $images ? [$images] : []; // normal string -> array
+                                                                    }
+                                                                }
+                                                            @endphp
+
+                                                            @if (count($images) > 0)
+                                                                <img class="img-hover lazyload"
+                                                                    src="{{ asset($images[0]) }}"
+                                                                    data-src="{{ asset($images[0]) }}"
+                                                                    alt="{{ $product->warehouseProduct->product_name }}">
+                                                            @endif
                                                         @else
                                                             <img class="img-hover lazyload"
                                                                 src="{{ asset($product->warehouseProduct->main_product_image) }}"
@@ -1073,7 +1149,7 @@
                                                             alt="image-product">
                                                     @endif
                                                 </a>
-                                                <ul class="list-product-btn">
+                                                <ul class="list-product-btn top-0 end-0">
                                                     <li>
                                                         <a href="#;"
                                                             class="box-icon add-to-cart-btn btn-icon-action hover-tooltip tooltip-left"
@@ -1083,32 +1159,31 @@
                                                             <span class="tooltip">Add to Cart</span>
                                                         </a>
                                                     </li>
-                                                    <li class="d-none d-sm-block wishlist">
+                                                    <li class="wishlist">
                                                         <a href="#;"
                                                             class="box-icon btn-icon-action hover-tooltip tooltip-left add-to-wishlist-btn"
                                                             data-product-id="{{ $product->id }}"
                                                             data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
-                                                            <span class="icon icon-heart2"></span>
+                                                            <span><i class="fa-solid fa-heart"></i></span>
                                                             <span class="tooltip">Add to Wishlist</span>
                                                         </a>
                                                     </li>
-                                                    <li>
-                                                        <a href="#quickView{{ $product->id }}" data-bs-toggle="modal"
-                                                            data-product-id="{{ $product->id }}"
-                                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                            <span class="icon icon-view"></span>
-                                                            <span class="tooltip">Quick View</span>
-                                                        </a>
-                                                    </li>
                                                     <li class="d-none d-sm-block">
-                                                        <a href="#;"
+                                                        <a href="#;" id="compare"
                                                             class="box-icon btn-icon-action hover-tooltip tooltip-left compare-btn"
-                                                            data-product-id="{{ $product->id }}"
-                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            data-product-id="{{ $product->id }}">
                                                             <span class="icon icon-compare1"></span>
                                                             <span class="tooltip">Compare</span>
                                                         </a>
                                                     </li>
+                                                    {{-- <li>
+                                                        <a href="{{ route('product.detail', $product->id) }}"
+                                                            data-bs-toggle="modal" data-product-id="{{ $product->id }}"
+                                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                            <span class="icon icon-view"></span>
+                                                            <span class="tooltip">Quick View</span>
+                                                        </a>
+                                                    </li> --}}
                                                 </ul>
                                             </div>
                                             <div class="card-product-info px-">
@@ -1223,10 +1298,29 @@
                                                             data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
                                                             alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
                                                         @if (!empty($product->warehouseProduct->additional_product_images))
-                                                            <img class="img-hover lazyload"
-                                                                src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                                data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                                alt="image-product">
+                                                            @php
+                                                                $images =
+                                                                    $product->warehouseProduct
+                                                                        ->additional_product_images;
+
+                                                                // agar string hai to array bana do
+                                                                if (!is_array($images)) {
+                                                                    $decoded = json_decode($images, true);
+
+                                                                    if (json_last_error() === JSON_ERROR_NONE) {
+                                                                        $images = $decoded; // JSON string -> array
+                                                                    } else {
+                                                                        $images = $images ? [$images] : []; // normal string -> array
+                                                                    }
+                                                                }
+                                                            @endphp
+
+                                                            @if (count($images) > 0)
+                                                                <img class="img-hover lazyload"
+                                                                    src="{{ asset($images[0]) }}"
+                                                                    data-src="{{ asset($images[0]) }}"
+                                                                    alt="{{ $product->warehouseProduct->product_name }}">
+                                                            @endif
                                                         @else
                                                             <img class="img-hover lazyload"
                                                                 src="{{ asset($product->warehouseProduct->main_product_image) }}"
@@ -1244,7 +1338,7 @@
                                                             alt="image-product">
                                                     @endif
                                                 </a>
-                                                <ul class="list-product-btn">
+                                                <ul class="list-product-btn top-0 end-0">
                                                     <li>
                                                         <a href="#;"
                                                             class="box-icon add-to-cart-btn btn-icon-action hover-tooltip tooltip-left"
@@ -1254,32 +1348,31 @@
                                                             <span class="tooltip">Add to Cart</span>
                                                         </a>
                                                     </li>
-                                                    <li class="d-none d-sm-block wishlist">
+                                                    <li class="wishlist">
                                                         <a href="#;"
                                                             class="box-icon btn-icon-action hover-tooltip tooltip-left add-to-wishlist-btn"
                                                             data-product-id="{{ $product->id }}"
                                                             data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
-                                                            <span class="icon icon-heart2"></span>
+                                                            <span><i class="fa-solid fa-heart"></i></span>
                                                             <span class="tooltip">Add to Wishlist</span>
                                                         </a>
                                                     </li>
-                                                    <li>
-                                                        <a href="#quickView{{ $product->id }}" data-bs-toggle="modal"
-                                                            data-product-id="{{ $product->id }}"
-                                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                            <span class="icon icon-view"></span>
-                                                            <span class="tooltip">Quick View</span>
-                                                        </a>
-                                                    </li>
                                                     <li class="d-none d-sm-block">
-                                                        <a href="#;"
+                                                        <a href="#;" id="compare"
                                                             class="box-icon btn-icon-action hover-tooltip tooltip-left compare-btn"
-                                                            data-product-id="{{ $product->id }}"
-                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            data-product-id="{{ $product->id }}">
                                                             <span class="icon icon-compare1"></span>
                                                             <span class="tooltip">Compare</span>
                                                         </a>
                                                     </li>
+                                                    {{-- <li>
+                                                        <a href="{{ route('product.detail', $product->id) }}"
+                                                            data-bs-toggle="modal" data-product-id="{{ $product->id }}"
+                                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                            <span class="icon icon-view"></span>
+                                                            <span class="tooltip">Quick View</span>
+                                                        </a>
+                                                    </li> --}}
                                                 </ul>
                                             </div>
                                             <div class="card-product-info px-">
@@ -1394,10 +1487,29 @@
                                                             data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
                                                             alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
                                                         @if (!empty($product->warehouseProduct->additional_product_images))
-                                                            <img class="img-hover lazyload"
-                                                                src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                                data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                                alt="image-product">
+                                                            @php
+                                                                $images =
+                                                                    $product->warehouseProduct
+                                                                        ->additional_product_images;
+
+                                                                // agar string hai to array bana do
+                                                                if (!is_array($images)) {
+                                                                    $decoded = json_decode($images, true);
+
+                                                                    if (json_last_error() === JSON_ERROR_NONE) {
+                                                                        $images = $decoded; // JSON string -> array
+                                                                    } else {
+                                                                        $images = $images ? [$images] : []; // normal string -> array
+                                                                    }
+                                                                }
+                                                            @endphp
+
+                                                            @if (count($images) > 0)
+                                                                <img class="img-hover lazyload"
+                                                                    src="{{ asset($images[0]) }}"
+                                                                    data-src="{{ asset($images[0]) }}"
+                                                                    alt="{{ $product->warehouseProduct->product_name }}">
+                                                            @endif
                                                         @else
                                                             <img class="img-hover lazyload"
                                                                 src="{{ asset($product->warehouseProduct->main_product_image) }}"
@@ -1415,7 +1527,7 @@
                                                             alt="image-product">
                                                     @endif
                                                 </a>
-                                                <ul class="list-product-btn">
+                                                <ul class="list-product-btn top-0 end-0">
                                                     <li>
                                                         <a href="#;"
                                                             class="box-icon add-to-cart-btn btn-icon-action hover-tooltip tooltip-left"
@@ -1425,32 +1537,31 @@
                                                             <span class="tooltip">Add to Cart</span>
                                                         </a>
                                                     </li>
-                                                    <li class="d-none d-sm-block wishlist">
+                                                    <li class="wishlist">
                                                         <a href="#;"
                                                             class="box-icon btn-icon-action hover-tooltip tooltip-left add-to-wishlist-btn"
                                                             data-product-id="{{ $product->id }}"
                                                             data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
-                                                            <span class="icon icon-heart2"></span>
+                                                            <span><i class="fa-solid fa-heart"></i></span>
                                                             <span class="tooltip">Add to Wishlist</span>
                                                         </a>
                                                     </li>
-                                                    <li>
-                                                        <a href="#quickView{{ $product->id }}" data-bs-toggle="modal"
-                                                            data-product-id="{{ $product->id }}"
-                                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                            <span class="icon icon-view"></span>
-                                                            <span class="tooltip">Quick View</span>
-                                                        </a>
-                                                    </li>
                                                     <li class="d-none d-sm-block">
-                                                        <a href="#;"
+                                                        <a href="#;" id="compare"
                                                             class="box-icon btn-icon-action hover-tooltip tooltip-left compare-btn"
-                                                            data-product-id="{{ $product->id }}"
-                                                            data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            data-product-id="{{ $product->id }}">
                                                             <span class="icon icon-compare1"></span>
                                                             <span class="tooltip">Compare</span>
                                                         </a>
                                                     </li>
+                                                    {{-- <li>
+                                                        <a href="{{ route('product.detail', $product->id) }}"
+                                                            data-bs-toggle="modal" data-product-id="{{ $product->id }}"
+                                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                            <span class="icon icon-view"></span>
+                                                            <span class="tooltip">Quick View</span>
+                                                        </a>
+                                                    </li> --}}
                                                 </ul>
                                             </div>
                                             <div class="card-product-info px-">
@@ -1564,13 +1675,13 @@
             <div class="flat-title wow fadeInUp" data-wow-delay="0s">
                 <h5 class="fw-semibold">Trending Products</h5>
                 <!-- <div class="box-btn-slide relative">
-                                                                <div class="swiper-button-prev nav-swiper nav-prev-products">
-                                                                    <i class="icon-arrow-left-lg"></i>
-                                                                </div>
-                                                                <div class="swiper-button-next nav-swiper nav-next-products">
-                                                                    <i class="icon-arrow-right-lg"></i>
-                                                                </div>
-                                                            </div> -->
+                                    <div class="swiper-button-prev nav-swiper nav-prev-products">
+                                        <i class="icon-arrow-left-lg"></i>
+                                    </div>
+                                    <div class="swiper-button-next nav-swiper nav-next-products">
+                                        <i class="icon-arrow-right-lg"></i>
+                                    </div>
+                                </div> -->
             </div>
             <div class="swiper tf-sw-products" data-preview="5" data-tablet="4" data-mobile-sm="3" data-mobile="1"
                 data-space-lg="30" data-space-md="20" data-space="15" data-pagination="1" data-pagination-sm="3"
@@ -1590,10 +1701,26 @@
                                                     data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
                                                     alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
                                                 @if (isset($product->warehouseProduct->additional_product_images[0]))
-                                                    <img class="img-hover lazyload"
-                                                        src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                        data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                        alt="image-product">
+                                                    @php
+                                                        $images = $product->warehouseProduct->additional_product_images;
+
+                                                        // agar string hai to array bana do
+                                                        if (!is_array($images)) {
+                                                            $decoded = json_decode($images, true);
+
+                                                            if (json_last_error() === JSON_ERROR_NONE) {
+                                                                $images = $decoded; // JSON string -> array
+                                                            } else {
+                                                                $images = $images ? [$images] : []; // normal string -> array
+                                                            }
+                                                        }
+                                                    @endphp
+
+                                                    @if (count($images) > 0)
+                                                        <img class="img-hover lazyload" src="{{ asset($images[0]) }}"
+                                                            data-src="{{ asset($images[0]) }}"
+                                                            alt="{{ $product->warehouseProduct->product_name }}">
+                                                    @endif
                                                 @endif
                                             @else
                                                 <img class="img-product lazyload"
@@ -1602,35 +1729,41 @@
                                                     alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
                                             @endif
                                         </a>
-                                        <ul class="list-product-btn">
+                                        <ul class="list-product-btn top-0 end-0">
                                             <li>
-                                                <a href="#shoppingCart" data-bs-toggle="offcanvas"
-                                                    class="box-icon add-to-cart btn-icon-action hover-tooltip tooltip-left">
+                                                <a href="#;"
+                                                    class="box-icon add-to-cart-btn btn-icon-action hover-tooltip tooltip-left"
+                                                    data-product-id="{{ $product->id }}"
+                                                    data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
                                                     <span class="icon icon-cart2"></span>
                                                     <span class="tooltip">Add to Cart</span>
                                                 </a>
                                             </li>
-                                            <li class="d-none d-sm-block wishlist">
+                                            <li class="wishlist">
                                                 <a href="#;"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-heart2"></span>
+                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left add-to-wishlist-btn"
+                                                    data-product-id="{{ $product->id }}"
+                                                    data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                    <span><i class="fa-solid fa-heart"></i></span>
                                                     <span class="tooltip">Add to Wishlist</span>
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a href="#quickView{{ $product->id }}" data-bs-toggle="modal"
-                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
-                                                    <span class="icon icon-view"></span>
-                                                    <span class="tooltip">Quick View</span>
-                                                </a>
-                                            </li>
                                             <li class="d-none d-sm-block">
-                                                <a href="#compare" data-bs-toggle="offcanvas"
-                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left">
+                                                <a href="#;" id="compare"
+                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left compare-btn"
+                                                    data-product-id="{{ $product->id }}">
                                                     <span class="icon icon-compare1"></span>
                                                     <span class="tooltip">Compare</span>
                                                 </a>
                                             </li>
+                                            {{-- <li>
+                                                        <a href="{{ route('product.detail', $product->id) }}"
+                                                            data-bs-toggle="modal" data-product-id="{{ $product->id }}"
+                                                            class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                            <span class="icon icon-view"></span>
+                                                            <span class="tooltip">Quick View</span>
+                                                        </a>
+                                                    </li> --}}
                                         </ul>
                                     </div>
                                     <div class="card-product-info">
@@ -1674,7 +1807,7 @@
     <!-- Banner Product -->
     <section>
         <div class="container">
-            <a href="{{ route('product-detail') }}" class="banner-image-product-2 hover-img d-block">
+            <a href="{{ route('shop') }}" class="banner-image-product-2 hover-img d-block">
                 <div class="item-image item-1 img-style overflow-visible">
                     <img src="{{ asset('frontend-assets/images/item/laptop.webp') }}" style="height: 200%;"
                         data-src="{{ asset('frontend-assets/images/item/laptop.webp') }}" alt=""
@@ -1730,10 +1863,29 @@
                                                             data-src="{{ asset($product->warehouseProduct->main_product_image) }}"
                                                             alt="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
                                                         @if (!empty($product->warehouseProduct->additional_product_images))
-                                                            <img class="img-hover lazyload"
-                                                                src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                                data-src="{{ asset($product->warehouseProduct->additional_product_images[0]) }}"
-                                                                alt="image-product">
+                                                            @php
+                                                                $images =
+                                                                    $product->warehouseProduct
+                                                                        ->additional_product_images;
+
+                                                                // agar string hai to array bana do
+                                                                if (!is_array($images)) {
+                                                                    $decoded = json_decode($images, true);
+
+                                                                    if (json_last_error() === JSON_ERROR_NONE) {
+                                                                        $images = $decoded; // JSON string -> array
+                                                                    } else {
+                                                                        $images = $images ? [$images] : []; // normal string -> array
+                                                                    }
+                                                                }
+                                                            @endphp
+
+                                                            @if (count($images) > 0)
+                                                                <img class="img-hover lazyload"
+                                                                    src="{{ asset($images[0]) }}"
+                                                                    data-src="{{ asset($images[0]) }}"
+                                                                    alt="{{ $product->warehouseProduct->product_name }}">
+                                                            @endif
                                                         @else
                                                             <img class="img-hover lazyload"
                                                                 src="{{ asset($product->warehouseProduct->main_product_image) }}"
@@ -1776,10 +1928,11 @@
                                                                     class="new-price price-text fw-medium mb-0">₹{{ number_format($product->warehouseProduct->selling_price ?? 0, 0) }}</span>
                                                             @endif
                                                         </p>
+
                                                         <ul class="list-product-btn flex-row">
                                                             <li>
                                                                 <a href="#;"
-                                                                    class="box-icon add-to-cart-btn btn-icon-action hover-tooltip"
+                                                                    class="box-icon add-to-cart-btn btn-icon-action hover-tooltip tooltip-left"
                                                                     data-product-id="{{ $product->id }}"
                                                                     data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
                                                                     <span class="icon icon-cart2"></span>
@@ -1788,31 +1941,29 @@
                                                             </li>
                                                             <li class="wishlist">
                                                                 <a href="#;"
-                                                                    class="box-icon btn-icon-action hover-tooltip add-to-wishlist-btn"
+                                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left add-to-wishlist-btn"
                                                                     data-product-id="{{ $product->id }}"
                                                                     data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
-                                                                    <span class="icon icon-heart2"></span>
+                                                                    <span><i class="fa-solid fa-heart"></i></span>
                                                                     <span class="tooltip">Add to Wishlist</span>
                                                                 </a>
                                                             </li>
-                                                            <li>
-                                                                <a href="#quickView{{ $product->id }}"
-                                                                    data-bs-toggle="modal"
-                                                                    data-product-id="{{ $product->id }}"
-                                                                    class="box-icon quickview btn-icon-action hover-tooltip">
-                                                                    <span class="icon icon-view"></span>
-                                                                    <span class="tooltip">Quick View</span>
-                                                                </a>
-                                                            </li>
-                                                            <li class="">
-                                                                <a href="#;"
-                                                                    class="box-icon btn-icon-action hover-tooltip compare-btn"
-                                                                    data-product-id="{{ $product->id }}"
-                                                                    data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
+                                                            <li class="d-none d-sm-block">
+                                                                <a href="#;" id="compare"
+                                                                    class="box-icon btn-icon-action hover-tooltip tooltip-left compare-btn"
+                                                                    data-product-id="{{ $product->id }}">
                                                                     <span class="icon icon-compare1"></span>
                                                                     <span class="tooltip">Compare</span>
                                                                 </a>
                                                             </li>
+                                                            {{-- <li>
+                                                                <a href="{{ route('product.detail', $product->id) }}"
+                                                                    data-bs-toggle="modal" data-product-id="{{ $product->id }}"
+                                                                    class="box-icon quickview btn-icon-action hover-tooltip tooltip-left">
+                                                                    <span class="icon icon-view"></span>
+                                                                    <span class="tooltip">Quick View</span>
+                                                                </a>
+                                                            </li> --}}
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -2107,45 +2258,8 @@
                 sessionStorage.setItem("showPopup", true);
             });
 
-            // Countdown Timer for Deal of the Day
-            function initCountdownTimers() {
-                $('.countdown-timer').each(function() {
-                    const $timer = $(this);
-                    const endTime = new Date($timer.data('end-time')).getTime();
-
-                    function updateTimer() {
-                        const now = new Date().getTime();
-                        const timeLeft = endTime - now;
-
-                        if (timeLeft > 0) {
-                            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-                            $timer.find('.days').text(String(days).padStart(2, '0'));
-                            $timer.find('.hours').text(String(hours).padStart(2, '0'));
-                            $timer.find('.minutes').text(String(minutes).padStart(2, '0'));
-                            $timer.find('.seconds').text(String(seconds).padStart(2, '0'));
-                        } else {
-                            // Deal expired
-                            $timer.find('.days, .hours, .minutes, .seconds').text('00');
-                            $timer.closest('.swiper-slide').fadeOut();
-                        }
-                    }
-
-                    // Update immediately and then every second
-                    updateTimer();
-                    setInterval(updateTimer, 1000);
-                });
-            }
-
-            // Initialize countdown timers
-            initCountdownTimers();
         });
-    </script>
 
-    <script>
         $(document).ready(function() {
             // CSRF token setup for AJAX requests
             $.ajaxSetup({
@@ -2154,94 +2268,28 @@
                 }
             });
 
-            // Quick view functionality
-            $('.quickview').on('click', function(e) {
-                e.preventDefault();
-
-                const productId = $(this).data('product-id');
-                console.log(productId);
-
-                // Make AJAX request to fetch product details
-                $.ajax({
-                    url: '{{ route('product.get') }}',
-                    method: 'GET',
-                    data: {
-                        id: productId
-                    },
-                    success: function(response) {
-                        console.log(response);
-                        if (response.success) {
-                            // Populate quick view modal with product details
-                            // ... (your code to populate the modal goes here)
-                            @foreach ($products as $product)
-                                $('#quickView').modal('show');
-
-                                $('.model_product_name').html(
-                                    '<a href="/product-detail/' + response.data.id +
-                                    '" class="product-link">' +
-                                    response.data.product_name +
-                                    '</a>'
-                                );
-
-                                $('.model_product_selling_price').text('₹' + response.data
-                                    .selling_price);
-                                $('.model_product_cost_price').text('₹' + response.data
-                                    .cost_price);
-                                // $('.model_product_main_images').html(response.data
-                                //     .main_product_image);
-                                // $('.model_product_thumbs_images').html(response.data
-                                //     .additional_product_images);
-                                $('.model_main_product_image').attr('src', response.data
-                                    .main_product_image);
-                                $('.model_additional_product_image').attr('src', response.data
-                                    .additional_product_images);
-                                $('.model_product_brand').text(response.data.brand.brand_title);
-                                $('.model_product_model_no').text(response.data.model_no);
-                                $('.model_product_sku').text(response.data.sku);
-                                $('.model_product_short_description').html(response.data
-                                    .short_description);
-                                $('.model_product_full_description').html(response.data
-                                    .full_description);
-                                $('.model_product_technical_specification').html(response.data
-                                    .technical_specification);
-                                $('model_product_quantity-product').val(response.data
-                                    .min_order_qty);
-                                $('.add-to-cart-btn, .add-to-cart').data('product-id', response
-                                    .data.id);
-                            @endforeach
-
-                            // Note: Add to Cart, Wishlist, and Compare functionality is handled by product-actions.js
-                        }
-                    },
-                    error: function(e) {
-                        console.log(e.responseText);
-                        console.log('Error fetching product details');
-                    }
-                });
-            });
-
             // Note: Add to Wishlist functionality is handled by product-actions.js
 
             // Function to show notifications
             function showNotification(message, type) {
                 // Create notification element
                 const notification = $(`
-            <div class="notification notification-${type}" style="
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'success' ? '#28a745' : type === 'warning' ? '#ffc107' : '#dc3545'};
-                color: white;
-                padding: 15px 20px;
-                border-radius: 5px;
-                z-index: 9999;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                max-width: 300px;
-                word-wrap: break-word;
-            ">
-                ${message}
-            </div>
-        `);
+                    <div class="notification notification-${type}" style="
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: ${type === 'success' ? '#28a745' : type === 'warning' ? '#ffc107' : '#dc3545'};
+                        color: white;
+                        padding: 15px 20px;
+                        border-radius: 5px;
+                        z-index: 9999;
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                        max-width: 300px;
+                        word-wrap: break-word;
+                    ">
+                        ${message}
+                    </div>
+                `);
 
                 // Add to body
                 $('body').append(notification);
@@ -2286,24 +2334,24 @@
             function showLoginModal() {
                 // Create and show login modal
                 const modalHtml = `
-            <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="loginModalLabel">Login Required</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body text-center">
-                            <p>Please login to add products to your cart.</p>
-                            <div class="d-flex gap-2 justify-content-center">
-                                <a href="{{ route('ecommerce.login') }}" class="btn btn-primary">Login</a>
-                                <a href="{{ route('ecommerce.signup') }}" class="btn btn-outline-primary">Sign Up</a>
+                    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="loginModalLabel">Login Required</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <p>Please login to add products to your cart.</p>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <a href="{{ route('ecommerce.login') }}" class="btn btn-primary">Login</a>
+                                        <a href="{{ route('ecommerce.signup') }}" class="btn btn-outline-primary">Sign Up</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        `;
+                `;
 
                 // Remove existing modal if any
                 $('#loginModal').remove();
@@ -2312,31 +2360,441 @@
                 $('body').append(modalHtml);
                 $('#loginModal').modal('show');
             }
+        });
+    </script>
 
-            // Initialize counts on page load
-            updateWishlistCount();
-            updateCartCount();
+    <script>
+        $(document).ready(function() {
+            // CSRF token setup for AJAX requests
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            // Add to Cart button handler for shop page (Toggle: add if not in cart, remove if in cart)
+            $(document).on('click', '.add-to-cart-btn', function(e) {
+                e.preventDefault();
+
+                const $button = $(this);
+                const productId = $button.data('product-id');
+                const quantity = 1;
+
+                // Show loading state
+                const originalHtml = $button.html();
+                $button.html('<i class="fa-solid fa-spinner fa-spin"></i>');
+                $button.prop('disabled', true);
+
+                // Make AJAX request to toggle cart (add if not in cart, remove if in cart)
+                $.ajax({
+                    url: '{{ route('cart.toggle') }}',
+                    method: 'POST',
+                    data: {
+                        product_id: productId,
+                        quantity: quantity
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
+
+                            // Update button state based on action
+                            if (response.action === 'added') {
+                                $button.html('<i class="icon-cart-2"></i>');
+                                $button.addClass('in-cart');
+                            } else {
+                                $button.html(
+                                    '<span class="icon icon-cart2"></span><span class="tooltip">Add to Cart</span>'
+                                );
+                                $button.removeClass('in-cart');
+                            }
+
+                            // Update cart count and sidebar
+                            updateCartCount();
+                            updateCartSidebar();
+                        } else {
+                            showNotification(response.message, 'error');
+                            $button.html(originalHtml);
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 401 && xhr.responseJSON && xhr.responseJSON
+                            .requires_auth) {
+                            showLoginModal();
+                        } else {
+                            showNotification('Error updating cart. Please try again.', 'error');
+                        }
+                        $button.html(originalHtml);
+                    },
+                    complete: function() {
+                        $button.prop('disabled', false);
+                    }
+                });
+            });
+
+            // Add to Wishlist button handler for shop page (Toggle: add if not in wishlist, remove if in wishlist)
+            $(document).on('click', '.add-to-wishlist-btn', function(e) {
+                e.preventDefault();
+
+                const $button = $(this);
+                const productId = $button.data('product-id');
+
+                // Show loading state
+                const originalHtml = $button.html();
+                $button.html('<i class="fa-solid fa-spinner fa-spin"></i>');
+                $button.prop('disabled', true);
+
+                // Make AJAX request to toggle wishlist
+                $.ajax({
+                    url: '{{ route('wishlist.toggle') }}',
+                    method: 'POST',
+                    data: {
+                        ecommerce_product_id: productId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
+
+                            // Update button state based on action
+                            if (response.action === 'added') {
+                                $button.addClass('in-wishlist');
+                                $button.find('i').removeClass('fa-heart').addClass(
+                                    'fa-solid fa-heart');
+                            } else {
+                                $button.removeClass('in-wishlist');
+                                $button.find('i').removeClass('fa-solid fa-heart').addClass(
+                                    'fa-heart');
+                            }
+
+                            // Update wishlist count
+                            updateWishlistCount();
+                        } else {
+                            showNotification(response.message, 'error');
+                            $button.html(originalHtml);
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 401 && xhr.responseJSON && xhr.responseJSON
+                            .requires_auth) {
+                            showLoginModal();
+                        } else {
+                            showNotification('Error updating wishlist. Please try again.',
+                                'error');
+                        }
+                        $button.html(originalHtml);
+                    },
+                    complete: function() {
+                        $button.prop('disabled', false);
+                    }
+                });
+            });
+
+            // Compare button handler for shop page
+            $(document).on('click', '.compare-btn', function(e) {
+                e.preventDefault();
+
+                const $button = $(this);
+                const productId = $button.data('product-id');
+
+                // Show loading state
+                const originalHtml = $button.html();
+                $button.html('<i class="fa-solid fa-spinner fa-spin"></i>');
+                $button.prop('disabled', true);
+
+                // Make AJAX request to toggle compare
+                $.ajax({
+                    url: '{{ route('compare.add') }}',
+                    method: 'POST',
+                    data: {
+                        ecommerce_product_id: productId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
+
+                            // Update button state based on action
+                            if (response.action === 'added') {
+                                $button.addClass('in-compare');
+                            } else {
+                                $button.removeClass('in-compare');
+                            }
+
+                            // Update compare count
+                            updateCompareCount();
+                        } else {
+                            showNotification(response.message, 'error');
+                            $button.html(originalHtml);
+                        }
+                    },
+                    error: function(xhr) {
+                        showNotification('Error updating compare list. Please try again.',
+                            'error');
+                        $button.html(originalHtml);
+                    },
+                    complete: function() {
+                        $button.prop('disabled', false);
+                    }
+                });
+            });
+
+            // Quick view functionality
+            $('.quickview').on('click', function(e) {
+                e.preventDefault();
+
+                const productId = $(this).data('product-id');
+                console.log(productId);
+
+                // Make AJAX request to fetch product details
+                $.ajax({
+                    url: '{{ route('product.get') }}',
+                    method: 'GET',
+                    data: {
+                        id: productId
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success) {
+                            // Populate quick view modal with product details
+                            // ... (your code to populate the modal goes here)
+                            @foreach ($products as $product)
+                                $('#quickView').modal('show');
+
+                                $('.model_product_name').html(
+                                    '<a href="/product-detail/' + response.data.id +
+                                    '" class="product-link">' +
+                                    response.data.product_name +
+                                    '</a>'
+                                );
+
+                                $('.model_product_selling_price').text('₹' + response.data
+                                    .selling_price);
+                                $('.model_product_cost_price').text('₹' + response.data
+                                    .cost_price);
+                                // $('.model_product_main_images').html(response.data
+                                //     .main_product_image);
+                                // $('.model_product_thumbs_images').html(response.data
+                                //     .additional_product_images);
+                                $('.model_main_product_image').attr('src', '/' + response.data
+                                    .main_product_image);
+                                $('.model_additional_product_image').attr('src', '/' + response
+                                    .data
+                                    .additional_product_images);
+                                $('.model_product_brand').text(response.data.brand.brand_title);
+                                $('.model_product_model_no').text(response.data.model_no);
+                                $('.model_product_sku').text(response.data.sku);
+                                $('.model_product_short_description').html(response.data
+                                    .short_description);
+                                $('.model_product_full_description').html(response.data
+                                    .full_description);
+                                $('.model_product_technical_specification').html(response.data
+                                    .technical_specification);
+                                $('model_product_quantity-product').val(response.data
+                                    .min_order_qty);
+                                $('.add-to-cart-btn, .add-to-cart').data('product-id', response
+                                    .data.id);
+                            @endforeach
+
+                            // Add to Cart functionality
+                            $('.add-to-cart-btn, .add-to-cart').on('click', function(e) {
+                                e.preventDefault();
+
+                                const $button = $(this);
+                                const productId = $button.data('product-id');
+                                const quantity = $('.quantity-input').val() || 1;
+
+                                // Check if user is authenticated
+                                // Check if user is authenticated
+                                @if (!auth('customer_web'))
+                                    showNotification(
+                                        'Please login to add products to your wishlist.',
+                                        'warning');
+                                    return;
+                                @endif
+
+                                // Show loading state
+                                const originalText = $button.html();
+                                $button.html(
+                                    '<i class="spinner-border spinner-border-sm me-2"></i>'
+                                );
+                                $button.prop('disabled', true);
+
+                                // Make AJAX request
+                                $.ajax({
+                                    url: '{{ route('cart.add') }}',
+                                    method: 'POST',
+                                    data: {
+                                        ecommerce_product_id: productId,
+                                        quantity: quantity
+                                    },
+                                    success: function(response) {
+                                        if (response.success) {
+                                            showNotification(response
+                                                .message,
+                                                'success');
+
+                                            // Update button state
+                                            $button.html(
+                                                'Added to Cart <i class="icon-cart-2"></i>'
+                                            );
+                                            $button.addClass('in-cart');
+
+                                            // Update cart count and sidebar
+                                            updateCartCount();
+                                            updateCartSidebar();
+                                        } else {
+                                            showNotification(response
+                                                .message,
+                                                'error');
+                                            // Reset button state
+                                            $button.html(originalText);
+                                        }
+                                    },
+                                    error: function(xhr) {
+                                        if (xhr.status === 401 && xhr
+                                            .responseJSON && xhr
+                                            .responseJSON
+                                            .requires_auth) {
+                                            showLoginModal();
+                                        } else {
+                                            console.log(productId)
+                                            console.log(xhr.responseJSON);
+                                            showNotification(
+                                                'Error adding product to cart. Please try again.',
+                                                'error');
+                                            // Reset button state
+                                            $button.html(originalText);
+                                        }
+                                    },
+                                    complete: function() {
+                                        $button.prop('disabled', false);
+                                    }
+                                });
+                            });
+                        }
+                    },
+                    error: function(e) {
+                        console.log(e.responseText);
+                        console.log('Error fetching product details');
+                    }
+                });
+            });
+
+
+            // Create product card HTML
+            function createProductCard(product) {
+                // console.log(product);
+                const shortDescription = product.short_description ? product.short_description : '';
+                // console.log(shortDescription);
+                const discountPercent = product.selling_price > product.final_price ?
+                    Math.round(((product.selling_price - product.final_price) / product.selling_price) * 100) :
+                    0;
+
+                return `
+                <div class="card-product"
+                     data-brand-id="${product.brand_id || ''}"
+                     data-category-id="${product.category_id || ''}"
+                     data-price="${product.final_price}">
+                    <div class="card-product-wrapper">
+                        <a href="${product.url}" class="product-img">
+                            <img class="img-product lazyload" src="/${product.main_image || '{{ asset('frontend-assets/images/placeholder-product.png') }}'}" alt="${product.name}">
+                        </a>
+                        <ul class="list-product-btn top-0 end-0">
+                            <li>
+                                <a href="#;" class="box-icon add-to-cart-btn btn-icon-action hover-tooltip tooltip-left" data-product-id="${product.id}" data-product-name="${product.name}">
+                                    <span class="icon icon-cart2"></span>
+                                    <span class="tooltip">Add to Cart</span>
+                                </a>
+                            </li>
+                            <li class="wishlist">
+                                <a href="#;" class="box-icon btn-icon-action hover-tooltip tooltip-left add-to-wishlist-btn" data-product-id="${product.id}" data-product-name="${product.name}">
+                                    <span class="icon icon-heart2"></span>
+                                    <span class="tooltip">Add to Wishlist</span>
+                                </a>
+                            </li>
+                            <li class="d-none d-sm-block">
+                                <a href="#;" class="box-icon btn-icon-action hover-tooltip tooltip-left compare-btn" data-product-id="${product.id}" data-product-name="${product.name}">
+                                    <span class="icon icon-compare1"></span>
+                                    <span class="tooltip">Compare</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-product-info">
+                        <div class="box-title">
+                            <div>
+                                ${product.category ? `<p class="product-tag caption text-main-2">${product.category}</p>` : ''}
+                                <a href="${product.url}" class="name-product body-md-2 fw-semibold text-secondary link text-truncate" style="max-width: 220px;">
+                                    ${product.name}
+                                </a>
+                            </div>
+                            
+                            <p class="price-wrap fw-medium">
+                                ${product.final_price ? `<span class="new-price price-text fw-medium">₹${product.final_price}</span>` : `<span class="new-price price-text fw-medium">₹0.00</span>`}
+
+                                ${product.discount_price > 0 ? `<span class="old-price body-md-2 text-main-2">₹${(parseFloat(product.final_price) + parseFloat(product.discount_price)).toFixed(2)}</span>` : ''}
+
+                            </p>
+
+                            ${shortDescription ? `<div class="product-description">
+                                                                                                    <p class="caption">${shortDescription}</p>
+                                                                                                </div>` : ''}
+                            <div class="box-infor-detail">
+                                <div class="star-review flex-wrap">
+                                    <ul class="list-star">
+                                        <li><i class="icon-star"></i></li>
+                                        <li><i class="icon-star"></i></li>
+                                        <li><i class="icon-star"></i></li>
+                                        <li><i class="icon-star"></i></li>
+                                        <li><i class="icon-star"></i></li>
+                                    </ul>
+                                    <p class="caption text-main-2">(${product.total_sold || 0})</p>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="card-product-btn">
+                        <a href="#;" class="tf-btn btn-line w-100 add-to-cart-btn" data-product-id="${product.id}">
+                            <span>Add to cart</span>
+                            <i class="icon-cart-2"></i>
+                        </a>
+                    </div>
+                </div>
+            `;
+            }
+
+            // Show error message
+            function showError(message) {
+                $('#gridLayout').html(`
+                <div class="col-12">
+                    <div class="alert alert-danger text-center" role="alert">
+                        ${message}
+                    </div>
+                </div>
+            `);
+            }
 
             // Add to Wishlist functionality
             $('.add-to-wishlist-btn').on('click', function(e) {
-                    e.preventDefault();
+                e.preventDefault();
 
-                    const $button = $(this);
-                    const productId = $button.data('product-id');
-                    const productName = $button.data('product-name');
+                const $button = $(this);
+                const productId = $button.data('product-id');
+                const productName = $button.data('product-name');
 
-                    // Check if user is authenticated
-                    @guest
+                // Check if user is authenticated
+                @if (!auth('customer_web'))
                     showNotification('Please login to add products to your wishlist.', 'warning');
                     return;
-                @endguest
+                @endif
 
                 // Show loading state
                 const originalIcon = $button.find('.icon').attr('class');
                 const originalTooltip = $button.find('.tooltip').text();
 
-                $button.find('.icon').attr('class', 'icon icon-loading'); $button.find('.tooltip').text(
-                    'Adding...'); $button.prop('disabled', true);
+                $button.find('.icon').attr('class', 'icon icon-loading');
+                $button.find('.tooltip').text('Adding...');
+                $button.prop('disabled', true);
 
                 // Make AJAX request
                 $.ajax({

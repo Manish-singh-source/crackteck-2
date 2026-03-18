@@ -147,6 +147,11 @@ class User extends Authenticatable
             ->logOnly(['name', 'email', 'phone', 'status'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn (string $eventName) => "User {$eventName}");
+            ->setDescriptionForEvent(fn(string $eventName) => "User {$eventName}");
+    }
+
+    public function devices()
+    {
+        return $this->hasMany(DeviceTokens::class);
     }
 }

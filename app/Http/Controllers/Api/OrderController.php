@@ -13,6 +13,7 @@ use App\Models\Product;
 use App\Models\ReturnOrder;
 use App\Models\StockRequest;
 use App\Models\StockRequestItem;
+use App\Services\FirebaseFcmService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -117,7 +118,7 @@ class OrderController extends Controller
     }
 
     // Buy Product
-    public function buyProduct(Request $request, $product_id)
+    public function buyProduct(Request $request, $product_id, FirebaseFcmService $fcm)
     {
         $roleValidated = Validator::make($request->all(), ([
             'role_id' => 'required|in:4',
@@ -155,7 +156,7 @@ class OrderController extends Controller
 
             $order = Order::create([
                 'customer_id' => $request->user_id,
-                'order_number' => 'ORD-'.date('YmdHis').'-'.$request->user_id,
+                'order_number' => 'ORD-' . date('YmdHis') . '-' . $request->user_id,
                 'total_items' => $quantity,
                 'subtotal' => $product->warehouseProduct->final_price,
                 'discount_amount' => 0,
@@ -205,8 +206,8 @@ class OrderController extends Controller
 
             OrderPayment::create([
                 'order_id' => $order->id,
-                'payment_id' => 'PMT-'.strtoupper(uniqid()),
-                'transaction_id' => 'TXN-'.strtoupper(uniqid()),
+                'payment_id' => 'PMT-' . strtoupper(uniqid()),
+                'transaction_id' => 'TXN-' . strtoupper(uniqid()),
                 'payment_method' => 'online',
                 'payment_gateway' => 'phonepe',
                 'amount' => $total,
@@ -214,6 +215,14 @@ class OrderController extends Controller
                 'status' => 'Completed',
                 'processed_at' => now(),
             ]);
+
+            // send push notification 
+            $fcm->sendToUser(
+                $customer,
+                $request->role_id,
+                'Order Placed',
+                'Hi, Your order has been placed successfully.'
+            );
 
             return response()->json([
                 'success' => true,
@@ -312,7 +321,7 @@ class OrderController extends Controller
         }
     }
 
-    
+
     public function requestProduct(Request $request)
     {
         $roleValidated = Validator::make($request->all(), ([
@@ -406,7 +415,7 @@ class OrderController extends Controller
         $cancellableStatuses = ['pending', 'admin_approved', 'assigned_delivery_man', 'order_accepted', 'product_taken'];
 
         if (! in_array($order->status, $cancellableStatuses)) {
-            return response()->json(['success' => false, 'message' => 'This order cannot be cancelled. Current status: '.$order->status], 400);
+            return response()->json(['success' => false, 'message' => 'This order cannot be cancelled. Current status: ' . $order->status], 400);
         }
 
         // Update order status to cancelled

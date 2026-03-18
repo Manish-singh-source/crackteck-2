@@ -22,6 +22,8 @@ use App\Http\Controllers\FieldEngineerController;
 use App\Http\Controllers\PartRequestController;
 use App\Http\Controllers\PickupRequestController;
 use App\Http\Controllers\ReturnRequestController;
+use App\Http\Controllers\Api\DeviceTokenController;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -64,6 +66,9 @@ Route::prefix('v1')->group(function () {
     Route::post('/test-fcm', [FcmTestController::class, 'send'])->middleware('throttle:60,1');
 
     Route::middleware(['throttle:60,1', 'jwt.verify'])->group(function () {
+
+        Route::post('/device-token', [DeviceTokenController::class, 'store']);
+        Route::delete('/device-token', [DeviceTokenController::class, 'destroy']);
 
         Route::post('/logout', [ApiAuthController::class, 'logout']);
         Route::post('/refresh-token', [ApiAuthController::class, 'refreshToken']);
@@ -403,4 +408,3 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
-

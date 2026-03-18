@@ -221,9 +221,8 @@ class OrderController extends Controller
             ]);
 
             // send push notification 
-            $fcm->sendToUser(
+            $fcm->sendToToken(
                 $customer,
-                $request->role_id,
                 'Order Placed',
                 'Hi, Your order has been placed successfully.'
             );

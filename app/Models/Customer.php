@@ -83,4 +83,9 @@ class Customer extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Lead::class);
     }
+
+    public function devices()
+    {
+        return $this->hasMany(DeviceTokens::class);
+    }
 }

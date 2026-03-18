@@ -206,6 +206,14 @@ class Order extends Model
     }
 
     /**
+     * Get the reward associated with this order.
+     */
+    public function reward()
+    {
+        return $this->hasOne(Reward::class);
+    }
+
+    /**
      * Check if the order can have delivery man assigned
      */
     public function canAssignDeliveryMan(): bool

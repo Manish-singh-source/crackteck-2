@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\QuickServiceController;
 use App\Http\Controllers\Api\QuotationController;
+use App\Http\Controllers\Api\RewardClaimController;
 use App\Http\Controllers\Api\StaffWalletController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\FieldEngineerController;
@@ -95,6 +96,11 @@ Route::prefix('v1')->group(function () {
             // Cancel and Return Order APIs
             Route::post('/cancel-order/{order_id}', 'cancelOrder');
             Route::post('/return-order/{order_id}', 'returnOrder');
+
+            // Reward Claim APIs
+            Route::post('/orders/{id}/claim-reward', [RewardClaimController::class, 'claimReward']);
+            Route::get('/orders/{id}/reward-availability', [RewardClaimController::class, 'checkRewardAvailability']);
+            Route::get('/rewards', [RewardClaimController::class, 'listRewards']);
 
             // Engineer APIs
             Route::get('/all-product', 'allListProducts'); // Engineer

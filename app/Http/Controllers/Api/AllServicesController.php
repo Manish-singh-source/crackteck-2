@@ -7,6 +7,7 @@ use App\Http\Resources\QuotationResource;
 use App\Models\Amc;
 use App\Models\AmcPlan;
 use App\Models\AmcProduct;
+use App\Models\Coupon;
 use App\Models\CoveredItem;
 use App\Models\EngineerDiagnosisDetail;
 use App\Models\Feedback;
@@ -605,6 +606,38 @@ class AllServicesController extends Controller
                 'status' => $requestPart->status,
             ], 200);
         }
+    }
+
+    // apply coupon for service request 
+    public function partApplyCoupon(Request $request) {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'user_id' => 'required|integer|exists:customers,id',
+            'coupon_code' => 'required|string',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        $couponCode = Coupon::where('code', $validated['coupon_code'])->first();
+
+        if (!$couponCode) {
+            return response()->json(['success' => false, 'message' => 'Coupon Not Exists or Exipired.'], 422);
+        }
+
+        return response()->json(['discount' => [
+            'coupon_id' => $couponCode->id,
+            'coupon_code' => $couponCode->code,
+            'discount' => $couponCode->discount_value
+        ]], 200);
     }
 
     public function serviceRequestQuotations(Request $request)

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('user_id');
             $table->integer('role_id');
             $table->string('device_type', 20)->nullable(); // android / ios / web
-            $table->text('fcm_token')->unique();
+            $table->string('fcm_token')->unique();
             $table->string('device_id')->nullable(); // optional
             $table->timestamp('last_used_at')->nullable();
             $table->timestamps();

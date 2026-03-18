@@ -720,7 +720,7 @@
                         @foreach ($collections as $collection)
                             <div class="swiper-slide" style="background-color: #d1d1d1; padding: 15px">
                                 <div class="wg-cls hover-img type-abs wow fadeInUp" data-wow-delay="0s">
-                                    <a href="{{ route('collection.details', $collection->id) }}"
+                                    <a href=""
                                         class="img-style d-block">
                                         @if ($collection->image_url)
                                             <img src="{{ asset($collection->image_url) }}"
@@ -732,9 +732,10 @@
                                     </a>
                                     <div class="content">
                                         <h6 class="fw-normal">
-                                            <a href="{{ route('collection.details', $collection->id) }}" class="link">
+                                            {{-- <a href="{{ route('collection.details', $collection->id) }}" class="link">
                                                 {{ $collection->name }}
-                                            </a>
+                                            </a> --}}
+                                            {{ $collection->name }}
                                         </h6>
                                         @if ($collection->description)
                                             <p class="text-muted small">{{ Str::limit($collection->description, 50) }}</p>
@@ -778,7 +779,7 @@
                 <div class="swiper-wrapper">
                     <!-- item 1 -->
                     <div class="swiper-slide">
-                        <a href="{{ route('product-detail') }}"
+                        <a href="{{ route('shop') }}"
                             class="banner-image-product-2 style-2 type-sp-2 hover-img d-block">
                             <div class="item-image img-style overflow-visible position3">
                                 <img src="{{ asset('frontend-assets/images/item/camera-1.webp') }}"
@@ -807,7 +808,7 @@
                     </div>
                     <!-- item 2 -->
                     <div class="swiper-slide">
-                        <a href="{{ route('product-detail') }}"
+                        <a href="{{ route('shop') }}"
                             class="banner-image-product-2 type-sp-2 hover-img d-block">
                             <div class="item-image img-style overflow-visible position2">
                                 <img src="{{ asset('frontend-assets/images/item/laptop.webp') }}"
@@ -1806,7 +1807,7 @@
     <!-- Banner Product -->
     <section>
         <div class="container">
-            <a href="{{ route('product-detail') }}" class="banner-image-product-2 hover-img d-block">
+            <a href="{{ route('shop') }}" class="banner-image-product-2 hover-img d-block">
                 <div class="item-image item-1 img-style overflow-visible">
                     <img src="{{ asset('frontend-assets/images/item/laptop.webp') }}" style="height: 200%;"
                         data-src="{{ asset('frontend-assets/images/item/laptop.webp') }}" alt=""

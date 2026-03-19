@@ -70,7 +70,7 @@ class FirebaseFcmService
                     'title' => $title,
                     'body' => $body,
                 ],
-                'data' => $data,
+                // 'data' => $data,
             ],
         ];
 

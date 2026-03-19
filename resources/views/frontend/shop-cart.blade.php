@@ -63,12 +63,12 @@
                                         $warehouseProduct = $product->warehouseProduct ?? null;
                                         $tax = $warehouseProduct ? $warehouseProduct->tax : 0;
 
-                                        // Ensure price is numeric and not null
+                                        // Ensure price is numeric and not null - use final_price first, then selling_price
                                         $price = 0;
-                                        if ($warehouseProduct && isset($warehouseProduct->final_price)) {
-                                            $price = is_numeric($warehouseProduct->final_price)
-                                                ? (float) $warehouseProduct->final_price
-                                                : 0;
+                                        if ($warehouseProduct) {
+                                            // Use null coalescing operator - handles null values properly
+                                            $finalPrice = $warehouseProduct->final_price ?? $warehouseProduct->selling_price ?? 0;
+                                            $price = is_numeric($finalPrice) ? (float) $finalPrice : 0;
                                         }
 
                                         $total = $price * $item->quantity;
@@ -582,9 +582,50 @@
                 $(this).data('original-value', $(this).val());
             });
 
+            // Fix individual item totals on page load - recalculate from price and quantity
+            function fixItemTotalsOnLoad() {
+                $('.tf-cart-item').each(function() {
+                    const $row = $(this);
+                    const $priceElement = $row.find('.cart-price');
+                    const $totalElement = $row.find('.total-price');
+                    const $quantityInput = $row.find('.quantity-product');
+                    
+                    // Get price from data attribute or text
+                    let price = parseFloat($priceElement.attr('data-price'));
+                    if (isNaN(price) || !isFinite(price)) {
+                        // Try to parse from text
+                        const priceText = $priceElement.text().replace(/₹|,|\s/g, '').trim();
+                        price = parseFloat(priceText);
+                    }
+                    
+                    // Get quantity
+                    const quantity = parseInt($quantityInput.val()) || 1;
+                    
+                    // Calculate total
+                    const total = price * quantity;
+                    
+                    // Fix if NaN
+                    if (isNaN(total) || !isFinite(total)) {
+                        $totalElement.attr('data-total', '0');
+                        $totalElement.text('₹0.00');
+                    } else {
+                        $totalElement.attr('data-total', total.toFixed(2));
+                        $totalElement.text('₹' + total.toLocaleString('en-IN', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }));
+                    }
+                });
+            }
+
             // Initialize cart total calculation on page load with a small delay to ensure DOM is ready
             setTimeout(function() {
+                // First fix individual item totals
+                fixItemTotalsOnLoad();
+                
+                // Then update the grand total
                 updateCartTotal();
+                
                 // Also update the cart_total element specifically
                 let currentTotal = $('#cart_total').text().replace(/₹|,|\s/g, '').trim();
                 if (currentTotal === 'NaN' || currentTotal === '') {

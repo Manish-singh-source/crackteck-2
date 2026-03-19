@@ -1092,7 +1092,7 @@ $isProcessed = in_array($currentStatus, [
                                 <h5 class="card-title mb-0">Assign Engineer</h5>
                             </div>
                             <div class="card-body">
-                                <form id="assignEngineerForm">
+                                <form id="assignRemoteEngineerForm">
                                     @csrf
                                     <input type="hidden" name="service_request_id" value="{{ $request->id }}">
                                     <input type="hidden" name="service_type"

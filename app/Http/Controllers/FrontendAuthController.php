@@ -151,6 +151,11 @@ class FrontendAuthController extends Controller
 
     public function login(Request $request)
     {
+        if (! Auth::guard('customer_web')->check()) {
+            // return redirect()->route('login')->with('error', 'Please login to access your account.');
+            return redirect()->back()->with('open_login_modal', true)->with('error', 'Please login to access your account.');
+        } 
+
         $credentials = $request->only('email', 'password');
 
         $request->validate([

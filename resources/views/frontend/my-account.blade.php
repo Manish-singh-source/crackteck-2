@@ -55,7 +55,7 @@
                 <div class="col-lg-9">
                     <div class="my-account-content account-dashboard">
                         <div class="mb_60">
-                            <h3 class="fw-semibold mb-20">Hello Technofra</h3>
+                            <h3 class="fw-semibold mb-20">Hello {{ Auth::guard('customer_web')->user() ? Auth::guard('customer_web')->user()->first_name . ' ' . optional(auth('customer_web')->user())->last_name : 'Guest' }}</h3>
                             <p>
                                 From your account dashboard you can view your
                                 <a class="text-secondary link fw-medium" href="{{ route('my-account-orders') }}">

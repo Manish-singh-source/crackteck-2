@@ -825,7 +825,8 @@ class CheckoutController extends Controller
     public function myAccountOrders()
     {
         if (! Auth::guard('customer_web')->check()) {
-            return redirect()->route('login')->with('error', 'Please login to view your orders.');
+            // return redirect()->route('login')->with('error', 'Please login to view your orders.');
+            return redirect()->back()->with('open_login_modal', true)->with('error', 'Please login to See your Order details.');
         }
 
         // Get user's orders with pagination

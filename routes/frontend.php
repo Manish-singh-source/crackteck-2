@@ -254,11 +254,11 @@ Route::prefix('/')->group(function () {
 
     // My Account order
     Route::get('/my-account-orders', [CheckoutController::class, 'myAccountOrders'])
-        ->name('my-account-orders')->middleware('auth:customer_web');
+        ->name('my-account-orders');
 
     // My Account Address
     Route::get('/my-account-address', [MyAccountController::class, 'addresses'])
-        ->name('my-account-address')->middleware('auth:customer_web');
+        ->name('my-account-address');
 
     // My Account Address AJAX Routes
     Route::middleware('auth:customer_web')->group(function () {
@@ -276,27 +276,27 @@ Route::prefix('/')->group(function () {
 
     // My Account Edit
     Route::get('/my-account-edit', [MyAccountController::class, 'accountDetails'])
-        ->name('my-account-edit')->middleware('auth:customer_web');
+        ->name('my-account-edit');
 
     // My Account Password
     Route::get('/my-account-password', [MyAccountController::class, 'changePassword'])
-        ->name('my-account-password')->middleware('auth:customer_web');
+        ->name('my-account-password');
 
     // My Account AMC
     Route::get('/my-account-amc', [MyAccountController::class, 'amcServices'])
-        ->name('my-account-amc')->middleware('auth:customer_web');
+        ->name('my-account-amc');
 
     // My Account AMC Service Details
     Route::get('/my-account-amc/{id}', [MyAccountController::class, 'viewAmcService'])
-        ->name('my-account-amc.view')->middleware('auth:customer_web');
+        ->name('my-account-amc.view');
 
     // My Account AMC
     Route::get('/my-account-ticket', [MyAccountController::class, 'ticket'])
-        ->name('my-account-ticket')->middleware('auth:customer_web');
+        ->name('my-account-ticket');
 
     // Store AMC Ticket
     Route::post('/my-account-amc/ticket', [MyAccountController::class, 'storeAmcTicket'])
-        ->name('my-account-amc.ticket.store')->middleware('auth:customer_web');
+        ->name('my-account-amc.ticket.store');
 
     // My Account Non-AMC
     Route::get('/my-account-non-amc', [MyAccountController::class, 'nonAmcServices'])

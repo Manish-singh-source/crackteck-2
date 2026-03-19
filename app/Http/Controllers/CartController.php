@@ -47,8 +47,8 @@ class CartController extends Controller
         }
 
         // Calculate totals
-        $subtotal = Cart::getCartTotal(Auth::id());
-        $cartCount = Cart::getCartCount(Auth::id());
+        $subtotal = Cart::getCartTotal(Auth::guard('customer_web')->id());
+        $cartCount = Cart::getCartCount(Auth::guard('customer_web')->id());
 
         return view('frontend.shop-cart', compact('cartItems', 'subtotal', 'cartCount'));
     }
@@ -74,7 +74,7 @@ class CartController extends Controller
 
         $productId = $request->ecommerce_product_id;
         $quantity = $request->quantity ?? 1;
-        $customerId = Auth::id();
+        $customerId = Auth::guard('customer_web')->id();
 
         // Check if product exists and is active
         $product = EcommerceProduct::with('warehouseProduct')
@@ -141,7 +141,7 @@ class CartController extends Controller
 
         $cartItem = Cart::with('ecommerceProduct.warehouseProduct')
             ->where('id', $id)
-            ->where('customer_id', Auth::id())
+            ->where('customer_id', Auth::guard('customer_web')->id())
             ->first();
 
         if (! $cartItem) {
@@ -173,8 +173,8 @@ class CartController extends Controller
             'message' => 'Cart updated successfully.',
             'item_price' => $productPrice,
             'item_total' => $productPrice * $cartItem->quantity,
-            'cart_count' => Cart::getCartCount(Auth::id()),
-            'cart_total' => Cart::getCartTotal(Auth::id()),
+            'cart_count' => Cart::getCartCount(Auth::guard('customer_web')->id()),
+            'cart_total' => Cart::getCartTotal(Auth::guard('customer_web')->id()),
         ]);
     }
 
@@ -192,7 +192,7 @@ class CartController extends Controller
         }
 
         $cartItem = Cart::where('id', $id)
-            ->where('customer_id', Auth::id())
+            ->where('customer_id', Auth::guard('customer_web')->id())
             ->first();
 
         if (! $cartItem) {
@@ -207,8 +207,8 @@ class CartController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Product removed from cart.',
-            'cart_count' => Cart::getCartCount(Auth::id()),
-            'cart_total' => Cart::getCartTotal(Auth::id()),
+            'cart_count' => Cart::getCartCount(Auth::guard('customer_web')->id()),
+            'cart_total' => Cart::getCartTotal(Auth::guard('customer_web')->id()),
         ]);
     }
 
@@ -230,7 +230,7 @@ class CartController extends Controller
         $cartItems = Cart::with([
             'ecommerceProduct.warehouseProduct',
         ])
-            ->where('customer_id', Auth::id())
+            ->where('customer_id', Auth::guard('customer_web')->id())
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($item) {
@@ -248,8 +248,8 @@ class CartController extends Controller
         return response()->json([
             'success' => true,
             'cart_items' => $cartItems,
-            'cart_count' => Cart::getCartCount(Auth::id()),
-            'cart_total' => Cart::getCartTotal(Auth::id()),
+            'cart_count' => Cart::getCartCount(Auth::guard('customer_web')->id()),
+            'cart_total' => Cart::getCartTotal(Auth::guard('customer_web')->id()),
         ]);
     }
 
@@ -265,7 +265,7 @@ class CartController extends Controller
         }
 
         return response()->json([
-            'cart_count' => Cart::getCartCount(Auth::id()),
+            'cart_count' => Cart::getCartCount(Auth::guard('customer_web')->id()),
         ]);
     }
 
@@ -281,7 +281,7 @@ class CartController extends Controller
         }
 
         $productId = $request->product_id;
-        $inCart = Cart::isInCart(Auth::id(), $productId);
+        $inCart = Cart::isInCart(Auth::guard('customer_web')->id(), $productId);
 
         return response()->json([
             'in_cart' => $inCart,
@@ -418,7 +418,7 @@ class CartController extends Controller
         try {
             $productId = $request->product_id;
             $quantity = $request->quantity ?? 1;
-            $userId = Auth::id();
+            $userId = Auth::guard('customer_web')->id();
 
             // Check if product exists and is active
             $product = EcommerceProduct::with('warehouseProduct')

@@ -69,7 +69,7 @@ class CheckoutController extends Controller
     private function getCheckoutData(Request $request)
     {
         $source = $request->get('source', 'cart');
-        $userId = Auth::id();
+        $userId = Auth::guard('customer_web')->id();
 
         if ($source === 'buy_now') {
             // Single product checkout
@@ -182,7 +182,7 @@ class CheckoutController extends Controller
             ], 401);
         }
 
-        $addresses = CustomerAddressDetail::getUserAddresses(Auth::id());
+        $addresses = CustomerAddressDetail::getUserAddresses(Auth::guard('customer_web')->id());
 
         return response()->json([
             'success' => true,
@@ -305,7 +305,7 @@ class CheckoutController extends Controller
                 $couponController = new CouponApplicationController;
                 $couponController->recordCouponUsage(
                     $totals['applied_coupon']['id'],
-                    Auth::id(),
+                    Auth::guard('customer_web')->id(),
                     $order->id,
                     $totals['discount_amount']
                 );
@@ -316,7 +316,7 @@ class CheckoutController extends Controller
 
             // Clear cart if checkout from cart
             if ($checkoutData['source'] === 'cart') {
-                Cart::where('customer_id', Auth::id())->delete();
+                Cart::where('customer_id', Auth::guard('customer_web')->id())->delete();
             }
 
             // Clear checkout navigation source from session
@@ -333,7 +333,7 @@ class CheckoutController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Checkout error: '.$e->getMessage(), [
-                'customer_id' => Auth::id(),
+                'customer_id' => Auth::guard('customer_web')->id(),
                 'request_data' => $request->all(),
             ]);
 
@@ -384,7 +384,7 @@ class CheckoutController extends Controller
         if (empty($shippingAddressId)) {
             // Create new address in customer_address_details table
             $customerAddress = CustomerAddressDetail::create([
-                'customer_id' => Auth::id(),
+                'customer_id' => Auth::guard('customer_web')->id(),
                 'branch_name' => $validated['shipping_first_name'].' '.$validated['shipping_last_name'],
                 'address1' => $validated['shipping_address_line_1'],
                 'address2' => $validated['shipping_address_line_2'] ?? null,
@@ -398,7 +398,7 @@ class CheckoutController extends Controller
         }
 
         $orderData = [
-            'customer_id' => Auth::id(),
+            'customer_id' => Auth::guard('customer_web')->id(),
             'order_source' => $source,
             'email' => $validated['email'],
 
@@ -582,7 +582,7 @@ class CheckoutController extends Controller
         ]);
 
         try {
-            $validated['customer_id'] = Auth::id();
+            $validated['customer_id'] = Auth::guard('customer_web')->id();
             $address = CustomerAddressDetail::create($validated);
 
             if ($validated['is_default'] ?? false) {
@@ -625,7 +625,7 @@ class CheckoutController extends Controller
             'shippingAddress',
         ])
             ->where('order_number', $orderNumber)
-            ->where('customer_id', Auth::id())
+            ->where('customer_id', Auth::guard('customer_web')->id())
             ->first();
         // dd($order);
 
@@ -830,7 +830,7 @@ class CheckoutController extends Controller
 
         // Get user's orders with pagination
         $orders = Order::with(['orderItems'])
-            ->where('customer_id', Auth::id())
+            ->where('customer_id', Auth::guard('customer_web')->id())
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -856,7 +856,7 @@ class CheckoutController extends Controller
             ]);
 
             $order = Order::where('order_number', $request->order_number)
-                ->where('customer_id', Auth::id())
+                ->where('customer_id', Auth::guard('customer_web')->id())
                 ->first();
 
             if (! $order) {
@@ -867,7 +867,7 @@ class CheckoutController extends Controller
             }
 
             // Debug: log the current status
-            Log::info('Order status: '.$order->status.' - Customer ID: '.Auth::id());
+            Log::info('Order status: '.$order->status.' - Customer ID: '.Auth::guard('customer_web')->id());
 
             // Check if order can be cancelled
             $cancellableStatuses = [
@@ -924,7 +924,7 @@ class CheckoutController extends Controller
         ]);
 
         $order = Order::where('order_number', $request->order_number)
-            ->where('customer_id', Auth::id())
+            ->where('customer_id', Auth::guard('customer_web')->id())
             ->first();
 
         if (! $order) {
@@ -963,7 +963,7 @@ class CheckoutController extends Controller
 
         // Check if a return order already exists
         $existingReturn = ReturnOrder::where('order_number', $order->order_number)
-            ->where('customer_id', Auth::id())
+            ->where('customer_id', Auth::guard('customer_web')->id())
             ->first();
 
         if ($existingReturn) {

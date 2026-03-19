@@ -67,3 +67,40 @@ status update from crm
 accept quotation from customer 
 send invoice for customer 
 quotation invoice 
+
+
+Todays Tasks:
+
+#Roshan 
+
+1. quantity updation after buy now to checkout page 
+2. My Account: if user not logged in show popup for login
+
+#Roshan & #Saurabh 
+
+1. App Testing and solving if any error occurred
+
+#Saurabh 
+
+1. Group Engineer Flow 
+
+#Shubham 
+
+1. Integrating APIs of Reward 
+2. MyCRM Project Module and Tasks Module Screens
+
+#Pradnya 
+
+1. Home page changes 
+2. Career page changes 
+
+
+
+2. razorpay integration code in e-commerce 
+3. Cash On Delivery APIs for e-commerce and services 
+
+
+
+
+
+

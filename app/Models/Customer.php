@@ -86,6 +86,6 @@ class Customer extends Authenticatable implements JWTSubject
 
     public function devices()
     {
-        return $this->hasMany(DeviceTokens::class);
+        return $this->hasMany(DeviceTokens::class, 'user_id');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\FileUpload;
+use App\Models\AmcScheduleMeeting;
 use App\Models\AssignmentWorkflow;
 use App\Models\FieldIssue;
 use App\Models\JobAssignment;
@@ -61,6 +62,11 @@ class AssignedJobController extends Controller
                 $serviceRequest->status = 'in_progress';
                 $serviceRequest->save();
 
+
+                $amcScheduleMeeting = AmcScheduleMeeting::where('id', $remoteSupportJob->amc_schedule_meeting_id)->first();
+                $amcScheduleMeeting->status = 'in_progress';
+                $amcScheduleMeeting->save();
+
                 return redirect()->back()->with('success', 'Diagnosis started successfully.');
             }
             return redirect()->back()->with('error', 'Failed to start diagnosis.');
@@ -111,6 +117,10 @@ class AssignedJobController extends Controller
             $serviceRequest->status = 'completed';
             $serviceRequest->save();
 
+            $amcScheduleMeeting = AmcScheduleMeeting::where('id', $remoteSupportJob->amc_schedule_meeting_id)->first();
+            $amcScheduleMeeting->status = 'completed';
+            $amcScheduleMeeting->save();
+
             if ($remoteSupportDiagnose) {
                 return redirect()->back()->with('success', 'Diagnosis completed successfully.');
             }
@@ -127,8 +137,19 @@ class AssignedJobController extends Controller
             $remoteSupportJob->save();
 
             if ($remoteSupportDiagnose) {
+
+                $serviceRequestProduct = ServiceRequestProduct::with('serviceRequest')->findOrFail($id);
+                // $serviceRequestProduct->status = 'escalated';
+                $serviceRequestProduct->status = 'pending';
+                $serviceRequestProduct->save();
+
+                $serviceRequest = ServiceRequest::findOrFail($serviceRequestProduct->service_requests_id);
+                $serviceRequest->status = 'escalated';
+                $serviceRequest->save();
+
                 return redirect()->back()->with('success', 'Diagnosis completed successfully.');
             }
+
             return redirect()->back()->with('error', 'Failed to start diagnosis.');
         }
     }

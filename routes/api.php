@@ -64,6 +64,7 @@ Route::prefix('v1')->group(function () {
         return response()->file($path);
     });
 
+    // Only for testing notification
     Route::post('/test-fcm', [FcmTestController::class, 'send'])->middleware('throttle:60,1');
 
     Route::middleware(['throttle:60,1', 'jwt.verify'])->group(function () {

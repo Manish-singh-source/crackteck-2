@@ -108,19 +108,19 @@
                                                             @foreach ($leads as $lead)
                                                                 <tr>
                                                                     <td>{{ $lead->id }}</td>
-                                                                    <td>{{ $lead->lead_number }}</td>
-                                                                    <td>{{ $lead->staff->first_name . ' ' . $lead->staff->last_name }}
+                                                                    <td>{{ $lead->lead_number ?? 'N/A' }}</td>
+                                                                    <td>{{ $lead->staff?->first_name ? ($lead->staff?->first_name . ' ' . $lead->staff?->last_name) : 'N/A' }}
                                                                     </td>
-                                                                    <td>{{ $lead->customer->first_name }}
-                                                                        {{ $lead->customer->last_name }}</td>
-                                                                    <td>{{ $lead->customer->phone }}</td>
+                                                                    <td>{{ $lead->customer?->first_name ?? 'N/A' }}
+                                                                        {{ $lead->customer?->last_name ?? 'N/A' }}</td>
+                                                                    <td>{{ $lead->customer?->phone ?? 'N/A' }}</td>
                                                                     <td>{{ $lead->companyDetails?->company_name ?? 'N/A' }}
                                                                     </td>
                                                                     <td>{{ $lead->customer->industry_type ?? 'N/A' }}</td>
                                                                     <td>
-                                                                        {{ ucwords($lead->requirement_type) }}
+                                                                        {{ $lead->requirement_type ? ucwords($lead->requirement_type) : 'N/A' }}
                                                                     </td>
-                                                                    <td>{{ $lead->budget_range }}</td>
+                                                                    <td>{{ $lead->budget_range ?? 'N/A' }}</td>
                                                                     <td>
                                                                         @php
                                                                             $badgeClass = match ($lead->urgency) {

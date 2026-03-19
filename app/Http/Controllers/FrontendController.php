@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\Collection;
 use App\Models\Contact;
 use App\Models\EcommerceProduct;
+use App\Models\Lead;
 use App\Models\ParentCategory;
 use App\Models\Product;
 use App\Models\ProductDeal;
@@ -354,6 +355,7 @@ class FrontendController extends Controller
             'email' => 'required|email|max:255',
             'customer_type' => 'nullable',
             'source_type' => 'nullable|string',
+            'amc_type' => 'required|in:remote,onsite',
 
             // Step 2: Customer Address (required for onsite, optional for remote)
             'branch_name' => 'required_if:amc_type,onsite|string|max:255|nullable',
@@ -377,7 +379,6 @@ class FrontendController extends Controller
             // Step 4: AMC Plan Selection
             'amc_plan_id' => 'required|integer|min:1',
             'preferred_start_date' => 'required|date',
-            'amc_type' => 'required|in:remote,onsite',
 
             // Step 5: Product Information (Multiple Products)
             'products' => 'required|array|min:1',
@@ -407,7 +408,7 @@ class FrontendController extends Controller
 
             if (! $customer) {
                 // Generate customer code
-                $customerCode = 'CUST-'.strtoupper(uniqid());
+                $customerCode = 'CUST-' . strtoupper(uniqid());
 
                 $customer = \App\Models\Customer::create([
                     'customer_code' => $customerCode,
@@ -476,18 +477,6 @@ class FrontendController extends Controller
             $serviceId = $this->generateServiceId();
 
             $uniqId = uniqid('SR-'); // Generate unique request ID with prefix
-            // Create Service Request in service_requests table
-            // $serviceRequest = \App\Models\ServiceRequest::create([
-            //     'request_id' => $uniqId,
-            //     'service_type' => 'amc',
-            //     'customer_id' => $customer->id,
-            //     'customer_address_id' => $customerAddress->id,
-            //     'amc_plan_id' => $request->amc_plan_id,
-            //     'request_date' => now(),
-            //     'status' => 'active',
-            //     'request_source' => $request->source_type ?? 'customer',
-            //     'visit_date' => $request->preferred_start_date,
-            // ]);
 
             // AMC Add
             $amc = Amc::create([
@@ -535,18 +524,6 @@ class FrontendController extends Controller
             // Create Service Request Products in service_request_products table
             $products = $request->input('products', []);
             foreach ($products as $productData) {
-                // \App\Models\ServiceRequestProduct::create([
-                //     'service_requests_id' => $serviceRequest->id,
-                //     'name' => $productData['product_name'],
-                //     'type' => $productData['product_type'],
-                //     'brand' => $productData['brand_name'],
-                //     'model_no' => $productData['model_number'],
-                //     'purchase_date' => $productData['purchase_date'],
-                //     'sku' => $productData['sku'] ?? null,
-                //     'hsn' => $productData['hsn'] ?? null,
-                //     'status' => 'Pending',
-                // ]);
-
                 AmcProduct::create([
                     'amc_id' => $amc->id,
                     'name' => $productData['product_name'],
@@ -557,6 +534,21 @@ class FrontendController extends Controller
                     'sku' => $productData['sku'] ?? null,
                     'hsn' => $productData['hsn'] ?? null,
                     'mac_address' => $productData['mac_address'] ?? null,
+                ]);
+            }
+
+
+            // Create a Lead based on this AMC Request 
+            if ($request->amc_type === 'onsite') {
+                $lead = Lead::create([
+                    'customer_id' => $customer->id,
+                    'staff_id' => null,
+                    'customer_address_id' => $customerAddress ? $customerAddress->id : null,
+                    'lead_number' => uniqid(),
+                    'requirement_type' => 'amc',
+                    'budget_range' => null,
+                    'estimated_value',
+                    'notes' => $request->additional_notes ?? null,
                 ]);
             }
 
@@ -690,7 +682,7 @@ class FrontendController extends Controller
 
         $nextNumber = $lastService ? (intval(substr($lastService->request_id, -4)) + 1) : 1;
 
-        return 'SRV-'.$year.'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        return 'SRV-' . $year . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     /**

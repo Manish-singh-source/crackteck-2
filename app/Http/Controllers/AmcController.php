@@ -582,7 +582,7 @@ class AmcController extends Controller
         $amcRequest = Amc::findOrFail($id);
         $amcRequest->delete();
 
-        return redirect()->route('active-amcs.index')->with('success', 'AMC Request deleted successfully.');
+        return redirect()->route('amcs-lists.index')->with('success', 'AMC Request deleted successfully.');
     }
 
     // 3. View AMC request details

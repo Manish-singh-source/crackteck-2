@@ -1343,12 +1343,14 @@
                 e.preventDefault();
 
                 const productId = $(this).data('product-id');
-                const quantity = $('.quantity-input').val() || 1;
+                const quantity = $('.quantity-product').val() || 1;
 
                 // Show loading state
                 const originalText = $(this).html();
                 $(this).html('<i class="spinner-border spinner-border-sm me-2"></i>Processing...');
                 $(this).prop('disabled', true);
+
+                console.log(quantity);
 
                 // Redirect to checkout with buy_now parameters
                 const checkoutUrl = '{{ route('checkout') }}' + '?source=buy_now&product_id=' + productId +

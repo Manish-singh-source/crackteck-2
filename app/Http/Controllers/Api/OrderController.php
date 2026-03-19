@@ -222,7 +222,7 @@ class OrderController extends Controller
 
             // send push notification 
             $fcm->sendToToken(
-                $customer->devices()->first()->device_token,
+                $customer->devices()->first()->fcm_token,
                 'Order Placed',
                 'Hi, Your order has been placed successfully.'
             );

@@ -951,6 +951,7 @@ $isProcessed = in_array($currentStatus, [
                                 <form method="POST" action="{{ route('service-request.assign-quick-service-remote-engineer') }}" >
                                     @csrf   
                                     <input type="hidden" name="service_request_id" value="{{ $request->id }}">
+                                    <input type="hidden" name="request_type" value="{{ $request->service_type }}">
                                     
                                     <div id="individualSection">
                                         <div class="mb-3">

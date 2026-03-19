@@ -21,11 +21,12 @@ class MyAccountController extends Controller
     public function addresses()
     {
         if (! Auth::guard('customer_web')->check()) {
-            return redirect()->route('login')->with('error', 'Please login to view your orders.');
+            // return redirect()->route('login')->with('error', 'Please login to view your orders.');
+            return redirect()->back()->with('open_login_modal', true)->with('error', 'Please login to see your address.');
         }
 
-        // Debug: Check what Auth::id() returns
-        $customerId = Auth::id();
+        // Debug: Check what Auth::guard('customer_web')->id() returns
+        $customerId = Auth::guard('customer_web')->id();
 
         // If using Customer model, get the actual customer ID
         $customer = Auth::user();
@@ -264,7 +265,12 @@ class MyAccountController extends Controller
      */
     public function accountDetails()
     {
-        $customer = Auth::user();
+        if (! Auth::guard('customer_web')->check()) {
+            // return redirect()->route('login')->with('error', 'Please login to access your account.');
+            return redirect()->back()->with('open_login_modal', true)->with('error', 'Please login to see your account detail.');
+        }
+
+        $customer = Auth::guard('customer_web')->user();
         $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
         $primaryAddress = CustomerAddressDetail::where('is_primary', 'yes')
             ->where('customer_id', $customerId)
@@ -280,10 +286,11 @@ class MyAccountController extends Controller
     public function amcServices()
     {
         if (! Auth::guard('customer_web')->check()) {
-            return redirect()->route('login')->with('error', 'Please login to access your account.');
+            // return redirect()->route('login')->with('error', 'Please login to access your account.');
+            return redirect()->back()->with('open_login_modal', true)->with('error', 'Please login to see your Amc detail.');
         }
 
-        // Debug: Check what Auth::id() returns
+        // Debug: Check what Auth::guard('customer_web')->id() returns
         $customerId = Auth::guard('customer_web')->id();
 
         // If using Customer model, get the actual customer ID
@@ -316,7 +323,8 @@ class MyAccountController extends Controller
     public function viewAmcService($id)
     {
         if (! Auth::guard('customer_web')->check()) {
-            return redirect()->route('login')->with('error', 'Please login to access your account.');
+            // return redirect()->route('login')->with('error', 'Please login to access your account.');
+            return redirect()->back()->with('open_login_modal', true)->with('error', 'Please login to see your AMC Detail page.');
         }
 
         $customer = Auth::guard('customer_web')->user();
@@ -380,7 +388,7 @@ class MyAccountController extends Controller
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,'.Auth::id(),
+            'email' => 'required|email|unique:users,email,'.Auth::guard('customer_web')->id(),
             'phone' => 'nullable|string|max:20',
         ]);
 
@@ -414,6 +422,10 @@ class MyAccountController extends Controller
      */
     public function changePassword()
     {
+        if (! Auth::guard('customer_web')->check()) {
+            // return redirect()->route('login')->with('error', 'Please login to access your account.');
+            return redirect()->back()->with('open_login_modal', true)->with('error', 'Please login to change password.');
+        }
         return view('frontend.my-account-password');
     }
 
@@ -480,7 +492,8 @@ class MyAccountController extends Controller
     public function ticket()
     {
         if (! Auth::guard('customer_web')->check()) {
-            return redirect()->route('login')->with('error', 'Please login to view your tickets.');
+            // return redirect()->route('login')->with('error', 'Please login to view your tickets.');
+            return redirect()->back()->with('open_login_modal', true)->with('error', 'Please login to see your ticket.');
         }
 
         $customer = Auth::guard('customer_web')->user();

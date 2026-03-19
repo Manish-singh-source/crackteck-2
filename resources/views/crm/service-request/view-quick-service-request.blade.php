@@ -948,7 +948,7 @@ $isProcessed = in_array($currentStatus, [
                                 <h5 class="card-title mb-0">Assign Remote Engineer</h5>
                             </div>
                             <div class="card-body">
-                                <form method="POST" action="{{ route('service-request.assign-quick-service-engineer') }}" >
+                                <form method="POST" action="{{ route('service-request.assign-quick-service-remote-engineer') }}" >
                                     @csrf   
                                     <input type="hidden" name="service_request_id" value="{{ $request->id }}">
                                     
@@ -1092,7 +1092,7 @@ $isProcessed = in_array($currentStatus, [
                                 <h5 class="card-title mb-0">Assign Engineer</h5>
                             </div>
                             <div class="card-body">
-                                <form id="assignRemoteEngineerForm">
+                                <form id="assignEngineerForm">
                                     @csrf
                                     <input type="hidden" name="service_request_id" value="{{ $request->id }}">
                                     <input type="hidden" name="service_type"

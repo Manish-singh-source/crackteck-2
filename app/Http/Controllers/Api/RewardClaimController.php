@@ -233,9 +233,9 @@ class RewardClaimController extends Controller
                 'used_count' => $coupon->used_count,
                 'usage_per_customer' => $coupon->usage_per_customer,
                 'status' => $coupon->status,
-                'applicable_categories' => $this->getApplicableCategoriesData($coupon),
-                'applicable_brands' => $this->getApplicableBrandsData($coupon),
-                'excluded_products' => $this->getExcludedProductsData($coupon),
+                // 'applicable_categories' => $this->getApplicableCategoriesData($coupon),
+                // 'applicable_brands' => $this->getApplicableBrandsData($coupon),
+                // 'excluded_products' => $this->getExcludedProductsData($coupon),
             ]
         ], 200);
     }

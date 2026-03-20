@@ -32,6 +32,79 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/custom.css') }}">
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/media.css') }}">
+    
+    <!-- Search Suggestions CSS -->
+    <style>
+        .search-fieldset {
+            position: relative !important;
+        }
+        .search-suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-top: none;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .search-suggestions-dropdown.show {
+            display: block;
+        }
+        .search-suggestion-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+        .search-suggestion-item:hover {
+            background-color: #f8f9fa;
+        }
+        .search-suggestion-item:last-child {
+            border-bottom: none;
+        }
+        .search-suggestion-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .search-suggestion-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .search-suggestion-name {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .search-suggestion-brand {
+            font-size: 12px;
+            color: #666;
+        }
+        .search-suggestion-price {
+            font-weight: 600;
+            color: #1987ff;
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+        .search-no-results {
+            padding: 15px;
+            text-align: center;
+            color: #666;
+        }
+    </style>
 
     @yield('style')
 
@@ -235,7 +308,7 @@
                         </div>
                         <div class="col-md-6 d-none d-md-block justify-content-center">
                             <div class="header-center justify-content-end">
-                                <form class="form-search-product style-3">
+                                <form class="form-search-product style-3" id="header-search-form" action="{{ route('shop') }}" method="GET">
                                     <div class="select-category" id="select-category-dropdown">
                                         {{-- <select name="product_cat" id="product_cat" class="dropdown_product_cat" style="display: none;">
                                             <option value="" selected="selected"> All Categories </option>
@@ -254,8 +327,9 @@
                                         </ul>
                                     </div>
                                     <span class="br-line type-vertical bg-line"></span>
-                                    <fieldset>
-                                        <input type="text" placeholder="Search for products">
+                                    <fieldset class="search-fieldset">
+                                        <input type="text" id="header-search-input" name="search" placeholder="Search for products" autocomplete="off">
+                                        <div id="search-suggestions" class="search-suggestions-dropdown"></div>
                                     </fieldset>
                                     <button type="submit" class="btn-submit-form">
                                         <!-- <i class="icon-search"></i> -->
@@ -2031,6 +2105,94 @@
         });
     </script>
 
+    <!-- Search Suggestions JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('header-search-input');
+            const suggestionsDropdown = document.getElementById('search-suggestions');
+            let searchTimeout = null;
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const query = e.target.value.trim();
+                    
+                    // Clear previous timeout
+                    if (searchTimeout) {
+                        clearTimeout(searchTimeout);
+                    }
+
+                    // Hide dropdown if query is empty
+                    if (query.length < 2) {
+                        suggestionsDropdown.classList.remove('show');
+                        suggestionsDropdown.innerHTML = '';
+                        return;
+                    }
+
+                    // Debounce the search request
+                    searchTimeout = setTimeout(function() {
+                        fetchSearchResults(query);
+                    }, 300);
+                });
+
+                // Hide dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!searchInput.contains(e.target) && !suggestionsDropdown.contains(e.target)) {
+                        suggestionsDropdown.classList.remove('show');
+                    }
+                });
+
+                // Show dropdown when focusing on search input with content
+                searchInput.addEventListener('focus', function() {
+                    if (searchInput.value.trim().length >= 2 && suggestionsDropdown.children.length > 0) {
+                        suggestionsDropdown.classList.add('show');
+                    }
+                });
+            }
+
+            function fetchSearchResults(query) {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                
+                fetch('{{ route("api.search.products") }}?q=' + encodeURIComponent(query), {
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    displaySuggestions(data);
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                });
+            }
+
+            function displaySuggestions(products) {
+                if (!products || products.length === 0) {
+                    suggestionsDropdown.innerHTML = '<div class="search-no-results">No products found</div>';
+                    suggestionsDropdown.classList.add('show');
+                    return;
+                }
+
+                let html = '';
+                products.forEach(function(product) {
+                    html += `
+                        <a href="${product.url}" class="search-suggestion-item">
+                            <img src="${product.image}" alt="${product.name}" class="search-suggestion-image">
+                            <div class="search-suggestion-info">
+                                <div class="search-suggestion-name">${product.name}</div>
+                                <div class="search-suggestion-brand">${product.brand ? product.brand : ''} ${product.category ? ' | ' + product.category : ''}</div>
+                            </div>
+                            <div class="search-suggestion-price">₹${parseFloat(product.price).toLocaleString('en-IN')}</div>
+                        </a>
+                    `;
+                });
+
+                suggestionsDropdown.innerHTML = html;
+                suggestionsDropdown.classList.add('show');
+            }
+        });
+    </script>
 </body>
 
 

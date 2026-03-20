@@ -57,6 +57,9 @@ Route::prefix('/')->group(function () {
     Route::get('/e-commerce/product/{id}', [FrontendEcommerceController::class, 'productDetail'])->name('ecommerce.product.detail');
     Route::get('/product-detail/{id}', [FrontendEcommerceController::class, 'productDetail'])->name('product.detail');
     Route::get('/product/get', [FrontendController::class, 'getProduct'])->name('product.get');
+    
+    // Product Search API Route
+    Route::get('/api/search/products', [FrontendEcommerceController::class, 'searchProducts'])->name('api.search.products');
 
     // Shop Filter API Routes
     Route::get('/api/shop/categories', [FrontendEcommerceController::class, 'getCategories'])->name('shop.categories');

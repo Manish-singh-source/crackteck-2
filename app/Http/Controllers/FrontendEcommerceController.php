@@ -57,6 +57,14 @@ class FrontendEcommerceController extends Controller
             });
         }
 
+        // Filter by search query
+        $searchQuery = $request->input('search', '');
+        if ($searchQuery) {
+            $productsQuery->whereHas('warehouseProduct', function ($query) use ($searchQuery) {
+                $query->where('product_name', 'like', '%' . $searchQuery . '%');
+            });
+        }
+
         $products = $productsQuery->paginate(12);
 
         $brands = Brand::where('status', 'active')
@@ -109,6 +117,42 @@ class FrontendEcommerceController extends Controller
             'relatedProducts',
             'productFeatures'
         ));
+    }
+
+    /**
+     * Search products for autocomplete suggestions
+     */
+    public function searchProducts(Request $request)
+    {
+        $searchTerm = $request->input('q', '');
+        
+        if (strlen($searchTerm) < 2) {
+            return response()->json([]);
+        }
+
+        $products = EcommerceProduct::with(['warehouseProduct.brand', 'warehouseProduct.parentCategorie'])
+            ->where('status', 'active')
+            ->whereHas('warehouseProduct', function ($query) use ($searchTerm) {
+                $query->where('product_name', 'like', '%' . $searchTerm . '%');
+            })
+            ->limit(10)
+            ->get();
+
+        $results = $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->warehouseProduct->product_name ?? 'N/A',
+                'brand' => $product->warehouseProduct->brand->name ?? '',
+                'category' => $product->warehouseProduct->parentCategorie->name ?? '',
+                'price' => $product->warehouseProduct->final_price ?? 0,
+                'image' => $product->warehouseProduct->main_product_image 
+                    ? asset($product->warehouseProduct->main_product_image) 
+                    : asset('frontend-assets/images/placeholder-product.png'),
+                'url' => route('ecommerce.product.detail', $product->id)
+            ];
+        });
+
+        return response()->json($results);
     }
 
     /**

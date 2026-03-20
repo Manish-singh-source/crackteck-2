@@ -29,7 +29,18 @@ class FrontendEcommerceController extends Controller
         // If category is selected, filter products by category
         $selectedCategory = null;
         if ($categorySlug) {
-            $selectedCategory = ParentCategory::where('slug', $categorySlug)->first();
+            // Check if it's a slug (string) or ID (numeric)
+            if (is_numeric($categorySlug)) {
+                $selectedCategory = ParentCategory::find($categorySlug);
+            } else {
+                $selectedCategory = ParentCategory::where('slug', $categorySlug)->first();
+            }
+        } elseif ($request->has('category')) {
+            // Also check for category ID in query parameter (from index page)
+            $categoryId = $request->input('category');
+            if (is_numeric($categoryId)) {
+                $selectedCategory = ParentCategory::find($categoryId);
+            }
         }
 
         $productsQuery = EcommerceProduct::with([

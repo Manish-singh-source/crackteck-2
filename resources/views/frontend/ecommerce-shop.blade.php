@@ -209,7 +209,8 @@
                                     @forelse($categories as $category)
                                         <fieldset class="fieldset-item">
                                             <input type="checkbox" name="category" class="tf-check category-filter"
-                                                id="category-{{ $category->id }}" value="{{ $category->id }}">
+                                                id="category-{{ $category->id }}" value="{{ $category->id }}"
+                                                {{ isset($selectedCategory) && $selectedCategory && $selectedCategory->id == $category->id ? 'checked' : '' }}>
                                             <label for="category-{{ $category->id }}">{{ $category->name }}</label>
                                         </fieldset>
                                     @empty
@@ -1085,6 +1086,27 @@
             let selectedDeal = null;
             let currentPage = 1;
 
+            // Check for category in URL query parameter (from index page category clicks)
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryFromUrl = urlParams.get('category');
+            if (categoryFromUrl) {
+                // Add category to selectedCategories array
+                selectedCategories.push(categoryFromUrl);
+                // Update the checkbox to checked state
+                $(`.category-filter[value="${categoryFromUrl}"]`).prop('checked', true);
+                // Show the meta filter section
+                $('.meta-filter-shop').show();
+                $('#remove-all').show();
+                // Update the filter tag display
+                const categoryLabel = $(`#category-${categoryFromUrl}`).next('label').text();
+                if (categoryLabel) {
+                    $('#applied-filters').append(`
+                        <span class="filter-tag">${categoryLabel}
+                            <span class="remove-tag icon-close" data-filter="category" data-value="${categoryFromUrl}"></span>
+                        </span>
+                    `);
+                }
+            }
 
             // Category filter change
             $('.category-filter').on('change', function() {

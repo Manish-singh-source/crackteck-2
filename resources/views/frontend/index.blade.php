@@ -11,7 +11,7 @@
                         @if (isset($categories) && $categories->count() > 0)
                             @foreach ($categories as $category)
                                 <div class="category-item swiper-slide">
-                                    <a href="{{ route('shop') }}?category={{ $category->id }}" class="hover-img"
+                                    <a href="{{ route('shop', ['category' => $category->slug]) }}" class="hover-img"
                                         style="text-decoration: none;">
                                         <img src="{{ $category->image ? asset($category->image) : asset('frontend-assets/images/new-products/default-category.png') }}"
                                             alt="{{ $category->name }}"

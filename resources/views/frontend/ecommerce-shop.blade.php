@@ -151,8 +151,25 @@
                     <i class="icon icon-arrow-right"></i>
                 </li>
                 <li>
+                    <a href="{{ route('shop') }}" class="body-small link">
+                        Shop
+                    </a>
+                </li>
+                @if(isset($selectedCategory) && $selectedCategory)
+                <li class="d-flex align-items-center">
+                    <i class="icon icon-arrow-right"></i>
+                </li>
+                <li>
+                    <span class="body-small">{{ $selectedCategory->name }}</span>
+                </li>
+                @else
+                <li class="d-flex align-items-center">
+                    <i class="icon icon-arrow-right"></i>
+                </li>
+                <li>
                     <span class="body-small">Product Grid</span>
                 </li>
+                @endif
             </ul>
         </div>
     </div>

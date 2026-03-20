@@ -14,16 +14,8 @@ class FrontendEcommerceController extends Controller
     /**
      * Display the e-commerce shop page with products from ecommerce_products table
      */
-    public function shop()
+    public function shop(Request $request, $categorySlug = null)
     {
-        $products = EcommerceProduct::with([
-            'warehouseProduct.brand',
-            'warehouseProduct.parentCategorie',
-            'warehouseProduct.subCategorie',
-        ])
-            ->where('status', 'active')
-            ->paginate(12);
-
         $categories = ParentCategory::where('status_ecommerce', 'active')
             ->whereHas('products', function ($query) {
                 $query->whereHas('ecommerceProduct', function ($q) {
@@ -32,7 +24,29 @@ class FrontendEcommerceController extends Controller
                 });
             })
             ->orderBy('sort_order', 'asc')
-            ->get(['id', 'name', 'image']);
+            ->get(['id', 'name', 'slug', 'image']);
+
+        // If category is selected, filter products by category
+        $selectedCategory = null;
+        if ($categorySlug) {
+            $selectedCategory = ParentCategory::where('slug', $categorySlug)->first();
+        }
+
+        $productsQuery = EcommerceProduct::with([
+            'warehouseProduct.brand',
+            'warehouseProduct.parentCategorie',
+            'warehouseProduct.subCategorie',
+        ])
+            ->where('status', 'active');
+
+        // Filter by category through warehouseProduct relationship
+        if ($selectedCategory) {
+            $productsQuery->whereHas('warehouseProduct', function ($query) use ($selectedCategory) {
+                $query->where('parent_category_id', $selectedCategory->id);
+            });
+        }
+
+        $products = $productsQuery->paginate(12);
 
         $brands = Brand::where('status', 'active')
             ->whereHas('products', function ($query) {
@@ -46,7 +60,7 @@ class FrontendEcommerceController extends Controller
 
         // dd($brands);
 
-        return view('frontend.ecommerce-shop', compact('products', 'categories', 'brands'));
+        return view('frontend.ecommerce-shop', compact('products', 'categories', 'brands', 'selectedCategory'));
     }
 
     /**

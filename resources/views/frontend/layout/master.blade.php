@@ -245,9 +245,9 @@
                                             @endforelse
                                         </select>
                                         <ul class="select-options">
-                                            <li class="link" rel=""><span> All Categories </span></li>
+                                            <li class="link" rel="" data-url="{{ route('shop') }}"><span> All Categories </span></li>
                                             @forelse($categories as $category)
-                                                <li class="link" rel="{{ $category->slug }}"><span> {{ $category->name }} </span></li>
+                                                <li class="link" rel="{{ $category->slug }}" data-url="{{ route('shop', $category->slug) }}"><span> {{ $category->name }} </span></li>
                                             @empty
                                             @endforelse
                                         </ul>
@@ -1591,6 +1591,27 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
+        });
+
+        // Handle category selection in search dropdown
+        $(document).ready(function() {
+            $('.select-options .link').on('click', function(e) {
+                e.preventDefault();
+                var url = $(this).data('url');
+                if (url) {
+                    window.location.href = url;
+                }
+            });
+
+            // Also handle select change
+            $('#product_cat').on('change', function() {
+                var slug = $(this).val();
+                if (slug) {
+                    window.location.href = '{{ route("shop") }}/' + slug;
+                } else {
+                    window.location.href = '{{ route("shop") }}';
+                }
+            });
         });
 
         // Global function to show notifications

@@ -53,7 +53,7 @@ Route::prefix('/')->group(function () {
     // })->name('shop');
 
     // E-commerce Routes
-    Route::get('/e-commerce/shop', [FrontendEcommerceController::class, 'shop'])->name('shop');
+    Route::get('/e-commerce/shop/{category?}', [FrontendEcommerceController::class, 'shop'])->name('shop');
     Route::get('/e-commerce/product/{id}', [FrontendEcommerceController::class, 'productDetail'])->name('ecommerce.product.detail');
     Route::get('/product-detail/{id}', [FrontendEcommerceController::class, 'productDetail'])->name('product.detail');
     Route::get('/product/get', [FrontendController::class, 'getProduct'])->name('product.get');

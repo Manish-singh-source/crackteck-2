@@ -68,7 +68,7 @@ class AppServiceProvider extends ServiceProvider
         View::composer('frontend.layout.master', function ($view) {
             $categories = ParentCategory::where('status', 'active')
                 ->orderBy('sort_order', 'asc')
-                ->get();
+                ->get(['id', 'name', 'slug', 'image']);
             $view->with('categories', $categories);
         });
     }

@@ -732,10 +732,10 @@
                                     </a>
                                     <div class="content">
                                         <h6 class="fw-normal">
-                                            {{-- <a href="{{ route('collection.details', $collection->id) }}" class="link">
+                                            <a href="{{ route('shop') }}?collection={{ $collection->id }}" class="link">
                                                 {{ $collection->name }}
-                                            </a> --}}
-                                            {{ $collection->name }}
+                                            </a>
+                                            {{-- {{ $collection->name }} --}}
                                         </h6>
                                         @if ($collection->description)
                                             <p class="text-muted small">{{ Str::limit($collection->description, 50) }}</p>

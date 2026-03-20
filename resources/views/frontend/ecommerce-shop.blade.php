@@ -155,7 +155,14 @@
                         Shop
                     </a>
                 </li>
-                @if(isset($selectedCategory) && $selectedCategory)
+                @if(isset($selectedCollection) && $selectedCollection)
+                <li class="d-flex align-items-center">
+                    <i class="icon icon-arrow-right"></i>
+                </li>
+                <li>
+                    <span class="body-small">{{ $selectedCollection->name }}</span>
+                </li>
+                @elseif(isset($selectedCategory) && $selectedCategory)
                 <li class="d-flex align-items-center">
                     <i class="icon icon-arrow-right"></i>
                 </li>
@@ -210,7 +217,7 @@
                                         <fieldset class="fieldset-item">
                                             <input type="checkbox" name="category" class="tf-check category-filter"
                                                 id="category-{{ $category->id }}" value="{{ $category->id }}"
-                                                {{ isset($selectedCategory) && $selectedCategory && $selectedCategory->id == $category->id ? 'checked' : '' }}>
+                                                {{ (isset($selectedCategory) && $selectedCategory && $selectedCategory->id == $category->id) || (isset($selectedCollectionCategories) && in_array($category->id, $selectedCollectionCategories)) ? 'checked' : '' }}>
                                             <label for="category-{{ $category->id }}">{{ $category->name }}</label>
                                         </fieldset>
                                     @empty
@@ -1105,6 +1112,25 @@
                             <span class="remove-tag icon-close" data-filter="category" data-value="${categoryFromUrl}"></span>
                         </span>
                     `);
+                }
+            }
+
+            // Check for collection in URL query parameter
+            const collectionFromUrl = urlParams.get('collection');
+            if (collectionFromUrl) {
+                // Get all checked category checkboxes (pre-checked by server)
+                $('.category-filter:checked').each(function() {
+                    const categoryId = $(this).val();
+                    if (!selectedCategories.includes(categoryId)) {
+                        selectedCategories.push(categoryId);
+                    }
+                });
+                // Show the meta filter section if there are categories selected
+                if (selectedCategories.length > 0) {
+                    $('.meta-filter-shop').show();
+                    $('#remove-all').show();
+                    // Update the filter display
+                    updateFilterMeta($('#gridLayout .card-product').length);
                 }
             }
 

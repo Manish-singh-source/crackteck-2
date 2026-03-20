@@ -56,4 +56,12 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'razorpay' => [
+        'key_id' => env('RAZORPAY_KEY_ID'),
+        'key_secret' => env('RAZORPAY_KEY_SECRET'),
+        'webhook_secret' => env('RAZORPAY_WEBHOOK_SECRET'),
+        'currency' => env('RAZORPAY_CURRENCY', 'INR'),
+        'auto_capture' => filter_var(env('RAZORPAY_AUTO_CAPTURE', true), FILTER_VALIDATE_BOOL),
+    ],
+
 ];

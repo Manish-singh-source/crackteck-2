@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Contracts\PaymentGatewayInterface;
 use App\Models\CouponUsage;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
@@ -11,10 +12,12 @@ use App\Observers\ServiceRequestObserver;
 use App\Observers\ServiceRequestProductObserver;
 use App\Observers\ServiceRequestProductRequestPartObserver;
 use App\Services\FirebaseStorageService;
+use App\Services\Payments\RazorpayGateway;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Pagination\Paginator;
+use Razorpay\Api\Api;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +30,15 @@ class AppServiceProvider extends ServiceProvider
             return new FirebaseStorageService;
         });
 
+        $this->app->singleton(Api::class, function () {
+            return new Api(
+                config('services.razorpay.key_id'),
+                config('services.razorpay.key_secret')
+            );
+        });
+
+        $this->app->bind(PaymentGatewayInterface::class, RazorpayGateway::class);
+
         $this->app->singleton('firebase.storage', function ($app) {
             return $app->make(FirebaseStorageService::class);
         });
@@ -37,7 +49,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Register observers
         ServiceRequest::observe(ServiceRequestObserver::class);
         ServiceRequestProduct::observe(ServiceRequestProductObserver::class);
         ServiceRequestProductRequestPart::observe(ServiceRequestProductRequestPartObserver::class);

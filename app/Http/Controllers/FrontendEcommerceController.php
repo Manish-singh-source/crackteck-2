@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use App\Models\Collection;
 use App\Models\EcommerceProduct;
 use App\Models\ParentCategory;
 use App\Models\Product;
@@ -14,16 +15,8 @@ class FrontendEcommerceController extends Controller
     /**
      * Display the e-commerce shop page with products from ecommerce_products table
      */
-    public function shop()
+    public function shop(Request $request, $categorySlug = null)
     {
-        $products = EcommerceProduct::with([
-            'warehouseProduct.brand',
-            'warehouseProduct.parentCategorie',
-            'warehouseProduct.subCategorie',
-        ])
-            ->where('status', 'active')
-            ->paginate(12);
-
         $categories = ParentCategory::where('status_ecommerce', 'active')
             ->whereHas('products', function ($query) {
                 $query->whereHas('ecommerceProduct', function ($q) {
@@ -32,7 +25,68 @@ class FrontendEcommerceController extends Controller
                 });
             })
             ->orderBy('sort_order', 'asc')
-            ->get(['id', 'name', 'image']);
+            ->get(['id', 'name', 'slug', 'image']);
+
+        // If category is selected, filter products by category
+        $selectedCategory = null;
+        $selectedCollection = null;
+        $selectedCollectionCategories = [];
+        
+        if ($categorySlug) {
+            // Check if it's a slug (string) or ID (numeric)
+            if (is_numeric($categorySlug)) {
+                $selectedCategory = ParentCategory::find($categorySlug);
+            } else {
+                $selectedCategory = ParentCategory::where('slug', $categorySlug)->first();
+            }
+        } elseif ($request->has('category')) {
+            // Also check for category ID in query parameter (from index page)
+            $categoryId = $request->input('category');
+            if (is_numeric($categoryId)) {
+                $selectedCategory = ParentCategory::find($categoryId);
+            }
+        }
+        
+        // Handle collection filtering - get categories from collection and filter products
+        $collectionId = $request->input('collection');
+        if ($collectionId) {
+            $selectedCollection = Collection::find($collectionId);
+            if ($selectedCollection) {
+                // Get all category IDs associated with this collection
+                $selectedCollectionCategories = $selectedCollection->categories()->pluck('parent_categories.id')->toArray();
+            }
+        }
+
+        $productsQuery = EcommerceProduct::with([
+            'warehouseProduct.brand',
+            'warehouseProduct.parentCategorie',
+            'warehouseProduct.subCategorie',
+        ])
+            ->where('status', 'active');
+
+        // Filter by category through warehouseProduct relationship
+        if ($selectedCategory) {
+            $productsQuery->whereHas('warehouseProduct', function ($query) use ($selectedCategory) {
+                $query->where('parent_category_id', $selectedCategory->id);
+            });
+        }
+        
+        // Filter by collection categories
+        if (!empty($selectedCollectionCategories)) {
+            $productsQuery->whereHas('warehouseProduct', function ($query) use ($selectedCollectionCategories) {
+                $query->whereIn('parent_category_id', $selectedCollectionCategories);
+            });
+        }
+
+        // Filter by search query
+        $searchQuery = $request->input('search', '');
+        if ($searchQuery) {
+            $productsQuery->whereHas('warehouseProduct', function ($query) use ($searchQuery) {
+                $query->where('product_name', 'like', '%' . $searchQuery . '%');
+            });
+        }
+
+        $products = $productsQuery->paginate(12);
 
         $brands = Brand::where('status', 'active')
             ->whereHas('products', function ($query) {
@@ -46,7 +100,7 @@ class FrontendEcommerceController extends Controller
 
         // dd($brands);
 
-        return view('frontend.ecommerce-shop', compact('products', 'categories', 'brands'));
+        return view('frontend.ecommerce-shop', compact('products', 'categories', 'brands', 'selectedCategory', 'selectedCollection', 'selectedCollectionCategories'));
     }
 
     /**
@@ -84,6 +138,42 @@ class FrontendEcommerceController extends Controller
             'relatedProducts',
             'productFeatures'
         ));
+    }
+
+    /**
+     * Search products for autocomplete suggestions
+     */
+    public function searchProducts(Request $request)
+    {
+        $searchTerm = $request->input('q', '');
+        
+        if (strlen($searchTerm) < 2) {
+            return response()->json([]);
+        }
+
+        $products = EcommerceProduct::with(['warehouseProduct.brand', 'warehouseProduct.parentCategorie'])
+            ->where('status', 'active')
+            ->whereHas('warehouseProduct', function ($query) use ($searchTerm) {
+                $query->where('product_name', 'like', '%' . $searchTerm . '%');
+            })
+            ->limit(10)
+            ->get();
+
+        $results = $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->warehouseProduct->product_name ?? 'N/A',
+                'brand' => $product->warehouseProduct->brand->name ?? '',
+                'category' => $product->warehouseProduct->parentCategorie->name ?? '',
+                'price' => $product->warehouseProduct->final_price ?? 0,
+                'image' => $product->warehouseProduct->main_product_image 
+                    ? asset($product->warehouseProduct->main_product_image) 
+                    : asset('frontend-assets/images/placeholder-product.png'),
+                'url' => route('ecommerce.product.detail', $product->id)
+            ];
+        });
+
+        return response()->json($results);
     }
 
     /**

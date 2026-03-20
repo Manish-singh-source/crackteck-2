@@ -32,6 +32,79 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/custom.css') }}">
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/media.css') }}">
+    
+    <!-- Search Suggestions CSS -->
+    <style>
+        .search-fieldset {
+            position: relative !important;
+        }
+        .search-suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-top: none;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .search-suggestions-dropdown.show {
+            display: block;
+        }
+        .search-suggestion-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+        .search-suggestion-item:hover {
+            background-color: #f8f9fa;
+        }
+        .search-suggestion-item:last-child {
+            border-bottom: none;
+        }
+        .search-suggestion-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .search-suggestion-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .search-suggestion-name {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .search-suggestion-brand {
+            font-size: 12px;
+            color: #666;
+        }
+        .search-suggestion-price {
+            font-weight: 600;
+            color: #1987ff;
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+        .search-no-results {
+            padding: 15px;
+            text-align: center;
+            color: #666;
+        }
+    </style>
 
     @yield('style')
 
@@ -209,134 +282,54 @@
                             <nav class="category-menu active-item">
                                 <div class="menu-category-menu-container">
                                     <ul id="primary-menu" class="megamenu">
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-clothing fs-20"></i> -->
-                                                <!-- <i class="fa-solid fa-laptop"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/ios-glyphs/30/1A1A1A/laptop.png"
-                                                    alt="laptop" />
-                                                <span>Laptops & Notebooks</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-computer-wifi fs-20"></i> -->
-                                                <!-- <i class="fa-solid fa-desktop"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/ios/50/1A1A1A/windows-client.png"
-                                                    alt="windows-client" />
-                                                <span>Desktops & All-in-One PCs</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-beauti fs-20"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/external-outline-lafs/64/1A1A1A/external-ic_components-dao-and-tocenomics-outline-lafs.png"
-                                                    alt="external-ic_components-dao-and-tocenomics-outline-lafs" />
-                                                <span>Computer Components</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-computer fs-20"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/external-konkapp-detailed-outline-konkapp/64/1A1A1A/external-monitor-cinema-konkapp-detailed-outline-konkapp.png"
-                                                    alt="external-monitor-cinema-konkapp-detailed-outline-konkapp" />
-                                                <span>Monitors</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-sofa fs-20"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/ios/50/1A1A1A/keyboard.png"
-                                                    alt="keyboard" />
-                                                <span>Peripherals & Accessories</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-computer-wifi fs-20"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/ios/50/1A1A1A/cloud-storage.png"
-                                                    alt="cloud-storage" />
-                                                <span>Storage Devices</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-machine fs-20"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/wired/64/1A1A1A/wifi-router.png"
-                                                    alt="wifi-router" />
-                                                <span>Networking Devices</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-jewelry fs-20"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/external-nawicon-detailed-outline-nawicon/64/1A1A1A/external-printer-internet-of-things-nawicon-detailed-outline-nawicon.png"
-                                                    alt="external-printer-internet-of-things-nawicon-detailed-outline-nawicon" />
-                                                <span>Printers & Scanners</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <i class="icon-tool fs-20"></i>
-                                                <span>Software</span>
-                                            </a>
-                                        </li>
-
+                                        @forelse($categories as $category)
+                                            <li class="menu-item">
+                                                <a href="{{ route('shop', ['category' => $category->slug]) }}">
+                                                    @if($category->image)
+                                                        <img width="50" height="50"
+                                                            src="{{ asset($category->image) }}"
+                                                            alt="{{ $category->name }}" />
+                                                    @else
+                                                        <i class="icon-tool fs-20"></i>
+                                                    @endif
+                                                    <span>{{ $category->name }}</span>
+                                                </a>
+                                            </li>
+                                        @empty
+                                            <li class="menu-item">
+                                                <a href="#">
+                                                    <span>No categories available</span>
+                                                </a>
+                                            </li>
+                                        @endforelse
                                     </ul>
                                 </div>
                             </nav>
                         </div>
                         <div class="col-md-6 d-none d-md-block justify-content-center">
                             <div class="header-center justify-content-end">
-                                <form class="form-search-product style-3">
-                                    <div class="select-category">
-                                        <select name="product_cat" id="product_cat" class="dropdown_product_cat">
+                                <form class="form-search-product style-3" id="header-search-form" action="{{ route('shop') }}" method="GET">
+                                    <div class="select-category" id="select-category-dropdown">
+                                        {{-- <select name="product_cat" id="product_cat" class="dropdown_product_cat" style="display: none;">
                                             <option value="" selected="selected"> All Categories </option>
-                                            <option class="level-0" value="apple-products"> Product XYZ </option>
-                                            <option class="level-0" value="Product 1-equipments"> Product XYZ
-                                            </option>
-                                            <option class="level-0" value="camera-video"> Product XYZ </option>
-                                            <option class="level-0" value="game-room-furniture"> Product XYZ </option>
-                                            <option class="level-0" value="gaming-accessories"> Product XYZ </option>
-                                            <option class="level-0" value="headphone"> Product XYZ </option>
-                                            <option class="level-0" value="laptop-tablet"> Product XYZ </option>
-                                            <option class="level-0" value="server-workstation"> Product XYZ </option>
-                                            <option class="level-0" value="smartphone"> Product XYZ </option>
-                                            <option class="level-0" value="smartwatch"> Product XYZ </option>
-                                            <option class="level-0" value="storage-digital-devices"> Product XYZ
-                                            </option>
-                                        </select>
+                                            @forelse($categories as $category)
+                                            <option class="level-0" value="{{ $category->slug }}">{{ $category->name }}</option>
+                                            @empty
+                                            @endforelse
+                                        </select> --}}
+                                        <option value="" selected="selected"> All Categories </option>
                                         <ul class="select-options">
-                                            <li class="link" rel=""><span> All Categories </span></li>
-                                            <li class="link" rel="apple-products"><span> Product XYZ </span> </li>
-                                            <li class="link" rel="Product 1-equipments"><span> Product XYZ </span>
-                                            </li>
-                                            <li class="link" rel="camera-video"><span></span> Product XYZ </li>
-                                            <li class="link" rel="game-room-furniture"><span> Product XYZ </span>
-                                            </li>
-                                            <li class="link" rel="gaming-accessories"><span> Product XYZ </span>
-                                            </li>
-                                            <li class="link" rel="headphone"><span> Product XYZ </span></li>
-                                            <li class="link" rel="laptop-tablet"><span> Product XYZ </span></li>
-                                            <li class="link" rel="server-workstation"><span></span>
-                                            </li>
-                                            <li class="link" rel="smartphone"><span> Product XYZ </span></li>
-                                            <li class="link" rel="smartwatch"><span> Product XYZ </span></li>
-                                            <li class="link" rel="storage-digital-devices"><span> Product XYZ
-                                                </span></li>
+                                            <li class="link" rel="" data-url="{{ route('shop') }}"><span> All Categories </span></li>
+                                            @forelse($categories as $category)
+                                                <li class="link" rel="{{ $category->slug }}" data-url="{{ route('shop', $category->slug) }}"><span> {{ $category->name }} </span></li>
+                                            @empty
+                                            @endforelse
                                         </ul>
                                     </div>
                                     <span class="br-line type-vertical bg-line"></span>
-                                    <fieldset>
-                                        <input type="text" placeholder="Search for products">
+                                    <fieldset class="search-fieldset">
+                                        <input type="text" id="header-search-input" name="search" placeholder="Search for products" autocomplete="off">
+                                        <div id="search-suggestions" class="search-suggestions-dropdown"></div>
                                     </fieldset>
                                     <button type="submit" class="btn-submit-form">
                                         <!-- <i class="icon-search"></i> -->
@@ -491,17 +484,18 @@
                                     <h6 class="ft-heading footer-heading-mobile fw-semibold">Popular categories</h6>
                                     <div class="tf-collapse-content">
                                         <ul class="ft-menu-list">
-                                            <li><a href="{{ route('shop') }}" class="link">Laptops & Notebooks</a>
-                                            </li>
-                                            <li><a href="{{ route('shop') }}" class="link">Desktops & All-in-One
-                                                    PCs</a></li>
-                                            <li><a href="{{ route('shop') }}" class="link">Computer Components</a>
-                                            </li>
+                                            {{-- @forelse($categories as $category)
+                                                <li><a href="{{ route('shop', ['category' => $category->slug]) }}" class="link">{{ $category->name }}</a></li>
+                                            @empty
+                                                <li><a href="{{ route('shop') }}" class="link">No categories available</a></li>
+                                            @endforelse --}}
+                                            <li><a href="{{ route('shop') }}" class="link">Laptops & Notebooks</a></li>
+                                            <li><a href="{{ route('shop') }}" class="link">Desktops & All-in-One PCs</a></li>
+                                            <li><a href="{{ route('shop') }}" class="link">Computer Components</a></li>
                                             {{-- <li><a href="{{ route('shop') }}" class="link">Monitors</a></li>  --}}
                                             {{-- <li><a href="{{ route('shop') }}" class="link">Peripherals & Accessories</a></li>  --}}
                                             <li><a href="{{ route('shop') }}" class="link">Storage Devices</a></li>
-                                            <li><a href="{{ route('shop') }}" class="link">Networking Devices</a>
-                                            </li>
+                                            <li><a href="{{ route('shop') }}" class="link">Networking Devices</a></li>
                                             {{-- <li><a href="{{ route('shop') }}" class="link">Software</a></li>  --}}
                                         </ul>
                                     </div>
@@ -1674,6 +1668,38 @@
             }
         });
 
+        // Handle category selection in search dropdown
+        $(document).ready(function() {
+            // Handle click on category items in select-options dropdown
+            $(document).on('click', '.select-options .link', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var url = $(this).data('url');
+                if (url) {
+                    window.location.href = url;
+                }
+            });
+
+            // Make select-options visible on hover/focus of the select-category container
+            $('#select-category-dropdown').on('mouseenter', function() {
+                $(this).find('.select-options').css('display', 'block');
+            });
+            
+            $('#select-category-dropdown').on('mouseleave', function() {
+                $(this).find('.select-options').css('display', 'none');
+            });
+
+            // Also handle select change
+            $('#product_cat').on('change', function() {
+                var slug = $(this).val();
+                if (slug) {
+                    window.location.href = '{{ route("shop") }}/' + slug;
+                } else {
+                    window.location.href = '{{ route("shop") }}';
+                }
+            });
+        });
+
         // Global function to show notifications
         function showNotification(message, type) {
             // Create notification element
@@ -2079,6 +2105,94 @@
         });
     </script>
 
+    <!-- Search Suggestions JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('header-search-input');
+            const suggestionsDropdown = document.getElementById('search-suggestions');
+            let searchTimeout = null;
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const query = e.target.value.trim();
+                    
+                    // Clear previous timeout
+                    if (searchTimeout) {
+                        clearTimeout(searchTimeout);
+                    }
+
+                    // Hide dropdown if query is empty
+                    if (query.length < 2) {
+                        suggestionsDropdown.classList.remove('show');
+                        suggestionsDropdown.innerHTML = '';
+                        return;
+                    }
+
+                    // Debounce the search request
+                    searchTimeout = setTimeout(function() {
+                        fetchSearchResults(query);
+                    }, 300);
+                });
+
+                // Hide dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!searchInput.contains(e.target) && !suggestionsDropdown.contains(e.target)) {
+                        suggestionsDropdown.classList.remove('show');
+                    }
+                });
+
+                // Show dropdown when focusing on search input with content
+                searchInput.addEventListener('focus', function() {
+                    if (searchInput.value.trim().length >= 2 && suggestionsDropdown.children.length > 0) {
+                        suggestionsDropdown.classList.add('show');
+                    }
+                });
+            }
+
+            function fetchSearchResults(query) {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                
+                fetch('{{ route("api.search.products") }}?q=' + encodeURIComponent(query), {
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    displaySuggestions(data);
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                });
+            }
+
+            function displaySuggestions(products) {
+                if (!products || products.length === 0) {
+                    suggestionsDropdown.innerHTML = '<div class="search-no-results">No products found</div>';
+                    suggestionsDropdown.classList.add('show');
+                    return;
+                }
+
+                let html = '';
+                products.forEach(function(product) {
+                    html += `
+                        <a href="${product.url}" class="search-suggestion-item">
+                            <img src="${product.image}" alt="${product.name}" class="search-suggestion-image">
+                            <div class="search-suggestion-info">
+                                <div class="search-suggestion-name">${product.name}</div>
+                                <div class="search-suggestion-brand">${product.brand ? product.brand : ''} ${product.category ? ' | ' + product.category : ''}</div>
+                            </div>
+                            <div class="search-suggestion-price">₹${parseFloat(product.price).toLocaleString('en-IN')}</div>
+                        </a>
+                    `;
+                });
+
+                suggestionsDropdown.innerHTML = html;
+                suggestionsDropdown.classList.add('show');
+            }
+        });
+    </script>
 </body>
 
 

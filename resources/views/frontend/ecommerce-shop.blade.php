@@ -151,8 +151,32 @@
                     <i class="icon icon-arrow-right"></i>
                 </li>
                 <li>
+                    <a href="{{ route('shop') }}" class="body-small link">
+                        Shop
+                    </a>
+                </li>
+                @if(isset($selectedCollection) && $selectedCollection)
+                <li class="d-flex align-items-center">
+                    <i class="icon icon-arrow-right"></i>
+                </li>
+                <li>
+                    <span class="body-small">{{ $selectedCollection->name }}</span>
+                </li>
+                @elseif(isset($selectedCategory) && $selectedCategory)
+                <li class="d-flex align-items-center">
+                    <i class="icon icon-arrow-right"></i>
+                </li>
+                <li>
+                    <span class="body-small">{{ $selectedCategory->name }}</span>
+                </li>
+                @else
+                <li class="d-flex align-items-center">
+                    <i class="icon icon-arrow-right"></i>
+                </li>
+                <li>
                     <span class="body-small">Product Grid</span>
                 </li>
+                @endif
             </ul>
         </div>
     </div>
@@ -192,7 +216,8 @@
                                     @forelse($categories as $category)
                                         <fieldset class="fieldset-item">
                                             <input type="checkbox" name="category" class="tf-check category-filter"
-                                                id="category-{{ $category->id }}" value="{{ $category->id }}">
+                                                id="category-{{ $category->id }}" value="{{ $category->id }}"
+                                                {{ (isset($selectedCategory) && $selectedCategory && $selectedCategory->id == $category->id) || (isset($selectedCollectionCategories) && in_array($category->id, $selectedCollectionCategories)) ? 'checked' : '' }}>
                                             <label for="category-{{ $category->id }}">{{ $category->name }}</label>
                                         </fieldset>
                                     @empty
@@ -1068,6 +1093,46 @@
             let selectedDeal = null;
             let currentPage = 1;
 
+            // Check for category in URL query parameter (from index page category clicks)
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryFromUrl = urlParams.get('category');
+            if (categoryFromUrl) {
+                // Add category to selectedCategories array
+                selectedCategories.push(categoryFromUrl);
+                // Update the checkbox to checked state
+                $(`.category-filter[value="${categoryFromUrl}"]`).prop('checked', true);
+                // Show the meta filter section
+                $('.meta-filter-shop').show();
+                $('#remove-all').show();
+                // Update the filter tag display
+                const categoryLabel = $(`#category-${categoryFromUrl}`).next('label').text();
+                if (categoryLabel) {
+                    $('#applied-filters').append(`
+                        <span class="filter-tag">${categoryLabel}
+                            <span class="remove-tag icon-close" data-filter="category" data-value="${categoryFromUrl}"></span>
+                        </span>
+                    `);
+                }
+            }
+
+            // Check for collection in URL query parameter
+            const collectionFromUrl = urlParams.get('collection');
+            if (collectionFromUrl) {
+                // Get all checked category checkboxes (pre-checked by server)
+                $('.category-filter:checked').each(function() {
+                    const categoryId = $(this).val();
+                    if (!selectedCategories.includes(categoryId)) {
+                        selectedCategories.push(categoryId);
+                    }
+                });
+                // Show the meta filter section if there are categories selected
+                if (selectedCategories.length > 0) {
+                    $('.meta-filter-shop').show();
+                    $('#remove-all').show();
+                    // Update the filter display
+                    updateFilterMeta($('#gridLayout .card-product').length);
+                }
+            }
 
             // Category filter change
             $('.category-filter').on('change', function() {

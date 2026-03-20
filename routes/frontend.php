@@ -53,10 +53,13 @@ Route::prefix('/')->group(function () {
     // })->name('shop');
 
     // E-commerce Routes
-    Route::get('/e-commerce/shop', [FrontendEcommerceController::class, 'shop'])->name('shop');
+    Route::get('/e-commerce/shop/{category?}', [FrontendEcommerceController::class, 'shop'])->name('shop');
     Route::get('/e-commerce/product/{id}', [FrontendEcommerceController::class, 'productDetail'])->name('ecommerce.product.detail');
     Route::get('/product-detail/{id}', [FrontendEcommerceController::class, 'productDetail'])->name('product.detail');
     Route::get('/product/get', [FrontendController::class, 'getProduct'])->name('product.get');
+    
+    // Product Search API Route
+    Route::get('/api/search/products', [FrontendEcommerceController::class, 'searchProducts'])->name('api.search.products');
 
     // Shop Filter API Routes
     Route::get('/api/shop/categories', [FrontendEcommerceController::class, 'getCategories'])->name('shop.categories');

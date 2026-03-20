@@ -69,6 +69,7 @@ send invoice for customer
 quotation invoice 
 
 
+Date: 19-March-2026
 Todays Tasks:
 
 #Roshan 
@@ -100,7 +101,27 @@ Todays Tasks:
 3. Cash On Delivery APIs for e-commerce and services 
 
 
+Date: 20-March-2026
+
+Todays Tasks:
+
+#Roshan 
+
+1. SK International changes 
+2. Home Page categories filter feature in crackteck
 
 
+#Saurabh 
 
+Crackteck: 
 
+1. Razorpay payment APIs setup and integration for e-commerce order 
+2. App Testing and solving if any error occurred
+
+#Shubham 
+
+1. My CRM Screens Profile, Clients and Staffs
+
+#Pradnya 
+
+ Home page , about page and career page final changes and update online

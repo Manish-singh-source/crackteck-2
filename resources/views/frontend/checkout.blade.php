@@ -2,63 +2,63 @@
 
 <style>
     /* Coupon Wrapper */
-.coupon-box {
-    width: 100%;
-}
-
-/* Input + Button Row */
-.coupon-input-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* Input */
-.coupon-input {
-    flex: 1;
-    height: 45px;
-    border-radius: 8px;
-    padding: 0 12px;
-    font-size: 14px;
-}
-
-/* Button */
-.coupon-btn {
-    height: 45px;
-    padding: 0 18px;
-    border-radius: 8px;
-    white-space: nowrap;
-}
-
-/* Success Section */
-.coupon-success {
-    margin-top: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #f0fff4;
-    border: 1px solid #c6f6d5;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-}
-
-/* Mobile Responsive */
-@media (max-width: 576px) {
-    .coupon-input-group {
-        flex-direction: column;
-    }
-
-    .coupon-btn {
+    .coupon-box {
         width: 100%;
     }
 
-    .coupon-success {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
+    /* Input + Button Row */
+    .coupon-input-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
-}
+
+    /* Input */
+    .coupon-input {
+        flex: 1;
+        height: 45px;
+        border-radius: 8px;
+        padding: 0 12px;
+        font-size: 14px;
+    }
+
+    /* Button */
+    .coupon-btn {
+        height: 45px;
+        padding: 0 18px;
+        border-radius: 8px;
+        white-space: nowrap;
+    }
+
+    /* Success Section */
+    .coupon-success {
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f0fff4;
+        border: 1px solid #c6f6d5;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 576px) {
+        .coupon-input-group {
+            flex-direction: column;
+        }
+
+        .coupon-btn {
+            width: 100%;
+        }
+
+        .coupon-success {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+    }
 </style>
 
 @section('main-content')
@@ -312,40 +312,14 @@
                             <h5 class="title fw-semibold">Payment Method</h5>
                             <div class="form-payment">
                                 <div class="payment-box" id="payment-box">
-                                    <!-- Mastercard Payment -->
-                                    <div class="payment-item payment-choose-card">
-                                        <label for="credit-card-method" class="payment-header" data-bs-toggle="collapse"
-                                            data-bs-target="#credit-card-payment" aria-controls="credit-card-payment"
-                                            aria-expanded="false">
+                                    <!-- Razorpay Payment -->
+                                    <div class="payment-item">
+                                        <label for="credit-card-method" class="payment-header radio-item">
                                             <input type="radio" name="payment_method" value="mastercard"
                                                 class="tf-check-rounded" id="credit-card-method">
-                                            <span class="body-md-2 fw-semibold">Mastercard</span>
+                                            <span class="body-text-3">Pay Online with Razorpay</span>
                                         </label>
-                                        <div id="credit-card-payment" class="collapse" data-bs-parent="#payment-box">
-                                            <div class="payment-body">
-                                                <fieldset>
-                                                    <label>Credit Card number</label>
-                                                    <input type="text" name="card_number" class="number-credit-card"
-                                                        placeholder="1234 5678 9012 3456" maxlength="19">
-                                                </fieldset>
-                                                <div class="cols">
-                                                    <fieldset>
-                                                        <label>Expiration date</label>
-                                                        <input type="text" name="card_expiry" placeholder="MM/YY"
-                                                            maxlength="5">
-                                                    </fieldset>
-                                                    <fieldset>
-                                                        <label>CVV</label>
-                                                        <input type="text" name="card_cvv" placeholder="123"
-                                                            maxlength="4">
-                                                    </fieldset>
-                                                </div>
-                                                <fieldset>
-                                                    <label>Name on card</label>
-                                                    <input type="text" name="card_name" placeholder="e.g. JOHN DOE">
-                                                </fieldset>
-                                            </div>
-                                        </div>
+                                        <p class="caption text-main-2 font-2 ps-4 mb-0">Cards, UPI, netbanking and wallets are available in the Razorpay popup.</p>
                                     </div>
 
                                     <!-- Cash on Delivery -->
@@ -562,9 +536,7 @@
                         </ul>
                     </div>
                 </div>
-        </div>
-        </form>
-        </div>
+            </form>
         </div>
     </section>
     <!-- /Check Out Cart -->
@@ -583,13 +555,161 @@
 @endsection
 
 @section('script')
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         $(document).ready(function() {
-            // Previous address selection
+            const checkoutForm = $('#checkout-form');
+            const checkoutMessages = $('#checkout-messages');
+            const errorMessage = $('#error-message');
+            const successMessage = $('#success-message');
+            const loadingOverlay = $('#loading-overlay');
+            const placeOrderButton = $('#place-order-btn');
+            const razorpayOrderRouteTemplate = @json(route('checkout.razorpay.order', ['order' => '__ORDER_ID__']));
+            const razorpayVerifyRoute = @json(route('checkout.razorpay.verify'));
+            const csrfToken = @json(csrf_token());
+
+            function setLoadingState(isLoading) {
+                loadingOverlay.toggle(isLoading);
+                placeOrderButton.prop('disabled', isLoading);
+            }
+
+            function resetCheckoutMessages() {
+                checkoutMessages.hide();
+                errorMessage.hide().html('');
+                successMessage.hide().text('');
+            }
+
+            function showCheckoutError(message) {
+                errorMessage.html(message).show();
+                checkoutMessages.show();
+            }
+
+            function showCheckoutSuccess(message) {
+                successMessage.text(message).show();
+                checkoutMessages.show();
+            }
+
+            function buildErrorMessage(xhr, fallbackMessage) {
+                let message = fallbackMessage;
+
+                if (xhr.responseJSON) {
+                    if (xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    }
+
+                    if (xhr.responseJSON.error) {
+                        message = xhr.responseJSON.error;
+                    }
+
+                    if (xhr.responseJSON.errors) {
+                        message = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                    }
+                } else if (xhr.responseText) {
+                    message = xhr.responseText;
+                }
+
+                return message;
+            }
+
+            function redirectToOrderDetails(url) {
+                if (url) {
+                    window.location.href = url;
+                }
+            }
+
+            function createRazorpayOrder(orderId) {
+                return $.ajax({
+                    url: razorpayOrderRouteTemplate.replace('__ORDER_ID__', orderId),
+                    method: 'POST',
+                    data: {
+                        _token: csrfToken
+                    }
+                });
+            }
+
+            function verifyRazorpayPayment(payload) {
+                return $.ajax({
+                    url: razorpayVerifyRoute,
+                    method: 'POST',
+                    data: {
+                        _token: csrfToken,
+                        order_id: payload.order_id,
+                        razorpay_order_id: payload.razorpay_order_id,
+                        razorpay_payment_id: payload.razorpay_payment_id,
+                        razorpay_signature: payload.razorpay_signature
+                    }
+                });
+            }
+
+            function openRazorpayCheckout(orderResponse, checkoutResponse) {
+                const shippingFirstName = $('input[name="shipping_first_name"]').val() || '';
+                const shippingLastName = $('input[name="shipping_last_name"]').val() || '';
+                const shippingPhone = $('input[name="shipping_phone"]').val() || '';
+                const customerEmail = $('input[name="email"]').val() || '';
+                const fullName = [shippingFirstName, shippingLastName].join(' ').trim();
+                const razorpayData = orderResponse.data.razorpay;
+
+                const options = {
+                    key: razorpayData.key_id,
+                    amount: razorpayData.amount,
+                    currency: razorpayData.currency,
+                    name: 'Crackteck',
+                    description: 'Order #' + checkoutResponse.order_number,
+                    order_id: razorpayData.order_id,
+                    handler: function(response) {
+                        setLoadingState(true);
+
+                        verifyRazorpayPayment({
+                            order_id: checkoutResponse.order_id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        }).done(function(verificationResponse) {
+                            if (verificationResponse.success) {
+                                showCheckoutSuccess(verificationResponse.message || 'Payment verified successfully.');
+                                redirectToOrderDetails(verificationResponse.data?.redirect || checkoutResponse.redirect);
+                                return;
+                            }
+
+                            showCheckoutError(verificationResponse.message || 'Payment verification failed.');
+                        }).fail(function(xhr) {
+                            showCheckoutError(buildErrorMessage(xhr,
+                                'Payment verification failed. Please contact support if the amount was debited.'));
+                        }).always(function() {
+                            setLoadingState(false);
+                        });
+                    },
+                    prefill: {
+                        name: fullName,
+                        email: customerEmail,
+                        contact: shippingPhone
+                    },
+                    theme: {
+                        color: '#0d6efd'
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            setLoadingState(false);
+                            showCheckoutError(
+                                'Payment was not completed. Your order is created in pending state; you can retry the payment from the order details page.'
+                            );
+                        }
+                    }
+                };
+
+                const razorpay = new Razorpay(options);
+                razorpay.on('payment.failed', function(response) {
+                    setLoadingState(false);
+                    const failureMessage = response.error && response.error.description ? response.error.description :
+                        'Payment failed. Please try again.';
+                    showCheckoutError(failureMessage);
+                });
+                razorpay.open();
+            }
+
             $('#previous-address-select').on('change', function() {
                 const selectedOption = $(this).find('option:selected');
                 if (selectedOption.val()) {
-                    // Fill shipping address fields
                     $('input[name="shipping_first_name"]').val(selectedOption.data('first-name'));
                     $('input[name="shipping_last_name"]').val(selectedOption.data('last-name'));
                     $('select[name="shipping_country"]').val(selectedOption.data('country'));
@@ -602,7 +722,6 @@
                 }
             });
 
-            // Billing same as shipping toggle
             $('#billing-same-as-shipping').on('change', function() {
                 const billingForm = $('#billing-address-form');
                 const billingInputs = billingForm.find('input, select');
@@ -610,7 +729,6 @@
                 if ($(this).is(':checked')) {
                     billingForm.hide();
                     billingInputs.prop('required', false);
-                    // Copy shipping data to billing fields (for form submission)
                     copyShippingToBilling();
                 } else {
                     billingForm.show();
@@ -620,7 +738,6 @@
                 }
             });
 
-            // Function to copy shipping address to billing address
             function copyShippingToBilling() {
                 $('input[name="billing_first_name"]').val($('input[name="shipping_first_name"]').val());
                 $('input[name="billing_last_name"]').val($('input[name="shipping_last_name"]').val());
@@ -633,51 +750,12 @@
                 $('input[name="billing_phone"]').val($('input[name="shipping_phone"]').val());
             }
 
-            // Copy shipping to billing when shipping fields change (if checkbox is checked)
             $('input[name^="shipping_"], select[name^="shipping_"]').on('input change', function() {
                 if ($('#billing-same-as-shipping').is(':checked')) {
                     copyShippingToBilling();
                 }
             });
 
-            // Payment method toggle
-            $('input[name="payment_method"]').on('change', function() {
-                const cardFields = $('#credit-card-payment');
-                const cardInputs = cardFields.find('input');
-
-                if ($(this).val() === 'mastercard') {
-                    cardFields.collapse('show');
-                    cardInputs.prop('required', true);
-                } else {
-                    cardFields.collapse('hide');
-                    cardInputs.prop('required', false);
-                }
-            });
-
-            // Credit card number formatting
-            $('input[name="card_number"]').on('input', function() {
-                let value = $(this).val().replace(/\s/g, '').replace(/[^0-9]/gi, '');
-                let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-                if (formattedValue.length > 19) formattedValue = formattedValue.substr(0, 19);
-                $(this).val(formattedValue);
-            });
-
-            // Card expiry formatting
-            $('input[name="card_expiry"]').on('input', function() {
-                let value = $(this).val().replace(/\D/g, '');
-                if (value.length >= 2) {
-                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
-                }
-                $(this).val(value);
-            });
-
-            // CVV formatting
-            $('input[name="card_cvv"]').on('input', function() {
-                let value = $(this).val().replace(/\D/g, '');
-                $(this).val(value);
-            });
-
-            // Coupon functionality
             $('#apply_coupon').on('click', function() {
                 const couponCode = $('#coupon_code').val().trim();
                 if (!couponCode) {
@@ -698,7 +776,6 @@
                     success: function(response) {
                         if (response.success) {
                             showCouponMessage(response.message, 'success');
-                            // Reload page to update totals
                             setTimeout(function() {
                                 window.location.reload();
                             }, 1000);
@@ -707,11 +784,11 @@
                         }
                     },
                     error: function(xhr) {
-                        let errorMessage = 'Error applying coupon. Please try again.';
+                        let couponErrorMessage = 'Error applying coupon. Please try again.';
                         if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
+                            couponErrorMessage = xhr.responseJSON.message;
                         }
-                        showCouponMessage(errorMessage, 'error');
+                        showCouponMessage(couponErrorMessage, 'error');
                     }
                 });
             });
@@ -726,7 +803,6 @@
                     success: function(response) {
                         if (response.success) {
                             showCouponMessage(response.message, 'success');
-                            // Reload page to update totals
                             setTimeout(function() {
                                 window.location.reload();
                             }, 1000);
@@ -734,7 +810,7 @@
                             showCouponMessage(response.message, 'error');
                         }
                     },
-                    error: function(xhr) {
+                    error: function() {
                         showCouponMessage('Error removing coupon. Please try again.', 'error');
                     }
                 });
@@ -752,73 +828,61 @@
                 }, 5000);
             }
 
-            // Form submission
-            $('#checkout-form').on('submit', function(e) {
+            checkoutForm.on('submit', function(e) {
                 e.preventDefault();
-
-                // Show loading
-                // $('#loading-overlay').show();
-                // $('#place-order-btn').prop('disabled', true);
-
-                // Hide previous messages
-                $('#checkout-messages').hide();
-                $('#error-message, #success-message').hide();
+                resetCheckoutMessages();
+                setLoadingState(true);
 
                 $.ajax({
                     url: '{{ route('checkout.store') }}',
                     method: 'POST',
-                    data: $(this).serialize(),
+                    data: checkoutForm.serialize(),
                     success: function(response) {
-                        console.log(response);
-                        if (response.success) {
-                            console.log(response);
-                            alert(response.message);
-                            $('#success-message').text(response.message).show();
-                            $('#checkout-messages').show();
-
-                            // Redirect to order details
-                            if (response.redirect) {
-                                setTimeout(function() {
-                                    window.location.href = response.redirect;
-                                }, 2000);
-                            }
-                        } else {
-                            alert(response.error);
-                            console.log(response);
-                            $('#error-message').text(response.message || 'An error occurred')
-                                .show();
-                            $('#checkout-messages').show();
+                        if (!response.success) {
+                            setLoadingState(false);
+                            showCheckoutError(response.message || 'An error occurred while processing your order.');
+                            return;
                         }
+
+                        if (response.payment_method === 'mastercard') {
+                            createRazorpayOrder(response.order_id).done(function(orderResponse) {
+                                if (!orderResponse.success) {
+                                    showCheckoutError(orderResponse.message ||
+                                        'Unable to initialize Razorpay payment.');
+                                    setLoadingState(false);
+                                    return;
+                                }
+
+                                setLoadingState(false);
+                                showCheckoutSuccess(response.message);
+                                openRazorpayCheckout(orderResponse, response);
+                            }).fail(function(xhr) {
+                                showCheckoutError(buildErrorMessage(xhr,
+                                    'Unable to initialize Razorpay payment. Please try again.'));
+                                setLoadingState(false);
+                            });
+
+                            return;
+                        }
+
+                        showCheckoutSuccess(response.message);
+                        setTimeout(function() {
+                            redirectToOrderDetails(response.redirect);
+                        }, 1200);
                     },
                     error: function(xhr) {
-                        let errorMessage = 'An error occurred while processing your order.';
-
-                        if (xhr.responseJSON) {
-                            if (xhr.responseJSON.message) {
-                                errorMessage = xhr.responseJSON.message;
-                            }
-
-                            if (xhr.responseJSON.errors) {
-                                const errors = Object.values(xhr.responseJSON.errors).flat();
-                                errorMessage = errors.join('<br>');
-                            }
-                        } else if (xhr.responseText) {
-                            // sometimes server sends plain text or html
-                            errorMessage = xhr.responseText;
-                        }
-
-                        console.log('AJAX ERROR:', xhr.responseJSON);
-                        alert(errorMessage);
-
-                        $('#error-message').html(errorMessage).show();
-                        $('#checkout-messages').show();
+                        setLoadingState(false);
+                        showCheckoutError(buildErrorMessage(xhr,
+                            'An error occurred while processing your order.'));
                     },
                     complete: function() {
-                        $('#loading-overlay').hide();
-                        $('#place-order-btn').prop('disabled', false);
+                        setLoadingState(false);
                     }
                 });
             });
         });
     </script>
 @endsection
+
+
+

@@ -346,7 +346,6 @@ class FrontendController extends Controller
      */
     public function submitAmcRequest(Request $request)
     {
-        // dd($request->all());
         $validator = Validator::make($request->all(), [
             // Step 1: Customer Details
             'first_name' => 'required|string|max:255',

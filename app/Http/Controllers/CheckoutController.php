@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreatePaymentOrderAction;
+use App\Actions\VerifyCheckoutSignatureAction;
 use App\Models\Cart;
 use App\Models\Coupon;
 use App\Models\CustomerAddressDetail;
@@ -10,6 +12,7 @@ use App\Models\InventoryUpdateLog;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderPayment;
+use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ReturnOrder;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -278,17 +281,17 @@ class CheckoutController extends Controller
             $order = $this->createOrder($validated, $totals, $checkoutData['source'], $checkoutData);
 
             // Create payment record
-            $paymentStatus = $validated['payment_method'] === 'cod' ? 'pending' : 'completed';
+            $isCashOnDelivery = $validated['payment_method'] === 'cod';
             OrderPayment::create([
                 'order_id' => $order->id,
                 'payment_id' => 'PMT-'.strtoupper(uniqid()),
-                'transaction_id' => 'TXN-'.strtoupper(uniqid()),
-                'payment_method' => $validated['payment_method'] === 'cod' ? 'cod' : 'online',
-                'payment_gateway' => $validated['payment_method'] === 'cod' ? 'cod' : 'phonepe',
+                'transaction_id' => $isCashOnDelivery ? 'TXN-'.strtoupper(uniqid()) : null,
+                'payment_method' => $isCashOnDelivery ? 'cod' : 'online',
+                'payment_gateway' => $isCashOnDelivery ? 'cod' : 'razorpay',
                 'amount' => $totals['total'],
                 'currency' => 'INR',
-                'status' => $paymentStatus,
-                'processed_at' => now(),
+                'status' => $isCashOnDelivery ? 'pending' : 'processing',
+                'processed_at' => $isCashOnDelivery ? now() : null,
             ]);
 
             // Generate invoice
@@ -326,8 +329,10 @@ class CheckoutController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Order placed successfully!',
+                'message' => $isCashOnDelivery ? 'Order placed successfully!' : 'Order created successfully. Complete the Razorpay payment to confirm it.',
+                'order_id' => $order->id,
                 'order_number' => $order->order_number,
+                'payment_method' => $validated['payment_method'],
                 'redirect' => route('order-details', ['orderNumber' => $order->order_number]),
             ]);
         } catch (\Exception $e) {
@@ -344,6 +349,90 @@ class CheckoutController extends Controller
                 'message' => $e->getMessage(),
                 'error' => 'An error occurred while processing your order. Please try again.',
             ], 500);
+        }
+    }
+    public function createRazorpayOrder(Request $request, Order $order, CreatePaymentOrderAction $action): JsonResponse
+    {
+        if ((int) $order->customer_id !== (int) Auth::guard('customer_web')->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found for the authenticated customer.',
+            ], 404);
+        }
+
+        try {
+            $result = $action->execute($order);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Razorpay order created successfully.',
+                'data' => [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'amount_paise' => $order->payable_amount_paise,
+                    'currency' => $result['payment']->currency,
+                    'razorpay' => [
+                        'key_id' => config('services.razorpay.key_id'),
+                        'order_id' => $result['gateway_order']['id'],
+                        'amount' => $result['gateway_order']['amount'],
+                        'currency' => $result['gateway_order']['currency'],
+                    ],
+                ],
+            ]);
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to create Razorpay order.',
+                'error' => $exception->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function verifyRazorpayPayment(Request $request, VerifyCheckoutSignatureAction $action): JsonResponse
+    {
+        $validated = $request->validate([
+            'order_id' => 'required|integer|exists:orders,id',
+            'razorpay_order_id' => 'required|string|exists:payments,gateway_order_id',
+            'razorpay_payment_id' => 'required|string',
+            'razorpay_signature' => 'required|string',
+        ]);
+
+        $order = Order::findOrFail($validated['order_id']);
+
+        if ((int) $order->customer_id !== (int) Auth::guard('customer_web')->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found for the authenticated customer.',
+            ], 404);
+        }
+
+        $payment = Payment::where('order_id', $order->id)
+            ->where('gateway_order_id', $validated['razorpay_order_id'])
+            ->firstOrFail();
+
+        try {
+            $verifiedPayment = $action->execute(
+                $order,
+                $payment,
+                $validated['razorpay_payment_id'],
+                $validated['razorpay_signature'],
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment verified successfully.',
+                'data' => [
+                    'payment' => $verifiedPayment,
+                    'order' => $order->fresh(),
+                    'redirect' => route('order-details', ['orderNumber' => $order->order_number]),
+                ],
+            ]);
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to verify the Razorpay payment.',
+                'error' => $exception->getMessage(),
+            ], 422);
         }
     }
 
@@ -476,9 +565,9 @@ class CheckoutController extends Controller
         // Add payment details for credit card
         if ($validated['payment_method'] === 'mastercard') {
             $orderData = array_merge($orderData, [
-                'card_name' => $validated['card_name'],
-                'card_last_four' => substr($validated['card_number'] ?? '', -4),
-                'card_expiry' => $validated['card_expiry'],
+                'card_name' => $validated['card_name'] ?? null,
+                'card_last_four' => ! empty($validated['card_number']) ? substr($validated['card_number'], -4) : null,
+                'card_expiry' => $validated['card_expiry'] ?? null,
             ]);
         }
 
@@ -1012,3 +1101,6 @@ class CheckoutController extends Controller
         }
     }
 }
+
+
+

@@ -209,6 +209,8 @@ Route::prefix('/')->group(function () {
         // AJAX routes for checkout operations (require authentication)
         Route::middleware('auth:customer_web')->group(function () {
             Route::post('/checkout/place-order', 'store')->name('checkout.store');
+            Route::post('/checkout/orders/{order}/razorpay', 'createRazorpayOrder')->name('checkout.razorpay.order');
+            Route::post('/checkout/razorpay/verify', 'verifyRazorpayPayment')->name('checkout.razorpay.verify');
             Route::get('/checkout/addresses', 'getUserAddresses')->name('checkout.addresses');
             Route::post('/checkout/save-address', 'saveAddress')->name('checkout.save-address');
         });
@@ -264,7 +266,6 @@ Route::prefix('/')->group(function () {
         ->name('my-account-address');
 
     // My Account Address AJAX Routes
-    Route::middleware('auth:customer_web')->group(function () {
         Route::post('/my-account/address', [MyAccountController::class, 'storeAddress'])->name('my-account.address.store');
         Route::get('/my-account/address/{id}', [MyAccountController::class, 'getAddress'])->name('my-account.address.get');
         Route::put('/my-account/address/{id}', [MyAccountController::class, 'updateAddress'])->name('my-account.address.update');
@@ -275,7 +276,6 @@ Route::prefix('/')->group(function () {
 
         // Password update route
         Route::put('/my-account/password', [MyAccountController::class, 'updatePassword'])->name('my-account.password.update');
-    });
 
     // My Account Edit
     Route::get('/my-account-edit', [MyAccountController::class, 'accountDetails'])
@@ -331,3 +331,7 @@ Route::prefix('/')->group(function () {
     // Collections Routes
     Route::get('/collections/{id}', [FrontendController::class, 'collectionDetails'])->name('collection.details');
 });
+
+
+
+

@@ -236,14 +236,15 @@
                         <div class="col-md-6 d-none d-md-block justify-content-center">
                             <div class="header-center justify-content-end">
                                 <form class="form-search-product style-3">
-                                    <div class="select-category">
-                                        <select name="product_cat" id="product_cat" class="dropdown_product_cat">
+                                    <div class="select-category" id="select-category-dropdown">
+                                        {{-- <select name="product_cat" id="product_cat" class="dropdown_product_cat" style="display: none;">
                                             <option value="" selected="selected"> All Categories </option>
                                             @forelse($categories as $category)
-                                                <option class="level-0" value="{{ $category->slug }}">{{ $category->name }}</option>
+                                            <option class="level-0" value="{{ $category->slug }}">{{ $category->name }}</option>
                                             @empty
                                             @endforelse
-                                        </select>
+                                        </select> --}}
+                                        <option value="" selected="selected"> All Categories </option>
                                         <ul class="select-options">
                                             <li class="link" rel="" data-url="{{ route('shop') }}"><span> All Categories </span></li>
                                             @forelse($categories as $category)
@@ -1595,12 +1596,23 @@
 
         // Handle category selection in search dropdown
         $(document).ready(function() {
-            $('.select-options .link').on('click', function(e) {
+            // Handle click on category items in select-options dropdown
+            $(document).on('click', '.select-options .link', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
                 var url = $(this).data('url');
                 if (url) {
                     window.location.href = url;
                 }
+            });
+
+            // Make select-options visible on hover/focus of the select-category container
+            $('#select-category-dropdown').on('mouseenter', function() {
+                $(this).find('.select-options').css('display', 'block');
+            });
+            
+            $('#select-category-dropdown').on('mouseleave', function() {
+                $(this).find('.select-options').css('display', 'none');
             });
 
             // Also handle select change

@@ -17,10 +17,9 @@ use App\Services\Payments\RazorpayGateway;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Razorpay\Api\Api;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\View;
 
 class AppServiceProvider extends ServiceProvider
 {

@@ -267,14 +267,14 @@
         }
 
         /* input,
-                              select,
-                              textarea {
-                                width: 100%;
-                                padding: 12px;
-                                margin: 10px 0 20px;
-                                border: 1px solid #ccc;
-                                border-radius: 4px;
-                              } */
+                                  select,
+                                  textarea {
+                                    width: 100%;
+                                    padding: 12px;
+                                    margin: 10px 0 20px;
+                                    border: 1px solid #ccc;
+                                    border-radius: 4px;
+                                  } */
 
         .btn {
             padding: 10px 20px;
@@ -829,7 +829,7 @@
                 <div class="form-section" id="section2">
                     <h3 class="mb-3">Customer Address</h3>
                     <p class="text-muted mb-4">Please provide the service address for AMC.</p>
-                    
+
                     <!-- Address Dropdown for logged in users with multiple addresses -->
                     <div class="row g-3" id="address-selection-row" style="display: none;">
                         <div class="col-12">
@@ -839,7 +839,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label for="address1" class="form-label">Address Line 1 <span
@@ -955,11 +955,12 @@
                             <input type="text" class="form-control form-control-lg" id="plan_duration"
                                 name="plan_duration" placeholder="Duration will be auto-filled" readonly>
                         </div>
+                        {{-- 
                         <div class="col-md-6">
                             <label for="plan_cost_display" class="form-label">Plan Cost (₹)</label>
                             <input type="text" class="form-control form-control-lg" id="plan_cost_display"
                                 name="plan_cost" placeholder="Cost will be auto-filled" readonly>
-                        </div>
+                        </div> --}}
                         <div class="col-md-6">
                             <label for="preferred_start_date" class="form-label">Preferred Start Date <span
                                     class="text-danger">*</span></label>
@@ -1179,7 +1180,8 @@
                     <p class="mb-3">The email address you entered is already registered in our system.</p>
                     <p class="mb-4">Please login to continue with your existing account.</p>
                     <div class="d-flex justify-content-center gap-3">
-                        <a href="#log" data-bs-toggle="modal" class="btn btn-primary" onclick="$('#loginRequiredModal').modal('hide');">
+                        <a href="#log" data-bs-toggle="modal" class="btn btn-primary"
+                            onclick="$('#loginRequiredModal').modal('hide');">
                             <i class="fas fa-sign-in-alt me-2"></i>Login
                         </a>
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -1209,13 +1211,13 @@
             <div class="flat-title wow fadeInUp">
                 <h5 class="fw-semibold">Customer Review</h5>
                 <!-- <div class="box-btn-slide relative">
-                                    <div class="swiper-button-prev nav-swiper nav-prev-products">
-                                      <i class="icon-arrow-left-lg"></i>
-                                    </div>
-                                    <div class="swiper-button-next nav-swiper nav-next-products">
-                                      <i class="icon-arrow-right-lg"></i>
-                                    </div>
-                                  </div> -->
+                                        <div class="swiper-button-prev nav-swiper nav-prev-products">
+                                          <i class="icon-arrow-left-lg"></i>
+                                        </div>
+                                        <div class="swiper-button-next nav-swiper nav-next-products">
+                                          <i class="icon-arrow-right-lg"></i>
+                                        </div>
+                                      </div> -->
             </div>
             <div class="swiper tf-sw-products" data-preview="3" data-tablet="2" data-mobile-sm="1" data-mobile="1"
                 data-space-lg="30" data-space-md="15" data-space="15" data-pagination="1" data-pagination-sm="1"
@@ -1823,7 +1825,7 @@
                     customerAddresses = addresses; // Store for later use
                     const addressSelectorRow = document.getElementById('address-selection-row');
                     const addressSelector = document.getElementById('address_selector');
-                    
+
                     console.log('Customer addresses:', addresses); // Debug log
                     if (addresses.length > 0) {
                         if (addresses.length === 1) {
@@ -1843,21 +1845,22 @@
                             // Multiple addresses - show dropdown
                             addressSelectorRow.style.display = 'block';
                             addressSelector.innerHTML = '<option value="">Select an address</option>';
-                            
+
                             addresses.forEach((address, index) => {
                                 const option = document.createElement('option');
                                 option.value = address.id; // Use actual address ID
-                                const addressText = address.branch_name || address.address1 || `Address ${index + 1}`;
+                                const addressText = address.branch_name || address.address1 ||
+                                    `Address ${index + 1}`;
                                 option.textContent = addressText + (address.city ? `, ${address.city}` : '');
                                 addressSelector.appendChild(option);
                             });
-                            
+
                             // Pre-select first address
                             addressSelector.value = addresses[0].id;
                             document.getElementById('selected_address_id').value = addresses[0].id || '';
                             populateAddressFields(addresses[0]);
                         }
-                        
+
                         // Add change event listener for address dropdown
                         addressSelector.addEventListener('change', function() {
                             const selectedId = this.value;
@@ -1887,14 +1890,14 @@
                     // Make fields readonly for logged in users
                     document.getElementById('first_name').readOnly = true;
                     document.getElementById('last_name').readOnly = true;
-                    document.getElementById('phone').readOnly = true;
+                    // document.getElementById('phone').readOnly = true;
                     document.getElementById('email').readOnly = true;
                 }
             } catch (error) {
                 console.error('Error checking customer login:', error);
             }
         }
-        
+
         // Function to populate address fields
         function populateAddressFields(address) {
             document.getElementById('branch_name').value = address.branch_name || '';
@@ -2413,8 +2416,8 @@
             <p><strong>Plan:</strong> ${getSelectedText('amc_plan_id')}</p>
             <p><strong>Duration:</strong> ${formData.plan_duration || ''}</p>
             <p><strong>Start Date:</strong> ${formData.preferred_start_date || ''}</p>
-            <p><strong>Cost:</strong> ${document.getElementById('plan_cost_display').value || ''}</p>
         `;
+            // <p><strong>Cost:</strong> ${document.getElementById('plan_cost_display').value || ''}</p>
             document.getElementById('review-plan-info').innerHTML = planInfo;
         }
 
@@ -2434,12 +2437,13 @@
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
 
-                let selected_address_id = document.getElementById('selected_address_id') ? document.getElementById('selected_address_id').value : null;
+                let selected_address_id = document.getElementById('selected_address_id') ? document.getElementById(
+                    'selected_address_id').value : null;
                 // Combine form data with products data
                 const submitData = {
                     ...formData,
                     products: productsData,
-                    selected_address_id: selected_address_id    
+                    selected_address_id: selected_address_id
                 };
                 console.log('Submitting data:', submitData);
 

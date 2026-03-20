@@ -327,7 +327,7 @@
                             </div>
                         @endif
 
-                        @if ($remoteSupportJob?->diagnosis?->client_connected_via && !$remoteSupportJob?->diagnosis?->diagnosis_list)
+                        @if ($remoteSupportJob?->diagnosis?->client_connected_via && !$remoteSupportJob?->diagnosis?->diagnosis_list && $remoteSupportJob?->diagnosis?->status != 'escalated')
                             <!-- Diagnosis Section -->
                             <div class="col-lg-12">
                                 <div class="card">
@@ -431,7 +431,7 @@
                             </div>
                         @endif
 
-                        @if ($remoteSupportJob?->diagnosis?->diagnosis_list && !$remoteSupportJob?->diagnosis?->before_screenshots)
+                        @if ($remoteSupportJob?->diagnosis?->diagnosis_list && !$remoteSupportJob?->diagnosis?->before_screenshots && $remoteSupportJob?->diagnosis?->status != 'escalated')
                             <!-- Action Taken Section -->
                             <div class="col-lg-12">
                                 <div class="card">
@@ -731,6 +731,40 @@
                                 </div>
                             </div>
                         </div>
+
+                        @if ($remoteSupportJob?->diagnosis?->status == 'escalated')
+                            <!-- Action Taken Details Section -->
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-header border-bottom-dashed">
+                                        <div class="d-flex">
+                                            <h5 class="card-title flex-grow-1 mb-0">
+                                                Escalated Job Details
+                                            </h5>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="row gap-3">
+                                            <div class="col-12">
+                                                <div class="fw-semibold text-break">Reason For Escalation
+                                                </div>
+                                                <div id="display_fix_description">
+                                                    {{ $remoteSupportJob?->diagnosis?->reason_for_escalation }}
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="fw-semibold text-break">Escalation Notes
+                                                </div>
+                                                <div id="display_fix_description">
+                                                    {{ $remoteSupportJob?->diagnosis?->escalation_notes }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

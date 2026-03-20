@@ -36,6 +36,7 @@
             'picked' => 'Picked',
             'completed' => 'Completed',
             'on_hold' => 'On Hold',
+            'escalated' => 'Escalated',
         ];
 
         $statusColor = [
@@ -55,6 +56,7 @@
             'picked' => 'bg-success-subtle text-success',
             'completed' => 'bg-success-subtle text-success',
             'on_hold' => 'bg-warning-subtle text-warning',
+            'escalated' => 'bg-danger-subtle text-danger',
         ];
     @endphp
 

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\CouponUsage;
+use App\Models\ParentCategory;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestProductRequestPart;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -61,5 +63,13 @@ class AppServiceProvider extends ServiceProvider
 
         Paginator::useBootstrapFive();
         Paginator::useBootstrapFour();
+
+        // Share parent categories with the master layout
+        View::composer('frontend.layout.master', function ($view) {
+            $categories = ParentCategory::where('status', 'active')
+                ->orderBy('sort_order', 'asc')
+                ->get();
+            $view->with('categories', $categories);
+        });
     }
 }

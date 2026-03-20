@@ -209,87 +209,26 @@
                             <nav class="category-menu active-item">
                                 <div class="menu-category-menu-container">
                                     <ul id="primary-menu" class="megamenu">
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-clothing fs-20"></i> -->
-                                                <!-- <i class="fa-solid fa-laptop"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/ios-glyphs/30/1A1A1A/laptop.png"
-                                                    alt="laptop" />
-                                                <span>Laptops & Notebooks</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-computer-wifi fs-20"></i> -->
-                                                <!-- <i class="fa-solid fa-desktop"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/ios/50/1A1A1A/windows-client.png"
-                                                    alt="windows-client" />
-                                                <span>Desktops & All-in-One PCs</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-beauti fs-20"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/external-outline-lafs/64/1A1A1A/external-ic_components-dao-and-tocenomics-outline-lafs.png"
-                                                    alt="external-ic_components-dao-and-tocenomics-outline-lafs" />
-                                                <span>Computer Components</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-computer fs-20"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/external-konkapp-detailed-outline-konkapp/64/1A1A1A/external-monitor-cinema-konkapp-detailed-outline-konkapp.png"
-                                                    alt="external-monitor-cinema-konkapp-detailed-outline-konkapp" />
-                                                <span>Monitors</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-sofa fs-20"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/ios/50/1A1A1A/keyboard.png"
-                                                    alt="keyboard" />
-                                                <span>Peripherals & Accessories</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-computer-wifi fs-20"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/ios/50/1A1A1A/cloud-storage.png"
-                                                    alt="cloud-storage" />
-                                                <span>Storage Devices</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-machine fs-20"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/wired/64/1A1A1A/wifi-router.png"
-                                                    alt="wifi-router" />
-                                                <span>Networking Devices</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <!-- <i class="icon-jewelry fs-20"></i> -->
-                                                <img width="20" height="20"
-                                                    src="https://img.icons8.com/external-nawicon-detailed-outline-nawicon/64/1A1A1A/external-printer-internet-of-things-nawicon-detailed-outline-nawicon.png"
-                                                    alt="external-printer-internet-of-things-nawicon-detailed-outline-nawicon" />
-                                                <span>Printers & Scanners</span>
-                                            </a>
-                                        </li>
-                                        <li class="menu-item">
-                                            <a href="#">
-                                                <i class="icon-tool fs-20"></i>
-                                                <span>Software</span>
-                                            </a>
-                                        </li>
-
+                                        @forelse($categories as $category)
+                                            <li class="menu-item">
+                                                <a href="{{ route('shop', ['category' => $category->slug]) }}">
+                                                    @if($category->image)
+                                                        <img width="50" height="50"
+                                                            src="{{ asset($category->image) }}"
+                                                            alt="{{ $category->name }}" />
+                                                    @else
+                                                        <i class="icon-tool fs-20"></i>
+                                                    @endif
+                                                    <span>{{ $category->name }}</span>
+                                                </a>
+                                            </li>
+                                        @empty
+                                            <li class="menu-item">
+                                                <a href="#">
+                                                    <span>No categories available</span>
+                                                </a>
+                                            </li>
+                                        @endforelse
                                     </ul>
                                 </div>
                             </nav>
@@ -300,38 +239,17 @@
                                     <div class="select-category">
                                         <select name="product_cat" id="product_cat" class="dropdown_product_cat">
                                             <option value="" selected="selected"> All Categories </option>
-                                            <option class="level-0" value="apple-products"> Product XYZ </option>
-                                            <option class="level-0" value="Product 1-equipments"> Product XYZ
-                                            </option>
-                                            <option class="level-0" value="camera-video"> Product XYZ </option>
-                                            <option class="level-0" value="game-room-furniture"> Product XYZ </option>
-                                            <option class="level-0" value="gaming-accessories"> Product XYZ </option>
-                                            <option class="level-0" value="headphone"> Product XYZ </option>
-                                            <option class="level-0" value="laptop-tablet"> Product XYZ </option>
-                                            <option class="level-0" value="server-workstation"> Product XYZ </option>
-                                            <option class="level-0" value="smartphone"> Product XYZ </option>
-                                            <option class="level-0" value="smartwatch"> Product XYZ </option>
-                                            <option class="level-0" value="storage-digital-devices"> Product XYZ
-                                            </option>
+                                            @forelse($categories as $category)
+                                                <option class="level-0" value="{{ $category->slug }}">{{ $category->name }}</option>
+                                            @empty
+                                            @endforelse
                                         </select>
                                         <ul class="select-options">
                                             <li class="link" rel=""><span> All Categories </span></li>
-                                            <li class="link" rel="apple-products"><span> Product XYZ </span> </li>
-                                            <li class="link" rel="Product 1-equipments"><span> Product XYZ </span>
-                                            </li>
-                                            <li class="link" rel="camera-video"><span></span> Product XYZ </li>
-                                            <li class="link" rel="game-room-furniture"><span> Product XYZ </span>
-                                            </li>
-                                            <li class="link" rel="gaming-accessories"><span> Product XYZ </span>
-                                            </li>
-                                            <li class="link" rel="headphone"><span> Product XYZ </span></li>
-                                            <li class="link" rel="laptop-tablet"><span> Product XYZ </span></li>
-                                            <li class="link" rel="server-workstation"><span></span>
-                                            </li>
-                                            <li class="link" rel="smartphone"><span> Product XYZ </span></li>
-                                            <li class="link" rel="smartwatch"><span> Product XYZ </span></li>
-                                            <li class="link" rel="storage-digital-devices"><span> Product XYZ
-                                                </span></li>
+                                            @forelse($categories as $category)
+                                                <li class="link" rel="{{ $category->slug }}"><span> {{ $category->name }} </span></li>
+                                            @empty
+                                            @endforelse
                                         </ul>
                                     </div>
                                     <span class="br-line type-vertical bg-line"></span>
@@ -491,17 +409,18 @@
                                     <h6 class="ft-heading footer-heading-mobile fw-semibold">Popular categories</h6>
                                     <div class="tf-collapse-content">
                                         <ul class="ft-menu-list">
-                                            <li><a href="{{ route('shop') }}" class="link">Laptops & Notebooks</a>
-                                            </li>
-                                            <li><a href="{{ route('shop') }}" class="link">Desktops & All-in-One
-                                                    PCs</a></li>
-                                            <li><a href="{{ route('shop') }}" class="link">Computer Components</a>
-                                            </li>
+                                            {{-- @forelse($categories as $category)
+                                                <li><a href="{{ route('shop', ['category' => $category->slug]) }}" class="link">{{ $category->name }}</a></li>
+                                            @empty
+                                                <li><a href="{{ route('shop') }}" class="link">No categories available</a></li>
+                                            @endforelse --}}
+                                            <li><a href="{{ route('shop') }}" class="link">Laptops & Notebooks</a></li>
+                                            <li><a href="{{ route('shop') }}" class="link">Desktops & All-in-One PCs</a></li>
+                                            <li><a href="{{ route('shop') }}" class="link">Computer Components</a></li>
                                             {{-- <li><a href="{{ route('shop') }}" class="link">Monitors</a></li>  --}}
                                             {{-- <li><a href="{{ route('shop') }}" class="link">Peripherals & Accessories</a></li>  --}}
                                             <li><a href="{{ route('shop') }}" class="link">Storage Devices</a></li>
-                                            <li><a href="{{ route('shop') }}" class="link">Networking Devices</a>
-                                            </li>
+                                            <li><a href="{{ route('shop') }}" class="link">Networking Devices</a></li>
                                             {{-- <li><a href="{{ route('shop') }}" class="link">Software</a></li>  --}}
                                         </ul>
                                     </div>

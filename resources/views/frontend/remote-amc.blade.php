@@ -733,6 +733,7 @@
         </div>
     </section>
 
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         function selectPlan(planId, planName) {
             // Scroll to the form section
@@ -995,7 +996,7 @@
                             Next<i class="fas fa-arrow-right ms-2"></i>
                         </button>
                         <button type="button" class="btn btn-success" id="submitBtn" style="display: none;">
-                            <i class="fas fa-check me-2"></i>Submit Request
+                            <i class="fas fa-credit-card me-2"></i>Proceed to Pay
                         </button>
                     </div>
                 </div>
@@ -1285,6 +1286,7 @@
         const nextBtn = document.getElementById('nextBtn');
         const skipBtn = document.getElementById('skipBtn');
         const submitBtn = document.getElementById('submitBtn');
+        const remoteAmcVerifyUrl = '{{ route('amc.remote-payment.verify') }}';
 
         // Form data storage
         let formData = {};
@@ -1914,22 +1916,127 @@
             return item ? item[textField] : value;
         }
 
+        function resetRemoteAmcForm() {
+            document.getElementById('requestForm').reset();
+
+            const productsContainer = document.getElementById('productsContainer');
+            const allProducts = productsContainer.querySelectorAll('.product-entry');
+            allProducts.forEach((product, index) => {
+                if (index > 0) product.remove();
+            });
+
+            productCounter = 1;
+            productsData = [];
+            formData = {};
+            currentStep = 0;
+            showStep(currentStep);
+            updateNavigationButtons();
+            updateRemoveButtonsVisibility();
+        }
+
+        async function verifyRemoteAmcPayment(paymentPayload) {
+            const response = await fetch(remoteAmcVerifyUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute('content')
+                },
+                body: JSON.stringify(paymentPayload)
+            });
+
+            return response.json();
+        }
+
+        function openRemoteAmcRazorpayCheckout(result) {
+            if (typeof Razorpay === 'undefined') {
+                alert('Razorpay checkout could not be loaded. Please refresh the page and try again.');
+                return;
+            }
+
+            const payment = result.payment;
+            const razorpayData = payment.razorpay;
+            const customerName = `${formData.first_name || ''} ${formData.last_name || ''}`.trim();
+
+            const options = {
+                key: razorpayData.key_id,
+                amount: razorpayData.amount,
+                currency: razorpayData.currency,
+                name: 'Crackteck',
+                description: 'Remote AMC Payment',
+                order_id: razorpayData.order_id,
+                handler: async function(response) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Verifying Payment...';
+
+                    try {
+                        const verification = await verifyRemoteAmcPayment({
+                            remote_amc_payment_id: payment.id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        });
+
+                        if (verification.success) {
+                            alert(`Payment successful! Your Remote AMC has been activated. Service ID: ${result.service_id}`);
+                            resetRemoteAmcForm();
+                            return;
+                        }
+
+                        alert(verification.message || 'Payment verification failed. Please contact support if money was debited.');
+                    } catch (error) {
+                        console.error('Payment verification error:', error);
+                        alert('Payment verification failed. Please contact support if money was debited.');
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Proceed to Pay';
+                    }
+                },
+                prefill: {
+                    name: customerName,
+                    email: formData.email || '',
+                    contact: formData.phone || ''
+                },
+                theme: {
+                    color: '#1987FF'
+                },
+                modal: {
+                    ondismiss: function() {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Proceed to Pay';
+                        alert('Payment was not completed. Your Remote AMC request is saved in pending state until payment is completed.');
+                    }
+                }
+            };
+
+            const razorpay = new Razorpay(options);
+            razorpay.on('payment.failed', function(response) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Proceed to Pay';
+                const failureMessage = response.error && response.error.description
+                    ? response.error.description
+                    : 'Payment failed. Please try again.';
+                alert(failureMessage);
+            });
+
+            razorpay.open();
+        }
+
         // Submit form
         async function submitForm() {
             try {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Payment...';
 
                 let selected_address_id = document.getElementById('selected_address_id') ? document.getElementById('selected_address_id').value : null;
-                // Combine form data with products data
                 const submitData = {
                     ...formData,
                     products: productsData,
-                    selected_address_id: selected_address_id    
+                    selected_address_id: selected_address_id
                 };
                 console.log('Submitting data:', submitData);
 
-                // const response = await fetch('/beta/api/amc/submit', {
                 const response = await fetch('/api/amc/submit', {
                     method: 'POST',
                     headers: {
@@ -1945,26 +2052,13 @@
 
                 console.log('Submission result:', result);
                 if (result.success) {
+                    if (result.requires_payment && result.payment && result.payment.razorpay) {
+                        openRemoteAmcRazorpayCheckout(result);
+                        return;
+                    }
+
                     alert(`Success! Your service request has been submitted. Service ID: ${result.service_id}`);
-
-                    // Reset form
-                    document.getElementById('requestForm').reset();
-
-                    // Reset products to single entry
-                    const productsContainer = document.getElementById('productsContainer');
-                    const allProducts = productsContainer.querySelectorAll('.product-entry');
-                    allProducts.forEach((product, index) => {
-                        if (index > 0) product.remove();
-                    });
-
-                    // Reset counters and data
-                    productCounter = 1;
-                    productsData = [];
-                    formData = {};
-                    currentStep = 0;
-                    showStep(currentStep);
-                    updateNavigationButtons();
-                    updateRemoveButtonsVisibility();
+                    resetRemoteAmcForm();
                 } else {
                     let errorMsg = result.message || 'Something went wrong';
                     if (result.errors) {
@@ -1987,7 +2081,7 @@
                 alert('Error submitting form. Please try again. Check console for details.');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Submit Request';
+                submitBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Proceed to Pay';
             }
         }
 
@@ -2008,3 +2102,4 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 @endsection
+

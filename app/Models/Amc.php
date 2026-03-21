@@ -24,7 +24,15 @@ class Amc extends Model
         'request_date',
         'request_source',
         'status',
+        'payment_status',
+        'payment_amount',
+        'payment_currency',
+        'paid_at',
         'created_by',
+    ];
+
+    protected $casts = [
+        'paid_at' => 'datetime',
     ];
 
     /**
@@ -47,6 +55,10 @@ class Amc extends Model
                 'request_date',
                 'request_source',
                 'status',
+                'payment_status',
+                'payment_amount',
+                'payment_currency',
+                'paid_at',
                 'created_by',
             ])
             ->logOnlyDirty()
@@ -78,4 +90,10 @@ class Amc extends Model
     {
         return $this->hasMany(AmcScheduleMeeting::class, 'amc_id');
     }
+
+    public function remoteAmcPayments()
+    {
+        return $this->hasMany(RemoteAmcPayment::class);
+    }
 }
+

@@ -221,6 +221,7 @@ class AllServicesController extends Controller
                 'user_id' => 'required|integer|exists:customers,id',
                 'customer_address_id' => 'required|integer|exists:customer_address_details,id',
                 'service_type' => 'required|in:amc',
+                'amc_type' => 'required|in:onsite,remote',
                 'products' => 'required|array|min:1',
                 'products.*.name' => 'required|string',
                 'products.*.type' => 'required|string',
@@ -277,6 +278,7 @@ class AllServicesController extends Controller
                     $amc = Amc::create([
                         'request_id' => $serviceRequest,
                         'service_type' => $request->service_type,
+                        'amc_type' => $request->filled('amc_type'),
                         'customer_id' => $request->user_id,
                         'customer_address_id' => $request->customer_address_id,
                         'amc_plan_id' => $request->amc_plan_id,

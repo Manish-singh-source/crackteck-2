@@ -92,6 +92,7 @@ Route::prefix('/')->group(function () {
     Route::post('/api/amc/get-customer-data', [FrontendController::class, 'getCustomerData'])->name('amc.get-customer-data');
     Route::get('/api/amc/get-device-types', [FrontendController::class, 'getDeviceTypes'])->name('amc.get-device-types');
     Route::post('/api/amc/submit', [FrontendController::class, 'submitAmcRequest'])->name('amc.submit');
+    Route::post('/api/amc/remote-payment/verify', [FrontendController::class, 'verifyRemoteAmcPayment'])->name('amc.remote-payment.verify');
     Route::post('/api/non-amc/submit', [FrontendController::class, 'submitNonAmcRequest'])->name('non-amc.submit');
 
     // Customer Check Login API Route
@@ -331,6 +332,8 @@ Route::prefix('/')->group(function () {
     // Collections Routes
     Route::get('/collections/{id}', [FrontendController::class, 'collectionDetails'])->name('collection.details');
 });
+
+
 
 
 

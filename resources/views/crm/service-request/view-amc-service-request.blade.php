@@ -214,124 +214,124 @@
                                     </div>
                                     <div>
                                         @if(!empty($request->amcScheduleMeetings->first()?->remoteSupportJob->status == 'escalated') && empty($request->amcScheduleMeetings->first()?->activeAssignment))
-                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#addVisitModal2">Assign Engineer</button>
-                                        <!-- Modal -->
-                                        @endif
-
-                                        <div class="modal fade" id="addVisitModal2" tabindex="-1"
-                                            aria-labelledby="addVisitModalLabel2" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <form id="assignEngineerModalForm">
-                                                        @csrf
-
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="addVisitModalLabel2">Assign
-                                                                Engineer</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
-                                                        </div>
-
-                                                        <div class="modal-body p-2">
-                                                            <input type="hidden" name="service_request_id"
-                                                                value="{{ $request->id }}">
-                                                            <input type="hidden" name="service_type" value="amc">
-                                                            <input type="hidden" name="amc_id" value="{{ $request->amcScheduleMeetings->first()?->amc_id }}">
-
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-semibold">Assignment
-                                                                    Type</label>
-                                                                <div>
-                                                                    <div class="form-check form-check-inline">
-                                                                        <input class="form-check-input" type="radio"
-                                                                            name="assignment_type" id="typeIndividualModal"
-                                                                            value="individual" checked>
-                                                                        <label class="form-check-label"
-                                                                            for="typeIndividualModal">Individual</label>
-                                                                    </div>
-                                                                    <div class="form-check form-check-inline">
-                                                                        <input class="form-check-input" type="radio"
-                                                                            name="assignment_type" id="typeGroupModal"
-                                                                            value="group">
-                                                                        <label class="form-check-label"
-                                                                            for="typeGroupModal">Group</label>
-                                                                    </div>
-                                                                </div>
+                                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#addVisitModal2">Assign Engineer</button>
+                                            <!-- Modal -->
+    
+                                            <div class="modal fade" id="addVisitModal2" tabindex="-1"
+                                                aria-labelledby="addVisitModalLabel2" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <form id="assignEngineerModalForm">
+                                                            @csrf
+    
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="addVisitModalLabel2">Assign
+                                                                    Engineer</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                    aria-label="Close"></button>
                                                             </div>
-
-                                                            <!-- Individual Assignment -->
-                                                            <div id="individualSectionModal">
+    
+                                                            <div class="modal-body p-2">
+                                                                <input type="hidden" name="service_request_id"
+                                                                    value="{{ $request->id }}">
+                                                                <input type="hidden" name="service_type" value="amc">
+                                                                <input type="hidden" name="amc_id" value="{{ $request->amcScheduleMeetings->first()?->amc_id }}">
+    
                                                                 <div class="mb-3">
-                                                                    <label for="engineer_id_modal"
-                                                                        class="form-label">Select Engineer</label>
-                                                                    <select name="engineer_id" id="engineer_id_modal"
-                                                                        class="form-select">
-                                                                        <option value="">--Select Engineer--</option>
-                                                                        @foreach ($engineers as $engineer)
-                                                                            <option value="{{ $engineer->id }}">
-                                                                                {{ $engineer->first_name }}
-                                                                                {{ $engineer->last_name }}
-                                                                            </option>
-                                                                        @endforeach
-                                                                    </select>
+                                                                    <label class="form-label fw-semibold">Assignment
+                                                                        Type</label>
+                                                                    <div>
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input class="form-check-input" type="radio"
+                                                                                name="assignment_type" id="typeIndividualModal"
+                                                                                value="individual" checked>
+                                                                            <label class="form-check-label"
+                                                                                for="typeIndividualModal">Individual</label>
+                                                                        </div>
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input class="form-check-input" type="radio"
+                                                                                name="assignment_type" id="typeGroupModal"
+                                                                                value="group">
+                                                                            <label class="form-check-label"
+                                                                                for="typeGroupModal">Group</label>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-
-                                                            <!-- Group Assignment -->
-                                                            <div id="groupSectionModal" style="display: none;">
-                                                                <div class="mb-3">
-                                                                    <label for="group_name_modal" class="form-label">Group
-                                                                        Name</label>
-                                                                    <input type="text" name="group_name"
-                                                                        id="group_name_modal" class="form-control"
-                                                                        placeholder="Enter Group Name">
-                                                                </div>
-
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Select Engineers</label>
-                                                                    <div class="border rounded p-3"
-                                                                        style="max-height: 300px; overflow-y: auto;">
-                                                                        @foreach ($engineers as $engineer)
-                                                                            <div class="form-check mb-2">
-                                                                                <input
-                                                                                    class="form-check-input engineer-checkbox-modal"
-                                                                                    type="checkbox" name="engineer_ids[]"
-                                                                                    value="{{ $engineer->id }}"
-                                                                                    id="eng_modal_{{ $engineer->id }}">
-                                                                                <label class="form-check-label"
-                                                                                    for="eng_modal_{{ $engineer->id }}">
+    
+                                                                <!-- Individual Assignment -->
+                                                                <div id="individualSectionModal">
+                                                                    <div class="mb-3">
+                                                                        <label for="engineer_id_modal"
+                                                                            class="form-label">Select Engineer</label>
+                                                                        <select name="engineer_id" id="engineer_id_modal"
+                                                                            class="form-select">
+                                                                            <option value="">--Select Engineer--</option>
+                                                                            @foreach ($engineers as $engineer)
+                                                                                <option value="{{ $engineer->id }}">
                                                                                     {{ $engineer->first_name }}
                                                                                     {{ $engineer->last_name }}
-                                                                                </label>
-                                                                                <input class="form-check-input ms-3"
-                                                                                    type="radio" name="supervisor_id"
-                                                                                    value="{{ $engineer->id }}"
-                                                                                    id="sup_modal_{{ $engineer->id }}">
-                                                                                <label
-                                                                                    class="form-check-label small text-muted"
-                                                                                    for="sup_modal_{{ $engineer->id }}">
-                                                                                    (Supervisor)
-                                                                                </label>
-                                                                            </div>
-                                                                        @endforeach
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </select>
                                                                     </div>
-                                                                    <small class="text-muted">Check engineers to add to
-                                                                        group, select one as
-                                                                        supervisor</small>
                                                                 </div>
+    
+                                                                <!-- Group Assignment -->
+                                                                <div id="groupSectionModal" style="display: none;">
+                                                                    <div class="mb-3">
+                                                                        <label for="group_name_modal" class="form-label">Group
+                                                                            Name</label>
+                                                                        <input type="text" name="group_name"
+                                                                            id="group_name_modal" class="form-control"
+                                                                            placeholder="Enter Group Name">
+                                                                    </div>
+    
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Select Engineers</label>
+                                                                        <div class="border rounded p-3"
+                                                                            style="max-height: 300px; overflow-y: auto;">
+                                                                            @foreach ($engineers as $engineer)
+                                                                                <div class="form-check mb-2">
+                                                                                    <input
+                                                                                        class="form-check-input engineer-checkbox-modal"
+                                                                                        type="checkbox" name="engineer_ids[]"
+                                                                                        value="{{ $engineer->id }}"
+                                                                                        id="eng_modal_{{ $engineer->id }}">
+                                                                                    <label class="form-check-label"
+                                                                                        for="eng_modal_{{ $engineer->id }}">
+                                                                                        {{ $engineer->first_name }}
+                                                                                        {{ $engineer->last_name }}
+                                                                                    </label>
+                                                                                    <input class="form-check-input ms-3"
+                                                                                        type="radio" name="supervisor_id"
+                                                                                        value="{{ $engineer->id }}"
+                                                                                        id="sup_modal_{{ $engineer->id }}">
+                                                                                    <label
+                                                                                        class="form-check-label small text-muted"
+                                                                                        for="sup_modal_{{ $engineer->id }}">
+                                                                                        (Supervisor)
+                                                                                    </label>
+                                                                                </div>
+                                                                            @endforeach
+                                                                        </div>
+                                                                        <small class="text-muted">Check engineers to add to
+                                                                            group, select one as
+                                                                            supervisor</small>
+                                                                    </div>
+                                                                </div>
+    
                                                             </div>
-
-                                                        </div>
-
-                                                        <div class="modal-footer">
-                                                            <button type="submit" class="btn btn-success">Assign</button>
-                                                        </div>
-                                                    </form>
-
+    
+                                                            <div class="modal-footer">
+                                                                <button type="submit" class="btn btn-success">Assign</button>
+                                                            </div>
+                                                        </form>
+    
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        @endif
 
                                     </div>
                                 </div>

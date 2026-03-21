@@ -278,7 +278,7 @@ class AllServicesController extends Controller
                     $amc = Amc::create([
                         'request_id' => $serviceRequest,
                         'service_type' => $request->service_type,
-                        'amc_type' => $request->filled('amc_type'),
+                        'amc_type' => $request->amc_type,
                         'customer_id' => $request->user_id,
                         'customer_address_id' => $request->customer_address_id,
                         'amc_plan_id' => $request->amc_plan_id,

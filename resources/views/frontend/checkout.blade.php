@@ -319,7 +319,8 @@
                                                 class="tf-check-rounded" id="credit-card-method">
                                             <span class="body-text-3">Pay Online with Razorpay</span>
                                         </label>
-                                        <p class="caption text-main-2 font-2 ps-4 mb-0">Cards, UPI, netbanking and wallets are available in the Razorpay popup.</p>
+                                        <p class="caption text-main-2 font-2 ps-4 mb-0">Cards, UPI, netbanking and wallets
+                                            are available in the Razorpay popup.</p>
                                     </div>
 
                                     <!-- Cash on Delivery -->
@@ -389,35 +390,6 @@
                                     : null;
                             @endphp
                         </ul>
-
-                        {{-- <!-- Discount Code Section -->
-                        <div class="mt-3">
-                            <p class="body-md-2 fw-semibold sub-type">Discount code</p>
-                            <div class="ip-discount-code style-2">
-                                <div class="d-flex gap-2">
-                                    <input type="text" id="coupon_code" class="def"
-                                        placeholder="Enter coupon code"
-                                        value="{{ session('applied_coupon.code') ?? '' }}">
-                                    <button type="button" id="apply_coupon" class="tf-btn btn-primary">
-                                        <span>Apply</span>
-                                    </button>
-                                </div>
-                                @if (session('applied_coupon'))
-                                    <div class="mt-2">
-                                        <small class="text-success">
-                                            <i class="icon-check"></i>
-                                            Coupon "{{ session('applied_coupon.code') }}" applied successfully!
-                                        </small>
-                                        <button type="button" id="remove_coupon"
-                                            class="btn btn-sm btn-outline-danger ms-2">
-                                            Remove
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
-                            <div id="coupon_message" class="mt-2" style="display: none;"></div>
-                        </div> --}}
-
                         <!-- Discount Code Section -->
                         <div class="mt-3">
                             <p class="body-md-2 fw-semibold sub-type">Discount Code</p>
@@ -452,54 +424,6 @@
 
                         <!-- Price Summary -->
                         <ul class="sec-total-price">
-
-                            <!-- Product Additional Details -->
-                            {{-- @if ($warehouseProduct->weight || $warehouseProduct->dimensions || $warehouseProduct->shipping_time || $warehouseProduct->cod || $warehouseProduct->installation)
-                                <div class="product-details mt-2 pt-2" style="border-top: 1px dashed #ddd;">
-                                    @if ($warehouseProduct->weight)
-                                        <p class="body-md-2 text-main-2 mb-1">
-                                            <span class="fw-semibold">Weight:</span> {{ $warehouseProduct->weight }}
-                                        </p>
-                                    @endif
-                                    @if ($warehouseProduct->dimensions)
-                                        <p class="body-md-2 text-main-2 mb-1">
-                                            <span class="fw-semibold">Dimensions:</span>
-                                            {{ $warehouseProduct->dimensions }}
-                                        </p>
-                                    @endif
-                                    @if ($warehouseProduct->shipping_time)
-                                        <p class="body-md-2 text-main-2 mb-1">
-                                            <span class="fw-semibold">Shipping Time:</span>
-                                            {{ $warehouseProduct->shipping_time }}
-                                        </p>
-                                    @endif
-                                    @if ($warehouseProduct->cod)
-                                        <p class="body-md-2 text-main-2 mb-1">
-                                            <span class="fw-semibold">COD:</span> {{ ucfirst($warehouseProduct->cod) }}
-                                        </p>
-                                    @endif
-                                    @if ($warehouseProduct->installation)
-                                        <p class="body-md-2 text-main-2 mb-1">
-                                            <span class="fw-semibold">Installation:</span>
-                                            {{ ucfirst($warehouseProduct->installation) }}
-                                        </p>
-                                    @endif
-                                </div>
-                            @endif --}}
-                            {{-- <li>
-                                <span class="body-text-3">Weight</span>
-                                <span class="body-text-3" id="weight">{{ $warehouseProduct->weight }} kg</span>
-                            </li>
-                            <li>
-                                <span class="body-text-3">Shipping Time</span>
-                                <span class="body-text-3" id="shipping_time">{{ $warehouseProduct->shipping_time }}
-                                    Days</span>
-                            </li>
-                            <li>
-                                <span class="body-text-3">COD</span>
-                                <span class="body-text-3" id="cod">{{ ucfirst($warehouseProduct->cod) }}</span>
-                            </li> --}}
-
                             <li>
                                 <span class="body-text-3">Subtotal</span>
                                 <span class="body-text-3"
@@ -666,15 +590,19 @@
                             razorpay_signature: response.razorpay_signature
                         }).done(function(verificationResponse) {
                             if (verificationResponse.success) {
-                                showCheckoutSuccess(verificationResponse.message || 'Payment verified successfully.');
-                                redirectToOrderDetails(verificationResponse.data?.redirect || checkoutResponse.redirect);
+                                showCheckoutSuccess(verificationResponse.message ||
+                                    'Payment verified successfully.');
+                                redirectToOrderDetails(verificationResponse.data?.redirect ||
+                                    checkoutResponse.redirect);
                                 return;
                             }
 
-                            showCheckoutError(verificationResponse.message || 'Payment verification failed.');
+                            showCheckoutError(verificationResponse.message ||
+                                'Payment verification failed.');
                         }).fail(function(xhr) {
                             showCheckoutError(buildErrorMessage(xhr,
-                                'Payment verification failed. Please contact support if the amount was debited.'));
+                                'Payment verification failed. Please contact support if the amount was debited.'
+                                ));
                         }).always(function() {
                             setLoadingState(false);
                         });
@@ -700,7 +628,8 @@
                 const razorpay = new Razorpay(options);
                 razorpay.on('payment.failed', function(response) {
                     setLoadingState(false);
-                    const failureMessage = response.error && response.error.description ? response.error.description :
+                    const failureMessage = response.error && response.error.description ? response.error
+                        .description :
                         'Payment failed. Please try again.';
                     showCheckoutError(failureMessage);
                 });
@@ -840,12 +769,14 @@
                     success: function(response) {
                         if (!response.success) {
                             setLoadingState(false);
-                            showCheckoutError(response.message || 'An error occurred while processing your order.');
+                            showCheckoutError(response.message ||
+                                'An error occurred while processing your order.');
                             return;
                         }
 
                         if (response.payment_method === 'mastercard') {
-                            createRazorpayOrder(response.order_id).done(function(orderResponse) {
+                            createRazorpayOrder(response.order_id).done(function(
+                            orderResponse) {
                                 if (!orderResponse.success) {
                                     showCheckoutError(orderResponse.message ||
                                         'Unable to initialize Razorpay payment.');
@@ -858,7 +789,8 @@
                                 openRazorpayCheckout(orderResponse, response);
                             }).fail(function(xhr) {
                                 showCheckoutError(buildErrorMessage(xhr,
-                                    'Unable to initialize Razorpay payment. Please try again.'));
+                                    'Unable to initialize Razorpay payment. Please try again.'
+                                    ));
                                 setLoadingState(false);
                             });
 
@@ -883,6 +815,3 @@
         });
     </script>
 @endsection
-
-
-

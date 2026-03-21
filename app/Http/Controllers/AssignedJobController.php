@@ -63,9 +63,11 @@ class AssignedJobController extends Controller
                 $serviceRequest->save();
 
 
-                $amcScheduleMeeting = AmcScheduleMeeting::where('id', $remoteSupportJob->amc_schedule_meeting_id)->first();
-                $amcScheduleMeeting->status = 'in_progress';
-                $amcScheduleMeeting->save();
+                if ($serviceRequest->service_type == 'amc') {
+                    $amcScheduleMeeting = AmcScheduleMeeting::where('id', $remoteSupportJob->amc_schedule_meeting_id)->first();
+                    $amcScheduleMeeting->status = 'in_progress';
+                    $amcScheduleMeeting->save();
+                }
 
                 return redirect()->back()->with('success', 'Diagnosis started successfully.');
             }
@@ -117,9 +119,11 @@ class AssignedJobController extends Controller
             $serviceRequest->status = 'completed';
             $serviceRequest->save();
 
-            $amcScheduleMeeting = AmcScheduleMeeting::where('id', $remoteSupportJob->amc_schedule_meeting_id)->first();
-            $amcScheduleMeeting->status = 'completed';
-            $amcScheduleMeeting->save();
+            if ($serviceRequest->service_type == 'amc') {
+                $amcScheduleMeeting = AmcScheduleMeeting::where('id', $remoteSupportJob->amc_schedule_meeting_id)->first();
+                $amcScheduleMeeting->status = 'completed';
+                $amcScheduleMeeting->save();
+            }
 
             if ($remoteSupportDiagnose) {
                 return redirect()->back()->with('success', 'Diagnosis completed successfully.');

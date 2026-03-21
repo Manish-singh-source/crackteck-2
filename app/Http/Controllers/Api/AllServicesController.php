@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\QuotationResource;
 use App\Models\Amc;
@@ -9,6 +10,7 @@ use App\Models\AmcPlan;
 use App\Models\AmcProduct;
 use App\Models\Coupon;
 use App\Models\CoveredItem;
+use App\Models\DeviceSpecificDiagnosis;
 use App\Models\EngineerDiagnosisDetail;
 use App\Models\Feedback;
 use App\Models\Lead;
@@ -171,6 +173,35 @@ class AllServicesController extends Controller
             }
 
             return response()->json(['quick_service' => $quickService], 200);
+        }
+    }
+
+    public function getDevicesTypes(Request $request) {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return ApiResponse::error('Invalid Role Id provided.', 400);
+        }
+
+        if ($staffRole == 'customers') {
+            $deviceType = DeviceSpecificDiagnosis::where('status', 'active')
+                ->select('id', 'device_type')
+                ->get();
+
+            if (! $deviceType) {
+                return response()->json(['success' => false, 'message' => 'Device Type not found.'], 404);
+            }
+
+            return ApiResponse::success($deviceType, 'Devices Types Data Fetched Successfully');
         }
     }
 

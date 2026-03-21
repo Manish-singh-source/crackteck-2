@@ -24,7 +24,7 @@ return new class extends Migration
     {
         Schema::table('leads', function (Blueprint $table) {
             //
-            $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade'); 
+            $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade')->change(); 
         });
     }
 };

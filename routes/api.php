@@ -260,6 +260,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/quick-services', 'quickServicesList');
             Route::get('/services-list', 'servicesListByType');
             Route::get('/service-details/{id}', 'getServiceDetails');
+
+            Route::get('/devices-types', 'getDevicesTypes');
+
             // submit service request
             Route::post('/submit-quick-service-request', 'submitQuickServiceRequest');
 

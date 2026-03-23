@@ -267,14 +267,14 @@
         }
 
         /* input,
-                                  select,
-                                  textarea {
-                                    width: 100%;
-                                    padding: 12px;
-                                    margin: 10px 0 20px;
-                                    border: 1px solid #ccc;
-                                    border-radius: 4px;
-                                  } */
+                                              select,
+                                              textarea {
+                                                width: 100%;
+                                                padding: 12px;
+                                                margin: 10px 0 20px;
+                                                border: 1px solid #ccc;
+                                                border-radius: 4px;
+                                              } */
 
         .btn {
             padding: 10px 20px;
@@ -714,11 +714,10 @@
                                     @endif
                                 </div>
 
-                                {{-- <div class="plan-action">
-                                    <button class="btn btn-primary" onclick="selectPlan({{ $plan->id }}, '{{ $plan->plan_name }}')">
-                                        Select Plan
-                                    </button>
-                                </div> --}}
+                                <div class="detail-label">
+                                    <strong>Note:</strong> By proceeding, you agree to our <a
+                                        href="{{ route('t&c') }}">Terms &amp; Conditions.</a>
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -955,19 +954,6 @@
                             <input type="text" class="form-control form-control-lg" id="plan_duration"
                                 name="plan_duration" placeholder="Duration will be auto-filled" readonly>
                         </div>
-                        {{-- 
-                        <div class="col-md-6">
-                            <label for="plan_cost_display" class="form-label">Plan Cost (₹)</label>
-                            <input type="text" class="form-control form-control-lg" id="plan_cost_display"
-                                name="plan_cost" placeholder="Cost will be auto-filled" readonly>
-                        </div> --}}
-                        <div class="col-md-6">
-                            <label for="preferred_start_date" class="form-label">Preferred Start Date <span
-                                    class="text-danger">*</span></label>
-                            <input type="date" class="form-control form-control-lg" id="preferred_start_date"
-                                name="preferred_start_date" required>
-                        </div>
-
                     </div>
                 </div>
 
@@ -1014,21 +1000,6 @@
                                         <input type="text" class="form-control form-control-lg product-model"
                                             placeholder="Model Number" required>
                                     </div>
-                                    {{-- <div class="col-md-4">
-                                        <label class="form-label">Serial Number</label>
-                                        <input type="text" class="form-control form-control-lg product-serial"
-                                            placeholder="Serial Number">
-                                    </div> --}}
-                                    <div class="col-md-3">
-                                        <label class="form-label">SKU</label>
-                                        <input type="text" class="form-control form-control-lg product-sku"
-                                            placeholder="SKU">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">HSN Code</label>
-                                        <input type="text" class="form-control form-control-lg product-hsn"
-                                            placeholder="HSN Code">
-                                    </div>
                                     <div class="col-md-3">
                                         <label class="form-label">MAC Address <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control form-control-lg product-mac-address"
@@ -1039,6 +1010,14 @@
                                         <input type="date" class="form-control form-control-lg product-purchase-date"
                                             required>
                                     </div>
+                                </div>
+                                <div class="alert alert-info mt-3" id="login-notice" style="display: block;">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <span id="login-notice-text">Please Refer Following Instructions to Find MAC Address of
+                                        Your System.
+                                        <a href="{{ asset('assets/files/MAC Address Instructions.pdf') }}"
+                                            target="_blank">Click Here</a>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -1211,13 +1190,13 @@
             <div class="flat-title wow fadeInUp">
                 <h5 class="fw-semibold">Customer Review</h5>
                 <!-- <div class="box-btn-slide relative">
-                                        <div class="swiper-button-prev nav-swiper nav-prev-products">
-                                          <i class="icon-arrow-left-lg"></i>
-                                        </div>
-                                        <div class="swiper-button-next nav-swiper nav-next-products">
-                                          <i class="icon-arrow-right-lg"></i>
-                                        </div>
-                                      </div> -->
+                                                    <div class="swiper-button-prev nav-swiper nav-prev-products">
+                                                      <i class="icon-arrow-left-lg"></i>
+                                                    </div>
+                                                    <div class="swiper-button-next nav-swiper nav-next-products">
+                                                      <i class="icon-arrow-right-lg"></i>
+                                                    </div>
+                                                  </div> -->
             </div>
             <div class="swiper tf-sw-products" data-preview="3" data-tablet="2" data-mobile-sm="1" data-mobile="1"
                 data-space-lg="30" data-space-md="15" data-space="15" data-pagination="1" data-pagination-sm="1"
@@ -1785,8 +1764,8 @@
             updateNavigationButtons();
 
             // Set minimum date for preferred start date
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('preferred_start_date').setAttribute('min', today);
+            // const today = new Date().toISOString().split('T')[0];
+            // document.getElementById('preferred_start_date').setAttribute('min', today);
         });
 
         // Check if customer is logged in
@@ -2028,16 +2007,6 @@
                         <label class="form-label">Model Number</label>
                         <input type="text" class="form-control form-control-lg product-model"
                             placeholder="Model Number" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">SKU</label>
-                        <input type="text" class="form-control form-control-lg product-sku"
-                            placeholder="SKU">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">HSN Code</label>
-                        <input type="text" class="form-control form-control-lg product-hsn"
-                            placeholder="HSN Code">
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">MAC Address <span class="text-danger">*</span></label>
@@ -2328,8 +2297,6 @@
                         product_type: entry.querySelector('.product-type').value,
                         brand_name: entry.querySelector('.product-brand').value,
                         model_number: entry.querySelector('.product-model').value,
-                        sku: entry.querySelector('.product-sku').value,
-                        hsn: entry.querySelector('.product-hsn').value,
                         mac_address: entry.querySelector('.product-mac-address').value,
                         purchase_date: entry.querySelector('.product-purchase-date').value
                     };
@@ -2344,8 +2311,6 @@
                         !input.classList.contains('product-type') &&
                         !input.classList.contains('product-brand') &&
                         !input.classList.contains('product-model') &&
-                        !input.classList.contains('product-sku') &&
-                        !input.classList.contains('product-hsn') &&
                         !input.classList.contains('product-mac-address') &&
                         !input.classList.contains('product-purchase-date')) {
 
@@ -2402,8 +2367,6 @@
                     <p class="mb-1"><strong>Product Type:</strong> ${productTypeName}</p>
                     <p class="mb-1"><strong>Brand:</strong> ${brandName}</p>
                     <p class="mb-1"><strong>Model:</strong> ${product.model_number || ''}</p>
-                    <p class="mb-1"><strong>SKU:</strong> ${product.sku || ''}</p>
-                    <p class="mb-1"><strong>HSN Code:</strong> ${product.hsn || ''}</p>
                     <p class="mb-1"><strong>MAC Address:</strong> ${product.mac_address || ''}</p>
                     <p class="mb-1"><strong>Purchase Date:</strong> ${product.purchase_date || ''}</p>
                 </div>
@@ -2415,7 +2378,6 @@
             <p><strong>Plan Type:</strong> ${formData.plan_type || ''}</p>
             <p><strong>Plan:</strong> ${getSelectedText('amc_plan_id')}</p>
             <p><strong>Duration:</strong> ${formData.plan_duration || ''}</p>
-            <p><strong>Start Date:</strong> ${formData.preferred_start_date || ''}</p>
         `;
             // <p><strong>Cost:</strong> ${document.getElementById('plan_cost_display').value || ''}</p>
             document.getElementById('review-plan-info').innerHTML = planInfo;

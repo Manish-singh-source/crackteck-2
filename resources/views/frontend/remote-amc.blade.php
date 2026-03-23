@@ -267,14 +267,14 @@
         }
 
         /* input,
-                              select,
-                              textarea {
-                                width: 100%;
-                                padding: 12px;
-                                margin: 10px 0 20px;
-                                border: 1px solid #ccc;
-                                border-radius: 4px;
-                              } */
+                                          select,
+                                          textarea {
+                                            width: 100%;
+                                            padding: 12px;
+                                            margin: 10px 0 20px;
+                                            border: 1px solid #ccc;
+                                            border-radius: 4px;
+                                          } */
 
         .btn {
             padding: 10px 20px;
@@ -712,13 +712,12 @@
                                             @endforeach
                                         </div>
                                     @endif
+
+                                    <div class="detail-label">
+                                        <strong>Note:</strong> By proceeding, you agree to our <a href="{{ route('t&c') }}">Terms &amp; Conditions.</a>
+                                    </div>
                                 </div>
 
-                                {{-- <div class="plan-action">
-                                    <button class="btn btn-primary" onclick="selectPlan({{ $plan->id }}, '{{ $plan->plan_name }}')">
-                                        Select Plan
-                                    </button>
-                                </div> --}}
                             </div>
                         </div>
                     @endforeach
@@ -799,7 +798,8 @@
                                 placeholder="First Name" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <label for="last_name" class="form-label">Last Name <span
+                                    class="text-danger">*</span></label>
                             <input type="text" class="form-control form-control-lg" id="last_name" name="last_name"
                                 placeholder="Last Name" required>
                         </div>
@@ -854,12 +854,13 @@
                             <input type="text" class="form-control form-control-lg" id="plan_cost_display"
                                 name="plan_cost" placeholder="Cost will be auto-filled" readonly>
                         </div>
+                        {{-- 
                         <div class="col-md-6">
                             <label for="preferred_start_date" class="form-label">Preferred Start Date <span
                                     class="text-danger">*</span></label>
                             <input type="date" class="form-control form-control-lg" id="preferred_start_date"
                                 name="preferred_start_date" required>
-                        </div>
+                        </div> --}}
 
                     </div>
                 </div>
@@ -913,16 +914,6 @@
                                             placeholder="Serial Number">
                                     </div> --}}
                                     <div class="col-md-3">
-                                        <label class="form-label">SKU</label>
-                                        <input type="text" class="form-control form-control-lg product-sku"
-                                            placeholder="SKU">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">HSN Code</label>
-                                        <input type="text" class="form-control form-control-lg product-hsn"
-                                            placeholder="HSN Code">
-                                    </div>
-                                    <div class="col-md-3">
                                         <label class="form-label">MAC Address <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control form-control-lg product-mac-address"
                                             placeholder="MAC Address" required>
@@ -932,6 +923,14 @@
                                         <input type="date" class="form-control form-control-lg product-purchase-date"
                                             required>
                                     </div>
+                                </div>
+                                <div class="alert alert-info mt-3" id="login-notice" style="display: block;">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <span id="login-notice-text">Please Refer Following Instructions to Find MAC Address of
+                                        Your System.
+                                        <a href="{{ asset('assets/files/MAC Address Instructions.pdf') }}"
+                                            target="_blank">Click Here</a>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -1051,7 +1050,8 @@
                     <p class="mb-3">The email address you entered is already registered in our system.</p>
                     <p class="mb-4">Please login to continue with your existing account.</p>
                     <div class="d-flex justify-content-center gap-3">
-                        <a href="#log" data-bs-toggle="modal" class="btn btn-primary" onclick="$('#loginRequiredModal').modal('hide');">
+                        <a href="#log" data-bs-toggle="modal" class="btn btn-primary"
+                            onclick="$('#loginRequiredModal').modal('hide');">
                             <i class="fas fa-sign-in-alt me-2"></i>Login
                         </a>
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -1081,13 +1081,13 @@
             <div class="flat-title wow fadeInUp">
                 <h5 class="fw-semibold">Customer Review</h5>
                 <!-- <div class="box-btn-slide relative">
-                                    <div class="swiper-button-prev nav-swiper nav-prev-products">
-                                      <i class="icon-arrow-left-lg"></i>
-                                    </div>
-                                    <div class="swiper-button-next nav-swiper nav-next-products">
-                                      <i class="icon-arrow-right-lg"></i>
-                                    </div>
-                                  </div> -->
+                                                <div class="swiper-button-prev nav-swiper nav-prev-products">
+                                                  <i class="icon-arrow-left-lg"></i>
+                                                </div>
+                                                <div class="swiper-button-next nav-swiper nav-next-products">
+                                                  <i class="icon-arrow-right-lg"></i>
+                                                </div>
+                                              </div> -->
             </div>
             <div class="swiper tf-sw-products" data-preview="3" data-tablet="2" data-mobile-sm="1" data-mobile="1"
                 data-space-lg="30" data-space-md="15" data-space="15" data-pagination="1" data-pagination-sm="1"
@@ -1306,8 +1306,8 @@
             updateNavigationButtons();
 
             // Set minimum date for preferred start date
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('preferred_start_date').setAttribute('min', today);
+            // const today = new Date().toISOString().split('T')[0];
+            // document.getElementById('preferred_start_date').setAttribute('min', today);
         });
 
         // Check if customer is logged in
@@ -1346,7 +1346,7 @@
                     customerAddresses = addresses; // Store for later use
                     const addressSelectorRow = document.getElementById('address-selection-row');
                     const addressSelector = document.getElementById('address_selector');
-                    
+
                     console.log('Customer addresses:', addresses); // Debug log
                     if (addresses.length > 0) {
                         if (addresses.length === 1) {
@@ -1366,21 +1366,22 @@
                             // Multiple addresses - show dropdown
                             addressSelectorRow.style.display = 'block';
                             addressSelector.innerHTML = '<option value="">Select an address</option>';
-                            
+
                             addresses.forEach((address, index) => {
                                 const option = document.createElement('option');
                                 option.value = address.id; // Use actual address ID
-                                const addressText = address.branch_name || address.address1 || `Address ${index + 1}`;
+                                const addressText = address.branch_name || address.address1 ||
+                                    `Address ${index + 1}`;
                                 option.textContent = addressText + (address.city ? `, ${address.city}` : '');
                                 addressSelector.appendChild(option);
                             });
-                            
+
                             // Pre-select first address
                             addressSelector.value = addresses[0].id;
                             document.getElementById('selected_address_id').value = addresses[0].id || '';
                             populateAddressFields(addresses[0]);
                         }
-                        
+
                         // Add change event listener for address dropdown
                         addressSelector.addEventListener('change', function() {
                             const selectedId = this.value;
@@ -1417,7 +1418,7 @@
                 console.error('Error checking customer login:', error);
             }
         }
-        
+
         // Function to populate address fields
         function populateAddressFields(address) {
             document.getElementById('branch_name').value = address.branch_name || '';
@@ -1545,16 +1546,6 @@
                         <label class="form-label">Model Number</label>
                         <input type="text" class="form-control form-control-lg product-model"
                             placeholder="Model Number" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">SKU</label>
-                        <input type="text" class="form-control form-control-lg product-sku"
-                            placeholder="SKU">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">HSN Code</label>
-                        <input type="text" class="form-control form-control-lg product-hsn"
-                            placeholder="HSN Code">
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">MAC Address <span class="text-danger">*</span></label>
@@ -1834,8 +1825,8 @@
                         product_type: entry.querySelector('.product-type').value,
                         brand_name: entry.querySelector('.product-brand').value,
                         model_number: entry.querySelector('.product-model').value,
-                        sku: entry.querySelector('.product-sku').value,
-                        hsn: entry.querySelector('.product-hsn').value,
+                        // sku: entry.querySelector('.product-sku').value,
+                        // hsn: entry.querySelector('.product-hsn').value,
                         mac_address: entry.querySelector('.product-mac-address').value,
                         purchase_date: entry.querySelector('.product-purchase-date').value
                     };
@@ -1850,8 +1841,8 @@
                         !input.classList.contains('product-type') &&
                         !input.classList.contains('product-brand') &&
                         !input.classList.contains('product-model') &&
-                        !input.classList.contains('product-sku') &&
-                        !input.classList.contains('product-hsn') &&
+                        // !input.classList.contains('product-sku') &&
+                        // !input.classList.contains('product-hsn') &&
                         !input.classList.contains('product-mac-address') &&
                         !input.classList.contains('product-purchase-date')) {
 
@@ -1888,8 +1879,6 @@
                     <p class="mb-1"><strong>Product Type:</strong> ${productTypeName}</p>
                     <p class="mb-1"><strong>Brand:</strong> ${brandName}</p>
                     <p class="mb-1"><strong>Model:</strong> ${product.model_number || ''}</p>
-                    <p class="mb-1"><strong>SKU:</strong> ${product.sku || ''}</p>
-                    <p class="mb-1"><strong>HSN Code:</strong> ${product.hsn || ''}</p>
                     <p class="mb-1"><strong>MAC Address:</strong> ${product.mac_address || ''}</p>
                     <p class="mb-1"><strong>Purchase Date:</strong> ${product.purchase_date || ''}</p>
                 </div>
@@ -1900,7 +1889,6 @@
             const planInfo = `
             <p><strong>Plan:</strong> ${getSelectedText('amc_plan_id')}</p>
             <p><strong>Duration:</strong> ${formData.plan_duration || ''} Months</p>
-            <p><strong>Start Date:</strong> ${formData.preferred_start_date || ''}</p>
             <p><strong>Cost:</strong> ${document.getElementById('plan_cost_display').value || ''}</p>
         `;
             document.getElementById('review-plan-info').innerHTML = planInfo;
@@ -1979,12 +1967,15 @@
                         });
 
                         if (verification.success) {
-                            alert(`Payment successful! Your Remote AMC has been activated. Service ID: ${result.service_id}`);
+                            alert(
+                                `Payment successful! Your Remote AMC has been activated. Service ID: ${result.service_id}`
+                            );
                             resetRemoteAmcForm();
                             return;
                         }
 
-                        alert(verification.message || 'Payment verification failed. Please contact support if money was debited.');
+                        alert(verification.message ||
+                            'Payment verification failed. Please contact support if money was debited.');
                     } catch (error) {
                         console.error('Payment verification error:', error);
                         alert('Payment verification failed. Please contact support if money was debited.');
@@ -2005,7 +1996,9 @@
                     ondismiss: function() {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Proceed to Pay';
-                        alert('Payment was not completed. Your Remote AMC request is saved in pending state until payment is completed.');
+                        alert(
+                            'Payment was not completed. Your Remote AMC request is saved in pending state until payment is completed.'
+                        );
                     }
                 }
             };
@@ -2014,9 +2007,9 @@
             razorpay.on('payment.failed', function(response) {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Proceed to Pay';
-                const failureMessage = response.error && response.error.description
-                    ? response.error.description
-                    : 'Payment failed. Please try again.';
+                const failureMessage = response.error && response.error.description ?
+                    response.error.description :
+                    'Payment failed. Please try again.';
                 alert(failureMessage);
             });
 
@@ -2029,7 +2022,8 @@
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Payment...';
 
-                let selected_address_id = document.getElementById('selected_address_id') ? document.getElementById('selected_address_id').value : null;
+                let selected_address_id = document.getElementById('selected_address_id') ? document.getElementById(
+                    'selected_address_id').value : null;
                 const submitData = {
                     ...formData,
                     products: productsData,
@@ -2102,4 +2096,3 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 @endsection
-

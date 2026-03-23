@@ -381,7 +381,7 @@ class FrontendController extends Controller
 
             // Step 4: AMC Plan Selection
             'amc_plan_id' => 'required|integer|min:1',
-            'preferred_start_date' => 'required|date',
+            // 'preferred_start_date' => 'required|date',
 
             // Step 5: Product Information (Multiple Products)
             'products' => 'required|array|min:1',

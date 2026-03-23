@@ -52,7 +52,8 @@
                             <li><a href="{{ route('my-account-password') }}" class="my-account-nav-item">Change Password</a>
                             </li>
                             <li><span class="my-account-nav-item active">AMC</span></li>
-                            <li><a href="{{ route('my-account-ticket') }}" class="my-account-nav-item">Support Ticket</a></li>
+                            <li><a href="{{ route('my-account-ticket') }}" class="my-account-nav-item">Support Ticket</a>
+                            </li>
                             {{-- <li><a href="{{ route('my-account-non-amc') }}" class="my-account-nav-item">NON AMC</a></li> --}}
                             <li><a href="{{ route('wishlist') }}" class="my-account-nav-item">Wishlist</a></li>
                             @if (Auth::guard('customer_web')->check())
@@ -71,7 +72,8 @@
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h4 class="fw-semibold mb-0">AMC Service Details</h4>
                             <div class="d-flex gap-2">
-                                <button type="button" class="tf-btn btn-small d-inline-flex" data-bs-toggle="modal" data-bs-target="#raiseTicketModal">
+                                <button type="button" class="tf-btn btn-small d-inline-flex" data-bs-toggle="modal"
+                                    data-bs-target="#raiseTicketModal">
                                     <span class="text-white"><i class="fas fa-ticket-alt me-2"></i>Raise Ticket</span>
                                 </button>
                                 <a href="{{ route('my-account-amc') }}" class="tf-btn btn-small d-inline-flex">
@@ -158,7 +160,7 @@
                                         <p class="mb-2"><strong>Plan Name:</strong>
                                             {{ $amcService->amcPlan->plan_name ?? 'N/A' }}</p>
                                         <p class="mb-2"><strong>Start Date:</strong>
-                                            {{ $amcService->created_at ? $amcService->created_at->format('d M Y') : 'N/A' }}
+                                            {{ $amcService->startDate ? $amcService->startDate : 'N/A' }}
                                         </p>
                                         <p class="mb-2"><strong>Plan Type:</strong> AMC Service</p>
                                         <p class="mb-2"><strong>Priority Level:</strong> Normal</p>
@@ -170,23 +172,7 @@
                                         </p>
                                         <p class="mb-2">
                                             <strong>End Date:</strong>
-                                            @php
-                                                $endDate = null;
-                                                if ($amcService->created_at && $amcService->amcPlan->duration) {
-                                                    $startDate = \Carbon\Carbon::parse($amcService->created_at);
-                                                    $duration = $amcService->amcPlan->duration;
-                                                    preg_match('/\d+/', $duration, $matches);
-                                                    $number = isset($matches[0]) ? (int) $matches[0] : 0;
-                                                    if (stripos($duration, 'month') !== false) {
-                                                        $endDate = $startDate->copy()->addMonths($number);
-                                                    } elseif (stripos($duration, 'year') !== false) {
-                                                        $endDate = $startDate->copy()->addYears($number);
-                                                    } elseif (stripos($duration, 'day') !== false) {
-                                                        $endDate = $startDate->copy()->addDays($number);
-                                                    }
-                                                }
-                                            @endphp
-                                            {{ $endDate ? $endDate->format('d M Y') : 'N/A' }}
+                                            {{ $amcService->endDate ? $amcService->endDate : 'N/A' }}
                                         </p>
                                         <p class="mb-2"><strong>Total Visits:</strong>
                                             {{ $amcService->amcPlan->total_visits ?? 'N/A' }}</p>
@@ -214,9 +200,9 @@
                                                         {{ $branch->branch_name ?? 'Branch ' . ($index + 1) }}</h6>
                                                     <p class="mb-1"><strong>Address:</strong>
                                                         {{ $branch->address1 }}
-                                                    @if ($branch->address2)
-                                                        {{ $branch->address2 }}
-                                                    @endif
+                                                        @if ($branch->address2)
+                                                            {{ $branch->address2 }}
+                                                        @endif
                                                     </p>
                                                     <p class="mb-1">{{ $branch->city }}, {{ $branch->state }} -
                                                         {{ $branch->pincode }}, {{ $branch->country }}</p>
@@ -258,7 +244,7 @@
                                                         <td>{{ $index + 1 }}</td>
                                                         <td>{{ $product->name ?? ($product->item_name ?? 'N/A') }}
                                                         </td>
-                                                        <td>{{ $product->type ?? '-' }}</td>
+                                                        <td>{{ $product->productType->device_type ?? '-' }}</td>
                                                         <td>{{ $product->brand ?? '-' }}</td>
                                                         <td>{{ $product->model_no ?? '-' }}</td>
                                                         <td>{{ $product->sku ?? '-' }}</td>
@@ -278,7 +264,8 @@
                         @if ($amcService->amcScheduleMeetings && $amcService->amcScheduleMeetings->count() > 0)
                             <div class="card mb-3">
                                 <div class="card-header bg-light">
-                                    <h6 class="mb-0 fw-semibold"><i class="fas fa-history me-2"></i>Service History Details
+                                    <h6 class="mb-0 fw-semibold"><i class="fas fa-history me-2"></i>Service History
+                                        Details
                                         ({{ $amcService->amcScheduleMeetings->count() }})</h6>
                                 </div>
                                 <div class="card-body">
@@ -288,36 +275,75 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Engineer Name</th>
-                                                    <th>Visit Date</th>
+                                                    <th>Visit/Remote Support Date</th>
                                                     <th>Issue Type</th>
                                                     <th>Report</th>
                                                     <th>Status</th>
+                                                    {{-- <th>Action </th> --}}
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @foreach ($amcService->amcScheduleMeetings as $index => $meeting)
-                                                    <tr>
-                                                        <td>{{ $index + 1 }}</td>
-                                                        <td>{{ $meeting->activeAssignment->engineer->first_name ?? 'N/A' }}
-                                                            {{ $meeting->activeAssignment->engineer->last_name ?? '' }}
-                                                        </td>
-                                                        <td>{{ $meeting->scheduled_at ? \Carbon\Carbon::parse($meeting->scheduled_at)->format('d M Y') : 'N/A' }}
-                                                        </td>
-                                                        <td>Maintenance</td>
-                                                        <td>NA</td>
-                                                        <td>
-                                                            @php
-                                                                $meetingStatusClass = match ($meeting->status) {
-                                                                    'Pending' => 'badge bg-warning text-dark',
-                                                                    'Completed' => 'badge bg-success',
-                                                                    'Cancelled' => 'badge bg-danger',
-                                                                    'In Progress' => 'badge bg-info',
-                                                                    default => 'badge bg-secondary',
-                                                                };
-                                                            @endphp
-                                                            <span class="{{ $meetingStatusClass }}">{{ $meeting->status ?? 'N/A' }}</span>
-                                                        </td>
-                                                    </tr>
+                                                    @php
+                                                        $meetingStatusClass = match ($meeting->status) {
+                                                            'Pending' => 'badge bg-warning text-dark',
+                                                            'Completed' => 'badge bg-success',
+                                                            'Cancelled' => 'badge bg-danger',
+                                                            'In Progress' => 'badge bg-info',
+                                                            default => 'badge bg-secondary',
+                                                        };
+                                                    @endphp
+                                                    {{-- @if ($meeting->status != 'pending') --}}
+                                                    @if ($meeting->status == 'completed')
+                                                        <tr>
+                                                            <td>{{ $index + 1 }}</td>
+                                                            <td>
+                                                                @if (empty($meeting->activeAssignment))
+                                                                    {{ $meeting->remoteSupportJob->engineer->first_name ?? 'N/A' }}
+                                                                @else
+                                                                    {{ $meeting->activeAssignment->engineer->first_name ?? 'N/A' }}
+                                                                @endif
+                                                            </td>
+                                                            <td>{{ $meeting->scheduled_at ? \Carbon\Carbon::parse($meeting->scheduled_at)->format('d M Y') : 'N/A' }}
+                                                            </td>
+                                                            <td>Maintenance</td>
+                                                            <td>
+                                                                @if ($meeting->status == 'completed')
+                                                                    <!-- Report Button -->
+                                                                    <a href="{{ route('service-request.view-amc-service-request', $meeting->service_request_id) }}"
+                                                                        class="btn btn-sm btn-primary">
+                                                                        View Report
+                                                                    </a>
+                                                                @else
+                                                                    N/A
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                <span
+                                                                    class="{{ $meetingStatusClass }}">{{ $meeting->status ?? 'N/A' }}</span>
+                                                            </td>
+                                                            {{-- 
+                                                            <td>
+                                                                @if ($meeting->status == 'completed' || !$meeting->activeAssignment)
+                                                                    <button class="btn btn-sm btn-primary"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#rescheduleModal" disabled>
+                                                                        Re-Scheduled
+                                                                    </button>
+                                                                @else
+                                                                    <!-- Re-Scheduled Button -->
+                                                                    <button class="btn btn-sm btn-primary"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#rescheduleModal"
+                                                                        data-reschedule-id="{{ $meeting->id }}"
+                                                                        data-scheduled-time="{{ $meeting->scheduled_at }}">
+                                                                        Re-Scheduled
+                                                                    </button>
+                                                                @endif
+                                                            </td> 
+                                                            --}}
+                                                        </tr>
+                                                    @endif
                                                 @endforeach
                                             </tbody>
                                         </table>
@@ -347,7 +373,8 @@
     <!-- /AMC Service Details -->
 
     <!-- Raise Ticket Modal -->
-    <div class="modal fade" id="raiseTicketModal" tabindex="-1" aria-labelledby="raiseTicketModalLabel" aria-hidden="true">
+    <div class="modal fade" id="raiseTicketModal" tabindex="-1" aria-labelledby="raiseTicketModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -359,12 +386,15 @@
                     <input type="hidden" name="amc_id" value="{{ $amcService->id }}">
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="ticketSubject" class="form-label">Subject <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="ticketSubject" name="subject" required placeholder="Enter issue subject">
+                            <label for="ticketSubject" class="form-label">Subject <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="ticketSubject" name="subject" required
+                                placeholder="Enter issue subject">
                         </div>
                         <div class="mb-3">
                             <label for="ticketDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="ticketDescription" name="description" rows="4" placeholder="Describe your issue in detail"></textarea>
+                            <textarea class="form-control" id="ticketDescription" name="description" rows="4"
+                                placeholder="Describe your issue in detail"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -381,13 +411,15 @@
         $(document).ready(function() {
             $('#raiseTicketForm').on('submit', function(e) {
                 e.preventDefault();
-                
+
                 var formData = $(this).serialize();
                 var submitBtn = $(this).find('button[type="submit"]');
                 var originalBtnText = submitBtn.html();
-                
-                submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Submitting...');
-                
+
+                submitBtn.prop('disabled', true).html(
+                    '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Submitting...'
+                );
+
                 $.ajax({
                     url: "{{ route('my-account-amc.ticket.store') }}",
                     type: 'POST',
@@ -396,7 +428,8 @@
                         if (response.success) {
                             $('#raiseTicketModal').modal('hide');
                             $('#raiseTicketForm')[0].reset();
-                            alert(response.message + '\nTicket No: ' + response.ticket.ticket_no);
+                            alert(response.message + '\nTicket No: ' + response.ticket
+                                .ticket_no);
                         } else {
                             alert(response.message);
                         }

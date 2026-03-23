@@ -1,0 +1,68 @@
+I am creating a new project named as 'MyCRM' such as that will handle following things.
+
+1. Role based access control (RBAC)
+2. there are three main roles like staff, client, and admin but we can create more roles if we want 
+3. the system can create teams and teams can has permissions to access modules 
+4. the system has clients management module 
+5. the system has staff management module 
+6. the system has vendor management module 
+7. the system has projects management module 
+8. the system has tasks management module   
+9. the system has services management module 
+10. the system has leads management module
+
+
+Now we can go through each in details: 
+
+
+1. Permissions:
+    - create permissions 
+    - delete permissions 
+    - view permissions 
+    - edit permissions 
+
+2. Roles:
+    - create roles with permissions 
+    - delete roles 
+    - view roles 
+    - edit roles with permissions 
+
+3. Teams:
+    - create teams with roles/permissions
+    - delete teams 
+    - view teams 
+    - edit teams with roles/permissions
+
+4. Staff Management: 
+    - create staff: 
+        - when creating a staff we can add staffs basic details like name, email, dob, phone number, etc. 
+        - we can select role for that staff 
+        - we can choose team for that staff and it is optional 
+        - generate a random password for him and send to him on mail with welcome message 
+
+    - edit staff details: 
+        - we can update same details as we are filling when we are creating staff 
+
+    - delete staff (soft delete)
+    - permanent delete 
+    - restore staff: 
+        - restore staff member that is deleted
+    - view staff details: 
+        - we can view staff details as we are filling in form 
+        - we can track system login logs 
+        - we can view assigned projects for that staff 
+        - we can view tasks list that is assigned for that staff
+
+5. Client Management
+    - create client
+        - when creating a staff we can add staffs basic details like name, email, dob, phone number, etc. 
+        
+    - edit client
+    - delete client
+    - delete permenant client
+    - restore client: 
+        - restore client that is deleted
+    - view client
+
+
+

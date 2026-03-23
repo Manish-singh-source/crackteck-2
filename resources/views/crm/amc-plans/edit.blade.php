@@ -242,7 +242,8 @@
                                     <div class="card-body">
                                         <div class="alert alert-info mb-0">
                                             <i class="mdi mdi-information-outline me-2"></i>
-                                            <strong>Pricing not applicable for Onsite support.</strong> The cost will be calculated based on the actual services rendered.
+                                            <strong>Pricing not applicable for Onsite support.</strong> The cost will be
+                                            calculated based on the actual services rendered.
                                         </div>
                                     </div>
                                 </div>
@@ -442,7 +443,7 @@
 
             function togglePricing() {
                 const supportType = supportTypeSelect?.value;
-                
+
                 if (supportType === 'remote' || supportType === 'both') {
                     // Show pricing for remote
                     if (pricingCard) pricingCard.style.display = 'block';

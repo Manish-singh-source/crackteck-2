@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -66,6 +67,32 @@ class Amc extends Model
             ->setDescriptionForEvent(fn(string $eventName) => "AMC {$eventName}");
     }
 
+    // start date 
+    public function getStartDateAttribute()
+    {
+        return $this->created_at
+            ? Carbon::parse($this->created_at)->format('d M Y')
+            : null;
+    }
+
+    // end date
+    public function getEndDateAttribute()
+    {
+        if (!$this->created_at || !$this->amcPlan?->duration) {
+            return null;
+        }
+
+        $startDate = Carbon::parse($this->created_at);
+        $duration = $this->amcPlan->duration;
+
+        if ($duration > 0){
+            return Carbon::parse($startDate->copy()->addMonths($duration))->format('d M Y');
+        }
+
+        return null;
+    }
+
+
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'customer_id');
@@ -96,4 +123,3 @@ class Amc extends Model
         return $this->hasMany(RemoteAmcPayment::class);
     }
 }
-

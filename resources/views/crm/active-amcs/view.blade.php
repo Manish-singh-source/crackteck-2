@@ -378,7 +378,7 @@
                                                         Onsite
                                                     @endif
                                                 </td>
-                                                <td>{{ \Carbon\Carbon::parse($meeting->scheduled_at)->format('d M Y') }}
+                                                <td>{{ $meeting->scheduled_at ? \Carbon\Carbon::parse($meeting->scheduled_at)->format('d M Y') : 'N/A' }}
                                                 </td>
                                                 <td>
                                                     Maintanance

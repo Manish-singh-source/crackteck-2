@@ -46,6 +46,7 @@ use App\Http\Controllers\StockReportController;
 use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\TrackRequestController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\WithdrawController;
 use Illuminate\Support\Facades\Route;
 
@@ -60,6 +61,33 @@ Route::get('/auth/{provider}/redirect', [SocialController::class, 'redirectToPro
 Route::get('/auth/{provider}/callback', [SocialController::class, 'handleProviderCallback'])
     ->whereIn('provider', ['google', 'facebook', 'github'])
     ->name('auth.callback');
+
+// Password Reset Routes
+Route::prefix('password')->name('password.')->group(function () {
+    // Show forgot password form
+    Route::get('/forgot', [PasswordResetController::class, 'showForgotPasswordForm'])
+        ->name('forgot');
+    
+    // Send password reset link
+    Route::post('/send-reset-link', [PasswordResetController::class, 'sendResetLink'])
+        ->name('send-reset-link');
+    
+    // Show reset password form
+    Route::get('/reset', [PasswordResetController::class, 'showResetForm'])
+        ->name('reset');
+    
+    // Reset password
+    Route::post('/reset', [PasswordResetController::class, 'resetPassword'])
+        ->name('update');
+    
+    // API Routes for AJAX (from frontend modal)
+    Route::post('/api/send-reset-link', [PasswordResetController::class, 'apiSendResetLink'])
+        ->name('api.send-reset-link');
+    
+    // API Reset password
+    Route::post('/api/reset', [PasswordResetController::class, 'apiResetPassword'])
+        ->name('api.reset');
+});
 
 Route::prefix('/demo')->group(function () {
 

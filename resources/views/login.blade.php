@@ -124,7 +124,7 @@
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-6 text-end">
-                                                                <a class='text-muted fs-14' href="{{ route('recover-password') }}">Forgot password?</a>
+                                                                <a class='text-muted fs-14' href="{{ route('password.forgot', ['source' => 'staff']) }}">Forgot password?</a>
                                                             </div>
                                                         </div>
 

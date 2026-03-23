@@ -40,6 +40,7 @@ class CheckoutController extends Controller
 
         // Determine checkout source and get items
         $checkoutData = $this->getCheckoutData($request);
+        // dd($checkoutData);
 
         if (! $checkoutData['items'] || $checkoutData['items']->isEmpty()) {
             return redirect()->route('shop-cart')->with('error', 'No items found for checkout.');
@@ -48,7 +49,6 @@ class CheckoutController extends Controller
         // Store navigation source in session for coupon validation
         $source = $request->get('source', 'direct');
         Session::put('checkout_navigation_source', $source);
-
         // Get user's saved addresses
         $userAddresses = CustomerAddressDetail::with('customer')
             ->where('customer_id', $user->id)

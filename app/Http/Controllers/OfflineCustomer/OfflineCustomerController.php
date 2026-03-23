@@ -22,7 +22,7 @@ class OfflineCustomerController extends Controller
     public function amc()
     {
         if (! Auth::guard('customer_web')->check()) {
-            return redirect()->route('login')->with('error', 'Please login to access your account.');
+            return redirect()->route('offlinelogin')->with('error', 'Please login to access your account.');
         }
 
         $customer = Auth::guard('customer_web')->user();
@@ -46,7 +46,7 @@ class OfflineCustomerController extends Controller
     public function amcView($id)
     {
         if (! Auth::guard('customer_web')->check()) {
-            return redirect()->route('login')->with('error', 'Please login to access your account.');
+            return redirect()->route('offlinelogin')->with('error', 'Please login to access your account.');
         }
 
         $customer = Auth::guard('customer_web')->user();
@@ -129,7 +129,6 @@ class OfflineCustomerController extends Controller
         $primaryAddress = CustomerAddressDetail::where('is_primary', 'yes')
             ->where('customer_id', $customerId)
             ->first();
-        // dd($customer,$primaryAddress);
 
         return view('offline-users-dashboard.account-detail', compact('customer', 'primaryAddress'));
     }

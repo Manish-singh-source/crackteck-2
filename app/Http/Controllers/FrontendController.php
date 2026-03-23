@@ -13,11 +13,15 @@ use App\Models\Lead;
 use App\Models\ParentCategory;
 use App\Models\Product;
 use App\Models\ProductDeal;
+use App\Models\RemoteAmcPayment;
 use App\Models\WebsiteBanner;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Razorpay\Api\Api;
 
 class FrontendController extends Controller
 {
@@ -346,7 +350,6 @@ class FrontendController extends Controller
      */
     public function submitAmcRequest(Request $request)
     {
-        // dd($request->all());
         $validator = Validator::make($request->all(), [
             // Step 1: Customer Details
             'first_name' => 'required|string|max:255',
@@ -378,7 +381,7 @@ class FrontendController extends Controller
 
             // Step 4: AMC Plan Selection
             'amc_plan_id' => 'required|integer|min:1',
-            'preferred_start_date' => 'required|date',
+            // 'preferred_start_date' => 'required|date',
 
             // Step 5: Product Information (Multiple Products)
             'products' => 'required|array|min:1',
@@ -403,164 +406,179 @@ class FrontendController extends Controller
         }
 
         try {
-            // Check if customer exists or create new one
-            $customer = \App\Models\Customer::where('email', $request->email)->first();
+            $result = DB::transaction(function () use ($request) {
+                $customer = \App\Models\Customer::where('email', $request->email)->first();
 
-            if (! $customer) {
-                // Generate customer code
-                $customerCode = 'CUST-' . strtoupper(uniqid());
-
-                $customer = \App\Models\Customer::create([
-                    'customer_code' => $customerCode,
-                    'first_name' => $request->first_name,
-                    'last_name' => $request->last_name,
-                    'phone' => $request->phone,
-                    'email' => $request->email,
-                    'customer_type' => $request->customer_type,
-                    'source_type' => $request->source_type ?? 'ecommerce',
-                ]);
-            }
-
-            // Create or update customer address
-            $customerAddress = null;
-            $selectedAddressId = $request->input('selected_address_id');
-
-            // For remote AMC, don't create any address
-            // For onsite AMC, require customer address
-            if ($request->amc_type === 'remote') {
-                // For remote AMC, no address needed - leave as null
-                $customerAddress = null;
-            } else {
-                // For onsite AMC, require customer address
-                if ($selectedAddressId) {
-                    // Use existing address if selected
-                    $customerAddress = \App\Models\CustomerAddressDetail::find($selectedAddressId);
-                }
-
-                if (! $customerAddress) {
-                    // Create new address only if no existing address selected
-                    $customerAddress = \App\Models\CustomerAddressDetail::create([
-                        'customer_id' => $customer->id,
-                        'branch_name' => $request->branch_name ?? 'Primary',
-                        'address1' => $request->address1,
-                        'address2' => $request->address2,
-                        'country' => $request->country ?? 'India',
-                        'state' => $request->state,
-                        'city' => $request->city,
-                        'pincode' => $request->pincode,
-                        'is_primary' => 'yes',
+                if (! $customer) {
+                    $customer = \App\Models\Customer::create([
+                        'customer_code' => 'CUST-' . strtoupper(uniqid()),
+                        'first_name' => $request->first_name,
+                        'last_name' => $request->last_name,
+                        'phone' => $request->phone,
+                        'email' => $request->email,
+                        'customer_type' => $request->customer_type,
+                        'source_type' => $request->source_type ?? 'ecommerce',
                     ]);
                 }
-            }
 
-            // Create customer company details if company name is provided
-            if ($request->filled('company_name')) {
-                \App\Models\CustomerCompanyDetail::updateOrCreate(
-                    ['customer_id' => $customer->id],
-                    [
-                        'company_name' => $request->company_name,
-                        'gst_no' => $request->gst_no,
-                        'comp_address1' => $request->comp_address1,
-                        'comp_address2' => $request->comp_address2,
-                        'comp_country' => $request->comp_country ?? 'India',
-                        'comp_state' => $request->comp_state,
-                        'comp_city' => $request->comp_city,
-                        'comp_pincode' => $request->comp_pincode,
-                    ]
-                );
-            }
+                $customerAddress = null;
+                $selectedAddressId = $request->input('selected_address_id');
 
-            // Get AMC plan details
-            $amcPlan = \App\Models\AmcPlan::find($request->amc_plan_id);
+                if ($request->amc_type !== 'remote') {
+                    if ($selectedAddressId) {
+                        $customerAddress = \App\Models\CustomerAddressDetail::find($selectedAddressId);
+                    }
 
-            // Generate unique service ID
-            $serviceId = $this->generateServiceId();
+                    if (! $customerAddress) {
+                        $customerAddress = \App\Models\CustomerAddressDetail::create([
+                            'customer_id' => $customer->id,
+                            'branch_name' => $request->branch_name ?? 'Primary',
+                            'address1' => $request->address1,
+                            'address2' => $request->address2,
+                            'country' => $request->country ?? 'India',
+                            'state' => $request->state,
+                            'city' => $request->city,
+                            'pincode' => $request->pincode,
+                            'is_primary' => 'yes',
+                        ]);
+                    }
+                }
 
-            $uniqId = uniqid('SR-'); // Generate unique request ID with prefix
+                if ($request->filled('company_name')) {
+                    \App\Models\CustomerCompanyDetail::updateOrCreate(
+                        ['customer_id' => $customer->id],
+                        [
+                            'company_name' => $request->company_name,
+                            'gst_no' => $request->gst_no,
+                            'comp_address1' => $request->comp_address1,
+                            'comp_address2' => $request->comp_address2,
+                            'comp_country' => $request->comp_country ?? 'India',
+                            'comp_state' => $request->comp_state,
+                            'comp_city' => $request->comp_city,
+                            'comp_pincode' => $request->comp_pincode,
+                        ]
+                    );
+                }
 
-            // AMC Add
-            $amc = Amc::create([
-                'request_id' => $uniqId,
-                'service_type' => 'amc',
-                'amc_type' => $request->amc_type,
-                'customer_id' => $customer->id,
-                'customer_address_id' => $customerAddress ? $customerAddress->id : null,
-                'amc_plan_id' => $request->amc_plan_id,
-                'request_date' => now(),
-                'request_source' => $request->source_type ?? 'customer',
-                'status' => $request->amc_type === 'remote' ? 'active' : 'pending',
-                'created_by' => Auth::id(),
-            ]);
+                $amcPlan = AmcPlan::findOrFail($request->amc_plan_id);
+                $paymentAmount = $request->amc_type === 'remote' ? $this->calculateAmcPlanAmountInPaise($amcPlan) : 0;
+                $paymentCurrency = config('services.razorpay.currency', 'INR');
 
-            $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
-
-            // Calculate the month gap between visits as an integer (avoid fractional months)
-            $monthGapFloat = intval($amcPlan->duration) / max(1, intval($amcPlan->total_visits));
-            $monthGap = (int) round($monthGapFloat);
-
-            // Ensure we have a Carbon instance for dates
-            $startVisitDate = $request->preferred_start_date ? \Carbon\Carbon::parse($request->preferred_start_date) : \Carbon\Carbon::now();
-
-            // Start from the next visit after the initial visit date
-            $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
-
-            foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
-                // Create a service request visit for each visit
-                $amc->amcScheduleMeetings()->create([
-                    // 'service_request_id' => $serviceRequest->id,
-                    'amc_id' => $amc->id,
-                    'scheduled_at' => $nextVisitDate,
-                    'completed_at' => null,
-                    'remarks' => null,
-                    'report' => null,
-                    'visits_count' => $visitNumber,
-                    'status' => 'scheduled',
-                ]);
-
-                // Update the next visit date for the next iteration
-                $nextVisitDate = $nextVisitDate->addMonths($monthGap);
-            }
-
-            // Create Service Request Products in service_request_products table
-            $products = $request->input('products', []);
-            foreach ($products as $productData) {
-                AmcProduct::create([
-                    'amc_id' => $amc->id,
-                    'name' => $productData['product_name'],
-                    'type' => $productData['product_type'],
-                    'brand' => $productData['brand_name'],
-                    'model_no' => $productData['model_number'],
-                    'purchase_date' => $productData['purchase_date'],
-                    'sku' => $productData['sku'] ?? null,
-                    'hsn' => $productData['hsn'] ?? null,
-                    'mac_address' => $productData['mac_address'] ?? null,
-                ]);
-            }
-
-
-            // Create a Lead based on this AMC Request 
-            if ($request->amc_type === 'onsite') {
-                $lead = Lead::create([
+                $amc = Amc::create([
+                    'request_id' => uniqid('SR-'),
+                    'service_type' => 'amc',
+                    'amc_type' => $request->amc_type,
                     'customer_id' => $customer->id,
-                    'staff_id' => null,
                     'customer_address_id' => $customerAddress ? $customerAddress->id : null,
-                    'lead_number' => uniqid(),
-                    'requirement_type' => 'amc',
-                    'budget_range' => null,
-                    'estimated_value',
-                    'notes' => $request->additional_notes ?? null,
+                    'amc_plan_id' => $request->amc_plan_id,
+                    'request_date' => now(),
+                    'request_source' => $request->source_type ?? 'customer',
+                    'status' => 'pending',
+                    'payment_status' => 'pending',
+                    'payment_amount' => $paymentAmount,
+                    'payment_currency' => $paymentCurrency,
+                    'created_by' => Auth::id(),
+                ]);
+
+                $monthGapFloat = intval($amcPlan->duration) / max(1, intval($amcPlan->total_visits));
+                $monthGap = (int) round($monthGapFloat);
+                $startVisitDate = $request->preferred_start_date ? \Carbon\Carbon::parse($request->preferred_start_date) : \Carbon\Carbon::now();
+                $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
+
+                foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
+                    $amc->amcScheduleMeetings()->create([
+                        'amc_id' => $amc->id,
+                        'scheduled_at' => $nextVisitDate,
+                        'completed_at' => null,
+                        'remarks' => null,
+                        'report' => null,
+                        'visits_count' => $visitNumber,
+                        'status' => 'scheduled',
+                    ]);
+
+                    $nextVisitDate = $nextVisitDate->addMonths($monthGap);
+                }
+
+                $products = $request->input('products', []);
+                foreach ($products as $productData) {
+                    AmcProduct::create([
+                        'amc_id' => $amc->id,
+                        'name' => $productData['product_name'],
+                        'type' => $productData['product_type'],
+                        'brand' => $productData['brand_name'],
+                        'model_no' => $productData['model_number'],
+                        'purchase_date' => $productData['purchase_date'],
+                        'sku' => $productData['sku'] ?? null,
+                        'hsn' => $productData['hsn'] ?? null,
+                        'mac_address' => $productData['mac_address'] ?? null,
+                    ]);
+                }
+
+                if ($request->amc_type === 'onsite') {
+                    Lead::create([
+                        'customer_id' => $customer->id,
+                        'staff_id' => null,
+                        'customer_address_id' => $customerAddress ? $customerAddress->id : null,
+                        'lead_number' => uniqid(),
+                        'requirement_type' => 'amc',
+                        'budget_range' => null,
+                        'estimated_value' => null,
+                        'notes' => $request->additional_notes ?? null,
+                    ]);
+                }
+
+                $response = [
+                    'amc' => $amc->fresh(),
+                    'products_count' => count($products),
+                    'selected_address_id' => $request->selected_address_id,
+                    'requires_payment' => false,
+                    'payment' => null,
+                ];
+
+                if ($request->amc_type === 'remote') {
+                    $payment = $this->createRemoteAmcPaymentOrder($amc, $customer, $amcPlan);
+
+                    $response['requires_payment'] = true;
+                    $response['payment'] = [
+                        'id' => $payment->id,
+                        'payment_reference' => $payment->payment_reference,
+                        'amount_paise' => $payment->amount,
+                        'currency' => $payment->currency,
+                        'razorpay' => [
+                            'key_id' => config('services.razorpay.key_id'),
+                            'order_id' => $payment->gateway_order_id,
+                            'amount' => $payment->amount,
+                            'currency' => $payment->currency,
+                        ],
+                    ];
+                }
+
+                return $response;
+            });
+
+            if ($result['requires_payment']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Remote AMC request created. Complete the payment to activate your plan.',
+                    'service_id' => $result['amc']->id,
+                    'data' => $result['amc'],
+                    'selected_address_id' => $result['selected_address_id'],
+                    'products_count' => $result['products_count'],
+                    'requires_payment' => true,
+                    'payment' => $result['payment'],
                 ]);
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'AMC service request submitted successfully!',
-                'service_id' => $amc->id,
-                'data' => $amc,
-                'selected_address_id' => $request->selected_address_id,
-                'products_count' => count($products),
+                'service_id' => $result['amc']->id,
+                'data' => $result['amc'],
+                'selected_address_id' => $result['selected_address_id'],
+                'products_count' => $result['products_count'],
+                'requires_payment' => false,
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong. Please try again.',
@@ -569,6 +587,110 @@ class FrontendController extends Controller
                 'line' => $e->getLine(),
             ], 500);
         }
+    }
+
+    public function verifyRemoteAmcPayment(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'remote_amc_payment_id' => 'required|integer|exists:remote_amc_payments,id',
+            'razorpay_order_id' => 'required|string',
+            'razorpay_payment_id' => 'required|string',
+            'razorpay_signature' => 'required|string',
+        ]);
+
+        $payment = RemoteAmcPayment::with('amc')
+            ->whereKey($validated['remote_amc_payment_id'])
+            ->where('gateway_order_id', $validated['razorpay_order_id'])
+            ->firstOrFail();
+
+        try {
+            $verifiedPayment = DB::transaction(function () use ($payment, $validated) {
+                $api = app(Api::class);
+
+                $api->utility->verifyPaymentSignature([
+                    'razorpay_order_id' => $validated['razorpay_order_id'],
+                    'razorpay_payment_id' => $validated['razorpay_payment_id'],
+                    'razorpay_signature' => $validated['razorpay_signature'],
+                ]);
+
+                $gatewayPayment = $api->payment->fetch($validated['razorpay_payment_id'])->toArray();
+                $status = $gatewayPayment['status'] ?? 'authorized';
+                $isPaid = in_array($status, ['authorized', 'captured'], true);
+
+                $payment->forceFill([
+                    'gateway_payment_id' => $validated['razorpay_payment_id'],
+                    'gateway_signature' => $validated['razorpay_signature'],
+                    'status' => $status,
+                    'method' => $gatewayPayment['method'] ?? null,
+                    'gateway_payload' => $gatewayPayment,
+                    'paid_at' => $isPaid ? now() : $payment->paid_at,
+                    'failed_at' => $status === 'failed' ? now() : $payment->failed_at,
+                ])->save();
+
+                $payment->amc->forceFill([
+                    'status' => $isPaid ? 'active' : 'pending',
+                    'payment_status' => $isPaid ? 'paid' : ($status === 'failed' ? 'failed' : 'pending'),
+                    'paid_at' => $isPaid ? now() : $payment->amc->paid_at,
+                ])->save();
+
+                return $payment->fresh(['amc']);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment verified successfully. Your Remote AMC plan is now active.',
+                'data' => [
+                    'payment' => $verifiedPayment,
+                    'amc' => $verifiedPayment->amc,
+                ],
+            ]);
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to verify the Razorpay payment.',
+                'error' => $exception->getMessage(),
+            ], 422);
+        }
+    }
+
+    private function calculateAmcPlanAmountInPaise(AmcPlan $amcPlan): int
+    {
+        return (int) round(((float) $amcPlan->total_cost) * 100);
+    }
+
+    private function createRemoteAmcPaymentOrder(Amc $amc, \App\Models\Customer $customer, AmcPlan $amcPlan): RemoteAmcPayment
+    {
+        $api = app(Api::class);
+        $amount = $this->calculateAmcPlanAmountInPaise($amcPlan);
+        $currency = config('services.razorpay.currency', 'INR');
+
+        $gatewayOrder = $api->order->create([
+            'amount' => $amount,
+            'currency' => $currency,
+            'receipt' => $amc->request_id,
+            'payment_capture' => config('services.razorpay.auto_capture', true) ? 1 : 0,
+            'notes' => array_filter([
+                'amc_id' => (string) $amc->getKey(),
+                'request_id' => $amc->request_id,
+                'customer_id' => (string) $customer->getKey(),
+                'customer_email' => $customer->email,
+                'amc_type' => $amc->amc_type,
+                'plan_name' => $amcPlan->plan_name,
+            ], static fn ($value) => $value !== null && $value !== ''),
+        ])->toArray();
+
+        return RemoteAmcPayment::create([
+            'amc_id' => $amc->id,
+            'customer_id' => $customer->id,
+            'amc_plan_id' => $amcPlan->id,
+            'payment_reference' => 'RAMP-' . strtoupper(uniqid()),
+            'gateway' => 'razorpay',
+            'gateway_order_id' => $gatewayOrder['id'],
+            'amount' => $gatewayOrder['amount'],
+            'currency' => $gatewayOrder['currency'] ?? $currency,
+            'status' => $gatewayOrder['status'] ?? 'created',
+            'gateway_payload' => $gatewayOrder,
+        ]);
     }
 
     public function submitNonAmcRequest(Request $request)
@@ -772,3 +894,4 @@ class FrontendController extends Controller
         }
     }
 }
+

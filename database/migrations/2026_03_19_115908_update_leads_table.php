@@ -6,25 +6,39 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('leads', function (Blueprint $table) {
-            //
-            $table->integer('staff_id')->change()->nullable();
+            $table->dropForeign(['staff_id']);
+        });
+
+        Schema::table('leads', function (Blueprint $table) {
+            $table->unsignedBigInteger('staff_id')->nullable()->change();
+        });
+
+        Schema::table('leads', function (Blueprint $table) {
+            $table->foreign('staff_id')
+                ->references('id')
+                ->on('staff')
+                ->nullOnDelete();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('leads', function (Blueprint $table) {
-            //
-            $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade'); 
+            $table->dropForeign(['staff_id']);
+        });
+
+        Schema::table('leads', function (Blueprint $table) {
+            $table->unsignedBigInteger('staff_id')->nullable(false)->change();
+        });
+
+        Schema::table('leads', function (Blueprint $table) {
+            $table->foreign('staff_id')
+                ->references('id')
+                ->on('staff')
+                ->cascadeOnDelete();
         });
     }
 };

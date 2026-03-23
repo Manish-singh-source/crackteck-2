@@ -69,6 +69,7 @@ send invoice for customer
 quotation invoice 
 
 
+Date: 19-March-2026
 Todays Tasks:
 
 #Roshan 
@@ -100,7 +101,136 @@ Todays Tasks:
 3. Cash On Delivery APIs for e-commerce and services 
 
 
+Date: 20-March-2026
+
+Todays Tasks:
+
+#Roshan 
+
+1. SK International changes 
+2. Home Page categories filter feature in crackteck
+
+
+#Saurabh 
+
+Crackteck: 
+
+1. Razorpay payment APIs setup and integration for e-commerce order 
+2. App Testing and solving if any error occurred
+
+#Shubham 
+
+1. My CRM Screens Profile, Clients and Staffs
+
+#Pradnya 
+
+ Home page , about page and career page final changes and update online
 
 
 
+
+
+Date: 23-March-2026
+
+Todays Tasks: 
+
+# Saurabh 
+
+Crackteck: 
+1. Remove the following fields from forms like remote amc and onsite amc Preferred Start Date, SKU, HSN
+2. The “Visits (AMC Scheduled Meeting)” feature will be removed from Remote AMC.
+
+# Roshan
+
+1. Oceanic: responsiveness for all devices
+2. Crackteck: Forgot password feature adding
+
+#Shubham 
+
+MyCRM: 
+1. My CRM Screens Clients Detailed Page and Staffs Detailed Page
+2. My CRM Screens for Vendors List
+
+#Pradnya
+1. Working Pages: Android APP, IOS APP, Industries Pages
+
+
+
+Pending All Over Tasks: 
+
+Crackteck App: 
+
+1. Payment integration 
+2. Client changes as defined in MoM 
+3. Cash on Delivery Flow 
+4. Facebook login 
+5. Adding Invoices
+6. Chats Module
+
+Crackteck CRM and Website: 
+
+1. Dashboard Pages: 
+    - E-commerce 
+    - CRM 
+    - Warehouse 
+    - Sales Reports 
+2. Chats Module 
+3. Field Issues 
+5. E-commerce Website:
+    - Adding Meta tags in website 
+    - Replace dummy content from pages like about us, FAQs, etc. 
+    - Improve performance of website 
+
+6. Forgot Password Feature                                              - done 
+7. Check Auth redirects properly                                        - done
+8. App testing and fixing APIs and errors if occurred 
+9. Cash on Delivery Flow 
+10. Invoices formats implementing 
+11. GST Verification API implementing 
+12. MAC Address guidelines adding for service requests and amc requests - dummy added
+13. Terms and conditions adding for AMCs                                - dummy added
+14. WhatsApp APIs integration and Facebook login integration
+15. Client Changes as defined in MoM
+
+
+
+
+MyCRM: 
+
+1. All APIs 
+2. Following Screens: 
+    - Client Renewal 
+    - Vendor Renewal 
+    - Staff Module
+    - Roles Module 
+    - Lead Details 
+    - Project Details 
+    - Issues Details 
+    - Client Details 
+    - Settings Module 
+3. API integration in App for all modules 
+4. Website: Review everything and making changes if needed
+
+
+
+
+1. Remove the following fields from forms like remote amc and onsite amc Preferred Start Date, SKU, HSN
+2. The “Visits (AMC Scheduled Meeting)” feature will be removed from Remote AMC.
+
+
+
+
+
+
+
+•  Auto Refund on Cancelled Orders
+•	A system-driven automatic refund process will be implemented for all cancelled orders.
+•  Refund Process for Returned Orders
+•	Online Payments (via Razorpay):
+o	Refund will be processed only after the returned product is received.
+•	Cash on Delivery (COD):
+o	Customers will receive an email requesting bank details if not already available in the system.
+o	Refund will be processed after receiving valid bank details and product verification.
+•  Engineer App Enhancement
+•	Product-related issues will be made visible within the Engineer App for better tracking and resolution.
 

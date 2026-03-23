@@ -204,7 +204,7 @@ class AmcController extends Controller
                     );
                 }
             }
-            $amc->covered_items = json_encode($coveredIds);
+            $amc->covered_items = $coveredIds;
 
             // Brochure upload (replace old if new uploaded)
             if ($request->hasFile('brochure')) {

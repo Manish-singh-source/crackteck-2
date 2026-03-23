@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    // New status constants for delivery tracking
     const STATUS_PENDING = 'pending';
 
     const STATUS_ADMIN_APPROVED = 'admin_approved';
@@ -23,7 +22,6 @@ class Order extends Model
 
     const STATUS_RETURNED = 'returned';
 
-    // Array of all status options
     const STATUS_OPTIONS = [
         self::STATUS_PENDING,
         self::STATUS_ADMIN_APPROVED,
@@ -35,7 +33,6 @@ class Order extends Model
         self::STATUS_RETURNED,
     ];
 
-    // Status options for edit page (limited to initial statuses)
     const STATUS_OPTIONS_EDIT = [
         self::STATUS_PENDING,
         self::STATUS_ADMIN_APPROVED,
@@ -44,7 +41,6 @@ class Order extends Model
     protected $fillable = [
         'customer_id',
         'order_number',
-
         'total_items',
         'subtotal',
         'discount_amount',
@@ -53,18 +49,13 @@ class Order extends Model
         'shipping_charges',
         'packaging_charges',
         'total_amount',
-
         'billing_address_id',
         'shipping_address_id',
         'billing_same_as_shipping',
-
         'order_status',
         'payment_status',
         'delivery_status',
-
-        // New status column for delivery tracking
         'status',
-
         'confirmed_at',
         'assigned_at',
         'accepted_at',
@@ -72,30 +63,24 @@ class Order extends Model
         'delivered_at',
         'cancelled_at',
         'expected_delivery_date',
-
         'otp',
         'otp_expiry',
         'otp_verified_at',
-
         'customer_notes',
         'admin_notes',
         'source_platform',
         'tracking_number',
         'tracking_url',
-
         'is_returnable',
         'return_days',
         'return_status',
         'refund_amount',
         'refund_status',
-
         'is_priority',
         'requires_signature',
         'is_gift',
-
         'assigned_person_type',
         'assigned_person_id',
-
         'created_by',
         'updated_by',
     ];
@@ -112,36 +97,26 @@ class Order extends Model
         'otp_verified_at' => 'datetime',
     ];
 
-    /**
-     * Boot the model.
-     */
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($order) {
-            // Auto-generate order number if not set
             if (empty($order->order_number)) {
                 $order->order_number = self::generateOrderNumber();
             }
         });
     }
 
-    /**
-     * Generate a unique order number.
-     */
     public static function generateOrderNumber()
     {
         $prefix = 'ORD';
         $date = date('Ymd');
         $random = strtoupper(substr(md5(uniqid()), 0, 6));
 
-        return $prefix.'-'.$date.'-'.$random;
+        return $prefix . '-' . $date . '-' . $random;
     }
 
-    /**
-     * Get the status display name
-     */
     public function getStatusDisplayNameAttribute(): string
     {
         return match ($this->status) {
@@ -157,9 +132,6 @@ class Order extends Model
         };
     }
 
-    /**
-     * Get the status badge color
-     */
     public function getStatusBadgeColorAttribute(): string
     {
         return match ($this->status) {
@@ -200,30 +172,31 @@ class Order extends Model
         return $this->hasMany(OrderPayment::class);
     }
 
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function getPayableAmountPaiseAttribute(): int
+    {
+        return (int) round(((float) $this->total_amount) * 100);
+    }
+
     public function deliveryMan()
     {
         return $this->belongsTo(Staff::class, 'delivery_man_id');
     }
 
-    /**
-     * Get the reward associated with this order.
-     */
     public function reward()
     {
         return $this->hasOne(Reward::class);
     }
 
-    /**
-     * Check if the order can have delivery man assigned
-     */
     public function canAssignDeliveryMan(): bool
     {
         return in_array($this->status, [self::STATUS_ADMIN_APPROVED]);
     }
 
-    /**
-     * Check if the order is in an active delivery state
-     */
     public function isInDeliveryProcess(): bool
     {
         return in_array($this->status, [

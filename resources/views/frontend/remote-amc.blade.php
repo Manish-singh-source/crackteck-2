@@ -267,14 +267,14 @@
         }
 
         /* input,
-                              select,
-                              textarea {
-                                width: 100%;
-                                padding: 12px;
-                                margin: 10px 0 20px;
-                                border: 1px solid #ccc;
-                                border-radius: 4px;
-                              } */
+                                          select,
+                                          textarea {
+                                            width: 100%;
+                                            padding: 12px;
+                                            margin: 10px 0 20px;
+                                            border: 1px solid #ccc;
+                                            border-radius: 4px;
+                                          } */
 
         .btn {
             padding: 10px 20px;
@@ -712,13 +712,12 @@
                                             @endforeach
                                         </div>
                                     @endif
+
+                                    <div class="detail-label">
+                                        <strong>Note:</strong> By proceeding, you agree to our <a href="{{ route('t&c') }}">Terms &amp; Conditions.</a>
+                                    </div>
                                 </div>
 
-                                {{-- <div class="plan-action">
-                                    <button class="btn btn-primary" onclick="selectPlan({{ $plan->id }}, '{{ $plan->plan_name }}')">
-                                        Select Plan
-                                    </button>
-                                </div> --}}
                             </div>
                         </div>
                     @endforeach
@@ -733,6 +732,7 @@
         </div>
     </section>
 
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         function selectPlan(planId, planName) {
             // Scroll to the form section
@@ -798,7 +798,8 @@
                                 placeholder="First Name" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <label for="last_name" class="form-label">Last Name <span
+                                    class="text-danger">*</span></label>
                             <input type="text" class="form-control form-control-lg" id="last_name" name="last_name"
                                 placeholder="Last Name" required>
                         </div>
@@ -853,12 +854,13 @@
                             <input type="text" class="form-control form-control-lg" id="plan_cost_display"
                                 name="plan_cost" placeholder="Cost will be auto-filled" readonly>
                         </div>
+                        {{-- 
                         <div class="col-md-6">
                             <label for="preferred_start_date" class="form-label">Preferred Start Date <span
                                     class="text-danger">*</span></label>
                             <input type="date" class="form-control form-control-lg" id="preferred_start_date"
                                 name="preferred_start_date" required>
-                        </div>
+                        </div> --}}
 
                     </div>
                 </div>
@@ -912,16 +914,6 @@
                                             placeholder="Serial Number">
                                     </div> --}}
                                     <div class="col-md-3">
-                                        <label class="form-label">SKU</label>
-                                        <input type="text" class="form-control form-control-lg product-sku"
-                                            placeholder="SKU">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">HSN Code</label>
-                                        <input type="text" class="form-control form-control-lg product-hsn"
-                                            placeholder="HSN Code">
-                                    </div>
-                                    <div class="col-md-3">
                                         <label class="form-label">MAC Address <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control form-control-lg product-mac-address"
                                             placeholder="MAC Address" required>
@@ -931,6 +923,14 @@
                                         <input type="date" class="form-control form-control-lg product-purchase-date"
                                             required>
                                     </div>
+                                </div>
+                                <div class="alert alert-info mt-3" id="login-notice" style="display: block;">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <span id="login-notice-text">Please Refer Following Instructions to Find MAC Address of
+                                        Your System.
+                                        <a href="{{ asset('assets/files/MAC Address Instructions.pdf') }}"
+                                            target="_blank">Click Here</a>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -995,7 +995,7 @@
                             Next<i class="fas fa-arrow-right ms-2"></i>
                         </button>
                         <button type="button" class="btn btn-success" id="submitBtn" style="display: none;">
-                            <i class="fas fa-check me-2"></i>Submit Request
+                            <i class="fas fa-credit-card me-2"></i>Proceed to Pay
                         </button>
                     </div>
                 </div>
@@ -1050,7 +1050,8 @@
                     <p class="mb-3">The email address you entered is already registered in our system.</p>
                     <p class="mb-4">Please login to continue with your existing account.</p>
                     <div class="d-flex justify-content-center gap-3">
-                        <a href="#log" data-bs-toggle="modal" class="btn btn-primary" onclick="$('#loginRequiredModal').modal('hide');">
+                        <a href="#log" data-bs-toggle="modal" class="btn btn-primary"
+                            onclick="$('#loginRequiredModal').modal('hide');">
                             <i class="fas fa-sign-in-alt me-2"></i>Login
                         </a>
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -1080,13 +1081,13 @@
             <div class="flat-title wow fadeInUp">
                 <h5 class="fw-semibold">Customer Review</h5>
                 <!-- <div class="box-btn-slide relative">
-                                    <div class="swiper-button-prev nav-swiper nav-prev-products">
-                                      <i class="icon-arrow-left-lg"></i>
-                                    </div>
-                                    <div class="swiper-button-next nav-swiper nav-next-products">
-                                      <i class="icon-arrow-right-lg"></i>
-                                    </div>
-                                  </div> -->
+                                                <div class="swiper-button-prev nav-swiper nav-prev-products">
+                                                  <i class="icon-arrow-left-lg"></i>
+                                                </div>
+                                                <div class="swiper-button-next nav-swiper nav-next-products">
+                                                  <i class="icon-arrow-right-lg"></i>
+                                                </div>
+                                              </div> -->
             </div>
             <div class="swiper tf-sw-products" data-preview="3" data-tablet="2" data-mobile-sm="1" data-mobile="1"
                 data-space-lg="30" data-space-md="15" data-space="15" data-pagination="1" data-pagination-sm="1"
@@ -1273,356 +1274,6 @@
 @endsection
 
 @section('script')
-    {{-- <script>
-        // Form navigation variables
-        const sections = document.querySelectorAll('.form-section');
-        const steps = document.querySelectorAll('.step');
-        let currentStep = 0;
-        const totalSteps = sections.length;
-
-        // Button elements
-        const backBtn = document.getElementById('backBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const skipBtn = document.getElementById('skipBtn');
-        const submitBtn = document.getElementById('submitBtn');
-
-        // Form data storage
-        let formData = {};
-        let categoriesData = [];
-        let brandsData = [];
-        let plansData = {};
-
-        // Initialize form
-        document.addEventListener('DOMContentLoaded', function() {
-            loadDropdownData();
-            updateNavigationButtons();
-        });
-
-        // Load dropdown data from API
-        async function loadDropdownData() {
-            try {
-                // Load device types from device_specific_diagnoses table
-                const deviceTypesResponse = await fetch('/beta/api/amc/get-device-types');
-                const deviceTypesResult = await deviceTypesResponse.json();
-                console.log('Device Types Response:', deviceTypesResult);
-                if (deviceTypesResult.success) {
-                    categoriesData = deviceTypesResult.data;
-                    populateDropdown('product_type', categoriesData, 'id', 'device_type');
-                }
-
-                // Load AMC plans
-                const plansResponse = await fetch('/beta/api/amc/plans');
-                const plansResult = await plansResponse.json();
-                if (plansResult.success) {
-                    plansData = plansResult.data;
-                }
-            } catch (error) {
-                console.error('Error loading dropdown data:', error);
-            }
-        }
-
-        // Populate dropdown with data
-        function populateDropdown(selectId, data, valueField, textField) {
-            const select = document.getElementById(selectId);
-            const defaultOption = select.querySelector('option[value=""]');
-
-            // Clear existing options except default
-            select.innerHTML = '';
-            if (defaultOption) {
-                select.appendChild(defaultOption);
-            }
-
-            data.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item[valueField];
-                option.textContent = item[textField];
-                select.appendChild(option);
-            });
-        }
-
-        // Plan type change handler
-        document.addEventListener('change', function(e) {
-            if (e.target.name === 'plan_type') {
-                const planType = e.target.value;
-                const amcPlanSelect = document.getElementById('amc_plan_id');
-
-                // Clear existing options
-                amcPlanSelect.innerHTML = '<option value="">Select AMC Plan</option>';
-
-                if (plansData[planType]) {
-                    plansData[planType].forEach(plan => {
-                        const option = document.createElement('option');
-                        option.value = plan.id;
-                        option.textContent = plan.plan_name;
-                        option.dataset.duration = plan.duration;
-                        option.dataset.cost = plan.total_cost;
-                        option.dataset.description = plan.description;
-                        amcPlanSelect.appendChild(option);
-                    });
-                }
-            }
-        });
-
-        // AMC plan change handler
-        document.addEventListener('change', function(e) {
-            if (e.target.id === 'amc_plan_id') {
-                const selectedOption = e.target.selectedOptions[0];
-                if (selectedOption && selectedOption.value) {
-                    // Update duration
-                    const durationSelect = document.getElementById('plan_duration');
-                    durationSelect.innerHTML = '<option value="">Select Duration</option>';
-
-                    const duration = selectedOption.dataset.duration;
-                    if (duration) {
-                        const option = document.createElement('option');
-                        option.value = duration;
-                        option.textContent = duration;
-                        durationSelect.appendChild(option);
-                        durationSelect.value = duration;
-                    }
-
-                    // Update cost display
-                    const costDisplay = document.getElementById('plan_cost_display');
-                    const cost = selectedOption.dataset.cost;
-                    if (cost) {
-                        costDisplay.value = '₹ ' + parseFloat(cost).toLocaleString();
-                    }
-                }
-            }
-        });
-
-        // Navigation button handlers
-        nextBtn.addEventListener('click', function() {
-            if (validateCurrentStep()) {
-                saveCurrentStepData();
-
-                if (currentStep < totalSteps - 1) {
-                    // Move to next step
-                    if (currentStep === 1 && shouldSkipCompanyDetails()) {
-                        // Skip company details if individual customer
-                        currentStep += 2;
-                    } else {
-                        currentStep++;
-                    }
-
-                    if (currentStep === totalSteps - 1) {
-                        // Last step - populate review
-                        populateReviewSection();
-                    }
-
-                    showStep(currentStep);
-                    updateNavigationButtons();
-                }
-            }
-        });
-
-        backBtn.addEventListener('click', function() {
-            if (currentStep > 0) {
-                // Check if we skipped company details when going forward
-                if (currentStep === 3 && shouldSkipCompanyDetails()) {
-                    currentStep -= 2; // Go back to step 1
-                } else {
-                    currentStep--;
-                }
-                showStep(currentStep);
-                updateNavigationButtons();
-            }
-        });
-
-        skipBtn.addEventListener('click', function() {
-            if (currentStep === 1) { // Company details step
-                saveCurrentStepData();
-                currentStep++;
-                showStep(currentStep);
-                updateNavigationButtons();
-            }
-        });
-
-        submitBtn.addEventListener('click', function() {
-            if (validateCurrentStep()) {
-                saveCurrentStepData();
-                submitForm();
-            }
-        });
-
-        // Show specific step
-        function showStep(stepIndex) {
-            sections.forEach((section, index) => {
-                section.classList.toggle('active', index === stepIndex);
-            });
-
-            steps.forEach((step, index) => {
-                step.classList.toggle('active', index === stepIndex);
-            });
-        }
-
-        // Update navigation buttons visibility
-        function updateNavigationButtons() {
-            // Back button
-            backBtn.style.display = currentStep > 0 ? 'inline-block' : 'none';
-
-            // Skip button (only show on company details step)
-            skipBtn.style.display = currentStep === 1 ? 'inline-block' : 'none';
-
-            // Next/Submit buttons
-            if (currentStep === totalSteps - 1) {
-                nextBtn.style.display = 'none';
-                submitBtn.style.display = 'inline-block';
-            } else {
-                nextBtn.style.display = 'inline-block';
-                submitBtn.style.display = 'none';
-            }
-        }
-
-        // Check if company details should be skipped
-        function shouldSkipCompanyDetails() {
-            const customerType = document.getElementById('customer_type').value;
-            return customerType === 'Individual';
-        }
-
-        // Validate current step
-        function validateCurrentStep() {
-            const currentSection = sections[currentStep];
-            const requiredFields = currentSection.querySelectorAll('[required]');
-            let isValid = true;
-
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    field.classList.add('is-invalid');
-                    isValid = false;
-                } else {
-                    field.classList.remove('is-invalid');
-                }
-            });
-
-            if (!isValid) {
-                alert('Please fill in all required fields.');
-            }
-
-            return isValid;
-        }
-
-        // Save current step data
-        function saveCurrentStepData() {
-            const currentSection = sections[currentStep];
-            const inputs = currentSection.querySelectorAll('input, select, textarea');
-
-            inputs.forEach(input => {
-                if (input.type === 'radio') {
-                    if (input.checked) {
-                        formData[input.name] = input.value;
-                    }
-                } else if (input.type === 'checkbox') {
-                    formData[input.name] = input.checked ? input.value : '';
-                } else {
-                    formData[input.name] = input.value;
-                }
-            });
-        }
-
-        // Populate review section
-        function populateReviewSection() {
-            // Customer info
-            const customerInfo = `
-                <p><strong>Name:</strong> ${formData.first_name || ''} ${formData.last_name || ''}</p>
-                <p><strong>Email:</strong> ${formData.email || ''}</p>
-                <p><strong>Phone:</strong> ${formData.phone || ''}</p>
-                <p><strong>Customer Type:</strong> ${formData.customer_type || ''}</p>
-            `;
-            document.getElementById('review-customer-info').innerHTML = customerInfo;
-
-            // Company info (if provided)
-            if (formData.company_name) {
-                const companyInfo = `
-                    <p><strong>Company:</strong> ${formData.company_name || ''}</p>
-                    <p><strong>Branch:</strong> ${formData.branch_name || ''}</p>
-                    <p><strong>Address:</strong> ${formData.address_line1 || ''} ${formData.address_line2 || ''}</p>
-                    <p><strong>City:</strong> ${formData.city || ''}, ${formData.state || ''} ${formData.pin_code || ''}</p>
-                    <p><strong>GST No:</strong> ${formData.gst_no || ''}</p>
-                `;
-                document.getElementById('review-company-info').innerHTML = companyInfo;
-                document.getElementById('review-company-section').style.display = 'block';
-            }
-
-            // Product info
-            const productInfo = `
-                <p><strong>Product Type:</strong> ${getSelectedText('product_type')}</p>
-                <p><strong>Brand:</strong> ${getSelectedText('brand_name')}</p>
-                <p><strong>Model:</strong> ${formData.model_number || ''}</p>
-                <p><strong>Serial Number:</strong> ${formData.serial_number || ''}</p>
-                <p><strong>Purchase Date:</strong> ${formData.purchase_date || ''}</p>
-            `;
-            document.getElementById('review-product-info').innerHTML = productInfo;
-
-            // Plan info
-            const planInfo = `
-                <p><strong>Plan Type:</strong> ${formData.plan_type || ''}</p>
-                <p><strong>Plan:</strong> ${getSelectedText('amc_plan_id')}</p>
-                <p><strong>Duration:</strong> ${formData.plan_duration || ''}</p>
-                <p><strong>Start Date:</strong> ${formData.preferred_start_date || ''}</p>
-                <p><strong>Cost:</strong> ${document.getElementById('plan_cost_display').value || ''}</p>
-            `;
-            document.getElementById('review-plan-info').innerHTML = planInfo;
-        }
-
-        // Get selected text from dropdown
-        function getSelectedText(selectId) {
-            const select = document.getElementById(selectId);
-            return select.selectedOptions[0] ? select.selectedOptions[0].textContent : '';
-        }
-
-        // Submit form
-        async function submitForm() {
-            try {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
-
-                const response = await fetch('/beta/api/amc/submit', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    alert(`Success! Your service request has been submitted. Service ID: ${result.service_id}`);
-                    document.getElementById('requestForm').reset();
-                    currentStep = 0;
-                    showStep(currentStep);
-                    updateNavigationButtons();
-                    formData = {};
-                } else {
-                    alert('Error: ' + (result.message || 'Something went wrong'));
-                }
-            } catch (error) {
-                console.error('Submission error:', error);
-                alert('Error submitting form. Please try again.');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Submit Request';
-            }
-        }
-
-        // Pricing toggle functionality (existing)
-        document.getElementById('monthlyBtn').addEventListener('click', function() {
-            document.getElementById('monthlyBtn').classList.add('active');
-            document.getElementById('annuallyBtn').classList.remove('active');
-            document.getElementById('monthlyPlans').style.display = 'block';
-            document.getElementById('annualPlans').style.display = 'none';
-        });
-
-        document.getElementById('annuallyBtn').addEventListener('click', function() {
-            document.getElementById('annuallyBtn').classList.add('active');
-            document.getElementById('monthlyBtn').classList.remove('active');
-            document.getElementById('monthlyPlans').style.display = 'none';
-            document.getElementById('annualPlans').style.display = 'block';
-        });
-    </script> --}}
-
     <script>
         // Form navigation variables
         const sections = document.querySelectorAll('.form-section');
@@ -1635,6 +1286,7 @@
         const nextBtn = document.getElementById('nextBtn');
         const skipBtn = document.getElementById('skipBtn');
         const submitBtn = document.getElementById('submitBtn');
+        const remoteAmcVerifyUrl = '{{ route('amc.remote-payment.verify') }}';
 
         // Form data storage
         let formData = {};
@@ -1654,8 +1306,8 @@
             updateNavigationButtons();
 
             // Set minimum date for preferred start date
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('preferred_start_date').setAttribute('min', today);
+            // const today = new Date().toISOString().split('T')[0];
+            // document.getElementById('preferred_start_date').setAttribute('min', today);
         });
 
         // Check if customer is logged in
@@ -1694,7 +1346,7 @@
                     customerAddresses = addresses; // Store for later use
                     const addressSelectorRow = document.getElementById('address-selection-row');
                     const addressSelector = document.getElementById('address_selector');
-                    
+
                     console.log('Customer addresses:', addresses); // Debug log
                     if (addresses.length > 0) {
                         if (addresses.length === 1) {
@@ -1714,21 +1366,22 @@
                             // Multiple addresses - show dropdown
                             addressSelectorRow.style.display = 'block';
                             addressSelector.innerHTML = '<option value="">Select an address</option>';
-                            
+
                             addresses.forEach((address, index) => {
                                 const option = document.createElement('option');
                                 option.value = address.id; // Use actual address ID
-                                const addressText = address.branch_name || address.address1 || `Address ${index + 1}`;
+                                const addressText = address.branch_name || address.address1 ||
+                                    `Address ${index + 1}`;
                                 option.textContent = addressText + (address.city ? `, ${address.city}` : '');
                                 addressSelector.appendChild(option);
                             });
-                            
+
                             // Pre-select first address
                             addressSelector.value = addresses[0].id;
                             document.getElementById('selected_address_id').value = addresses[0].id || '';
                             populateAddressFields(addresses[0]);
                         }
-                        
+
                         // Add change event listener for address dropdown
                         addressSelector.addEventListener('change', function() {
                             const selectedId = this.value;
@@ -1765,7 +1418,7 @@
                 console.error('Error checking customer login:', error);
             }
         }
-        
+
         // Function to populate address fields
         function populateAddressFields(address) {
             document.getElementById('branch_name').value = address.branch_name || '';
@@ -1893,16 +1546,6 @@
                         <label class="form-label">Model Number</label>
                         <input type="text" class="form-control form-control-lg product-model"
                             placeholder="Model Number" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">SKU</label>
-                        <input type="text" class="form-control form-control-lg product-sku"
-                            placeholder="SKU">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">HSN Code</label>
-                        <input type="text" class="form-control form-control-lg product-hsn"
-                            placeholder="HSN Code">
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">MAC Address <span class="text-danger">*</span></label>
@@ -2182,8 +1825,8 @@
                         product_type: entry.querySelector('.product-type').value,
                         brand_name: entry.querySelector('.product-brand').value,
                         model_number: entry.querySelector('.product-model').value,
-                        sku: entry.querySelector('.product-sku').value,
-                        hsn: entry.querySelector('.product-hsn').value,
+                        // sku: entry.querySelector('.product-sku').value,
+                        // hsn: entry.querySelector('.product-hsn').value,
                         mac_address: entry.querySelector('.product-mac-address').value,
                         purchase_date: entry.querySelector('.product-purchase-date').value
                     };
@@ -2198,8 +1841,8 @@
                         !input.classList.contains('product-type') &&
                         !input.classList.contains('product-brand') &&
                         !input.classList.contains('product-model') &&
-                        !input.classList.contains('product-sku') &&
-                        !input.classList.contains('product-hsn') &&
+                        // !input.classList.contains('product-sku') &&
+                        // !input.classList.contains('product-hsn') &&
                         !input.classList.contains('product-mac-address') &&
                         !input.classList.contains('product-purchase-date')) {
 
@@ -2236,8 +1879,6 @@
                     <p class="mb-1"><strong>Product Type:</strong> ${productTypeName}</p>
                     <p class="mb-1"><strong>Brand:</strong> ${brandName}</p>
                     <p class="mb-1"><strong>Model:</strong> ${product.model_number || ''}</p>
-                    <p class="mb-1"><strong>SKU:</strong> ${product.sku || ''}</p>
-                    <p class="mb-1"><strong>HSN Code:</strong> ${product.hsn || ''}</p>
                     <p class="mb-1"><strong>MAC Address:</strong> ${product.mac_address || ''}</p>
                     <p class="mb-1"><strong>Purchase Date:</strong> ${product.purchase_date || ''}</p>
                 </div>
@@ -2248,7 +1889,6 @@
             const planInfo = `
             <p><strong>Plan:</strong> ${getSelectedText('amc_plan_id')}</p>
             <p><strong>Duration:</strong> ${formData.plan_duration || ''} Months</p>
-            <p><strong>Start Date:</strong> ${formData.preferred_start_date || ''}</p>
             <p><strong>Cost:</strong> ${document.getElementById('plan_cost_display').value || ''}</p>
         `;
             document.getElementById('review-plan-info').innerHTML = planInfo;
@@ -2264,22 +1904,133 @@
             return item ? item[textField] : value;
         }
 
+        function resetRemoteAmcForm() {
+            document.getElementById('requestForm').reset();
+
+            const productsContainer = document.getElementById('productsContainer');
+            const allProducts = productsContainer.querySelectorAll('.product-entry');
+            allProducts.forEach((product, index) => {
+                if (index > 0) product.remove();
+            });
+
+            productCounter = 1;
+            productsData = [];
+            formData = {};
+            currentStep = 0;
+            showStep(currentStep);
+            updateNavigationButtons();
+            updateRemoveButtonsVisibility();
+        }
+
+        async function verifyRemoteAmcPayment(paymentPayload) {
+            const response = await fetch(remoteAmcVerifyUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute('content')
+                },
+                body: JSON.stringify(paymentPayload)
+            });
+
+            return response.json();
+        }
+
+        function openRemoteAmcRazorpayCheckout(result) {
+            if (typeof Razorpay === 'undefined') {
+                alert('Razorpay checkout could not be loaded. Please refresh the page and try again.');
+                return;
+            }
+
+            const payment = result.payment;
+            const razorpayData = payment.razorpay;
+            const customerName = `${formData.first_name || ''} ${formData.last_name || ''}`.trim();
+
+            const options = {
+                key: razorpayData.key_id,
+                amount: razorpayData.amount,
+                currency: razorpayData.currency,
+                name: 'Crackteck',
+                description: 'Remote AMC Payment',
+                order_id: razorpayData.order_id,
+                handler: async function(response) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Verifying Payment...';
+
+                    try {
+                        const verification = await verifyRemoteAmcPayment({
+                            remote_amc_payment_id: payment.id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        });
+
+                        if (verification.success) {
+                            alert(
+                                `Payment successful! Your Remote AMC has been activated. Service ID: ${result.service_id}`
+                            );
+                            resetRemoteAmcForm();
+                            return;
+                        }
+
+                        alert(verification.message ||
+                            'Payment verification failed. Please contact support if money was debited.');
+                    } catch (error) {
+                        console.error('Payment verification error:', error);
+                        alert('Payment verification failed. Please contact support if money was debited.');
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Proceed to Pay';
+                    }
+                },
+                prefill: {
+                    name: customerName,
+                    email: formData.email || '',
+                    contact: formData.phone || ''
+                },
+                theme: {
+                    color: '#1987FF'
+                },
+                modal: {
+                    ondismiss: function() {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Proceed to Pay';
+                        alert(
+                            'Payment was not completed. Your Remote AMC request is saved in pending state until payment is completed.'
+                        );
+                    }
+                }
+            };
+
+            const razorpay = new Razorpay(options);
+            razorpay.on('payment.failed', function(response) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Proceed to Pay';
+                const failureMessage = response.error && response.error.description ?
+                    response.error.description :
+                    'Payment failed. Please try again.';
+                alert(failureMessage);
+            });
+
+            razorpay.open();
+        }
+
         // Submit form
         async function submitForm() {
             try {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Payment...';
 
-                let selected_address_id = document.getElementById('selected_address_id') ? document.getElementById('selected_address_id').value : null;
-                // Combine form data with products data
+                let selected_address_id = document.getElementById('selected_address_id') ? document.getElementById(
+                    'selected_address_id').value : null;
                 const submitData = {
                     ...formData,
                     products: productsData,
-                    selected_address_id: selected_address_id    
+                    selected_address_id: selected_address_id
                 };
                 console.log('Submitting data:', submitData);
 
-                // const response = await fetch('/beta/api/amc/submit', {
                 const response = await fetch('/api/amc/submit', {
                     method: 'POST',
                     headers: {
@@ -2295,26 +2046,13 @@
 
                 console.log('Submission result:', result);
                 if (result.success) {
+                    if (result.requires_payment && result.payment && result.payment.razorpay) {
+                        openRemoteAmcRazorpayCheckout(result);
+                        return;
+                    }
+
                     alert(`Success! Your service request has been submitted. Service ID: ${result.service_id}`);
-
-                    // Reset form
-                    document.getElementById('requestForm').reset();
-
-                    // Reset products to single entry
-                    const productsContainer = document.getElementById('productsContainer');
-                    const allProducts = productsContainer.querySelectorAll('.product-entry');
-                    allProducts.forEach((product, index) => {
-                        if (index > 0) product.remove();
-                    });
-
-                    // Reset counters and data
-                    productCounter = 1;
-                    productsData = [];
-                    formData = {};
-                    currentStep = 0;
-                    showStep(currentStep);
-                    updateNavigationButtons();
-                    updateRemoveButtonsVisibility();
+                    resetRemoteAmcForm();
                 } else {
                     let errorMsg = result.message || 'Something went wrong';
                     if (result.errors) {
@@ -2337,7 +2075,7 @@
                 alert('Error submitting form. Please try again. Check console for details.');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Submit Request';
+                submitBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Proceed to Pay';
             }
         }
 

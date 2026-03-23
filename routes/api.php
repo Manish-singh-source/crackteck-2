@@ -12,13 +12,16 @@ use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\LeadController;
 use App\Http\Controllers\Api\MeetController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PaymentRefundController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\QuickServiceController;
 use App\Http\Controllers\Api\QuotationController;
+use App\Http\Controllers\Api\RazorpayWebhookController;
 use App\Http\Controllers\Api\RewardClaimController;
 use App\Http\Controllers\Api\StaffWalletController;
 use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\CheckoutController as ApiCheckoutController;
 use App\Http\Controllers\FieldEngineerController;
 use App\Http\Controllers\PartRequestController;
 use App\Http\Controllers\PickupRequestController;
@@ -43,6 +46,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/send-otp', [ApiAuthController::class, 'login']);
     Route::post('/verify-otp', [ApiAuthController::class, 'verifyOtp']);
     Route::post('/google-login', [ApiAuthController::class, 'googleLogin']);
+    Route::post('/webhooks/razorpay', RazorpayWebhookController::class);
 
     // Public route for staff wallet status update (used by admin panel)
     Route::put('/staff-expenses/{id}/status', [StaffWalletController::class, 'updateStatus']);
@@ -68,6 +72,10 @@ Route::prefix('v1')->group(function () {
     Route::post('/test-fcm', [FcmTestController::class, 'send'])->middleware('throttle:60,1');
 
     Route::middleware(['throttle:60,1', 'jwt.verify'])->group(function () {
+
+        Route::post('/checkout/orders/{order}/razorpay', [ApiCheckoutController::class, 'createRazorpayOrder']);
+        Route::post('/checkout/razorpay/verify', [ApiCheckoutController::class, 'verifyRazorpayPayment']);
+        Route::post('/payments/{payment}/refund', PaymentRefundController::class);
 
         Route::post('/device-token', [DeviceTokenController::class, 'store']);
         Route::delete('/device-token', [DeviceTokenController::class, 'destroy']);
@@ -252,6 +260,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/quick-services', 'quickServicesList');
             Route::get('/services-list', 'servicesListByType');
             Route::get('/service-details/{id}', 'getServiceDetails');
+
+            Route::get('/devices-types', 'getDevicesTypes');
+
             // submit service request
             Route::post('/submit-quick-service-request', 'submitQuickServiceRequest');
 
@@ -415,3 +426,7 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
+
+
+
+

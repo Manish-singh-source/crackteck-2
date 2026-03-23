@@ -21,6 +21,7 @@
         "milon/barcode": "^12.0",
         "php-flasher/flasher-laravel": "^2.1",
         "rappasoft/laravel-authentication-log": "^6.0",
+        "razorpay/razorpay": "^2.9",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-db-snapshots": "^2.9",
         "spatie/laravel-permission": "^6.21",

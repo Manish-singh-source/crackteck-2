@@ -246,7 +246,8 @@ class AuthController extends Controller
 
     public function recover_password()
     {
-        return view('recover-password');
+        // Redirect to new password reset system
+        return redirect()->route('password.forgot', ['source' => 'staff']);
     }
 
     public function logout(Request $request)

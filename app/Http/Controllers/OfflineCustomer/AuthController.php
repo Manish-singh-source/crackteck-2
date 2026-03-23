@@ -92,7 +92,8 @@ class AuthController extends Controller
 
     public function recover_password()
     {
-        return view('offline-users-dashboard.password');
+        // Redirect to new password reset system
+        return redirect()->route('password.forgot', ['source' => 'customer']);
     }
 
     public function offlinelogout(Request $request)

@@ -825,7 +825,7 @@
                                         <input type="password" placeholder="Enter your password" autocomplete="off"
                                             name="password" required>
                                     </fieldset>
-                                    <a href="#" class="link text-end body-text-3">
+                                    <a href="#" class="link text-end body-text-3" onclick="showForgotPasswordModal(); return false;">
                                         Forgot password ?
                                     </a>
                                 </div>
@@ -894,6 +894,50 @@
         </div>
     </div>
     <!-- /Login -->
+
+    <!-- Forgot Password Modal -->
+    <div class="modal modalCentered fade modal-log" id="forgotPasswordModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <span class="icon icon-close btn-hide-popup" data-bs-dismiss="modal"></span>
+                <div class="modal-log-wrap list-file-delete">
+                    <h5 class="title fw-semibold text-center">Forgot Password</h5>
+                    <p class="body-text-3 text-center text-muted mb-4">Enter your email address and we'll send you a link to reset your password.</p>
+                    
+                    <!-- Success Message -->
+                    <div id="forgot-password-success" class="alert alert-success" style="display: none;"></div>
+                    
+                    <!-- Error Message -->
+                    <div id="forgot-password-error" class="alert alert-danger" style="display: none;"></div>
+                    
+                    <form id="forgot-password-form">
+                        @csrf
+                        <input type="hidden" name="user_type" value="customer">
+                        <div class="form-content">
+                            <fieldset>
+                                <label class="fw-semibold body-md-2">
+                                    Email Id
+                                </label>
+                                <input type="email" name="email" id="forgot-password-email" placeholder="Your email" autocomplete="off"
+                                    required>
+                            </fieldset>
+                        </div>
+                        <button type="submit" class="tf-btn w-100 text-white" id="forgot-password-btn">
+                            Send Reset Link
+                        </button>
+                    </form>
+                    
+                    <p class="body-text-3 text-center mt-3">
+                        Remember your password?
+                        <a href="#" onclick="showLoginModal(); $('#forgotPasswordModal').modal('hide'); return false;" class="text-primary">
+                            Login
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Forgot Password -->
 
     <!-- Register -->
     <div class="modal modalCentered fade modal-log" id="register">
@@ -1737,6 +1781,67 @@
             // Open the existing login modal from the master layout
             $('#log').modal('show');
         }
+
+        // Global function to show forgot password modal
+        function showForgotPasswordModal() {
+            // Hide any previous messages
+            $('#forgot-password-success').hide();
+            $('#forgot-password-error').hide();
+            $('#forgot-password-email').val('');
+            
+            // Open the forgot password modal
+            $('#forgotPasswordModal').modal('show');
+        }
+
+        // Handle forgot password form submission
+        $(document).on('submit', '#forgot-password-form', function(e) {
+            e.preventDefault();
+            
+            const email = $('#forgot-password-email').val();
+            const btn = $('#forgot-password-btn');
+            const originalText = btn.text();
+            
+            // Hide previous messages
+            $('#forgot-password-success').hide();
+            $('#forgot-password-error').hide();
+            
+            // Show loading state
+            btn.prop('disabled', true).text('Sending...');
+            
+            $.ajax({
+                url: '{{ route("password.api.send-reset-link") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    email: email,
+                    user_type: 'customer'
+                },
+                success: function(response) {
+                    btn.prop('disabled', false).text(originalText);
+                    
+                    if (response.success) {
+                        $('#forgot-password-success').text(response.message).show();
+                        $('#forgot-password-email').val('');
+                        
+                        // Close modal after 3 seconds
+                        setTimeout(function() {
+                            $('#forgotPasswordModal').modal('hide');
+                        }, 3000);
+                    } else {
+                        $('#forgot-password-error').text(response.message).show();
+                    }
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).text(originalText);
+                    
+                    let errorMessage = 'Something went wrong. Please try again.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    $('#forgot-password-error').text(errorMessage).show();
+                }
+            });
+        });
 
         // Check for flash message to open login modal
         @if(Session::has('open_login_modal'))

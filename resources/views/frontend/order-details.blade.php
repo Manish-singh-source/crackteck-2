@@ -194,7 +194,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-2 pe-3">
                                 <p class="mb-0">Total Value (in figure)</p>
                                 <p class="text-dark fw-medium mb-2">
-                                    ₹{{ number_format($order->total_amount, 2) }}</p>
+                                    ₹{{ number_format($order->total_amount + $totals['rounding_off'], 2) }}</p>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mb-2 pe-3">
                                 <p class="mb-0">Total Value (in Word)</p>

@@ -21,7 +21,7 @@ class PasswordResetController extends Controller
     public function showForgotPasswordForm(Request $request)
     {
         $source = $request->query('source', 'frontend');
-        
+
         return view('auth.forgot-password', compact('source'));
     }
 
@@ -54,12 +54,12 @@ class PasswordResetController extends Controller
             // For security reasons, don't reveal if email exists or not
             // But for better UX, we can show a message
             return back()->with('error', 'We couldn\'t find an account with this email address.')
-                        ->withInput();
+                ->withInput();
         }
 
         // Generate unique token
         $token = Str::random(64);
-        
+
         // Delete any existing tokens for this email and user type
         DB::table('password_resets')
             ->where('email', $email)
@@ -82,15 +82,18 @@ class PasswordResetController extends Controller
                 'user_type' => $userType,
             ]);
 
-            Mail::to($email)->send(new PasswordResetMail($user, $resetUrl, $userType));
-            
-            return back()->with('success', 'We have emailed your password reset link!');
+            $mail = Mail::to($email)->send(new PasswordResetMail($user, $resetUrl, $userType));
+            if ($mail) {
+                return back()->with('success', 'We have emailed your password reset link!');
+            }
+            return back()->with('error', 'Failed to send password reset email. Please try again later.')
+                ->withInput();
         } catch (\Exception $e) {
             // Log the error
             Log::error('Password reset email failed: ' . $e->getMessage());
-            
+
             return back()->with('error', 'Failed to send password reset email. Please try again later.')
-                        ->withInput();
+                ->withInput();
         }
     }
 
@@ -130,7 +133,7 @@ class PasswordResetController extends Controller
 
         if (!$tokenData) {
             return back()->with('error', 'Invalid or expired password reset token.')
-                        ->withInput();
+                ->withInput();
         }
 
         // Check if token is expired (1 hour)
@@ -139,9 +142,9 @@ class PasswordResetController extends Controller
                 ->where('email', $request->email)
                 ->where('user_type', $request->user_type)
                 ->delete();
-            
+
             return back()->with('error', 'Password reset token has expired. Please request a new one.')
-                        ->withInput();
+                ->withInput();
         }
 
         // Find and update user password
@@ -154,7 +157,7 @@ class PasswordResetController extends Controller
 
         if (!$user) {
             return back()->with('error', 'User not found.')
-                        ->withInput();
+                ->withInput();
         }
 
         // Update password
@@ -168,7 +171,11 @@ class PasswordResetController extends Controller
             ->where('user_type', $request->user_type)
             ->delete();
 
-        return redirect()->route('login')->with('success', 'Your password has been reset successfully. Please login with your new password.');
+        if ($request->user_type === 'customer') {
+            return redirect()->route('frontend.login')->with('success', 'Your password has been reset successfully. Please login with your new password.');
+        } elseif ($request->user_type === 'staff') {
+            return redirect()->route('login')->with('success', 'Your password has been reset successfully. Please login with your new password.');
+        }
     }
 
     /**
@@ -209,7 +216,7 @@ class PasswordResetController extends Controller
 
         // Generate unique token
         $token = Str::random(64);
-        
+
         // Delete any existing tokens
         DB::table('password_resets')
             ->where('email', $email)
@@ -233,14 +240,14 @@ class PasswordResetController extends Controller
             ]);
 
             Mail::to($email)->send(new PasswordResetMail($user, $resetUrl, $userType));
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Password reset link has been sent to your email.'
             ]);
         } catch (\Exception $e) {
             Log::error('Password reset email failed: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to send password reset email. Please try again later.'
@@ -286,7 +293,7 @@ class PasswordResetController extends Controller
                 ->where('email', $request->email)
                 ->where('user_type', $request->user_type)
                 ->delete();
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Password reset token has expired. Please request a new one.'

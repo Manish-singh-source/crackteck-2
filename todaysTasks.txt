@@ -191,6 +191,7 @@ Crackteck CRM and Website:
 13. Terms and conditions adding for AMCs                                - dummy added
 14. WhatsApp APIs integration and Facebook login integration
 15. Client Changes as defined in MoM
+16. Customer Reviews 
 
 
 

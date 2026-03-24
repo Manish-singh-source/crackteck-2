@@ -316,7 +316,7 @@
                                     <div class="payment-item">
                                         <label for="credit-card-method" class="payment-header radio-item">
                                             <input type="radio" name="payment_method" value="mastercard"
-                                                class="tf-check-rounded" id="credit-card-method">
+                                                class="tf-check-rounded" id="credit-card-method" checked>
                                             <span class="body-text-3">Pay Online with Razorpay</span>
                                         </label>
                                         <p class="caption text-main-2 font-2 ps-4 mb-0">Cards, UPI, netbanking and wallets
@@ -327,8 +327,12 @@
                                     <div class="payment-item">
                                         <label for="cod-method" class="payment-header radio-item">
                                             <input type="radio" name="payment_method" value="cod"
-                                                class="tf-check-rounded" id="cod-method" checked>
+                                                class="tf-check-rounded" id="cod-method"  
+                                                @if($totals['total'] >= 2000) disabled @endif>
                                             <span class="body-text-3">Cash on Delivery</span>
+                                            @if($totals['total'] >= 2000) 
+                                                <span class="text-danger">You can not use Cash on Delivery for oder below ₹2000</span>
+                                            @endif
                                         </label>
                                     </div>
                                 </div>

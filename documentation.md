@@ -2380,3 +2380,51 @@ jise hi order ( /order-details me reward button par click ho tabhi reward table 
 - created_at
 - updated_at
 - deleted_at -->
+
+
+Cash Received from Customer will Order Deliverd or Service Completed
+
+Task 1.
+Create a table for store that Staff Received Cash From customer ( cash_received )
+
+id
+customer_id
+staff_id
+order_id
+service_request_id
+amount
+status ( customer_paid, received )
+created_at
+updated_at
+
+Task 2.
+Mujhe ek API Create karna hai
+jisme mera staff ( delivery man , engineer ) entry kar sakte hi usne customer se cash received kiya hai
+agar cash order ke liye hoga to
+
+customer_id
+staff_id
+order_id 
+amount
+status ( customer_paid ) 
+aayega
+
+aur agar cash service ke liye hoga to 
+customer_id
+staff_id
+service_request_id
+amount
+status ( customer_paid ) 
+
+Task 3.
+/crm/index me account kar ke ek section hai usme mujhe display karwan hai 
+ki kis staff ne kitna cash kis customer se liya hai ( index page )
+view page me pura detail display hoga 
+aur umse hi cash received to the account team kar ke option aayega aur jisse hi cash received to the account team ho to cash_received table ka status received ho jaye
+
+aur uske sath order_payments table me us order ka status bhi update karo ki status completed ( agar order ke liye cash received huaa ho )
+aur uske sath service_request_payments table me us service ka payment_status bhi update karo ki status completed ( agar service ke liye cash received huaa ho )
+
+
+
+

@@ -27,6 +27,7 @@ use App\Http\Controllers\PartRequestController;
 use App\Http\Controllers\PickupRequestController;
 use App\Http\Controllers\ReturnRequestController;
 use App\Http\Controllers\Api\DeviceTokenController;
+use App\Http\Controllers\Api\CashReceivedController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -423,6 +424,16 @@ Route::prefix('v1')->group(function () {
             Route::get('/staff-reimbursements/{id}', 'show');
             // Get expense history
             Route::get('/staff-reimbursements-history', 'history');
+        });
+
+        // Cash Received APIs for staff (Delivery Man / Engineer)
+        Route::controller(CashReceivedController::class)->group(function () {
+            // Store cash received from customer
+            Route::post('/cash-received', 'store');
+            // Get all cash received entries (with filters)
+            Route::get('/cash-received', 'index');
+            // Get single cash received entry
+            Route::get('/cash-received/{id}', 'show');
         });
     });
 });

@@ -68,6 +68,9 @@
                             <li>
                                 <a class='tp-link' href="{{ route('withdraw') }}">Withdraw</a>
                             </li>
+                            <li>
+                                <a class='tp-link' href="{{ route('cash-received.index') }}">Cash Received</a>
+                            </li>
                             {{-- <li>
                                 <a class='tp-link' href="{{ route('sales.index') }}">
                                     Sales Invoicing

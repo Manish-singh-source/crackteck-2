@@ -41,7 +41,7 @@ class OrderController extends Controller
         }
 
         // Paginate orders
-        $orders = $query->orderByDesc('created_at')->get()->withQueryString();
+        $orders = $query->orderByDesc('created_at')->get();
 
         // Efficiently get status counts
         $statusCounts = Order::selectRaw('status, COUNT(*) as count')

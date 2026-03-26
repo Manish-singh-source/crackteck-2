@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AllServicesController;
 use App\Http\Controllers\Api\AmcServicesController;
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\AttendanceController;
+use App\Http\Controllers\Api\CashReceivedController;
 use App\Http\Controllers\Api\CheckoutController as ApiCheckoutController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DeliveryOrderController;
@@ -27,9 +28,6 @@ use App\Http\Controllers\FieldEngineerController;
 use App\Http\Controllers\PartRequestController;
 use App\Http\Controllers\PickupRequestController;
 use App\Http\Controllers\ReturnRequestController;
-use App\Http\Controllers\Api\DeviceTokenController;
-use App\Http\Controllers\Api\CashReceivedController;
-
 use Illuminate\Support\Facades\Route;
 
 /*

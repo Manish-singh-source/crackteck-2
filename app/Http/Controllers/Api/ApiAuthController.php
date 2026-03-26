@@ -360,8 +360,8 @@ class ApiAuthController extends Controller
             StaffAadharDetail::create([
                 'staff_id' => $staff->id,
                 'aadhar_number' => $request->aadhar_number,
-                'aadhar_front_path' => $aadharFrontPath,
-                'aadhar_back_path' => $aadharBackPath,
+                'aadhar_front_path' => $aadharFrontPath ?? null,
+                'aadhar_back_path' => $aadharBackPath ?? null,
             ]);
         }
 
@@ -370,8 +370,8 @@ class ApiAuthController extends Controller
             StaffPanCardDetail::create([
                 'staff_id' => $staff->id,
                 'pan_number' => $request->pan_number,
-                'pan_card_front_path' => $panFrontPath,
-                'pan_card_back_path' => $panBackPath,
+                'pan_card_front_path' => $panFrontPath ?? null,
+                'pan_card_back_path' => $panBackPath ?? null,
             ]);
         }
 
@@ -382,8 +382,8 @@ class ApiAuthController extends Controller
                 'vehicle_type' => $request->vehicle_type,
                 'vehicle_number' => $request->vehicle_number,
                 'driving_license_no' => $request->driving_license_no,
-                'driving_license_front_path' => $drivingLicenseFrontPath,
-                'driving_license_back_path' => $drivingLicenseBackPath,
+                'driving_license_front_path' => $drivingLicenseFrontPath ?? null,
+                'driving_license_back_path' => $drivingLicenseBackPath ?? null,
             ]);
         }
 
@@ -395,7 +395,7 @@ class ApiAuthController extends Controller
                 'bank_acc_number' => $request->bank_acc_number,
                 'bank_name' => $request->bank_name,
                 'ifsc_code' => $request->ifsc_code,
-                'passbook_pic' => $passbookPic,
+                'passbook_pic' => $passbookPic ?? null,
             ]);
         }
 
@@ -419,7 +419,7 @@ class ApiAuthController extends Controller
                 'staff_id' => $staff->id,
                 'police_verification' => $request->police_verifications,
                 'police_verification_status' => $request->police_verification_status,
-                'police_certificate' => $policeCertificate,
+                'police_certificate' => $policeCertificate ?? null,
             ]);
         }
 

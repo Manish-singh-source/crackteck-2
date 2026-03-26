@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CallLogController;
 use App\Http\Controllers\CaseTransferController;
+use App\Http\Controllers\CashReceivedController;
 use App\Http\Controllers\ClientReceiptController;
 use App\Http\Controllers\CreditorsReportController;
 use App\Http\Controllers\CustomerController;
@@ -213,6 +214,20 @@ Route::prefix('/demo')->group(function () {
 
     // Payment Page
     Route::get('/crm/payments', [PaymentController::class, 'index'])->name('payments');
+
+    // Cash Received from Customer (Accounts Section)
+    Route::controller(CashReceivedController::class)->group(function () {
+        // Cash Received List Page
+        Route::get('/crm/accounts-cash', 'index')->name('cash-received.index');
+        // View Cash Received Details
+        Route::get('/crm/accounts-cash/{id}', 'view')->name('cash-received.view');
+        // Mark as Received by Account Team
+        Route::post('/crm/accounts-cash/{id}/mark-received', 'markAsReceived')->name('cash-received.mark-received');
+        // AJAX: Get Staff List
+        Route::get('/crm/accounts-cash/staff-list', 'getStaffList')->name('cash-received.staff-list');
+        // AJAX: Get Customer List
+        Route::get('/crm/accounts-cash/customer-list', 'getCustomerList')->name('cash-received.customer-list');
+    });
 
     // Reimbursement Page
     Route::controller(ReimbursementController::class)->group(function () {

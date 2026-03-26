@@ -56,6 +56,7 @@
             position: absolute;
         }
     </style>
+    @yield('styles')
 
 </head>
 
@@ -82,6 +83,7 @@
 
 
 @yield('content')
+
 
 
 

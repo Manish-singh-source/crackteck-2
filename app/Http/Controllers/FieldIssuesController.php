@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FieldIssue;
 use Illuminate\Http\Request;
 
 class FieldIssuesController extends Controller
@@ -9,23 +10,19 @@ class FieldIssuesController extends Controller
     //
     public function index()
     {
-        $fieldIssues = \App\Models\FieldIssue::all();
-
+        $fieldIssues = FieldIssue::with(['staff', 'serviceRequest.customer'])->get();
         return view('/crm/field-issues/index', compact('fieldIssues'));
     }
 
     public function view($id)
     {
-        // Load the issue with related engineer and job (and job devices)
-        $issue = \App\Models\FieldIssue::with(['engineer', 'job.devices'])->findOrFail($id);
+        $issue = FieldIssue::with(['staff', 'serviceRequest.customer', 'serviceRequestProduct'])->findOrFail($id);
+        $engineer = $issue->staff;
+        $customer = $issue->serviceRequest?->customer ?? null; 
+        $customerAddress = $issue->serviceRequest?->customer?->primaryAddress ?? null;
+        $productData = $issue->serviceRequestProduct ?? null;
 
-        // Prepare data for the view
-        $engineer = $issue->engineer;
-        $job = $issue->job; // Job contains customer fields and hasMany devices
-        $customer = $job; // reuse job as customer source when available
-        $devices = $job ? $job->devices : collect();
-
-        return view('/crm/field-issues/view', compact('issue', 'engineer', 'customer', 'devices'));
+        return view('/crm/field-issues/view', compact('issue', 'engineer', 'customer', 'customerAddress', 'productData'));
     }
 
     public function edit($id)

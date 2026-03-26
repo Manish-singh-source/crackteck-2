@@ -721,6 +721,79 @@
                         </div>
                     @endif
 
+                    @php
+                        $replacementRequests = $order->replacementRequests()->with(['orderItem', 'originalProduct', 'replacementProduct.warehouseProduct', 'assignedPerson'])->get();
+                    @endphp
+                    @if ($replacementRequests->isNotEmpty())
+                        <div class="card mt-3">
+                            <div class="card-header border-bottom-dashed">
+                                <h5 class="card-title mb-0">Replacement Requests</h5>
+                            </div>
+                            <div class="card-body">
+                                @foreach ($replacementRequests as $replacementRequest)
+                                    <div class="border rounded p-3 mb-3">
+                                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                                            <div>
+                                                <div class="fw-semibold">{{ $replacementRequest->request_number }}</div>
+                                                <div class="text-muted small">{{ $replacementRequest->orderItem->product_name ?? 'N/A' }} -> {{ $replacementRequest->replacementProduct->warehouseProduct->product_name ?? 'N/A' }}</div>
+                                            </div>
+                                            <span class="badge bg-info">{{ ucfirst($replacementRequest->status) }}</span>
+                                        </div>
+                                        <p class="mb-2"><strong>Reason:</strong> {{ $replacementRequest->reason }}</p>
+                                        <p class="mb-3"><strong>Description:</strong> {{ $replacementRequest->description ?: 'N/A' }}</p>
+
+                                        @if ($replacementRequest->status === 'pending')
+                                            <form action="{{ route('order.replacement-requests.status', $replacementRequest->id) }}" method="POST" class="mb-3">
+                                                @csrf
+                                                <div class="mb-2">
+                                                    <textarea name="admin_notes" class="form-control" rows="2" placeholder="Admin notes (optional)"></textarea>
+                                                </div>
+                                                <div class="d-flex gap-2">
+                                                    <button class="btn btn-success btn-sm" name="action" value="approve">Approve</button>
+                                                    <button class="btn btn-danger btn-sm" name="action" value="reject">Reject</button>
+                                                </div>
+                                            </form>
+                                        @endif
+
+                                        @if (in_array($replacementRequest->status, ['approved', 'assigned']))
+                                            <form action="{{ route('order.replacement-requests.assign', $replacementRequest->id) }}" method="POST" class="row g-2 align-items-end">
+                                                @csrf
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Assign To</label>
+                                                    <select class="form-select replacement-assign-type" name="assigned_person_type" data-target="assign-{{ $replacementRequest->id }}">
+                                                        <option value="delivery_man" {{ $replacementRequest->assigned_person_type === 'delivery_man' ? 'selected' : '' }}>Delivery Man</option>
+                                                        <option value="engineer" {{ $replacementRequest->assigned_person_type === 'engineer' ? 'selected' : '' }}>Engineer</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4 assign-delivery-man" id="assign-{{ $replacementRequest->id }}-delivery" style="display: {{ $replacementRequest->assigned_person_type === 'engineer' ? 'none' : 'block' }};">
+                                                    <label class="form-label">Delivery Man</label>
+                                                    <select class="form-select" name="delivery_man_id">
+                                                        <option value="">Select</option>
+                                                        @foreach ($deliveryMen as $deliveryMan)
+                                                            <option value="{{ $deliveryMan->id }}" {{ $replacementRequest->assigned_person_id == $deliveryMan->id ? 'selected' : '' }}>{{ $deliveryMan->first_name }} {{ $deliveryMan->last_name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4 assign-engineer" id="assign-{{ $replacementRequest->id }}-engineer" style="display: {{ $replacementRequest->assigned_person_type === 'engineer' ? 'block' : 'none' }};">
+                                                    <label class="form-label">Engineer</label>
+                                                    <select class="form-select" name="engineer_id">
+                                                        <option value="">Select</option>
+                                                        @foreach ($engineers as $engineer)
+                                                            <option value="{{ $engineer->id }}" {{ $replacementRequest->assigned_person_id == $engineer->id ? 'selected' : '' }}>{{ $engineer->first_name }} {{ $engineer->last_name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <button type="submit" class="btn btn-warning w-100">Assign</button>
+                                                </div>
+                                            </form>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Assign Delivery Man Card - Show only when status is admin_approved -->
                     @if ($order->status === 'admin_approved')
                         @php
@@ -1300,4 +1373,14 @@
             });
         });
     </script>
+<script>
+    $(document).on('change', '.replacement-assign-type', function () {
+        const target = $(this).data('target');
+        const type = $(this).val();
+        $('#' + target + '-delivery').toggle(type === 'delivery_man');
+        $('#' + target + '-engineer').toggle(type === 'engineer');
+    });
+</script>
 @endsection
+
+

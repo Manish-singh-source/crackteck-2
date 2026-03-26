@@ -7,6 +7,7 @@ use App\Models\AssignedEngineer;
 use App\Models\CaseTransferRequest;
 use App\Models\CoveredItem;
 use App\Models\EngineerDiagnosisDetail;
+use App\Models\FieldIssue;
 use App\Models\Product;
 use App\Models\ServiceRequest;
 use App\Models\ServiceRequestProduct;
@@ -421,7 +422,7 @@ class FieldEngineerController extends Controller
 
         // Create case transfer request
         $caseTransferRequest = CaseTransferRequest::create([
-            'transfer_id' => 'CTR-'.date('Ymd').'-'.random_int(100, 999),
+            'transfer_id' => 'CTR-' . date('Ymd') . '-' . random_int(100, 999),
             'service_request_id' => $id,
             'requesting_engineer_id' => $validated['user_id'],
             'engineer_reason' => $validated['engineer_reason'],
@@ -732,7 +733,7 @@ class FieldEngineerController extends Controller
                 foreach ($request->file('before_photos') as $k => $photo) {
                     $beforePhotos[$k] = $photo->storeAs(
                         'diagnosis_photos/before',
-                        'before_'.time()."_$k.".$photo->getClientOriginalExtension(),
+                        'before_' . time() . "_$k." . $photo->getClientOriginalExtension(),
                         'public'
                     );
                 }
@@ -743,7 +744,7 @@ class FieldEngineerController extends Controller
                 foreach ($request->file('after_photos') as $k => $photo) {
                     $afterPhotos[$k] = $photo->storeAs(
                         'diagnosis_photos/after',
-                        'after_'.time()."_$k.".$photo->getClientOriginalExtension(),
+                        'after_' . time() . "_$k." . $photo->getClientOriginalExtension(),
                         'public'
                     );
                 }
@@ -826,7 +827,7 @@ class FieldEngineerController extends Controller
                     foreach ($diagnosis['images'] as $j => $img) {
                         $imgs[] = $img->storeAs(
                             'diagnosis_photos/list',
-                            'diag_'.time()."_{$i}_{$j}.".$img->getClientOriginalExtension(),
+                            'diag_' . time() . "_{$i}_{$j}." . $img->getClientOriginalExtension(),
                             'public'
                         );
                     }
@@ -1010,7 +1011,7 @@ class FieldEngineerController extends Controller
                             $reasonParts = [];
                             foreach ($diagnosisList as $item) {
                                 if (isset($item['status']) && $item['status'] === 'picking') {
-                                    $reasonParts[] = ($item['name'] ?? '').': '.($item['report'] ?? '');
+                                    $reasonParts[] = ($item['name'] ?? '') . ': ' . ($item['report'] ?? '');
                                 }
                             }
                             $reason = implode('; ', $reasonParts);
@@ -1104,5 +1105,90 @@ class FieldEngineerController extends Controller
         // 4. Create request part entry
 
         return response()->json(['message' => 'Request part API is working.'], 200);
+    }
+
+
+
+
+
+
+
+
+    // Field Issues Section
+    public function fieldIssuesList(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:1',
+            'user_id' => 'required|integer|exists:staff,id',
+        ]); 
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+
+        $fieldIssues = FieldIssue::where('field_executive_id', $validated['user_id'])->get();
+
+        if($fieldIssues) {
+            return response()->json(['fieldIssues' => $fieldIssues], 200);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No field issues found.'], 404);
+    }
+
+    public function fieldIssueView(Request $request, $id) {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:1',
+            'user_id' => 'required|integer|exists:staff,id',
+        ]); 
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+        
+        $fieldIssue = FieldIssue::find($id);
+
+        if($fieldIssue) {
+            return response()->json(['fieldIssue' => $fieldIssue], 200);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Field issue not found.'], 404);
+    }
+
+    public function fieldIssueStore(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:1',
+            'user_id' => 'required|integer|exists:staff,id',
+            'service_request_id' => 'required|integer|exists:service_requests,id',
+            'service_request_product_id' => 'required|integer|exists:service_request_products,id',
+            'issue_type' => 'required|string',
+            'issue_description' => 'nullable|string',
+            'priority' => 'nullable|string',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+
+        $fieldIssue = FieldIssue::create([
+            'issue_id' => uniqid(),
+            'field_executive_id' => $validated['user_id'],
+            'service_request_id' => $validated['service_request_id'],
+            'service_request_product_id' => $validated['service_request_product_id'],
+            'issue_type' => $validated['issue_type'],
+            'issue_description' => $validated['issue_description'],
+            'priority' => $validated['priority'] ?? 'low',
+            'status' => 'pending',
+        ]);
+
+        if ($fieldIssue) {
+            return response()->json(['success' => true, 'message' => 'Field issue created successfully.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Failed to create field issue.'], 500);
     }
 }

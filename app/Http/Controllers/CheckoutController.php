@@ -716,7 +716,6 @@ class CheckoutController extends Controller
             ->where('order_number', $orderNumber)
             ->where('customer_id', Auth::guard('customer_web')->id())
             ->first();
-        // dd($order);
 
         if (! $order) {
             return redirect()->route('my-account-orders')->with('error', 'Order not found.');

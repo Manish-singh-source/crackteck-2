@@ -112,63 +112,6 @@
                         </form>
                     </div>
 
-                    <!-- <div class="col-xl-2 col-sm-3 col-6">
-                                    <div>
-                                        <select class="form-select" name="type" id="">
-
-                                            <option selected="" value="0">
-                                                All
-                                            </option>
-                                            <option value="1">
-                                                Laptops
-                                            </option>
-                                            <option value="2">
-                                                Computers
-                                            </option>
-                                            <option value="3">
-                                                Accessories
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-xl-2 col-md-2 col-sm-3 col-3">
-                                    <div>
-                                        <button type="submit" class="btn btn-primary w-100 waves ripple-light">
-                                            <span class="d-none d-md-inline-flex"> Search </span>
-                                            <i class="fa-solid fa-magnifying-glass "></i>
-
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-xl-2 col-sm-3 col-6">
-                                    <div>
-                                        <a href="#" class="btn btn-primary w-50 waves ripple-light">
-                                            <i class="ri-refresh-line me-1 align-bottom"></i>
-                                            Sort
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="col-xl-2 col-md-2 col-sm-3 col-3 btn-group" role="group">
-                                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span class="d-none d-md-inline-flex"> Brand </span>
-                                        <i class="mdi mdi-chevron-down"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Dell</a></li>
-                                        <li><a class="dropdown-item" href="#">Hp</a></li>
-                                    </ul>
-                                </div>
-                                <div class="col-xl-2 col-md-2 col-sm-3 col-3 btn-group" role="group">
-                                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span class="d-none d-md-inline-flex"> Status </span>
-                                        <i class="mdi mdi-chevron-down"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Approved</a></li>
-                                        <li><a class="dropdown-item" href="#">Pending</a></li>
-                                        <li><a class="dropdown-item" href="#">Rejected</a></li>
-                                    </ul>
-                                </div> -->
                     <div class="card-body pt-0">
                         <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
                             <li class="nav-item" role="presentation">
@@ -195,7 +138,7 @@
                                                             <th>Job Id</th>
                                                             <th>Engineer Name</th>
                                                             <th>Client Name</th>
-                                                            <th>Location</th>
+                                                            <th>Service Request Id</th>
                                                             <th>Issue Type</th>
                                                             <th>Priority</th>
                                                             <th>Status</th>
@@ -205,14 +148,14 @@
                                                     <tbody>
                                                     @forelse($fieldIssues as $issue)
                                                         <tr>
-                                                            <td>{{ $issue->job_id }}</td>
-                                                            <td>{{ $issue->engineer_id }}</td>
-                                                            <td>{{ $issue->customer_name }}</td>
-                                                            <td>{{ $issue->location }}</td>
-                                                            <td>{{ $issue->issue_type }}</td>
-                                                            <td>{{ $issue->priority }}</td>
+                                                            <td>{{ $issue->issue_id }}</td>
+                                                            <td>{{ $issue->staff?->first_name . ' ' . $issue->staff?->last_name }}</td>
+                                                            <td>{{ $issue->serviceRequest?->customer?->first_name ?? 'N/A' }}</td>
+                                                            <td>{{ $issue->serviceRequest?->request_id ?? 'N/A' }}</td>
+                                                            <td>{{ $issue->issue_type ? ucwords($issue->issue_type) : 'N/A' }}</td>
+                                                            <td>{{ $issue->priority ? ucwords($issue->priority) : 'N/A'}}</td>
                                                             <td>
-                                                                <span class="badge bg-danger-subtle text-danger fw-semibold">{{ $issue->status }}</span>
+                                                                <span class="badge bg-danger-subtle text-danger fw-semibold">{{ $issue->status ? ucwords($issue->status) : 'N/A'}}</span>
                                                             </td>
                                                             <td>
                                                                 <a aria-label="anchor" href="{{ route('field-issues.view', ['id' => $issue->id]) }}"

@@ -8,6 +8,7 @@ use App\Http\Controllers\FrontendAuthController;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\FrontendEcommerceController;
 use App\Http\Controllers\MyAccountController;
+use App\Http\Controllers\OrderSupportController;
 use App\Http\Controllers\OrderTrackingController;
 use App\Http\Controllers\RewardController;
 use App\Http\Controllers\SubscriberController;
@@ -218,12 +219,6 @@ Route::prefix('/')->group(function () {
 
         // Order details page (requires authentication)
         Route::get('/order-details/{orderNumber}', 'orderDetails')->name('order-details')->middleware('auth:customer_web');
-
-        // Cancel order (requires authentication)
-        Route::post('/order/cancel', 'cancelOrder')->name('order.cancel')->middleware('auth:customer_web');
-
-        // Return order (requires authentication)
-        Route::post('/order/return', 'returnOrder')->name('order.return')->middleware('auth:customer_web');
     });
 
     // Reward Routes
@@ -331,10 +326,20 @@ Route::prefix('/')->group(function () {
 
     // Collections Routes
     Route::get('/collections/{id}', [FrontendController::class, 'collectionDetails'])->name('collection.details');
+    Route::controller(OrderSupportController::class)->group(function () {
+        Route::middleware('auth:customer_web')->group(function () {
+            Route::post('/order/cancel', 'cancelOrder')->name('order.cancel');
+            Route::post('/order/return', 'returnOrder')->name('order.return');
+            Route::post('/order/replacement/start', 'startReplacement')->name('order.replacement.start');
+            Route::get('/order/replacement/compare/{productId}', 'replacementCompare')->name('order.replacement.compare');
+            Route::post('/order/replacement/submit', 'submitReplacement')->name('order.replacement.submit');
+        });
+
+        Route::middleware('signed')->group(function () {
+            Route::get('/order/refund-bank-details/{order}/{context}', 'refundBankDetailsForm')->name('order.refund-bank-details.form');
+            Route::post('/order/refund-bank-details/{order}/{context}', 'refundBankDetailsStore')->name('order.refund-bank-details.store');
+        });
+    });
 });
-
-
-
-
 
 

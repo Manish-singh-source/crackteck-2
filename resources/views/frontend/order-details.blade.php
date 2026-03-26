@@ -261,84 +261,100 @@
                     </div>
                 </div>
 
-                {{-- Cancel Order and Return Product Buttons --}}
+                                {{-- Customer Actions --}}
                 @php
-                    $cancellableStatuses = [
-                        'pending',
-                        'admin_approved',
-                        'assigned_delivery_man',
-                        'order_accepted',
-                    ];
-                    $canCancel = in_array($order->status, $cancellableStatuses);
-                    $canReturn = false;
-                    $returnMessage = '';
-
-                    if ($order->status === 'delivered' && $order->is_returnable) {
-                        if ($order->delivered_at) {
-                            $returnDeadline = $order->delivered_at->addDays($order->return_days ?? 30);
-                            if (now()->lessThanOrEqualTo($returnDeadline)) {
-                                $canReturn = true;
-                            } else {
-                                $returnMessage = 'Return period has expired.';
-                            }
-                        }
-                    } elseif ($order->status === 'delivered' && !$order->is_returnable) {
-                        $returnMessage = 'This order is not returnable.';
-                    }
-
-                    // Check if order is delivered for reward eligibility
+                    $returnRequests = \App\Models\ReturnOrder::where('order_number', $order->order_number)->get()->keyBy('order_item_id');
+                    $replacementRequests = \App\Models\ReplacementRequest::where('order_id', $order->id)->get()->keyBy('order_item_id');
+                    $cancellableStatuses = ['pending', 'admin_approved', 'assigned_delivery_man'];
+                    $canCancel = in_array($order->status, $cancellableStatuses, true) && ! $order->shipped_at;
                     $isDelivered = $order->status === 'delivered';
+                    $returnWindowOpen = $isDelivered && $order->is_returnable && $order->delivered_at && now()->lessThanOrEqualTo($order->delivered_at->copy()->addDays($order->return_days ?? 30));
 
-                    // Check if reward already exists for this order
+                    $returnableItems = $order->orderItems->filter(function ($item) use ($returnRequests) {
+                        return ! $returnRequests->has($item->id);
+                    });
+
+                    $replaceableItems = $order->orderItems->filter(function ($item) use ($replacementRequests) {
+                        $request = $replacementRequests->get($item->id);
+                        return ! $request || in_array($request->status, ['rejected', 'completed'], true);
+                    });
+
                     $reward = null;
                     if (Auth::guard('customer_web')->check()) {
                         $reward = \App\Models\Reward::where('order_id', $order->id)
                             ->where('customer_id', Auth::guard('customer_web')->id())
                             ->first();
                     }
-
                     $hasReward = $reward !== null;
-                    $canClaimReward = $isDelivered && !$hasReward;
+                    $canClaimReward = $isDelivered && ! $hasReward;
                 @endphp
 
-                @if ($canCancel || $canReturn || $canClaimReward || $hasReward)
+                @if ($canCancel || $isDelivered || $canClaimReward || $hasReward)
                     <div class="row mt-4">
                         <div class="col-12">
-                            <div class="order-action-buttons d-flex gap-3 flex-wrap">
+                            <div class="order-action-buttons d-flex gap-3 flex-wrap align-items-center">
                                 @if ($canCancel)
-                                    <button type="button" class="btn btn-danger" id="cancelOrderBtn" data-bs-toggle="modal"
-                                        data-bs-target="#cancelOrderModal">
+                                    <button type="button" class="btn btn-danger" id="cancelOrderBtn" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
                                         <i class="icon icon-close"></i> Cancel Order
                                     </button>
                                 @endif
 
-                                @if ($canReturn)
-                                    <button type="button" class="btn btn-warning" id="returnProductBtn" data-bs-toggle="modal"
-                                        data-bs-target="#returnOrderModal">
+                                @if ($isDelivered)
+                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#returnOrderModal" {{ $returnWindowOpen && $returnableItems->isNotEmpty() ? '' : 'disabled' }}>
                                         <i class="icon icon-refresh"></i> Return Product
                                     </button>
-                                @elseif ($order->status === 'delivered' && !$canReturn && $returnMessage)
-                                    <div class="text-muted">
-                                        <small>{{ $returnMessage }}</small>
-                                    </div>
+                                    <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#replaceOrderModal" {{ $replaceableItems->isNotEmpty() ? '' : 'disabled' }}>
+                                        <i class="icon icon-repeat"></i> Replace Product
+                                    </button>
                                 @endif
 
-                                {{-- Reward Button - Show only when order is delivered and no reward claimed yet --}}
                                 @if ($canClaimReward)
-                                    <button type="button" class="btn btn-success" id="rewardBtn" data-bs-toggle="modal"
-                                        data-bs-target="#rewardModal">
+                                    <button type="button" class="btn btn-success" id="rewardBtn" data-bs-toggle="modal" data-bs-target="#rewardModal">
                                         <i class="icon icon-gift"></i> Claim Reward
                                     </button>
                                 @endif
                             </div>
+
+                            @if ($isDelivered && ! $returnWindowOpen)
+                                <p class="text-muted mt-2 mb-0"><small>The return window for this order has expired.</small></p>
+                            @endif
                         </div>
                     </div>
                 @endif
 
-                {{-- Reward Details Section - Show when reward is already claimed --}}
+                @if ($returnRequests->isNotEmpty() || $replacementRequests->isNotEmpty())
+                    <div class="row mt-4 g-3">
+                        @if ($returnRequests->isNotEmpty())
+                            <div class="col-lg-6">
+                                <div class="order-detail-wrap">
+                                    <h6 class="fw-bold mb-3">Return Requests</h6>
+                                    @foreach ($returnRequests as $request)
+                                        <div class="border rounded p-3 mb-2">
+                                            <div class="fw-medium">{{ optional($request->orderItem)->product_name ?? 'Product' }}</div>
+                                            <div class="text-muted small">Status: {{ ucfirst($request->status) }} | Refund: {{ ucfirst($request->refund_status) }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                        @if ($replacementRequests->isNotEmpty())
+                            <div class="col-lg-6">
+                                <div class="order-detail-wrap">
+                                    <h6 class="fw-bold mb-3">Replacement Requests</h6>
+                                    @foreach ($replacementRequests as $request)
+                                        <div class="border rounded p-3 mb-2">
+                                            <div class="fw-medium">{{ optional($request->orderItem)->product_name ?? 'Product' }}</div>
+                                            <div class="text-muted small">Status: {{ ucfirst($request->status) }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
                 @if ($hasReward && $reward)
                     @php
-                        // Sync status with coupon usage
                         $reward->syncStatusWithCouponUsage();
                         $coupon = $reward->coupon;
                     @endphp
@@ -347,209 +363,234 @@
             </div>
         </div>
     </section>
-    <!-- /Check Out Cart -->
 
-    {{-- Reward Modal --}}
     @if ($canClaimReward || $hasReward)
         @include('frontend.components.reward-modal')
     @endif
 
-    <!-- Cancel Order Modal -->
     @if ($canCancel)
-        <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order</h5>
+                        <h5 class="modal-title">Cancel Order</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure you want to cancel this order?</p>
                         <p class="text-muted">Order Number: <strong>{{ $order->order_number }}</strong></p>
-                        <p class="text-danger">This action cannot be undone.</p>
-
-                        <div class="mb-3">
-                            <label for="cancelReason" class="form-label">Why do you want to cancel this order?</label>
-                            <textarea class="form-control" id="cancelReason" rows="3"
-                                placeholder="Please enter the reason for cancellation..."></textarea>
-                            <div class="invalid-feedback" id="cancelReasonError">Please enter a reason for cancellation.
-                            </div>
-                        </div>
+                        <label for="cancelReason" class="form-label">Cancellation reason</label>
+                        <textarea class="form-control" id="cancelReason" rows="3" placeholder="Tell us why you want to cancel this order"></textarea>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-danger" id="confirmCancelOrder">Yes, Cancel Order</button>
+                        <button type="button" class="btn btn-danger" id="confirmCancelOrder">Cancel Order</button>
                     </div>
                 </div>
             </div>
         </div>
     @endif
 
-    <!-- Return Order Modal -->
-    @if ($canReturn)
-        <div class="modal fade" id="returnOrderModal" tabindex="-1" aria-labelledby="returnOrderModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="returnOrderModalLabel">Return Product</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="returnOrderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Return Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select product</label>
+                        <select class="form-select" id="returnOrderItemId">
+                            <option value="">Choose a delivered product</option>
+                            @foreach ($returnableItems as $item)
+                                <option value="{{ $item->id }}">{{ $item->product_name }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div class="modal-body">
-                        <p>Are you sure you want to return this product?</p>
-                        <p class="text-muted">Order Number: <strong>{{ $order->order_number }}</strong></p>
-                        <p>Please ensure the product is in its original condition with all tags and packaging.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Reason for return</label>
+                        <input type="text" class="form-control" id="returnReason" placeholder="Example: wrong item, damaged, no longer needed">
                     </div>
-                    <div class="modal-body mb-3">
-                        <label for="returnReason" class="form-label">Why do you want to return this product?</label>
-                        <textarea class="form-control" id="returnReason" rows="3" placeholder="Please enter the reason for return..."></textarea>
-                        <div class="invalid-feedback" id="returnReasonError">Please enter a reason for return.</div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="returnDescription" rows="3" placeholder="Add any extra details for the admin team"></textarea>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-warning" id="confirmReturnOrder">Yes, Return
-                            Product</button>
+                    <div>
+                        <label class="form-label">Images (optional)</label>
+                        <input type="file" class="form-control" id="returnImages" multiple accept="image/*">
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-warning" id="confirmReturnOrder">Submit Return Request</button>
                 </div>
             </div>
         </div>
-    @endif
+    </div>
 
-    <!-- CSRF Token -->
+    <div class="modal fade" id="replaceOrderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Replace Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select product</label>
+                        <select class="form-select" id="replaceOrderItemId">
+                            <option value="">Choose a delivered product</option>
+                            @foreach ($replaceableItems as $item)
+                                <option value="{{ $item->id }}">{{ $item->product_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Reason for replacement</label>
+                        <input type="text" class="form-control" id="replaceReason" placeholder="Example: defective item, want another model">
+                    </div>
+                    <div>
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="replaceDescription" rows="3" placeholder="Add any context for the admin review"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-dark" id="confirmReplaceOrder">Choose Replacement Product</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
 @section('script')
     <script>
-        // Cancel Order
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        function showOrderActionAlert(message) {
+            alert(message);
+        }
+
         const cancelOrderBtn = document.getElementById('confirmCancelOrder');
         if (cancelOrderBtn) {
-            cancelOrderBtn.addEventListener('click', function() {
-                const orderNumber = '{{ $order->order_number }}';
-                const cancelReason = document.getElementById('cancelReason');
-                const cancelReasonError = document.getElementById('cancelReasonError');
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-                // Validate input
-                if (!cancelReason.value.trim()) {
-                    cancelReason.classList.add('is-invalid');
-                    cancelReasonError.style.display = 'block';
+            cancelOrderBtn.addEventListener('click', async function () {
+                const reason = document.getElementById('cancelReason').value.trim();
+                if (!reason) {
+                    showOrderActionAlert('Please enter a cancellation reason.');
                     return;
                 }
 
-                cancelReason.classList.remove('is-invalid');
-                cancelReasonError.style.display = 'none';
                 cancelOrderBtn.disabled = true;
                 cancelOrderBtn.textContent = 'Processing...';
 
-                fetch('{{ route('order.cancel') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken
-                        },
-                        body: JSON.stringify({
-                            order_number: orderNumber,
-                            customer_notes: cancelReason.value.trim()
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Close modal
-                            const modal = bootstrap.Modal.getInstance(document.getElementById(
-                                'cancelOrderModal'));
-                            modal.hide();
-
-                            // Hide the cancel button immediately
-                            const cancelBtn = document.getElementById('cancelOrderBtn');
-                            if (cancelBtn) {
-                                cancelBtn.style.display = 'none';
-                            }
-
-                            // Show success message and redirect
-                            alert(data.message);
-                            window.location.reload();
-                        } else {
-                            alert(data.message || 'Failed to cancel order. Please try again.');
-                            cancelOrderBtn.disabled = false;
-                            cancelOrderBtn.textContent = 'Yes, Cancel Order';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
-                        cancelOrderBtn.disabled = false;
-                        cancelOrderBtn.textContent = 'Yes, Cancel Order';
-                    });
+                const response = await fetch('{{ route('order.cancel') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        order_number: '{{ $order->order_number }}',
+                        customer_notes: reason,
+                    }),
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showOrderActionAlert(data.message);
+                    window.location.reload();
+                    return;
+                }
+                cancelOrderBtn.disabled = false;
+                cancelOrderBtn.textContent = 'Cancel Order';
+                showOrderActionAlert(data.message || 'Unable to cancel the order.');
             });
         }
 
-        // Return Order
         const returnOrderBtn = document.getElementById('confirmReturnOrder');
         if (returnOrderBtn) {
-            returnOrderBtn.addEventListener('click', function() {
-                const orderNumber = '{{ $order->order_number }}';
-                const returnReason = document.getElementById('returnReason');
-                const returnReasonError = document.getElementById('returnReasonError');
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            returnOrderBtn.addEventListener('click', async function () {
+                const orderItemId = document.getElementById('returnOrderItemId').value;
+                const reason = document.getElementById('returnReason').value.trim();
+                const description = document.getElementById('returnDescription').value.trim();
+                const images = document.getElementById('returnImages').files;
 
-                // Validate input
-                if (!returnReason.value.trim()) {
-                    returnReason.classList.add('is-invalid');
-                    returnReasonError.style.display = 'block';
+                if (!orderItemId || !reason) {
+                    showOrderActionAlert('Please choose a product and return reason.');
                     return;
                 }
 
-                returnReason.classList.remove('is-invalid');
-                returnReasonError.style.display = 'none';
                 returnOrderBtn.disabled = true;
-                returnOrderBtn.textContent = 'Processing...';
+                returnOrderBtn.textContent = 'Submitting...';
 
-                fetch('{{ route('order.return') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken
-                        },
-                        body: JSON.stringify({
-                            order_number: orderNumber,
-                            customer_notes: returnReason.value.trim()
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Close modal
-                            const modal = bootstrap.Modal.getInstance(document.getElementById(
-                                'returnOrderModal'));
-                            modal.hide();
+                const formData = new FormData();
+                formData.append('order_number', '{{ $order->order_number }}');
+                formData.append('order_item_id', orderItemId);
+                formData.append('return_reason', reason);
+                formData.append('return_description', description);
+                for (let i = 0; i < images.length; i++) {
+                    formData.append('return_images[]', images[i]);
+                }
 
-                            // Hide the return button immediately
-                            const returnBtn = document.getElementById('returnProductBtn');
-                            if (returnBtn) {
-                                returnBtn.style.display = 'none';
-                            }
+                const response = await fetch('{{ route('order.return') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: formData,
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showOrderActionAlert(data.message);
+                    window.location.reload();
+                    return;
+                }
+                returnOrderBtn.disabled = false;
+                returnOrderBtn.textContent = 'Submit Return Request';
+                showOrderActionAlert(data.message || 'Unable to create the return request.');
+            });
+        }
 
-                            // Show success message and redirect
-                            alert(data.message);
-                            window.location.reload();
-                        } else {
-                            alert(data.message || 'Failed to initiate return. Please try again.');
-                            returnOrderBtn.disabled = false;
-                            returnOrderBtn.textContent = 'Yes, Return Product';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
-                        returnOrderBtn.disabled = false;
-                        returnOrderBtn.textContent = 'Yes, Return Product';
-                    });
+        const replaceOrderBtn = document.getElementById('confirmReplaceOrder');
+        if (replaceOrderBtn) {
+            replaceOrderBtn.addEventListener('click', async function () {
+                const orderItemId = document.getElementById('replaceOrderItemId').value;
+                const reason = document.getElementById('replaceReason').value.trim();
+                const description = document.getElementById('replaceDescription').value.trim();
+
+                if (!orderItemId || !reason) {
+                    showOrderActionAlert('Please choose a product and replacement reason.');
+                    return;
+                }
+
+                replaceOrderBtn.disabled = true;
+                replaceOrderBtn.textContent = 'Redirecting...';
+
+                const response = await fetch('{{ route('order.replacement.start') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        order_number: '{{ $order->order_number }}',
+                        order_item_id: orderItemId,
+                        reason: reason,
+                        description: description,
+                    }),
+                });
+                const data = await response.json();
+                if (data.success && data.redirect) {
+                    window.location.href = data.redirect;
+                    return;
+                }
+                replaceOrderBtn.disabled = false;
+                replaceOrderBtn.textContent = 'Choose Replacement Product';
+                showOrderActionAlert(data.message || 'Unable to start the replacement flow.');
             });
         }
     </script>
-    
+
     {{-- Reward System JavaScript --}}
     <script>
         // Set global variables for reward system
@@ -609,3 +650,5 @@ order_number ( jise order ke liye return aaya hai )
 customer_id
 status (pending)
 created_at --}}
+
+

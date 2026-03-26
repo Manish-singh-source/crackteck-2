@@ -185,6 +185,9 @@
     <!-- Main Content -->
     <div class="flat-content mb-5">
         <div class="container">
+            @if (session('replacement_request_context'))
+                <div class="alert alert-info mb-4">You are choosing a replacement product. Select a product to review the comparison before submitting the request.</div>
+            @endif
             <div class="tf-product-view-content wrapper-control-shop">
                 <div class="canvas-filter-product sidebar-filter handle-canvas left"
                     style="border: 1px solid #e9e9e9; padding: 20px;">
@@ -449,6 +452,14 @@
                                                     <span class="tooltip">Compare</span>
                                                 </a>
                                             </li>
+                                            @if (session('replacement_request_context'))
+                                                <li class="d-none d-sm-block">
+                                                    <a href="{{ route('order.replacement.compare', $product->id) }}" class="box-icon btn-icon-action hover-tooltip tooltip-left">
+                                                        <span class="icon icon-repeat"></span>
+                                                        <span class="tooltip">Select as Replacement</span>
+                                                    </a>
+                                                </li>
+                                            @endif
                                             {{-- <li>
                                                 <a href="{{ route('product.detail', $product->id) }}"
                                                     data-bs-toggle="modal" data-product-id="{{ $product->id }}"
@@ -548,6 +559,9 @@
                                             <span>Add to cart</span>
                                             <i class="icon-cart-2"></i>
                                         </a>
+                                        @if (session('replacement_request_context'))
+                                            <a href="{{ route('order.replacement.compare', $product->id) }}" class="tf-btn btn-dark w-100 mb-2">Select as Replacement</a>
+                                        @endif
                                         <div class="box-btn">
                                             <a href="#compare" data-bs-toggle="offcanvas"
                                                 class="tf-btn-icon style-2 type-black">
@@ -1713,3 +1727,4 @@
         });
     </script>
 @endsection
+

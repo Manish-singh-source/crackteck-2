@@ -4,8 +4,10 @@ use App\Http\Controllers\Api\AllServicesController;
 use App\Http\Controllers\Api\AmcServicesController;
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\AttendanceController;
+use App\Http\Controllers\Api\CheckoutController as ApiCheckoutController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DeliveryOrderController;
+use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FcmTestController;
 use App\Http\Controllers\Api\FollowUpController;
 use App\Http\Controllers\Api\KycController;
@@ -14,20 +16,17 @@ use App\Http\Controllers\Api\MeetController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentRefundController;
 use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\Api\ProfileController;
-use App\Http\Controllers\Api\QuickServiceController;
 use App\Http\Controllers\Api\QuotationController;
 use App\Http\Controllers\Api\RazorpayWebhookController;
+use App\Http\Controllers\Api\ReplacementRequestController;
 use App\Http\Controllers\Api\RewardClaimController;
 use App\Http\Controllers\Api\StaffWalletController;
 use App\Http\Controllers\Api\TaskController;
-use App\Http\Controllers\Api\CheckoutController as ApiCheckoutController;
+use App\Http\Controllers\FcmTestFinalController;
 use App\Http\Controllers\FieldEngineerController;
 use App\Http\Controllers\PartRequestController;
 use App\Http\Controllers\PickupRequestController;
 use App\Http\Controllers\ReturnRequestController;
-use App\Http\Controllers\Api\DeviceTokenController;
-
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -70,6 +69,7 @@ Route::prefix('v1')->group(function () {
 
     // Only for testing notification
     Route::post('/test-fcm', [FcmTestController::class, 'send'])->middleware('throttle:60,1');
+    Route::post('/test-fcm-final', [FcmTestFinalController::class, 'sendFinal'])->middleware('throttle:60,1');
 
     Route::middleware(['throttle:60,1', 'jwt.verify'])->group(function () {
 
@@ -223,7 +223,6 @@ Route::prefix('v1')->group(function () {
             Route::post('/return-order/{id}/verify-otp', 'verifyReturnOrderOtp');
             Route::post('/return-order-received/{id}', 'receiveReturnOrder');
             Route::get('/return-order-picked/{id}', 'pickedReturnOrderDetails');
-
             // vehical registration
             Route::get('/vehicle-registration', 'getVehicleDetails');
             Route::post('/vehicle-registration', 'vehicleRegistration');
@@ -245,33 +244,11 @@ Route::prefix('v1')->group(function () {
             Route::put('/update-driving-license', 'updateDrivingLicense');
         });
 
-        // Engineer APIs
-        // Route::controller(StockinHandController::class)->group(function () {
-        //     Route::get('/stock-in-hand', 'index');
-        //     Route::get('/stock-in-hand/{id}', 'show');
-        //     Route::post('/stock-in-hand', 'store');
-        // });
-
-        // ================================== Customer APIs ========================================
-        // All Requests APIs AMC and Non-AMC
+        Route::controller(ReplacementRequestController::class)->group(function () {
+            Route::get('/replacement-requests', 'index');
+            Route::get('/replacement-requests/{id}', 'show');
+        });
         Route::controller(AllServicesController::class)->group(function () {
-            // Quick Services List
-            Route::get('/services', 'servicesList');
-            Route::get('/quick-services', 'quickServicesList');
-            Route::get('/services-list', 'servicesListByType');
-            Route::get('/service-details/{id}', 'getServiceDetails');
-
-            Route::get('/devices-types', 'getDevicesTypes');
-
-            // submit service request
-            Route::post('/submit-quick-service-request', 'submitQuickServiceRequest');
-
-            // Get all service requests
-            Route::get('/all-service-requests', 'allServiceRequests');
-            // service request details
-            Route::get('/service-request-details/{id}', 'serviceRequestDetails');
-            // service request product diagnostics
-            Route::get('/service-request-product-diagnostics/{id}/{product_id}', 'serviceRequestProductDiagnostics');
             // diagnosis list with full details
             // Route::get('/service-request/{id}/{product_id}/diagnosis-list', 'diagnosisList');
 
@@ -339,6 +316,11 @@ Route::prefix('v1')->group(function () {
 
             // Request Part
             Route::post('/service-request/{id}/{product_id}/request-part', 'requestPart');
+
+            // Field Issues 
+            Route::post('/field-issue', 'fieldIssueStore');
+            Route::get('/field-issues', 'fieldIssuesList');
+            Route::get('/field-issue/{id}', 'fieldIssueView');
 
             // Attendance APIs
             Route::get('/attendance', 'index');
@@ -426,6 +408,7 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
+
 
 
 

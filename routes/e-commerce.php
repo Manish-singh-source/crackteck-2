@@ -3,9 +3,10 @@
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\AdminOrderSupportController;
 use App\Http\Controllers\CollectionController;
-use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CouponsController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\EcommerceOrderController;
 use App\Http\Controllers\EcommerceProductController;
@@ -50,8 +51,11 @@ Route::prefix('/demo/e-commerce')->group(function () {
         Route::post('/orders/bulk-delete', 'bulkDestroy')->name('order.bulk-delete');
         Route::get('/view-order/{id}', 'show')->name('order.view');
         Route::put('/order/{id}/assign-person', 'assignPerson')->name('order.assign-person');
-        Route::put('/return/{id}/receive', 'returnReceive')->name('order.return.receive');
-        Route::put('/return/{id}/complete-refund', 'completeRefund')->name('order.return.complete-refund');
+        Route::put('/return/{id}/complete-refund', [AdminOrderSupportController::class, 'completeRefund'])->name('order.return.complete-refund');
+        Route::put('/return/{id}/receive', [AdminOrderSupportController::class, 'returnReceive'])->name('order.return.receive');
+        Route::get('/replacement-requests', [AdminOrderSupportController::class, 'replacementRequestsIndex'])->name('order.replacement-requests.index');
+        Route::post('/replacement-requests/{id}/status', [AdminOrderSupportController::class, 'updateReplacementStatus'])->name('order.replacement-requests.status');
+        Route::post('/replacement-requests/{id}/assign', [AdminOrderSupportController::class, 'assignReplacementRequest'])->name('order.replacement-requests.assign');
         Route::get('/order/{id}/invoice', 'generateInvoice')->name('order.invoice');
         Route::get('/order/{id}/invoice/download', 'downloadInvoice')->name('order.invoice-download');
         Route::get('/delivery-men-by-city/{city}', 'getDeliveryMenByCity')->name('order.delivery-men-by-city');
@@ -214,3 +218,5 @@ Route::prefix('/demo/e-commerce')->group(function () {
         Route::get('/search-categories', 'searchCategories')->name('collection.search-categories');
     });
 });
+
+

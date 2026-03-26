@@ -50,6 +50,12 @@
     </div>
     <!-- /Breadcrumbs -->
 
+    @if (session('replacement_request_context'))
+        <div class="container mb-3">
+            <div class="alert alert-info">You are choosing a replacement product. Review this item and use the replacement button below to continue.</div>
+        </div>
+    @endif
+
     <!-- Product Main -->
     <section>
         <div class="tf-main-product section-image-zoom border-bt mb-3">
@@ -416,6 +422,11 @@
                                                     data-product-name="{{ $product->warehouseProduct->product_name ?? 'Product' }}">
                                                     Buy now
                                                 </a>
+                                                @if (session('replacement_request_context'))
+                                                    <a href="{{ route('order.replacement.compare', $product->id) }}" class="tf-btn btn-dark">
+                                                        Select as Replacement
+                                                    </a>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -1644,3 +1655,4 @@
         // }
     </script>
 @endsection
+

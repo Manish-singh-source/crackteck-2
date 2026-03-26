@@ -164,7 +164,7 @@ class DeliveryOrderController extends Controller
 
         if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
 
-            $order = Order::with(['orderItems.productSerial', 'customer'])
+            $order = Order::with(['orderItems.productSerial', 'customer.primaryAddress'])
                 ->where('id', $order_id)
                 ->first();
 

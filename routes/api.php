@@ -17,6 +17,8 @@ use App\Http\Controllers\Api\MeetController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentRefundController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\QuickServiceController;
 use App\Http\Controllers\Api\QuotationController;
 use App\Http\Controllers\Api\RazorpayWebhookController;
 use App\Http\Controllers\Api\ReplacementRequestController;

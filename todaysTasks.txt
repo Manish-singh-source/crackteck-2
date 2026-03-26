@@ -156,6 +156,39 @@ MyCRM:
 
 
 
+
+
+Todays Completed Tasks: 
+
+# Saurabh 
+
+Crackteck: 
+1. Remove the following fields from forms like remote amc and onsite amc Preferred Start Date, SKU, HSN     - done
+2. The “Visits (AMC Scheduled Meeting)” feature will be removed from Remote AMC                             - done
+
+# Roshan
+
+1. Oceanic: responsiveness for all devices                      - done
+2. Crackteck: Forgot password feature adding                    - done
+
+#Shubham 
+
+MyCRM: 
+1. My CRM Screens Clients Detailed Page and Staffs Detailed Page            - done
+2. My CRM Screens for Vendors List                                          - done
+
+#Pradnya
+1. Working Pages: Android APP, IOS APP                                      - done
+
+
+
+
+
+
+
+
+
+
 Pending All Over Tasks: 
 
 Crackteck App: 
@@ -235,3 +268,207 @@ o	Refund will be processed after receiving valid bank details and product verifi
 •  Engineer App Enhancement
 •	Product-related issues will be made visible within the Engineer App for better tracking and resolution.
 
+
+
+
+
+
+Todays Tasks: 
+
+# Saurabh
+
+1. Cash On Delivery: Customer buys product as cash on delivery                                     - done
+2. After Order delivered customer can return or replace product.                                      - done
+3. In return case: Customers will receive an email requesting bank details if not already available in the system.                                     - done
+4. Refund will be processed after receiving valid bank details and product verification.                                     - done
+
+# Roshan 
+
+1. RNisarg Foundation changes                                      - client side pending
+2. Auto Refund on Cancelled Orders: A system-driven automatic refund process will be implemented for all cancelled orders.                                     - done
+3. Staff wallete module                                      - done
+
+# Shubham & # Pradnya 
+
+1. Wrap Pack N Carry Website Figma & Mobile App layout template                                      - done
+
+# Shubham 
+
+1. Payment gateway integration in App                                     - done
+
+# Pradnya
+
+1. Digital Card changes                                      - done
+2. Finding Templates for modern laminators                     - done
+
+
+
+
+if customer cancelled order that is paid by razorpay then the refund will be initiate for that customer if customer paid cash on delivery then we will send him a form link on mail for filling the refund form where we can get bank account details and then refund will be initiate. for that customer 
+also if make sure customer will cancel order only if order is not shipped. 
+if order is delivered then customer will return or replace product. 
+so add this functionality for return and replace product. if customer selects return or replace then show him a popup where he/she can choose options like return product or replace product or directly show both buttons on page. 
+after selecting option: 
+1. return product: 
+    - show him a popup form where he can enter details like why he wants to return product. 
+    - after product received from customer: we will initiate refund for that customer. 
+2. replace product: 
+    - after clicking replace product button: we will redirect user to shop page where he can select product for replacement. 
+    - after selecting product that product will be open in new page where we will see both products like selected product and current product and it's difference. 
+    - then after checking that customer will proceed for replace product. 
+    - then that order request will go to admin and then admin processed that request: 
+        - approve request: 
+        - assign delivery man/engineer 
+        - then that product will be displays in delivery man/engineer app 
+        - other flow is same 
+        - 
+
+so update my current code accordingly and make sure everything is working properly. 
+
+
+
+
+
+
+
+
+
+
+Update my current order management, cancellation, refund, return, and replacement flow with the following business rules and UI changes. 
+Make the code production-ready, fully integrated into the existing codebase, and ensure all related validations, API calls, database updates, admin flow, and user flow work correctly.
+Firstly check my entire codebase cause mostly all logic has been implemented already. 
+
+Requirements:
+
+1. Order Cancellation Rules
+- A customer can cancel an order only if the order status is NOT_SHIPPED / not yet shipped.
+- If the order is already shipped, then cancellation must not be allowed.
+- If the order is delivered, then the customer must not see the cancel option. Instead, they should see options for Return Product and Replace Product.
+
+2. Refund Logic for Cancelled Orders
+When a customer cancels an eligible order:
+
+a) If payment method is Razorpay (prepaid):
+- Automatically initiate a refund for that customer through Razorpay.
+- Update order/payment/refund status properly in the system.
+- Store refund transaction details.
+- Show a success/failure message to the customer.
+
+b) If payment method is Cash on Delivery:
+- Do not auto-refund immediately.
+- Send the customer an email containing a refund form link.
+- The refund form should collect bank account details required for manual refund processing.
+- Save submitted bank details securely.
+- Mark refund status as pending until admin processes it.
+
+3. Delivered Order Flow
+- If the order status is DELIVERED, show:
+  - Return Product button
+  - Replace Product button
+- Either show both buttons directly on the page, or show a popup/modal where the customer chooses:
+  - Return Product
+  - Replace Product
+
+4. Return Product Flow
+When customer selects Return Product:
+- Open a popup/modal form.
+- The form should collect:
+  - reason for return
+  - optional description/comments
+  - optional images if already supported in current system
+- Submit a return request to the backend.
+- Create a return request record linked to the order.
+- Send the request to admin for review/processing.
+- Once the returned product is received from the customer, initiate the refund:
+  - Razorpay payment: refund through Razorpay
+  - COD payment: process refund using collected bank details or request bank details if not already available
+- Update all statuses properly:
+  - return request status
+  - product pickup status
+  - refund status
+  - order status
+
+5. Replace Product Flow
+When customer selects Replace Product:
+- Redirect the customer to the shop page/product listing page.
+- Let the customer select a replacement product.
+- After selecting a replacement product, open a new comparison/review page.
+- On that page, show:
+  - current product
+  - selected replacement product
+  - important differences between both products, such as:
+    - name
+    - image
+    - price
+    - attributes/variants
+    - specifications
+- Then allow the customer to proceed with the replacement request.
+
+6. Replacement Request Processing
+After customer confirms replacement:
+- Create a replacement request linked to the original order and selected product.
+- Send this request to admin for processing.
+
+Admin flow:
+- Admin can view all replacement requests.
+- Admin can approve or reject the request.
+- If approved:
+  - admin can assign delivery man / engineer
+  - assigned task should appear in delivery man / engineer app/dashboard
+  - remaining workflow should follow the existing delivery/replacement process in the system
+
+7. UI / UX Requirements
+- Add all necessary buttons, modals, forms, pages, and status messages.
+- Prevent invalid actions based on order status.
+- Show proper error handling and loading states.
+- Keep the UI consistent with the existing design system.
+- Ensure the flow works on both desktop and mobile if the project already supports responsive design.
+
+8. Backend Requirements
+- Update existing models, controllers, services, APIs, and routes as needed.
+- Add or update statuses for:
+  - order
+  - cancellation
+  - return
+  - replacement
+  - refund
+- Ensure validation for all edge cases.
+- Do not break existing functionality.
+- Reuse existing architecture and coding style wherever possible.
+
+9. Email / Notification Requirements
+- Send email for COD refund form when cancelled order is eligible for refund.
+- Send relevant notifications for:
+  - cancellation request success
+  - return request created
+  - replacement request created
+  - admin approval/rejection
+  - refund initiated/completed
+
+10. Final Deliverable
+- Update the current code accordingly.
+- Modify both frontend and backend wherever required.
+- Add all necessary database changes/migrations if needed.
+- Ensure the full flow works end-to-end.
+- Fix any related bugs found during implementation.
+- Keep code clean, modular, and well-structured.
+- At the end, provide a summary of:
+  - files changed
+  - new APIs/routes added
+  - database changes
+  - major logic changes
+  - any assumptions made
+
+
+
+
+#Saurabh 
+1. Adding Invoice Formats 
+2. Field Issues Module
+
+#Roshan
+1. Figma Layout for Modern Laminators
+2. Testing and Fixing Transactions.
+
+#Shubham 
+1. MyCRM Screens For All Modules Edit Pages 

@@ -7,13 +7,13 @@ use App\Models\FollowUp;
 use App\Models\Lead;
 use App\Models\Meet;
 use App\Models\Order;
+use App\Models\ReplacementRequest;
 use App\Models\WebsiteBanner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class DashboardController extends Controller
 {
-    //
     protected function getRoleId($roleId)
     {
         return [
@@ -48,33 +48,28 @@ class DashboardController extends Controller
                 'followup' => $followup,
             ];
         } elseif ($staffRole == 'delivery_man') {
-            $total_orders = Order::where('assigned_person_id', $validated['user_id'])->count();
-            $pending_orders = Order::where('assigned_person_id', $validated['user_id'])->where('status', 'order_accepted')->orderBy('updated_at', 'desc')->count();
-            $new_orders = Order::where('assigned_person_id', $validated['user_id'])->where('status', 'assigned_delivery_man')->orderBy('updated_at', 'desc')->count();
-            $shipped_orders = Order::where('assigned_person_id', $validated['user_id'])->where('status', 'product_taken')->orderBy('updated_at', 'desc')->count();
-            $delivered_orders = Order::where('assigned_person_id', $validated['user_id'])->where('status', 'delivered')->orderBy('updated_at', 'desc')->count();
-            $cancelled_orders = Order::where('assigned_person_id', $validated['user_id'])->where('status', 'cancelled')->orderBy('updated_at', 'desc')->count();
-            $returned_orders = Order::where('assigned_person_id', $validated['user_id'])->where('status', 'returned')->orderBy('updated_at', 'desc')->count();
-
             $data = [
-                'total_orders' => $total_orders,
-                'pending_orders' => $pending_orders,
-                'new_orders' => $new_orders,
-                'shipped_orders' => $shipped_orders,
-                'delivered_orders' => $delivered_orders,
-                'cancelled_orders' => $cancelled_orders,
-                'returned_orders' => $returned_orders,
+                'total_orders' => Order::where('assigned_person_id', $validated['user_id'])->count(),
+                'pending_orders' => Order::where('assigned_person_id', $validated['user_id'])->where('status', 'order_accepted')->orderBy('updated_at', 'desc')->count(),
+                'new_orders' => Order::where('assigned_person_id', $validated['user_id'])->where('status', 'assigned_delivery_man')->orderBy('updated_at', 'desc')->count(),
+                'shipped_orders' => Order::where('assigned_person_id', $validated['user_id'])->where('status', 'product_taken')->orderBy('updated_at', 'desc')->count(),
+                'delivered_orders' => Order::where('assigned_person_id', $validated['user_id'])->where('status', 'delivered')->orderBy('updated_at', 'desc')->count(),
+                'cancelled_orders' => Order::where('assigned_person_id', $validated['user_id'])->where('status', 'cancelled')->orderBy('updated_at', 'desc')->count(),
+                'returned_orders' => Order::where('assigned_person_id', $validated['user_id'])->where('status', 'returned')->orderBy('updated_at', 'desc')->count(),
+                'replacement_requests' => ReplacementRequest::where('assigned_person_type', 'delivery_man')->where('assigned_person_id', $validated['user_id'])->count(),
+            ];
+        } elseif ($staffRole == 'engineer') {
+            $data = [
+                'replacement_requests' => ReplacementRequest::where('assigned_person_type', 'engineer')->where('assigned_person_id', $validated['user_id'])->count(),
             ];
         }
 
         return response()->json($data, 200);
     }
 
-    // Sales Overview for Sales Person
     public function salesOverview(Request $request)
     {
         $validated = Validator::make($request->all(), ([
-            // validation rules if any
             'user_id' => 'required',
         ]));
 
@@ -86,7 +81,6 @@ class DashboardController extends Controller
         $newLeads = Lead::where('staff_id', $validated['user_id'])->where('status', 'new')->count();
         $contactedLeads = Lead::where('staff_id', $validated['user_id'])->where('status', 'contacted')->count();
         $qualifiedLeads = Lead::where('staff_id', $validated['user_id'])->where('status', 'qualified')->count();
-        // replaced quoted with won
         $quotedLeads = Lead::where('staff_id', $validated['user_id'])->where('status', 'won')->count();
         $lostLeads = Lead::where('staff_id', $validated['user_id'])->where('status', 'lost')->count();
 
@@ -96,7 +90,6 @@ class DashboardController extends Controller
     public function banners(Request $request)
     {
         $validated = Validator::make($request->all(), ([
-            // validation rules if any
             'role_id' => 'required|in:4',
         ]));
 

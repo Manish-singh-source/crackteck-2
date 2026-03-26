@@ -384,7 +384,7 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $order = Order::with('orderItems', 'orderItems.product')->where('id', $order_id)->first();
+            $order = Order::with('customer', 'orderItems', 'orderItems.product')->where('id', $order_id)->first();
 
             if (! $order) {
                 return response()->json(['message' => 'Order not found'], 404);

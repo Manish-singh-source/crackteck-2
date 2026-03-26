@@ -55,7 +55,7 @@ Now we can go through each in details:
 
 5. Client Management
     - create client
-        - when creating a staff we can add staffs basic details like name, email, dob, phone number, etc. 
+        - when creating a client we can add clients basic details like name, email, dob, phone number, etc. 
         
     - edit client
     - delete client
@@ -63,6 +63,6 @@ Now we can go through each in details:
     - restore client: 
         - restore client that is deleted
     - view client
-
+        
 
 

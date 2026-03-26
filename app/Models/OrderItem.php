@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderItem extends Model
 {
-    //
     use SoftDeletes;
 
     protected $fillable = [
@@ -37,9 +36,6 @@ class OrderItem extends Model
         'custom_options' => 'array',
     ];
 
-    /**
-     * Create an order item from a product (for buy now checkout).
-     */
     public static function createFromProduct($product, $quantity, $orderId)
     {
         $warehouseProduct = $product->warehouseProduct;
@@ -71,9 +67,6 @@ class OrderItem extends Model
         ]);
     }
 
-    /**
-     * Create an order item from a cart item.
-     */
     public static function createFromCartItem($cartItem, $orderId)
     {
         $product = $cartItem->ecommerceProduct;
@@ -114,7 +107,6 @@ class OrderItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
-        // return $this->belongsTo(EcommerceProduct::class);
     }
 
     public function ecommerceProduct()
@@ -125,5 +117,15 @@ class OrderItem extends Model
     public function productSerial()
     {
         return $this->belongsTo(ProductSerial::class);
+    }
+
+    public function returnOrders()
+    {
+        return $this->hasMany(ReturnOrder::class);
+    }
+
+    public function replacementRequests()
+    {
+        return $this->hasMany(ReplacementRequest::class);
     }
 }

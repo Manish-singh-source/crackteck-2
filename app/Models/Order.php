@@ -62,6 +62,7 @@ class Order extends Model
         'shipped_at',
         'delivered_at',
         'cancelled_at',
+        'cancellation_reason',
         'expected_delivery_date',
         'otp',
         'otp_expiry',
@@ -74,6 +75,7 @@ class Order extends Model
         'is_returnable',
         'return_days',
         'return_status',
+        'replacement_status',
         'refund_amount',
         'refund_status',
         'is_priority',
@@ -175,6 +177,21 @@ class Order extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function returnOrders()
+    {
+        return $this->hasMany(ReturnOrder::class, 'order_number', 'order_number');
+    }
+
+    public function replacementRequests()
+    {
+        return $this->hasMany(ReplacementRequest::class);
+    }
+
+    public function refundBankDetails()
+    {
+        return $this->hasMany(RefundBankDetail::class);
     }
 
     public function getPayableAmountPaiseAttribute(): int

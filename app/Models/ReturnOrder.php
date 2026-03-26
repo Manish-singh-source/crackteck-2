@@ -9,7 +9,6 @@ class ReturnOrder extends Model
 {
     use SoftDeletes;
 
-    // Status constants
     const STATUS_PENDING = 'pending';
 
     const STATUS_ASSIGNED = 'assigned';
@@ -20,7 +19,6 @@ class ReturnOrder extends Model
 
     const STATUS_RECEIVED = 'received';
 
-    // Refund status constants
     const REFUND_STATUS_PENDING = 'pending';
 
     const REFUND_STATUS_PROCESSING = 'processing';
@@ -47,6 +45,8 @@ class ReturnOrder extends Model
     protected $fillable = [
         'return_order_number',
         'order_number',
+        'order_item_id',
+        'product_id',
         'customer_id',
         'return_person_id',
         'delivery_man_id',
@@ -60,9 +60,15 @@ class ReturnOrder extends Model
         'otp_verified_at',
         'return_completed_at',
         'return_reason',
+        'return_description',
+        'return_images',
+        'payment_method_snapshot',
         'customer_notes',
         'refund_amount',
         'refund_status',
+        'refund_reference',
+        'refund_notes',
+        'admin_notes',
     ];
 
     protected $casts = [
@@ -74,26 +80,20 @@ class ReturnOrder extends Model
         'return_completed_at' => 'datetime',
         'otp_expiry' => 'datetime',
         'refund_amount' => 'decimal:2',
+        'return_images' => 'array',
     ];
 
-    /**
-     * Boot the model.
-     */
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($returnOrder) {
-            // Auto-generate return order number if not set
             if (empty($returnOrder->return_order_number)) {
                 $returnOrder->return_order_number = self::generateReturnOrderNumber();
             }
         });
     }
 
-    /**
-     * Generate a unique return order number.
-     */
     public static function generateReturnOrderNumber()
     {
         $prefix = 'RET';
@@ -103,9 +103,6 @@ class ReturnOrder extends Model
         return $prefix.'-'.$date.'-'.$random;
     }
 
-    /**
-     * Get the status display name
-     */
     public function getStatusDisplayNameAttribute(): string
     {
         return match ($this->status) {
@@ -118,9 +115,6 @@ class ReturnOrder extends Model
         };
     }
 
-    /**
-     * Get the status badge color
-     */
     public function getStatusBadgeColorAttribute(): string
     {
         return match ($this->status) {
@@ -133,9 +127,6 @@ class ReturnOrder extends Model
         };
     }
 
-    /**
-     * Get the refund status display name
-     */
     public function getRefundStatusDisplayNameAttribute(): string
     {
         return match ($this->refund_status) {
@@ -147,9 +138,6 @@ class ReturnOrder extends Model
         };
     }
 
-    /**
-     * Get the refund status badge color
-     */
     public function getRefundStatusBadgeColorAttribute(): string
     {
         return match ($this->refund_status) {
@@ -161,49 +149,46 @@ class ReturnOrder extends Model
         };
     }
 
-    /**
-     * Get the customer who placed the order
-     */
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'customer_id');
     }
 
-    /**
-     * Get the person who initiated the return
-     */
     public function returnPerson()
     {
         return $this->belongsTo(Customer::class, 'return_person_id');
     }
 
-    /**
-     * Get the delivery man assigned for return
-     */
     public function deliveryMan()
     {
         return $this->belongsTo(Staff::class, 'delivery_man_id');
     }
 
-    /**
-     * Get the order associated with this return
-     */
     public function order()
     {
         return $this->belongsTo(Order::class, 'order_number', 'order_number');
     }
 
-    /**
-     * Check if return can be initiated
-     */
+    public function orderItem()
+    {
+        return $this->belongsTo(OrderItem::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function refundBankDetails()
+    {
+        return $this->hasMany(RefundBankDetail::class);
+    }
+
     public function canInitiateReturn(): bool
     {
         return in_array($this->status, [self::STATUS_PENDING]);
     }
 
-    /**
-     * Check if OTP can be verified
-     */
     public function canVerifyOtp(): bool
     {
         return in_array($this->status, [self::STATUS_PENDING, self::STATUS_ASSIGNED])

@@ -50,6 +50,11 @@ return [
         'upload_disk' => env('FILE_UPLOAD_DISK', 'public'),
     ],
 
+    'firebasefinal' => [
+        'project_id' => env('FIREBASE_FINAL_PROJECT_ID'),
+        'credentials' => env('FIREBASE_FINAL_CREDENTIALS'),
+    ],
+
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),

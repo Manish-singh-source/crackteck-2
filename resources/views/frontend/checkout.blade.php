@@ -328,10 +328,10 @@
                                         <label for="cod-method" class="payment-header radio-item">
                                             <input type="radio" name="payment_method" value="cod"
                                                 class="tf-check-rounded" id="cod-method"  
-                                                @if($totals['total'] >= 2000) disabled @endif>
+                                                @if($totals['total'] >= 6000) disabled @endif>
                                             <span class="body-text-3">Cash on Delivery</span>
-                                            @if($totals['total'] >= 2000) 
-                                                <span class="text-danger">You can not use Cash on Delivery for oder below ₹2000</span>
+                                            @if($totals['total'] >= 6000) 
+                                                <span class="text-danger">You can not use Cash on Delivery for oder below ₹6000</span>
                                             @endif
                                         </label>
                                     </div>

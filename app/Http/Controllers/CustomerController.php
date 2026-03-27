@@ -331,13 +331,9 @@ class CustomerController extends Controller
             $customer->where('status', $status);
         }
 
-        $customers = $customer->where('customer_type', 'ecommerce')->get();
+        $customers = $customer->whereIn('customer_type', ['ecommerce', 'both'])->get();
 
         return view('/e-commerce/customer/index', compact('customers'));
-
-        // $customers = Customer::with('branches', 'orders')
-        //     ->where('customer_type', 'ecommerce')
-        //     ->get();
     }
 
     public function ec_create()

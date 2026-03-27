@@ -270,7 +270,8 @@ Route::prefix('v1')->group(function () {
             Route::get('/service-request-product-diagnostics/{id}/{product_id}', 'serviceRequestProductDiagnostics');
             // diagnosis list with full details
 
-            
+             Route::get('/devices-types', 'getDevicesTypes');
+
 
             // customer approve/reject for stock_in_hand, request_part
             Route::post('/customer-approve-reject-part', 'customerApproveRejectPart');

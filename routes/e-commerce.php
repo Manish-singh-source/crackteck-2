@@ -15,6 +15,7 @@ use App\Http\Controllers\ProductDealController;
 use App\Http\Controllers\ProductListController;
 use App\Http\Controllers\ProductVariantsController;
 use App\Http\Controllers\SubscriberController;
+use App\Http\Controllers\Admin\OrderFeedbackController;
 use Illuminate\Support\Facades\Route;
 
 // *******************************************************************************************************************************************************
@@ -217,6 +218,16 @@ Route::prefix('/demo/e-commerce')->group(function () {
         // AJAX Routes for Category Search
         Route::get('/search-categories', 'searchCategories')->name('collection.search-categories');
     });
-});
 
+    // ------------------------------------------------------------ E-Commerce Order Feedback Page -------------------------------------------------------------
+    Route::controller(OrderFeedbackController::class)->group(function () {
+        Route::get('/order-feedback', 'index')->name('order-feedback.index');
+        Route::get('/order-feedback/{id}/edit', 'edit')->name('order-feedback.edit');
+        Route::put('/order-feedback/{id}', 'update')->name('order-feedback.update');
+        Route::delete('/order-feedback/{id}', 'destroy')->name('order-feedback.destroy');
+        Route::post('/order-feedback/{id}/toggle-status', 'toggleStatus')->name('order-feedback.toggle-status');
+        Route::delete('/order-feedback/{feedbackId}/media/{mediaIndex}', 'deleteMedia')->name('order-feedback.delete-media');
+        Route::get('/order-feedback/statistics', 'statistics')->name('order-feedback.statistics');
+    });
+});
 

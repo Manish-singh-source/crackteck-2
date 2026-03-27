@@ -10,6 +10,7 @@ use App\Http\Controllers\FrontendEcommerceController;
 use App\Http\Controllers\MyAccountController;
 use App\Http\Controllers\OrderSupportController;
 use App\Http\Controllers\OrderTrackingController;
+use App\Http\Controllers\OrderFeedbackController;
 use App\Http\Controllers\RewardController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\WishlistController;
@@ -323,6 +324,18 @@ Route::prefix('/')->group(function () {
 
     // Product Deal
     Route::get('/product-deals', [FrontendEcommerceController::class, 'productDeals'])->name('ecommerce-product-detail');
+
+    // Order Feedback Routes
+    Route::controller(OrderFeedbackController::class)->group(function () {
+        // Submit feedback for order product (requires authentication)
+        Route::middleware('auth:customer_web')->group(function () {
+            Route::post('/order-feedback/store', 'store')->name('order-feedback.store');
+            Route::post('/order-feedback/check', 'checkFeedbackExists')->name('order-feedback.check');
+        });
+        
+        // Get product feedback (public)
+        Route::get('/product-feedback/{productId}', 'getProductFeedback')->name('product-feedback.get');
+    });
 
     // Collections Routes
     Route::get('/collections/{id}', [FrontendController::class, 'collectionDetails'])->name('collection.details');

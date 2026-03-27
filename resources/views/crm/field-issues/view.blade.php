@@ -47,8 +47,6 @@
                             <li class="breadcrumb-item active" aria-current="page">Start</li>
                         </ol>
                     </nav>
-
-                    {{-- Assign remote engineer --}}
                 </div>
             </div>
 
@@ -423,6 +421,64 @@
                             </div>
                         </div>
 
+                        @if ($issue->resolution_notes)
+                            <div class="col-lg-12 start-job-details-section">
+                                <div class="card">
+                                    <div class="card-header border-bottom-dashed">
+                                        <div class="d-flex justify-content-between">
+                                            <h5 class="card-title flex-grow-1 mb-0">
+                                                Issue Solved Details
+                                            </h5>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <ul class="list-group list-group-flush ">
+                                                    <li
+                                                        class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                                        <span class="fw-semibold text-break">Connected Via :
+                                                        </span>
+                                                        <span>
+                                                            Call
+                                                        </span>
+                                                    </li>
+                                                    <li
+                                                        class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                                        <span class="fw-semibold text-break">Fixed Issue Description :
+                                                        </span>
+                                                        <span>
+                                                            {{ $issue->resolution_notes }}
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <ul class="list-group list-group-flush">
+                                                    <li
+                                                        class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                                        <span class="fw-semibold text-break">Remote Tool Used :
+                                                        </span>
+                                                        <span>
+                                                            Anydesk
+                                                        </span>
+                                                    </li>
+                                                    <li
+                                                        class="list-group-item border-0 d-flex align-items-center gap-3 flex-wrap">
+                                                        <span class="fw-semibold text-break">Remarks :
+                                                        </span>
+                                                        <span>
+                                                            {{ $issue->attachments }}
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

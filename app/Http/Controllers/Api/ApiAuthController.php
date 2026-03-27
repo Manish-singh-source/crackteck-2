@@ -143,8 +143,8 @@ class ApiAuthController extends Controller
                 'email' => $request->email,
                 'dob' => $request->dob,
                 'gender' => $request->gender,
-                'customer_type' => '0',
-                'source_type' => '1',
+                'customer_type' => 'both',
+                'source_type' => 'app',
             ]);
 
             if (! $customer) {
@@ -161,7 +161,7 @@ class ApiAuthController extends Controller
                     'state' => $request->state,
                     'country' => $request->country,
                     'pincode' => $request->pincode,
-                    'is_primary' => 1,
+                    'is_primary' => 'yes',
                 ]);
             }
 

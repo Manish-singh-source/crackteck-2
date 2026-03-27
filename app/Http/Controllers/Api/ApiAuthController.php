@@ -539,7 +539,7 @@ class ApiAuthController extends Controller
                 $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
             }
         }
-        
+
         if (! $user) {
             return response()->json(['success' => false, 'message' => 'User not found.'], 404);
         }
@@ -690,16 +690,24 @@ class ApiAuthController extends Controller
             $user = Customer::where('provider_id', $googleUser['sub'])->first();
 
             if (!$user) {
+                $user = Customer::where('email', $googleUser['email'])->first();
 
-                $user = Customer::create([
-                    'customer_code' => $this->generateCustomerCode(),
-                    'first_name' => $googleUser['name'],
-                    'last_name' => $googleUser['name'],
-                    'email' => $googleUser['email'],
-                    'provider_id' => $googleUser['sub'],
-                    'avatar' => $googleUser['picture'] ?? null,
-                    'password' => bcrypt(Str::random(16))
-                ]);
+                if (!$user) {
+                    $user = Customer::create([
+                        'customer_code' => $this->generateCustomerCode(),
+                        'first_name' => $googleUser['name'],
+                        'last_name' => $googleUser['name'],
+                        'email' => $googleUser['email'],
+                        'provider_id' => $googleUser['sub'],
+                        'avatar' => $googleUser['picture'] ?? null,
+                        'password' => bcrypt(Str::random(16))
+                    ]);
+                } else {
+                    $user = Customer::update([
+                        'provider_id' => $googleUser['sub'],
+                        'avatar' => $googleUser['picture'] ?? null,
+                    ]);
+                }
             }
         } else {
             $user = Staff::where('provider_id', $googleUser['sub'])->where('staff_role', $staffRole)->first();
@@ -733,5 +741,3 @@ class ApiAuthController extends Controller
         ]);
     }
 }
-
-

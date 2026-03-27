@@ -703,10 +703,9 @@ class ApiAuthController extends Controller
                         'password' => bcrypt(Str::random(16))
                     ]);
                 } else {
-                    $user = Customer::update([
-                        'provider_id' => $googleUser['sub'],
-                        'avatar' => $googleUser['picture'] ?? null,
-                    ]);
+                    $user->provider_id = $googleUser['sub'];
+                    $user->avatar = $googleUser['picture'] ?? null;
+                    $user->save();
                 }
             }
         } else {

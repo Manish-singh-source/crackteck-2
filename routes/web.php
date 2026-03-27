@@ -46,7 +46,7 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StockReportController;
 use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\TrackRequestController;
-use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\TransactionsController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\WithdrawController;
 use Illuminate\Support\Facades\Route;
@@ -210,7 +210,8 @@ Route::prefix('/demo')->group(function () {
     // ------------------------------------------------------------ Accounts Page -------------------------------------------------------------
 
     // Transactions Page
-    Route::get('/crm/transactions', [TransactionController::class, 'index'])->name('transactions');
+    Route::get('/crm/transactions', [TransactionsController::class, 'index'])->name('transactions');
+    Route::get('/crm/transactions/export', [TransactionsController::class, 'export'])->name('transactions.export');
 
     // Payment Page
     Route::get('/crm/payments', [PaymentController::class, 'index'])->name('payments');

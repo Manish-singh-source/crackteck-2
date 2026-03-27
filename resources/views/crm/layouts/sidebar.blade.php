@@ -63,13 +63,13 @@
                                 <a class='tp-link' href="{{ route('payments') }}">Payment</a>
                             </li>
                             <li>
-                                <a class='tp-link' href="{{ route('reimbursement') }}">Re-Imbursement</a>
-                            </li>
-                            <li>
                                 <a class='tp-link' href="{{ route('withdraw') }}">Withdraw</a>
                             </li>
                             <li>
                                 <a class='tp-link' href="{{ route('cash-received.index') }}">Cash Received</a>
+                            </li>
+                            <li>
+                                <a class='tp-link' href="{{ route('reimbursement') }}">Re-Imbursement</a>
                             </li>
                             {{-- <li>
                                 <a class='tp-link' href="{{ route('sales.index') }}">

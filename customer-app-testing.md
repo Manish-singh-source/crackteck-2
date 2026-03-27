@@ -5,8 +5,9 @@
 
 i. Login with Phone Number - using wrong phone number - showing error user not found          - passed
 ii. Login with Phone Number - using correct phone number - user logged in and redirect to dashboard  - passed
-iii. login with email and password - using wrong email and password -     error not showing properly  - not passed
-iv. 
+iii. login with email and password - using wrong email and password -     error not showing properly  - api pending
+iv. login with google - if customer already exists duplicate entry error showing - not properly error shown - 
+v. 
 
 
 2. Signup form: 

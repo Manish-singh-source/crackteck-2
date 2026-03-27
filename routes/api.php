@@ -254,6 +254,23 @@ Route::prefix('v1')->group(function () {
         Route::controller(AllServicesController::class)->group(function () {
             // diagnosis list with full details
             // Route::get('/service-request/{id}/{product_id}/diagnosis-list', 'diagnosisList');
+            // Quick Services List
+            Route::get('/services', 'servicesList');
+            Route::get('/quick-services', 'quickServicesList');
+            Route::get('/services-list', 'servicesListByType');
+            Route::get('/service-details/{id}', 'getServiceDetails');
+            // submit service request
+            Route::post('/submit-quick-service-request', 'submitQuickServiceRequest');
+
+            // Get all service requests
+            Route::get('/all-service-requests', 'allServiceRequests');
+            // service request details
+            Route::get('/service-request-details/{id}', 'serviceRequestDetails');
+            // service request product diagnostics
+            Route::get('/service-request-product-diagnostics/{id}/{product_id}', 'serviceRequestProductDiagnostics');
+            // diagnosis list with full details
+
+            
 
             // customer approve/reject for stock_in_hand, request_part
             Route::post('/customer-approve-reject-part', 'customerApproveRejectPart');

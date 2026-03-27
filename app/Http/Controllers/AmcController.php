@@ -272,7 +272,7 @@ class AmcController extends Controller
             'service_name' => 'required|string|max:255',
             // service_charge required only when type is NOT 0 (AMC)
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'service_charge' => 'nullable|numeric|min:0|required_unless:service_type,0',
+            'service_charge' => 'nullable|numeric|min:0|required_unless:service_type,amc',
             'status' => 'nullable|in:active,inactive',
             'diagnosis_list' => 'nullable|string', // JSON string from hidden field
             'device_specific_diagnosis_id' => 'nullable|exists:device_specific_diagnoses,id',

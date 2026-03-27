@@ -134,13 +134,15 @@ class OrderFeedbackController extends Controller
             // Handle image uploads
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
+                    $originalName = $image->getClientOriginalName();
+                    $fileSize = $image->getSize();
                     $path = FileUpload::fileUpload($image, 'uploads/feedback/images/');
-                    
+
                     $media[] = [
                         'file_path' => $path,
                         'file_type' => 'image',
-                        'original_name' => $image->getClientOriginalName(),
-                        'file_size' => $image->getSize(),
+                        'original_name' => $originalName,
+                        'file_size' => $fileSize,
                     ];
                 }
             }
@@ -148,13 +150,15 @@ class OrderFeedbackController extends Controller
             // Handle video uploads
             if ($request->hasFile('videos')) {
                 foreach ($request->file('videos') as $video) {
+                    $originalName = $video->getClientOriginalName();
+                    $fileSize = $video->getSize();
                     $path = FileUpload::fileUpload($video, 'uploads/feedback/videos/');
-                    
+
                     $media[] = [
                         'file_path' => $path,
                         'file_type' => 'video',
-                        'original_name' => $video->getClientOriginalName(),
-                        'file_size' => $video->getSize(),
+                        'original_name' => $originalName,
+                        'file_size' => $fileSize,
                     ];
                 }
             }

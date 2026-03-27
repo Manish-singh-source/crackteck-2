@@ -143,8 +143,8 @@ class ApiAuthController extends Controller
                 'email' => $request->email,
                 'dob' => $request->dob,
                 'gender' => $request->gender,
-                'customer_type' => '0',
-                'source_type' => '1',
+                'customer_type' => 'both',
+                'source_type' => 'app',
             ]);
 
             if (! $customer) {
@@ -161,7 +161,7 @@ class ApiAuthController extends Controller
                     'state' => $request->state,
                     'country' => $request->country,
                     'pincode' => $request->pincode,
-                    'is_primary' => 1,
+                    'is_primary' => 'yes',
                 ]);
             }
 
@@ -539,7 +539,7 @@ class ApiAuthController extends Controller
                 $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
             }
         }
-        
+
         if (! $user) {
             return response()->json(['success' => false, 'message' => 'User not found.'], 404);
         }
@@ -690,16 +690,23 @@ class ApiAuthController extends Controller
             $user = Customer::where('provider_id', $googleUser['sub'])->first();
 
             if (!$user) {
+                $user = Customer::where('email', $googleUser['email'])->first();
 
-                $user = Customer::create([
-                    'customer_code' => $this->generateCustomerCode(),
-                    'first_name' => $googleUser['name'],
-                    'last_name' => $googleUser['name'],
-                    'email' => $googleUser['email'],
-                    'provider_id' => $googleUser['sub'],
-                    'avatar' => $googleUser['picture'] ?? null,
-                    'password' => bcrypt(Str::random(16))
-                ]);
+                if (!$user) {
+                    $user = Customer::create([
+                        'customer_code' => $this->generateCustomerCode(),
+                        'first_name' => $googleUser['name'],
+                        'last_name' => $googleUser['name'],
+                        'email' => $googleUser['email'],
+                        'provider_id' => $googleUser['sub'],
+                        'avatar' => $googleUser['picture'] ?? null,
+                        'password' => bcrypt(Str::random(16))
+                    ]);
+                } else {
+                    $user->provider_id = $googleUser['sub'];
+                    $user->avatar = $googleUser['picture'] ?? null;
+                    $user->save();
+                }
             }
         } else {
             $user = Staff::where('provider_id', $googleUser['sub'])->where('staff_role', $staffRole)->first();
@@ -733,5 +740,3 @@ class ApiAuthController extends Controller
         ]);
     }
 }
-
-

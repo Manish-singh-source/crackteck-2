@@ -32,6 +32,13 @@ class Customer extends Authenticatable implements JWTSubject
         'remember_token',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+        ];
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();

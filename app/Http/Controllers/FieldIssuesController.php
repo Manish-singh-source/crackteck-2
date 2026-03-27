@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\FieldIssue;
+use App\Models\Staff;
 use Illuminate\Http\Request;
 
 class FieldIssuesController extends Controller
@@ -21,8 +22,9 @@ class FieldIssuesController extends Controller
         $customer = $issue->serviceRequest?->customer ?? null; 
         $customerAddress = $issue->serviceRequest?->customer?->primaryAddress ?? null;
         $productData = $issue->serviceRequestProduct ?? null;
+        $remoteEngineers = Staff::where('staff_role', 'delivery_man')->get();
 
-        return view('/crm/field-issues/view', compact('issue', 'engineer', 'customer', 'customerAddress', 'productData'));
+        return view('/crm/field-issues/view', compact('issue', 'engineer', 'customer', 'customerAddress', 'productData', 'remoteEngineers', 'id'));
     }
 
     public function edit($id)
@@ -71,5 +73,23 @@ class FieldIssuesController extends Controller
         $issue->delete();
 
         return redirect()->route('field-issues.index')->with('success', 'Field issue deleted successfully.');
+    }
+
+    public function fieldIssueSolution(Request $request) {
+        $data = $request->validate([
+            'field_issue_id' => 'required',
+            'field_engineer' => 'required',
+            'remote_tool' => 'required',
+            'issueDescription' => 'nullable|string',
+            'remarks' => 'nullable|string',
+        ]);
+
+        $issue = FieldIssue::find($request->field_issue_id);
+        $issue->resolution_notes = $data['issueDescription'];
+        $issue->attachments = $data['remarks'];
+        $issue->status = 'resolved';
+        $issue->save();
+
+        return redirect()->route('field-issues.index')->with('success', 'Field issue updated successfully.');
     }
 }

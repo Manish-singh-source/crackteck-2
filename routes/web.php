@@ -853,6 +853,8 @@ Route::prefix('/demo')->group(function () {
         Route::put('/crm/field-issues/{id}', 'update')->name('field-issues.update');
         // Delete Field Issue
         Route::delete('/crm/field-issues/{id}', 'destroy')->name('field-issues.destroy');
+        // Assign Engineer to Field Issue Solved 
+        Route::post('/crm/field-issues/field-issue-solved', 'fieldIssueSolution')->name('field-issues.solve');
     });
 
     // ------------------------------------------------------------ Spare Parts Page -------------------------------------------------------------

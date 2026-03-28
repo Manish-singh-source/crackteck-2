@@ -47,8 +47,19 @@ Route::prefix('v1')->group(function () {
     Route::post('/signup', [ApiAuthController::class, 'signup']);
     Route::post('/send-otp', [ApiAuthController::class, 'login']);
     Route::post('/verify-otp', [ApiAuthController::class, 'verifyOtp']);
+
+    Route::post('/send-verification-code', [ApiAuthController::class, 'sendVerificationCode']);
+    Route::post('/verify-verification-code', [ApiAuthController::class, 'verifyVerificationCode']);
+    Route::post('/resend-verification-code', [ApiAuthController::class, 'resendVerificationCode']);
+    
     Route::post('/google-login', [ApiAuthController::class, 'googleLogin']);
     Route::post('email-pass-login', [ApiAuthController::class, 'emailPasswordLogin']);
+    // forgot password apis
+    Route::post('/forgot-password/send-code', [ApiAuthController::class, 'sendForgotPasswordCode']);
+    Route::post('/forgot-password/verify-code', [ApiAuthController::class, 'verifyForgotPasswordCode']);
+    Route::post('/forgot-password/resend-code', [ApiAuthController::class, 'resendForgotPasswordCode']);
+    Route::post('/forgot-password/reset', [ApiAuthController::class, 'resetForgotPassword']);
+    
     Route::post('/webhooks/razorpay', RazorpayWebhookController::class);
 
     // Public route for staff wallet status update (used by admin panel)

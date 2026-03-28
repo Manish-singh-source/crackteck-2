@@ -81,3 +81,18 @@ vi. payment page:
 2. password reset link not getting 
 
 
+
+
+1. Quick Service & Installation Service & Repairing Service
+    - Display quick service details banner - displaying properly - passed 
+    - In detail quick service page - working as expected - passed 
+    - product type dropdown list - working as expected - passed
+    - Service request submittion - working as expected - passed 
+    - payment integration - not implemented - pending 
+
+2.  AMC Service:
+    - Offline AMC 
+        - 
+
+    - Online AMC 
+        - 

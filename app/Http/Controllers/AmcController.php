@@ -53,6 +53,7 @@ class AmcController extends Controller
             'duration' => 'required|numeric|min:1',
             'total_visits' => 'required|numeric|min:1',
             'support_type' => 'required|string|max:255',
+            'pay_terms' => 'nullable|in:full_payment,installments',
             'tandc' => 'nullable|string|max:255',
             'replacement_policy' => 'nullable|string|max:255',
             'status' => 'required|in:active,inactive',
@@ -63,6 +64,7 @@ class AmcController extends Controller
             $rules['plan_cost'] = 'required|numeric|min:0';
             $rules['tax'] = 'required|numeric|min:0';
             $rules['total_cost'] = 'required|numeric|min:0';
+            $rules['pay_terms'] = 'required|in:full_payment,installments';
         }
 
         $validator = Validator::make($request->all(), $rules);
@@ -84,13 +86,13 @@ class AmcController extends Controller
                 $amc->plan_cost = $request->plan_cost;
                 $amc->tax = $request->tax;
                 $amc->total_cost = $request->total_cost;
-                $amc->pay_terms = 'full_payment';
+                $amc->pay_terms = $request->pay_terms;
             } else {
                 // For onsite, set pricing to null or 0
                 $amc->plan_cost = 0;
                 $amc->tax = 0;
                 $amc->total_cost = 0;
-                $amc->pay_terms = 'full_payment';
+                $amc->pay_terms = null;
             }
             
             $amc->support_type = $request->support_type;
@@ -158,6 +160,7 @@ class AmcController extends Controller
             $rules['plan_cost'] = 'required|numeric|min:0';
             $rules['tax'] = 'required|numeric|min:0';
             $rules['total_cost'] = 'required|numeric|min:0';
+            $rules['pay_terms'] = 'required|in:full_payment,installments';
         }
 
         $validator = Validator::make($request->all(), $rules);
@@ -180,13 +183,13 @@ class AmcController extends Controller
                 $amc->plan_cost = $request->plan_cost;
                 $amc->tax = $request->tax;
                 $amc->total_cost = $request->total_cost;
-                $amc->pay_terms = 'full_payment';
+                $amc->pay_terms = $request->pay_terms;
             } else {
                 // For onsite, set pricing to null
                 $amc->plan_cost = 0;
                 $amc->tax = 0;
                 $amc->total_cost = 0;
-                $amc->pay_terms = 'full_payment';
+                $amc->pay_terms = null;
             }
             
             $amc->support_type = $request->support_type;

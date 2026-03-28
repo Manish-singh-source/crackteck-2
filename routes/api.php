@@ -48,6 +48,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/send-otp', [ApiAuthController::class, 'login']);
     Route::post('/verify-otp', [ApiAuthController::class, 'verifyOtp']);
     Route::post('/google-login', [ApiAuthController::class, 'googleLogin']);
+    Route::post('email-pass-login', [ApiAuthController::class, 'emailPasswordLogin']);
     Route::post('/webhooks/razorpay', RazorpayWebhookController::class);
 
     // Public route for staff wallet status update (used by admin panel)

@@ -16,6 +16,7 @@ use App\Models\StaffVehicleDetail;
 use App\Models\StaffWorkSkill;
 use App\Services\Fast2smsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -111,6 +112,8 @@ class ApiAuthController extends Controller
                 'dob' => 'nullable',
                 'gender' => 'required',
                 'customer_type' => 'both',
+                'password' => 'nullable|string|min:8',
+
                 'pan_no' => 'nullable|string|max:10',
                 'pan_card_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
                 'pan_card_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
@@ -738,5 +741,45 @@ class ApiAuthController extends Controller
             'token' => $token,
             'user' => $user
         ]);
+    }
+
+    // Email Password Login
+    public function emailPasswordLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+            'role_id' => 'required|in:1,2,3,4',
+        ]);
+
+        $staffRole = $this->getRoleId($request->role_id);
+
+        if ($staffRole == 'customers') {
+            $user = Customer::where('email', $request->email)->first();
+        } else {
+            $user = Staff::where('email', $request->email)->where('staff_role', $staffRole)->first();
+        }
+
+        if (!$user) {
+            return ApiResponse::error('User not found', 404);
+        }
+
+        // ✅ Check password
+        if (!Hash::check($request->password, $user->password)) {
+            return ApiResponse::error('Invalid password', 401);
+        }
+
+
+        // $token = $user->createToken('mobile_token')->plainTextToken;
+        if ($staffRole == 'customers') {
+            $token = auth('customer_api')->login($user);
+        } else {
+            $token = auth('staff_api')->login($user);
+        }
+
+        return ApiResponse::success([
+            'token' => $token,
+            'user' => $user,
+        ], 'Login successful');
     }
 }

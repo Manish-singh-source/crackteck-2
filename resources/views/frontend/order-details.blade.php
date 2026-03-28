@@ -313,6 +313,29 @@
                                         <i class="icon icon-gift"></i> Claim Reward
                                     </button>
                                 @endif
+
+                                @if ($isDelivered)
+                                    @php
+                                        // Get existing feedback for this order and customer
+                                        $existingFeedbacks = \App\Models\OrderFeedback::where('order_id', $order->id)
+                                            ->where('customer_id', Auth::guard('customer_web')->id())
+                                            ->pluck('product_id')
+                                            ->toArray();
+                                        
+                                        // Filter order items to only show products without feedback
+                                        $feedbackableItems = $order->orderItems->filter(function ($item) use ($existingFeedbacks) {
+                                            // Get ecommerce product id for this order item
+                                            $ecommerceProduct = \App\Models\EcommerceProduct::where('product_id', $item->product_id)->first();
+                                            return $ecommerceProduct && !in_array($ecommerceProduct->id, $existingFeedbacks);
+                                        });
+                                    @endphp
+                                    
+                                    @if ($feedbackableItems->isNotEmpty())
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#feedbackModal">
+                                            <i class="icon icon-star"></i> Submit Feedback
+                                        </button>
+                                    @endif
+                                @endif
                             </div>
 
                             @if ($isDelivered && ! $returnWindowOpen)
@@ -462,6 +485,95 @@
         </div>
     </div>
 
+    <!-- Feedback Modal -->
+    <style>
+        .star-rating-input {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-start;
+        }
+        .star-rating-input .star-label {
+            cursor: pointer;
+            font-size: 24px;
+            color: #ddd;
+            transition: color 0.2s;
+        }
+        .star-rating-input .star-label:hover,
+        .star-rating-input .star-label.hover {
+            color: #ffc107;
+        }
+        .star-rating-input .star-label.active {
+            color: #ffc107;
+        }
+        .star-rating-input .star-label i {
+            font-style: normal;
+        }
+    </style>
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Submit Feedback</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="feedbackForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">Select Product <span class="text-danger">*</span></label>
+                            <select class="form-select" id="feedbackProductId" name="product_id" required>
+                                <option value="">Choose a product from this order</option>
+                                @foreach ($feedbackableItems as $item)
+                                    @php
+                                        $ecommerceProduct = \App\Models\EcommerceProduct::where('product_id', $item->product_id)->first();
+                                    @endphp
+                                    @if ($ecommerceProduct)
+                                        <option value="{{ $ecommerceProduct->id }}" data-product-name="{{ $item->product_name }}">
+                                            {{ $item->product_name }}
+                                        </option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Star Rating <span class="text-danger">*</span></label>
+                            <div class="star-rating-input">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <input type="radio" name="star" value="{{ $i }}" id="star{{ $i }}" class="d-none">
+                                    <label for="star{{ $i }}" class="star-label" data-rating="{{ $i }}">
+                                        <i class="icon-star"></i>
+                                    </label>
+                                @endfor
+                            </div>
+                            <input type="hidden" id="feedbackStar" name="star" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Your Review</label>
+                            <textarea class="form-control" id="feedbackText" name="feedback" rows="4" placeholder="Share your experience with this product..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Upload Images (Optional)</label>
+                            <input type="file" class="form-control" id="feedbackImages" name="images[]" multiple accept="image/*">
+                            <small class="text-muted">Max 5 images, 2MB each. Accepted formats: JPEG, PNG, JPG, GIF, WEBP</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Upload Videos (Optional)</label>
+                            <input type="file" class="form-control" id="feedbackVideos" name="videos[]" multiple accept="video/*">
+                            <small class="text-muted">Max 3 videos, 10MB each. Accepted formats: MP4, MOV, AVI, WMV</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="feedbackForm" class="btn btn-primary" id="submitFeedbackBtn">Submit Feedback</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
 @section('script')
@@ -588,6 +700,134 @@
                 replaceOrderBtn.textContent = 'Choose Replacement Product';
                 showOrderActionAlert(data.message || 'Unable to start the replacement flow.');
             });
+        }
+
+        // Feedback Modal JavaScript
+        const feedbackModal = document.getElementById('feedbackModal');
+        if (feedbackModal) {
+            // Star rating functionality
+            const starLabels = feedbackModal.querySelectorAll('.star-label');
+            const feedbackStarInput = document.getElementById('feedbackStar');
+
+            starLabels.forEach(label => {
+                label.addEventListener('click', function() {
+                    const rating = this.dataset.rating;
+                    feedbackStarInput.value = rating;
+
+                    // Update visual state
+                    starLabels.forEach(l => {
+                        const starRating = l.dataset.rating;
+                        if (starRating <= rating) {
+                            l.classList.add('active');
+                        } else {
+                            l.classList.remove('active');
+                        }
+                    });
+                });
+
+                label.addEventListener('mouseenter', function() {
+                    const rating = this.dataset.rating;
+                    starLabels.forEach(l => {
+                        const starRating = l.dataset.rating;
+                        if (starRating <= rating) {
+                            l.classList.add('hover');
+                        } else {
+                            l.classList.remove('hover');
+                        }
+                    });
+                });
+
+                label.addEventListener('mouseleave', function() {
+                    starLabels.forEach(l => l.classList.remove('hover'));
+                });
+            });
+
+            // Submit feedback
+            const feedbackForm = document.getElementById('feedbackForm');
+            const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+            
+            console.log('Feedback form found:', feedbackForm);
+            console.log('Submit button found:', submitFeedbackBtn);
+            
+            if (feedbackForm && submitFeedbackBtn) {
+                // Handle form submission
+                feedbackForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    console.log('Form submit event triggered');
+                    
+                    const productId = document.getElementById('feedbackProductId').value;
+                    const star = feedbackStarInput.value;
+                    const feedbackText = document.getElementById('feedbackText').value.trim();
+                    const images = document.getElementById('feedbackImages').files;
+                    const videos = document.getElementById('feedbackVideos').files;
+
+                    console.log('Form data:', { productId, star, feedbackText, images: images.length, videos: videos.length });
+
+                    // Validation
+                    if (!productId) {
+                        showOrderActionAlert('Please select a product.');
+                        return;
+                    }
+
+                    if (!star) {
+                        showOrderActionAlert('Please select a star rating.');
+                        return;
+                    }
+
+                    // Prepare form data
+                    const formData = new FormData();
+                    formData.append('order_id', {{ $order->id }});
+                    formData.append('product_id', productId);
+                    formData.append('star', star);
+                    formData.append('feedback', feedbackText);
+
+                    // Add images
+                    for (let i = 0; i < images.length; i++) {
+                        formData.append('images[]', images[i]);
+                    }
+
+                    // Add videos
+                    for (let i = 0; i < videos.length; i++) {
+                        formData.append('videos[]', videos[i]);
+                    }
+
+                    submitFeedbackBtn.disabled = true;
+                    submitFeedbackBtn.textContent = 'Submitting...';
+
+                    try {
+                        const response = await fetch('{{ route('order-feedback.store') }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken,
+                            },
+                            body: formData,
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            showOrderActionAlert(data.message);
+                            // Close modal and reload page
+                            const modal = bootstrap.Modal.getInstance(feedbackModal);
+                            modal.hide();
+                            window.location.reload();
+                        } else {
+                            // Show validation errors
+                            if (data.errors) {
+                                let errorMessages = Object.values(data.errors).flat().join('\n');
+                                showOrderActionAlert(errorMessages);
+                            } else {
+                                showOrderActionAlert(data.message || 'Failed to submit feedback.');
+                            }
+                        }
+                    } catch (error) {
+                        showOrderActionAlert('An error occurred while submitting feedback.');
+                    } finally {
+                        submitFeedbackBtn.disabled = false;
+                        submitFeedbackBtn.textContent = 'Submit Feedback';
+                    }
+                });
+            }
         }
     </script>
 

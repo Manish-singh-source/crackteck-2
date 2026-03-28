@@ -41,6 +41,14 @@
                     </a>
                 </li>
 
+                {{-- Reviews --}}
+                <li>
+                    <a class='tp-link' href="{{ route('order-feedback.index') }}">
+                        <i class="fas fa-star"></i>
+                        <span class="ps-1"> Reviews </span>
+                    </a>
+                </li>
+
                 <li class="menu-title mt-2">PRODUCTS</li>
                 <li>
                     <a class='tp-link' href="{{ route('ec.product.index') }}">

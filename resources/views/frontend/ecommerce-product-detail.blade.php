@@ -688,61 +688,57 @@
                             <!-- Reviews Tab -->
                             <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
                                 <div class="product-reviews">
+                                    @php
+                                        $productReviews = \App\Models\OrderFeedback::with(['customer'])
+                                            ->where('product_id', $product->id)
+                                            ->where('status', 'active')
+                                            ->orderBy('created_at', 'desc')
+                                            ->get();
+                                        
+                                        $totalReviews = $productReviews->count();
+                                        $averageRating = $totalReviews > 0 ? round($productReviews->avg('star'), 1) : 0;
+                                        
+                                        $ratingBreakdown = [];
+                                        for ($i = 1; $i <= 5; $i++) {
+                                            $count = $productReviews->where('star', $i)->count();
+                                            $ratingBreakdown[$i] = [
+                                                'count' => $count,
+                                                'percentage' => $totalReviews > 0 ? round(($count / $totalReviews) * 100) : 0,
+                                            ];
+                                        }
+                                    @endphp
+
                                     <!-- Reviews Summary -->
                                     <div class="reviews-summary mb-4">
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <div class="rating-overview text-center">
                                                     <div class="average-rating">
-                                                        <h2 class="rating-number">4.5</h2>
+                                                        <h2 class="rating-number">{{ $averageRating }}</h2>
                                                         <div class="stars mb-2">
-                                                            <i class="icon-star text-warning"></i>
-                                                            <i class="icon-star text-warning"></i>
-                                                            <i class="icon-star text-warning"></i>
-                                                            <i class="icon-star text-warning"></i>
-                                                            <i class="icon-star text-muted"></i>
+                                                            @for ($i = 1; $i <= 5; $i++)
+                                                                @if ($i <= $averageRating)
+                                                                    <i class="icon-star text-warning"></i>
+                                                                @else
+                                                                    <i class="icon-star text-muted"></i>
+                                                                @endif
+                                                            @endfor
                                                         </div>
-                                                        <p class="text-muted">Based on 127 reviews</p>
+                                                        <p class="text-muted">Based on {{ $totalReviews }} {{ Str::plural('review', $totalReviews) }}</p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-8">
                                                 <div class="rating-breakdown">
-                                                    <div class="rating-bar d-flex align-items-center mb-2">
-                                                        <span class="rating-label">5 stars</span>
-                                                        <div class="progress flex-grow-1 mx-3">
-                                                            <div class="progress-bar bg-warning" style="width: 70%"></div>
+                                                    @for ($i = 5; $i >= 1; $i--)
+                                                        <div class="rating-bar d-flex align-items-center mb-2">
+                                                            <span class="rating-label">{{ $i }} {{ Str::plural('star', $i) }}</span>
+                                                            <div class="progress flex-grow-1 mx-3">
+                                                                <div class="progress-bar bg-warning" style="width: {{ $ratingBreakdown[$i]['percentage'] }}%"></div>
+                                                            </div>
+                                                            <span class="rating-count">{{ $ratingBreakdown[$i]['count'] }}</span>
                                                         </div>
-                                                        <span class="rating-count">89</span>
-                                                    </div>
-                                                    <div class="rating-bar d-flex align-items-center mb-2">
-                                                        <span class="rating-label">4 stars</span>
-                                                        <div class="progress flex-grow-1 mx-3">
-                                                            <div class="progress-bar bg-warning" style="width: 20%"></div>
-                                                        </div>
-                                                        <span class="rating-count">25</span>
-                                                    </div>
-                                                    <div class="rating-bar d-flex align-items-center mb-2">
-                                                        <span class="rating-label">3 stars</span>
-                                                        <div class="progress flex-grow-1 mx-3">
-                                                            <div class="progress-bar bg-warning" style="width: 8%"></div>
-                                                        </div>
-                                                        <span class="rating-count">10</span>
-                                                    </div>
-                                                    <div class="rating-bar d-flex align-items-center mb-2">
-                                                        <span class="rating-label">2 stars</span>
-                                                        <div class="progress flex-grow-1 mx-3">
-                                                            <div class="progress-bar bg-warning" style="width: 2%"></div>
-                                                        </div>
-                                                        <span class="rating-count">2</span>
-                                                    </div>
-                                                    <div class="rating-bar d-flex align-items-center">
-                                                        <span class="rating-label">1 star</span>
-                                                        <div class="progress flex-grow-1 mx-3">
-                                                            <div class="progress-bar bg-warning" style="width: 1%"></div>
-                                                        </div>
-                                                        <span class="rating-count">1</span>
-                                                    </div>
+                                                    @endfor
                                                 </div>
                                             </div>
                                         </div>
@@ -750,104 +746,75 @@
 
                                     <!-- Individual Reviews -->
                                     <div class="reviews-list">
-                                        <div class="review-item border-bottom pb-4 mb-4">
-                                            <div class="d-flex align-items-start">
-                                                <div class="reviewer-avatar me-3">
-                                                    <div class="avatar-circle bg-primary text-white d-flex align-items-center justify-content-center"
-                                                        style="width: 50px; height: 50px; border-radius: 50%;">
-                                                        <span class="fw-bold">JD</span>
-                                                    </div>
-                                                </div>
-                                                <div class="review-content flex-grow-1">
-                                                    <div class="reviewer-info mb-2">
-                                                        <h6 class="reviewer-name mb-1">John Doe</h6>
-                                                        <div class="d-flex align-items-center gap-3">
-                                                            <div class="review-rating">
-                                                                <i class="icon-star text-warning"></i>
-                                                                <i class="icon-star text-warning"></i>
-                                                                <i class="icon-star text-warning"></i>
-                                                                <i class="icon-star text-warning"></i>
-                                                                <i class="icon-star text-warning"></i>
-                                                            </div>
-                                                            <span class="review-date text-muted small">2 weeks ago</span>
-                                                            <span class="verified-badge badge bg-success small">Verified
-                                                                Purchase</span>
+                                        @forelse ($productReviews as $review)
+                                            <div class="review-item border-bottom pb-4 mb-4">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="reviewer-avatar me-3">
+                                                        <div class="avatar-circle bg-{{ ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'dark'][($review->customer_id % 7)] }} text-white d-flex align-items-center justify-content-center"
+                                                            style="width: 50px; height: 50px; border-radius: 50%;">
+                                                            <span class="fw-bold">{{ strtoupper(substr($review->customer->first_name ?? 'U', 0, 1) . substr($review->customer->last_name ?? '', 0, 1)) }}</span>
                                                         </div>
                                                     </div>
-                                                    <p class="review-text">Excellent product! Works exactly as described.
-                                                        Fast shipping and great customer service. Highly recommended for
-                                                        anyone looking for quality equipment.</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="review-item border-bottom pb-4 mb-4">
-                                            <div class="d-flex align-items-start">
-                                                <div class="reviewer-avatar me-3">
-                                                    <div class="avatar-circle bg-secondary text-white d-flex align-items-center justify-content-center"
-                                                        style="width: 50px; height: 50px; border-radius: 50%;">
-                                                        <span class="fw-bold">AS</span>
-                                                    </div>
-                                                </div>
-                                                <div class="review-content flex-grow-1">
-                                                    <div class="reviewer-info mb-2">
-                                                        <h6 class="reviewer-name mb-1">Alice Smith</h6>
-                                                        <div class="d-flex align-items-center gap-3">
-                                                            <div class="review-rating">
-                                                                <i class="icon-star text-warning"></i>
-                                                                <i class="icon-star text-warning"></i>
-                                                                <i class="icon-star text-warning"></i>
-                                                                <i class="icon-star text-warning"></i>
-                                                                <i class="icon-star text-muted"></i>
+                                                    <div class="review-content flex-grow-1">
+                                                        <div class="reviewer-info mb-2">
+                                                            <h6 class="reviewer-name mb-1">{{ $review->customer->first_name ?? 'Unknown' }} {{ $review->customer->last_name ?? '' }}</h6>
+                                                            <div class="d-flex align-items-center gap-3">
+                                                                <div class="review-rating">
+                                                                    @for ($i = 1; $i <= 5; $i++)
+                                                                        @if ($i <= $review->star)
+                                                                            <i class="icon-star text-warning"></i>
+                                                                        @else
+                                                                            <i class="icon-star text-muted"></i>
+                                                                        @endif
+                                                                    @endfor
+                                                                </div>
+                                                                <span class="review-date text-muted small">{{ $review->created_at->diffForHumans() }}</span>
+                                                                <span class="verified-badge badge bg-success small">Verified Purchase</span>
                                                             </div>
-                                                            <span class="review-date text-muted small">1 month ago</span>
-                                                            <span class="verified-badge badge bg-success small">Verified
-                                                                Purchase</span>
                                                         </div>
-                                                    </div>
-                                                    <p class="review-text">Good value for money. The build quality is solid
-                                                        and it performs well. Delivery was prompt and packaging was secure.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="review-item">
-                                            <div class="d-flex align-items-start">
-                                                <div class="reviewer-avatar me-3">
-                                                    <div class="avatar-circle bg-info text-white d-flex align-items-center justify-content-center"
-                                                        style="width: 50px; height: 50px; border-radius: 50%;">
-                                                        <span class="fw-bold">MJ</span>
-                                                    </div>
-                                                </div>
-                                                <div class="review-content flex-grow-1">
-                                                    <div class="reviewer-info mb-2">
-                                                        <h6 class="reviewer-name mb-1">Mike Johnson</h6>
-                                                        <div class="d-flex align-items-center gap-3">
-                                                            <div class="review-rating">
-                                                                <i class="icon-star text-warning"></i>
-                                                                <i class="icon-star text-warning"></i>
-                                                                <i class="icon-star text-warning"></i>
-                                                                <i class="icon-star text-warning"></i>
-                                                                <i class="icon-star text-warning"></i>
+                                                        @if ($review->feedback)
+                                                            <p class="review-text">{{ $review->feedback }}</p>
+                                                        @endif
+                                                        @php
+                                                            $reviewMedia = is_array($review->media ?? null) ? $review->media : [];
+                                                        @endphp
+                                                        @if (count($reviewMedia) > 0)
+                                                            <div class="review-media mt-3">
+                                                                <div class="d-flex gap-2 flex-wrap">
+                                                                    @foreach ($reviewMedia as $media)
+                                                                        @if (($media['file_type'] ?? '') === 'image' && !empty($media['file_path']))
+                                                                            <a href="{{ asset($media['file_path']) }}" target="_blank" class="review-media-item">
+                                                                                <img src="{{ asset($media['file_path']) }}" 
+                                                                                     alt="Review image" 
+                                                                                     class="rounded" 
+                                                                                     style="width: 80px; height: 80px; object-fit: cover;">
+                                                                            </a>
+                                                                        @elseif (($media['file_type'] ?? '') === 'video' && !empty($media['file_path']))
+                                                                            <a href="{{ asset($media['file_path']) }}" target="_blank" class="review-media-item btn btn-sm btn-outline-primary">
+                                                                                <i class="icon-video"></i> View Video
+                                                                            </a>
+                                                                        @endif
+                                                                    @endforeach
+                                                                </div>
                                                             </div>
-                                                            <span class="review-date text-muted small">3 weeks ago</span>
-                                                            <span class="verified-badge badge bg-success small">Verified
-                                                                Purchase</span>
-                                                        </div>
+                                                        @endif
                                                     </div>
-                                                    <p class="review-text">Outstanding product! Exceeded my expectations.
-                                                        The quality is top-notch and it's been working flawlessly. Will
-                                                        definitely buy from this seller again.</p>
                                                 </div>
                                             </div>
-                                        </div>
+                                        @empty
+                                            <div class="text-center py-5">
+                                                <i class="icon-comment" style="font-size: 48px; color: #ccc;"></i>
+                                                <p class="text-muted mt-3">No reviews yet. Be the first to review this product!</p>
+                                            </div>
+                                        @endforelse
                                     </div>
 
-                                    <!-- Load More Reviews Button -->
-                                    <div class="text-center mt-4">
-                                        <button class="btn btn-outline-primary">Load More Reviews</button>
-                                    </div>
+                                    @if ($totalReviews > 10)
+                                        <!-- Load More Reviews Button -->
+                                        <div class="text-center mt-4">
+                                            <button class="btn btn-outline-primary" id="loadMoreReviews">Load More Reviews</button>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -1655,4 +1622,3 @@
         // }
     </script>
 @endsection
-

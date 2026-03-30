@@ -549,7 +549,7 @@ class AllServicesController extends Controller
                 $diagnoses[] = [
                     'diagnosis_id' => $diagnosis->id,
                     'assigned_engineer_id' => $diagnosis->assigned_engineer_id,
-                    'diagnosis_list' => $diagnosisList ? $diagnosisList : ($productDiagnosisList->diagnosis_list ?? []),
+                    'diagnosis_list' => $diagnosisList ?? [],
                     'diagnosis_notes' => $diagnosis->diagnosis_notes,
                     'completed_at' => $diagnosis->completed_at ?? null,
                 ];
@@ -561,7 +561,7 @@ class AllServicesController extends Controller
                     'name' => $serviceRequestProduct->name,
                     'status' => $serviceRequestProduct->status,
                 ],
-                'diagnoses' => $diagnoses,
+                'diagnoses' => $diagnoses ? $diagnoses : ($productDiagnosisList->diagnosis_list ?? []),
                 // 'request_parts' => $parts,
             ], 200);
         }

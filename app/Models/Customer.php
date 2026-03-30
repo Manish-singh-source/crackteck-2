@@ -3,17 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Customer extends Authenticatable implements JWTSubject
 {
     //
+    use Notifiable;
+
     protected $fillable = [
         'customer_code',
         'first_name',
         'last_name',
         'phone',
-        'email',
+        'email',    
         'dob',
         'gender',
         'customer_type',

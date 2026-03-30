@@ -84,15 +84,29 @@ vi. payment page:
 
 
 1. Quick Service & Installation Service & Repairing Service
-    - Display quick service details banner - displaying properly - passed 
-    - In detail quick service page - working as expected - passed 
-    - product type dropdown list - working as expected - passed
-    - Service request submittion - working as expected - passed 
-    - payment integration - not implemented - pending 
+    - Fill form with proper details and submit - form submitted successfully - passed
+    - Fill form with wrong details and submit - error showing properly - passed
+    - Fill form with multiple products and submit - form submitted successfully - passed
+    - Pay using razorpay - working as expected - passed
 
 2.  AMC Service:
     - Offline AMC 
-        - 
+        - Fill form with proper details and submit - form submitted successfully - passed
+        - Fill form with wrong details and submit - error showing properly - passed
+        - Fill form with multiple products and submit - form submitted successfully - passed        
 
     - Online AMC 
-        - 
+        - Fill form with proper details and submit - form submitted successfully - passed
+        - Fill form with wrong details and submit - error showing properly - passed
+        - Fill form with multiple products and submit - form submitted successfully - passed
+        - Pay using razorpay - working as expected - passed
+
+
+After Quick Service & Installation Service & Repairing Service & AMC Service 
+
+1. Check In profile that service request is generated or not - service request generated successfully - passed
+2. Check in orders that order is generated or not - order generated successfully - passed
+
+Profile Page: 
+
+1. 

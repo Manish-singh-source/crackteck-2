@@ -17,6 +17,7 @@ use App\Models\Reward;
 use App\Models\StockRequest;
 use App\Models\StockRequestItem;
 use App\Models\SubCategory;
+use App\Notifications\NewOrderNotification;
 use App\Services\FirebaseFcmService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -220,12 +221,19 @@ class OrderController extends Controller
                 'processed_at' => now(),
             ]);
 
-            // send push notification 
-            $fcm->sendToToken(
-                $customer->devices()->first()->fcm_token,
-                'Order Placed',
-                'Hi, Your order has been placed successfully.'
-            );
+            if ($customer->devices()->first()?->fcm_token) {
+                // send push notification 
+                $fcm->sendToToken(
+                    $customer->devices()->first()->fcm_token,
+                    'Order Placed',
+                    'Hi, Your order has been placed successfully.'
+                );
+            }
+
+            $customer->notify(new NewOrderNotification([
+                'id' => $order->id,
+                'amount' => $order->total_amount,
+            ]));
 
             return response()->json([
                 'success' => true,
@@ -431,7 +439,7 @@ class OrderController extends Controller
                 // Check if order is eligible for reward
                 $eligibleStatuses = ['delivered'];
                 $isEligible = in_array($order->status, $eligibleStatuses);
-                
+
                 $rewardData = [
                     'reward_available' => $isEligible,
                     'reward_claimed' => false,
@@ -577,13 +585,13 @@ class OrderController extends Controller
     private function getApplicableCategoriesData(Coupon $coupon): array
     {
         $categoryIds = $coupon->applicable_categories ?? [];
-        
+
         if (empty($categoryIds)) {
             return [];
         }
-        
+
         $categories = [];
-        
+
         foreach ($categoryIds as $id) {
             // Try to find in ParentCategory first
             $parentCategory = ParentCategory::find($id);
@@ -596,7 +604,7 @@ class OrderController extends Controller
                 ];
                 continue;
             }
-            
+
             // Try to find in SubCategory
             $subCategory = SubCategory::find($id);
             if ($subCategory) {
@@ -609,7 +617,7 @@ class OrderController extends Controller
                 ];
             }
         }
-        
+
         return $categories;
     }
 
@@ -619,13 +627,13 @@ class OrderController extends Controller
     private function getApplicableBrandsData(Coupon $coupon): array
     {
         $brandIds = $coupon->applicable_brands ?? [];
-        
+
         if (empty($brandIds)) {
             return [];
         }
-        
+
         $brands = Brand::whereIn('id', $brandIds)->get(['id', 'name', 'slug']);
-        
+
         return $brands->toArray();
     }
 
@@ -635,15 +643,15 @@ class OrderController extends Controller
     private function getExcludedProductsData(Coupon $coupon): array
     {
         $productIds = $coupon->excluded_products ?? [];
-        
+
         if (empty($productIds)) {
             return [];
         }
-        
+
         $products = EcommerceProduct::whereIn('id', $productIds)
             ->with(['warehouseProduct:id,product_name,sku,brand_id,parent_category_id,sub_category_id'])
             ->get(['id', 'sku', 'product_id']);
-        
+
         $result = [];
         foreach ($products as $product) {
             $item = [
@@ -651,17 +659,17 @@ class OrderController extends Controller
                 'sku' => $product->sku,
                 'product_id' => $product->product_id,
             ];
-            
+
             if ($product->warehouseProduct) {
                 $item['product_name'] = $product->warehouseProduct->product_name;
                 $item['brand_id'] = $product->warehouseProduct->brand_id;
                 $item['parent_category_id'] = $product->warehouseProduct->parent_category_id;
                 $item['sub_category_id'] = $product->warehouseProduct->sub_category_id;
             }
-            
+
             $result[] = $item;
         }
-        
+
         return $result;
     }
 }

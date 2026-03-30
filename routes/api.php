@@ -13,7 +13,9 @@ use App\Http\Controllers\Api\FcmTestController;
 use App\Http\Controllers\Api\FollowUpController;
 use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\LeadController;
+use App\Http\Controllers\Api\MacAddress;
 use App\Http\Controllers\Api\MeetController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentRefundController;
 use App\Http\Controllers\Api\ProductController;
@@ -87,6 +89,11 @@ Route::prefix('v1')->group(function () {
     Route::post('/test-fcm-final', [FcmTestFinalController::class, 'sendFinal'])->middleware('throttle:60,1');
 
     Route::middleware(['throttle:60,1', 'jwt.verify'])->group(function () {
+        // MAC Address APIs
+        Route::get('/mac-address', [MacAddress::class, 'getMacAddress']);
+
+        // Notifications 
+        Route::get('/notifications', [NotificationController::class, 'getNotifications']);
 
         Route::post('/checkout/orders/{order}/razorpay', [ApiCheckoutController::class, 'createRazorpayOrder']);
         Route::post('/checkout/razorpay/verify', [ApiCheckoutController::class, 'verifyRazorpayPayment']);

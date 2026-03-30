@@ -63,6 +63,9 @@ class CreatePaymentOrderAction
                 ]
             );
 
+            // after this i want invoice for this order and store in db for orders only after payment successfull
+            // create table if not already exists for order_invoices 
+
             return [
                 'payment' => $payment->fresh(),
                 'attempt' => $attempt,

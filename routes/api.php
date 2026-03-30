@@ -46,6 +46,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('v1')->group(function () {
+    // Authentication APIs for customer and staff login/signup flows
     Route::post('/signup', [ApiAuthController::class, 'signup']);
     Route::post('/send-otp', [ApiAuthController::class, 'login']);
     Route::post('/verify-otp', [ApiAuthController::class, 'verifyOtp']);
@@ -53,7 +54,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/send-verification-code', [ApiAuthController::class, 'sendVerificationCode']);
     Route::post('/verify-verification-code', [ApiAuthController::class, 'verifyVerificationCode']);
     Route::post('/resend-verification-code', [ApiAuthController::class, 'resendVerificationCode']);
-    
+
     Route::post('/google-login', [ApiAuthController::class, 'googleLogin']);
     Route::post('email-pass-login', [ApiAuthController::class, 'emailPasswordLogin']);
     // forgot password apis
@@ -61,7 +62,8 @@ Route::prefix('v1')->group(function () {
     Route::post('/forgot-password/verify-code', [ApiAuthController::class, 'verifyForgotPasswordCode']);
     Route::post('/forgot-password/resend-code', [ApiAuthController::class, 'resendForgotPasswordCode']);
     Route::post('/forgot-password/reset', [ApiAuthController::class, 'resetForgotPassword']);
-    
+
+    // Razorpay webhook API: receives payment status events from Razorpay server-to-server
     Route::post('/webhooks/razorpay', RazorpayWebhookController::class);
 
     // Public route for staff wallet status update (used by admin panel)
@@ -89,15 +91,74 @@ Route::prefix('v1')->group(function () {
     Route::post('/test-fcm-final', [FcmTestFinalController::class, 'sendFinal'])->middleware('throttle:60,1');
 
     Route::middleware(['throttle:60,1', 'jwt.verify'])->group(function () {
+        // E-commerce payment APIs: create Razorpay order, verify checkout payment, and request order refund
+        Route::post('/checkout/orders/{order}/razorpay', [ApiCheckoutController::class, 'createRazorpayOrder']); // Create a Razorpay order for an e-commerce order checkout
+        Route::post('/checkout/razorpay/verify', [ApiCheckoutController::class, 'verifyRazorpayPayment']); // Verify Razorpay payment signature after successful checkout
+        Route::post('/payments/{payment}/refund', PaymentRefundController::class); // Initiate refund for an e-commerce payment record
+
+        // Service request APIs: customer service booking, tracking, quotation review, and invoice/payment actions
+        Route::controller(AllServicesController::class)->group(function () {
+            Route::get('/services', 'servicesList'); // List available service categories for customers
+            Route::get('/quick-services', 'quickServicesList'); // List quick service offerings
+            Route::get('/services-list', 'servicesListByType'); // List services filtered by selected type
+            Route::get('/service-details/{id}', 'getServiceDetails'); // Get full details of a specific service
+            Route::post('/submit-quick-service-request', 'submitQuickServiceRequest'); // Create a new quick service request
+            Route::get('/all-service-requests', 'allServiceRequests'); // Get all service requests for the authenticated customer
+            Route::get('/service-request-details/{id}', 'serviceRequestDetails'); // Get summary details of a specific service request
+            Route::get('/service-request-product-diagnostics/{id}/{product_id}', 'serviceRequestProductDiagnostics'); // Get diagnosis details for a service request product
+            Route::get('/devices-types', 'getDevicesTypes'); // List supported device types for service requests
+            Route::post('/customer-approve-reject-part', 'customerApproveRejectPart'); // Approve or reject requested parts for a service request
+            Route::get('/part-apply-coupon', 'partApplyCoupon'); // Apply coupon on service request part charges
+            Route::post('/customer-approve-reject-pickup', 'customerApproveRejectPickup'); // Approve or reject pickup action for a service request
+
+            Route::get('/service-request-quotations', 'serviceRequestQuotations'); // List quotations generated for customer service requests
+            Route::get('/service-request-quotation-details/{id}', 'serviceRequestQuotationDetails'); // Get one service request quotation in detail
+            Route::post('/service-request-quotation-payment', 'makeServiceRequestQuotationPayment'); // Record payment for a service request quotation
+            Route::post('/service-request-quotations/{id}/accept', 'acceptQuotation'); // Accept a service request quotation
+            Route::post('/service-request-quotations/{id}/reject', 'rejectQuotation'); // Reject a service request quotation
+            Route::get('/service-request-invoices', 'serviceRequestInvoicesList'); // List invoices raised for service requests
+            Route::get('/service-request-invoice/{id}', 'serviceRequestInvoice'); // Get a specific service request invoice
+            Route::post('/service-request-invoice/{id}/accept', 'acceptInvoice'); // Accept a generated service request invoice
+            Route::post('/service-request-invoice/{id}/reject', 'rejectInvoice'); // Reject a generated service request invoice
+            Route::post('/invoice-payment/{id}', 'payInvoice'); // Record payment against a service request invoice
+            Route::post('/give-feedback', 'giveFeedback'); // Submit customer feedback after service completion
+            Route::get('/get-all-feedback', 'getAllFeedback'); // List customer feedback entries
+            Route::get('/get-feedback/{feedback_id}', 'getFeedback'); // Get one feedback entry by id
+        });
+
+        // Field engineer service request APIs: assigned jobs, diagnosis, part requests, and field updates
+        Route::controller(FieldEngineerController::class)->group(function () {
+            Route::get('/service-requests', 'serviceRequests'); // List service requests assigned to the engineer
+            Route::get('/service-request/{id}', 'serviceRequestDetails'); // Get service request details for engineer workflow
+            Route::get('/service-request/{id}/{product_id}', 'serviceRequestProductDetails'); // Get service request product details
+            Route::post('/service-request/{id}/accept', 'acceptServiceRequest'); // Accept an assigned service request
+            Route::post('/service-request/{id}/send-otp', 'startDiagnosis'); // Send OTP to begin diagnosis at customer location
+            Route::post('/service-request/{id}/verify-otp', 'verifyDiagnosis'); // Verify OTP before starting diagnosis
+            Route::post('/service-request/{id}/case-transfer', 'caseTransfer'); // Transfer a service request to another engineer or team
+            Route::post('/service-request/{id}/reschedule', 'rescheduleServiceRequest'); // Reschedule a service visit
+            Route::get('/service-request/{id}/{product_id}/diagnosis-list', 'diagnosisList'); // List diagnosis entries for a service request product
+            Route::post('/service-request/{id}/{product_id}/submit-diagnosis', 'submitDiagnosis'); // Submit diagnosis result for a service request product
+            Route::post('/service-request/{id}/{product_id}/request-part', 'requestPart'); // Raise a part requirement against a service request product
+
+            // Stock In Hand Products APIs
+            Route::get('/stock-in-hand', 'stockInHand');
+
+            // Field Issues
+            Route::post('/field-issue', 'fieldIssueStore');
+            Route::get('/field-issues', 'fieldIssuesList');
+            Route::get('/field-issue/{id}', 'fieldIssueView');
+
+            // Attendance APIs
+            Route::get('/attendance', 'index');
+            Route::post('/check-in', 'store');
+            Route::post('/check-out', 'logout');
+        });
+
         // MAC Address APIs
         Route::get('/mac-address', [MacAddress::class, 'getMacAddress']);
 
-        // Notifications 
+        // Notifications
         Route::get('/notifications', [NotificationController::class, 'getNotifications']);
-
-        Route::post('/checkout/orders/{order}/razorpay', [ApiCheckoutController::class, 'createRazorpayOrder']);
-        Route::post('/checkout/razorpay/verify', [ApiCheckoutController::class, 'verifyRazorpayPayment']);
-        Route::post('/payments/{payment}/refund', PaymentRefundController::class);
 
         Route::post('/device-token', [DeviceTokenController::class, 'store']);
         Route::delete('/device-token', [DeviceTokenController::class, 'destroy']);
@@ -129,6 +190,10 @@ Route::prefix('v1')->group(function () {
             Route::get('/order', 'listOrders'); // Sales Person and Customer
             Route::get('/order/{id}', 'order'); // Sales Person and Customer
 
+            // Order Invoices 
+            Route::get('/order/invoices', 'listOrderInvoices'); // Sales Person and Customer
+            Route::get('/order/{id}/invoice', 'orderInvoice'); // Sales Person and Customer
+
             // Cancel and Return Order APIs
             Route::post('/cancel-order/{order_id}', 'cancelOrder');
             Route::post('/return-order/{order_id}', 'returnOrder');
@@ -142,7 +207,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/all-product', 'allListProducts'); // Engineer
             Route::get('/all-product/{id}', 'allProduct'); // Engineer
             Route::post('/request-product', 'requestProduct'); // Engineer
-
         });
 
         //
@@ -270,103 +334,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/replacement-requests', 'index');
             Route::get('/replacement-requests/{id}', 'show');
         });
-        Route::controller(AllServicesController::class)->group(function () {
-            // diagnosis list with full details
-            // Route::get('/service-request/{id}/{product_id}/diagnosis-list', 'diagnosisList');
-            // Quick Services List
-            Route::get('/services', 'servicesList');
-            Route::get('/quick-services', 'quickServicesList');
-            Route::get('/services-list', 'servicesListByType');
-            Route::get('/service-details/{id}', 'getServiceDetails');
-            // submit service request
-            Route::post('/submit-quick-service-request', 'submitQuickServiceRequest');
-
-            // Get all service requests
-            Route::get('/all-service-requests', 'allServiceRequests');
-            // service request details
-            Route::get('/service-request-details/{id}', 'serviceRequestDetails');
-            // service request product diagnostics
-            Route::get('/service-request-product-diagnostics/{id}/{product_id}', 'serviceRequestProductDiagnostics');
-            // diagnosis list with full details
-
-             Route::get('/devices-types', 'getDevicesTypes');
-
-
-            // customer approve/reject for stock_in_hand, request_part
-            Route::post('/customer-approve-reject-part', 'customerApproveRejectPart');
-
-            Route::get('/part-apply-coupon', 'partApplyCoupon');
-
-            // Customer approve/reject for pickup
-            Route::post('/customer-approve-reject-pickup', 'customerApproveRejectPickup');
-
-            // service request quotation details
-            Route::get('/service-request-quotations', 'serviceRequestQuotations');
-            Route::get('/service-request-quotation-details/{id}', 'serviceRequestQuotationDetails');
-            // Make payment for service request quotation
-            Route::post('/service-request-quotation-payment', 'makeServiceRequestQuotationPayment');
-
-            // accept or reject quotation
-            Route::post('/service-request-quotations/{id}/accept', 'acceptQuotation');
-            Route::post('/service-request-quotations/{id}/reject', 'rejectQuotation');
-
-            // display invoice to the customer
-            Route::get('/service-request-invoices', 'serviceRequestInvoicesList');
-            Route::get('/service-request-invoice/{id}', 'serviceRequestInvoice');
-            Route::post('/service-request-invoice/{id}/accept', 'acceptInvoice');
-            Route::post('/service-request-invoice/{id}/reject', 'rejectInvoice');
-
-            // invoice payment
-            Route::post('/invoice-payment/{id}', 'payInvoice');
-
-            // Give Feedback APIs
-            Route::post('/give-feedback', 'giveFeedback');
-            Route::get('/get-all-feedback', 'getAllFeedback');
-            Route::get('/get-feedback/{feedback_id}', 'getFeedback');
-        });
-
-        // Feild Engineer APIs
-        Route::controller(FieldEngineerController::class)->group(function () {
-            // List of services
-            Route::get('/service-requests', 'serviceRequests');
-            // Service details and List of products in this service
-            Route::get('/service-request/{id}', 'serviceRequestDetails');
-            // Product details of selected service and it's product
-            Route::get('/service-request/{id}/{product_id}', 'serviceRequestProductDetails');
-            // Accept Request
-            Route::post('/service-request/{id}/accept', 'acceptServiceRequest');
-
-            // Send otp for Start Diagnosis
-            Route::post('/service-request/{id}/send-otp', 'startDiagnosis');
-            // Verify otp for Start Diagnosis
-            Route::post('/service-request/{id}/verify-otp', 'verifyDiagnosis');
-
-            // Case Transfer API
-            Route::post('/service-request/{id}/case-transfer', 'caseTransfer');
-            // Reschedule Service Request API
-            Route::post('/service-request/{id}/reschedule', 'rescheduleServiceRequest');
-
-            // List of diagnosis
-            Route::get('/service-request/{id}/{product_id}/diagnosis-list', 'diagnosisList');
-            // Submit Diagnosis
-            Route::post('/service-request/{id}/{product_id}/submit-diagnosis', 'submitDiagnosis');
-
-            // Stock In Hand Products APIs
-            Route::get('/stock-in-hand', 'stockInHand');
-
-            // Request Part
-            Route::post('/service-request/{id}/{product_id}/request-part', 'requestPart');
-
-            // Field Issues 
-            Route::post('/field-issue', 'fieldIssueStore');
-            Route::get('/field-issues', 'fieldIssuesList');
-            Route::get('/field-issue/{id}', 'fieldIssueView');
-
-            // Attendance APIs
-            Route::get('/attendance', 'index');
-            Route::post('/check-in', 'store');
-            Route::post('/check-out', 'logout');
-        });
 
         // 1. Products List of all the product avialble in warehouse how status is active ( Basic Details )
         // 2. Products Detail Page ( In Details )
@@ -458,8 +425,3 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
-
-
-
-
-

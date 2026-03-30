@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\EcommerceProduct;
+use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderPayment;
@@ -214,7 +215,7 @@ class OrderController extends Controller
                 'payment_id' => 'PMT-' . strtoupper(uniqid()),
                 'transaction_id' => 'TXN-' . strtoupper(uniqid()),
                 'payment_method' => 'online',
-                'payment_gateway' => 'phonepe',
+                'payment_gateway' => 'razorpay',
                 'amount' => $total,
                 'currency' => 'INR',
                 'status' => 'Completed',
@@ -333,6 +334,7 @@ class OrderController extends Controller
     }
 
 
+    // not used 
     public function requestProduct(Request $request)
     {
         $roleValidated = Validator::make($request->all(), ([
@@ -672,4 +674,71 @@ class OrderController extends Controller
 
         return $result;
     }
+    // Order Invoices 
+    public function listOrderInvoices(Request $request)
+    {
+        $roleValidated = Validator::make($request->all(), ([
+            'user_id' => 'required|integer|exists:customers,id',
+            'role_id' => 'required|in:4',
+        ]));
+
+        if ($roleValidated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
+        }
+
+        $staffRole = $this->getRoleId($request->role_id);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'customers') {
+            $invoices = Invoice::with(['items', 'order'])
+                ->whereHas('order', function ($query) use ($request) {
+                    $query->where('customer_id', $request->user_id);
+                })
+                ->orderByDesc('created_at')
+                ->get();
+
+            return response()->json(['success' => true, 'invoices' => $invoices], 200);
+        }
+
+        return response()->json(['success' => true, 'invoices' => []], 200);
+    }
+
+    public function orderInvoice(Request $request, $id)
+    {
+        $roleValidated = Validator::make($request->all(), ([
+            'user_id' => 'required|integer|exists:customers,id',
+            'role_id' => 'required|in:4',
+        ]));
+
+        if ($roleValidated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
+        }
+
+        $order = Order::where('id', $id)
+            ->where('customer_id', $request->user_id)
+            ->first();
+
+        if (! $order) {
+            return response()->json(['success' => false, 'message' => 'Order not found for the authenticated customer.'], 404);
+        }
+
+        $invoice = Invoice::with(['items', 'order'])
+            ->where('order_id', $order->id)
+            ->latest('id')
+            ->first();
+
+        if (! $invoice) {
+            return response()->json(['success' => false, 'message' => 'Invoice not found for this order.'], 404);
+        }
+
+        return response()->json(['success' => true, 'invoice' => $invoice], 200);
+    }
 }
+
+
+
+
+

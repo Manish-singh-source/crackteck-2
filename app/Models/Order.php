@@ -179,6 +179,16 @@ class Order extends Model
         return $this->hasMany(Payment::class);
     }
 
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class);
+    }
+
     public function returnOrders()
     {
         return $this->hasMany(ReturnOrder::class, 'order_number', 'order_number');
@@ -223,3 +233,5 @@ class Order extends Model
         ]);
     }
 }
+
+

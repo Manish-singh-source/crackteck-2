@@ -176,7 +176,8 @@ class AllServicesController extends Controller
         }
     }
 
-    public function getDevicesTypes(Request $request) {
+    public function getDevicesTypes(Request $request)
+    {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
         ]);
@@ -348,6 +349,12 @@ class AllServicesController extends Controller
                     }
 
                     if ($request->service_type == 'amc') {
+                        if (isset($product['type']) && is_string($product['type'])) {
+                            $productDiagnosisList = DeviceSpecificDiagnosis::where('device_type', $product['type'])->first();
+                            if ($productDiagnosisList) {
+                                $product['type'] = $productDiagnosisList->id;
+                            }
+                        }
                         $amcProduct = AmcProduct::create([
                             'amc_id' => $amc->id,
                             'name' => $product['name'] ?? null,
@@ -383,14 +390,14 @@ class AllServicesController extends Controller
                                 continue;
                             }
 
-                            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+                            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
                             $file->move(
                                 public_path('uploads/crm/quick-service/products'),
                                 $filename
                             );
 
-                            $images[] = 'uploads/crm/quick-service/products/'.$filename;
+                            $images[] = 'uploads/crm/quick-service/products/' . $filename;
                         }
                     }
 
@@ -516,6 +523,7 @@ class AllServicesController extends Controller
                 ->where('service_request_product_id', $product_id)
                 ->get();
 
+
             $productDiagnosisList = DeviceSpecificDiagnosis::where('id', $serviceRequestProduct->type)->first();
 
             $diagnoses = [];
@@ -555,7 +563,7 @@ class AllServicesController extends Controller
                 ];
             }
 
-            if(empty($diagnoses)) {
+            if (empty($diagnoses)) {
                 $diagnoses[] = [
                     'diagnosis_list' => $productDiagnosisList->diagnosis_list ?? [],
                 ];
@@ -568,6 +576,7 @@ class AllServicesController extends Controller
                     'status' => $serviceRequestProduct->status,
                 ],
                 'diagnoses' => $diagnoses ?? [],
+                'engineer' => $serviceRequest?->activeAssignment?->engineer ?? [],
                 // 'request_parts' => $parts,
             ], 200);
         }
@@ -620,7 +629,7 @@ class AllServicesController extends Controller
 
             // Check if customer action is allowed (only for admin_approved or warehouse_approved status)
             if (! in_array($requestPart->status, ['admin_approved', 'warehouse_approved'])) {
-                return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: '.$requestPart->status], 400);
+                return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: ' . $requestPart->status], 400);
             }
 
             // Update the status based on customer action
@@ -650,7 +659,8 @@ class AllServicesController extends Controller
     }
 
     // apply coupon for service request 
-    public function partApplyCoupon(Request $request) {
+    public function partApplyCoupon(Request $request)
+    {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
             'user_id' => 'required|integer|exists:customers,id',
@@ -1211,7 +1221,7 @@ class AllServicesController extends Controller
 
         // Check if customer action is allowed (only for admin_approved status)
         if ($pickup->status !== 'admin_approved') {
-            return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: '.$pickup->status], 400);
+            return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: ' . $pickup->status], 400);
         }
 
         // Update the status based on customer action
@@ -1273,7 +1283,7 @@ class AllServicesController extends Controller
 
         // Update the quotation with payment details
         $newPaidAmount = ($quotation->paid_amount ?? 0) + $validated['amount'];
-        
+
         // Determine payment status based on paid amount
         $paymentStatus = 'partial';
         if ($newPaidAmount >= $quotation->grand_total) {

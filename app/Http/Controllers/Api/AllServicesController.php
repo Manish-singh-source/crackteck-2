@@ -557,11 +557,7 @@ class AllServicesController extends Controller
 
             if(empty($diagnoses)) {
                 $diagnoses[] = [
-                    'diagnosis_id' => $diagnosis->id,
-                    'assigned_engineer_id' => $diagnosis->assigned_engineer_id,
                     'diagnosis_list' => $productDiagnosisList->diagnosis_list ?? [],
-                    'diagnosis_notes' => $diagnosis->diagnosis_notes,
-                    'completed_at' => $diagnosis->completed_at ?? null,
                 ];
             }
 

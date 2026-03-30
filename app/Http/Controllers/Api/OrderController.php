@@ -221,14 +221,14 @@ class OrderController extends Controller
                 'processed_at' => now(),
             ]);
 
-            if ($customer->devices()->first()?->fcm_token) {
-                // send push notification 
-                $fcm->sendToToken(
-                    $customer->devices()->first()->fcm_token,
-                    'Order Placed',
-                    'Hi, Your order has been placed successfully.'
-                );
-            }
+            // if ($customer->devices()->first()?->fcm_token) {
+            //     // send push notification 
+            //     $fcm->sendToToken(
+            //         $customer->devices()->first()->fcm_token,
+            //         'Order Placed',
+            //         'Hi, Your order has been placed successfully.'
+            //     );
+            // }
 
             $customer->notify(new NewOrderNotification([
                 'id' => $order->id,

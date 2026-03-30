@@ -516,6 +516,8 @@ class AllServicesController extends Controller
                 ->where('service_request_product_id', $product_id)
                 ->get();
 
+            $productDiagnosisList = DeviceSpecificDiagnosis::where('id', $serviceRequestProduct->type)->first();
+
             $diagnoses = [];
             foreach ($diagnosisDetails as $diagnosis) {
                 $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
@@ -547,7 +549,7 @@ class AllServicesController extends Controller
                 $diagnoses[] = [
                     'diagnosis_id' => $diagnosis->id,
                     'assigned_engineer_id' => $diagnosis->assigned_engineer_id,
-                    'diagnosis_list' => $diagnosisList ?? [],
+                    'diagnosis_list' => $diagnosisList ? $diagnosisList : ($productDiagnosisList->diagnosis_list ?? []),
                     'diagnosis_notes' => $diagnosis->diagnosis_notes,
                     'completed_at' => $diagnosis->completed_at ?? null,
                 ];

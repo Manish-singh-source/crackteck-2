@@ -240,7 +240,7 @@ class AllServicesController extends Controller
                 'role_id' => 'required|in:4',
                 'user_id' => 'required|integer|exists:customers,id',
                 'customer_address_id' => 'required|integer|exists:customer_address_details,id',
-                'service_type' => 'required|in:quick_service,installation,repairing',
+                'service_type' => 'required|in:quick_service,installation,repair',
                 'products' => 'required|array|min:1',
                 'products.*.service_type_id' => 'required|integer|exists:covered_items,id',
                 'products.*.name' => 'required|string',
@@ -1048,7 +1048,7 @@ class AllServicesController extends Controller
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
             'user_id' => 'required|integer|exists:customers,id',
-            'service_type' => 'required|in:amc,repairing,installation,quick_service',
+            'service_type' => 'required|in:amc,repair,installation,quick_service',
             'service_id' => 'required|integer',
             'rating' => 'required|numeric|min:1|max:5',
             'comments' => 'nullable|string',

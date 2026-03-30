@@ -33,7 +33,7 @@ class AssignedJobController extends Controller
     {
         $serviceRequestProduct = ServiceRequestProduct::with('productDiagnose', 'remoteSupportDiagnose')->findOrFail($id);
         $remoteSupportJob = RemoteSupportJob::with('diagnosis')->findOrFail($remote_support_id);
-
+        
         return view('/crm/assigned-jobs/diagnose', compact('serviceRequestProduct', 'remote_support_id', 'remoteSupportJob'));
     }
 

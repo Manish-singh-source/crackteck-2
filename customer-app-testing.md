@@ -110,3 +110,33 @@ After Quick Service & Installation Service & Repairing Service & AMC Service
 Profile Page: 
 
 1. 
+
+
+
+
+
+
+
+{
+    "product": {
+        "id":14,
+        "name":"manish laptop",
+        "status":"diagnosis_completed"
+    },
+    
+    "diagnoses": [
+        {
+            "diagnosis_id":1,
+            "assigned_engineer_id":1,
+            "diagnosis_list":
+                [
+                    {
+                        "name":"Earthing",
+                        "status":"working",
+                        "report":"gghvf"
+                    },
+                    {
+                        "name":"Router \/ Firewall Boot + Config Access",
+                        "status":"working",
+                        "report":"gghvf"
+                    },{"name":"LAN Cable Punching, Speed, Tester Results","status":"working","report":"gghvf"},{"name":"Switch Power \/ Port Blink Test","status":"working","report":"gghvf"},{"name":"Patch Panel Labeling","status":"working","report":"gghvf"},{"name":"Wi-Fi Strength","status":"working","report":"gghvf"},{"name":"RJ45 & Keystone Crimp Quality","status":"working","report":"gghvf"}],"diagnosis_notes":null,"completed_at":"2026-03-30 13:17:46"}]}

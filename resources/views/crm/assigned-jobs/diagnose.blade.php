@@ -133,9 +133,9 @@
                                                     <span class="fw-semibold text-break">Status :
                                                     </span>
                                                     <span>
-                                                        @if($serviceRequestProduct?->remoteSupportDiagnose)
+                                                        @if ($serviceRequestProduct?->remoteSupportDiagnose)
                                                             {{ ucwords(str_replace('_', ' ', $serviceRequestProduct?->remoteSupportDiagnose?->status)) }}
-                                                        @else 
+                                                        @else
                                                             Pending
                                                         @endif
                                                     </span>
@@ -327,7 +327,10 @@
                             </div>
                         @endif
 
-                        @if ($remoteSupportJob?->diagnosis?->client_connected_via && !$remoteSupportJob?->diagnosis?->diagnosis_list && $remoteSupportJob?->diagnosis?->status != 'escalated')
+                        @if (
+                            $remoteSupportJob?->diagnosis?->client_connected_via &&
+                                !$remoteSupportJob?->diagnosis?->diagnosis_list &&
+                                $remoteSupportJob?->diagnosis?->status != 'escalated')
                             <!-- Diagnosis Section -->
                             <div class="col-lg-12">
                                 <div class="card">
@@ -357,18 +360,22 @@
                                                         Diagnosis Type <span class="text-danger">*</span>
                                                     </div>
                                                 </div>
-                                                @foreach ($serviceRequestProduct?->productDiagnose?->diagnosis_list as $diagnosis)
-                                                    <div class="col-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input diagnosis-type-checkbox"
-                                                                name="diagnosis_list[]" type="checkbox"
-                                                                value="{{ $diagnosis }}" id="{{ $diagnosis }}">
-                                                            <label class="form-check-label" for="{{ $diagnosis }}">
-                                                                {{ $diagnosis }}
-                                                            </label>
+                                                @if (is_array($serviceRequestProduct?->productDiagnose?->diagnosis_list))
+                                                    @foreach ($serviceRequestProduct?->productDiagnose?->diagnosis_list as $diagnosis)
+                                                        <div class="col-6">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input diagnosis-type-checkbox"
+                                                                    name="diagnosis_list[]" type="checkbox"
+                                                                    value="{{ $diagnosis }}"
+                                                                    id="{{ $diagnosis }}">
+                                                                <label class="form-check-label"
+                                                                    for="{{ $diagnosis }}">
+                                                                    {{ $diagnosis }}
+                                                                </label>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                @endforeach
+                                                    @endforeach
+                                                @endif
                                             </div>
                                             <div class="row g-3 pt-3 mb-3">
                                                 <div class="col-12">
@@ -431,7 +438,10 @@
                             </div>
                         @endif
 
-                        @if ($remoteSupportJob?->diagnosis?->diagnosis_list && !$remoteSupportJob?->diagnosis?->before_screenshots && $remoteSupportJob?->diagnosis?->status != 'escalated')
+                        @if (
+                            $remoteSupportJob?->diagnosis?->diagnosis_list &&
+                                !$remoteSupportJob?->diagnosis?->before_screenshots &&
+                                $remoteSupportJob?->diagnosis?->status != 'escalated')
                             <!-- Action Taken Section -->
                             <div class="col-lg-12">
                                 <div class="card">

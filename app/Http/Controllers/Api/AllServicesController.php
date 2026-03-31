@@ -1328,7 +1328,7 @@ class AllServicesController extends Controller
                 return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
             }
     
-            $amcs = Amc::with('amcScheduleMeetings')->where('customer_id', $validated['user_id'])->get();
+            $amcs = Amc::with('amcPlan')->withCount('amcScheduleMeetings')->where('customer_id', $validated['user_id'])->get();
     
             return ApiResponse::success($amcs, 'AMCs retrieved successfully.');
     }

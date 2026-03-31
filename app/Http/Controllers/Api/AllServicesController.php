@@ -1310,4 +1310,26 @@ class AllServicesController extends Controller
             'paid_at' => $quotation->paid_at,
         ], 200);
     }
+
+    public function customerAmcs(Request $request) {
+            $validated = Validator::make($request->all(), [
+                'role_id' => 'required|in:4',
+                'user_id' => 'required|integer|exists:customers,id',
+            ]);
+    
+            if ($validated->fails()) {
+                return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+            }
+    
+            $validated = $validated->validated();
+            $staffRole = $this->getRoleId($validated['role_id']);
+    
+            if (! $staffRole) {
+                return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+            }
+    
+            $amcs = Amc::with('amcScheduleMeetings')->where('customer_id', $validated['user_id'])->get();
+    
+            return ApiResponse::success($amcs, 'AMCs retrieved successfully.');
+    }
 }

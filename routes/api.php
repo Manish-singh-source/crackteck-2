@@ -124,6 +124,10 @@ Route::prefix('v1')->group(function () {
             Route::post('/give-feedback', 'giveFeedback'); // Submit customer feedback after service completion
             Route::get('/get-all-feedback', 'getAllFeedback'); // List customer feedback entries
             Route::get('/get-feedback/{feedback_id}', 'getFeedback'); // Get one feedback entry by id
+
+
+            // AMC APIs
+            Route::get('/customer-amcs', 'customerAmcs'); // List AMC
         });
 
         // Field engineer service request APIs: assigned jobs, diagnosis, part requests, and field updates

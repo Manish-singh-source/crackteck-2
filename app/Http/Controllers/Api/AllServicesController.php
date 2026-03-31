@@ -1332,4 +1332,30 @@ class AllServicesController extends Controller
     
             return ApiResponse::success($amcs, 'AMCs retrieved successfully.');
     }
+
+    public function customerAmcDetails(Request $request, $amc_id) {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'user_id' => 'required|integer|exists:customers,id',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        $amc = Amc::with('amcScheduleMeetings')->where('id', $amc_id)->where('customer_id', $validated['user_id'])->first();
+
+        if (! $amc) {
+            return ApiResponse::error('AMC not found or does not belong to this customer.', 404);
+        }
+
+        return ApiResponse::success($amc, 'AMC details retrieved successfully.');
+    }
 }

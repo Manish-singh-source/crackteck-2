@@ -128,6 +128,7 @@ Route::prefix('v1')->group(function () {
 
             // AMC APIs
             Route::get('/customer-amcs', 'customerAmcs'); // List AMC
+            Route::get('/customer-amc/{id}', 'customerAmcDetails'); // Get AMC details
         });
 
         // Field engineer service request APIs: assigned jobs, diagnosis, part requests, and field updates

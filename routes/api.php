@@ -191,7 +191,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/order/{id}', 'order'); // Sales Person and Customer
 
             // Order Invoices 
-            Route::get('/order/invoices', 'listOrderInvoices'); // Sales Person and Customer
+            Route::get('/order-invoices', 'listOrderInvoices'); // Sales Person and Customer
             Route::get('/order/{id}/invoice', 'orderInvoice'); // Sales Person and Customer
 
             // Cancel and Return Order APIs

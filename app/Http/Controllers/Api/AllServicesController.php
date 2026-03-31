@@ -1350,7 +1350,7 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        $amc = Amc::with('amcScheduleMeetings')->where('id', $amc_id)->where('customer_id', $validated['user_id'])->first();
+        $amc = Amc::with(['amcPlan', 'amcScheduleMeetings'])->where('id', $amc_id)->where('customer_id', $validated['user_id'])->first();
 
         if (! $amc) {
             return ApiResponse::error('AMC not found or does not belong to this customer.', 404);

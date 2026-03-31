@@ -261,7 +261,7 @@
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <a href="{{ route('order.invoice', $order->id) }}"
+                                                        <a href="{{ asset($order->invoice->invoice_document_path) }}"
                                                             class="btn btn-sm btn-outline-success" title="View Invoice"
                                                             target="_blank">
                                                             <i class="fas fa-file-pdf me-1"></i> View

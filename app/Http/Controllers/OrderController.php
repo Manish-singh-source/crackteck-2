@@ -24,7 +24,7 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Order::with(['customer', 'orderItems.ecommerceProduct.warehouseProduct']);
+        $query = Order::with(['customer', 'invoice', 'orderItems.ecommerceProduct.warehouseProduct']);
 
         // Status filter
         if ($request->has('status') && ! empty($request->status)) {

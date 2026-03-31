@@ -42,7 +42,9 @@ class ServiceRequestProductRequestPartObserver
      */
     public function deleted(ServiceRequestProductRequestPart $requestPart): void
     {
-        $this->updateQuotation($requestPart->request_id);
+        if ($requestPart->request_id) {
+            $this->updateQuotation($requestPart->request_id);
+        }
     }
 
     /**

@@ -13,7 +13,9 @@ class ServiceRequestProductRequestPartObserver
      */
     public function created(ServiceRequestProductRequestPart $requestPart): void
     {
-        $this->updateQuotation($requestPart->request_id);
+        if ($requestPart->request_id) {
+            $this->updateQuotation($requestPart->request_id);
+        }
     }
 
     /**
@@ -23,11 +25,11 @@ class ServiceRequestProductRequestPartObserver
     {
         // If status changes to used, delivered, or customer_approved, update the quotation
         $relevantStatuses = ['used', 'delivered', 'customer_approved'];
-        
+
         if ($requestPart->isDirty('status')) {
             $newStatus = $requestPart->status;
             $oldStatus = $requestPart->getOriginal('status');
-            
+
             // If status changed to or from a relevant status, update quotation
             if (in_array($newStatus, $relevantStatuses) || in_array($oldStatus, $relevantStatuses)) {
                 $this->updateQuotation($requestPart->request_id);
@@ -50,14 +52,14 @@ class ServiceRequestProductRequestPartObserver
     {
         // Get the service request to access customer_address_id
         $serviceRequest = \App\Models\ServiceRequest::find($serviceRequestId);
-        
+
         if (!$serviceRequest) {
             return;
         }
 
         // Get all service_request_products for this request
         $serviceRequestProducts = ServiceRequestProduct::where('service_requests_id', $serviceRequestId)->get();
-        
+
         // Get all request parts with specific statuses (used in service)
         $requestParts = ServiceRequestProductRequestPart::where('request_id', $serviceRequestId)
             ->whereIn('status', ['used', 'delivered', 'customer_approved'])
@@ -67,7 +69,7 @@ class ServiceRequestProductRequestPartObserver
         // Calculate counts and totals
         $requestPartCount = $serviceRequestProducts->count();
         $serviceChargeTotal = $serviceRequestProducts->sum('service_charge');
-        
+
         $partCount = $requestParts->count();
         $productPriceTotal = $requestParts->sum(function ($part) {
             return $part->product->final_price ?? 0;
@@ -83,7 +85,7 @@ class ServiceRequestProductRequestPartObserver
 
         // Get existing quotation or create new one
         $quotation = ServiceRequestQuotation::where('request_id', $serviceRequestId)->first();
-        
+
         if (!$quotation) {
             // Generate unique invoice number
             $invoiceNumber = $this->generateInvoiceNumber($serviceRequestId);
@@ -135,7 +137,7 @@ class ServiceRequestProductRequestPartObserver
         $year = date('Y');
         $month = date('m');
         $uniqueId = str_pad($requestId, 6, '0', STR_PAD_LEFT);
-        
+
         return "{$prefix}/{$year}/{$month}/{$uniqueId}";
     }
 }

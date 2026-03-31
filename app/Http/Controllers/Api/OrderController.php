@@ -677,6 +677,12 @@ class OrderController extends Controller
     // Order Invoices 
     public function listOrderInvoices(Request $request)
     {
+        return response()->json([
+            'success' => false,
+            'message' => 'This endpoint is not implemented yet.',
+            'data' => [],
+        ], 404);
+    
         $roleValidated = Validator::make($request->all(), ([
             'user_id' => 'required|integer|exists:customers,id',
             'role_id' => 'required|in:4',
@@ -691,12 +697,11 @@ class OrderController extends Controller
         if (! $staffRole) {
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
+        return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
 
         if ($staffRole == 'customers') {
             $invoices = Invoice::with(['items', 'order'])
-                ->whereHas('order', function ($query) use ($request) {
-                    $query->where('customer_id', $request->user_id);
-                })
+                ->where('customer_id', $request->user_id)
                 ->orderByDesc('created_at')
                 ->get();
 
@@ -737,8 +742,3 @@ class OrderController extends Controller
         return response()->json(['success' => true, 'invoice' => $invoice], 200);
     }
 }
-
-
-
-
-

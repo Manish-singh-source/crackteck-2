@@ -1197,7 +1197,6 @@ class ServiceRequestController extends Controller
             return redirect()->route('service-request.index')->with('success', 'Service request created successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e->getMessage());
 
             return redirect()->back()->with('error', 'Error creating service request: ' . $e->getMessage());
         }
@@ -1435,7 +1434,6 @@ class ServiceRequestController extends Controller
             return redirect()->route('service-request.index')->with('success', 'Service request created successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e->getMessage());
 
             return redirect()->back()->with('error', 'Error creating service request: ' . $e->getMessage());
         }
@@ -1789,7 +1787,6 @@ class ServiceRequestController extends Controller
             return redirect()->route('service-request.index')->with('success', 'Service request created successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e->getMessage());
 
             return redirect()->back()->with('error', 'Error creating service request: ' . $e->getMessage());
         }
@@ -2189,7 +2186,6 @@ class ServiceRequestController extends Controller
             return redirect()->route('service-request.index')->with('success', 'Service request created successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e->getMessage());
 
             return redirect()->back()->with('error', 'Error creating service request: ' . $e->getMessage());
         }
@@ -2263,7 +2259,7 @@ class ServiceRequestController extends Controller
         ]);
 
         if ($validated->fails()) {
-            dd($validated->errors());
+            return back()->withErrors($validated)->withInput();
         }
 
         // Determine request type - default to stock_in_hand if not provided

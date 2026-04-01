@@ -107,7 +107,7 @@ class Delivery extends Controller
 
             $delivery->save();
         } catch (Exception $e) {
-            dd($e);
+            return back()->with('error', 'Something went wrong.');
         }
 
         if (! $delivery) {

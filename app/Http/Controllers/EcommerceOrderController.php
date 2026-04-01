@@ -54,7 +54,6 @@ class EcommerceOrderController extends Controller
             'delivered' => EcommerceOrder::where('status', 'delivered')->count(),
             'cancelled' => EcommerceOrder::where('status', 'cancelled')->count(),
         ];
-        dd($orders);
 
         return view('e-commerce.ecommerce-orders.index', compact('orders', 'statusCounts'));
     }

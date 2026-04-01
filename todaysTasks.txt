@@ -224,7 +224,7 @@ Crackteck CRM and Website:
 13. Terms and conditions adding for AMCs                                - dummy added
 14. WhatsApp APIs integration and Facebook login integration 
 15. Client Changes as defined in MoM                                              - done 
-16. Customer Reviews 
+16. Customer Reviews                                               - done 
 
 
 
@@ -379,4 +379,23 @@ Todays Tasks:
 
 #Saurabh & #Shubham
 1. Crackteck: App Testing Customer
+
+
+
+Date: 31 March 2026
+
+Todays Tasks:
+
+#Saurabh & #Shubham
+1. Crackteck: App Testing Customer
+
+
+
+
+#Saurabh 
+
+1. Crackteck: Dashboard Pages: 
+    - E-commerce - Checking and correcting data
+    - Warehouse  - implementing 
+2. Headquaters: Implement the ‘Shipped’ button and the ‘Vendor PI Update’ button
 

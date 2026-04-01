@@ -9,6 +9,7 @@ use App\Http\Controllers\VendorController;
 use App\Http\Controllers\VendorPurchaseBillController;
 use App\Http\Controllers\Warehouse\ScrapItemController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\WarehouseDashboardController;
 use App\Http\Controllers\WarehouseRackController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,10 +20,10 @@ use Illuminate\Support\Facades\Route;
 // *******************************************************************************************************************************************************
 
 Route::prefix('demo/warehouse')->group(function () {
-    // Index Page
-    Route::get('/index', function () {
-        return view('/warehouse/index');
-    })->name('warehouse/index');
+    Route::controller(WarehouseDashboardController::class)->group(function () {
+        Route::get('/index', 'index')->name('warehouse/index');
+        Route::get('/dashboard-data', 'data')->name('warehouse.dashboard.data');
+    });
 
     // ------------------------------------------------------------ Warehouse Page ------------------------------------------------------------
 
@@ -185,3 +186,4 @@ Route::prefix('demo/warehouse')->group(function () {
         Route::delete('/delete-rack/{id}', 'delete')->name('rack.delete');
     });
 });
+

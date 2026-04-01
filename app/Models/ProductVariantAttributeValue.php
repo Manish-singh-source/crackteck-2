@@ -12,4 +12,9 @@ class ProductVariantAttributeValue extends Model
         'value',
         'status',
     ];
+
+    public function attribute()
+    {
+        return $this->belongsTo(ProductVariantAttribute::class, 'attribute_id');
+    }
 }

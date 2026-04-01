@@ -8,6 +8,7 @@ use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\EcDashboardController;
 use App\Http\Controllers\EcommerceOrderController;
 use App\Http\Controllers\EcommerceProductController;
 use App\Http\Controllers\OrderController;
@@ -24,10 +25,9 @@ use Illuminate\Support\Facades\Route;
 // *******************************************************************************************************************************************************
 // *******************************************************************************************************************************************************
 Route::prefix('/demo/e-commerce')->group(function () {
-    // Index Page
-    Route::get('/index', function () {
-        return view('/e-commerce/index');
-    })->name('e-commerce/index');
+    // Dashboard Page
+    Route::get('/index', [EcDashboardController::class, 'index'])->name('e-commerce/index');
+    Route::get('/dashboard/filter', [EcDashboardController::class, 'filter'])->name('e-commerce.dashboard.filter');
 
     // ------------------------------------------------------------ E-Commerce Customer Page -------------------------------------------------------------
 

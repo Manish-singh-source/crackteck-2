@@ -85,14 +85,14 @@
             <div class="col-xl-4"><div class="chart-card card"><div class="card-body"><p class="dashboard-section-title">Revenue Contribution by Category</p><div id="revenueContribution" class="chart-box"></div></div></div></div>
         </div>
 
-        <div class="row g-4 mt-1">
+        <div class="row g-4 mt-1 mb-1">
             <div class="col-xl-6"><div class="list-card card"><div class="card-body"><p class="dashboard-section-title">Warehouse Capacity Snapshot</p><div class="list-shell" id="warehousePerformanceList"></div></div></div></div>
             <div class="col-xl-3"><div class="list-card card"><div class="card-body"><p class="dashboard-section-title">Low Stock Focus</p><div class="list-shell" id="lowStockList"></div></div></div></div>
             <div class="col-xl-3"><div class="list-card card"><div class="card-body"><p class="dashboard-section-title">Out of Stock Focus</p><div class="list-shell" id="outStockList"></div></div></div></div>
             <div class="col-xl-4"><div class="list-card card"><div class="card-body"><p class="dashboard-section-title">Top Revenue Products</p><div class="list-shell" id="topRevenueList"></div></div></div></div>
             <div class="col-xl-4"><div class="list-card card"><div class="card-body"><p class="dashboard-section-title">Scrap by Brand</p><div class="list-shell" id="scrapBrandList"></div></div></div></div>
             <div class="col-xl-4"><div class="list-card card"><div class="card-body"><p class="dashboard-section-title">Revenue by Category</p><div class="list-shell" id="revenueCategoryList"></div></div></div></div>
-            <div class="col-12"><div class="list-card card notes-card"><div class="card-body"><p class="dashboard-section-title">Implementation Notes</p><div class="list-shell" id="assumptionNotes">@foreach ($dashboardAssumptions as $note)<div class="list-item"><div><h6>{{ $note }}</h6></div></div>@endforeach</div></div></div></div>
+            {{-- <div class="col-12"><div class="list-card card notes-card"><div class="card-body"><p class="dashboard-section-title">Implementation Notes</p><div class="list-shell" id="assumptionNotes">@foreach ($dashboardAssumptions as $note)<div class="list-item"><div><h6>{{ $note }}</h6></div></div>@endforeach</div></div></div></div> --}}
         </div>
     </div>
     <div class="dashboard-loading" id="dashboardLoading"><div class="loading-pill"><span class="spinner-border spinner-border-sm me-2"></span>Refreshing dashboard analytics...</div></div>
@@ -130,10 +130,10 @@ window.warehouseDashboardConfig = {
         if (!items || !items.length) { shell.innerHTML = '<div class="list-item"><div><h6>No data for the current filters.</h6></div></div>'; return; }
         shell.innerHTML = items.map((item) => {
             if (mode === 'warehouse') {
-                return `<div class="list-item"><div class="w-100"><div class="d-flex justify-content-between align-items-start gap-3"><div><h6>${escapeHtml(item.name)}</h6><p>${escapeHtml(item.location)} · ${escapeHtml(item.verification_status)}</p></div><span class="list-badge">${formatter.format(item.products_count)} products</span></div><div class="mt-3"><div class="d-flex justify-content-between small text-muted mb-1"><span>Capacity usage</span><span>${item.capacity_usage}%</span></div><div class="progress-shell"><span style="width:${Math.min(item.capacity_usage, 100)}%"></span></div></div><div class="mt-3"><div class="d-flex justify-content-between small text-muted mb-1"><span>Rack utilization</span><span>${item.rack_usage}%</span></div><div class="progress-shell"><span style="width:${Math.min(item.rack_usage, 100)}%; background: linear-gradient(90deg, #00a86b, #54d6a1);"></span></div></div></div></div>`;
+                return `<div class="list-item"><div class="w-100"><div class="d-flex justify-content-between align-items-start gap-3"><div><h6>${escapeHtml(item.name)}</h6><p>${escapeHtml(item.location)} ï¿½ ${escapeHtml(item.verification_status)}</p></div><span class="list-badge">${formatter.format(item.products_count)} products</span></div><div class="mt-3"><div class="d-flex justify-content-between small text-muted mb-1"><span>Capacity usage</span><span>${item.capacity_usage}%</span></div><div class="progress-shell"><span style="width:${Math.min(item.capacity_usage, 100)}%"></span></div></div><div class="mt-3"><div class="d-flex justify-content-between small text-muted mb-1"><span>Rack utilization</span><span>${item.rack_usage}%</span></div><div class="progress-shell"><span style="width:${Math.min(item.rack_usage, 100)}%; background: linear-gradient(90deg, #00a86b, #54d6a1);"></span></div></div></div></div>`;
             }
             if (mode === 'product') {
-                return `<div class="list-item"><div><h6>${escapeHtml(item.name)}</h6><p>${escapeHtml(item.brand)} · ${escapeHtml(item.category)} · ${escapeHtml(item.warehouse)}</p></div><span class="list-badge">${formatter.format(item.quantity)} units</span></div>`;
+                return `<div class="list-item"><div><h6>${escapeHtml(item.name)}</h6><p>${escapeHtml(item.brand)} ï¿½ ${escapeHtml(item.category)} ï¿½ ${escapeHtml(item.warehouse)}</p></div><span class="list-badge">${formatter.format(item.quantity)} units</span></div>`;
             }
             if (mode === 'revenue') {
                 return `<div class="list-item"><div><h6>${escapeHtml(item.label)}</h6><p>${formatter.format(item.quantity || 0)} units moved</p></div><span class="list-badge">${currency.format(item.revenue || item.value || 0)}</span></div>`;

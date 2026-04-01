@@ -203,9 +203,9 @@ Crackteck App:
 Crackteck CRM and Website: 
 
 1. Dashboard Pages: 
-    - E-commerce 
+    - E-commerce                                                - done 
     - CRM 
-    - Warehouse 
+    - Warehouse                                                - done 
     - Sales Reports 
 2. Chats Module 
 3. Field Issues                                               - done 
@@ -399,3 +399,11 @@ Todays Tasks:
     - Warehouse  - implementing 
 2. Headquaters: Implement the ‘Shipped’ button and the ‘Vendor PI Update’ button
 
+
+
+
+https://github.com/HackRoot1/Laravel-Learning/blob/main/20.%20Log%20Viewer%20Package.md 
+
+https://github.com/HackRoot1/Laravel-Learning/blob/main/21.%20spatie_laravel-uptime-monitor%20README.md
+
+    

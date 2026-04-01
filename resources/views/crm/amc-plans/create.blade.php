@@ -25,6 +25,24 @@
 
             <div class="row">
                 <div class="col-12">
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Error!</strong> {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Please fix the following errors:</strong>
+                            <ul class="mb-0 mt-2 ps-3">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
 
                     <form action="{{ route('amc-plan.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -68,9 +86,7 @@
 
                                             {{-- Plan Description --}}
                                             <div class="col-12">
-                                                <label for="description" class="form-label">
-                                                    Description <span class="text-danger">*</span>
-                                                </label>
+                                                <label for="description" class="form-label">Description</label>
                                                 <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror"
                                                     placeholder="Enter Description" rows="3">{{ old('description') }}</textarea>
                                                 @error('description')
@@ -154,10 +170,10 @@
                                             {{-- Plan Cost --}}
                                             <div class="col-6 pricing-field">
                                                 @include('components.form.input', [
-                                                    'label' => 'Plan Cost (₹)',
+                                                    'label' => 'Plan Cost (Rs.)',
                                                     'name' => 'plan_cost',
                                                     'type' => 'number',
-                                                    'placeholder' => 'Enter Plan Cost (₹)',
+                                                    'placeholder' => 'Enter Plan Cost (Rs.)',
                                                     'value' => old('plan_cost'),
                                                     'attributes' => 'step=0.01 min=0',
                                                 ])
@@ -184,7 +200,7 @@
                                             {{-- Total Cost --}}
                                             <div class="col-6 pricing-field">
                                                 @include('components.form.input', [
-                                                    'label' => 'Total Cost (₹)',
+                                                    'label' => 'Total Cost (Rs.)',
                                                     'name' => 'total_cost',
                                                     'type' => 'number',
                                                     'placeholder' => 'Auto calculated',
@@ -379,7 +395,7 @@
                                                         'inactive' => 'Inactive',
                                                         'active' => 'Active',
                                                     ],
-                                                    'value' => old('status', '1'),
+                                                    'value' => old('status', 'active'),
                                                 ])
                                                 @error('status')
                                                     <div class="invalid-feedback d-block">{{ $message }}</div>

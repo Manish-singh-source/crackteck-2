@@ -176,7 +176,8 @@ class AllServicesController extends Controller
         }
     }
 
-    public function getDevicesTypes(Request $request) {
+    public function getDevicesTypes(Request $request)
+    {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
         ]);
@@ -240,7 +241,7 @@ class AllServicesController extends Controller
                 'role_id' => 'required|in:4',
                 'user_id' => 'required|integer|exists:customers,id',
                 'customer_address_id' => 'required|integer|exists:customer_address_details,id',
-                'service_type' => 'required|in:quick_service,installation,repairing',
+                'service_type' => 'required|in:quick_service,installation,repair',
                 'products' => 'required|array|min:1',
                 'products.*.service_type_id' => 'required|integer|exists:covered_items,id',
                 'products.*.name' => 'required|string',
@@ -348,6 +349,12 @@ class AllServicesController extends Controller
                     }
 
                     if ($request->service_type == 'amc') {
+                        if (isset($product['type']) && is_string($product['type'])) {
+                            $productDiagnosisList = DeviceSpecificDiagnosis::where('device_type', $product['type'])->first();
+                            if ($productDiagnosisList) {
+                                $product['type'] = $productDiagnosisList->id;
+                            }
+                        }
                         $amcProduct = AmcProduct::create([
                             'amc_id' => $amc->id,
                             'name' => $product['name'] ?? null,
@@ -383,14 +390,14 @@ class AllServicesController extends Controller
                                 continue;
                             }
 
-                            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+                            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
                             $file->move(
                                 public_path('uploads/crm/quick-service/products'),
                                 $filename
                             );
 
-                            $images[] = 'uploads/crm/quick-service/products/'.$filename;
+                            $images[] = 'uploads/crm/quick-service/products/' . $filename;
                         }
                     }
 
@@ -516,6 +523,9 @@ class AllServicesController extends Controller
                 ->where('service_request_product_id', $product_id)
                 ->get();
 
+
+            $productDiagnosisList = DeviceSpecificDiagnosis::where('id', $serviceRequestProduct->type)->first();
+
             $diagnoses = [];
             foreach ($diagnosisDetails as $diagnosis) {
                 $diagnosisList = json_decode($diagnosis->diagnosis_list, true);
@@ -553,13 +563,20 @@ class AllServicesController extends Controller
                 ];
             }
 
+            if (empty($diagnoses)) {
+                $diagnoses[] = [
+                    'diagnosis_list' => $productDiagnosisList->diagnosis_list ?? [],
+                ];
+            }
+
             return response()->json([
                 'product' => [
                     'id' => $serviceRequestProduct->id,
                     'name' => $serviceRequestProduct->name,
                     'status' => $serviceRequestProduct->status,
                 ],
-                'diagnoses' => $diagnoses,
+                'diagnoses' => $diagnoses ?? [],
+                'engineer' => $serviceRequest?->activeAssignment?->engineer ?? [],
                 // 'request_parts' => $parts,
             ], 200);
         }
@@ -612,7 +629,7 @@ class AllServicesController extends Controller
 
             // Check if customer action is allowed (only for admin_approved or warehouse_approved status)
             if (! in_array($requestPart->status, ['admin_approved', 'warehouse_approved'])) {
-                return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: '.$requestPart->status], 400);
+                return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: ' . $requestPart->status], 400);
             }
 
             // Update the status based on customer action
@@ -642,7 +659,8 @@ class AllServicesController extends Controller
     }
 
     // apply coupon for service request 
-    public function partApplyCoupon(Request $request) {
+    public function partApplyCoupon(Request $request)
+    {
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
             'user_id' => 'required|integer|exists:customers,id',
@@ -1046,7 +1064,7 @@ class AllServicesController extends Controller
         $validated = Validator::make($request->all(), [
             'role_id' => 'required|in:4',
             'user_id' => 'required|integer|exists:customers,id',
-            'service_type' => 'required|in:amc,repairing,installation,quick_service',
+            'service_type' => 'required|in:amc,repair,installation,quick_service',
             'service_id' => 'required|integer',
             'rating' => 'required|numeric|min:1|max:5',
             'comments' => 'nullable|string',
@@ -1203,7 +1221,7 @@ class AllServicesController extends Controller
 
         // Check if customer action is allowed (only for admin_approved status)
         if ($pickup->status !== 'admin_approved') {
-            return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: '.$pickup->status], 400);
+            return response()->json(['success' => false, 'message' => 'Customer approval is not required for current status. Current status: ' . $pickup->status], 400);
         }
 
         // Update the status based on customer action
@@ -1265,7 +1283,7 @@ class AllServicesController extends Controller
 
         // Update the quotation with payment details
         $newPaidAmount = ($quotation->paid_amount ?? 0) + $validated['amount'];
-        
+
         // Determine payment status based on paid amount
         $paymentStatus = 'partial';
         if ($newPaidAmount >= $quotation->grand_total) {
@@ -1291,5 +1309,53 @@ class AllServicesController extends Controller
             'payment_method' => 'phonepe',
             'paid_at' => $quotation->paid_at,
         ], 200);
+    }
+
+    public function customerAmcs(Request $request) {
+            $validated = Validator::make($request->all(), [
+                'role_id' => 'required|in:4',
+                'user_id' => 'required|integer|exists:customers,id',
+            ]);
+    
+            if ($validated->fails()) {
+                return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+            }
+    
+            $validated = $validated->validated();
+            $staffRole = $this->getRoleId($validated['role_id']);
+    
+            if (! $staffRole) {
+                return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+            }
+    
+            $amcs = Amc::with('amcPlan')->withCount('amcScheduleMeetings')->where('customer_id', $validated['user_id'])->get();
+    
+            return ApiResponse::success($amcs, 'AMCs retrieved successfully.');
+    }
+
+    public function customerAmcDetails(Request $request, $amc_id) {
+        $validated = Validator::make($request->all(), [
+            'role_id' => 'required|in:4',
+            'user_id' => 'required|integer|exists:customers,id',
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $validated = $validated->validated();
+        $staffRole = $this->getRoleId($validated['role_id']);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        $amc = Amc::with(['amcPlan', 'amcScheduleMeetings'])->where('id', $amc_id)->where('customer_id', $validated['user_id'])->first();
+
+        if (! $amc) {
+            return ApiResponse::error('AMC not found or does not belong to this customer.', 404);
+        }
+
+        return ApiResponse::success($amc, 'AMC details retrieved successfully.');
     }
 }

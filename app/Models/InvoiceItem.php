@@ -18,4 +18,11 @@ class InvoiceItem extends Model
         'tax_rate',
         'line_total',
     ];
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class);
+    }
 }
+
+

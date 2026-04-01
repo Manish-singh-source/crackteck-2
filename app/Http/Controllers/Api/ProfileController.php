@@ -303,7 +303,7 @@ class ProfileController extends Controller
             // validation rules if any
             'role_id' => 'required|in:1,2,3,4',
             'user_id' => 'required',
-            'aadhar_number' => 'required',
+            'aadhar_number' => 'required|digits:12',
             'aadhar_front_path' => 'required|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
             'aadhar_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
         ]);
@@ -391,8 +391,8 @@ class ProfileController extends Controller
             // validation rules if any
             'role_id' => 'required|in:1,2,3,4',
             'user_id' => 'required',
-            'aadhar_number' => 'required',
-            'aadhar_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+            'aadhar_number' => 'required|digits:12',
+            'aadhar_front_path' => 'required|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
             'aadhar_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:2048',
         ]);
 

@@ -16,8 +16,10 @@ use App\Models\StaffVehicleDetail;
 use App\Models\StaffWorkSkill;
 use App\Services\Fast2smsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -86,6 +88,362 @@ class ApiAuthController extends Controller
         }
     }
 
+    protected function normalizeContact(string $contact): string
+    {
+        return trim($contact);
+    }
+
+    protected function detectContactType(string $contact): ?string
+    {
+        if (filter_var($contact, FILTER_VALIDATE_EMAIL)) {
+            return 'email';
+        }
+
+        if (preg_match('/^\d{10}$/', $contact)) {
+            return 'phone_number';
+        }
+
+        return null;
+    }
+
+    protected function findCustomerByContact(string $contact, string $contactType): ?Customer
+    {
+        return match ($contactType) {
+            'email' => Customer::where('email', $contact)->where('status', 'active')->first(),
+            'phone_number' => Customer::where('phone', $contact)->where('status', 'active')->first(),
+            default => null,
+        };
+    }
+
+    protected function generateAndStoreVerificationCode(Customer $customer): string
+    {
+        $otp = (string) rand(1000, 9999);
+        $customer->otp = $otp;
+        $customer->otp_expiry = now()->addMinutes(5);
+        $customer->save();
+
+        return $otp;
+    }
+
+    protected function sendVerificationEmail(string $email, string $otp): bool
+    {
+        try {
+            Mail::raw("Your verification code is $otp. It is valid for 5 minutes.", function ($message) use ($email) {
+                $message->to($email)->subject('Verification Code');
+            });
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Verification email sending failed: ' . $e->getMessage(), [
+                'email' => $email,
+            ]);
+
+            return false;
+        }
+    }
+
+    protected function sendVerificationCodeToContact(Customer $customer, string $contactType, string $contact, string $otp): bool
+    {
+        if ($contactType === 'email') {
+            return $this->sendVerificationEmail($contact, $otp);
+        }
+
+        $response = $this->fast2sms->sendOtp($customer->phone, $otp);
+
+        if (! ($response['success'] ?? false)) {
+            Log::error('Verification SMS sending failed.', [
+                'phone' => $customer->phone,
+                'response' => $response,
+            ]);
+        }
+
+        return (bool) ($response['success'] ?? false);
+    }
+
+    protected function verificationResponseData(string $contactType, string $contact, string $otp = null): array
+    {
+        $data = [
+            'contact_type' => $contactType,
+            'contact' => $contact,
+            'expires_in_seconds' => 300,
+        ];
+
+        if (config('app.debug') && $otp !== null) {
+            $data['otp'] = $otp;
+        }
+
+        return $data;
+    }
+
+    public function sendVerificationCode(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'contact' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return ApiResponse::error('Validation failed.', 422, $validator->errors());
+        }
+
+        $contact = $this->normalizeContact($request->contact);
+        $contactType = $this->detectContactType($contact);
+
+        if (! $contactType) {
+            return ApiResponse::error('Please provide a valid email or 10-digit phone number.', 422);
+        }
+
+        $customer = $this->findCustomerByContact($contact, $contactType);
+
+        if (! $customer) {
+            return ApiResponse::error('Customer not found.', 404);
+        }
+
+        $otp = $this->generateAndStoreVerificationCode($customer);
+        $sent = $this->sendVerificationCodeToContact($customer, $contactType, $contact, $otp);
+
+        if (! $sent) {
+            return ApiResponse::error('Failed to send verification code. Please try again.', 500, $this->verificationResponseData($contactType, $contact, config('app.debug') ? $otp : null));
+        }
+
+        return ApiResponse::success(
+            $this->verificationResponseData($contactType, $contact, config('app.debug') ? $otp : null),
+            'Verification code sent successfully.',
+            200
+        );
+    }
+
+    public function verifyVerificationCode(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'contact' => 'required|string',
+            'code' => 'required|digits:4',
+        ]);
+
+        if ($validator->fails()) {
+            return ApiResponse::error('Validation failed.', 422, $validator->errors());
+        }
+
+        $contact = $this->normalizeContact($request->contact);
+        $contactType = $this->detectContactType($contact);
+
+        if (! $contactType) {
+            return ApiResponse::error('Please provide a valid email or 10-digit phone number.', 422);
+        }
+
+        $customer = $this->findCustomerByContact($contact, $contactType);
+
+        if (! $customer) {
+            return ApiResponse::error('Customer not found.', 404);
+        }
+
+        if (! $customer->otp || ! $customer->otp_expiry) {
+            return ApiResponse::error('Verification code not found. Please request a new code.', 404);
+        }
+
+        if (now()->gt($customer->otp_expiry)) {
+            $customer->otp = null;
+            $customer->otp_expiry = null;
+            $customer->save();
+
+            return ApiResponse::error('Verification code has expired. Please request a new code.', 401);
+        }
+
+        if ((string) $customer->otp !== (string) $request->code) {
+            return ApiResponse::error('Invalid verification code.', 401);
+        }
+
+        $customer->otp = null;
+        $customer->otp_expiry = null;
+        $customer->save();
+
+        return ApiResponse::success([
+            'contact_type' => $contactType,
+            'contact' => $contact,
+            'verified' => true,
+        ], 'Verification successful.', 200);
+    }
+
+    public function resendVerificationCode(Request $request)
+    {
+        return $this->sendVerificationCode($request);
+    }
+    protected function getRequestedContact(Request $request): ?string
+    {
+        if ($request->filled('contact')) {
+            return $this->normalizeContact((string) $request->contact);
+        }
+
+        if ($request->filled('email')) {
+            return $this->normalizeContact((string) $request->email);
+        }
+
+        if ($request->filled('phone_number')) {
+            return $this->normalizeContact((string) $request->phone_number);
+        }
+
+        return null;
+    }
+
+    protected function passwordResetVerificationKey(string $contactType, string $contact): string
+    {
+        return 'password_reset_verified_' . $contactType . '_' . md5($contact);
+    }
+
+    protected function validateVerificationCode(Customer $customer, string $code): ?array
+    {
+        if (! $customer->otp || ! $customer->otp_expiry) {
+            return ['message' => 'Verification code not found. Please request a new code.', 'status' => 404];
+        }
+
+        if (now()->gt($customer->otp_expiry)) {
+            $customer->otp = null;
+            $customer->otp_expiry = null;
+            $customer->save();
+
+            return ['message' => 'Verification code has expired. Please request a new code.', 'status' => 401];
+        }
+
+        if ((string) $customer->otp !== (string) $code) {
+            return ['message' => 'Invalid verification code.', 'status' => 401];
+        }
+
+        return null;
+    }
+
+    public function sendForgotPasswordCode(Request $request)
+    {
+        $contact = $this->getRequestedContact($request);
+
+        if (! $contact) {
+            return ApiResponse::error('Email or phone number is required.', 422);
+        }
+
+        $contactType = $this->detectContactType($contact);
+
+        if (! $contactType) {
+            return ApiResponse::error('Please provide a valid email or 10-digit phone number.', 422);
+        }
+
+        $customer = $this->findCustomerByContact($contact, $contactType);
+
+        if (! $customer) {
+            return ApiResponse::error('Customer not found.', 404);
+        }
+
+        cache()->forget($this->passwordResetVerificationKey($contactType, $contact));
+
+        $otp = $this->generateAndStoreVerificationCode($customer);
+        $sent = $this->sendVerificationCodeToContact($customer, $contactType, $contact, $otp);
+
+        if (! $sent) {
+            return ApiResponse::error('Failed to send verification code. Please try again.', 500, $this->verificationResponseData($contactType, $contact, config('app.debug') ? $otp : null));
+        }
+
+        return ApiResponse::success(
+            $this->verificationResponseData($contactType, $contact, config('app.debug') ? $otp : null),
+            'Verification code sent successfully.',
+            200
+        );
+    }
+
+    public function verifyForgotPasswordCode(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|digits:4',
+        ]);
+
+        if ($validator->fails()) {
+            return ApiResponse::error('Validation failed.', 422, $validator->errors());
+        }
+
+        $contact = $this->getRequestedContact($request);
+
+        if (! $contact) {
+            return ApiResponse::error('Email or phone number is required.', 422);
+        }
+
+        $contactType = $this->detectContactType($contact);
+
+        if (! $contactType) {
+            return ApiResponse::error('Please provide a valid email or 10-digit phone number.', 422);
+        }
+
+        $customer = $this->findCustomerByContact($contact, $contactType);
+
+        if (! $customer) {
+            return ApiResponse::error('Customer not found.', 404);
+        }
+
+        $validationError = $this->validateVerificationCode($customer, (string) $request->code);
+
+        if ($validationError) {
+            return ApiResponse::error($validationError['message'], $validationError['status']);
+        }
+
+        cache()->put($this->passwordResetVerificationKey($contactType, $contact), [
+            'customer_id' => $customer->id,
+            'verified_at' => now()->toDateTimeString(),
+        ], now()->addMinutes(10));
+
+        return ApiResponse::success([
+            'contact_type' => $contactType,
+            'contact' => $contact,
+            'verified' => true,
+        ], 'Verification successful.', 200);
+    }
+
+    public function resendForgotPasswordCode(Request $request)
+    {
+        return $this->sendForgotPasswordCode($request);
+    }
+
+    public function resetForgotPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return ApiResponse::error('Validation failed.', 422, $validator->errors());
+        }
+
+        $contact = $this->getRequestedContact($request);
+
+        if (! $contact) {
+            return ApiResponse::error('Email or phone number is required.', 422);
+        }
+
+        $contactType = $this->detectContactType($contact);
+
+        if (! $contactType) {
+            return ApiResponse::error('Please provide a valid email or 10-digit phone number.', 422);
+        }
+
+        $customer = $this->findCustomerByContact($contact, $contactType);
+
+        if (! $customer) {
+            return ApiResponse::error('Customer not found.', 404);
+        }
+
+        $verificationData = cache()->get($this->passwordResetVerificationKey($contactType, $contact));
+
+        if (! $verificationData || ($verificationData['customer_id'] ?? null) != $customer->id) {
+            return ApiResponse::error('Please verify the code before resetting password.', 403);
+        }
+
+        $customer->password = Hash::make($request->password);
+        $customer->otp = null;
+        $customer->otp_expiry = null;
+        $customer->save();
+
+        cache()->forget($this->passwordResetVerificationKey($contactType, $contact));
+
+        return ApiResponse::success([
+            'contact_type' => $contactType,
+            'contact' => $contact,
+            'password_reset' => true,
+        ], 'Password reset successfully.', 200);
+    }
     public function signup(Request $request)
     {
         $roleValidated = Validator::make($request->all(), ([
@@ -111,6 +469,8 @@ class ApiAuthController extends Controller
                 'dob' => 'nullable',
                 'gender' => 'required',
                 'customer_type' => 'both',
+                'password' => 'nullable|string|min:8',
+
                 'pan_no' => 'nullable|string|max:10',
                 'pan_card_front_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
                 'pan_card_back_path' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
@@ -145,6 +505,7 @@ class ApiAuthController extends Controller
                 'gender' => $request->gender,
                 'customer_type' => 'both',
                 'source_type' => 'app',
+                'password' => $request->password,
             ]);
 
             if (! $customer) {
@@ -738,5 +1099,45 @@ class ApiAuthController extends Controller
             'token' => $token,
             'user' => $user
         ]);
+    }
+
+    // Email Password Login
+    public function emailPasswordLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+            'role_id' => 'required|in:1,2,3,4',
+        ]);
+
+        $staffRole = $this->getRoleId($request->role_id);
+
+        if ($staffRole == 'customers') {
+            $user = Customer::where('email', $request->email)->first();
+        } else {
+            $user = Staff::where('email', $request->email)->where('staff_role', $staffRole)->first();
+        }
+
+        if (!$user) {
+            return ApiResponse::error('User not found', 404);
+        }
+
+        // Check password
+        if (!Hash::check($request->password, $user->password)) {
+            return ApiResponse::error('Invalid password', 401);
+        }
+
+
+        // $token = $user->createToken('mobile_token')->plainTextToken;
+        if ($staffRole == 'customers') {
+            $token = auth('customer_api')->login($user);
+        } else {
+            $token = auth('staff_api')->login($user);
+        }
+
+        return ApiResponse::success([
+            'token' => $token,
+            'user' => $user,
+        ], 'Login successful');
     }
 }

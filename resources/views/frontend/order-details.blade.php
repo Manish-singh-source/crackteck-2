@@ -522,16 +522,18 @@
                             <label class="form-label">Select Product <span class="text-danger">*</span></label>
                             <select class="form-select" id="feedbackProductId" name="product_id" required>
                                 <option value="">Choose a product from this order</option>
-                                @foreach ($feedbackableItems as $item)
-                                    @php
-                                        $ecommerceProduct = \App\Models\EcommerceProduct::where('product_id', $item->product_id)->first();
-                                    @endphp
-                                    @if ($ecommerceProduct)
-                                        <option value="{{ $ecommerceProduct->id }}" data-product-name="{{ $item->product_name }}">
-                                            {{ $item->product_name }}
-                                        </option>
-                                    @endif
-                                @endforeach
+                                @if(isset($feedbackableItems))
+                                    @foreach ($feedbackableItems as $item)
+                                        @php
+                                            $ecommerceProduct = \App\Models\EcommerceProduct::where('product_id', $item->product_id)->first();
+                                        @endphp
+                                        @if ($ecommerceProduct)
+                                            <option value="{{ $ecommerceProduct->id }}" data-product-name="{{ $item->product_name }}">
+                                                {{ $item->product_name }}
+                                            </option>
+                                        @endif
+                                    @endforeach
+                                @endif
                             </select>
                         </div>
 

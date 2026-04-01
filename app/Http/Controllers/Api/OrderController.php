@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\EcommerceProduct;
+use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderPayment;
@@ -17,6 +18,7 @@ use App\Models\Reward;
 use App\Models\StockRequest;
 use App\Models\StockRequestItem;
 use App\Models\SubCategory;
+use App\Notifications\NewOrderNotification;
 use App\Services\FirebaseFcmService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -213,19 +215,26 @@ class OrderController extends Controller
                 'payment_id' => 'PMT-' . strtoupper(uniqid()),
                 'transaction_id' => 'TXN-' . strtoupper(uniqid()),
                 'payment_method' => 'online',
-                'payment_gateway' => 'phonepe',
+                'payment_gateway' => 'razorpay',
                 'amount' => $total,
                 'currency' => 'INR',
                 'status' => 'Completed',
                 'processed_at' => now(),
             ]);
 
-            // send push notification 
-            $fcm->sendToToken(
-                $customer->devices()->first()->fcm_token,
-                'Order Placed',
-                'Hi, Your order has been placed successfully.'
-            );
+            // if ($customer->devices()->first()?->fcm_token) {
+            //     // send push notification 
+            //     $fcm->sendToToken(
+            //         $customer->devices()->first()->fcm_token,
+            //         'Order Placed',
+            //         'Hi, Your order has been placed successfully.'
+            //     );
+            // }
+
+            $customer->notify(new NewOrderNotification([
+                'id' => $order->id,
+                'amount' => $order->total_amount,
+            ]));
 
             return response()->json([
                 'success' => true,
@@ -325,6 +334,7 @@ class OrderController extends Controller
     }
 
 
+    // not used 
     public function requestProduct(Request $request)
     {
         $roleValidated = Validator::make($request->all(), ([
@@ -384,7 +394,7 @@ class OrderController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $order = Order::with('customer', 'orderItems', 'orderItems.product')->where('id', $order_id)->first();
+            $order = Order::with('customer', 'orderItems', 'orderItems.product', 'invoice')->where('id', $order_id)->first();
 
             if (! $order) {
                 return response()->json(['message' => 'Order not found'], 404);
@@ -431,7 +441,7 @@ class OrderController extends Controller
                 // Check if order is eligible for reward
                 $eligibleStatuses = ['delivered'];
                 $isEligible = in_array($order->status, $eligibleStatuses);
-                
+
                 $rewardData = [
                     'reward_available' => $isEligible,
                     'reward_claimed' => false,
@@ -577,13 +587,13 @@ class OrderController extends Controller
     private function getApplicableCategoriesData(Coupon $coupon): array
     {
         $categoryIds = $coupon->applicable_categories ?? [];
-        
+
         if (empty($categoryIds)) {
             return [];
         }
-        
+
         $categories = [];
-        
+
         foreach ($categoryIds as $id) {
             // Try to find in ParentCategory first
             $parentCategory = ParentCategory::find($id);
@@ -596,7 +606,7 @@ class OrderController extends Controller
                 ];
                 continue;
             }
-            
+
             // Try to find in SubCategory
             $subCategory = SubCategory::find($id);
             if ($subCategory) {
@@ -609,7 +619,7 @@ class OrderController extends Controller
                 ];
             }
         }
-        
+
         return $categories;
     }
 
@@ -619,13 +629,13 @@ class OrderController extends Controller
     private function getApplicableBrandsData(Coupon $coupon): array
     {
         $brandIds = $coupon->applicable_brands ?? [];
-        
+
         if (empty($brandIds)) {
             return [];
         }
-        
+
         $brands = Brand::whereIn('id', $brandIds)->get(['id', 'name', 'slug']);
-        
+
         return $brands->toArray();
     }
 
@@ -635,15 +645,15 @@ class OrderController extends Controller
     private function getExcludedProductsData(Coupon $coupon): array
     {
         $productIds = $coupon->excluded_products ?? [];
-        
+
         if (empty($productIds)) {
             return [];
         }
-        
+
         $products = EcommerceProduct::whereIn('id', $productIds)
             ->with(['warehouseProduct:id,product_name,sku,brand_id,parent_category_id,sub_category_id'])
             ->get(['id', 'sku', 'product_id']);
-        
+
         $result = [];
         foreach ($products as $product) {
             $item = [
@@ -651,17 +661,77 @@ class OrderController extends Controller
                 'sku' => $product->sku,
                 'product_id' => $product->product_id,
             ];
-            
+
             if ($product->warehouseProduct) {
                 $item['product_name'] = $product->warehouseProduct->product_name;
                 $item['brand_id'] = $product->warehouseProduct->brand_id;
                 $item['parent_category_id'] = $product->warehouseProduct->parent_category_id;
                 $item['sub_category_id'] = $product->warehouseProduct->sub_category_id;
             }
-            
+
             $result[] = $item;
         }
-        
+
         return $result;
+    }
+    // Order Invoices 
+    public function listOrderInvoices(Request $request)
+    {
+        $roleValidated = Validator::make($request->all(), ([
+            'user_id' => 'required|integer|exists:customers,id',
+            'role_id' => 'required|in:1,2,3,4',
+        ]));
+
+        if ($roleValidated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
+        }
+
+        $staffRole = $this->getRoleId($request->role_id);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'customers') {
+            $invoices = Invoice::with(['items', 'order'])
+                ->where('customer_id', $request->user_id)
+                ->orderByDesc('created_at')
+                ->get();
+
+            return response()->json(['success' => true, 'invoices' => $invoices], 200);
+        }
+
+        return response()->json(['success' => true, 'invoices' => []], 200);
+    }
+
+    public function orderInvoice(Request $request, $id)
+    {
+        $roleValidated = Validator::make($request->all(), ([
+            'user_id' => 'required|integer|exists:customers,id',
+            'role_id' => 'required|in:4',
+        ]));
+
+        if ($roleValidated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
+        }
+
+        $order = Order::where('id', $id)
+            ->where('customer_id', $request->user_id)
+            ->first();
+
+        if (! $order) {
+            return response()->json(['success' => false, 'message' => 'Order not found for the authenticated customer.'], 404);
+        }
+
+        $invoice = Invoice::with(['items', 'order'])
+            ->where('order_id', $order->id)
+            ->latest('id')
+            ->first();
+
+        if (! $invoice) {
+            return response()->json(['success' => false, 'message' => 'Invoice not found for this order.'], 404);
+        }
+
+        return response()->json(['success' => true, 'invoice' => $invoice], 200);
     }
 }

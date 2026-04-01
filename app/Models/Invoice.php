@@ -30,4 +30,21 @@ class Invoice extends Model
         'viewed_at',
         'paid_at',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(InvoiceItem::class);
+    }
 }
+
+

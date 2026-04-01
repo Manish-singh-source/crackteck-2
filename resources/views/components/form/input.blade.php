@@ -25,14 +25,15 @@
         name="{{ $name }}" id="{{ $id ?? $name }}" {{-- Optional Attributes --}}
         @if (!empty($placeholder)) placeholder="{{ $placeholder }}" @endif
         @if (!empty($autofocus)) autofocus @endif @if (!empty($disabled)) disabled @endif
-        @if (!empty($readonly)) readonly @endif @if (!empty($required)) required @endif {{-- Value: from old input or model --}}
+        @if (!empty($readonly)) readonly @endif @if (!empty($required)) required @endif
         @if (isset($value)) value="{{ old($name, $value) }}"
         @elseif (isset($model) && isset($model->$name))
             value="{{ old($name, $model->$name) }}"
         @else
             value="{{ old($name) }}" @endif
         {{-- Aria for screen readers on error --}} @if ($errors->has($name)) aria-describedby="{{ $name }}-feedback" @endif
-        @if (!empty($accept)) accept="{{ $accept }}" @endif>
+        @if (!empty($accept)) accept="{{ $accept }}" @endif
+        {!! !empty($attributes) ? ' ' . $attributes : '' !!}>
 
     {{-- Error message --}}
     @error($name)

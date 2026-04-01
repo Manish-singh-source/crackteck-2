@@ -12,6 +12,7 @@ class VerifyCheckoutSignatureAction
 {
     public function __construct(
         protected PaymentGatewayInterface $gateway,
+        protected GenerateOrderInvoiceAction $generateOrderInvoiceAction,
     ) {}
 
     public function execute(Order $order, Payment $payment, string $gatewayPaymentId, string $signature): Payment
@@ -51,7 +52,13 @@ class VerifyCheckoutSignatureAction
                     'response_data' => $gatewayPayment,
                 ]);
 
+            if ($status === 'captured') {
+                $this->generateOrderInvoiceAction->execute($order);
+            }
+
             return $payment->fresh();
         });
     }
 }
+
+

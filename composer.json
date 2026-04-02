@@ -19,6 +19,7 @@
         "laravel/ui": "^4.6",
         "laravolt/avatar": "^6.2",
         "milon/barcode": "^12.0",
+        "opcodesio/log-viewer": "^3.24",
         "php-flasher/flasher-laravel": "^2.1",
         "rappasoft/laravel-authentication-log": "^6.0",
         "razorpay/razorpay": "^2.9",

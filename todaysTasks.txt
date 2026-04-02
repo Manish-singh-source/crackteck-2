@@ -204,9 +204,9 @@ Crackteck CRM and Website:
 
 1. Dashboard Pages: 
     - E-commerce                                                - done 
-    - CRM 
+    - CRM                                                 - done 
     - Warehouse                                                - done 
-    - Sales Reports 
+    - Sales Reports                                                 - done 
 2. Chats Module 
 3. Field Issues                                               - done 
 5. E-commerce Website:
@@ -391,6 +391,10 @@ Todays Tasks:
 
 
 
+Date: 01 April 2026
+
+Todays Tasks:
+
 
 #Saurabh 
 
@@ -400,10 +404,26 @@ Todays Tasks:
 2. Headquaters: Implement the ‘Shipped’ button and the ‘Vendor PI Update’ button
 
 
+Date: 02 April 2026
+
+Todays Tasks:
+
+#Saurabh 
+
+Crackteck E-commerce: 
+
+1. Adding Meta tags in website for seo 
+2. Replace dummy content from pages like about us, FAQs, etc. 
+3. Improve performance of website 
+
+
+
 
 
 https://github.com/HackRoot1/Laravel-Learning/blob/main/20.%20Log%20Viewer%20Package.md 
 
 https://github.com/HackRoot1/Laravel-Learning/blob/main/21.%20spatie_laravel-uptime-monitor%20README.md
 
-    
+http://github.com/Honeystone/laravel-seo 
+
+

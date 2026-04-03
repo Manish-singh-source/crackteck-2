@@ -59,7 +59,7 @@
                                                 @php
                                                     $roleOptions = ['' => '--Select--'];
                                                     foreach ($roles as $role) {
-                                                        $roleOptions[$role->name] = $role->name;
+                                                        $roleOptions[str_replace(' ' , '_' ,strtolower($role->name))] = $role->name;
                                                     }
 
                                                     $selectedRole = old('staff_role', $staff->staff_role ?? '');

@@ -716,7 +716,7 @@
 
                                 <div class="detail-label">
                                     <strong>Note:</strong> By proceeding, you agree to our <a
-                                        href="{{ route('t&c') }}">Terms &amp; Conditions.</a>
+                                        href="{{ route('onsite-amc-t-n-c') }}"> <span class="text-primary"> Terms &amp; Conditions. </span> </a>
                                 </div>
                             </div>
                         </div>

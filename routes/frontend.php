@@ -179,6 +179,21 @@ Route::prefix('/')->group(function () {
         return view('frontend/t&c');
     })->name('t&c');
 
+    // Order Terms & Conditions
+    Route::get('/order-t-n-c', function () {
+        return view('frontend/order-t-n-c');
+    })->name('order-t-n-c');
+
+    // Onsite AMC Terms & Conditions
+    Route::get('/onsite-amc-t-n-c', function () {
+        return view('frontend/onsite-amc-t-n-c');
+    })->name('onsite-amc-t-n-c');
+
+    // Remote AMC Terms & Conditions
+    Route::get('/remote-amc-t-n-c', function () {
+        return view('frontend/remote-amc-t-n-c');
+    })->name('remote-amc-t-n-c');
+
     // Shipping Information
     Route::get('/shipping-info', function () {
         return view('frontend/shipping-info');

@@ -306,7 +306,7 @@ class StaffController extends Controller
     {
         $staff = Staff::findOrFail($id);
 
-        $validated = $request->validate([
+        $validated = Validator::make($request->all(), [
             // Staff main
             'staff_role' => 'required',
             'first_name' => 'required|string|max:255',
@@ -369,6 +369,11 @@ class StaffController extends Controller
             'police_verification_status' => 'nullable|in:pending,completed',
             'police_certificate' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
+
+        
+        if ($validated->fails()) {
+            return back()->withErrors($validated)->withInput();
+        }
 
         try {
             \DB::transaction(function () use ($request, $validated, $staff) {

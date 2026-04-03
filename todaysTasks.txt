@@ -203,10 +203,10 @@ Crackteck App:
 Crackteck CRM and Website: 
 
 1. Dashboard Pages: 
-    - E-commerce 
-    - CRM 
-    - Warehouse 
-    - Sales Reports 
+    - E-commerce                                                - done 
+    - CRM                                                 - done 
+    - Warehouse                                                - done 
+    - Sales Reports                                                 - done 
 2. Chats Module 
 3. Field Issues                                               - done 
 5. E-commerce Website:
@@ -224,7 +224,7 @@ Crackteck CRM and Website:
 13. Terms and conditions adding for AMCs                                - dummy added
 14. WhatsApp APIs integration and Facebook login integration 
 15. Client Changes as defined in MoM                                              - done 
-16. Customer Reviews 
+16. Customer Reviews                                               - done 
 
 
 
@@ -379,4 +379,51 @@ Todays Tasks:
 
 #Saurabh & #Shubham
 1. Crackteck: App Testing Customer
+
+
+
+Date: 31 March 2026
+
+Todays Tasks:
+
+#Saurabh & #Shubham
+1. Crackteck: App Testing Customer
+
+
+
+Date: 01 April 2026
+
+Todays Tasks:
+
+
+#Saurabh 
+
+1. Crackteck: Dashboard Pages: 
+    - E-commerce - Checking and correcting data
+    - Warehouse  - implementing 
+2. Headquaters: Implement the ‘Shipped’ button and the ‘Vendor PI Update’ button
+
+
+Date: 02 April 2026
+
+Todays Tasks:
+
+#Saurabh 
+
+Crackteck E-commerce: 
+
+1. Adding Meta tags in website for seo 
+2. Replace dummy content from pages like about us, FAQs, etc. 
+3. Improve performance of website 
+
+
+
+
+
+https://github.com/HackRoot1/Laravel-Learning/blob/main/20.%20Log%20Viewer%20Package.md 
+
+https://github.com/HackRoot1/Laravel-Learning/blob/main/21.%20spatie_laravel-uptime-monitor%20README.md
+
+http://github.com/Honeystone/laravel-seo 
+
 

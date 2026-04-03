@@ -13,6 +13,7 @@ use App\Http\Controllers\CaseTransferController;
 use App\Http\Controllers\CashReceivedController;
 use App\Http\Controllers\ClientReceiptController;
 use App\Http\Controllers\CreditorsReportController;
+use App\Http\Controllers\CrmDashboardController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\Delivery;
 use App\Http\Controllers\EngineerController;
@@ -162,9 +163,8 @@ Route::prefix('/demo')->group(function () {
     // *******************************************************************************************************************************************************
 
     // Index Page
-    Route::get('/crm/index', function () {
-        return view('/crm/index');
-    })->name('crm/index');
+    Route::get('/crm/index', [CrmDashboardController::class, 'index'])->name('crm/index');
+    Route::get('/crm/dashboard-data', [CrmDashboardController::class, 'data'])->name('crm.dashboard.data');
 
     // ------------------------------------------------------------ Access Control ( Staff Page) -------------------------------------------------------------
 
@@ -938,3 +938,4 @@ Route::prefix('/demo')->group(function () {
         Route::post('crm/quick-service-requests/assign-engineer', 'assignEngineer')->name('quick-service-requests.assign-engineer');
     });
 });
+

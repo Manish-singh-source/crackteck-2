@@ -462,6 +462,10 @@
                                     id="total-amount">₹{{ number_format($totals['total'], 2) }}</span>
                             </li>
                         </ul>
+
+                        <div class="detail-label">
+                            <i class="fa-solid fa-file" style="color: rgb(0, 0, 0);"></i> By proceeding, you agree to our <a href="{{ route('order-t-n-c') }}"> <span class="text-primary"> Terms &amp; Conditions. </span> </a>
+                        </div>
                     </div>
                 </div>
             </form>

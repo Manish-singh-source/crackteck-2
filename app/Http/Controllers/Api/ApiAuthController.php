@@ -812,15 +812,20 @@ class ApiAuthController extends Controller
 
             if ($staffRole == 'customers') {
                 $user = Customer::where('phone', $request->phone_number)
-                    ->where('status', 'active')
+                    // ->where('status', 'active')
                     ->first();
             } else {
                 $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)
-                    ->where('status', 'active')
+                    // ->where('status', 'active')
                     ->first();
             }
             if (! $user) {
                 return response()->json(['success' => false, 'message' => 'User not found with the provided phone number.'], 404);
+            }
+
+            if ($user->status !== 'active'){
+                return response()->json(['success' => false,
+                'message' => 'Wait for Admin Approval.'])
             }
 
             $otp = rand(1000, 9999);

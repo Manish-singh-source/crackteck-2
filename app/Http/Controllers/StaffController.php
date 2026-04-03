@@ -386,7 +386,7 @@ class StaffController extends Controller
                     'employment_type' => $validated['employment_type'] ?? null,
                     'joining_date' => $validated['joining_date'] ?? null,
                     'assigned_area' => $validated['assigned_area'] ?? null,
-                    'status' => $validated['status'] ?? 1,
+                    'status' => $validated['status'] ?? 'pending',
                 ]);
 
                 // 2. Address

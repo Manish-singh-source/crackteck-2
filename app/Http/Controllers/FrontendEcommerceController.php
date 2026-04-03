@@ -9,6 +9,7 @@ use App\Models\ParentCategory;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Spatie\SchemaOrg\Schema;
 
 class FrontendEcommerceController extends Controller
 {
@@ -132,6 +133,51 @@ class FrontendEcommerceController extends Controller
         // Generate product features list from description
         $productFeatures = $this->extractProductFeatures($product);
 
+        // dd($product->seo());
+
+        $productName = $product->meta_title ?: $product->warehouseProduct?->product_name;
+        $productDescription = $product->meta_description
+            ?: $product->short_description
+            ?: $product->warehouseProduct?->short_description;
+        $productImage = $product->warehouseProduct?->main_product_image
+            ? asset($product->warehouseProduct->main_product_image)
+            : asset('frontend-assets/images/placeholder-product.png');
+        $productUrl = route('ecommerce.product.detail', $product->id);
+        $productPrice = $product->warehouseProduct?->final_price
+            ?: $product->warehouseProduct?->selling_price
+            ?: 0;
+        $availability = (
+            ($product->warehouseProduct?->stock_status === 'in_stock')
+            || (($product->warehouseProduct?->stock_quantity ?? 0) > 0)
+        )
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock';
+
+        $product->seo()
+            ->openGraphType('product')
+            ->twitterCard('summary_large_image')
+            ->jsonLdName($productName)
+            ->jsonLdDescription($productDescription)
+            ->jsonLdImage($productImage)
+            ->jsonLdUrl($productUrl);
+
+        seo()->jsonLdGraph()
+            ->product('product-' . $product->id, function ($schema) use ($product, $productName, $productDescription, $productImage, $productPrice, $availability, $productUrl) {
+                $schema
+                    ->name($productName)
+                    ->description($productDescription)
+                    ->sku($product->sku ?: $product->warehouseProduct?->sku)
+                    ->image([$productImage])
+                    ->url($productUrl)
+                    ->offers(
+                        Schema::offer()
+                            ->priceCurrency('INR')
+                            ->price($productPrice)
+                            ->availability($availability)
+                            ->url($productUrl)
+                    );
+            });
+                
         return view('frontend.ecommerce-product-detail', compact(
             'product',
             'recentlyViewed',
@@ -840,3 +886,5 @@ class FrontendEcommerceController extends Controller
         }
     }
 }
+
+

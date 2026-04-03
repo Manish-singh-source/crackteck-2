@@ -204,15 +204,30 @@ Crackteck CRM and Website:
 
 1. Dashboard Pages: 
     - E-commerce                                                - done 
-    - CRM                                                 - done 
-    - Warehouse                                                - done 
-    - Sales Reports                                                 - done 
-2. Chats Module 
-3. Field Issues                                               - done 
+    - CRM                                                       - done 
+    - Warehouse                                                 - done 
+    - Sales Reports                                             - done 
+3. Field Issues                                                 - done 
 5. E-commerce Website:
-    - Adding Meta tags in website 
-    - Replace dummy content from pages like about us, FAQs, etc. 
+    - Adding Meta tags in website                               - done
+    - Replace dummy content from pages like about us, FAQs, etc.                                                  
     - Improve performance of website 
+        - .webp format images 
+        - alt text for img and anchor tags 
+        - title for images 
+        - defer for js scripts 
+        - lazy load for images 
+        - remove unwanted code 
+        - broken links 
+        - lighthouse 
+        - robots.txt 
+        - sitemap 
+        - google analytics 
+        - google manager 
+        - canonical tags 
+        - favicon 
+        - schema ld 
+        - 
 
 6. Forgot Password Feature                                              - done 
 7. Check Auth redirects properly                                        - done
@@ -227,6 +242,7 @@ Crackteck CRM and Website:
 16. Customer Reviews                                               - done 
 
 
+2. Chats Module 
 
 
 MyCRM: 
@@ -413,7 +429,6 @@ Todays Tasks:
 Crackteck E-commerce: 
 
 1. Adding Meta tags in website for seo 
-2. Replace dummy content from pages like about us, FAQs, etc. 
 3. Improve performance of website 
 
 

@@ -12,6 +12,7 @@
         "google/auth": "^1.50",
         "google/cloud-storage": "^1.49",
         "guzzlehttp/guzzle": "^7.10",
+        "honeystone/laravel-seo": "^2.1",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.2",
         "laravel/socialite": "^5.24",
@@ -26,6 +27,7 @@
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-db-snapshots": "^2.9",
         "spatie/laravel-permission": "^6.21",
+        "spatie/schema-org": "^4.0",
         "spatie/simple-excel": "^3.7",
         "tecnickcom/tcpdf": "^6.10",
         "tymon/jwt-auth": "^2.2"

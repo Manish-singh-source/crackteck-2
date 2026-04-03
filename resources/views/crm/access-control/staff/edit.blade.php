@@ -730,7 +730,7 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Status',
                                                     'name' => 'status',
-                                                    'value' => '1', // Active selected by default
+                                                    'value' => 'pending', // Active selected by default
                                                     'options' => [
                                                         '' => '--Select--',
                                                         'inactive' => 'Inactive',

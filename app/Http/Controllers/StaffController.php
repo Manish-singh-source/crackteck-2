@@ -380,28 +380,28 @@ class StaffController extends Controller
 
                 // 1. Staff
                 $staff->update([
-                    'staff_role' => $validated['staff_role'],
-                    'first_name' => $validated['first_name'],
-                    'last_name' => $validated['last_name'] ?? null,
-                    'phone' => $validated['phone'],
-                    'email' => $validated['email'],
-                    'dob' => $validated['dob'] ?? null,
-                    'gender' => $validated['gender'] ?? null,
-                    'marital_status' => $validated['marital_status'] ?? null,
-                    'employment_type' => $validated['employment_type'] ?? null,
-                    'joining_date' => $validated['joining_date'] ?? null,
-                    'assigned_area' => $validated['assigned_area'] ?? null,
-                    'status' => $validated['status'] ?? 'pending',
+                    'staff_role' => $request->staff_role,
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name ?? null,
+                    'phone' => $request->phone,
+                    'email' => $request->email,
+                    'dob' => $request->dob ?? null,
+                    'gender' => $request->gender ?? null,
+                    'marital_status' => $request->marital_status ?? null,
+                    'employment_type' => $request->employment_type ?? null,
+                    'joining_date' => $request->joining_date ?? null,
+                    'assigned_area' => $request->assigned_area ?? null,
+                    'status' => $request->status ?? 'pending',
                 ]);
 
                 // 2. Address
                 $staff->address()->updateOrCreate([], [
-                    'address1' => $validated['address1'],
-                    'address2' => $validated['address2'] ?? null,
-                    'city' => $validated['city'],
-                    'state' => $validated['state'],
-                    'country' => $validated['country'],
-                    'pincode' => $validated['pincode'],
+                    'address1' => $request->address1,
+                    'address2' => $request->address2 ?? null,
+                    'city' => $request->city,
+                    'state' => $request->state,
+                    'country' => $request->country,
+                    'pincode' => $request->pincode,
                 ]);
 
                 // ---------- File uploads to public disk (storage/app/public) ----------
@@ -463,55 +463,55 @@ class StaffController extends Controller
 
                 // 3. Bank
                 $staff->bankDetails()->updateOrCreate([], [
-                    'bank_acc_holder_name' => $validated['bank_acc_holder_name'] ?? optional($staff->bankDetails)->bank_acc_holder_name,
-                    'bank_acc_number' => $validated['bank_acc_number'] ?? optional($staff->bankDetails)->bank_acc_number,
-                    'bank_name' => $validated['bank_name'] ?? optional($staff->bankDetails)->bank_name,
-                    'ifsc_code' => $validated['ifsc_code'] ?? optional($staff->bankDetails)->ifsc_code,
+                    'bank_acc_holder_name' => $request->bank_acc_holder_name ?? optional($staff->bankDetails)->bank_acc_holder_name,
+                    'bank_acc_number' => $request->bank_acc_number ?? optional($staff->bankDetails)->bank_acc_number,
+                    'bank_name' => $request->bank_name ?? optional($staff->bankDetails)->bank_name,
+                    'ifsc_code' => $request->ifsc_code ?? optional($staff->bankDetails)->ifsc_code,
                     'passbook_pic' => $passbookPath ?? optional($staff->bankDetails)->passbook_pic,
                 ]);
 
                 // 4. Work skills
                 $staff->workSkills()->updateOrCreate([], [
-                    'primary_skills' => isset($validated['primary_skills'])
-                        ? json_encode($validated['primary_skills'])
+                    'primary_skills' => isset($request->primary_skills)
+                        ? json_encode($request->primary_skills)
                         : optional($staff->workSkills)->primary_skills,
-                    'languages_known' => isset($validated['languages_known'])
-                        ? json_encode($validated['languages_known'])
+                    'languages_known' => isset($request->languages_known)
+                        ? json_encode($request->languages_known)
                         : optional($staff->workSkills)->languages_known,
                     'certifications' => $certPath ?? optional($staff->workSkills)->certifications,
-                    'experience' => $validated['experience'] ?? optional($staff->workSkills)->experience,
-                    'qualification' => $validated['qualification'] ?? optional($staff->workSkills)->qualification,
+                    'experience' => $request->experience ?? optional($staff->workSkills)->experience,
+                    'qualification' => $request->qualification ?? optional($staff->workSkills)->qualification,
                     'qualification_certifications' => $qualCertPath ?? optional($staff->workSkills)->qualification_certifications,
                     'address_proof' => $addressProofPath ?? optional($staff->workSkills)->address_proof,
                 ]);
 
                 // 5. Aadhar
                 $staff->aadharDetails()->updateOrCreate([], [
-                    'aadhar_number' => $validated['aadhar_number'] ?? optional($staff->aadharDetails)->aadhar_number,
+                    'aadhar_number' => $request->aadhar_number ?? optional($staff->aadharDetails)->aadhar_number,
                     'aadhar_front_path' => $aadharFront ?? optional($staff->aadharDetails)->aadhar_front_path,
                     'aadhar_back_path' => $aadharBack ?? optional($staff->aadharDetails)->aadhar_back_path,
                 ]);
 
                 // 6. PAN
                 $staff->panDetails()->updateOrCreate([], [
-                    'pan_number' => $validated['pan_number'] ?? optional($staff->panDetails)->pan_number,
+                    'pan_number' => $request->pan_number ?? optional($staff->panDetails)->pan_number,
                     'pan_card_front_path' => $panFront ?? optional($staff->panDetails)->pan_card_front_path,
                     'pan_card_back_path' => $panBack ?? optional($staff->panDetails)->pan_card_back_path,
                 ]);
 
                 // 7. Vehicle
                 $staff->vehicleDetails()->updateOrCreate([], [
-                    'vehicle_type' => $validated['vehicle_type'] ?? optional($staff->vehicleDetails)->vehicle_type,
-                    'vehicle_number' => $validated['vehicle_number'] ?? optional($staff->vehicleDetails)->vehicle_number,
-                    'driving_license_no' => $validated['driving_license_no'] ?? optional($staff->vehicleDetails)->driving_license_no,
+                    'vehicle_type' => $request->vehicle_type ?? optional($staff->vehicleDetails)->vehicle_type,
+                    'vehicle_number' => $request->vehicle_number ?? optional($staff->vehicleDetails)->vehicle_number,
+                    'driving_license_no' => $request->driving_license_no ?? optional($staff->vehicleDetails)->driving_license_no,
                     'driving_license_front_path' => $dlFront ?? optional($staff->vehicleDetails)->driving_license_front_path,
                     'driving_license_back_path' => $dlBack ?? optional($staff->vehicleDetails)->driving_license_back_path,
                 ]);
 
                 // 8. Police verification
                 $staff->policeVerification()->updateOrCreate([], [
-                    'police_verification' => $validated['police_verification'] ?? optional($staff->policeVerification)->police_verification,
-                    'police_verification_status' => $validated['police_verification_status'] ?? optional($staff->policeVerification)->police_verification_status,
+                    'police_verification' => $request->police_verification ?? optional($staff->policeVerification)->police_verification,
+                    'police_verification_status' => $request->police_verification_status ?? optional($staff->policeVerification)->police_verification_status,
                     'police_certificate' => $policeCert ?? optional($staff->policeVerification)->police_certificate,
                 ]);
             });

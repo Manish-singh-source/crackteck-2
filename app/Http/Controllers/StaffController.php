@@ -516,7 +516,7 @@ class StaffController extends Controller
                 ]);
             });
         } catch (\Exception $e) {
-
+            dd($e->getMessage());
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['error' => 'An error occurred while updating the staff data. Please try again.']);

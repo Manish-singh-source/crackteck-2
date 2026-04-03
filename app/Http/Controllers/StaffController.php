@@ -370,7 +370,7 @@ class StaffController extends Controller
             'police_certificate' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
 
-        
+
         if ($validated->fails()) {
             return back()->withErrors($validated)->withInput();
         }
@@ -462,58 +462,70 @@ class StaffController extends Controller
                 }
 
                 // 3. Bank
-                $staff->bankDetails()->updateOrCreate([], [
-                    'bank_acc_holder_name' => $request->bank_acc_holder_name ?? optional($staff->bankDetails)->bank_acc_holder_name,
-                    'bank_acc_number' => $request->bank_acc_number ?? optional($staff->bankDetails)->bank_acc_number,
-                    'bank_name' => $request->bank_name ?? optional($staff->bankDetails)->bank_name,
-                    'ifsc_code' => $request->ifsc_code ?? optional($staff->bankDetails)->ifsc_code,
-                    'passbook_pic' => $passbookPath ?? optional($staff->bankDetails)->passbook_pic,
-                ]);
+                if ($request->filled('bank_acc_holder_name')) {
+                    $staff->bankDetails()->updateOrCreate([], [
+                        'bank_acc_holder_name' => $request->bank_acc_holder_name ?? optional($staff->bankDetails)->bank_acc_holder_name,
+                        'bank_acc_number' => $request->bank_acc_number ?? optional($staff->bankDetails)->bank_acc_number,
+                        'bank_name' => $request->bank_name ?? optional($staff->bankDetails)->bank_name,
+                        'ifsc_code' => $request->ifsc_code ?? optional($staff->bankDetails)->ifsc_code,
+                        'passbook_pic' => $passbookPath ?? optional($staff->bankDetails)->passbook_pic,
+                    ]);
+                }
 
                 // 4. Work skills
-                $staff->workSkills()->updateOrCreate([], [
-                    'primary_skills' => isset($request->primary_skills)
-                        ? json_encode($request->primary_skills)
-                        : optional($staff->workSkills)->primary_skills,
-                    'languages_known' => isset($request->languages_known)
-                        ? json_encode($request->languages_known)
-                        : optional($staff->workSkills)->languages_known,
-                    'certifications' => $certPath ?? optional($staff->workSkills)->certifications,
-                    'experience' => $request->experience ?? optional($staff->workSkills)->experience,
-                    'qualification' => $request->qualification ?? optional($staff->workSkills)->qualification,
-                    'qualification_certifications' => $qualCertPath ?? optional($staff->workSkills)->qualification_certifications,
-                    'address_proof' => $addressProofPath ?? optional($staff->workSkills)->address_proof,
-                ]);
+                if ($request->filled('primary_skills')) {
+                    $staff->workSkills()->updateOrCreate([], [
+                        'primary_skills' => isset($request->primary_skills)
+                            ? json_encode($request->primary_skills)
+                            : optional($staff->workSkills)->primary_skills,
+                        'languages_known' => isset($request->languages_known)
+                            ? json_encode($request->languages_known)
+                            : optional($staff->workSkills)->languages_known,
+                        'certifications' => $certPath ?? optional($staff->workSkills)->certifications,
+                        'experience' => $request->experience ?? optional($staff->workSkills)->experience,
+                        'qualification' => $request->qualification ?? optional($staff->workSkills)->qualification,
+                        'qualification_certifications' => $qualCertPath ?? optional($staff->workSkills)->qualification_certifications,
+                        'address_proof' => $addressProofPath ?? optional($staff->workSkills)->address_proof,
+                    ]);
+                }
 
                 // 5. Aadhar
-                $staff->aadharDetails()->updateOrCreate([], [
-                    'aadhar_number' => $request->aadhar_number ?? optional($staff->aadharDetails)->aadhar_number,
-                    'aadhar_front_path' => $aadharFront ?? optional($staff->aadharDetails)->aadhar_front_path,
-                    'aadhar_back_path' => $aadharBack ?? optional($staff->aadharDetails)->aadhar_back_path,
-                ]);
+                if ($request->filled('aadhar_number')) {
+                    $staff->aadharDetails()->updateOrCreate([], [
+                        'aadhar_number' => $request->aadhar_number ?? optional($staff->aadharDetails)->aadhar_number,
+                        'aadhar_front_path' => $aadharFront ?? optional($staff->aadharDetails)->aadhar_front_path,
+                        'aadhar_back_path' => $aadharBack ?? optional($staff->aadharDetails)->aadhar_back_path,
+                    ]);
+                }
 
                 // 6. PAN
-                $staff->panDetails()->updateOrCreate([], [
-                    'pan_number' => $request->pan_number ?? optional($staff->panDetails)->pan_number,
-                    'pan_card_front_path' => $panFront ?? optional($staff->panDetails)->pan_card_front_path,
-                    'pan_card_back_path' => $panBack ?? optional($staff->panDetails)->pan_card_back_path,
-                ]);
+                if ($request->filled('pan_number')) {
+                    $staff->panDetails()->updateOrCreate([], [
+                        'pan_number' => $request->pan_number ?? optional($staff->panDetails)->pan_number,
+                        'pan_card_front_path' => $panFront ?? optional($staff->panDetails)->pan_card_front_path,
+                        'pan_card_back_path' => $panBack ?? optional($staff->panDetails)->pan_card_back_path,
+                    ]);
+                }
 
                 // 7. Vehicle
-                $staff->vehicleDetails()->updateOrCreate([], [
-                    'vehicle_type' => $request->vehicle_type ?? optional($staff->vehicleDetails)->vehicle_type,
-                    'vehicle_number' => $request->vehicle_number ?? optional($staff->vehicleDetails)->vehicle_number,
-                    'driving_license_no' => $request->driving_license_no ?? optional($staff->vehicleDetails)->driving_license_no,
-                    'driving_license_front_path' => $dlFront ?? optional($staff->vehicleDetails)->driving_license_front_path,
-                    'driving_license_back_path' => $dlBack ?? optional($staff->vehicleDetails)->driving_license_back_path,
-                ]);
+                if ($request->filled('vehicle_type')) {
+                    $staff->vehicleDetails()->updateOrCreate([], [
+                        'vehicle_type' => $request->vehicle_type ?? optional($staff->vehicleDetails)->vehicle_type,
+                        'vehicle_number' => $request->vehicle_number ?? optional($staff->vehicleDetails)->vehicle_number,
+                        'driving_license_no' => $request->driving_license_no ?? optional($staff->vehicleDetails)->driving_license_no,
+                        'driving_license_front_path' => $dlFront ?? optional($staff->vehicleDetails)->driving_license_front_path,
+                        'driving_license_back_path' => $dlBack ?? optional($staff->vehicleDetails)->driving_license_back_path,
+                    ]);
+                }
 
                 // 8. Police verification
-                $staff->policeVerification()->updateOrCreate([], [
-                    'police_verification' => $request->police_verification ?? optional($staff->policeVerification)->police_verification,
-                    'police_verification_status' => $request->police_verification_status ?? optional($staff->policeVerification)->police_verification_status,
-                    'police_certificate' => $policeCert ?? optional($staff->policeVerification)->police_certificate,
-                ]);
+                if ($request->filled('police_verification')) {
+                    $staff->policeVerification()->updateOrCreate([], [
+                        'police_verification' => $request->police_verification ?? optional($staff->policeVerification)->police_verification,
+                        'police_verification_status' => $request->police_verification_status ?? optional($staff->policeVerification)->police_verification_status,
+                        'police_certificate' => $policeCert ?? optional($staff->policeVerification)->police_certificate,
+                    ]);
+                }
             });
         } catch (\Exception $e) {
             dd($e->getMessage());

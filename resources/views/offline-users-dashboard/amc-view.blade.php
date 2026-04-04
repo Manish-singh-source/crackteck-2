@@ -353,7 +353,7 @@
                             </div>
                             <div class="info-item">
                                 <span class="label">Plan Type</span>
-                                <span class="value">AMC Service</span>
+                                <span class="value">{{ ucfirst($amcService->amc_type ?? 'N/A') }}</span>
                             </div>
                             <div class="info-item">
                                 <span class="label">Priority Level</span>

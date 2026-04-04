@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Honeystone\Seo\MetadataDirector;
 
 class EcommerceProduct extends Model
 {
@@ -56,6 +57,25 @@ class EcommerceProduct extends Model
     public function warehouseProduct()
     {
         return $this->belongsTo(Product::class, 'product_id');
+    }
+
+
+    public function seo(): MetadataDirector
+    {
+        $title = $this->meta_title ?: $this->warehouseProduct?->product_name;
+        $description = $this->meta_description
+            ?: $this->short_description
+            ?: $this->warehouseProduct?->short_description;
+        $image = $this->warehouseProduct?->main_product_image
+            ? asset($this->warehouseProduct->main_product_image)
+            : asset('frontend-assets/images/placeholder-product.png');
+
+        return seo()
+            ->title($title, config('app.name'))
+            ->description($description)
+            ->keywords(...array_filter(array_map('trim', explode(',', (string) $this->meta_keywords))))
+            ->canonical(route('ecommerce.product.detail', $this->id))
+            ->images($image);
     }
 
     public function brand()
@@ -111,3 +131,4 @@ class EcommerceProduct extends Model
         return $query->where('status', 'active');
     }
 }
+

@@ -416,6 +416,18 @@ class AllServicesController extends Controller
                     $data = $servicesRequest->load('products');
                 }
 
+                if ($request->amc_type === 'onsite') {
+                    Lead::create([
+                        'customer_id' => $request->user_id,
+                        'staff_id' => null,
+                        'customer_address_id' => $request->customer_address_id ? $request->customer_address_id : null,
+                        'lead_number' => uniqid(),
+                        'requirement_type' => 'amc',
+                        'budget_range' => null,
+                        'estimated_value' => null,
+                        'notes' => $request->additional_notes ?? null,
+                    ]);
+                }
                 DB::commit();
 
                 return response()->json(['quick_service_request' => $data], 200);

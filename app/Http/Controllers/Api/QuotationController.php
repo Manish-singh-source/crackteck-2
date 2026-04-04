@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\QuotationResource;
 use App\Models\AmcPlan;
@@ -32,10 +33,10 @@ class QuotationController extends Controller
         $quotations = Quotation::with('leadDetails', 'products', 'amcDetail')->where('staff_id', $validated['user_id'])->get();
 
         if ($quotations->isEmpty()) {
-            return response()->json(['message' => 'No quotations found'], 404);
+            return ApiResponse::error('No quotations found', 200);
         }
 
-        return response()->json(['success' => true, 'message' => 'Quotations found successfully.', 'data' => $quotations]);
+        return ApiResponse::success('Quotations found successfully.', $quotations);
     }
 
     // I want to create quotation with there products details

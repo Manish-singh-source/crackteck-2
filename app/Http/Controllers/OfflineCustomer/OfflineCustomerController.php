@@ -124,6 +124,10 @@ class OfflineCustomerController extends Controller
 
     public function accountDetail()
     {
+        if (! Auth::guard('customer_web')->check()) {
+            return redirect()->route('offlinelogin')->with('error', 'Please login to view ticket details.');
+        } 
+        
         $customer = Auth::guard('customer_web')->user();
         $customerId = $customer instanceof \App\Models\Customer ? $customer->id : $customer->getAuthIdentifier();
         $primaryAddress = CustomerAddressDetail::where('is_primary', 'yes')
@@ -151,6 +155,10 @@ class OfflineCustomerController extends Controller
 
     public function changePassword()
     {
+        if (! Auth::guard('customer_web')->check()) {
+            return redirect()->route('offlinelogin')->with('error', 'Please login to view ticket details.');
+        }
+        
         return view('offline-users-dashboard.password');
     }
 

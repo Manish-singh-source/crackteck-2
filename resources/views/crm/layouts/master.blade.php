@@ -96,7 +96,7 @@
                 &copy;
                 <script>
                     document.write(new Date().getFullYear())
-                </script> - Made by <a href="#!"
+                </script> - Made by <a href="https://technofra.com/" target="_blank"
                     class="text-reset fw-semibold">Technofra</a>
             </div>
         </div>

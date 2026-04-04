@@ -566,7 +566,7 @@
                             </ul>
                             <p class="nocopy caption text-center">
                                 <span class="fw-medium">Crackteck </span>© <script>document.write(new Date().getFullYear());</script>. All right reserved - Designed by
-                                Technofra
+                                <a href="https://technofra.com/" style="color: #fff" target="_blank">Technofra</a>
                             </p>
                         </div>
                     </div>

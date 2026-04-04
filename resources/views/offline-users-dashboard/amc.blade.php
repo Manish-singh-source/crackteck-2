@@ -15,11 +15,11 @@
                         </ol>
                     </nav>
                 </div>
-                <div>
+                {{-- <div>
                     <a href="{{ route('amc') }}" class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm">
                         <i class="fas fa-plus me-1"></i> New Request
                     </a>
-                </div>
+                </div> --}}
             </div>
 
             <!-- AMC Stats Summary -->

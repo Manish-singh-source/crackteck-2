@@ -34,6 +34,41 @@
 
             <ul class="list-unstyled topnav-menu mb-0 d-flex align-items-center">
 
+                {{-- model module  --}}
+                <li class="d-none d-sm-flex dropdown notification-list topbar-dropdown">
+
+                    <!-- Dropdown Toggle -->
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">
+                        <i class="fa-solid fa-headset" style="color: rgb(77, 77, 77); font-size: 25px;"></i> 
+                    </a>
+
+                    <!-- Dropdown Menu -->
+                    <div class="dropdown-menu dropdown-menu-end">
+
+                        <!-- Header -->
+                        <h6 class="dropdown-header">Support</h6>
+
+                        <!-- Email -->
+                        <a href="mailto:dev@crackteck.com" class="dropdown-item notify-item">
+                            <i class="ri-user-settings-line fs-16 align-middle me-1"></i>
+                            <span>dev@crackteck.com</span>
+                        </a>
+
+                        <!-- Phone -->
+                        <a href="tel:+918828813603" class="dropdown-item notify-item">
+                            <i class="ri-phone-line fs-16 align-middle me-1"></i>
+                            <span>+91 88288 13603</span>
+                        </a>
+
+                        <!-- WhatsApp -->
+                        <a href="https://wa.me/918828813603" target="_blank" class="dropdown-item notify-item">
+                            <i class="ri-whatsapp-line fs-16 align-middle me-1 text-success"></i>
+                            <span>Chat on WhatsApp</span>
+                        </a>
+
+                    </div>
+                </li>
+
                 <li class="d-none d-sm-flex dropdown notification-list topbar-dropdown">
                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
                         aria-haspopup="false" aria-expanded="false">
@@ -54,8 +89,8 @@
                             <a href="javascript:void(0);"
                                 class="dropdown-item notify-item text-muted link-primary active">
                                 <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-12.jpg') }}" class="img-fluid rounded-circle"
-                                        alt="" />
+                                    <img src="{{ asset('assets/images/users/user-12.jpg') }}"
+                                        class="img-fluid rounded-circle" alt="" />
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between">
                                     <p class="notify-details">Carl Steadham</p>
@@ -68,11 +103,10 @@
                             </a>
 
                             <!-- item-->
-                            <a href="javascript:void(0);"
-                                class="dropdown-item notify-item text-muted link-primary">
+                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
                                 <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-2.jpg') }}" class="img-fluid rounded-circle"
-                                        alt="" />
+                                    <img src="{{ asset('assets/images/users/user-2.jpg') }}"
+                                        class="img-fluid rounded-circle" alt="" />
                                 </div>
                                 <div class="notify-content">
                                     <div class="d-flex align-items-center justify-content-between">
@@ -94,11 +128,10 @@
                             </a>
 
                             <!-- item-->
-                            <a href="javascript:void(0);"
-                                class="dropdown-item notify-item text-muted link-primary">
+                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
                                 <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-3.jpg') }}" class="img-fluid rounded-circle"
-                                        alt="" />
+                                    <img src="{{ asset('assets/images/users/user-3.jpg') }}"
+                                        class="img-fluid rounded-circle" alt="" />
                                 </div>
                                 <div class="notify-content">
                                     <div class="d-flex align-items-center justify-content-between">
@@ -113,11 +146,10 @@
                             </a>
 
                             <!-- item-->
-                            <a href="javascript:void(0);"
-                                class="dropdown-item notify-item text-muted link-primary">
+                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
                                 <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-8.jpg') }}" class="img-fluid rounded-circle"
-                                        alt="" />
+                                    <img src="{{ asset('assets/images/users/user-8.jpg') }}"
+                                        class="img-fluid rounded-circle" alt="" />
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between">
                                     <p class="notify-details">Violette Lasky</p>
@@ -130,11 +162,10 @@
                             </a>
 
                             <!-- item-->
-                            <a href="javascript:void(0);"
-                                class="dropdown-item notify-item text-muted link-primary">
+                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
                                 <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-5.jpg') }}" class="img-fluid rounded-circle"
-                                        alt="" />
+                                    <img src="{{ asset('assets/images/users/user-5.jpg') }}"
+                                        class="img-fluid rounded-circle" alt="" />
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between">
                                     <p class="notify-details">Ralph Edwards</p>
@@ -147,11 +178,10 @@
                             </a>
 
                             <!-- item-->
-                            <a href="javascript:void(0);"
-                                class="dropdown-item notify-item text-muted link-primary">
+                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
                                 <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-6.jpg') }}" class="img-fluid rounded-circle"
-                                        alt="" />
+                                    <img src="{{ asset('assets/images/users/user-6.jpg') }}"
+                                        class="img-fluid rounded-circle" alt="" />
                                 </div>
                                 <div class="notify-content">
                                     <div class="d-flex align-items-center justify-content-between">
@@ -180,14 +210,15 @@
                 <li class="dropdown notification-list topbar-dropdown">
                     <a class="nav-link dropdown-toggle nav-user me-0" data-bs-toggle="dropdown" href="#"
                         role="button" aria-haspopup="false" aria-expanded="false">
-                        <img src="{{ asset('assets/images/users/user-13.jpg') }}" alt="user-image" class="rounded-circle" />
+                        <img src="{{ asset('assets/images/users/user-13.jpg') }}" alt="user-image"
+                            class="rounded-circle" />
                         <span class="d-none d-sm-inline-block pro-user-name ms-1">
                             {{ $customer ? $customer->first_name . ' ' . $customer->last_name : 'Guest' }}
                             <i class="mdi mdi-chevron-down"></i>
                         </span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end profile-dropdown">
-                        
+
                         <!-- item-->
                         <form action="{{ route('offline-logout') }}" method="POST" class="d-inline">
                             @csrf

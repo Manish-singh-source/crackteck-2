@@ -564,7 +564,7 @@
             <form id="raiseTicketForm">
                 @csrf
                 <input type="hidden" name="amc_id" value="{{ $amcService->id }}">
-                <div class="modal-body">
+                <div class="modal-body m-3">
                     <div class="mb-3">
                         <label for="ticketSubject" class="form-label">Subject <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="ticketSubject" name="subject" required placeholder="Enter issue subject">

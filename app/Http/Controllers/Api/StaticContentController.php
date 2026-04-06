@@ -143,7 +143,7 @@ class StaticContentController extends Controller
                 ],            
             ]
         ],
-        't_n_c_amc_ecommerce_order' => [
+        't_n_c_ecommerce_order' => [
             'title' => 'Terms and Conditions E-Commerce Orders',
             'last_updated' => '2026-04-06',
             'content' => [
@@ -206,7 +206,7 @@ class StaticContentController extends Controller
                 ],          
             ]
         ],
-        't_n_c_amc_quick' => [
+        't_n_c_quick' => [
             'title' => 'Terms and Conditions Quick Commerce Services',
             'last_updated' => '2026-04-06',
             'content' => [
@@ -261,7 +261,7 @@ class StaticContentController extends Controller
                 ],           
             ]
         ],
-        't_n_c_amc_installation' => [
+        't_n_c_installation' => [
             'title' => 'Terms and Conditions Installation Services',
             'last_updated' => '2026-04-06',
             'content' => [

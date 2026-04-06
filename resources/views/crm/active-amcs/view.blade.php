@@ -498,7 +498,17 @@
                                         @foreach ($amcRequest->amcProducts as $index => $product)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
-                                                <td>{{ $product->images ?? 'N/A' }}</td>
+                                                <td>
+                                                    @if($product->images)
+                                                        @if(is_array($product->images))
+                                                            <img src="{{ $product->images[0] ?? '' }}" alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                                                        @else
+                                                            <img src="{{ $product->images }}" alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                                                        @endif
+                                                    @else
+                                                        N/A
+                                                    @endif
+                                                </td>
                                                 <td>{{ $product->name ?? 'N/A' }}</td>
                                                 <td>{{ $product->mac_address ?? 'N/A' }}</td>
                                                 <td>{{ $product->productType?->device_type ?? '-' }}</td>

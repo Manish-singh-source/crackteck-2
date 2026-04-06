@@ -501,7 +501,7 @@
                                                 <td>
                                                     @if($product->images)
                                                         @if(is_array($product->images))
-                                                            <img src="{{ $product->images[0] ?? '' }}" alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                                                            <img src="/{{ $product->images[0] ?? '' }}" alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
                                                         @else
                                                             <img src="{{ $product->images }}" alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
                                                         @endif

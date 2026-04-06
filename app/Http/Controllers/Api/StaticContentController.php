@@ -9,110 +9,93 @@ use Illuminate\Http\Request;
 class StaticContentController extends Controller
 {
     private array $staticData = [
-        'terms_and_conditions' => [
-            'title' => 'Terms and Conditions',
-            'last_updated' => '2024-01-01',
+        't_n_c_amc_remote' => [
+            'title' => 'Terms and Conditions AMC Remote Support Services',
+            'last_updated' => '2026-04-06',
             'content' => [
                 [
                     'type' => 'heading',
                     'level' => 1,
-                    'text' => 'Terms and Conditions'
+                    'text' => 'These Terms and Conditions govern the provision of Annual Maintenance Contract Remote Support Services. By availing any of our services, the 
+                        client agrees to the terms outlined below. '
                 ],
                 [
                     'type' => 'paragraph',
-                    'text' => 'Welcome to CrackTech. By accessing and using our application, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our service.'
+                    'text' => '1. Remote support services are provided only for devices covered under a valid AMC agreement.'
                 ],
+                [
+                    'type' => 'paragraph',
+                    'text' => '2. Clients must provide accurate device identification details, including MAC ID where applicable, for authentication.'
+                ],
+                [
+                    'type' => 'paragraph',
+                    'text' => '3. Remote support is dependent on active internet connectivity at the client’s premises.'
+                ],
+                [
+                    'type' => 'paragraph',
+                    'text' => '4. Support will be provided during standard business hours unless otherwise agreed in writing.'
+                ],
+                [
+                    'type' => 'paragraph',
+                    'text' => '5. Issues requiring physical intervention will be treated as onsite service requests.'
+                ],
+                [
+                    'type' => 'paragraph',
+                    'text' => '6. Hardware-related faults cannot be resolved remotely and may require onsite inspection.'
+                ],
+                [
+                    'type' => 'paragraph',
+                    'text' => '7. The client is responsible for maintaining data backups prior to remote access sessions.'
+                ],
+                [
+                    'type' => 'paragraph',
+                    'text' => '8. Unauthorized software installations, malware infections, or system alterations may fall outside AMC coverage. '
+                ],
+                [
+                    'type' => 'paragraph',
+                    'text' => '9. Remote access will be used strictly for maintenance, diagnostics, and troubleshooting purposes.'
+                ],
+                
+            ]
+        ],
+        't_n_c_amc_Onsite' => [
+            'title' => 'Terms and Conditions AMC Onsite Support Services',
+            'last_updated' => '2026-04-06',
+            'content' => [
                 [
                     'type' => 'heading',
-                    'level' => 2,
-                    'text' => '1. Acceptance of Terms'
+                    'level' => 1,
+                    'text' => 'These Terms and Conditions govern the provision of Annual Maintenance Contract Onsite Services. By availing any of our services, the 
+                        client agrees to the terms outlined below. '
                 ],
                 [
                     'type' => 'paragraph',
-                    'text' => 'By downloading, installing, or using the CrackTech mobile application, you accept and agree to be bound by the terms of this agreement. Additionally, when using CrackTech services, you shall be subject to any posted guidelines or rules applicable to such services.'
-                ],
-                [
-                    'type' => 'heading',
-                    'level' => 2,
-                    'text' => '2. Description of Service'
+                    'text' => '1. Onsite services will be delivered as per the scope defined in the AMC agreement.'
                 ],
                 [
                     'type' => 'paragraph',
-                    'text' => 'CrackTech provides users with access to a rich collection of resources, including various communications tools, forums, shopping services, personalized content, and branded programming through its network of properties.'
-                ],
-                [
-                    'type' => 'heading',
-                    'level' => 2,
-                    'text' => '3. Your Registration Obligations'
+                    'text' => '2. Preventive maintenance visits will be scheduled mutually between both parties.'
                 ],
                 [
                     'type' => 'paragraph',
-                    'text' => 'In consideration of your use of the Service, you agree to: (a) provide true, accurate, current, and complete information about yourself as prompted by the Service\'s registration form and (b) maintain and promptly update the registration data to keep it true, accurate, current, and complete.'
-                ],
-                [
-                    'type' => 'heading',
-                    'level' => 2,
-                    'text' => '4. Privacy Policy'
+                    'text' => '3. Response time for service calls will be as agreed in the AMC contract.'
                 ],
                 [
                     'type' => 'paragraph',
-                    'text' => 'Registration data and certain other information about you is subject to our Privacy Policy. You understand that through your use of the Service, you consent to the collection and use of this information, including the transfer of this information to other countries for storage, processing, and use.'
-                ],
-                [
-                    'type' => 'heading',
-                    'level' => 2,
-                    'text' => '5. User Conduct'
+                    'text' => '4. Spare parts and consumables are chargeable unless explicitly included.'
                 ],
                 [
                     'type' => 'paragraph',
-                    'text' => 'You agree not to use the Service to: upload, post, email, transmit, or otherwise make available any content that is unlawful, harmful, threatening, abusive, harassing, tortious, defamatory, vulgar, obscene, libelous, invasive of another\'s privacy, hateful, or racially, ethnically, or otherwise objectionable.'
-                ],
-                [
-                    'type' => 'heading',
-                    'level' => 2,
-                    'text' => '6. Payment and Refund Policy'
+                    'text' => '5. Damage caused by power fluctuations, liquid spills, mishandling, or external factors is excluded.'
                 ],
                 [
                     'type' => 'paragraph',
-                    'text' => 'All payments made through the app are final. Refunds are processed according to our Refund Policy which allows returns within 7 days of purchase for unused products in original condition.'
-                ],
-                [
-                    'type' => 'list',
-                    'style' => 'bullet',
-                    'items' => [
-                        'Items must be unused and in original packaging',
-                        'Original receipt or proof of purchase required',
-                        'Refund will be processed within 5-7 business days',
-                        'Shipping charges are non-refundable'
-                    ]
-                ],
-                [
-                    'type' => 'heading',
-                    'level' => 2,
-                    'text' => '7. Shipping Policy'
+                    'text' => '6. The client must provide proper working conditions including power supply and access to equipment.'
                 ],
                 [
                     'type' => 'paragraph',
-                    'text' => 'We ship products within 2-3 business days of order confirmation. Delivery timelines vary by location and shipping method selected at checkout.'
-                ],
-                [
-                    'type' => 'list',
-                    'style' => 'ordered',
-                    'items' => [
-                        'Standard Shipping: 5-7 business days',
-                        'Express Shipping: 2-3 business days',
-                        'Same Day Delivery: Available for select pincodes'
-                    ]
-                ],
-                [
-                    'type' => 'heading',
-                    'level' => 2,
-                    'text' => '8. Contact Information'
-                ],
-                [
-                    'type' => 'paragraph',
-                    'text' => 'If you have any questions about these Terms and Conditions, please contact us at support@cracktech.com or call our customer support team.'
-                ]
+                    'text' => '7. Additional visits beyond the agreed scope may be billed separately.'
+                ]                
             ]
         ],
         'privacy_policy' => [

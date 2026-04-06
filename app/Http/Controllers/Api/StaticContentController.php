@@ -16,8 +16,7 @@ class StaticContentController extends Controller
                 [
                     'type' => 'heading',
                     'level' => 1,
-                    'text' => 'These Terms and Conditions govern the provision of Annual Maintenance Contract Remote Support Services. By availing any of our services, the 
-                        client agrees to the terms outlined below. '
+                    'text' => 'These Terms and Conditions govern the provision of Annual Maintenance Contract Remote Support Services. By availing any of our services, the client agrees to the terms outlined below. '
                 ],
                 [
                     'type' => 'paragraph',

@@ -485,10 +485,12 @@
                                     <thead>
                                         <tr>
                                             <th>Sr No</th>
+                                            <th>Product Image</th>
                                             <th>Product Name</th>
+                                            <th>MAC Address</th>
                                             <th>Type</th>
                                             <th>Model No</th>
-                                            <th>HSN</th>
+                                            <th>Purchase Date</th>
                                             <th>Brand</th>
                                         </tr>
                                     </thead>
@@ -496,10 +498,12 @@
                                         @foreach ($amcRequest->amcProducts as $index => $product)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
-                                                <td>{{ $product->name }}</td>
+                                                <td>{{ $product->images ?? 'N/A' }}</td>
+                                                <td>{{ $product->name ?? 'N/A' }}</td>
+                                                <td>{{ $product->mac_address ?? 'N/A' }}</td>
                                                 <td>{{ $product->productType?->device_type ?? '-' }}</td>
                                                 <td>{{ $product->model_no ?? '-' }}</td>
-                                                <td>{{ $product->hsn ?? '-' }}</td>
+                                                <td>{{ $product->purchase_date ?? '-' }}</td>
                                                 <td>{{ $product->brand ?? '-' }}</td>
                                             </tr>
                                         @endforeach

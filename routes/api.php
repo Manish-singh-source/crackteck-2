@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AllServicesController;
 use App\Http\Controllers\Api\AmcServicesController;
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\AttendanceController;
+use App\Http\Controllers\Api\StaticContentController;
 use App\Http\Controllers\Api\CashReceivedController;
 use App\Http\Controllers\Api\CheckoutController as ApiCheckoutController;
 use App\Http\Controllers\Api\DashboardController;
@@ -74,6 +75,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/kyc/status', 'getStatus'); // Get KYC status and reason
         Route::post('/kyc/submit', 'submitKyc'); // Submit KYC details
     });
+
+    // Static Content Routes (no auth required)
+    Route::get('/static/{key}', [StaticContentController::class, 'getStaticContent']);
+    // Route::get('/all-static', [StaticContentController::class, 'getAllStaticContent']);
+    // Route::get('/static-keys', [StaticContentController::class, 'getAvailableKeys']);
 
     // Receipt download route (public - outside JWT middleware)
     Route::get('/receipts/{filename}', function ($filename) {

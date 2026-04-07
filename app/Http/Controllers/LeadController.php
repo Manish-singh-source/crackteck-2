@@ -77,7 +77,7 @@ class LeadController extends Controller
 
     public function view($id)
     {
-        $lead = Lead::with('customerAddress', 'companyDetails')->find($id);
+        $lead = Lead::with('customerAddress', 'companyDetails', 'amcs.amcProducts')->find($id);
         $salesPersons = Staff::where('staff_role', 'sales_person')->get();
 
         return view('/crm/leads/view', compact('lead', 'salesPersons'));

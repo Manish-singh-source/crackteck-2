@@ -296,6 +296,60 @@
 
                     </div>
 
+                    {{-- Product Details Card --}}
+                    <div class="card mt-3">
+                        <div class="card-header border-bottom-dashed">
+                            <h5 class="card-title mb-0">Product Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Sr No</th>
+                                            <th>Product Image</th>
+                                            <th>Product Name</th>
+                                            <th>MAC Address</th>
+                                            <th>Type</th>
+                                            <th>Model No</th>
+                                            <th>Purchase Date</th>
+                                            <th>Brand</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php $srNo = 1; @endphp
+                                        @php $amcProducts = optional($lead->amcs)->amcProducts ?? collect(); @endphp
+                                        @if($amcProducts->count() > 0)
+                                            @foreach($amcProducts as $product)
+                                                <tr>
+                                                    <td>{{ $srNo++ }}</td>
+                                                    <td>
+                                                        @if(!empty($product->images) && is_array($product->images))
+                                                            @php $firstImage = $product->images[0]; @endphp
+                                                            <img src="{{ asset('storage/' . $firstImage) }}" alt="{{ $product->name }}" style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;" onclick="showImagePopup('{{ asset('storage/' . $firstImage) }}')">
+                                                        @else
+                                                            <span class="text-muted">N/A</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ $product->name ?? 'N/A' }}</td>
+                                                    <td>{{ $product->mac_address ?? 'N/A' }}</td>
+                                                    <td>{{ $product->type ?? 'N/A' }}</td>
+                                                    <td>{{ $product->model_no ?? 'N/A' }}</td>
+                                                    <td>{{ $product->purchase_date ?? 'N/A' }}</td>
+                                                    <td>{{ $product->brand ?? 'N/A' }}</td>
+                                                </tr>
+                                            @endforeach
+                                        @else
+                                            <tr>
+                                                <td colspan="8" class="text-center text-muted">No products found</td>
+                                            </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

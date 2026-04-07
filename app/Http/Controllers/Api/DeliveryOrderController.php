@@ -238,10 +238,19 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
-            $order = Order::where('id', $order_id)->first();
+            $order = Order::with('customer')->where('id', $order_id)->first();
 
             if (! $order) {
                 return response()->json(['message' => 'Order not found'], 404);
+            }
+
+            if ($order->status != 'product_taken') {
+                return response()->json(['success' => false, 'message' => 'Please first pick the product from warehouse'], 400);
+            }
+
+            $customer = $order->customer;
+            if (!$customer || !$customer->phone) {
+                return response()->json(['message' => 'Customer phone number not found'], 404);
             }
 
             $otp = rand(1000, 9999);
@@ -249,30 +258,19 @@ class DeliveryOrderController extends Controller
             $order->otp_expiry = now()->addMinutes(5);
             $order->save();
 
-            if (! $order) {
-                return response()->json(['message' => 'User not found'], 404);
+            $templateId = env('FAST2SMS_TEMPLATE_ID');
+
+            $success = $this->sendDltSms(
+                $customer->phone,
+                $templateId,
+                $otp
+            );
+
+            if (! $success) {
+                return response()->json(['message' => 'Failed to send OTP'], 500);
             }
 
-            $user = Customer::where('id', $order->customer_id)->first();
-
-            if (! $user) {
-                return response()->json(['message' => 'User not found'], 404);
-            }
-
-            // Send OTP via Fast2SMS DLT
-            // $templateId = env('FAST2SMS_TEMPLATE_ID');
-
-            // $success = $this->sendDltSms(
-            //     $user->phone,           // Phone number
-            //     $templateId,            // Template ID (191040)
-            //     $otp                    // OTP value to replace {#var#}
-            // );
-
-            // if (! $success) {
-            //     return response()->json(['message' => 'Failed to send OTP'], 500);
-            // }
-
-            return response()->json(['message' => 'OTP sent successfully', 'Otp' => $otp], 200);
+            return response()->json(['message' => 'OTP sent successfully'], 200);
         }
     }
 

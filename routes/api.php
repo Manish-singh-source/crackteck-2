@@ -339,6 +339,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/driving-license', 'getDrivingLicenseDetails');
             Route::post('/store-driving-license', 'storeDrivingLicense');
             Route::put('/update-driving-license', 'updateDrivingLicense');
+
+            // track your work
+            Route::get('/track-your-work', 'trackYourWork');
         });
 
         Route::controller(ReplacementRequestController::class)->group(function () {

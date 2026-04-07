@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\ReturnOrder;
+use App\Models\ServiceRequestProductPickup;
+use App\Models\ServiceRequestProductRequestPart;
 use App\Models\Staff;
 use App\Models\StaffAadharDetail;
 use App\Models\StaffPanCardDetail;
@@ -1106,6 +1108,107 @@ class DeliveryOrderController extends Controller
             }
 
             return response()->json(['message' => 'Return order received in warehouse successfully'], 200);
+        }
+    }
+
+    public function trackYourWork(Request $request)
+    {
+        $roleValidated = Validator::make($request->all(), [
+            'role_id' => 'required|in:1,2',
+            'user_id' => 'required',
+        ]);
+
+        if ($roleValidated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $roleValidated->errors()], 422);
+        }
+
+        $staffRole = $this->getRoleId($request->role_id);
+
+        if (! $staffRole) {
+            return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
+        }
+
+        if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
+            $perPage = $request->filled('per_page') ? (int) $request->per_page : 10;
+
+            // Orders
+            $orderTotalAssigned = Order::where('assigned_person_id', $request->user_id)->count();
+            $orderDelivered = Order::where('assigned_person_id', $request->user_id)->where('status', 'delivered')->count();
+            $orderPending = Order::where('assigned_person_id', $request->user_id)->whereIn('status', ['pending', 'admin_approved', 'assigned_delivery_man', 'order_accepted'])->count();
+            $orderInProgress = Order::where('assigned_person_id', $request->user_id)->where('status', 'product_taken')->count();
+            $orderCancelled = Order::where('assigned_person_id', $request->user_id)->where('status', 'cancelled')->count();
+            $orderReturned = Order::where('assigned_person_id', $request->user_id)->where('status', 'returned')->count();
+
+            $orderList = Order::with(['orderItems.product.warehouse', 'customer', 'shippingAddress'])
+                ->where('assigned_person_id', $request->user_id)
+                ->orderBy('id', 'desc')
+                ->paginate($perPage);
+
+            // Return Orders
+            $returnTotalAssigned = ReturnOrder::where('delivery_man_id', $request->user_id)->count();
+            $returnCompleted = ReturnOrder::where('delivery_man_id', $request->user_id)->where('status', 'received')->count();
+            $returnPending = ReturnOrder::where('delivery_man_id', $request->user_id)->whereIn('status', ['assigned', 'accepted', 'picked'])->count();
+            $returnCancelled = ReturnOrder::where('delivery_man_id', $request->user_id)->where('status', 'cancelled')->count();
+
+            $returnOrderList = ReturnOrder::with(['customer', 'order'])
+                ->where('delivery_man_id', $request->user_id)
+                ->orderBy('id', 'desc')
+                ->paginate($perPage);
+
+            // Service Request Product Pickups
+            $pickupTotalAssigned = ServiceRequestProductPickup::where('assigned_person_id', $request->user_id)->count();
+            $pickupCompleted = ServiceRequestProductPickup::where('assigned_person_id', $request->user_id)->where('status', 'received')->count();
+            $pickupPending = ServiceRequestProductPickup::where('assigned_person_id', $request->user_id)->whereIn('status', ['pending', 'assigned', 'approved', 'picked'])->count();
+            $pickupCancelled = ServiceRequestProductPickup::where('assigned_person_id', $request->user_id)->where('status', 'cancelled')->count();
+
+            $pickupList = ServiceRequestProductPickup::with(['serviceRequest', 'serviceRequestProduct'])
+                ->where('assigned_person_id', $request->user_id)
+                ->orderBy('id', 'desc')
+                ->paginate($perPage);
+
+            // Service Request Product Request Parts
+            $partTotalAssigned = ServiceRequestProductRequestPart::where('assigned_person_id', $request->user_id)->count();
+            $partCompleted = ServiceRequestProductRequestPart::where('assigned_person_id', $request->user_id)->where('status', 'delivered')->count();
+            $partPending = ServiceRequestProductRequestPart::where('assigned_person_id', $request->user_id)->whereIn('status', ['pending', 'admin_approved', 'assigned', 'warehouse_approved', 'picked', 'in_transit'])->count();
+            $partCancelled = ServiceRequestProductRequestPart::where('assigned_person_id', $request->user_id)->where('status', 'cancelled')->count();
+
+            $partList = ServiceRequestProductRequestPart::with(['serviceRequest', 'serviceRequestProduct', 'product'])
+                ->where('assigned_person_id', $request->user_id)
+                ->orderBy('id', 'desc')
+                ->paginate($perPage);
+
+            return response()->json([
+                'orders' => [
+                    'total_assigned' => $orderTotalAssigned,
+                    'delivered' => $orderDelivered,
+                    'pending' => $orderPending,
+                    'in_progress' => $orderInProgress,
+                    'cancelled' => $orderCancelled,
+                    'returned' => $orderReturned,
+                    'data' => $orderList,
+                ],
+                'return_orders' => [
+                    'total_assigned' => $returnTotalAssigned,
+                    'completed' => $returnCompleted,
+                    'pending' => $returnPending,
+                    'cancelled' => $returnCancelled,
+                    'data' => $returnOrderList,
+                ],
+                'service_request_product_pickups' => [
+                    'total_assigned' => $pickupTotalAssigned,
+                    'completed' => $pickupCompleted,
+                    'pending' => $pickupPending,
+                    'cancelled' => $pickupCancelled,
+                    'data' => $pickupList,
+                ],
+                'service_request_product_request_parts' => [
+                    'total_assigned' => $partTotalAssigned,
+                    'completed' => $partCompleted,
+                    'pending' => $partPending,
+                    'cancelled' => $partCancelled,
+                    'data' => $partList,
+                ],
+            ], 200);
         }
     }
 }

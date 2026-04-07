@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AmcPlan;
+use App\Models\CoveredItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -43,9 +44,10 @@ class AmcServicesController extends Controller
             $amcPlans = AmcPlan::where('status', 'active')->get();
             $amcPlansCoveredItems = [];
             foreach ($amcPlans as $plan) {
+                $detail = CoveredItem::whereIn('id', $plan->covered_items)->get();
                 $amcPlansCoveredItems[] = [
                     'plan' => $plan,
-                    'covered_items' => $plan->coveredItems ?? [],
+                    'covered_items' => $detail ?? [],
                 ];
             }
 

@@ -124,7 +124,7 @@ class DeliveryOrderController extends Controller
         }
 
         if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
-            $orders = Order::with(['orderItems.productSerial'])
+            $orders = Order::with(['orderItems.product.warehouse', 'orderItems.productSerial', 'customer', 'shippingAddress'])
                 ->where('assigned_person_id', $request->user_id);
 
             if ($request->filled('status')) {
@@ -136,6 +136,9 @@ class DeliveryOrderController extends Controller
             $orders->transform(function ($order) {
                 $order->orderItems->transform(function ($item) {
                     $item->product_serial_code = $item->productSerial->auto_generated_serial ?? null;
+                    $item->product_details = $item->product;
+                    $item->warehouse_details = $item->product->warehouse ?? null;
+                    unset($item->product, $item->productSerial);
                     return $item;
                 });
 
@@ -164,7 +167,7 @@ class DeliveryOrderController extends Controller
 
         if ($staffRole == 'delivery_man' || $staffRole == 'engineer') {
 
-            $order = Order::with(['orderItems.productSerial', 'customer.primaryAddress'])
+            $order = Order::with(['orderItems.product.warehouse', 'orderItems.productSerial', 'customer.customerAddresses', 'shippingAddress'])
                 ->where('id', $order_id)
                 ->first();
 
@@ -174,7 +177,9 @@ class DeliveryOrderController extends Controller
 
             $order->orderItems->transform(function ($item) {
                 $item->product_serial_code = $item->productSerial->auto_generated_serial ?? null;
-                unset($item->productSerial);
+                $item->product_details = $item->product;
+                $item->warehouse_details = $item->product->warehouse ?? null;
+                unset($item->product, $item->productSerial);
                 return $item;
             });
 

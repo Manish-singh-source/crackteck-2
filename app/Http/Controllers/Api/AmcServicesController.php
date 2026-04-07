@@ -81,7 +81,7 @@ class AmcServicesController extends Controller
 
         $data = [
             'amc_plan' => $amcPlan,
-            'covered_items' => $amcPlan->coveredItems(),
+            'covered_items' => CoveredItem::whereIn('id', $amcPlan->covered_items)->get(),
         ];
 
         return response()->json(['data' => $data], 200);

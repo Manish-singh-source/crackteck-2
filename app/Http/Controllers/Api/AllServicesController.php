@@ -286,7 +286,7 @@ class AllServicesController extends Controller
                         'amc_plan_id' => $request->amc_plan_id,
                         'request_date' => now(),
                         'request_source' => 'customer',
-                        'status' => 'active',
+                        'status' => 'pending',
                         'created_by' => Auth::id(),
                     ]);
                 } else {
@@ -420,6 +420,7 @@ class AllServicesController extends Controller
 
                 if ($request->amc_type === 'onsite') {
                     Lead::create([
+                        'amc_id' => $amc->id,
                         'customer_id' => $request->user_id,
                         'staff_id' => null,
                         'customer_address_id' => $request->customer_address_id ? $request->customer_address_id : null,
@@ -429,6 +430,9 @@ class AllServicesController extends Controller
                         'estimated_value' => null,
                         'notes' => $request->additional_notes ?? null,
                     ]);
+                }else{
+                    $amc->status =  'active';
+                    $amc->save();
                 }
                 DB::commit();
 

@@ -11,6 +11,7 @@ class Lead extends Model
 
     //
     protected $fillable = [
+        'amc_id',
         'customer_id',
         'staff_id',
         'customer_address_id',

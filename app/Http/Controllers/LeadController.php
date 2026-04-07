@@ -20,7 +20,7 @@ class LeadController extends Controller
         if ($status != 'all') {
             $query->where('status', $status);
         }
-        $leads = $query->with('staff', 'customer', 'customerAddress', 'companyDetails')->get();
+        $leads = $query->with('staff', 'customer', 'customerAddress', 'companyDetails', 'amcs')->get();
 
         return view('/crm/leads/index', compact('leads'));
     }

@@ -49,4 +49,9 @@ class Lead extends Model
     {
         return $this->hasOne(Quotation::class, 'lead_id');
     }
+
+    public function amcs()
+    {
+        return $this->belongsTo(Amc::class, 'amc_id');
+    }
 }

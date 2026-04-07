@@ -92,6 +92,7 @@
                                                             <tr>
                                                                 <th>Lead Id</th>
                                                                 <th>Lead Number</th>
+                                                                <th>AMC Id</th>
                                                                 <th>Sales Person</th>
                                                                 <th>Customer Name</th>
                                                                 <th>Contact No</th>
@@ -109,6 +110,7 @@
                                                                 <tr>
                                                                     <td>{{ $lead->id }}</td>
                                                                     <td>{{ $lead->lead_number ?? 'N/A' }}</td>
+                                                                    <td>{{ $lead->amcs->request_id ?? 'N/A' }}</td>
                                                                     <td>{{ $lead->staff?->first_name ? ($lead->staff?->first_name . ' ' . $lead->staff?->last_name) : 'N/A' }}
                                                                     </td>
                                                                     <td>{{ $lead->customer?->first_name ?? 'N/A' }}

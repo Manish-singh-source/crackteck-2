@@ -280,6 +280,7 @@ class PartRequestController extends Controller
                 'product' => $partRequest->product ? [
                     'id' => $partRequest->product->id,
                     'product_name' => $partRequest->product->product_name,
+                    'product_image' => $partRequest->product->main_product_image,
                     'sku' => $partRequest->product->sku,
                     'model_no' => $partRequest->product->model_no,
                     'brand_id' => $partRequest->product->brand_id,

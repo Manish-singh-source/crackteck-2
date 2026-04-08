@@ -91,10 +91,16 @@ class PartRequestController extends Controller
                     if ($warehouse) {
                         $warehouseDetails = [
                             'id' => $warehouse->id,
+                            'warehouse_code' => $warehouse->warehouse_code,
                             'name' => $warehouse->name,
-                            'address' => $warehouse->address,
+                            'address' => $warehouse->address1,
+                            'address' => $warehouse->address2,
                             'city' => $warehouse->city,
                             'state' => $warehouse->state,
+                            'country' => $warehouse->country,
+                            'pincode' => $warehouse->pincode,
+                            'contact_person_name' => $warehouse->contact_person_name,
+                            'phone_number' => $warehouse->phone_number,
                         ];
                     }
                 }

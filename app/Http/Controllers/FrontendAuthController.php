@@ -118,7 +118,7 @@ class FrontendAuthController extends Controller
         Auth::guard('customer_web')->login($customer);
         $request->session()->forget(['login_otp', 'login_phone']);
         
-        return redirect()->intended('/beta')->with('success', 'Login successful');
+        return redirect()->intended('/')->with('success', 'Login successful');
     }
 
     public function register(Request $request)

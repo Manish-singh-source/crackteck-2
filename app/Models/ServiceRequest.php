@@ -76,6 +76,11 @@ class ServiceRequest extends Model
         return $this->belongsTo(CustomerAddressDetail::class, 'customer_id', 'customer_id');
     }
 
+    public function addressDetail()
+    {
+        return $this->belongsTo(CustomerAddressDetail::class, 'customer_address_id');
+    }
+
     public function customerCompany()
     {
         return $this->belongsTo(CustomerCompanyDetail::class, 'customer_id', 'customer_id');

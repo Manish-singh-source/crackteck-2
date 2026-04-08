@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Helpers\StatusUpdateHelper;
 use App\Models\Customer;
+use App\Models\CustomerAddressDetail;
 use App\Models\DeliveryMan;
 use App\Models\Engineer;
 use App\Models\SalesPerson;
 use App\Models\ServiceRequestProductPickup;
+use App\Models\ServiceRequestProductRequestPart;
 use App\Models\Staff;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -77,9 +80,11 @@ class PickupRequestController extends Controller
         // Get pickup requests assigned to this user based on role
         $pickupRequests = ServiceRequestProductPickup::with([
             'serviceRequest',
+            'serviceRequest.addressDetail',
             'serviceRequestProduct',
+            'serviceRequestProduct.requestedParts.product',
+            'serviceRequestProduct.requestedParts.product.brand',
             'serviceRequest.customer',
-            'serviceRequestProduct.serviceRequest',
         ])
             ->where('assigned_person_type', $roleName)
             ->where('assigned_person_id', $request->user_id)
@@ -89,10 +94,92 @@ class PickupRequestController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Format the response to include product details with warehouse_id
+        $formattedPickupRequests = $pickupRequests->map(function ($pickup) {
+            $productDetails = null;
+            $warehouseDetails = null;
+
+            if ($pickup->serviceRequestProduct && $pickup->serviceRequestProduct->requestedParts->isNotEmpty()) {
+                $requestedPart = $pickup->serviceRequestProduct->requestedParts->first();
+                if ($requestedPart && $requestedPart->product) {
+                    $productDetails = [
+                        'part_id' => $requestedPart->part_id,
+                        'product_name' => $requestedPart->product->product_name,
+                        'sku' => $requestedPart->product->sku,
+                        'model_no' => $requestedPart->product->model_no,
+                        'brand_id' => $requestedPart->product->brand_id,
+                        'brand_name' => $requestedPart->product->brand?->name,
+                        'warehouse_id' => $requestedPart->product->warehouse_id,
+                    ];
+                    
+                    // Get warehouse details if warehouse_id exists
+                    if ($requestedPart->product->warehouse_id) {
+                        $warehouse = Warehouse::find($requestedPart->product->warehouse_id);
+                        if ($warehouse) {
+                            $warehouseDetails = [
+                                'id' => $warehouse->id,
+                                'name' => $warehouse->name,
+                                'address' => $warehouse->address ?? null,
+                                'city' => $warehouse->city ?? null,
+                                'state' => $warehouse->state ?? null,
+                            ];
+                        }
+                    }
+                }
+            }
+
+            $customerAddress = null;
+            if ($pickup->serviceRequest && $pickup->serviceRequest->customer_address_id) {
+                $address = CustomerAddressDetail::find($pickup->serviceRequest->customer_address_id);
+                if ($address) {
+                    $customerAddress = [
+                        'id' => $address->id,
+                        'address1' => $address->address1,
+                        'address2' => $address->address2,
+                        'city' => $address->city,
+                        'state' => $address->state,
+                        'country' => $address->country,
+                        'pincode' => $address->pincode,
+                        'branch_name' => $address->branch_name,
+                    ];
+                }
+            }
+
+            return [
+                'id' => $pickup->id,
+                'request_id' => $pickup->request_id,
+                'product_id' => $pickup->product_id,
+                'status' => $pickup->status,
+                'created_at' => $pickup->created_at,
+                'updated_at' => $pickup->updated_at,
+                'product_details' => $productDetails,
+                'warehouse_details' => $warehouseDetails,
+                'customer_address' => $customerAddress,
+                'service_request' => $pickup->serviceRequest ? [
+                    'id' => $pickup->serviceRequest->id,
+                    'request_id' => $pickup->serviceRequest->request_id,
+                    'service_type' => $pickup->serviceRequest->service_type,
+                    'customer_address_id' => $pickup->serviceRequest->customer_address_id,
+                    'status' => $pickup->serviceRequest->status,
+                ] : null,
+                'service_request_product' => $pickup->serviceRequestProduct ? [
+                    'id' => $pickup->serviceRequestProduct->id,
+                    'name' => $pickup->serviceRequestProduct->name,
+                    'model_no' => $pickup->serviceRequestProduct->model_no,
+                ] : null,
+                'customer' => $pickup->serviceRequest?->customer ? [
+                    'id' => $pickup->serviceRequest->customer->id,
+                    'name' => $pickup->serviceRequest->customer->first_name . ' ' . $pickup->serviceRequest->customer->last_name,
+                    'phone' => $pickup->serviceRequest->customer->phone,
+                    'email' => $pickup->serviceRequest->customer->email,
+                ] : null,
+            ];
+        });
+
         return response()->json([
             'success' => true,
             'message' => 'Pickup requests retrieved successfully.',
-            'pickup_requests' => $pickupRequests,
+            'pickup_requests' => $formattedPickupRequests,
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name ?? $user->first_name,
@@ -128,7 +215,10 @@ class PickupRequestController extends Controller
         // Find the pickup request
         $pickupRequest = ServiceRequestProductPickup::with([
             'serviceRequest',
+            'serviceRequest.addressDetail',
             'serviceRequestProduct',
+            'serviceRequestProduct.requestedParts.product',
+            'serviceRequestProduct.requestedParts.product.brand',
             'serviceRequest.customer',
             'assignedPerson',
         ])->find($id);
@@ -146,10 +236,111 @@ class PickupRequestController extends Controller
             ], 403);
         }
 
+        // Format the response to include product details with warehouse_id
+        $productDetails = null;
+        $warehouseDetails = null;
+
+        if ($pickupRequest->serviceRequestProduct && $pickupRequest->serviceRequestProduct->requestedParts->isNotEmpty()) {
+            $requestedPart = $pickupRequest->serviceRequestProduct->requestedParts->first();
+            if ($requestedPart && $requestedPart->product) {
+                $productDetails = [
+                    'part_id' => $requestedPart->part_id,
+                    'product_name' => $requestedPart->product->product_name,
+                    'sku' => $requestedPart->product->sku,
+                    'model_no' => $requestedPart->product->model_no,
+                    'brand_id' => $requestedPart->product->brand_id,
+                    'brand_name' => $requestedPart->product->brand?->name,
+                    'warehouse_id' => $requestedPart->product->warehouse_id,
+                ];
+                
+                // Get warehouse details if warehouse_id exists
+                if ($requestedPart->product->warehouse_id) {
+                    $warehouse = Warehouse::find($requestedPart->product->warehouse_id);
+                    if ($warehouse) {
+                        $warehouseDetails = [
+                            'id' => $warehouse->id,
+                            'name' => $warehouse->name,
+                            'address' => $warehouse->address ?? null,
+                            'city' => $warehouse->city ?? null,
+                            'state' => $warehouse->state ?? null,
+                        ];
+                    }
+                }
+            }
+        }
+
+        $customerAddress = null;
+        if ($pickupRequest->serviceRequest && $pickupRequest->serviceRequest->customer_address_id) {
+            $address = CustomerAddressDetail::find($pickupRequest->serviceRequest->customer_address_id);
+            if ($address) {
+                $customerAddress = [
+                    'id' => $address->id,
+                    'address1' => $address->address1,
+                    'address2' => $address->address2,
+                    'city' => $address->city,
+                    'state' => $address->state,
+                    'country' => $address->country,
+                    'pincode' => $address->pincode,
+                    'branch_name' => $address->branch_name,
+                ];
+            }
+        }
+
+        $formattedPickupRequest = [
+            'id' => $pickupRequest->id,
+            'request_id' => $pickupRequest->request_id,
+            'product_id' => $pickupRequest->product_id,
+            'engineer_id' => $pickupRequest->engineer_id,
+            'reason' => $pickupRequest->reason,
+            'assigned_person_type' => $pickupRequest->assigned_person_type,
+            'assigned_person_id' => $pickupRequest->assigned_person_id,
+            'status' => $pickupRequest->status,
+            'otp' => $pickupRequest->otp,
+            'otp_expiry' => $pickupRequest->otp_expiry,
+            'created_at' => $pickupRequest->created_at,
+            'updated_at' => $pickupRequest->updated_at,
+            'assigned_at' => $pickupRequest->assigned_at,
+            'approved_at' => $pickupRequest->approved_at,
+            'picked_at' => $pickupRequest->picked_at,
+            'product_details' => $productDetails,
+            'warehouse_details' => $warehouseDetails,
+            'customer_address' => $customerAddress,
+            'service_request' => $pickupRequest->serviceRequest ? [
+                'id' => $pickupRequest->serviceRequest->id,
+                'request_id' => $pickupRequest->serviceRequest->request_id,
+                'service_type' => $pickupRequest->serviceRequest->service_type,
+                'customer_id' => $pickupRequest->serviceRequest->customer_id,
+                'customer_address_id' => $pickupRequest->serviceRequest->customer_address_id,
+                'request_date' => $pickupRequest->serviceRequest->request_date,
+                'visit_date' => $pickupRequest->serviceRequest->visit_date,
+                'status' => $pickupRequest->serviceRequest->status,
+            ] : null,
+            'service_request_product' => $pickupRequest->serviceRequestProduct ? [
+                'id' => $pickupRequest->serviceRequestProduct->id,
+                'name' => $pickupRequest->serviceRequestProduct->name,
+                'type' => $pickupRequest->serviceRequestProduct->type,
+                'model_no' => $pickupRequest->serviceRequestProduct->model_no,
+                'sku' => $pickupRequest->serviceRequestProduct->sku,
+                'brand' => $pickupRequest->serviceRequestProduct->brand,
+            ] : null,
+            'customer' => $pickupRequest->serviceRequest?->customer ? [
+                'id' => $pickupRequest->serviceRequest->customer->id,
+                'first_name' => $pickupRequest->serviceRequest->customer->first_name,
+                'last_name' => $pickupRequest->serviceRequest->customer->last_name,
+                'name' => $pickupRequest->serviceRequest->customer->first_name . ' ' . $pickupRequest->serviceRequest->customer->last_name,
+                'phone' => $pickupRequest->serviceRequest->customer->phone,
+                'email' => $pickupRequest->serviceRequest->customer->email,
+            ] : null,
+            'assigned_person' => $pickupRequest->assignedPerson ? [
+                'id' => $pickupRequest->assignedPerson->id,
+                'name' => $pickupRequest->assignedPerson->name ?? $pickupRequest->assignedPerson->first_name,
+            ] : null,
+        ];
+
         return response()->json([
             'success' => true,
             'message' => 'Pickup request details retrieved successfully.',
-            'pickup_request' => $pickupRequest,
+            'pickup_request' => $formattedPickupRequest,
         ], 200);
     }
 

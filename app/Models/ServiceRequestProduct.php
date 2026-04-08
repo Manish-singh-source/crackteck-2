@@ -64,6 +64,11 @@ class ServiceRequestProduct extends Model
         return $this->hasMany(ServiceRequestProductRequestPart::class, 'product_id');
     }
 
+    public function requestedParts()
+    {
+        return $this->hasMany(ServiceRequestProductRequestPart::class, 'product_id');
+    }
+
     public function productDiagnose() {
         // return DeviceSpecificDiagnosis::where('id', '=', $this->type)->first();
         return $this->hasOne(DeviceSpecificDiagnosis::class, 'id', 'type');

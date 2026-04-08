@@ -6,6 +6,7 @@ use App\Models\CustomerAddressDetail;
 use App\Models\ServiceRequestProduct;
 use App\Models\ServiceRequestProductRequestPart;
 use App\Models\Warehouse;
+use App\Services\Fast2smsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -460,16 +461,25 @@ class PartRequestController extends Controller
                 'otp_expiry' => now()->addMinutes(5),
             ]);
 
-            // TODO: Send SMS to customer with OTP
-            // For now, we'll just return success - you can integrate with SMS service here
-            // Example: SmsService::send($customer->phone, "Your OTP is: $otp");
+            // Send OTP via SMS to customer
+            $smsService = new Fast2smsService();
+            $smsResponse = $smsService->sendOtp($customer->phone, $otp);
+
+            if (!$smsResponse['success']) {
+                Log::warning("SMS sending failed for part request OTP: " . $smsResponse['message']);
+            }
+
+            Log::info("Part Request OTP sent", [
+                'part_request_id' => $id,
+                'customer_phone' => $customer->phone,
+                'otp' => $otp,
+            ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'OTP sent successfully to customer.',
                 'data' => [
                     'otp_sent_to' => $customer->phone,
-                    'otp' => $otp,
                     'otp_expiry' => $partRequest->otp_expiry,
                 ],
             ], 200);

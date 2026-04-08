@@ -809,6 +809,18 @@
                         <div class="tab-pane fade show active" id="login-email" role="tabpanel">
                             <form class="form-log" action="{{ route('frontend.login') }}" method="POST">
                                 @csrf
+                                @if($errors->any())
+                                    <div class="alert alert-danger mb-3">
+                                        <ul class="mb-0 ps-3">
+                                            @foreach($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
+                                @if(session('error'))
+                                    <div class="alert alert-danger mb-3">{{ session('error') }}</div>
+                                @endif
                                 <div class="form-content">
                                     <fieldset>
                                         <label class="fw-semibold body-md-2">

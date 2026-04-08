@@ -157,29 +157,42 @@ class FrontendAuthController extends Controller
 
     public function login(Request $request)
     {
-        if (! Auth::guard('customer_web')->check()) {
-            // return redirect()->route('login')->with('error', 'Please login to access your account.');
-            return redirect()->back()->with('open_login_modal', true)->with('error', 'Please login to access your account.');
-        } 
-
-        $credentials = $request->only('email', 'password');
+        if (Auth::guard('customer_web')->check()) {
+            return redirect()->intended('/');
+        }
 
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        // Use the 'customer_web' guard
-        if (Auth::guard('customer_web')->attempt($credentials)) {
-            $request->session()->regenerate();
+        $email = $request->email;
+        $password = $request->password;
 
-            // return redirect()->intended('beta/'); // customer dashboard
-            return redirect()->intended('/'); // Beta Removed
+        Log::info('Login attempt for email: ' . $email);
+
+        $customer = Customer::where('email', $email)->first();
+
+        Log::info('Customer found: ' . ($customer ? 'Yes - ID: ' . $customer->id : 'No'));
+
+        if (!$customer) {
+            return back()->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ])->withInput($request->except('password'));
         }
 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match.',
-        ]);
+        if (!Hash::check($password, $customer->password)) {
+            return back()->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ])->withInput($request->except('password'));
+        }
+
+        Auth::guard('customer_web')->login($customer);
+        $request->session()->regenerate();
+
+        Log::info('Login successful for customer ID: ' . $customer->id);
+
+        return redirect()->intended('/');
     }
 
     public function logout(Request $request)

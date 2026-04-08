@@ -300,10 +300,10 @@ class AllServicesController extends Controller
                         'amc_plan_id' => $request->filled('amc_plan_id')
                             ? $request->amc_plan_id
                             : null,
-                        // 'request_status' => 'pending',
+                        'request_status' => 'pending',
                         'request_source' => 'customer',
                         // 'is_engineer_assigned' => '0',
-                        'status' => $request->service_type == 'amc' ? 'active' : 'pending',
+                        // 'status' => $request->service_type == 'amc' ? 'active' : 'pending',
                     ]);
                 }
 

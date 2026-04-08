@@ -860,8 +860,8 @@
                                         <label class="fw-semibold body-md-2">
                                             Phone Number
                                         </label>
-                                        <input type="tel" name="phone" placeholder="Enter phone number" autocomplete="off"
-                                            required id="login-phone-input">
+                                        <input type="tel" name="phone" placeholder="Enter 10 digit phone number" autocomplete="off"
+                                            required id="login-phone-input" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits">
                                     </fieldset>
                                     <div id="otp-section" style="display: none;">
                                         <fieldset>
@@ -2162,17 +2162,14 @@
     <script>
         function sendLoginOTP() {
             const phoneInput = document.getElementById('login-phone-input');
-            const phone = phoneInput.value;
+            const phone = phoneInput.value.replace(/\D/g, '');
             
-            if (!phone || phone.length < 10) {
-                alert('Please enter a valid phone number');
+            if (!phone || phone.length !== 10) {
+                alert('Please enter exactly 10 digit phone number');
                 return;
             }
             
-            // Show OTP section and change button
-            document.getElementById('otp-section').style.display = 'block';
-            document.getElementById('send-otp-btn').style.display = 'none';
-            document.getElementById('login-with-otp-btn').style.display = 'block';
+            phoneInput.value = phone;
             
             // Submit the form to send OTP
             const form = document.getElementById('phone-login-form');
@@ -2189,6 +2186,9 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    document.getElementById('otp-section').style.display = 'block';
+                    document.getElementById('send-otp-btn').style.display = 'none';
+                    document.getElementById('login-with-otp-btn').style.display = 'block';
                     alert('OTP sent successfully!');
                 } else {
                     alert(data.message || 'Failed to send OTP');

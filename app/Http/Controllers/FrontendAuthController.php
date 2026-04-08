@@ -37,17 +37,22 @@ class FrontendAuthController extends Controller
     public function sendLoginOtp(Request $request)
     {
         $request->validate([
-            'phone' => 'required|string|min:10',
+            'phone' => 'required|string|digits:10',
+        ], [
+            'phone.digits' => 'Please enter exactly 10 digit phone number',
         ]);
         
         $otp = rand(1000, 9999);
         $phone = $request->phone;
         
-        // Find customer and update OTP in database
+        // Find customer by phone number
         $customer = Customer::where('phone', $phone)->first();
         
         if (!$customer) {
-            return back()->with('error', 'No account found with this phone number');
+            return response()->json([
+                'success' => false,
+                'message' => 'Your entered mobile number is not available. Please check your phone number and signup.',
+            ]);
         }
         
         // Save OTP and expiry in customer record
@@ -69,14 +74,10 @@ class FrontendAuthController extends Controller
         
         Log::info("Login OTP for {$phone}: {$otp}");
         
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'OTP sent successfully',
-            ]);
-        }
-        
-        return back()->with('success', 'OTP sent to your phone number');
+        return response()->json([
+            'success' => true,
+            'message' => 'OTP sent successfully',
+        ]);
     }
 
     /**

@@ -47,7 +47,10 @@ Route::prefix('/')->group(function () {
     Route::post('/e-commerce/signup', [FrontendAuthController::class, 'ecommerceSignup'])->name('ecommerce.signup.post');
 
     // Home
-    Route::get('/', [FrontendController::class, 'index'])->name('website');
+    // Route::get('/', [FrontendController::class, 'index'])->name('website');
+    Route::get('/', function () {
+        return view('comming-soon');
+    })->name('website');
 
     // Shop
     // Route::get('/shop', function () {

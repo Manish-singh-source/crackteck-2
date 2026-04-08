@@ -584,6 +584,14 @@ class StaticContentController extends Controller
                 ],
                 [
                     'type' => 'paragraph',
+                    'text' => 'Contact No: +91 88288 13603'
+                ],
+                [
+                    'type' => 'paragraph',
+                    'text' => 'Email: satyam@srbcomputers.com'
+                ],
+                [
+                    'type' => 'paragraph',
                     'text' => '1. All devices will be inspected before confirming repair feasibility.'
                 ],
                 [

@@ -74,7 +74,7 @@ class ServiceRequestController extends Controller
 
         // Repairing
         $repairingServices = (clone $baseQuery)
-            ->where('service_type', 'repairing')
+            ->where('service_type', 'repair')
             ->get();
 
         // Quick

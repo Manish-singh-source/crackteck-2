@@ -205,6 +205,7 @@
                                     <thead>
                                         <tr>
                                             <th>Sr No</th>
+                                            <th>Product Image</th>
                                             <th>Product Name</th>
                                             <th>Type</th>
                                             <th>Model No</th>
@@ -212,6 +213,7 @@
                                             <th>Brand</th>
                                             <th>Status</th>
                                             <th>Service Type</th>
+                                            <th>Service Name</th>
                                             <th>Service Price</th>
                                         </tr>
                                     </thead>
@@ -220,6 +222,17 @@
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $product->name }}</td>
+                                                <td>
+                                                    @if($product->images)
+                                                        @if(is_array($product->images))
+                                                            <img src="/{{ $product->images[0] ?? '' }}" alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                                                        @else
+                                                            <img src="/{{ $product->images }}" alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                                                        @endif
+                                                    @else
+                                                        -
+                                                    @endif
+                                                </td>
                                                 <td>{{ $product->type ?? '-' }}</td>
                                                 <td>{{ $product->model_no ?? '-' }}</td>
                                                 <td>{{ $product->hsn ?? '-' }}</td>
@@ -272,6 +285,7 @@
                                                     @endphp
                                                     {{ $serviceType[$product->itemCode->service_type ?? '-'] ?? '-' }}
                                                 </td>
+                                                <td>{{ $product->item_code_id ?? '-' }}</td>
                                                 <td>{{ $product->service_charge ?? '-' }}</td>
                                             </tr>
                                         @endforeach

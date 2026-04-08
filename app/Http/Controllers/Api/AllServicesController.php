@@ -300,10 +300,8 @@ class AllServicesController extends Controller
                         'amc_plan_id' => $request->filled('amc_plan_id')
                             ? $request->amc_plan_id
                             : null,
-                        'request_status' => 'pending',
                         'request_source' => 'customer',
-                        // 'is_engineer_assigned' => '0',
-                        // 'status' => $request->service_type == 'amc' ? 'active' : 'pending',
+                        'status' => 'pending',
                     ]);
                 }
 
@@ -338,14 +336,18 @@ class AllServicesController extends Controller
                 }
 
                 foreach ($request->products as $product) {
+                    $serviceProduct = null;
 
                     if ($request->service_type != 'amc') {
                         $services = CoveredItem::where('status', 'active')
                             ->where('id', $product['service_type_id'] ?? null)
                             ->first();
 
-                        if (! $services) {
-                            continue;
+                        if (!$services) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Service type not found or inactive. product: ' . ($product['name'] ?? 'unknown')
+                            ], 422);
                         }
                     }
 
@@ -368,10 +370,11 @@ class AllServicesController extends Controller
                             'brand' => $product['brand'] ?? null,
                             'description' => $product['description'] ?? null,
                         ]);
+                        $images = [];
                     } else {
                         $serviceProduct = $servicesRequest->products()->create([
                             'service_requests_id' => $servicesRequest->id,
-                            'item_code_id' => $services->id ?? null,
+                            'item_code_id' => $product['service_type_id'] ?? null,
                             'name' => $product['name'] ?? null,
                             'type' => $product['type'] ?? null,
                             'model_no' => $product['model_no'] ?? null,
@@ -382,9 +385,9 @@ class AllServicesController extends Controller
                             'description' => $product['description'] ?? null,
                             'service_charge' => $services->service_charge ?? null,
                         ]);
+                        $images = [];
                     }
 
-                    $images = $serviceProduct->images ?? [];
                     if (! empty($product['images']) && is_array($product['images'])) {
                         foreach ($product['images'] as $file) {
 
@@ -418,7 +421,7 @@ class AllServicesController extends Controller
                     $data = $servicesRequest->load('products');
                 }
 
-                if ($request->amc_type === 'onsite') {
+                if ($request->service_type == 'amc' && $request->amc_type === 'onsite') {
                     Lead::create([
                         'amc_id' => $amc->id,
                         'customer_id' => $request->user_id,
@@ -430,8 +433,8 @@ class AllServicesController extends Controller
                         'estimated_value' => null,
                         'notes' => $request->additional_notes ?? null,
                     ]);
-                }else{
-                    $amc->status =  'active';
+                } elseif ($request->service_type == 'amc') {
+                    $amc->status = 'active';
                     $amc->save();
                 }
                 DB::commit();

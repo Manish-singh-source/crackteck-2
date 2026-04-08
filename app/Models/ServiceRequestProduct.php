@@ -20,6 +20,7 @@ class ServiceRequestProduct extends Model
         'description',
         'item_code_id',
         'service_charge',
+        'service_type',
         'status',
     ];
 

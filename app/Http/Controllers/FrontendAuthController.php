@@ -59,9 +59,14 @@ class FrontendAuthController extends Controller
         $request->session()->put('login_otp', $otp);
         $request->session()->put('login_phone', $phone);
         
-        // Send OTP via SMS (using Fast2SMS or similar)
-        // For now, we'll just return success and log the OTP
-        // In production, integrate with SMS service
+        // Send OTP via SMS
+        $smsService = new Fast2smsService();
+        $smsResponse = $smsService->sendOtp($phone, $otp);
+        
+        if (!$smsResponse['success']) {
+            Log::warning("SMS sending failed for {$phone}: " . $smsResponse['message']);
+        }
+        
         Log::info("Login OTP for {$phone}: {$otp}");
         
         if ($request->expectsJson()) {

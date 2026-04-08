@@ -110,7 +110,9 @@
                                                                     'engineer_rejected' =>
                                                                         'bg-danger-subtle text-danger',
                                                                     'warehouse_approved' =>
-                                                                        'bg-success-subtle text-success'
+                                                                        'bg-success-subtle text-success',
+                                                                    'warehouse_rejected' =>
+                                                                        'bg-danger-subtle text-danger'    
                                                                 ];
 
                                                                 $status = [
@@ -130,7 +132,8 @@
                                                                     'delivered' => 'Delivered',
                                                                     'engineer_approved' => 'Engineer Approved',
                                                                     'engineer_rejected' => 'Engineer Rejected',
-                                                                    'warehouse_approved' => 'Warehouse Approved'
+                                                                    'warehouse_approved' => 'Warehouse Approved',
+                                                                    'warehouse_rejected' => 'Warehouse Rejected',
                                                                 ];
                                                             @endphp
                                                             @forelse($stockRequests as $index => $request)

@@ -131,11 +131,11 @@
                                                 </div>
                                             </form>
 
-                                            <div class="text-center mt-3">
+                                            {{-- <div class="text-center mt-3">
                                                 <p class="text-muted fs-14 mb-0">
                                                     <a href="{{ route('login') }}" class="text-muted fw-semibold">Back to Login</a>
                                                 </p>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                     </div>
                                 </div>

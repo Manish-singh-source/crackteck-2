@@ -172,7 +172,7 @@ class PasswordResetController extends Controller
             ->delete();
 
         if ($request->user_type === 'customer') {
-            return redirect()->route('frontend.login')->with('success', 'Your password has been reset successfully. Please login with your new password.');
+            return redirect()->route('website')->with('success', 'Your password has been reset successfully. Please login with your new password.');
         } elseif ($request->user_type === 'staff') {
             return redirect()->route('login')->with('success', 'Your password has been reset successfully. Please login with your new password.');
         }

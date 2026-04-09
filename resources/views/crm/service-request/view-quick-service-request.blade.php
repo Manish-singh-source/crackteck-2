@@ -209,7 +209,7 @@
                                             <th>Product Name</th>
                                             <th>Type</th>
                                             <th>Model No</th>
-                                            <th>HSN</th>
+                                            <th>MAC Address</th>
                                             <th>Brand</th>
                                             <th>Status</th>
                                             <th>Service Type</th>
@@ -235,7 +235,7 @@
                                                 </td>
                                                 <td>{{ $product->type ?? '-' }}</td>
                                                 <td>{{ $product->model_no ?? '-' }}</td>
-                                                <td>{{ $product->hsn ?? '-' }}</td>
+                                                <td>{{ $product->mac_address ?? '-' }}</td>
                                                 <td>{{ $product->brand ?? '-' }}</td>
                                                 <td>
                                                     @php

@@ -6,6 +6,7 @@ use App\Helpers\StatusUpdateHelper;
 use App\Models\ServiceRequestProductPickup;
 use App\Models\ServiceRequestProductReturn;
 use App\Models\Staff;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -62,6 +63,7 @@ class ReturnRequestController extends Controller
             'serviceRequest',
             'serviceRequestProduct',
             'serviceRequest.customer',
+            'serviceRequest.customer.primaryAddress',
             'serviceRequestProduct.serviceRequest',
             'assignedPerson',
         ])
@@ -73,10 +75,14 @@ class ReturnRequestController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Get primary warehouse details
+        $primaryWarehouse = Warehouse::where('default_warehouse', 'yes')->first();
+
         return response()->json([
             'success' => true,
             'message' => 'Return requests retrieved successfully.',
             'return_requests' => $returnRequests,
+            'primary_warehouse' => $primaryWarehouse,
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name ?? $user->first_name,
@@ -114,6 +120,7 @@ class ReturnRequestController extends Controller
             'serviceRequest',
             'serviceRequestProduct',
             'serviceRequest.customer',
+            'serviceRequest.customer.primaryAddress',
             // 'serviceRequestProduct.product',
             'assignedPerson',
             'pickup',
@@ -132,10 +139,14 @@ class ReturnRequestController extends Controller
             ], 403);
         }
 
+        // Get primary warehouse details
+        $primaryWarehouse = Warehouse::where('default_warehouse', 'yes')->first();
+
         return response()->json([
             'success' => true,
             'message' => 'Return request details retrieved successfully.',
             'return_request' => $returnRequest,
+            'primary_warehouse' => $primaryWarehouse,
         ], 200);
     }
 

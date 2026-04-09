@@ -12,6 +12,7 @@ use App\Models\ServiceRequestProductPickup;
 use App\Models\ServiceRequestProductRequestPart;
 use App\Models\Staff;
 use App\Models\Warehouse;
+use App\Services\Fast2smsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -155,24 +156,6 @@ class PickupRequestController extends Controller
                 'product_details' => $productDetails,
                 'warehouse_details' => $warehouseDetails,
                 'customer_address' => $customerAddress,
-                'service_request' => $pickup->serviceRequest ? [
-                    'id' => $pickup->serviceRequest->id,
-                    'request_id' => $pickup->serviceRequest->request_id,
-                    'service_type' => $pickup->serviceRequest->service_type,
-                    'customer_address_id' => $pickup->serviceRequest->customer_address_id,
-                    'status' => $pickup->serviceRequest->status,
-                ] : null,
-                'service_request_product' => $pickup->serviceRequestProduct ? [
-                    'id' => $pickup->serviceRequestProduct->id,
-                    'name' => $pickup->serviceRequestProduct->name,
-                    'model_no' => $pickup->serviceRequestProduct->model_no,
-                ] : null,
-                'customer' => $pickup->serviceRequest?->customer ? [
-                    'id' => $pickup->serviceRequest->customer->id,
-                    'name' => $pickup->serviceRequest->customer->first_name . ' ' . $pickup->serviceRequest->customer->last_name,
-                    'phone' => $pickup->serviceRequest->customer->phone,
-                    'email' => $pickup->serviceRequest->customer->email,
-                ] : null,
             ];
         });
 
@@ -261,7 +244,7 @@ class PickupRequestController extends Controller
                         $warehouseDetails = [
                             'id' => $warehouse->id,
                             'name' => $warehouse->name,
-                            'address' => $warehouse->address ?? null,
+                            'address1' => $warehouse->address1 ?? null,
                             'city' => $warehouse->city ?? null,
                             'state' => $warehouse->state ?? null,
                         ];
@@ -314,23 +297,9 @@ class PickupRequestController extends Controller
                 'customer_address_id' => $pickupRequest->serviceRequest->customer_address_id,
                 'request_date' => $pickupRequest->serviceRequest->request_date,
                 'visit_date' => $pickupRequest->serviceRequest->visit_date,
+                'reschedule_date' => $pickupRequest->serviceRequest->reschedule_date,
                 'status' => $pickupRequest->serviceRequest->status,
-            ] : null,
-            'service_request_product' => $pickupRequest->serviceRequestProduct ? [
-                'id' => $pickupRequest->serviceRequestProduct->id,
-                'name' => $pickupRequest->serviceRequestProduct->name,
-                'type' => $pickupRequest->serviceRequestProduct->type,
-                'model_no' => $pickupRequest->serviceRequestProduct->model_no,
-                'sku' => $pickupRequest->serviceRequestProduct->sku,
-                'brand' => $pickupRequest->serviceRequestProduct->brand,
-            ] : null,
-            'customer' => $pickupRequest->serviceRequest?->customer ? [
-                'id' => $pickupRequest->serviceRequest->customer->id,
-                'first_name' => $pickupRequest->serviceRequest->customer->first_name,
-                'last_name' => $pickupRequest->serviceRequest->customer->last_name,
-                'name' => $pickupRequest->serviceRequest->customer->first_name . ' ' . $pickupRequest->serviceRequest->customer->last_name,
-                'phone' => $pickupRequest->serviceRequest->customer->phone,
-                'email' => $pickupRequest->serviceRequest->customer->email,
+                'additional_notes' => $pickupRequest->serviceRequest->additional_notes ?? null,
             ] : null,
             'assigned_person' => $pickupRequest->assignedPerson ? [
                 'id' => $pickupRequest->assignedPerson->id,
@@ -473,8 +442,40 @@ class PickupRequestController extends Controller
         }
 
         try {
+            // Check if OTP already sent and still valid
+            if ($pickupRequest->otp && $pickupRequest->otp_expiry && now()->lt($pickupRequest->otp_expiry)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP already sent and is still valid. Please wait before retrying.',
+                ], 400);
+            }
+
             // Generate 4-digit OTP
             $otp = rand(1000, 9999);
+
+            // Get customer phone number for SMS
+            $customer = $pickupRequest->serviceRequest->customer;
+            $customerPhone = $customer->phone ?? null;
+            $smsSent = false;
+
+            if ($customerPhone) {
+                try {
+                    $smsService = new Fast2smsService();
+                    $smsResponse = $smsService->sendOtp($customerPhone, $otp);
+                    $smsSent = $smsResponse['success'] ?? false;
+
+                    Log::info('Pickup OTP SMS sent to customer', [
+                        'pickup_id' => $id,
+                        'customer_phone' => $customerPhone,
+                        'sms_success' => $smsSent,
+                    ]);
+                } catch (\Exception $smsException) {
+                    Log::error('Failed to send pickup OTP SMS', [
+                        'pickup_id' => $id,
+                        'error' => $smsException->getMessage(),
+                    ]);
+                }
+            }
 
             // Update pickup request with OTP and expiry (5 minutes)
             $pickupRequest->update([
@@ -482,26 +483,14 @@ class PickupRequestController extends Controller
                 'otp_expiry' => now()->addMinutes(5),
             ]);
 
-            // Get customer phone number for SMS
-            $customer = $pickupRequest->serviceRequest->customer;
-
-            if ($customer && $customer->phone) {
-                // Log OTP for debugging (in production, send via SMS)
-                Log::info('Pickup OTP generated', [
-                    'pickup_id' => $id,
-                    'otp' => $otp,
-                    'customer_phone' => $customer->phone,
-                ]);
-
-                // TODO: Send OTP via SMS service (Fast2SMS, etc.)
-                // $this->sendSms($customer->phone, $otp);
-            }
-
             return response()->json([
                 'success' => true,
                 'message' => 'OTP sent successfully.',
                 'otp' => $otp,
-                'otp_expires_in_seconds' => 300, // 5 minutes
+                'otp_expiry' => $pickupRequest->otp_expiry,
+                'sms_sent' => $smsSent,
+                'customer_phone' => $customerPhone,
+                'otp_expires_in_seconds' => 300,
             ], 200);
 
         } catch (\Exception $e) {
@@ -555,8 +544,16 @@ class PickupRequestController extends Controller
             ], 403);
         }
 
+        // Check if OTP exists
+        if (! $pickupRequest->otp || ! $pickupRequest->otp_expiry) {
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP not generated for this pickup request.',
+            ], 400);
+        }
+
         // Check if OTP matches
-        if ($pickupRequest->otp !== $request->otp) {
+        if ($pickupRequest->otp != $request->otp) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid OTP.',

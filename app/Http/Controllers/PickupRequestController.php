@@ -156,6 +156,24 @@ class PickupRequestController extends Controller
                 'product_details' => $productDetails,
                 'warehouse_details' => $warehouseDetails,
                 'customer_address' => $customerAddress,
+                'service_request' => $pickup->serviceRequest ? [
+                    'id' => $pickup->serviceRequest->id,
+                    'request_id' => $pickup->serviceRequest->request_id,
+                    'service_type' => $pickup->serviceRequest->service_type,
+                    'customer_address_id' => $pickup->serviceRequest->customer_address_id,
+                    'status' => $pickup->serviceRequest->status,
+                ] : null,
+                'service_request_product' => $pickup->serviceRequestProduct ? [
+                    'id' => $pickup->serviceRequestProduct->id,
+                    'name' => $pickup->serviceRequestProduct->name,
+                    'model_no' => $pickup->serviceRequestProduct->model_no,
+                ] : null,
+                'customer' => $pickup->serviceRequest?->customer ? [
+                    'id' => $pickup->serviceRequest->customer->id,
+                    'name' => $pickup->serviceRequest->customer->first_name . ' ' . $pickup->serviceRequest->customer->last_name,
+                    'phone' => $pickup->serviceRequest->customer->phone,
+                    'email' => $pickup->serviceRequest->customer->email,
+                ] : null,
             ];
         });
 
@@ -244,7 +262,7 @@ class PickupRequestController extends Controller
                         $warehouseDetails = [
                             'id' => $warehouse->id,
                             'name' => $warehouse->name,
-                            'address1' => $warehouse->address1 ?? null,
+                            'address' => $warehouse->address ?? null,
                             'city' => $warehouse->city ?? null,
                             'state' => $warehouse->state ?? null,
                         ];
@@ -297,9 +315,23 @@ class PickupRequestController extends Controller
                 'customer_address_id' => $pickupRequest->serviceRequest->customer_address_id,
                 'request_date' => $pickupRequest->serviceRequest->request_date,
                 'visit_date' => $pickupRequest->serviceRequest->visit_date,
-                'reschedule_date' => $pickupRequest->serviceRequest->reschedule_date,
                 'status' => $pickupRequest->serviceRequest->status,
-                'additional_notes' => $pickupRequest->serviceRequest->additional_notes ?? null,
+            ] : null,
+            'service_request_product' => $pickupRequest->serviceRequestProduct ? [
+                'id' => $pickupRequest->serviceRequestProduct->id,
+                'name' => $pickupRequest->serviceRequestProduct->name,
+                'type' => $pickupRequest->serviceRequestProduct->type,
+                'model_no' => $pickupRequest->serviceRequestProduct->model_no,
+                'sku' => $pickupRequest->serviceRequestProduct->sku,
+                'brand' => $pickupRequest->serviceRequestProduct->brand,
+            ] : null,
+            'customer' => $pickupRequest->serviceRequest?->customer ? [
+                'id' => $pickupRequest->serviceRequest->customer->id,
+                'first_name' => $pickupRequest->serviceRequest->customer->first_name,
+                'last_name' => $pickupRequest->serviceRequest->customer->last_name,
+                'name' => $pickupRequest->serviceRequest->customer->first_name . ' ' . $pickupRequest->serviceRequest->customer->last_name,
+                'phone' => $pickupRequest->serviceRequest->customer->phone,
+                'email' => $pickupRequest->serviceRequest->customer->email,
             ] : null,
             'assigned_person' => $pickupRequest->assignedPerson ? [
                 'id' => $pickupRequest->assignedPerson->id,
@@ -544,16 +576,8 @@ class PickupRequestController extends Controller
             ], 403);
         }
 
-        // Check if OTP exists
-        if (! $pickupRequest->otp || ! $pickupRequest->otp_expiry) {
-            return response()->json([
-                'success' => false,
-                'message' => 'OTP not generated for this pickup request.',
-            ], 400);
-        }
-
         // Check if OTP matches
-        if ($pickupRequest->otp != $request->otp) {
+        if ($pickupRequest->otp !== $request->otp) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid OTP.',

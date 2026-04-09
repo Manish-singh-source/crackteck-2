@@ -131,7 +131,7 @@ class PickupRequestController extends Controller
 
             // If no warehouse details found, get the primary/default warehouse
             if (!$warehouseDetails) {
-                $primaryWarehouse = Warehouse::where('default_warehouse', 1)->first();
+                $primaryWarehouse = Warehouse::where('default_warehouse', 'yes')->first();
                 if ($primaryWarehouse) {
                     $warehouseDetails = [
                         'id' => $primaryWarehouse->id,
@@ -286,7 +286,7 @@ class PickupRequestController extends Controller
 
                 // If no warehouse details found, get the primary/default warehouse
                 if (!$warehouseDetails) {
-                    $primaryWarehouse = Warehouse::where('default_warehouse', 1)->first();
+                    $primaryWarehouse = Warehouse::where('default_warehouse', 'yes')->first();
                     if ($primaryWarehouse) {
                         $warehouseDetails = [
                             'id' => $primaryWarehouse->id,

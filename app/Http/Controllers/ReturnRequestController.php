@@ -7,6 +7,7 @@ use App\Models\ServiceRequestProductPickup;
 use App\Models\ServiceRequestProductReturn;
 use App\Models\Staff;
 use App\Models\Warehouse;
+use App\Services\Fast2smsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -291,15 +292,23 @@ class ReturnRequestController extends Controller
             $customer = $returnRequest->serviceRequest->customer;
 
             if ($customer && $customer->phone) {
-                // Log OTP for debugging (in production, send via SMS)
-                Log::info('Return OTP generated', [
-                    'return_id' => $id,
-                    'otp' => $otp,
-                    'customer_phone' => $customer->phone,
-                ]);
+                // Send OTP via SMS service
+                $fast2sms = new Fast2smsService();
+                $smsResponse = $fast2sms->sendOtp($customer->phone, $otp);
 
-                // TODO: Send OTP via SMS service (Fast2SMS, etc.)
-                // $this->sendSms($customer->phone, $otp);
+                if ($smsResponse['success']) {
+                    Log::info('Return OTP SMS sent to customer', [
+                        'return_id' => $id,
+                        'otp' => $otp,
+                        'customer_phone' => $customer->phone,
+                    ]);
+                } else {
+                    Log::error('Failed to send return OTP SMS', [
+                        'return_id' => $id,
+                        'customer_phone' => $customer->phone,
+                        'response' => $smsResponse['message'],
+                    ]);
+                }
             }
 
             return response()->json([

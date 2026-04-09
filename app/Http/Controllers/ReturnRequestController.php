@@ -63,7 +63,7 @@ class ReturnRequestController extends Controller
             'serviceRequest',
             'serviceRequestProduct',
             'serviceRequest.customer',
-            'serviceRequest.customer.primaryAddress',
+            'serviceRequest.addressDetail',
             'serviceRequestProduct.serviceRequest',
             'assignedPerson',
         ])
@@ -120,7 +120,7 @@ class ReturnRequestController extends Controller
             'serviceRequest',
             'serviceRequestProduct',
             'serviceRequest.customer',
-            'serviceRequest.customer.primaryAddress',
+            'serviceRequest.addressDetail',
             // 'serviceRequestProduct.product',
             'assignedPerson',
             'pickup',

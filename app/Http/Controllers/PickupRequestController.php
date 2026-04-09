@@ -95,7 +95,7 @@ class PickupRequestController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-            // Format the response to include product details with warehouse_id
+        // Format the response to include product details with warehouse_id
         $formattedPickupRequests = $pickupRequests->map(function ($pickup) {
             $productDetails = null;
             $warehouseDetails = null;
@@ -112,7 +112,7 @@ class PickupRequestController extends Controller
                         'brand_name' => $requestedPart->product->brand?->name,
                         'warehouse_id' => $requestedPart->product->warehouse_id,
                     ];
-                    
+
                     // Get warehouse details if warehouse_id exists
                     if ($requestedPart->product->warehouse_id) {
                         $warehouse = Warehouse::find($requestedPart->product->warehouse_id);
@@ -244,8 +244,10 @@ class PickupRequestController extends Controller
         }
 
         // Verify the user has access to this pickup request
-        if ($pickupRequest->assigned_person_type !== $roleName ||
-            $pickupRequest->assigned_person_id != $request->user_id) {
+        if (
+            $pickupRequest->assigned_person_type !== $roleName ||
+            $pickupRequest->assigned_person_id != $request->user_id
+        ) {
             return response()->json([
                 'success' => false,
                 'message' => 'You do not have access to this pickup request.',
@@ -269,7 +271,7 @@ class PickupRequestController extends Controller
                     'warehouse_id' => $requestedPart->product->warehouse_id,
                     'mac_address' => $requestedPart->product->mac_address,
                 ];
-                
+
                 // Get warehouse details if warehouse_id exists
                 if ($requestedPart->product->warehouse_id) {
                     $warehouse = Warehouse::find($requestedPart->product->warehouse_id);
@@ -283,21 +285,21 @@ class PickupRequestController extends Controller
                         ];
                     }
                 }
+            }
+        }
 
-                // If no warehouse details found, get the primary/default warehouse
-                if (!$warehouseDetails) {
-                    $primaryWarehouse = Warehouse::where('default_warehouse', 'yes')->first();
-                    if ($primaryWarehouse) {
-                        $warehouseDetails = [
-                            'id' => $primaryWarehouse->id,
-                            'name' => $primaryWarehouse->name,
-                            'address' => $primaryWarehouse->address1 ?? $primaryWarehouse->address2 ?? null,
-                            'city' => $primaryWarehouse->city ?? null,
-                            'state' => $primaryWarehouse->state ?? null,
-                            'is_primary' => true,
-                        ];
-                    }
-                }
+        // If no warehouse details found, get the primary/default warehouse
+        if (!$warehouseDetails) {
+            $primaryWarehouse = Warehouse::where('default_warehouse', 'yes')->first();
+            if ($primaryWarehouse) {
+                $warehouseDetails = [
+                    'id' => $primaryWarehouse->id,
+                    'name' => $primaryWarehouse->name,
+                    'address' => $primaryWarehouse->address1 ?? $primaryWarehouse->address2 ?? null,
+                    'city' => $primaryWarehouse->city ?? null,
+                    'state' => $primaryWarehouse->state ?? null,
+                    'is_primary' => true,
+                ];
             }
         }
 
@@ -409,8 +411,10 @@ class PickupRequestController extends Controller
         }
 
         // Verify the user has access to this pickup request
-        if ($pickupRequest->assigned_person_type !== $roleName ||
-            $pickupRequest->assigned_person_id != $request->user_id) {
+        if (
+            $pickupRequest->assigned_person_type !== $roleName ||
+            $pickupRequest->assigned_person_id != $request->user_id
+        ) {
             return response()->json([
                 'success' => false,
                 'message' => 'You do not have access to this pickup request.',
@@ -444,10 +448,9 @@ class PickupRequestController extends Controller
                 'message' => 'Pickup request accepted successfully. All products for this service have been approved.',
                 'approved_count' => $updatedCount,
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error accepting pickup request: '.$e->getMessage());
+            Log::error('Error accepting pickup request: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -488,8 +491,10 @@ class PickupRequestController extends Controller
         }
 
         // Verify the user has access to this pickup request
-        if ($pickupRequest->assigned_person_type !== $roleName ||
-            $pickupRequest->assigned_person_id != $request->user_id) {
+        if (
+            $pickupRequest->assigned_person_type !== $roleName ||
+            $pickupRequest->assigned_person_id != $request->user_id
+        ) {
             return response()->json([
                 'success' => false,
                 'message' => 'You do not have access to this pickup request.',
@@ -555,9 +560,8 @@ class PickupRequestController extends Controller
                 'customer_phone' => $customerPhone,
                 'otp_expires_in_seconds' => 300,
             ], 200);
-
         } catch (\Exception $e) {
-            Log::error('Error sending pickup OTP: '.$e->getMessage());
+            Log::error('Error sending pickup OTP: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -599,8 +603,10 @@ class PickupRequestController extends Controller
         }
 
         // Verify the user has access to this pickup request
-        if ($pickupRequest->assigned_person_type !== $roleName ||
-            $pickupRequest->assigned_person_id != $request->user_id) {
+        if (
+            $pickupRequest->assigned_person_type !== $roleName ||
+            $pickupRequest->assigned_person_id != $request->user_id
+        ) {
             return response()->json([
                 'success' => false,
                 'message' => 'You do not have access to this pickup request.',
@@ -642,10 +648,9 @@ class PickupRequestController extends Controller
                 'success' => true,
                 'message' => 'OTP verified successfully. Pickup status updated to picked.',
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error verifying pickup OTP: '.$e->getMessage());
+            Log::error('Error verifying pickup OTP: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,

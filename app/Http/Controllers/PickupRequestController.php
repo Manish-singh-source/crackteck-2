@@ -251,6 +251,7 @@ class PickupRequestController extends Controller
                     'brand_id' => $requestedPart->product->brand_id,
                     'brand_name' => $requestedPart->product->brand?->name,
                     'warehouse_id' => $requestedPart->product->warehouse_id,
+                    'mac_address' => $requestedPart->product->mac_address,
                 ];
                 
                 // Get warehouse details if warehouse_id exists

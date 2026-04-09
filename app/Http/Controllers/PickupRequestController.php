@@ -95,7 +95,7 @@ class PickupRequestController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Format the response to include product details with warehouse_id
+            // Format the response to include product details with warehouse_id
         $formattedPickupRequests = $pickupRequests->map(function ($pickup) {
             $productDetails = null;
             $warehouseDetails = null;
@@ -120,12 +120,27 @@ class PickupRequestController extends Controller
                             $warehouseDetails = [
                                 'id' => $warehouse->id,
                                 'name' => $warehouse->name,
-                                'address' => $warehouse->address ?? null,
+                                'address' => $warehouse->address1 ?? $warehouse->address2 ?? null,
                                 'city' => $warehouse->city ?? null,
                                 'state' => $warehouse->state ?? null,
                             ];
                         }
                     }
+                }
+            }
+
+            // If no warehouse details found, get the primary/default warehouse
+            if (!$warehouseDetails) {
+                $primaryWarehouse = Warehouse::where('default_warehouse', 1)->first();
+                if ($primaryWarehouse) {
+                    $warehouseDetails = [
+                        'id' => $primaryWarehouse->id,
+                        'name' => $primaryWarehouse->name,
+                        'address' => $primaryWarehouse->address1 ?? $primaryWarehouse->address2 ?? null,
+                        'city' => $primaryWarehouse->city ?? null,
+                        'state' => $primaryWarehouse->state ?? null,
+                        'is_primary' => true,
+                    ];
                 }
             }
 
@@ -262,9 +277,24 @@ class PickupRequestController extends Controller
                         $warehouseDetails = [
                             'id' => $warehouse->id,
                             'name' => $warehouse->name,
-                            'address' => $warehouse->address ?? null,
+                            'address' => $warehouse->address1 ?? $warehouse->address2 ?? null,
                             'city' => $warehouse->city ?? null,
                             'state' => $warehouse->state ?? null,
+                        ];
+                    }
+                }
+
+                // If no warehouse details found, get the primary/default warehouse
+                if (!$warehouseDetails) {
+                    $primaryWarehouse = Warehouse::where('default_warehouse', 1)->first();
+                    if ($primaryWarehouse) {
+                        $warehouseDetails = [
+                            'id' => $primaryWarehouse->id,
+                            'name' => $primaryWarehouse->name,
+                            'address' => $primaryWarehouse->address1 ?? $primaryWarehouse->address2 ?? null,
+                            'city' => $primaryWarehouse->city ?? null,
+                            'state' => $primaryWarehouse->state ?? null,
+                            'is_primary' => true,
                         ];
                     }
                 }
@@ -324,6 +354,7 @@ class PickupRequestController extends Controller
                 'model_no' => $pickupRequest->serviceRequestProduct->model_no,
                 'sku' => $pickupRequest->serviceRequestProduct->sku,
                 'brand' => $pickupRequest->serviceRequestProduct->brand,
+                'mac_address' => $pickupRequest->serviceRequestProduct->mac_address,
             ] : null,
             'customer' => $pickupRequest->serviceRequest?->customer ? [
                 'id' => $pickupRequest->serviceRequest->customer->id,

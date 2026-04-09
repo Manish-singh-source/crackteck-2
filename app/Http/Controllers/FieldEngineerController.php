@@ -16,6 +16,7 @@ use App\Models\ServiceRequestProductRequestPart;
 use App\Models\ServiceRequestQuotation;
 use App\Models\Staff;
 use App\Models\StockInHandProduct;
+use App\Services\Fast2smsService;
 use Barryvdh\DomPDF\Facade\PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -247,7 +248,7 @@ class FieldEngineerController extends Controller
     public function startDiagnosis(Request $request, $id)
     {
         try {
-            $serviceRequest = ServiceRequest::find($id);
+            $serviceRequest = ServiceRequest::with('customer')->find($id);
 
             if (! $serviceRequest) {
                 return response()->json([
@@ -272,6 +273,31 @@ class FieldEngineerController extends Controller
 
             $otp = rand(1000, 9999);
 
+            $customerPhone = $serviceRequest->customer->phone ?? null;
+            $smsSent = false;
+            $smsError = null;
+
+            if ($customerPhone) {
+                try {
+                    $smsService = new Fast2smsService();
+                    $smsResponse = $smsService->sendOtp($customerPhone, $otp);
+                    $smsSent = $smsResponse['success'] ?? false;
+                    $smsError = $smsResponse['message'] ?? null;
+
+                    Log::info('OTP SMS sent to customer', [
+                        'service_request_id' => $id,
+                        'customer_phone' => $customerPhone,
+                        'sms_success' => $smsSent,
+                    ]);
+                } catch (\Exception $smsException) {
+                    Log::error('Failed to send OTP SMS', [
+                        'service_request_id' => $id,
+                        'error' => $smsException->getMessage(),
+                    ]);
+                    $smsError = $smsException->getMessage();
+                }
+            }
+
             DB::beginTransaction();
             $serviceRequest->otp = $otp;
             $serviceRequest->otp_expiry = now()->addMinutes(5);
@@ -285,6 +311,8 @@ class FieldEngineerController extends Controller
                     'service_request_id' => $serviceRequest->id,
                     'otp' => $otp,
                     'otp_expiry' => $serviceRequest->otp_expiry,
+                    'sms_sent' => $smsSent,
+                    'customer_phone' => $customerPhone,
                 ],
             ], 200);
         } catch (\Exception $e) {

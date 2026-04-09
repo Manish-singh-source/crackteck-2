@@ -248,6 +248,7 @@ class AllServicesController extends Controller
                 'products.*.name' => 'required|string',
                 'products.*.type' => 'required|string',
                 'products.*.model_no' => 'nullable|string',
+                'products.*.mac_address' => 'nullable|string',
                 'products.*.sku' => 'nullable|string',
                 'products.*.hsn' => 'nullable|string',
                 'products.*.purchase_date' => 'nullable|date',

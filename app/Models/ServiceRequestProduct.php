@@ -12,6 +12,7 @@ class ServiceRequestProduct extends Model
         'name',
         'type',
         'model_no',
+        'mac_address',
         'sku',
         'hsn',
         'purchase_date',

@@ -160,9 +160,27 @@ class CashReceivedController extends Controller
             }
 
             // Reload relationships for response
-            $cashReceived->load(['customer', 'staff', 'order', 'serviceRequest']);
+            $cashReceived->load([
+                'customer',
+                'staff',
+                'order.customer',
+                'order.billingAddress',
+                'order.shippingAddress',
+                'order.orderItems.product',
+                'order.orderItems.productVariant',
+                'serviceRequest'
+            ]);
 
             DB::commit();
+
+            $orderData = null;
+            if ($cashReceived->order) {
+                $orderData = [
+                    'id' => $cashReceived->order->id,
+                    'order_number' => $cashReceived->order->order_number,
+                    'total_amount' => (float) $cashReceived->order->total_amount,
+                ];
+            }
 
             return response()->json([
                 'success' => true,
@@ -174,6 +192,7 @@ class CashReceivedController extends Controller
                     'staff_id' => $cashReceived->staff_id,
                     'staff_name' => $cashReceived->staff ? ($cashReceived->staff->first_name . ' ' . $cashReceived->staff->last_name) : null,
                     'order_id' => $cashReceived->order_id,
+                    'order' => $orderData,
                     'service_request_id' => $cashReceived->service_request_id,
                     'amount' => (float) $cashReceived->amount,
                     'status' => $cashReceived->status,
@@ -209,7 +228,16 @@ class CashReceivedController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = CashReceived::with(['customer', 'staff', 'order', 'serviceRequest']);
+            $query = CashReceived::with([
+                'customer',
+                'staff',
+                'order.customer',
+                'order.billingAddress',
+                'order.shippingAddress',
+                'order.orderItems.product',
+                'order.orderItems.productVariant',
+                'serviceRequest'
+            ]);
 
             // Apply filters
             if ($request->has('status') && $request->status) {
@@ -238,6 +266,52 @@ class CashReceivedController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $cashReceivedList->map(function ($cash) {
+                    $orderData = null;
+                    if ($cash->order) {
+                        $orderData = [
+                            'id' => $cash->order->id,
+                            'order_number' => $cash->order->order_number,
+                            'customer_id' => $cash->order->customer_id,
+                            'customer_name' => $cash->order->customer ? ($cash->order->customer->first_name . ' ' . $cash->order->customer->last_name) : null,
+                            'total_items' => $cash->order->total_items,
+                            'subtotal' => (float) $cash->order->subtotal,
+                            'discount_amount' => (float) $cash->order->discount_amount,
+                            'tax_amount' => (float) $cash->order->tax_amount,
+                            'shipping_charges' => (float) $cash->order->shipping_charges,
+                            'packaging_charges' => (float) $cash->order->packaging_charges,
+                            'total_amount' => (float) $cash->order->total_amount,
+                            'order_status' => $cash->order->order_status,
+                            'payment_status' => $cash->order->payment_status,
+                            'billing_address' => $cash->order->billingAddress ? [
+                                'id' => $cash->order->billingAddress->id,
+                                'address' => $cash->order->billingAddress->address,
+                                'city' => $cash->order->billingAddress->city,
+                                'state' => $cash->order->billingAddress->state,
+                                'pincode' => $cash->order->billingAddress->pincode,
+                            ] : null,
+                            'shipping_address' => $cash->order->shippingAddress ? [
+                                'id' => $cash->order->shippingAddress->id,
+                                'address' => $cash->order->shippingAddress->address,
+                                'city' => $cash->order->shippingAddress->city,
+                                'state' => $cash->order->shippingAddress->state,
+                                'pincode' => $cash->order->shippingAddress->pincode,
+                            ] : null,
+                            'order_items' => $cash->order->orderItems->map(function ($item) {
+                                return [
+                                    'id' => $item->id,
+                                    'product_id' => $item->product_id,
+                                    'product_name' => $item->product?->name,
+                                    'product_variant_id' => $item->product_variant_id,
+                                    'variant_name' => $item->productVariant?->variant_name,
+                                    'quantity' => $item->quantity,
+                                    'price' => (float) $item->price,
+                                    'total_price' => (float) $item->total_price,
+                                ];
+                            }),
+                            'created_at' => $cash->order->created_at->toISOString(),
+                        ];
+                    }
+
                     return [
                         'id' => $cash->id,
                         'customer_id' => $cash->customer_id,
@@ -246,6 +320,7 @@ class CashReceivedController extends Controller
                         'staff_name' => $cash->staff ? ($cash->staff->first_name . ' ' . $cash->staff->last_name) : null,
                         'staff_role' => $cash->staff?->staff_role,
                         'order_id' => $cash->order_id,
+                        'order' => $orderData,
                         'service_request_id' => $cash->service_request_id,
                         'type' => $cash->order_id ? 'Order' : 'Service Request',
                         'amount' => (float) $cash->amount,
@@ -278,13 +353,71 @@ class CashReceivedController extends Controller
     public function show(int $id): JsonResponse
     {
         try {
-            $cashReceived = CashReceived::with(['customer', 'staff', 'order', 'serviceRequest'])->find($id);
+            $cashReceived = CashReceived::with([
+                'customer',
+                'staff',
+                'order.customer',
+                'order.billingAddress',
+                'order.shippingAddress',
+                'order.orderItems.product',
+                'order.orderItems.productVariant',
+                'serviceRequest'
+            ])->find($id);
 
             if (!$cashReceived) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Cash received entry not found.',
                 ], 404);
+            }
+
+            $orderData = null;
+            if ($cashReceived->order) {
+                $orderData = [
+                    'id' => $cashReceived->order->id,
+                    'order_number' => $cashReceived->order->order_number,
+                    'customer_id' => $cashReceived->order->customer_id,
+                    'customer_name' => $cashReceived->order->customer ? ($cashReceived->order->customer->first_name . ' ' . $cashReceived->order->customer->last_name) : null,
+                    'total_items' => $cashReceived->order->total_items,
+                    'subtotal' => (float) $cashReceived->order->subtotal,
+                    'discount_amount' => (float) $cashReceived->order->discount_amount,
+                    'coupon_code' => $cashReceived->order->coupon_code,
+                    'tax_amount' => (float) $cashReceived->order->tax_amount,
+                    'shipping_charges' => (float) $cashReceived->order->shipping_charges,
+                    'packaging_charges' => (float) $cashReceived->order->packaging_charges,
+                    'total_amount' => (float) $cashReceived->order->total_amount,
+                    'order_status' => $cashReceived->order->order_status,
+                    'payment_status' => $cashReceived->order->payment_status,
+                    'delivery_status' => $cashReceived->order->delivery_status,
+                    'billing_address' => $cashReceived->order->billingAddress ? [
+                        'id' => $cashReceived->order->billingAddress->id,
+                        'address' => $cashReceived->order->billingAddress->address,
+                        'city' => $cashReceived->order->billingAddress->city,
+                        'state' => $cashReceived->order->billingAddress->state,
+                        'pincode' => $cashReceived->order->billingAddress->pincode,
+                    ] : null,
+                    'shipping_address' => $cashReceived->order->shippingAddress ? [
+                        'id' => $cashReceived->order->shippingAddress->id,
+                        'address' => $cashReceived->order->shippingAddress->address,
+                        'city' => $cashReceived->order->shippingAddress->city,
+                        'state' => $cashReceived->order->shippingAddress->state,
+                        'pincode' => $cashReceived->order->shippingAddress->pincode,
+                    ] : null,
+                    'order_items' => $cashReceived->order->orderItems->map(function ($item) {
+                        return [
+                            'id' => $item->id,
+                            'product_id' => $item->product_id,
+                            'product_name' => $item->product?->name,
+                            'product_variant_id' => $item->product_variant_id,
+                            'variant_name' => $item->productVariant?->variant_name,
+                            'quantity' => $item->quantity,
+                            'price' => (float) $item->price,
+                            'total_price' => (float) $item->total_price,
+                        ];
+                    }),
+                    'expected_delivery_date' => $cashReceived->order->expected_delivery_date?->toISOString(),
+                    'created_at' => $cashReceived->order->created_at->toISOString(),
+                ];
             }
 
             return response()->json([
@@ -303,6 +436,7 @@ class CashReceivedController extends Controller
                         'role' => $cashReceived->staff?->staff_role,
                     ],
                     'order_id' => $cashReceived->order_id,
+                    'order' => $orderData,
                     'service_request_id' => $cashReceived->service_request_id,
                     'type' => $cashReceived->order_id ? 'Order' : 'Service Request',
                     'amount' => (float) $cashReceived->amount,

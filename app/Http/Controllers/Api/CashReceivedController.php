@@ -167,7 +167,6 @@ class CashReceivedController extends Controller
                 'order.billingAddress',
                 'order.shippingAddress',
                 'order.orderItems.product',
-                'order.orderItems.productVariant',
                 'serviceRequest'
             ]);
 
@@ -235,7 +234,6 @@ class CashReceivedController extends Controller
                 'order.billingAddress',
                 'order.shippingAddress',
                 'order.orderItems.product',
-                'order.orderItems.productVariant',
                 'serviceRequest'
             ]);
 
@@ -282,32 +280,31 @@ class CashReceivedController extends Controller
                             'total_amount' => (float) $cash->order->total_amount,
                             'order_status' => $cash->order->order_status,
                             'payment_status' => $cash->order->payment_status,
-                            'billing_address' => $cash->order->billingAddress ? [
-                                'id' => $cash->order->billingAddress->id,
-                                'address' => $cash->order->billingAddress->address,
-                                'city' => $cash->order->billingAddress->city,
-                                'state' => $cash->order->billingAddress->state,
-                                'pincode' => $cash->order->billingAddress->pincode,
-                            ] : null,
-                            'shipping_address' => $cash->order->shippingAddress ? [
-                                'id' => $cash->order->shippingAddress->id,
-                                'address' => $cash->order->shippingAddress->address,
-                                'city' => $cash->order->shippingAddress->city,
-                                'state' => $cash->order->shippingAddress->state,
-                                'pincode' => $cash->order->shippingAddress->pincode,
-                            ] : null,
-                            'order_items' => $cash->order->orderItems->map(function ($item) {
-                                return [
-                                    'id' => $item->id,
-                                    'product_id' => $item->product_id,
-                                    'product_name' => $item->product?->name,
-                                    'product_variant_id' => $item->product_variant_id,
-                                    'variant_name' => $item->productVariant?->variant_name,
-                                    'quantity' => $item->quantity,
-                                    'price' => (float) $item->price,
-                                    'total_price' => (float) $item->total_price,
-                                ];
-                            }),
+                            // 'billing_address' => $cash->order->billingAddress ? [
+                            //     'id' => $cash->order->billingAddress->id,
+                            //     'address' => $cash->order->billingAddress->address,
+                            //     'city' => $cash->order->billingAddress->city,
+                            //     'state' => $cash->order->billingAddress->state,
+                            //     'pincode' => $cash->order->billingAddress->pincode,
+                            // ] : null,
+                            // 'shipping_address' => $cash->order->shippingAddress ? [
+                            //     'id' => $cash->order->shippingAddress->id,
+                            //     'address' => $cash->order->shippingAddress->address,
+                            //     'city' => $cash->order->shippingAddress->city,
+                            //     'state' => $cash->order->shippingAddress->state,
+                            //     'pincode' => $cash->order->shippingAddress->pincode,
+                            // ] : null,
+                            // 'order_items' => $cash->order->orderItems->map(function ($item) {
+                            //     return [
+                            //         'id' => $item->id,
+                            //         'product_id' => $item->product_id,
+                            //         'product_name' => $item->product?->name,
+                            //         'variant_details' => $item->variant_details,
+                            //         'quantity' => $item->quantity,
+                            //         'unit_price' => (float) $item->unit_price,
+                            //         'line_total' => (float) $item->line_total,
+                            //     ];
+                            // }),
                             'created_at' => $cash->order->created_at->toISOString(),
                         ];
                     }
@@ -360,7 +357,6 @@ class CashReceivedController extends Controller
                 'order.billingAddress',
                 'order.shippingAddress',
                 'order.orderItems.product',
-                'order.orderItems.productVariant',
                 'serviceRequest'
             ])->find($id);
 
@@ -389,32 +385,31 @@ class CashReceivedController extends Controller
                     'order_status' => $cashReceived->order->order_status,
                     'payment_status' => $cashReceived->order->payment_status,
                     'delivery_status' => $cashReceived->order->delivery_status,
-                    'billing_address' => $cashReceived->order->billingAddress ? [
-                        'id' => $cashReceived->order->billingAddress->id,
-                        'address' => $cashReceived->order->billingAddress->address,
-                        'city' => $cashReceived->order->billingAddress->city,
-                        'state' => $cashReceived->order->billingAddress->state,
-                        'pincode' => $cashReceived->order->billingAddress->pincode,
-                    ] : null,
-                    'shipping_address' => $cashReceived->order->shippingAddress ? [
-                        'id' => $cashReceived->order->shippingAddress->id,
-                        'address' => $cashReceived->order->shippingAddress->address,
-                        'city' => $cashReceived->order->shippingAddress->city,
-                        'state' => $cashReceived->order->shippingAddress->state,
-                        'pincode' => $cashReceived->order->shippingAddress->pincode,
-                    ] : null,
-                    'order_items' => $cashReceived->order->orderItems->map(function ($item) {
-                        return [
-                            'id' => $item->id,
-                            'product_id' => $item->product_id,
-                            'product_name' => $item->product?->name,
-                            'product_variant_id' => $item->product_variant_id,
-                            'variant_name' => $item->productVariant?->variant_name,
-                            'quantity' => $item->quantity,
-                            'price' => (float) $item->price,
-                            'total_price' => (float) $item->total_price,
-                        ];
-                    }),
+                    // 'billing_address' => $cashReceived->order->billingAddress ? [
+                    //     'id' => $cashReceived->order->billingAddress->id,
+                    //     'address' => $cashReceived->order->billingAddress->address,
+                    //     'city' => $cashReceived->order->billingAddress->city,
+                    //     'state' => $cashReceived->order->billingAddress->state,
+                    //     'pincode' => $cashReceived->order->billingAddress->pincode,
+                    // ] : null,
+                    // 'shipping_address' => $cashReceived->order->shippingAddress ? [
+                    //     'id' => $cashReceived->order->shippingAddress->id,
+                    //     'address' => $cashReceived->order->shippingAddress->address,
+                    //     'city' => $cashReceived->order->shippingAddress->city,
+                    //     'state' => $cashReceived->order->shippingAddress->state,
+                    //     'pincode' => $cashReceived->order->shippingAddress->pincode,
+                    // ] : null,
+                    // 'order_items' => $cashReceived->order->orderItems->map(function ($item) {
+                    //     return [
+                    //         'id' => $item->id,
+                    //         'product_id' => $item->product_id,
+                    //         'product_name' => $item->product?->name,
+                    //         'variant_details' => $item->variant_details,
+                    //         'quantity' => $item->quantity,
+                    //         'unit_price' => (float) $item->unit_price,
+                    //         'line_total' => (float) $item->line_total,
+                    //     ];
+                    // }),
                     'expected_delivery_date' => $cashReceived->order->expected_delivery_date?->toISOString(),
                     'created_at' => $cashReceived->order->created_at->toISOString(),
                 ];

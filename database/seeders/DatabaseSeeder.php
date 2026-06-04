@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-        Staff::factory()->create([
+        Staff::create([
             'name' => 'Support',
             'email' => 'support@technofra.com',
             'password' => '123456',

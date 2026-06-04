@@ -31,53 +31,53 @@ class DatabaseSeeder extends Seeder
         Role::firstOrCreate(['name' => 'Warehouse Manager']);
 
         $this->call([
-            StaffSeeder::class,
-            StaffAddressSeeder::class,
-            StaffAadharDetailSeeder::class,
-            StaffPanCardDetailSeeder::class,
-            StaffBankDetailSeeder::class,
-            StaffVehicleDetailSeeder::class,
-            StaffPoliceVerificationSeeder::class,
-            StaffWorkSkillSeeder::class,
+            // StaffSeeder::class,
+            // StaffAddressSeeder::class,
+            // StaffAadharDetailSeeder::class,
+            // StaffPanCardDetailSeeder::class,
+            // StaffBankDetailSeeder::class,
+            // StaffVehicleDetailSeeder::class,
+            // StaffPoliceVerificationSeeder::class,
+            // StaffWorkSkillSeeder::class,
 
-            CustomerSeeder::class,
-            CustomerAddressDetailsSeeder::class,
-            CustomerAadharDetailSeeder::class,
-            CustomerPanCardDetailSeeder::class,
-            CustomerCompanyDetailSeeder::class,
+            // CustomerSeeder::class,
+            // CustomerAddressDetailsSeeder::class,
+            // CustomerAadharDetailSeeder::class,
+            // CustomerPanCardDetailSeeder::class,
+            // CustomerCompanyDetailSeeder::class,
 
             // warehouse ================
-            VendorSeeder::class,
-            VendorPurchaseOrderSeeder::class,
-            WarehousesSeeder::class,
+            // VendorSeeder::class,
+            // VendorPurchaseOrderSeeder::class,
+            // WarehousesSeeder::class,
 
-            ParentCategoriesSeeder::class,
-            SubCategoriesSeeder::class,
+            // ParentCategoriesSeeder::class,
+            // SubCategoriesSeeder::class,
 
-            BrandsSeeder::class,
+            // BrandsSeeder::class,
             // ProductVariantAttributesSeeder::class,
             // ProductVariantAttributeValuesSeeder::class,
 
-            ProductsSeeder::class,
+            // ProductsSeeder::class,
             // EcommerceProductsSeeder::class,
             // ProductSerialSeeder::class,
 
-            CouponSeeder::class,
-            CouponUsageSeeder::class,
-            CollectionSeeder::class,
+            // CouponSeeder::class,
+            // CouponUsageSeeder::class,
+            // CollectionSeeder::class,
 
-            SubscriberSeeder::class,
-            ContactSeeder::class,
+            // SubscriberSeeder::class,
+            // ContactSeeder::class,
 
-            WebsiteBannerSeeder::class,
+            // WebsiteBannerSeeder::class,
 
             // OrderSeeder::class,
             // OrderItemSeeder::class,
             // OrderPaymentSeeder::class,
 
             // e-commerce data ====================
-            TestimonialSeeder::class,
-            FeedbackSeeder::class,
+            // TestimonialSeeder::class,
+            // FeedbackSeeder::class,
 
             // crm ====================
             // LeadTableSeeder::class,
@@ -87,9 +87,9 @@ class DatabaseSeeder extends Seeder
             // QuotationTableSeeder::class,
             // QuotationProductTableSeeder::class,
 
-            CoveredItemSeeder::class,
-            AmcPlanSeeder::class,
-            PincodeSeeder::class,
+            // CoveredItemSeeder::class,
+            // AmcPlanSeeder::class,
+            // PincodeSeeder::class,
 
             // ServiceRequestSeeder::class,
             // ServiceRequestProductSeeder::class,

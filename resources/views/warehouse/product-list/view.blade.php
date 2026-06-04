@@ -490,20 +490,26 @@
                                 {{-- @php 
                                     $variations = json_decode($product->variation_options, true); 
                                 @endphp --}}
-                                @foreach ($product?->variation_options as $key => $attribute)
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="fw-semibold">{{ $key }}:</label>
-                                            <p class="text-muted">
-                                                @if (is_array($attribute))
-                                                    @foreach ($attribute as $value)
-                                                        {{ $value }},
-                                                    @endforeach
-                                                @endif
-                                            </p>
+                                @if (is_array($product?->variation_options))
+                                    @foreach ($product?->variation_options as $key => $attribute)
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="fw-semibold">{{ $key }}:</label>
+                                                <p class="text-muted">
+                                                    @if (is_array($attribute))
+                                                        @foreach ($attribute as $value)
+                                                            {{ $value }},
+                                                        @endforeach
+                                                    @endif
+                                                </p>
+                                            </div>
                                         </div>
+                                    @endforeach
+                                @else
+                                    <div class="col-12">
+                                        <p class="text-muted">No variations available for this product.</p>
                                     </div>
-                                @endforeach
+                                @endif
                             </div>
                         </div>
 

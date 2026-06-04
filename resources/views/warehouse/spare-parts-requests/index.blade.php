@@ -30,7 +30,7 @@
                                         'customer_approved' => 'Customer Approved',
                                         'customer_rejected' => 'Customer Rejected',
                                         'admin_approved' => 'Admin Approved',
-                                        'admin_rejected' => 'Admin Rejected,
+                                        'admin_rejected' => 'Admin Rejected',
                                         'picked' => 'Picked',
                                         'in_transit' => 'In Transit',
                                         'delivered' => 'Delivered',

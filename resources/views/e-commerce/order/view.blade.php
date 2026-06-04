@@ -448,6 +448,23 @@
                                                     @endif
                                                 </span>
                                             </li>
+                                            <li> 
+                                                <span class="fw-semibold">Payment Status:</span>
+                                                @php
+                                                    $paymentStatus = [
+                                                        'pending' => 'Pending',
+                                                        'completed' => 'Completed',
+                                                        'failed' => 'Failed',
+                                                    ];
+                                                @endphp
+                                                <span class="badge bg-info">
+                                                    @if ($payment->status)
+                                                        {{ $paymentStatus[$payment->status] }}
+                                                    @else
+                                                        N/A
+                                                    @endif
+                                                </span>
+                                            </li>
                                             @if ($payment->payment_method !== 'cod' && $payment->card_last_four)
                                                 <li
                                                     class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">

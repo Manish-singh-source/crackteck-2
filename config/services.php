@@ -51,8 +51,8 @@ return [
     ],
 
     'firebasefinal' => [
-        'project_id' => env('FIREBASE_FINAL_PROJECT_ID'),
-        'credentials' => env('FIREBASE_FINAL_CREDENTIALS'),
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+        'credentials' => env('FIREBASE_CREDENTIALS'),
     ],
 
     'google' => [

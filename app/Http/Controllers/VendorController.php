@@ -46,6 +46,13 @@ class VendorController extends Controller
             ->with('success', 'Vendor added successfully.');
     }
 
+    public function view($id)
+    {
+        $vendor = Vendor::find($id);
+
+        return view('warehouse/vendor/view', compact('vendor'));
+    }
+
     public function edit($id)
     {
         $vendor = Vendor::find($id);

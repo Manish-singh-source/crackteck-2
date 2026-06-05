@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileUpload;
 use App\Http\Requests\StoreVendorPurchaseOrderRequest;
 use App\Http\Requests\UpdateVendorPurchaseOrderRequest;
 use App\Models\Vendor;
@@ -33,7 +34,7 @@ class VendorPurchaseBillController extends Controller
      */
     public function create()
     {
-        $vendors = Vendor::all();
+        $vendors = Vendor::where('status', 'active')->get();
 
         return view('/warehouse/vendor-purchase-bills/create', compact('vendors'));
     }
@@ -47,14 +48,7 @@ class VendorPurchaseBillController extends Controller
 
             // Handle invoice upload
             if ($request->hasFile('invoice_pdf')) {
-                $file = $request->file('invoice_pdf');
-                $filename = time().'_'.$file->getClientOriginalName();
-
-                $data['invoice_pdf'] = $file->storeAs(
-                    'uploads/vendor-purchase-bills',
-                    $filename,
-                    'public'
-                );
+                $data['invoice_pdf'] = FileUpload::fileUpload($request->file('invoice_pdf'), 'uploads/vendor-purchase-bills/');
             }
 
             // Calculate pending amount
@@ -92,7 +86,7 @@ class VendorPurchaseBillController extends Controller
     public function edit($id)
     {
         $vendorPurchaseBill = VendorPurchaseOrder::find($id);
-        $vendors = Vendor::all();
+        $vendors = Vendor::where('status', 'active')->get();
 
         if (! $vendorPurchaseBill) {
             return redirect()->route('vendor.index')->with('error', 'Record not found.');
@@ -114,22 +108,15 @@ class VendorPurchaseBillController extends Controller
 
             // Replace invoice file if uploaded
             if ($request->hasFile('invoice_pdf')) {
-
-                if (
-                    $purchaseOrder->invoice_pdf &&
-                    Storage::disk('public')->exists($purchaseOrder->invoice_pdf)
-                ) {
-                    Storage::disk('public')->delete($purchaseOrder->invoice_pdf);
+                if ($purchaseOrder->invoice_pdf) {
+                    $data['invoice_pdf'] = FileUpload::updateFileUpload(
+                        $request->file('invoice_pdf'),
+                        $purchaseOrder->invoice_pdf,
+                        'uploads/vendor-purchase-bills/'
+                    );
+                } else {
+                    $data['invoice_pdf'] = FileUpload::fileUpload($request->file('invoice_pdf'), 'uploads/vendor-purchase-bills/');
                 }
-
-                $file = $request->file('invoice_pdf');
-                $filename = time().'_'.$file->getClientOriginalName();
-
-                $data['invoice_pdf'] = $file->storeAs(
-                    'uploads/vendor-purchase-bills',
-                    $filename,
-                    'public'
-                );
             }
 
             // Recalculate pending amount

@@ -75,7 +75,7 @@
                                     @if($vendorPurchaseBill->invoice_pdf)
                                         <small class="text-info d-block mt-1">
                                             Current file:
-                                            <a href="{{ $vendorPurchaseBill->invoice_pdf_url ?? '#' }}" target="_blank">
+                                            <a href="{{ asset($vendorPurchaseBill->invoice_pdf) ?? '#' }}" target="_blank">
                                                 View Current Invoice
                                             </a>
                                         </small>

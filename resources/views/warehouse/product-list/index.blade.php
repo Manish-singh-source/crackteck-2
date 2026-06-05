@@ -78,7 +78,7 @@
                                                                                         class="img-fluid rounded">
                                                                                 @else
                                                                                     <img src="https://placehold.co/80x80"
-                                                                                        alt="No Image" width="80"
+                                                                                        alt="{{ $product->product_name }}" width="80"
                                                                                         height="80"
                                                                                         class="img-fluid rounded">
                                                                                 @endif
@@ -99,7 +99,7 @@
                                                                     </td>
                                                                     <td>
                                                                         <div class="small text-muted fw-semibold mb-1">SKU:
-                                                                                {{ $product->sku }}</div>
+                                                                                {{ $product->sku ?? 'N/A' }}</div>
                                                                         @if ($product->hsn_code)
                                                                             <div class="small text-muted">HSN:
                                                                                 {{ $product->hsn_code }}</div>
@@ -108,36 +108,50 @@
                                                                     <td>
                                                                         @if ($product->parentCategorie)
                                                                             <span
-                                                                                class="badge bg-primary-subtle text-primary fw-semibold">{{ $product->parentCategorie->name }}</span>
+                                                                                class="badge bg-primary-subtle text-primary fw-semibold">{{ $product->parentCategorie?->name ?? 'N/A' }}</span>
                                                                         @endif
                                                                         @if ($product->subCategorie)
                                                                             <div class="small text-muted">
-                                                                                {{ $product->subCategorie->name }}</div>
+                                                                                {{ $product->subCategorie?->name ?? 'N/A' }}</div>
                                                                         @endif
                                                                     </td>
                                                                     <td>
                                                                         @if ($product->cost_price)
                                                                             <div class="small">Cost:
-                                                                                ₹{{ number_format($product->cost_price, 2) }}
+                                                                                ₹{{ number_format($product->cost_price ?? 0, 2) }}
                                                                             </div>
                                                                         @endif
                                                                         @if ($product->selling_price)
                                                                             <div class="small">Selling:
-                                                                                ₹{{ number_format($product->selling_price, 2) }}
+                                                                                ₹{{ number_format($product->selling_price ?? 0, 2) }}
                                                                             </div>
                                                                         @endif
                                                                         @if ($product->discount_price)
                                                                             <div class="small text-success">Discount:
-                                                                                ₹{{ number_format($product->discount_price, 2) }}
+                                                                                ₹{{ number_format($product->discount_price ?? 0, 2) }}
                                                                             </div>
                                                                         @endif
                                                                     </td>
                                                                     <td>
                                                                         <div>{{ $product->stock_quantity ?? 0 }}</div>
                                                                         @if ($product->stock_status)
+                                                                            @php 
+                                                                                $status = [
+                                                                                    'in_stock' => 'In Stock',
+                                                                                    'out_of_stock' => 'Out of Stock',
+                                                                                    'low_stock' => 'Low Stock',
+                                                                                    'scrap' => 'Scrap',
+                                                                                ];
+                                                                                $statusLabels = [
+                                                                                    'in_stock' => 'bg-success-subtle text-success',
+                                                                                    'out_of_stock' => 'bg-danger-subtle text-danger',
+                                                                                    'low_stock' => 'bg-warning-subtle text-warning',
+                                                                                    'scrap' => 'bg-secondary-subtle text-secondary',
+                                                                                ];
+                                                                            @endphp 
                                                                             <span
-                                                                                class="badge {{ $product->stock_status == 'in_stock' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
-                                                                                {{ ucwords(str_replace('_', ' ', $product->stock_status)) }}
+                                                                                class="badge {{ $statusLabels[$product->stock_status] ?? 'bg-secondary-subtle text-secondary' }}">
+                                                                                {{ $status[$product->stock_status] ?? ucfirst(str_replace('_', ' ', $product->stock_status)) }}
                                                                             </span>
                                                                         @endif
                                                                     </td>

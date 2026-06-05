@@ -21,7 +21,7 @@
                     <div class="card-header border-bottom-dashed">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">Purchase Bill Details</h5>
-                            <div class="fw-bold text-dark">Bill No: {{ $vendorPurchaseBill->po_number }}</div>
+                            <div class="fw-bold text-dark">Bill No: {{ $vendorPurchaseBill->po_number ?? 'N/A' }}</div>
                         </div>
                     </div>
 
@@ -34,29 +34,33 @@
                                     
                                     <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                         <span class="fw-semibold">Vendor Name:</span>
-                                        <span>{{ $vendorPurchaseBill->vendor->first_name . ' ' . $vendorPurchaseBill->vendor->last_name }}</span>
+                                        <span>{{ ($vendorPurchaseBill->vendor->first_name . ' ' . $vendorPurchaseBill->vendor->last_name) ?? 'N/A' }}</span>
                                     </li>   
 
                                     <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                         <span class="fw-semibold">Purchase Bill No:</span>
-                                        <span>{{ $vendorPurchaseBill->po_number }}</span>
+                                        <span>{{ $vendorPurchaseBill->po_number ?? 'N/A' }}</span>
                                     </li>
 
                                     <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                         <span class="fw-semibold">Invoice Number:</span>
-                                        <span>{{ $vendorPurchaseBill->invoice_number }}</span>
+                                        <span>{{ $vendorPurchaseBill->invoice_number ?? 'N/A' }}</span>
                                     </li>
 
                                     <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                         <span class="fw-semibold">Purchase Date:</span>
-                                        <span>{{ $vendorPurchaseBill->purchase_date }}</span>
+                                        <span>{{ $vendorPurchaseBill->purchase_date ?? 'N/A' }}</span>
                                     </li>
                                     
                                     <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                         <span class="fw-semibold">Invoice PDF:</span>
-                                        <a href="{{ $vendorPurchaseBill->invoice_pdf_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                            <i class="mdi mdi-download me-1"></i>View/Download
-                                        </a>
+                                        @if($vendorPurchaseBill->invoice_pdf)
+                                            <a href="{{ asset($vendorPurchaseBill->invoice_pdf) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                <i class="mdi mdi-download me-1"></i>View/Download
+                                            </a>
+                                        @else
+                                            <span>N/A</span>
+                                        @endif
                                     </li>
                                 
                                 </ul>
@@ -69,22 +73,23 @@
 
                                     <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                         <span class="fw-semibold">PO Amount Paid:</span>
-                                        <span>{{ $vendorPurchaseBill->po_amount_paid }}</span>
+                                        <span>{{ $vendorPurchaseBill->po_amount_paid ?? 'N/A' }}</span>
                                     </li>
 
                                     <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                         <span class="fw-semibold">PO Amount Pending:</span> 
-                                        <span>{{ $vendorPurchaseBill->po_amount_pending }}</span>
+                                        <span>{{ $vendorPurchaseBill->po_amount_pending ?? 'N/A' }}</span>
                                     </li>
 
                                     <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                         <span class="fw-semibold">Total Amount:</span>
-                                        <span class="fw-bold text-success">{{ $vendorPurchaseBill->po_amount }}</span>
+                                        <span class="fw-bold text-success">{{ $vendorPurchaseBill->po_amount ?? 'N/A' }}</span>
                                     </li>
 
                                     <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
                                         <span class="fw-semibold">Created Date:</span>
-                                        <span>{{ $vendorPurchaseBill->created_at->format('d M Y, h:i A') }}</span>
+                                        <span>{{ $vendorPurchaseBill->created_at->format('d M Y, h:i A') ?? 'N/A' }}</span>
+                                    </li>
 
                                 </ul>
                             </div>

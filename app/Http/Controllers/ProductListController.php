@@ -50,18 +50,18 @@ class ProductListController extends Controller
     {
         $vendors = Vendor::selectRaw(
             "id, CONCAT(vendor_code, ' - ', first_name, ' ', last_name) AS name"
-        )->pluck('name', 'id');
-        $vendorPurchaseOrders = VendorPurchaseOrder::pluck('po_number', 'id');
-        $brands = Brand::pluck('name', 'id');
-        $parentCategories = ParentCategory::pluck('name', 'id');
-        $subCategories = SubCategory::pluck('name', 'id');
-        $warehouses = Warehouse::pluck('name', 'id');
+        )->where('status','active')->pluck('name', 'id');
+        $vendorPurchaseOrders = VendorPurchaseOrder::where('po_status', 'approved')->pluck('po_number', 'id');
+        $brands = Brand::where('status', 'active')->pluck('name', 'id');
+        $parentCategories = ParentCategory::where('status', 'active')->pluck('name', 'id');
+        // $subCategories = SubCategory::pluck('name', 'id');
+        $warehouses = Warehouse::where('status', 'active')->pluck('name', 'id');
         $warehouseRacks = WarehouseRack::pluck('rack_name', 'id');
         $zoneAreas = WarehouseRack::pluck('zone_area', 'id');
         $rackNo = WarehouseRack::pluck('rack_no', 'id');
         $levelNo = WarehouseRack::pluck('level_no', 'id');
         $positionNo = WarehouseRack::pluck('position_no', 'id');
-        $variationAttributes = ProductVariantAttribute::with('values')->get();
+        $variationAttributes = ProductVariantAttribute::where('status', 'active')->with('values')->get();
 
         $variationAttributeValues = [];
         foreach ($variationAttributes as $attribute) {
@@ -71,7 +71,7 @@ class ProductListController extends Controller
         // Initialize empty selectedVariations for create page
         $selectedVariations = [];
 
-        return view('/warehouse/product-list/create', compact('brands', 'vendors', 'vendorPurchaseOrders', 'parentCategories', 'subCategories', 'warehouses', 'warehouseRacks', 'zoneAreas', 'rackNo', 'levelNo', 'positionNo', 'variationAttributes', 'variationAttributeValues', 'selectedVariations'));
+        return view('/warehouse/product-list/create', compact('brands', 'vendors', 'vendorPurchaseOrders', 'parentCategories', 'warehouses', 'warehouseRacks', 'zoneAreas', 'rackNo', 'levelNo', 'positionNo', 'variationAttributes', 'variationAttributeValues', 'selectedVariations'));
     }
 
     /**
@@ -103,30 +103,22 @@ class ProductListController extends Controller
             //     + (($data['selling_price'] ?? 0) * ($data['tax'] ?? 0) / 100);
 
             // Main image
-            if ($request->hasFile('main_product_image')) {
-                $file = $request->file('main_product_image');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('uploads/products/images'), $filename);
-                $data['main_product_image'] = 'uploads/products/images/' . $filename;
+            if ($request->hasFile('main_product_image')) {                
+                $data['main_product_image'] = FileUpload::fileUpload($request->file('main_product_image'), 'uploads/products/images/');
             }
 
             // Additional images
             if ($request->hasFile('additional_product_images')) {
                 $images = [];
                 foreach ($request->file('additional_product_images') as $file) {
-                    $filename = time() . '_' . $file->getClientOriginalName();
-                    $file->move(public_path('uploads/products/images'), $filename);
-                    $images[] = 'uploads/products/images/' . $filename;
+                    $images[] = FileUpload::fileUpload($request->file($file), 'uploads/products/images/');
                 }
                 $data['additional_product_images'] = json_encode($images);
             }
 
             // Datasheet
             if ($request->hasFile('datasheet_manual')) {
-                $file = $request->file('datasheet_manual');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('uploads/products/datasheets'), $filename);
-                $data['datasheet_manual'] = 'uploads/products/datasheets/' . $filename;
+                $data['datasheet_manual'] = FileUpload::fileUpload($request->file('datasheet_manual'), 'uploads/products/datasheets/');
             }
 
             $product = Product::create($data);
@@ -581,7 +573,7 @@ class ProductListController extends Controller
             return response()->json([]);
         }
 
-        $vendorPurchaseOrders = VendorPurchaseOrder::where('vendor_id', $vendorId)->pluck('po_number', 'id');
+        $vendorPurchaseOrders = VendorPurchaseOrder::where('po_status', 'approved')->where('vendor_id', $vendorId)->pluck('po_number', 'id');
 
         return response()->json($vendorPurchaseOrders);
     }
@@ -594,6 +586,7 @@ class ProductListController extends Controller
         }
 
         $subcategories = SubCategory::where('parent_category_id', $parentId)
+            ->where('status', 'active')
             ->orderBy('name')
             ->pluck('name', 'id');
 

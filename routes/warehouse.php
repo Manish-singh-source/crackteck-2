@@ -55,6 +55,8 @@ Route::prefix('demo/warehouse')->group(function () {
         Route::get('/create-vendor', 'create')->name('vendor_list.create');
         // Store Vendor
         Route::post('/create-vendor', 'store')->name('vendor_list.store');
+        // View Vendor Page
+        Route::get('/view-vendor/{id}', 'view')->name('vendor_list.view');
         // Edit Vendor Page
         Route::get('/edit-vendor/{id}', 'edit')->name('vendor_list.edit');
         // Update Vendor

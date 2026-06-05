@@ -16,7 +16,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row">   
                 <div class="col-lg-8">
                     <!-- Vendor Information -->
                     <div class="card">
@@ -30,10 +30,8 @@
                                         <label class="fw-semibold">Vendor Name:</label>
                                         <p class="text-muted">
                                             {{ $product->vendor->first_name . ' ' . $product->vendor->last_name ?? 'N/A' }}
-                                            <span>{{ '{ ' . $product->vendor->vendor_code . ' }' ?? 'N/A' }}</span>
+                                            <span>{{ ' : ' . $product->vendor->vendor_code ?? 'N/A' }}</span>
                                         </p>
-                                        {{-- Vendor_code  --}}
-                                        <p class="text-muted"></p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -86,14 +84,20 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
+                                        <label class="fw-semibold">Warehouse:</label>
+                                        <p class="text-muted">{{ $product->warehouse?->name ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
                                         <label class="fw-semibold">Product Name:</label>
-                                        <p class="text-muted">{{ $product->product_name }}</p>
+                                        <p class="text-muted">{{ $product->product_name ?? 'N/A'}}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="fw-semibold">SKU:</label>
-                                        <p class="text-muted">{{ $product->sku }}</p>
+                                        <p class="text-muted">{{ $product->sku ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -117,14 +121,14 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="fw-semibold">Parent Category:</label>
-                                        <p class="text-muted">{{ $product->parentCategorie->name ?? 'N/A' }}
+                                        <p class="text-muted">{{ $product->parentCategorie?->name ?? 'N/A' }}
                                         </p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="fw-semibold">Sub Category:</label>
-                                        <p class="text-muted">{{ $product->subCategorie->name ?? 'N/A' }}</p>
+                                        <p class="text-muted">{{ $product->subCategorie?->name ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -137,12 +141,6 @@
                                     <div class="mb-3">
                                         <label class="fw-semibold">Company Warranty:</label>
                                         <p class="text-muted">{{ $product->company_warranty ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="fw-semibold">Warehouse:</label>
-                                        <p class="text-muted">{{ $product->warehouse->name ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -214,12 +212,12 @@
                                                             </div>
                                                         @endif
                                                         <div>
-                                                            <div class="fw-semibold">{{ $product->product_name }}</div>
-                                                            <div class="text-muted small">SKU: {{ $product->sku }}</div>
+                                                            <div class="fw-semibold">{{ $product->product_name ?? 'N/A' }}</div>
+                                                            <div class="text-muted small">SKU: {{ $product->sku ?? 'N/A' }}</div>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td>{{ $serial->auto_generated_serial }}</td>
+                                                <td>{{ $serial->auto_generated_serial ?? 'N/A'}}</td>
                                                 <td>{{ $serial->manual_serial ?? 'N/A' }}</td>
                                                 <td>
                                                     <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($serial->auto_generated_serial, 'C128') }}"
@@ -249,54 +247,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Rack Details -->
-                    {{-- <div class="card">
-                        <div class="card-header border-bottom-dashed">
-                            <h5 class="card-title mb-0">Rack Details</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="fw-semibold">Warehouse:</label>
-                                        <p class="text-muted">{{ $product->warehouse->warehouse_name ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="fw-semibold">Warehouse Rack:</label>
-                                        <p class="text-muted">{{ $product->warehouseRack->rack_name ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="fw-semibold">Rack Zone Area:</label>
-                                        <p class="text-muted">{{ $product->rack_zone_area ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="fw-semibold">Rack No:</label>
-                                        <p class="text-muted">{{ $product->rack_no ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="fw-semibold">Level No:</label>
-                                        <p class="text-muted">{{ $product->level_no ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="fw-semibold">Position No:</label>
-                                        <p class="text-muted">{{ $product->position_no ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div> --}}
-
                 </div>
 
                 <div class="col-lg-4">
@@ -366,21 +316,20 @@
                                     <div class="mb-3">
                                         <label class="fw-semibold">Stock Status:</label>
                                         @php
-                                            $stockStatus = $product->stock_status;
-                                            $badgeClass = '';
-                                            if ($stockStatus == 'in_stock') {
-                                                $stockStatus = 'In Stock';
-                                                $badgeClass = 'bg-success';
-                                            } elseif ($stockStatus == 'out_of_stock') {
-                                                $stockStatus = 'Out of Stock';
-                                                $badgeClass = 'bg-secondary';
-                                            } elseif ($stockStatus == 'low_stock') {
-                                                $stockStatus = 'Low Stock';
-                                                $badgeClass = 'bg-warning';
-                                            } else {
-                                                $stockStatus = 'Scrap';
-                                                $badgeClass = 'bg-danger';
-                                            }
+                                            $status = [
+                                                'in_stock' => 'In Stock',
+                                                'out_of_stock' => 'Out of Stock',
+                                                'low_stock' => 'Low Stock',
+                                                'scrap' => 'Scrap',
+                                            ];
+                                            $badgeClasses = [
+                                                'in_stock' => 'bg-success-subtle text-success',
+                                                'out_of_stock' => 'bg-danger-subtle text-danger',
+                                                'low_stock' => 'bg-warning-subtle text-warning',
+                                                'scrap' => 'bg-secondary-subtle text-secondary',
+                                            ];
+                                            $stockStatus = $status[$product->stock_status];
+                                            $badgeClass = $badgeClasses[$product->stock_status];
                                         @endphp
                                         <p class="text-muted">
                                             <span
@@ -388,30 +337,6 @@
                                         </p>
                                     </div>
                                 </div>
-                                {{-- <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="fw-semibold">Minimum Stock Level:</label>
-                                    <p class="text-muted">{{ $product->minimum_stock_level ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="fw-semibold">Maximum Stock Level:</label>
-                                    <p class="text-muted">{{ $product->maximum_stock_level ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="fw-semibold">Reorder Level:</label>
-                                    <p class="text-muted">{{ $product->reorder_level ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="fw-semibold">Reorder Quantity:</label>
-                                    <p class="text-muted">{{ $product->reorder_quantity ?? 'N/A' }}</p>
-                                </div>
-                            </div> --}}
                             </div>
                         </div>
                     </div>
@@ -487,9 +412,6 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                {{-- @php 
-                                    $variations = json_decode($product->variation_options, true); 
-                                @endphp --}}
                                 @if (is_array($product?->variation_options))
                                     @foreach ($product?->variation_options as $key => $attribute)
                                         <div class="col-md-6">
@@ -605,11 +527,8 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
-
             </div>
-
         </div>
     </div> <!-- content -->
 

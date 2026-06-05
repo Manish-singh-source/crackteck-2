@@ -22,22 +22,28 @@
                                 <li class="nav-item" role="presentation">
                                     <a class="nav-link {{ request()->get('status') === 'all' || request()->get('status') === null ? 'active' : '' }} p-2"
                                         href="{{ route('vendor_list.index') }}">
-                                        <span class="d-block d-sm-none"><i class="mdi mdi-format-list-bulleted fs-16 me-1"></i></span>
-                                        <span class="d-none d-sm-block"><i class="mdi mdi-format-list-bulleted fs-16 me-1"></i>All</span>
+                                        <span class="d-block d-sm-none"><i
+                                                class="mdi mdi-format-list-bulleted fs-16 me-1"></i></span>
+                                        <span class="d-none d-sm-block"><i
+                                                class="mdi mdi-format-list-bulleted fs-16 me-1"></i>All</span>
                                     </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <a class="nav-link {{ request()->get('status') === 'active' ? 'active' : '' }} p-2"
                                         href="{{ route('vendor_list.index', ['status' => 'active']) }}">
-                                        <span class="d-block d-sm-none"><i class="mdi mdi-check-circle-outline fs-16 me-1 text-success"></i></span>
-                                        <span class="d-none d-sm-block"><i class="mdi mdi-check-circle-outline fs-16 me-1 text-success"></i>Active</span>
+                                        <span class="d-block d-sm-none"><i
+                                                class="mdi mdi-check-circle-outline fs-16 me-1 text-success"></i></span>
+                                        <span class="d-none d-sm-block"><i
+                                                class="mdi mdi-check-circle-outline fs-16 me-1 text-success"></i>Active</span>
                                     </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <a class="nav-link {{ request()->get('status') === 'inactive' ? 'active' : '' }} p-2"
                                         href="{{ route('vendor_list.index', ['status' => 'inactive']) }}">
-                                        <span class="d-block d-sm-none"><i class="mdi mdi-close-circle-outline fs-16 me-1 text-danger"></i></span>
-                                        <span class="d-none d-sm-block"><i class="mdi mdi-close-circle-outline fs-16 me-1 text-danger"></i>Inactive</span>
+                                        <span class="d-block d-sm-none"><i
+                                                class="mdi mdi-close-circle-outline fs-16 me-1 text-danger"></i></span>
+                                        <span class="d-none d-sm-block"><i
+                                                class="mdi mdi-close-circle-outline fs-16 me-1 text-danger"></i>Inactive</span>
                                     </a>
                                 </li>
                             </ul>
@@ -52,7 +58,7 @@
                                                         class="table table-striped table-borderless dt-responsive nowrap">
                                                         <thead>
                                                             <tr>
-                                                                <th>Id</th>
+                                                                <th>Sr. No.</th>
                                                                 <th>Vendor Code</th>
                                                                 <th>First Name</th>
                                                                 <th>Last Name</th>
@@ -67,13 +73,13 @@
                                                         <tbody>
                                                             @foreach ($vendors as $vendor)
                                                                 <tr>
-                                                                    <td>{{ $vendor->id }}</td>
-                                                                    <td>{{ $vendor->vendor_code }}</td>
-                                                                    <td>{{ $vendor->first_name }}</td>
-                                                                    <td>{{ $vendor->last_name }}</td>
-                                                                    <td>{{ $vendor->phone }}</td>
-                                                                    <td>{{ $vendor->email }}</td>
-                                                                    <td>{{ $vendor->gst_no }}</td>
+                                                                    <td>{{ $loop->iteration }}</td>
+                                                                    <td>{{ $vendor->vendor_code ?? 'N/A' }}</td>
+                                                                    <td>{{ $vendor->first_name ?? 'N/A' }}</td>
+                                                                    <td>{{ $vendor->last_name ?? 'N/A' }}</td>
+                                                                    <td>{{ $vendor->phone ?? 'N/A' }}</td>
+                                                                    <td>{{ $vendor->email ?? 'N/A' }}</td>
+                                                                    <td>{{ $vendor->gst_no ?? 'N/A' }}</td>
                                                                     {{-- <td>{{ $vendor->no_of_po ? $vendor->no_of_po : 'N/A' }}</td> --}}
                                                                     <td>
                                                                         <span
@@ -82,6 +88,14 @@
                                                                         </span>
                                                                     </td>
                                                                     <td>
+                                                                        <a aria-label="anchor"
+                                                                            href="{{ route('vendor_list.view', $vendor->id) }}"
+                                                                            class="btn btn-icon btn-sm bg-primary-subtle me-1"
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-original-title="View">
+                                                                            <i
+                                                                                class="mdi mdi-eye-outline fs-14 text-primary"></i>
+                                                                        </a>
                                                                         <a aria-label="anchor"
                                                                             href="{{ route('vendor_list.edit', $vendor->id) }}"
                                                                             class="btn btn-icon btn-sm bg-warning-subtle me-1"
@@ -120,4 +134,6 @@
                     </div>
                 </div>
             </div>
-        @endsection
+        </div>
+    </div>
+@endsection

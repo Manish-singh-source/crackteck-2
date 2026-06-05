@@ -120,7 +120,6 @@
                                             'label' => 'PO Status',
                                             'name' => 'po_status',          
                                             'options' => [
-                                                '' => '--Select PO Status--',
                                                 'pending' => 'Pending',
                                                 'approved' => 'Approved',
                                                 'rejected' => 'Rejected',

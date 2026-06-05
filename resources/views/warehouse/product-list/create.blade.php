@@ -18,6 +18,17 @@
                     <form action="{{ route('product-list.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('POST')
+
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <div class="row">
                             <div class="col-lg-8">
                                 <div class="card">
@@ -38,8 +49,6 @@
                                                     @include('components.form.select', [
                                                         'label' => 'Vendor',
                                                         'name' => 'vendor_id',
-                                                        // I want Vendor Code as well as Vendor Name to be displayed in the dropdown
-                                                        // 'options' => $vendors->all(['vendor_code', 'id', 'first_name', 'last_name']),
                                                         'options' => $vendors->prepend('-- Select Vendor --', 0),
                                                     ])
                                                 </div>
@@ -49,9 +58,13 @@
                                                 <div>
                                                     <label class="form-label">Vendor PO Number</label>
                                                     <select name="vendor_purchase_order_id" id="vendor_purchase_order_id"
-                                                        class="form-select">
+                                                        class="form-select @error('vendor_purchase_order_id') is-invalid @enderror"
+                                                        data-old-value="{{ old('vendor_purchase_order_id') }}">
                                                         <option value="">--Select--</option>
                                                     </select>
+                                                    @error('vendor_purchase_order_id')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                             </div>
 
@@ -81,9 +94,14 @@
                                             <div class="col-lg-6">
                                                 {{-- Sub Category --}}
                                                 <label class="form-label">Sub Category</label>
-                                                <select name="sub_category_id" id="sub_category_id" class="form-select">
+                                                <select name="sub_category_id" id="sub_category_id"
+                                                    class="form-select @error('sub_category_id') is-invalid @enderror"
+                                                    data-old-value="{{ old('sub_category_id') }}">
                                                     <option value="">--Select Sub Category--</option>
                                                 </select>
+                                                @error('sub_category_id')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
 
                                             <div class="col-lg-6">
@@ -173,7 +191,11 @@
                                                     <label for="short_description" class="form-label">Short
                                                         Description</label>
                                                     <div id="short-description-editor" style="height: 200px;"></div>
-                                                    <input type="hidden" name="short_description" id="short_description">
+                                                    <input type="hidden" name="short_description" id="short_description"
+                                                        value="{{ old('short_description') }}">
+                                                    @error('short_description')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                             </div>
                                             <div class="col-12 mb-3">
@@ -181,7 +203,11 @@
                                                     <label for="full_description" class="form-label">Full
                                                         Description</label>
                                                     <div id="full-description-editor" style="height: 300px;"></div>
-                                                    <input type="hidden" name="full_description" id="full_description">
+                                                    <input type="hidden" name="full_description" id="full_description"
+                                                        value="{{ old('full_description') }}">
+                                                    @error('full_description')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                             </div>
                                             <div class="col-12 mb-3">
@@ -190,7 +216,11 @@
                                                         Specifications</label>
                                                     <div id="technical-specification-editor" style="height: 300px;"></div>
                                                     <input type="hidden" name="technical_specification"
-                                                        id="technical_specification">
+                                                        id="technical_specification"
+                                                        value="{{ old('technical_specification') }}">
+                                                    @error('technical_specification')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                             </div>
                                             <div class="col-xl-6 col-lg-6">
@@ -337,9 +367,19 @@
                                         <div class="mb-3">
                                             <label for="additional_product_images" class="form-label">Additional Product
                                                 Images</label>
-                                            <input type="file" class="form-control" name="additional_product_images[]"
-                                                multiple accept="image/*">
+                                            <input type="file"
+                                                class="form-control @error('additional_product_images') is-invalid @enderror @error('additional_product_images.*') is-invalid @enderror"
+                                                name="additional_product_images[]" multiple accept="image/*">
                                             <div class="text-danger">Image Size Should Be 800x650</div>
+                                            @if ($errors->has('additional_product_images'))
+                                                <div class="invalid-feedback d-block">
+                                                    {{ $errors->first('additional_product_images') }}</div>
+                                            @endif
+                                            @foreach ($errors->get('additional_product_images.*') as $messages)
+                                                @foreach ((array) $messages as $message)
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @endforeach
+                                            @endforeach
                                         </div>
 
                                         <div class="mb-3">
@@ -398,6 +438,20 @@
                                                 </div>
                                             @endforeach
                                         </div>
+
+                                        @php
+                                            $variationError = null;
+                                            foreach ($errors->keys() as $key) {
+                                                if (str_starts_with($key, 'variations')) {
+                                                    $variationError = $errors->first($key);
+                                                    break;
+                                                }
+                                            }
+                                        @endphp
+
+                                        @if ($variationError)
+                                            <div class="text-danger mb-3">{{ $variationError }}</div>
+                                        @endif
 
                                         @if ($variationAttributes->isEmpty())
                                             <div class="alert alert-info mb-0">
@@ -574,11 +628,30 @@
                 }
             });
 
+            var oldShortDescription = @json(old('short_description', ''));
+            var oldFullDescription = @json(old('full_description', ''));
+            var oldTechnicalSpecification = @json(old('technical_specification', ''));
+
+            if (oldShortDescription) {
+                shortDescriptionQuill.root.innerHTML = oldShortDescription;
+            }
+            if (oldFullDescription) {
+                fullDescriptionQuill.root.innerHTML = oldFullDescription;
+            }
+            if (oldTechnicalSpecification) {
+                technicalSpecificationQuill.root.innerHTML = oldTechnicalSpecification;
+            }
+
+            function getQuillHtmlValue(quill) {
+                var text = quill.getText().trim();
+                return text.length ? quill.root.innerHTML : '';
+            }
+
             // Update hidden inputs when form is submitted
             $('form').on('submit', function() {
-                $('#short_description').val(shortDescriptionQuill.root.innerHTML);
-                $('#full_description').val(fullDescriptionQuill.root.innerHTML);
-                $('#technical_specification').val(technicalSpecificationQuill.root.innerHTML);
+                $('#short_description').val(getQuillHtmlValue(shortDescriptionQuill));
+                $('#full_description').val(getQuillHtmlValue(fullDescriptionQuill));
+                $('#technical_specification').val(getQuillHtmlValue(technicalSpecificationQuill));
             });
 
             // Warehouse -> Racks
@@ -763,8 +836,12 @@
 
         // Vendor -> Vendor PO Number
         $(document).ready(function() {
-            $('#vendor_id').on('change', function() {
-                var vendorId = $(this).val();
+            function loadVendorPurchaseOrders(vendorId, selectedPurchaseOrderId) {
+                if (!vendorId) {
+                    $('#vendor_purchase_order_id').empty().append('<option value="">--Select--</option>');
+                    return;
+                }
+
                 $.ajax({
                     url: '{{ route('product-list.get-vendor-purchase-orders-by-vendor') }}',
                     method: 'GET',
@@ -772,20 +849,26 @@
                         vendor_id: vendorId
                     },
                     success: function(data) {
-                        $('#vendor_purchase_order_id').empty();
-                        $('#vendor_purchase_order_id').append(
-                            '<option value="">--Select--</option>');
+                        var $select = $('#vendor_purchase_order_id');
+                        $select.empty().append('<option value="">--Select--</option>');
                         $.each(data, function(key, value) {
-                            $('#vendor_purchase_order_id').append('<option value="' +
-                                key + '">' + value + '</option>');
+                            $select.append('<option value="' + key + '">' + value +
+                                '</option>');
                         });
+                        if (selectedPurchaseOrderId) {
+                            $select.val(selectedPurchaseOrderId);
+                        }
                     }
                 });
-            });
+            }
 
-            // Parent Category -> Sub Category
-            $('#parent_category_id').on('change', function() {
-                var parentId = $(this).val();
+            function loadSubCategories(parentId, selectedSubCategoryId) {
+                var $select = $('#sub_category_id');
+                if (!parentId) {
+                    $select.empty().append('<option value="">--Select Sub Category--</option>');
+                    return;
+                }
+
                 $.ajax({
                     url: '{{ route('product-list.get-sub-categories') }}',
                     method: 'GET',
@@ -793,18 +876,40 @@
                         parent_id: parentId
                     },
                     success: function(data) {
-                        $('#sub_category_id').empty();
-                        $('#sub_category_id').append(
-                            '<option value="">--Select Sub category--</option>');
-
+                        $select.empty().append('<option value="">--Select Sub Category--</option>');
                         $.each(data, function(key, value) {
-                            $('#sub_category_id').append('<option value="' + key +
-                                '">' + value + '</option>');
+                            $select.append('<option value="' + key + '">' + value +
+                                '</option>');
                         });
-
+                        var selected = $select.data('old-value');
+                        if (selected) {
+                            $select.val(selected);
+                        }
                     }
                 });
+            }
+
+            $('#vendor_id').on('change', function() {
+                var vendorId = $(this).val();
+                var selected = $('#vendor_purchase_order_id').data('old-value');
+                loadVendorPurchaseOrders(vendorId, selected);
             });
+
+            $('#parent_category_id').on('change', function() {
+                var parentId = $(this).val();
+                loadSubCategories(parentId);
+            });
+
+            var oldVendorId = @json(old('vendor_id'));
+            var oldParentCategoryId = @json(old('parent_category_id'));
+
+            if (oldVendorId) {
+                $('#vendor_id').val(oldVendorId).trigger('change');
+            }
+
+            if (oldParentCategoryId) {
+                $('#parent_category_id').val(oldParentCategoryId).trigger('change');
+            }
         });
     </script>
     <style>

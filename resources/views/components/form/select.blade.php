@@ -14,9 +14,7 @@
 --}}
 
 @php
-    $selectedValue = old($name)
-        ?? ($model->$name ?? null)
-        ?? ($value ?? null);
+    $selectedValue = old($name) ?? ($model->$name ?? null ?? ($value ?? null));
 @endphp
 
 <div class="{{ $colClass ?? 'col-12' }}">
@@ -26,25 +24,21 @@
     </label>
 
     {{-- Select Field --}}
-    <select id="{{ $name }}" name="{{ $name }}" class="form-select w-100 {{ $class ?? '' }}"
-        @if($required ?? false) required @endif
-        @if($disabled ?? false) disabled @endif
-        @if($readonly ?? false) readonly @endif
-    >
-        @foreach($options as $key => $option)
-            <option value="{{ $key }}"
-                {{ (string)$key === (string)$selectedValue ? 'selected' : '' }}
-                @if($errors->has($name)) class="text-neg" @endif
-            >
+    <select id="{{ $name }}" name="{{ $name }}"
+        class="form-select w-100 @error($name) is-invalid @enderror {{ $class ?? '' }}"
+        @if ($required ?? false) required @endif @if ($disabled ?? false) disabled @endif
+        @if ($readonly ?? false) readonly @endif>
+        @foreach ($options as $key => $option)
+            <option value="{{ $key }}" {{ (string) $key === (string) $selectedValue ? 'selected' : '' }}>
                 {{ $option }}
             </option>
         @endforeach
     </select>
-    
+
     {{-- Error message --}}
-    @if($errors->has($name))
-        <div class="text-neg text-small">
-            {{ $errors->first($name) }}
+    @error($name)
+        <div class="invalid-feedback">
+            {{ $message }}
         </div>
-    @endif
+    @enderror
 </div>

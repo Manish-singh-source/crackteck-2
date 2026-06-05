@@ -54,7 +54,7 @@
                                                         class="table table-striped table-borderless dt-responsive nowrap">
                                                         <thead>
                                                             <tr>
-                                                                <th>Id</th>
+                                                                <th>Sr. No.</th>
                                                                 <th>Warehouse Code</th>
                                                                 <th>Name</th>
                                                                 <th>Type</th>
@@ -97,11 +97,11 @@
                                                             @foreach ($warehouses as $warehouse)
                                                                 <tr>
                                                                     <td>
-                                                                        {{ $warehouse->id }}
+                                                                        {{ $loop->iteration }}
                                                                     </td>
                                                                     <td>{{ $warehouse->warehouse_code }}</td>
                                                                     <td>{{ $warehouse->name }}</td>
-                                                                    <td>{{ $warehouse->type }}</td>
+                                                                    <td>{{ $warehouse->type == '0' ? 'N/A' : $warehouse->type }}</td>
                                                                     <td>{{ $warehouse->address1 }}</td>
                                                                     <td>{{ $warehouse->contact_person_name }}</td>
                                                                     <td>{{ $warehouse->phone_number }}</td>

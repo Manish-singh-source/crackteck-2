@@ -21,7 +21,7 @@
                             <ul class="list-group list-group-flush ">
                                 <li
                                     class="list-group-item border-0 d-flex align-items-center justify-content-between gap-3 flex-wrap">
-                                    <span class="fw-semibold text-break">Id :</span>
+                                    <span class="fw-semibold text-break">Code :</span>
                                     <span>{{ $warehouse->warehouse_code }}</span>
                                 </li>
 
@@ -34,7 +34,7 @@
                                 <li
                                     class="list-group-item border-0 d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                     <span class="fw-semibold text-break">Type :</span>
-                                    <span>{{ $warehouse->type }}</span>
+                                    <span>{{ $warehouse->type == '0' ? 'N/A' : $warehouse->type }}</span>
                                 </li>
                             </ul>
                         </div>
@@ -66,7 +66,7 @@
                                     class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                     <span class="fw-semibold text-break">Address Line 2 :</span>
                                     <span>
-                                        <span>{{ $warehouse->address2 }}</span>
+                                        <span>{{ $warehouse->address2 ?? 'N/A' }}</span>
                                     </span>
                                 </li>
 
@@ -130,7 +130,7 @@
                                 <li
                                     class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                     <span class="fw-semibold text-break">Alternate Phone Number :</span>
-                                    <span>{{ $warehouse->alternate_phone_number }}</span>
+                                    <span>{{ $warehouse->alternate_phone_number ?? 'N/A' }}</span>
                                 </li>
 
                                 <li
@@ -160,7 +160,7 @@
                                         Working Hours :
                                     </span>
                                     <span>
-                                        <span>{{ $warehouse->working_hours }}</span>
+                                        <span>{{ $warehouse->working_hours ?? 'N/A' }}</span>
                                     </span>
                                 </li>
 
@@ -168,21 +168,21 @@
                                     class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                     <span class="fw-semibold text-break">Working Days:</span>
                                     <span>
-                                        <span>{{ $warehouse->working_days }}</span>
+                                        <span>{{ $warehouse->working_days ?? 'N/A' }}</span>
                                     </span>
                                 </li>
 
                                 <li
                                     class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                     <span class="fw-semibold text-break">Maximum Storage Capacity :</span>
-                                    <span>{{ $warehouse->max_store_capacity }}</span>
+                                    <span>{{ $warehouse->max_store_capacity ?? 'N/A' }}</span>
                                 </li>
 
                                 <li
                                     class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                     <span class="fw-semibold text-break">Supported Operations:</span>
                                     <span>
-                                        {{ ucwords($warehouse->supported_operations) }}
+                                        {{ ucwords($warehouse->supported_operations ?? 'N/A') }}
                                     </span>
 
                                 </li>
@@ -192,7 +192,7 @@
                                     <span class="fw-semibold text-break">Zone Configuration:</span>
                                     <span>
                                         {{-- Receiving_zone --}}
-                                        {{ ucwords(str_replace('_', ' ', $warehouse->zone_conf)) }}
+                                        {{ ucwords(str_replace('_', ' ', $warehouse->zone_conf ?? 'N/A')) }}
                                     </span>
                                 </li>
                             </ul>
@@ -222,7 +222,7 @@
                                         GST Number/Tax ID :
                                     </span>
                                     <span>
-                                        <span>{{ $warehouse->gst_no }}</span>
+                                        <span>{{ $warehouse->gst_no ?? 'N/A' }}</span>
                                     </span>
                                 </li>
 
@@ -230,7 +230,7 @@
                                     class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                     <span class="fw-semibold text-break">Licence/Permit Number:</span>
                                     <span>
-                                        <span>{{ $warehouse->licence_no }}</span>
+                                        <span>{{ $warehouse->licence_no ?? 'N/A' }}</span>
                                     </span>
                                 </li>
 
@@ -238,7 +238,12 @@
                                     class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                     <span class="fw-semibold text-break">Upload Licence Document:</span>
                                     <span>
-                                        <span><a class="btn btn-primary btn-sm" href="{{ asset($warehouse->licence_doc) }}">View</a></span>
+                                        @if ($warehouse->licence_doc)
+                                            <span><a class="btn btn-primary btn-sm"
+                                                    href="{{ asset($warehouse->licence_doc) }}">View</a></span>
+                                        @else
+                                            <span>N/A</span>
+                                        @endif
                                     </span>
                                 </li>
                             </ul>
@@ -315,9 +320,11 @@
                                 <div>
                                     <select required name="status" class="form-select w-100">
                                         <option value="" selected disabled>---- Select ----</option>
-                                        <option value="active" {{ $warehouse->status == 'active' ? 'selected' : '' }}>Active
+                                        <option value="active" {{ $warehouse->status == 'active' ? 'selected' : '' }}>
+                                            Active
                                         </option>
-                                        <option value="inactive" {{ $warehouse->status == 'inactive' ? 'selected' : '' }}>Inactive
+                                        <option value="inactive" {{ $warehouse->status == 'inactive' ? 'selected' : '' }}>
+                                            Inactive
                                         </option>
                                     </select>
                                 </div>

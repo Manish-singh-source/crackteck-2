@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileUpload;
 use App\Models\ParentCategory;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
@@ -33,7 +34,7 @@ class CategorieController extends Controller
     public function storeParent(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:parent_categories,name,NULL,id,deleted_at,NULL',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:inactive,active',
             'status_ecommerce' => 'required|in:inactive,active',
@@ -56,11 +57,7 @@ class CategorieController extends Controller
         $parentCategorie->status_ecommerce = $request->status_ecommerce;
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time().'.'.$file->getClientOriginalExtension();
-
-            $file->move(public_path('uploads/e-commerce/categories'), $filename);
-            $parentCategorie->image = 'uploads/e-commerce/categories/'.$filename;
+            $parentCategorie->image = FileUpload::fileUpload($request->file('image'), 'uploads/e-commerce/categories');
         }
 
         $parentCategorie->save();
@@ -69,14 +66,14 @@ class CategorieController extends Controller
             return back()->with('error', 'Something went wrong.');
         }
 
-        return redirect()->route('category.index')->with('success', 'Parent Categorie added successfully.');
+        return redirect()->route('category.index')->with('success', 'Parent Category added successfully.');
     }
 
     public function storeSubCategorie(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'parent_category_id' => 'required|exists:parent_categories,id',
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:sub_categories,name,NULL,id,deleted_at,NULL',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'icon_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:inactive,active',
@@ -90,34 +87,15 @@ class CategorieController extends Controller
         $subCategorie = new SubCategory;
         $subCategorie->parent_category_id = $request->parent_category_id;
         $subCategorie->name = $request->name;
-        $subCategorie->slug = strtolower(str_replace(' ', '-', $request->name));
         $subCategorie->status = $request->status ?? 'inactive';
         $subCategorie->status_ecommerce = $request->status_ecommerce ?? 'no';
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time().'.'.$file->getClientOriginalExtension();
-
-            $uploadPath = public_path('uploads/e-commerce/categories');
-            if (! File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-
-            $file->move($uploadPath, $filename);
-            $subCategorie->image = 'uploads/e-commerce/categories/'.$filename;
+            $subCategorie->image = FileUpload::fileUpload($request->file('image'), 'uploads/e-commerce/categories');
         }
 
         if ($request->hasFile('icon_image')) {
-            $file = $request->file('icon_image');
-            $filename = time().'_icon.'.$file->getClientOriginalExtension();
-
-            $uploadPath = public_path('uploads/e-commerce/categories');
-            if (! File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-
-            $file->move($uploadPath, $filename);
-            $subCategorie->icon_image = 'uploads/e-commerce/categories/'.$filename;
+            $subCategorie->icon_image = FileUpload::fileUpload($request->file('icon_image'), 'uploads/e-commerce/categories');
         }
 
         $subCategorie->save();
@@ -134,7 +112,6 @@ class CategorieController extends Controller
         $parentCategorie = ParentCategory::with('subCategories')->findOrFail($id);
         $subCategories = SubCategory::where('parent_category_id', $id)->get();
 
-        // dd($parentCategorie);
         return view('/e-commerce/categories/view', compact('parentCategorie', 'subCategories'));
     }
 
@@ -143,7 +120,7 @@ class CategorieController extends Controller
         $parentId = $request->parent_category_id;
 
         $subcategories = SubCategory::where('parent_category_id', $parentId)
-            ->pluck('name', 'id'); // returns [id => name]
+            ->pluck('name', 'id'); 
 
         return response()->json($subcategories);
     }
@@ -153,7 +130,7 @@ class CategorieController extends Controller
         $parentCategorie = ParentCategory::findOrFail($id);
         $parentCategorie->delete();
 
-        return redirect()->route('category.index')->with('success', 'Categorie deleted successfully.');
+        return redirect()->route('category.index')->with('success', 'Parent Category deleted successfully.');
     }
 
     public function edit($id)
@@ -175,7 +152,7 @@ class CategorieController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:sub_categories,name,'.$id.',id,deleted_at,NULL',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:inactive,active',
             'status_ecommerce' => 'required|in:inactive,active',
@@ -187,26 +164,11 @@ class CategorieController extends Controller
 
         $parentCategorie = ParentCategory::findOrFail($id);
         $parentCategorie->name = $request->name;
-        $parentCategorie->slug = strtolower(str_replace(' ', '-', $request->name));
         $parentCategorie->status = $request->status;
         $parentCategorie->status_ecommerce = $request->status_ecommerce;
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($parentCategorie->image && File::exists(public_path($parentCategorie->image))) {
-                File::delete(public_path($parentCategorie->image));
-            }
-
-            $file = $request->file('image');
-            $filename = time().'.'.$file->getClientOriginalExtension();
-
-            $uploadPath = public_path('uploads/e-commerce/categories');
-            if (! File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-
-            $file->move($uploadPath, $filename);
-            $parentCategorie->image = 'uploads/e-commerce/categories/'.$filename;
+            $parentCategorie->image = FileUpload::updateFileUpload($request->file('image'), $parentCategorie->image, 'uploads/e-commerce/categories');
         }
 
         $parentCategorie->save();
@@ -218,7 +180,7 @@ class CategorieController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'parent_category_id' => 'required|exists:parent_categories,id',
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:sub_categories,name,'.$id.',id,deleted_at,NULL',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'icon_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:inactive,active',
@@ -234,44 +196,17 @@ class CategorieController extends Controller
         $subCategorie->name = $request->name;
         $subCategorie->status = $request->status;
         $subCategorie->status_ecommerce = $request->status_ecommerce;
-        $subCategorie->slug = strtolower(str_replace(' ', '-', $request->name));
 
         // Handle image upload
         if ($request->hasFile('image')) {
             // Delete old image if exists
-            if ($subCategorie->image && File::exists(public_path($subCategorie->image))) {
-                File::delete(public_path($subCategorie->image));
-            }
-
-            $file = $request->file('image');
-            $filename = time().'.'.$file->getClientOriginalExtension();
-
-            $uploadPath = public_path('uploads/e-commerce/categories');
-            if (! File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-
-            $file->move($uploadPath, $filename);
-            $subCategorie->image = 'uploads/e-commerce/categories/'.$filename;
+            $subCategorie->image = FileUpload::updateFileUpload($request->file('image'), $subCategorie->image, 'uploads/e-commerce/categories');
         }
 
         // Handle icon image upload
         if ($request->hasFile('icon_image')) {
             // Delete old image if exists
-            if ($subCategorie->icon_image && File::exists(public_path($subCategorie->icon_image))) {
-                File::delete(public_path($subCategorie->icon_image));
-            }
-
-            $file = $request->file('icon_image');
-            $filename = time().'_icon.'.$file->getClientOriginalExtension();
-
-            $uploadPath = public_path('uploads/e-commerce/categories');
-            if (! File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-
-            $file->move($uploadPath, $filename);
-            $subCategorie->icon_image = 'uploads/e-commerce/categories/'.$filename;
+            $subCategorie->icon_image = FileUpload::updateFileUpload($request->file('icon_image'), $subCategorie->icon_image, 'uploads/e-commerce/categories');
         }
 
         $subCategorie->save();

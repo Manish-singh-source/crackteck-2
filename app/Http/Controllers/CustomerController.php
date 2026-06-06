@@ -53,7 +53,7 @@ class CustomerController extends Controller
             $customerCode = str_replace('CUST', '', $lastCustomerCode);
             $customerCode = (int) $customerCode + 1;
 
-            $customerCode = 'CUST'.str_pad($customerCode, 4, '0', STR_PAD_LEFT);
+            $customerCode = 'CUST' . str_pad($customerCode, 4, '0', STR_PAD_LEFT);
 
             // 1. Create Customer
             $customer = Customer::create([
@@ -156,7 +156,6 @@ class CustomerController extends Controller
     {
         $customer = Customer::with(['branches', 'aadharDetails', 'panCardDetails', 'companyDetails'])->find($id);
 
-        // dd($customer);
         return view('/crm/customer/edit', compact('customer'));
     }
 
@@ -198,44 +197,57 @@ class CustomerController extends Controller
             ]);
 
             /* ================= AADHAR ================= */
-            $customerAadhar = CustomerAadharDetail::where('customer_id', $customer->id)->first();
+            if ($validated['aadhar_number'] || $request->hasFile('aadhar_front_path') || $request->hasFile('aadhar_back_path')) {
+                $customerAadhar = CustomerAadharDetail::where('customer_id', $customer->id)->first();
 
-            if ($validated['aadhar_number']) {
-                $customerAadhar->aadhar_number = $validated['aadhar_number'];
-            }
+                if (!$customerAadhar) {
+                    $customerAadhar = new CustomerAadharDetail();
+                    $customerAadhar->customer_id = $customer->id;
+                }
+                if ($validated['aadhar_number']) {
+                    $customerAadhar->aadhar_number = $validated['aadhar_number'];
+                }
 
-            if ($request->hasFile('aadhar_front_path')) {
-                $aadharFront = $request->file('aadhar_front_path')
-                    ->store('customers/aadhar', 'public');
-                $customerAadhar->aadhar_front_path = $aadharFront;
-            }
+                if ($request->hasFile('aadhar_front_path')) {
+                    $aadharFront = $request->file('aadhar_front_path')
+                        ->store('customers/aadhar', 'public');
+                    $customerAadhar->aadhar_front_path = $aadharFront;
+                }
 
-            if ($request->hasFile('aadhar_back_path')) {
-                $aadharBack = $request->file('aadhar_back_path')
-                    ->store('customers/aadhar', 'public');
-                $customerAadhar->aadhar_back_path = $aadharBack;
+                if ($request->hasFile('aadhar_back_path')) {
+                    $aadharBack = $request->file('aadhar_back_path')
+                        ->store('customers/aadhar', 'public');
+                    $customerAadhar->aadhar_back_path = $aadharBack;
+                }
+                $customerAadhar->save();
             }
-            $customerAadhar->save();
 
             /* ================= PAN ================= */
-            $customerPan = CustomerPanCardDetail::where('customer_id', $customer->id)->first();
+            if ($validated['pan_number'] || $request->hasFile('pan_card_front_path') || $request->hasFile('pan_card_back_path')) {
+                $customerPan = CustomerPanCardDetail::where('customer_id', $customer->id)->first();
 
-            if ($validated['pan_number']) {
-                $customerPan->pan_number = $validated['pan_number'];
-            }
+                if (!$customerPan) {
+                    $customerPan = new CustomerPanCardDetail();
+                    $customerPan->customer_id = $customer->id;
+                }
 
-            if ($request->hasFile('pan_card_front_path')) {
-                $panFront = $request->file('pan_card_front_path')
-                    ->store('customers/pan', 'public');
-                $customerPan->pan_card_front_path = $panFront;
-            }
+                if ($validated['pan_number']) {
+                    $customerPan->pan_number = $validated['pan_number'];
+                }
 
-            if ($request->hasFile('pan_card_back_path')) {
-                $panBack = $request->file('pan_card_back_path')
-                    ->store('customers/pan', 'public');
-                $customerPan->pan_card_back_path = $panBack;
+                if ($request->hasFile('pan_card_front_path')) {
+                    $panFront = $request->file('pan_card_front_path')
+                        ->store('customers/pan', 'public');
+                    $customerPan->pan_card_front_path = $panFront;
+                }
+
+                if ($request->hasFile('pan_card_back_path')) {
+                    $panBack = $request->file('pan_card_back_path')
+                        ->store('customers/pan', 'public');
+                    $customerPan->pan_card_back_path = $panBack;
+                }
+                $customerPan->save();
             }
-            $customerPan->save();
 
             /* ================= BRANCHES ================= */
             $existingIds = $customer->addressDetails->pluck('id')->toArray();
@@ -300,10 +312,7 @@ class CustomerController extends Controller
             }
         });
 
-        // return redirect()->route('customer.index')
-        //     ->with('success', 'Customer updated successfully.');
-        // remove id from url
-        $url = str_replace('/'.$id, '', $request->getRequestUri());
+        $url = str_replace('/' . $id, '', $request->getRequestUri());
 
         if ($url == '/demo/crm/update-customer') {
             return redirect()->route('customer.index')

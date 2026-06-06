@@ -3,10 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class ParentCategory extends Model
 {
     //
+    use SoftDeletes;
+
     protected $fillable = [
         'slug',
         'name',
@@ -16,6 +20,16 @@ class ParentCategory extends Model
         'status',
     ];
 
+    // unique slug generation
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($parentCategory) {
+            $parentCategory->slug = self::generateUniqueSlug($parentCategory->name);
+        });
+    }
+    
     public function subCategories()
     {
         return $this->hasMany(SubCategory::class, 'parent_category_id');
@@ -30,4 +44,13 @@ class ParentCategory extends Model
     {
         return $this->hasMany(EcommerceProduct::class, 'parent_category_id');
     }
+
+    private static function generateUniqueSlug($name)
+    {
+        $slug = Str::slug($name);
+        $count = self::where('slug', 'LIKE', "{$slug}%")->count();
+
+        return $count ? "{$slug}-{$count}" : $slug;
+    }
 }
+

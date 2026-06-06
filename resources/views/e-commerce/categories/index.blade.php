@@ -103,7 +103,7 @@
                                                     <tbody>
                                                         @foreach ($parentCategorie as $category)
                                                             <tr data-category-id="{{ $category->id }}">
-                                                                <td>{{ $category->id }}</td>
+                                                                <td>{{ $loop->iteration }}</td>
                                                                 <td>
                                                                     @if ($category->image)
                                                                         <img src="{{ asset($category->image) }}"
@@ -345,6 +345,34 @@
             </div>
         </div>
     </div>
+
+    @if ($errors->any())
+        <script>
+            window.addEventListener('load', function() {
+                const parentCategoryValues = ['active', 'inactive'];
+                const submittedStatus = @json(old('status_ecommerce'));
+                const parentModalEl = document.querySelector('.modal.attribute');
+                const subModalEl = document.querySelector('.modal.attribute-value');
+
+                const openModal = (modalEl) => {
+                    if (!modalEl || !window.bootstrap) return;
+                    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                };
+
+                if (parentCategoryValues.includes(submittedStatus)) {
+                    openModal(parentModalEl);
+                    return;
+                }
+
+                if (submittedStatus === 'yes' || submittedStatus === 'no') {
+                    openModal(subModalEl);
+                    return;
+                }
+
+                openModal(parentModalEl);
+            });
+        </script>
+    @endif
 @endsection
 
 @section('scripts')

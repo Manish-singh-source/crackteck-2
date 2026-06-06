@@ -80,4 +80,21 @@ class FileUpload
 
         return $slug.'-'.time().'-'.Str::lower(Str::random(8)).($extension ? '.'.$extension : '');
     }
+
+    public static function storeBase64File(string $path, string $base64Data): void
+    {
+        if (self::shouldUseFirebase()) {
+            app(FirebaseStorageService::class)->storeBase64($path, $base64Data);
+        } else {
+            $fullPath = public_path($path);
+            $directory = dirname($fullPath);
+
+            if (! File::exists($directory)) {
+                File::makeDirectory($directory, 0755, true);
+            }
+
+            $data = base64_decode($base64Data);
+            File::put($fullPath, $data);
+        }
+    }
 }

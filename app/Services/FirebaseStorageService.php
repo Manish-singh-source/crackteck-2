@@ -87,6 +87,20 @@ class FirebaseStorageService
         return $this->publicUrl($objectPath);
     }
 
+    public function storeBase64(string $path, string $base64Data): void
+    {
+        $objectPath = ltrim($path, '/');
+        $decodedData = base64_decode($base64Data);
+
+        if ($decodedData === false) {
+            throw new RuntimeException('Invalid base64 data provided for Firebase Storage upload.');
+        }
+
+        $this->bucket->upload($decodedData, [
+            'name' => $objectPath,
+        ]);
+    }
+
     public function delete(?string $path): bool
     {
         $objectPath = $this->extractObjectPath($path);

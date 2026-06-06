@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Helpers\FileUpload;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Milon\Barcode\Facades\DNS1DFacade;
 
 class ProductSerial extends Model
 {
@@ -17,6 +20,7 @@ class ProductSerial extends Model
         'discount_price',
         'tax',
         'final_price',
+        'barcode_url',
         'main_product_image',
         'additional_product_images',
         'variations',
@@ -59,13 +63,36 @@ class ProductSerial extends Model
             $random = strtoupper(Str::random(4));
 
             // Build final serial
-            $serial = 'PRO-'.$sku.'-'.$random;
+            $serial = 'PRO-' . $sku . '-' . $random;
 
             // Ensure uniqueness
             $exists = ProductSerial::where('auto_generated_serial', $serial)->exists();
         } while ($exists);
 
         return $serial;
+    }
+
+    public static function generateBarcode(string $serial)
+    {
+        // Generate barcode PNG
+        $barcode = DNS1DFacade::getBarcodePNG($serial, 'C128');
+
+        // Create directory if not exists
+        $barcodePath = public_path('uploads/products/barcodes');
+
+        if (!File::exists($barcodePath)) {
+            File::makeDirectory($barcodePath, 0755, true);
+        }
+
+        // Save barcode image
+        $barcodeFileName = 'barcode_' . $serial . '_' . time() . '.png';
+
+        file_put_contents(
+            $barcodePath . '/' . $barcodeFileName,
+            base64_decode($barcode)
+        );
+
+        return 'uploads/products/barcodes/' . $barcodeFileName;
     }
 
     public function getFinalSerialAttribute()

@@ -50,7 +50,7 @@ class ProductListController extends Controller
     {
         $vendors = Vendor::selectRaw(
             "id, CONCAT(vendor_code, ' - ', first_name, ' ', last_name) AS name"
-        )->where('status','active')->pluck('name', 'id');
+        )->where('status', 'active')->pluck('name', 'id');
         $vendorPurchaseOrders = VendorPurchaseOrder::where('po_status', 'approved')->pluck('po_number', 'id');
         $brands = Brand::where('status', 'active')->pluck('name', 'id');
         $parentCategories = ParentCategory::where('status', 'active')->pluck('name', 'id');
@@ -103,7 +103,7 @@ class ProductListController extends Controller
             //     + (($data['selling_price'] ?? 0) * ($data['tax'] ?? 0) / 100);
 
             // Main image
-            if ($request->hasFile('main_product_image')) {                
+            if ($request->hasFile('main_product_image')) {
                 $data['main_product_image'] = FileUpload::fileUpload($request->file('main_product_image'), 'uploads/products/images/');
             }
 
@@ -111,7 +111,7 @@ class ProductListController extends Controller
             if ($request->hasFile('additional_product_images')) {
                 $images = [];
                 foreach ($request->file('additional_product_images') as $file) {
-                    $images[] = FileUpload::fileUpload($request->file($file), 'uploads/products/images/');
+                    $images[] = FileUpload::fileUpload($file, 'uploads/products/images/');
                 }
                 $data['additional_product_images'] = json_encode($images);
             }
@@ -175,23 +175,17 @@ class ProductListController extends Controller
 
         $vendors = Vendor::selectRaw(
             "id, CONCAT(vendor_code, ' - ', first_name, ' ', last_name) AS name"
-        )->pluck('name', 'id');
-        $vendorPurchaseOrders = VendorPurchaseOrder::where('vendor_id', $product->vendor_id)->pluck('po_number', 'id');
-        $brands = Brand::pluck('name', 'id');
-        $parentCategories = ParentCategory::pluck('name', 'id');
-        $subCategories = SubCategory::where('parent_category_id', $product->parent_category_id)->pluck('name', 'id');
-        $warehouses = Warehouse::pluck('name', 'id');
+        )->where('status', 'active')->pluck('name', 'id');
+        $vendorPurchaseOrders = VendorPurchaseOrder::where('vendor_id', $product->vendor_id)
+            ->where('po_status', 'approved')
+            ->pluck('po_number', 'id');
+        $brands = Brand::where('status', 'active')->pluck('name', 'id');
+        $parentCategories = ParentCategory::where('status', 'active')->pluck('name', 'id');
+        $subCategories = SubCategory::where('status', 'active')->where('parent_category_id', $product->parent_category_id)->pluck('name', 'id');
+        $warehouses = Warehouse::where('status', 'active')->pluck('name', 'id');
 
-        // Attributes + their values
-        $variationAttributes = ProductVariantAttribute::with('values')->get();
-        // dd($variationAttributes);
-        // variation_options stored as: { "attribute_id": [value_id, value_id], ... }
+        $variationAttributes = ProductVariantAttribute::where('status', 'active')->with('values')->get();
         $selectedVariations = $product->variation_options;
-        // dd($selectedVariations);
-        // $selectedVariations = collect($selectedVariations)->map(function ($values) {
-        //     return array_map('intval', (array) $values);
-        // })->toArray();
-        // dd($selectedVariations);
 
         return view('warehouse.product-list.edit', compact(
             'product',
@@ -226,11 +220,6 @@ class ProductListController extends Controller
 
             // Main image
             if ($request->hasFile('main_product_image')) {
-                // if ($product->main_product_image && Storage::disk('public')->exists($product->main_product_image)) {
-                //     Storage::disk('public')->delete($product->main_product_image);
-                // }
-                // $data['main_product_image'] = $request->file('main_product_image')
-                //     ->store('products/images', 'public');
                 $data['main_product_image'] = FileUpload::updateFileUpload($request->file('main_product_image'), $product->main_product_image, 'products/images');
             }
 
@@ -238,19 +227,14 @@ class ProductListController extends Controller
             if ($request->hasFile('additional_product_images')) {
                 $additional = [];
                 foreach ($request->file('additional_product_images') as $file) {
-                    // $additional[] = $file->store('products/images', 'public');
-                    $additional[] = FileUpload::updateFileUpload($file, '','products/additional-images');
+                    $additional[] = FileUpload::updateFileUpload($file, '', 'products/additional-images');
                 }
                 $data['additional_product_images'] = $additional;
             }
 
             // Datasheet manual
             if ($request->hasFile('datasheet_manual')) {
-                if ($product->datasheet_manual && Storage::disk('public')->exists($product->datasheet_manual)) {
-                    Storage::disk('public')->delete($product->datasheet_manual);
-                }
-                $data['datasheet_manual'] = $request->file('datasheet_manual')
-                    ->store('products/datasheets', 'public');
+                $data['datasheet_manual'] = FileUpload::updateFileUpload($request->file('datasheet_manual'), $product->datasheet_manual, 'products/datasheets');
             }
 
             $product->update($data);
@@ -316,6 +300,8 @@ class ProductListController extends Controller
             for ($i = 0; $i < $serialsToCreate; $i++) {
                 $autoSerial = ProductSerial::generateAutoSerial($product->sku);
 
+                $barcodeUrl = ProductSerial::generateBarcode($autoSerial);
+
                 ProductSerial::create([
                     'product_id' => $product->id,
                     'auto_generated_serial' => $autoSerial,
@@ -324,6 +310,7 @@ class ProductListController extends Controller
                     'discount_price' => $product->discount_price,
                     'tax' => $product->tax,
                     'final_price' => $product->final_price,
+                    'barcode_url' => $barcodeUrl,
                     'main_product_image' => $product->main_product_image,
                     'additional_product_images' => $product->additional_product_images,
                     'variations' => $product->variation_options,

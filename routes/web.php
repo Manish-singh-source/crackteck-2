@@ -638,7 +638,7 @@ Route::prefix('/demo')->group(function () {
         // Route::get('/crm/create-service-request', 'create')->name('service-request.create-servies');
         // View Service Request Page
         // Route::get('/crm/view-service-request/{id}', 'viewServiceRequest')->name('service-request.view-quick-service-request);
-        // Route::get('/crm/view-service-request-old', 'view')->name('service-request.view-service');
+        Route::get('/crm/view-service-request-old', 'view')->name('service-request.view-service');
         // Edit Service Request Page
         // Route::get('/crm/edit-service-request', 'edit')->name('service-request.edit-service');
 

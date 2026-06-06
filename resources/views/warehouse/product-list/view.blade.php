@@ -220,7 +220,7 @@
                                                 <td>{{ $serial->auto_generated_serial ?? 'N/A'}}</td>
                                                 <td>{{ $serial->manual_serial ?? 'N/A' }}</td>
                                                 <td>
-                                                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($serial->auto_generated_serial, 'C128') }}"
+                                                    <img src="{{ asset($serial->barcode_url) }}"
                                                         alt="Barcode" width="200">
                                                 </td>
                                                 <td>

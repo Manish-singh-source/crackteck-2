@@ -10,7 +10,7 @@ class SubCategory extends Model
 {
     //
     use SoftDeletes;
-    
+
     protected $fillable = [
         'parent_category_id',
         'slug',
@@ -24,7 +24,7 @@ class SubCategory extends Model
     // unique slug generation
     public static function boot()
     {
-        parent::boot(); 
+        parent::boot();
 
         static::creating(function ($subCategory) {
             $subCategory->slug = self::generateUniqueSlug($subCategory->name);
@@ -34,7 +34,9 @@ class SubCategory extends Model
     private static function generateUniqueSlug($name)
     {
         $slug = Str::slug($name);
-        $count = self::where('slug', 'LIKE', "{$slug}%")->count();
+        $count = self::withTrashed()
+            ->where('slug', 'LIKE', "{$slug}%")
+            ->count();
 
         return $count ? "{$slug}-{$count}" : $slug;
     }

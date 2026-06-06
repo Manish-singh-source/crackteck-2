@@ -48,7 +48,7 @@ class ParentCategory extends Model
     private static function generateUniqueSlug($name)
     {
         $slug = Str::slug($name);
-        $count = self::where('slug', 'LIKE', "{$slug}%")->count();
+        $count = self::withTrashed()->where('slug', 'LIKE', "{$slug}%")->count();
 
         return $count ? "{$slug}-{$count}" : $slug;
     }

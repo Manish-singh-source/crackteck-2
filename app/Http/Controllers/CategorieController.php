@@ -83,22 +83,22 @@ class CategorieController extends Controller
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
-
-        $subCategorie = new SubCategory;
-        $subCategorie->parent_category_id = $request->parent_category_id;
-        $subCategorie->name = $request->name;
-        $subCategorie->status = $request->status ?? 'inactive';
-        $subCategorie->status_ecommerce = $request->status_ecommerce ?? 'no';
-
         if ($request->hasFile('image')) {
-            $subCategorie->image = FileUpload::fileUpload($request->file('image'), 'uploads/e-commerce/categories');
+            $image = FileUpload::fileUpload($request->file('image'), 'uploads/e-commerce/categories');
         }
 
         if ($request->hasFile('icon_image')) {
-            $subCategorie->icon_image = FileUpload::fileUpload($request->file('icon_image'), 'uploads/e-commerce/categories');
+            $icon_image = FileUpload::fileUpload($request->file('icon_image'), 'uploads/e-commerce/categories');
         }
 
-        $subCategorie->save();
+        $subCategorie = SubCategory::create([
+            'parent_category_id' => $request->parent_category_id,
+            'name' => $request->name,
+            'status' => $request->status,
+            'status_ecommerce' => $request->status_ecommerce,
+            'image' => $image ?? null,
+            'icon_image' => $icon_image ?? null,
+        ]);
 
         if (! $subCategorie) {
             return back()->with('error', 'Something went wrong.');
@@ -120,7 +120,7 @@ class CategorieController extends Controller
         $parentId = $request->parent_category_id;
 
         $subcategories = SubCategory::where('parent_category_id', $parentId)
-            ->pluck('name', 'id'); 
+            ->pluck('name', 'id');
 
         return response()->json($subcategories);
     }
@@ -152,7 +152,7 @@ class CategorieController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:sub_categories,name,'.$id.',id,deleted_at,NULL',
+            'name' => 'required|string|max:255|unique:sub_categories,name,' . $id . ',id,deleted_at,NULL',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:inactive,active',
             'status_ecommerce' => 'required|in:inactive,active',
@@ -180,7 +180,7 @@ class CategorieController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'parent_category_id' => 'required|exists:parent_categories,id',
-            'name' => 'required|string|max:255|unique:sub_categories,name,'.$id.',id,deleted_at,NULL',
+            'name' => 'required|string|max:255|unique:sub_categories,name,' . $id . ',id,deleted_at,NULL',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'icon_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:inactive,active',

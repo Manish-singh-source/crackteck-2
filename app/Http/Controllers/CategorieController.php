@@ -199,13 +199,10 @@ class CategorieController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            // Delete old image if exists
             $subCategorie->image = FileUpload::updateFileUpload($request->file('image'), $subCategorie->image, 'uploads/e-commerce/categories');
         }
 
-        // Handle icon image upload
         if ($request->hasFile('icon_image')) {
-            // Delete old image if exists
             $subCategorie->icon_image = FileUpload::updateFileUpload($request->file('icon_image'), $subCategorie->icon_image, 'uploads/e-commerce/categories');
         }
 
@@ -217,15 +214,6 @@ class CategorieController extends Controller
     public function destroyChild($id)
     {
         $subCategorie = SubCategory::findOrFail($id);
-
-        // Delete associated images
-        if ($subCategorie->feature_image && File::exists(public_path($subCategorie->feature_image))) {
-            File::delete(public_path($subCategorie->feature_image));
-        }
-        if ($subCategorie->icon_image && File::exists(public_path($subCategorie->icon_image))) {
-            File::delete(public_path($subCategorie->icon_image));
-        }
-
         $subCategorie->delete();
 
         return redirect()->back()->with('success', 'Sub Category deleted successfully.');

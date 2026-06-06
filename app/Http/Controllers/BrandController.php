@@ -35,10 +35,20 @@ class BrandController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:brands,name,NULL,id,deleted_at,NULL',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status_ecommerce' => 'required|in:active,inactive',
             'status' => 'required|in:active,inactive',
+        ], [
+            'name.required' => 'The Brand name is required.',
+            'name.string' => 'The Brand name must be a string.',
+            'name.max' => 'The Brand name may not be greater than 255 characters.',
+            'name.unique' => 'The Brand name has already been taken.',
+            'image.max' => 'The image may not be greater than 2048 kilobytes.',
+            'image.mimes' => 'The image format is invalid.',
+            'image.required' => 'An image is required.',
+            'status_ecommerce.required' => 'Status is required.',
+            'status.required' => 'Status is required.',
         ]);
 
         if ($validator->fails()) {
@@ -52,11 +62,6 @@ class BrandController extends Controller
         $brand->status = $request->status;
 
         if ($request->hasFile('image')) {
-            // $file = $request->file('image');
-            // $filename = time().'.'.$file->getClientOriginalExtension();
-
-            // $file->move(public_path('uploads/e-commerce/brands'), $filename);
-            // $brand->image = 'uploads/e-commerce/brands/'.$filename;
             $brand->image = FileUpload::fileUpload($request->file('image'), 'uploads/e-commerce/brands/');
         }
 
@@ -96,16 +101,6 @@ class BrandController extends Controller
         $brand->status = $request->status;
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            // if ($brand->image && File::exists(public_path($brand->image))) {
-            //     File::delete(public_path($brand->image));
-            // }
-
-            // $file = $request->file('image');
-            // $filename = time().'.'.$file->getClientOriginalExtension();
-
-            // $file->move(public_path('uploads/e-commerce/brands'), $filename);
-            // $brand->image = 'uploads/e-commerce/brands/'.$filename;
             $brand->image = FileUpload::updateFileUpload($request->file('image'), $brand->image, 'uploads/e-commerce/brands/');
         }
 
@@ -123,11 +118,6 @@ class BrandController extends Controller
 
         if ($brand->products_count > 0) {
             return back()->with('error', 'Cannot delete brand with associated products.');
-        }
-
-        if ($brand->image && File::exists(public_path($brand->image))) {
-            // File::delete(public_path($brand->image));
-            FileUpload::deleteFile($brand->image);
         }
 
         $brand->delete();

@@ -442,7 +442,7 @@
                                                 @endphp
                                                 <span class="badge bg-info">
                                                     @if ($payment->payment_method)
-                                                        {{ $paymentMethod[$payment->payment_method] }}
+                                                        {{ $paymentMethod[$payment->payment_method] ?? ucwords(str_replace('_', ' ', $payment->payment_method)) }}
                                                     @else
                                                         N/A
                                                     @endif
@@ -453,13 +453,14 @@
                                                 @php
                                                     $paymentStatus = [
                                                         'pending' => 'Pending',
+                                                        'processing' => 'Processing',
                                                         'completed' => 'Completed',
                                                         'failed' => 'Failed',
                                                     ];
                                                 @endphp
                                                 <span class="badge bg-info">
                                                     @if ($payment->status)
-                                                        {{ $paymentStatus[$payment->status] }}
+                                                        {{ $paymentStatus[$payment->status] ?? ucwords(str_replace('_', ' ', $payment->status)) }}
                                                     @else
                                                         N/A
                                                     @endif

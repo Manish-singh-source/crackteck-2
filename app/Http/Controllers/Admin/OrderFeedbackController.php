@@ -65,6 +65,8 @@ class OrderFeedbackController extends Controller
     {
         $feedback = OrderFeedback::with(['order', 'product', 'customer'])->findOrFail($id);
 
+        app(\App\Services\EcommerceUnreadService::class)->markReviewsViewed([$feedback->id]);
+
         return view('e-commerce.order-feedback.edit', compact('feedback'));
     }
 

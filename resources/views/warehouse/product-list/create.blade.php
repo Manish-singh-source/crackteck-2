@@ -19,6 +19,8 @@
                         @csrf
                         @method('POST')
 
+                        <p class="text-muted"><span class="text-danger">*</span> Required fields</p>
+
                         @if ($errors->any())
                             <div class="alert alert-danger">
                                 <ul class="mb-0">
@@ -49,15 +51,16 @@
                                                     @include('components.form.select', [
                                                         'label' => 'Vendor',
                                                         'name' => 'vendor_id',
-                                                        'options' => $vendors->prepend('-- Select Vendor --', 0),
+                                                        'required' => true,
+                                                        'options' => ['' => '-- Select Vendor --'] + $vendors->toArray(),
                                                     ])
                                                 </div>
                                             </div>
 
                                             <div class="col-xl-6 col-lg-6">
                                                 <div>
-                                                    <label class="form-label">Vendor PO Number</label>
-                                                    <select name="vendor_purchase_order_id" id="vendor_purchase_order_id"
+                                                    <label for="vendor_purchase_order_id" class="form-label">Vendor PO Number <span class="text-danger">*</span></label>
+                                                    <select name="vendor_purchase_order_id" id="vendor_purchase_order_id" required
                                                         class="form-select @error('vendor_purchase_order_id') is-invalid @enderror"
                                                         data-old-value="{{ old('vendor_purchase_order_id') }}">
                                                         <option value="">--Select--</option>
@@ -73,6 +76,7 @@
                                                     @include('components.form.select', [
                                                         'label' => 'Brand',
                                                         'name' => 'brand_id',
+                                                        'required' => true,
                                                         'options' =>
                                                             ['' => '--Select Brand--'] + $brands->toArray(),
                                                     ])
@@ -83,7 +87,8 @@
                                                 {{-- Parent Category --}}
                                                 @include('components.form.select', [
                                                     'label' => 'Parent Category',
-                                                    'name' => 'parent_category_id', // keep as requested
+                                                    'name' => 'parent_category_id',
+                                                    'required' => true, // keep as requested
                                                     'id' => 'parent_category_id',
                                                     'options' =>
                                                         ['' => '--Select Parent Category--'] +
@@ -93,7 +98,7 @@
 
                                             <div class="col-lg-6">
                                                 {{-- Sub Category --}}
-                                                <label class="form-label">Sub Category</label>
+                                                <label for="sub_category_id" class="form-label">Sub Category</label>
                                                 <select name="sub_category_id" id="sub_category_id"
                                                     class="form-select @error('sub_category_id') is-invalid @enderror"
                                                     data-old-value="{{ old('sub_category_id') }}">
@@ -108,6 +113,7 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Warehouse',
                                                     'name' => 'warehouse_id',
+                                                    'required' => true,
                                                     'options' =>
                                                         ['' => 'Select Warehouse'] + $warehouses->toArray(),
                                                     'model' => isset($product) ? $product : null,
@@ -135,6 +141,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Product Name',
                                                         'name' => 'product_name',
+                                                        'required' => true,
                                                         'type' => 'text',
                                                         'placeholder' => 'Enter Product Name',
                                                     ])
@@ -146,6 +153,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'HSN Code',
                                                         'name' => 'hsn_code',
+                                                        'required' => true,
                                                         'type' => 'text',
                                                         'placeholder' => 'Product HSN Code',
                                                     ])
@@ -156,6 +164,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'SKU',
                                                         'name' => 'sku',
+                                                        'required' => true,
                                                         'type' => 'text',
                                                         'placeholder' => 'Product SKU Code',
                                                     ])
@@ -168,6 +177,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Model No',
                                                         'name' => 'model_no',
+                                                        'required' => true,
                                                         'type' => 'text',
                                                         'placeholder' => 'Product Model No.',
                                                     ])
@@ -189,7 +199,7 @@
                                             <div class="col-12 mb-3">
                                                 <div>
                                                     <label for="short_description" class="form-label">Short
-                                                        Description</label>
+                                                        Description <span class="text-danger">*</span></label>
                                                     <div id="short-description-editor" style="height: 200px;"></div>
                                                     <input type="hidden" name="short_description" id="short_description"
                                                         value="{{ old('short_description') }}">
@@ -265,6 +275,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Cost Price',
                                                         'name' => 'cost_price',
+                                                        'required' => true,
                                                         'type' => 'text',
                                                         'placeholder' => 'Enter Cost Price',
                                                     ])
@@ -275,6 +286,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Selling Price',
                                                         'name' => 'selling_price',
+                                                        'required' => true,
                                                         'type' => 'text',
                                                         'placeholder' => 'Enter Selling Price',
                                                     ])
@@ -303,14 +315,11 @@
                                             <div class="mb-3">
                                                 <div>
                                                     @include('components.form.input', [
-                                                        'label' => 'Final Price (Calculated)',
+                                                        'label' => 'Final Price',
                                                         'name' => 'final_price',
                                                         'type' => 'text',
-                                                        'placeholder' => 'Auto-calculated',
-                                                        'readonly' => true,
+                                                        'placeholder' => 'Enter Final Price',
                                                     ])
-                                                    <small class="text-muted">This field is automatically calculated based
-                                                        on selling price, discount, and tax</small>
                                                 </div>
                                             </div>
                                             <div class="mb-3">
@@ -318,6 +327,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Stock Quantity',
                                                         'name' => 'stock_quantity',
+                                                        'required' => true,
                                                         'type' => 'text',
                                                         'placeholder' => 'Enter Stock Quantity',
                                                     ])
@@ -328,6 +338,7 @@
                                                     @include('components.form.select', [
                                                         'label' => 'Stock Status',
                                                         'name' => 'stock_status',
+                                                        'required' => true,
                                                         'options' => [
                                                             '' => '--Select--',
                                                             'in_stock' => 'In Stock',
@@ -355,6 +366,7 @@
                                             @include('components.form.input', [
                                                 'label' => 'Main Product Image',
                                                 'name' => 'main_product_image',
+                                                'required' => true,
                                                 'type' => 'file',
                                                 'placeholder' => 'Upload Main Product Image',
                                                 'accept' => 'image/*',
@@ -477,6 +489,7 @@
                                                     @include('components.form.input', [
                                                         'label' => 'Weight',
                                                         'name' => 'weight',
+                                                        'required' => true,
                                                         'type' => 'text',
                                                         'placeholder' => 'Enter Weight (e.g., 5kg)',
                                                     ])
@@ -507,6 +520,7 @@
                                                     @include('components.form.select', [
                                                         'label' => 'Cash on Delivery (COD)',
                                                         'name' => 'cod',
+                                                        'required' => true,
                                                         'options' => [
                                                             '' => '--Select--',
                                                             'yes' => 'Yes',
@@ -520,6 +534,7 @@
                                                     @include('components.form.select', [
                                                         'label' => 'Installation',
                                                         'name' => 'installation',
+                                                        'required' => true,
                                                         'options' => [
                                                             '' => '--Select--',
                                                             'yes' => 'Yes',
@@ -533,6 +548,7 @@
                                                     @include('components.form.select', [
                                                         'label' => 'Product Status',
                                                         'name' => 'status',
+                                                        'required' => true,
                                                         'value' => 'active',
                                                         'options' => [
                                                             '' => '--Select--',
@@ -771,48 +787,7 @@
 
 
 
-            // ========================================
-            // Task 3: Real-time Pricing Calculation
-            // ========================================
-            function calculateFinalPrice() {
-                var sellingPrice = parseFloat($('input[name="selling_price"]').val()) || 0;
-                var discountPrice = parseFloat($('input[name="discount_price"]').val()) || 0;
-                var taxPercentage = parseFloat($('input[name="tax"]').val()) || 0;
 
-                // Validation: discount price cannot be greater than selling price
-                if (discountPrice > sellingPrice && sellingPrice > 0) {
-                    alert('Discount price cannot be greater than selling price');
-                    $('input[name="discount_price"]').val('');
-                    discountPrice = 0;
-                }
-
-                // Validation: tax percentage cannot exceed 100%
-                if (taxPercentage > 100) {
-                    alert('Tax percentage cannot exceed 100%');
-                    $('input[name="tax"]').val('');
-                    taxPercentage = 0;
-                }
-
-                // Calculate base price
-                // If discount price is entered: base_price = selling_price - discount_price
-                // Otherwise: base_price = selling_price
-                var basePrice = discountPrice > 0 ? (sellingPrice - discountPrice) : sellingPrice;
-
-                // Apply tax: final_price = base_price + (base_price * tax_percentage / 100)
-                var finalPrice = basePrice + (basePrice * taxPercentage / 100);
-
-                // Update final price field (rounded to 2 decimal places)
-                $('input[name="final_price"]').val(finalPrice.toFixed(2));
-            }
-
-            // Attach event listeners to pricing fields
-            $('input[name="selling_price"], input[name="discount_price"], input[name="tax"]').on('keyup change',
-                function() {
-                    calculateFinalPrice();
-                });
-
-            // Calculate on page load if values exist
-            calculateFinalPrice();
 
         });
     </script>

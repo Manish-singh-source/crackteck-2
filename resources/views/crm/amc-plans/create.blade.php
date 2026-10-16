@@ -46,6 +46,7 @@
 
                     <form action="{{ route('amc-plan.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
+                        <p class="text-muted"><span class="text-danger">*</span> Required fields</p>
 
                         <div class="row">
                             <div class="col-lg-8">
@@ -61,6 +62,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Plan Name',
                                                     'name' => 'plan_name',
+                                                    'required' => true,
                                                     'type' => 'text',
                                                     'placeholder' => 'Basic, Standard, etc.',
                                                     'value' => old('plan_name'),
@@ -75,6 +77,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Plan Code',
                                                     'name' => 'plan_code',
+                                                    'required' => true,
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Code',
                                                     'value' => old('plan_code'),
@@ -129,6 +132,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Duration (in months)',
                                                     'name' => 'duration',
+                                                    'required' => true,
                                                     'type' => 'number',
                                                     'placeholder' => 'e.g. 12',
                                                     'value' => old('duration'),
@@ -147,6 +151,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Total Visits Included',
                                                     'name' => 'total_visits',
+                                                    'required' => true,
                                                     'type' => 'number',
                                                     'placeholder' => 'Enter number of visits',
                                                     'value' => old('total_visits'),
@@ -172,6 +177,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Plan Cost (Rs.)',
                                                     'name' => 'plan_cost',
+                                                    'required' => true,
                                                     'type' => 'number',
                                                     'placeholder' => 'Enter Plan Cost (Rs.)',
                                                     'value' => old('plan_cost'),
@@ -187,6 +193,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Tax (%)',
                                                     'name' => 'tax',
+                                                    'required' => true,
                                                     'type' => 'number',
                                                     'placeholder' => 'Enter Tax (%)',
                                                     'value' => old('tax', 18),
@@ -202,6 +209,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Total Cost (Rs.)',
                                                     'name' => 'total_cost',
+                                                    'required' => true,
                                                     'type' => 'number',
                                                     'placeholder' => 'Auto calculated',
                                                     'value' => old('total_cost'),
@@ -261,6 +269,7 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Support Type',
                                                     'name' => 'support_type',
+                                                    'required' => true,
                                                     'options' => [
                                                         '' => '--Select --',
                                                         'onsite' => 'Onsite',
@@ -390,6 +399,7 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Status',
                                                     'name' => 'status',
+                                                    'required' => true,
                                                     'options' => [
                                                         '' => '--Select--',
                                                         'inactive' => 'Inactive',
@@ -434,6 +444,13 @@
 
             function togglePricing() {
                 const supportType = supportTypeSelect?.value;
+                const pricingRequired = supportType === 'remote' || supportType === 'both';
+                ['plan_cost', 'tax', 'total_cost'].forEach(name => {
+                    const input = document.getElementById(name);
+                    if (input) input.required = pricingRequired;
+                    const marker = document.querySelector(`label[for="${name}"] .text-danger`);
+                    if (marker) marker.hidden = !pricingRequired;
+                });
                 
                 if (supportType === 'remote' || supportType === 'both') {
                     // Show pricing for remote

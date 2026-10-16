@@ -21,6 +21,7 @@
     {{-- Label for the select --}}
     <label for="{{ $name }}" class="form-label">
         {{ $label ?? ucfirst($name) }}
+        @if (!empty($required)) <span class="text-danger">*</span> @endif
     </label>
 
     {{-- Select Field --}}

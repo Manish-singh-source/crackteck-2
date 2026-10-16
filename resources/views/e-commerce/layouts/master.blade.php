@@ -176,6 +176,37 @@
 
 @yield('scripts')
 
+<script>
+    (() => {
+        let pending = false;
+        async function refreshUnreadCounts() {
+            if (document.hidden || pending) return;
+            pending = true;
+            try {
+                const response = await fetch(@json(route('e-commerce.sidebar-unread-counts')), {
+                    headers: { 'Accept': 'application/json' },
+                    cache: 'no-store'
+                });
+                if (!response.ok) return;
+                const counts = await response.json();
+                document.querySelectorAll('[data-unread-count]').forEach(badge => {
+                    const count = counts[badge.dataset.unreadCount];
+                    if (!Number.isInteger(count) || count < 0) return;
+                    badge.textContent = count;
+                    badge.classList.toggle('d-none', count === 0);
+                });
+            } catch (error) {
+                // Keep the last count if the network is temporarily unavailable.
+            } finally {
+                pending = false;
+            }
+        }
+        setInterval(refreshUnreadCounts, 15000);
+        document.addEventListener('visibilitychange', refreshUnreadCounts);
+        window.addEventListener('pageshow', refreshUnreadCounts);
+    })();
+</script>
+
 </body>
 
 

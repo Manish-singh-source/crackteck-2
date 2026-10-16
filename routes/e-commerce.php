@@ -28,6 +28,9 @@ Route::prefix('/demo/e-commerce')->group(function () {
     // Dashboard Page
     Route::get('/index', [EcDashboardController::class, 'index'])->name('e-commerce/index');
     Route::get('/dashboard/filter', [EcDashboardController::class, 'filter'])->name('e-commerce.dashboard.filter');
+    Route::get('/sidebar-unread-counts', function (\App\Services\EcommerceUnreadService $unread) {
+        return response()->json($unread->counts())->header('Cache-Control', 'no-store');
+    })->middleware('auth:staff_web')->name('e-commerce.sidebar-unread-counts');
 
     // ------------------------------------------------------------ E-Commerce Customer Page -------------------------------------------------------------
 

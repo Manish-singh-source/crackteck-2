@@ -213,7 +213,7 @@
                                             class="p-1 rounded bg-warning-subtle text-warning fw-semibold">{{ $request->amcScheduleMeetings->first()?->scheduled_at ? \Carbon\Carbon::parse($request->amcScheduleMeetings->first()->scheduled_at)->format('d M Y') : 'N/A' }}</span>
                                     </div>
                                     <div>
-                                        @if(!empty($request->amcScheduleMeetings->first()?->remoteSupportJob->status == 'escalated') && empty($request->amcScheduleMeetings->first()?->activeAssignment))
+                                        @if($request->amcScheduleMeetings->first()?->remoteSupportJob?->status === 'escalated' && !$request->amcScheduleMeetings->first()?->activeAssignment)
                                             <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
                                                 data-bs-target="#addVisitModal2">Assign Engineer</button>
                                             <!-- Modal -->

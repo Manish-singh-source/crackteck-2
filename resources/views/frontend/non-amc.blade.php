@@ -278,7 +278,7 @@
 
         .btn {
             padding: 10px 20px;
-            background: #1987FF;
+            background: var(--srb-red);
             color: #fff;
             border: none;
             border-radius: 4px;
@@ -287,12 +287,12 @@
 
         .btn:hover {
             padding: 10px 20px;
-            background: rgb(56, 219, 192);
+            background: var(--srb-navy);
             color: #fff;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            color: #000000;
+            color: #fff;
         }
 
         .btn:disabled {

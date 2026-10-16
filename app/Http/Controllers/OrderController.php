@@ -487,6 +487,7 @@ class OrderController extends Controller
     {
         $order = Order::with(['customer', 'orderItems.product.ecommerceProduct', 'orderPayments'])
             ->findOrFail($id);
+        app(\App\Services\EcommerceUnreadService::class)->markOrdersViewed([$order->id]);
         $deliveryMen = Staff::where('staff_role', 'delivery_man')->where('status', 'active')->get();
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
         $assignedPerson = Staff::find($order->assigned_person_id);

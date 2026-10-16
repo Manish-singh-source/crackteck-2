@@ -1,513 +1,208 @@
 @extends('frontend/layout/master')
 
 @section('style')
-<style>
-    .about-section {
-      padding: 60px 0;
-    }
-
-    .about-us-section{
-        padding: 0 50px;
-    }
-
-    .image-wrapper {
-      position: relative;
-      width: 100%;
-    }
-
-    .main-img {
-      width: 100%;
-      border-radius: 20px;
-    }
-
-    .sub-img {
-      position: absolute;
-      bottom: -20px;
-      left: -30px;
-      width: 50%;
-      border-radius: 20px;
-      border: 5px solid #1987FF;
-    }
-
-    .counter-badge {
-      position: absolute;
-      bottom: -10px;
-      right: -15px;
-      background-color: #1987FF;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 50px;
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .section-title {
-      font-weight: 700;
-    }
-
-    .feature-box {
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .feature-icon {
-      background-color:rgba(25, 136, 255, 0.2);
-      color: #1987FF;
-      font-size: 18px;
-      padding: 12px;
-      border-radius: 50%;
-      margin-right: 15px;
-    }
-
-    .stats-box {
-      text-align: center;
-    }
-
-    .stats-box h4 {
-      font-weight: 700;
-      color: #1987FF;
-    }
-
-    .stats-box p {
-      margin: 0;
-      color: #333;
-    }
-
-    .info-card {
-        background-color: white;
-        border-radius: 12px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        height: 100%;
-    }
-  </style>
-  @endsection
+    <link rel="stylesheet" href="{{ asset('frontend-assets/css/about.css') }}?v={{ filemtime(public_path('frontend-assets/css/about.css')) }}">
+@endsection
 
 @section('main-content')
+    <div class="srb-about">
+        <div class="container pt-4">
+            <nav aria-label="Breadcrumb">
+                <ol class="srb-about-breadcrumb">
+                    <li><a href="{{ route('website') }}">Home</a></li>
+                    <li aria-hidden="true">/</li>
+                    <li aria-current="page">About SRB Computers</li>
+                </ol>
+            </nav>
+        </div>
 
-<!-- Breakcrumbs -->
-<div class="tf-sp-1 pb-0">
-    <div class="container">
-        <ul class="breakcrumbs">
-            <li>
-                <a href="{{ route('website') }}" class="body-small link">
-                    Home
-                </a>
-            </li>
-            <li class="d-flex align-items-center">
-                <i class="icon icon-arrow-right"></i>
-            </li>
-            <li>
-                <span class="body-small">About</span>
-            </li>
-        </ul>
-    </div>
-</div>
-<!-- /Breakcrumbs -->
-
-
-<!-- About Section -->
-<section class="about-section">
-    <div class="container">
-        <div class="row align-items-center">
-            <!-- Image Section -->
-            <div class="col-lg-6 mb-5 mb-lg-0 about-us-section">
-                <div class="image-wrapper">
-                    <img src="{{ asset('frontend-assets/images/banner/about.jpg') }}" alt="Main" class="main-img">
-                    <img src="{{ asset('frontend-assets/images/banner/about2.jpg') }}" alt="Sub" class="sub-img">
-                    <div class="counter-badge">1,485+ <br> Trusted Clients</div>
+        <section class="srb-about-section srb-about-hero" aria-labelledby="about-title">
+            <div class="container">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-6">
+                        <p class="srb-about-eyebrow">Your technology. Our responsibility.</p>
+                        <h1 id="about-title">We Are <span>SRB Computers</span></h1>
+                        <p class="srb-about-lead">We’re not here to just sell IT products and services. We’re here to solve every tech challenge before it disrupts your business.</p>
+                        <p>From the smallest cable to the most complex enterprise network, we make sure your systems run smoother, faster, and smarter.</p>
+                        <div class="srb-about-actions">
+                            <a href="{{ route('shop') }}" class="tf-btn text-white">Shop IT Products <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                            <a href="{{ route('contact') }}" class="srb-about-link">Talk to Our Team <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="srb-about-image">
+                            <img src="{{ asset('frontend-assets/images/banner/about.jpg') }}"
+                                alt="Professionals collaborating around a laptop" width="1080" height="719" fetchpriority="high">
+                            <div class="srb-about-image-note"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span>If it’s tech,<br><strong>it’s handled.</strong></span></div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Text Section -->
-            <div class="col-lg-6">
-                <p class="text-uppercase text-primary fw-semibold mb-2">About US</p>
-                <h3 class="section-title mb-3">Lorem ipsum dolor, sit amet consectetur elit.</h3>
-                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt <br> ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        <section class="srb-about-section srb-about-soft" aria-labelledby="who-title">
+            <div class="container">
+                <div class="row g-4 align-items-start">
+                    <div class="col-lg-4">
+                        <p class="srb-about-eyebrow">Who We Are</p>
+                        <h2 id="who-title">IT support that gets your business.</h2>
+                    </div>
+                    <div class="col-lg-8 srb-about-copy">
+                        <p>At SRB Computers, we’re not your average IT company. We’re the crew you call when you need tech that just works—fast, smart, and without the endless jargon.</p>
+                        <p>From solving last-minute IT emergencies to designing future-proof systems, we live for challenges that others avoid.</p>
+                        <h3>Why We Exist</h3>
+                        <p>Technology moves fast. Downtime is costly. We believe in giving businesses speed, reliability, and zero excuses when it comes to IT. That’s why SRB Computers is built around one simple principle: <strong>If it’s tech, it’s handled.</strong></p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-                <div class="feature-box">
-                    <div class="feature-icon"><i class="fa-solid fa-handshake"></i></div>
+        <section class="srb-about-section" aria-labelledby="ways-title">
+            <div class="container">
+                <div class="srb-about-heading">
+                    <p class="srb-about-eyebrow">Products &amp; Support</p>
+                    <h2 id="ways-title">Two Ways to Work with Us</h2>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <article class="srb-about-card srb-about-channel">
+                            <span class="srb-about-icon"><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i></span>
+                            <h3>E-Commerce Website</h3>
+                            <p>Shop IT products online and get them delivered fast. Find the computers, accessories, and essentials that keep your business moving.</p>
+                            <a href="{{ route('shop') }}" class="srb-about-link">Explore IT Products <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                        </article>
+                    </div>
+                    <div class="col-md-6">
+                        <article class="srb-about-card srb-about-channel">
+                            <span class="srb-about-icon"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i></span>
+                            <h3>Service Mobile App</h3>
+                            <p>Book repairs, installations, or urgent IT support in a few taps. Get help with the tech challenges that can’t wait.</p>
+                            <a href="{{ route('contact') }}" class="srb-about-link">Ask Us About the App <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="srb-about-section srb-about-soft" aria-labelledby="services-title">
+            <div class="container">
+                <div class="srb-about-heading">
+                    <p class="srb-about-eyebrow">Built Around Your Needs</p>
+                    <h2 id="services-title">What We Do Best</h2>
+                </div>
+                <div class="row g-4">
+                    @foreach ([
+                        ['icon' => 'fa-bolt', 'title' => 'Same-Day IT Support & Delivery', 'copy' => 'Because “tomorrow” is too late in the tech world. Get the support and products you need to keep your business moving.'],
+                        ['icon' => 'fa-network-wired', 'title' => 'End-to-End Solutions', 'copy' => 'Computers, laptops, networking, CCTV, biometrics, access control, servers, storage, and printers. If it connects, computes, or secures, we’ve got it covered.'],
+                        ['icon' => 'fa-computer', 'title' => 'Custom Builds', 'copy' => 'From high-performance PCs to enterprise-grade setups, built for your exact needs. We also handle computer and laptop sales, upgrades, and repairs.'],
+                        ['icon' => 'fa-screwdriver-wrench', 'title' => 'Proactive Maintenance', 'copy' => 'Annual Maintenance Contracts (AMC) that keep your IT running at peak performance—and actually give you peace of mind.'],
+                    ] as $service)
+                        <div class="col-md-6 col-xl-3">
+                            <article class="srb-about-card">
+                                <span class="srb-about-icon"><i class="fa-solid {{ $service['icon'] }}" aria-hidden="true"></i></span>
+                                <h3>{{ $service['title'] }}</h3>
+                                <p>{{ $service['copy'] }}</p>
+                            </article>
+                        </div>
+                    @endforeach
+                </div>
+                <a href="{{ route('amc') }}" class="srb-about-link mt-4 d-inline-flex">Explore AMC Support <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+        </section>
+
+        <section class="srb-about-section" aria-labelledby="work-title">
+            <div class="container">
+                <div class="srb-about-heading">
+                    <p class="srb-about-eyebrow">How We Work</p>
+                    <h2 id="work-title">IT should feel effortless.</h2>
+                    <p>We keep things simple, so you can focus on your business.</p>
+                </div>
+                <div class="row g-4">
+                    @foreach ([
+                        ['title' => 'Speed over excuses', 'copy' => 'If it can be fixed today, we won’t make you wait till tomorrow.'],
+                        ['title' => 'Clarity over confusion', 'copy' => 'No tech-speak that leaves you lost. We keep it simple.'],
+                        ['title' => 'Solutions over sales', 'copy' => 'We recommend what’s best for you, not just what’s on our shelf.'],
+                    ] as $principle)
+                        <div class="col-md-4">
+                            <article class="srb-about-principle">
+                                <span class="srb-about-number">0{{ $loop->iteration }}</span>
+                                <h3>{{ $principle['title'] }}</h3>
+                                <p>{{ $principle['copy'] }}</p>
+                            </article>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        <section class="srb-about-section srb-about-promise" aria-labelledby="promise-title">
+            <div class="container">
+                <div class="srb-about-heading">
+                    <p class="srb-about-eyebrow">What You Can Count On</p>
+                    <h2 id="promise-title">The SRB Computers Promise</h2>
+                </div>
+                <div class="row g-4">
+                    @foreach (['Fast Response', 'Expert Engineers', 'Transparent Pricing', 'Tech That Works—Always'] as $promise)
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="srb-about-promise-item"><i class="fa-solid fa-circle-check" aria-hidden="true"></i><h3>{{ $promise }}</h3></div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        <section class="srb-about-section" aria-labelledby="journey-title">
+            <div class="container">
+                <div class="row g-5">
+                    <div class="col-lg-6 srb-about-copy">
+                        <p class="srb-about-eyebrow">Our Journey</p>
+                        <h2 id="journey-title">A small tech team. A bigger ambition.</h2>
+                        <p>SRB Computers was born from one simple frustration: good IT support was either too slow, too complicated, or too expensive. So, we decided to flip the script.</p>
+                        <p>What started as a small tech team with a big attitude has grown into a powerhouse delivering same-day solutions, custom builds, and reliable support to businesses across industries.</p>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="srb-about-story srb-about-copy">
+                            <p class="srb-about-eyebrow">Why Businesses Choose Us</p>
+                            <h3>Partners in your everyday uptime.</h3>
+                            <p>We’re not just tech providers—we’re partners. We slot into your workflow like we’ve always been there, keeping your systems running while you focus on your business.</p>
+                            <h3>Our Clients</h3>
+                            <p>We work with businesses that demand uptime: manufacturing plants, corporate offices, schools, housing societies, healthcare, and anyone who can’t afford “system down” moments.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="srb-about-section srb-about-soft" aria-labelledby="energy-title">
+            <div class="container">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-4">
+                        <p class="srb-about-eyebrow">Our Vibe</p>
+                        <h2 id="energy-title">The SRB Computers Energy</h2>
+                    </div>
+                    <div class="col-lg-8 srb-about-copy">
+                        <p>No endless jargon. No “we’ll get back to you next week.” We’re fast, direct, and obsessed with solving problems before they even become problems.</p>
+                        <p>Fast-moving. Problem-solving. Coffee-fuelled. That’s us. We thrive in high-pressure situations and keep things friendly along the way.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="srb-about-section" aria-labelledby="talk-title">
+            <div class="container">
+                <div class="srb-about-cta">
                     <div>
-                        <h6 class="mb-1 fw-semibold">Trusted Partner</h6>
-                        <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        <p class="srb-about-eyebrow">Let’s Get Your IT Moving</p>
+                        <h2 id="talk-title">Ready to Talk?</h2>
+                        <p>Whether you need urgent support, a complete IT overhaul, or just want to chat about how to make your setup faster, safer, and smarter, we’re here.</p>
+                        <p>No waiting lines. No complicated forms. Just a call, and we’re on it.</p>
                     </div>
-                </div>
-
-                <div class="feature-box">
-                    <div class="feature-icon"><i class="fa-solid fa-handshake"></i></div>
-                    <div>
-                        <h6 class="mb-1 fw-semibold">Fastpace Platform</h6>
-                        <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                    </div>
-                </div>
-
-                <div class="feature-box">
-                    <div class="feature-icon"><i class="fa-solid fa-handshake"></i></div>
-                    <div>
-                        <h6 class="mb-1 fw-semibold">Tested Reliability</h6>
-                        <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                    <div class="srb-about-cta-actions">
+                        <a href="tel:+919607788836" class="tf-btn text-white"><i class="fa-solid fa-phone" aria-hidden="true"></i> Call Our Team</a>
+                        <a href="{{ route('contact') }}" class="srb-about-link">Contact SRB Computers <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Stats Row -->
-        <div class="row text-center mt-5">
-            <div class="col-md-3 col-6 mb-4">
-                <div class="stats-box info-card">
-                    <h4 class="counter mb-2" data-target="25">0</h4>
-                    <p>Years Of Experience</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="stats-box info-card">
-                    <h4 class="counter mb-2" data-target="3452">0</h4>
-                    <p>Total Transaction</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="stats-box info-card">
-                    <h4 class="counter mb-2" data-target="751">0</h4>
-                    <p>Active User</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="stats-box info-card">
-                    <h4 class="counter mb-2" data-target="592">0</h4>
-                    <p>Positive Reviews</p>
-                </div>
-            </div>
-        </div>
+        </section>
     </div>
-</section>
-
-<!-- Iconbox -->
-<div class="tf-sp-2">
-    <div class="container">
-        <div class="swiper tf-sw-iconbox" data-preview="5" data-tablet="3" data-mobile-sm="2" data-mobile="1"
-            data-space-lg="20" data-space-md="20" data-space="15">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                    <div class="tf-icon-box wow fadeInLeft" data-wow-delay="0s">
-                        <div class="icon-box">
-                            <img src="{{ asset('frontend-assets/images/icons/icon-1.png') }}"
-                                alt="icon">
-                        </div>
-                        <div class="content">
-                            <p class="body-text fw-semibold">Free delivery</p>
-                            <p class="body-text-3">Free Shipping for orders over ₹20</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="tf-icon-box wow fadeInLeft" data-wow-delay="0.1s">
-                        <div class="icon-box">
-                            <img src="{{ asset('frontend-assets/images/icons/icon-2.png') }}"
-                                alt="icon">
-                        </div>
-                        <div class="content">
-                            <p class="body-text fw-semibold">Support 24/7</p>
-                            <p class="body-text-3">24 hours a day, 7 days a week</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="tf-icon-box wow fadeInLeft" data-wow-delay="0.2s">
-                        <div class="icon-box">
-                            <img src="{{ asset('frontend-assets/images/icons/icon-3.png') }}"
-                                alt="icon">
-                        </div>
-                        <div class="content">
-                            <p class="body-text fw-semibold">Payment</p>
-                            <p class="body-text-3">Pay with Multiple Credit Cards</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="tf-icon-box wow fadeInLeft" data-wow-delay="0.3s">
-                        <div class="icon-box">
-                            <img src="{{ asset('frontend-assets/images/icons/icon-4.png') }}"
-                                alt="icon">
-                        </div>
-                        <div class="content">
-                            <p class="body-text fw-semibold">Reliable</p>
-                            <p class="body-text-3">Trusted by 2000+ major brands</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="tf-icon-box wow fadeInLeft" data-wow-delay="0.4s">
-                        <div class="icon-box">
-                            <img src="{{ asset('frontend-assets/images/icons/icon-5.png') }}"
-                                alt="icon">
-                        </div>
-                        <div class="content">
-                            <p class="body-text fw-semibold">Guarantee</p>
-                            <p class="body-text-3">Within 30 days for an exchange</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="sw-pagination-iconbox sw-dot-default justify-content-center"></div>
-        </div>
-    </div>
-</div>
-<!-- /Iconbox -->
-
-<!-- Testimonial -->
-<section class="tf-sp-2">
-    <div class="container">
-        <div class="flat-title wow fadeInUp">
-            <h5 class="fw-semibold">Customer Review</h5>
-            <div class="box-btn-slide relative">
-                <div class="swiper-button-prev nav-swiper nav-prev-products">
-                    <i class="icon-arrow-left-lg"></i>
-                </div>
-                <div class="swiper-button-next nav-swiper nav-next-products">
-                    <i class="icon-arrow-right-lg"></i>
-                </div>
-            </div>
-        </div>
-        <div class="swiper tf-sw-products" data-preview="3" data-tablet="2" data-mobile-sm="1" data-mobile="1"
-            data-space-lg="30" data-space-md="15" data-space="15" data-pagination="1" data-pagination-sm="1"
-            data-pagination-md="2" data-pagination-lg="3">
-            <div class="swiper-wrapper">
-                <!-- item 1 -->
-                <div class="swiper-slide">
-                    <div class="wg-testimonial wow fadeInUp">
-                        <div class="entry_image">
-                            <img src="{{ asset('frontend-assets/images/item/person.avif') }}" data-src="{{ asset('frontend-assets/images/item/person.avif') }}" alt=""
-                                class="lazyload">
-                        </div>
-                        <div class="content">
-                            <div class="box-title">
-                                <a href="#" class="entry_name product-title link fw-semibold">
-                                    Cameron Williamson
-                                </a>
-                                <ul class="entry_meta">
-                                    <li>
-                                        <p class="body-small text-main-2">Color: Black</p>
-                                    </li>
-                                    <li class="br-line"></li>
-                                    <li>
-                                        <p class="body-small text-main-2 fw-semibold">Verified Purchase</p>
-                                    </li>
-                                </ul>
-                                <ul class="list-star">
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                </ul>
-                            </div>
-                            <p class="entry_text">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fringilla iaculis
-                                velit,
-                                pharetra aliquet urna faucibus et. Vivamus blandit vulputate risus. Praesent at
-                                justo sed
-                                nibh interdum viverra at non magna
-                            </p>
-                            <p class="entry_date body-small">
-                                December 14, 2020 at 17:20
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <!-- item 2 -->
-                <div class="swiper-slide">
-                    <div class="wg-testimonial wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="entry_image">
-                            <img src="{{ asset('frontend-assets/images/item/person.avif') }}" data-src="{{ asset('frontend-assets/images/item/person.avif') }}" alt=""
-                                class="lazyload">
-                        </div>
-                        <div class="content">
-                            <div class="box-title">
-                                <a href="#" class="entry_name product-title link fw-semibold">
-                                    Cameron Williamson
-                                </a>
-                                <ul class="entry_meta">
-                                    <li>
-                                        <p class="body-small text-main-2">Color: Black</p>
-                                    </li>
-                                    <li class="br-line"></li>
-                                    <li>
-                                        <p class="body-small text-main-2 fw-semibold">Verified Purchase</p>
-                                    </li>
-                                </ul>
-                                <ul class="list-star">
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                </ul>
-                            </div>
-                            <p class="entry_text">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fringilla iaculis
-                                velit,
-                                pharetra aliquet urna faucibus et. Vivamus blandit vulputate risus. Praesent at
-                                justo sed
-                                nibh interdum viverra at non magna
-                            </p>
-                            <p class="entry_date body-small">
-                                December 14, 2020 at 17:20
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <!-- item 3 -->
-                <div class="swiper-slide">
-                    <div class="wg-testimonial wow fadeInUp" data-wow-delay="0.2s">
-                        <div class="entry_image">
-                            <img src="{{ asset('frontend-assets/images/item/person.avif') }}" data-src="{{ asset('frontend-assets/images/item/person.avif') }}" alt=""
-                                class="lazyload">
-                        </div>
-                        <div class="content">
-                            <div class="box-title">
-                                <a href="#" class="entry_name product-title link fw-semibold">
-                                    Cameron Williamson
-                                </a>
-                                <ul class="entry_meta">
-                                    <li>
-                                        <p class="body-small text-main-2">Color: Black</p>
-                                    </li>
-                                    <li class="br-line"></li>
-                                    <li>
-                                        <p class="body-small text-main-2 fw-semibold">Verified Purchase</p>
-                                    </li>
-                                </ul>
-                                <ul class="list-star">
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                </ul>
-                            </div>
-                            <p class="entry_text">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fringilla iaculis
-                                velit,
-                                pharetra aliquet urna faucibus et. Vivamus blandit vulputate risus. Praesent at
-                                justo sed
-                                nibh interdum viverra at non magna
-                            </p>
-                            <p class="entry_date body-small">
-                                December 14, 2020 at 17:20
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <!-- item 4 -->
-                <div class="swiper-slide">
-                    <div class="wg-testimonial">
-                        <div class="entry_image">
-                            <img src="{{ asset('frontend-assets/images/item/person.avif') }}" data-src="{{ asset('frontend-assets/images/item/person.avif') }}" alt=""
-                                class="lazyload">
-                        </div>
-                        <div class="content">
-                            <div class="box-title">
-                                <a href="#" class="entry_name product-title link fw-semibold">
-                                    Cameron Williamson
-                                </a>
-                                <ul class="entry_meta">
-                                    <li>
-                                        <p class="body-small text-main-2">Color: Black</p>
-                                    </li>
-                                    <li class="br-line"></li>
-                                    <li>
-                                        <p class="body-small text-main-2 fw-semibold">Verified Purchase</p>
-                                    </li>
-                                </ul>
-                                <ul class="list-star">
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                    <li><i class="icon-star"></i></li>
-                                </ul>
-                            </div>
-                            <p class="entry_text">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fringilla iaculis
-                                velit,
-                                pharetra aliquet urna faucibus et. Vivamus blandit vulputate risus. Praesent at
-                                justo sed
-                                nibh interdum viverra at non magna
-                            </p>
-                            <p class="entry_date body-small">
-                                December 14, 2020 at 17:20
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="sw-dot-default sw-pagination-products justify-content-center"></div>
-        </div>
-    </div>
-</section>
-<!-- /Testimonial -->
-
-<!-- Brand -->
-<!-- <div class="">
-            <div class="line-bt line-tp">
-                <div class="infiniteslide tf-brand">
-                    <div class="brand-item">
-                        <img src="images/brand/lead-ecommerce.svg" alt="brand">
-                    </div>
-                    <div class="brand-item">
-                        <img src="images/brand/global-brand.svg" alt="brand">
-                    </div>
-                    <div class="brand-item">
-                        <img src="images/brand/great-deal.svg" alt="brand">
-                    </div>
-                    <div class="brand-item">
-                        <img src="images/brand/walmart.svg" alt="brand">
-                    </div>
-                    <div class="brand-item">
-                        <img src="images/brand/rodem.svg" alt="brand">
-                    </div>
-                    <div class="brand-item">
-                        <img src="images/brand/fabric.svg" alt="brand">
-                    </div>
-                    <div class="brand-item">
-                        <img src="images/brand/sudo.svg" alt="brand">
-                    </div>
-                    <div class="brand-item">
-                        <img src="images/brand/ctaecom.svg" alt="brand">
-                    </div>
-                    <div class="brand-item">
-                        <img src="images/brand/amazon.svg" alt="brand">
-                    </div>
-                    <div class="brand-item">
-                        <img src="images/brand/bestbuy.svg" alt="brand">
-                    </div>
-                </div>
-            </div>
-        </div> -->
-<!-- /Brand -->
-
-
-<script>
-  const counters = document.querySelectorAll('.counter');
-
-  counters.forEach(counter => {
-    const updateCount = () => {
-      const target = +counter.getAttribute('data-target');
-      const count = +counter.innerText;
-      const increment = target / 200;
-
-      if (count < target) {
-        counter.innerText = Math.ceil(count + increment);
-        setTimeout(updateCount, 10);
-      } else {
-        counter.innerText = target + ' +';
-      }
-    };
-
-    updateCount();
-  });
-</script>
-
 @endsection

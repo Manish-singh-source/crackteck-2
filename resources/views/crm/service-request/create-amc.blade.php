@@ -15,6 +15,7 @@
                 <div class="col-12">
                     <form action="{{ route('amc-service-requests.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
+                        <input type="hidden" name="context" value="{{ old('context', request('context') === 'amc' ? 'amc' : 'service_request') }}">
                         @method('POST')
 
                         {{-- Global validation error summary --}}
@@ -42,6 +43,7 @@
                                 <h5 class="card-title mb-0">Customer Details</h5>
                             </div>
                             <div class="card-body">
+                                <p class="text-muted small mb-3"><span class="text-danger">*</span> Required fields. First Name and marked address fields are required when creating a new customer; existing customer details are reused.</p>
                                 <div class="row g-3 pb-3">
 
                                     <div class="col-xl-4 col-lg-6">
@@ -52,6 +54,7 @@
                                             @include('components.form.input', [
                                                 'label' => 'Email ID',
                                                 'name' => 'email',
+                                                'required' => true,
                                                 'type' => 'email',
                                                 'placeholder' => 'example@gamil.com',
                                             ])
@@ -77,6 +80,7 @@
                                             @include('components.form.input', [
                                                 'label' => 'First Name',
                                                 'name' => 'first_name',
+                                                'requiredLabel' => true,
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your First Name',
                                             ])
@@ -143,6 +147,7 @@
                                             @include('components.form.input', [
                                                 'label' => 'Branch Name',
                                                 'name' => 'branch_name',
+                                                'requiredLabel' => true,
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your Branch Name',
                                             ])
@@ -154,6 +159,7 @@
                                             @include('components.form.input', [
                                                 'label' => 'Address Line 1',
                                                 'name' => 'address1',
+                                                'requiredLabel' => true,
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your Address',
                                             ])
@@ -174,6 +180,7 @@
                                             @include('components.form.input', [
                                                 'label' => 'Country',
                                                 'name' => 'country',
+                                                'requiredLabel' => true,
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your Country',
                                             ])
@@ -184,6 +191,7 @@
                                             @include('components.form.input', [
                                                 'label' => 'State',
                                                 'name' => 'state',
+                                                'requiredLabel' => true,
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your State',
                                             ])
@@ -194,6 +202,7 @@
                                             @include('components.form.input', [
                                                 'label' => 'City',
                                                 'name' => 'city',
+                                                'requiredLabel' => true,
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your City',
                                             ])
@@ -204,6 +213,7 @@
                                             @include('components.form.input', [
                                                 'label' => 'Pin Code',
                                                 'name' => 'pincode',
+                                                'requiredLabel' => true,
                                                 'type' => 'text',
                                                 'placeholder' => 'Enter Your Pin Code',
                                             ])
@@ -466,7 +476,7 @@
                                 <button type="submit" class="btn btn-success w-sm waves ripple-light">
                                     <i class="mdi mdi-content-save"></i> Submit Service Request
                                 </button>
-                                <a href="{{ route('service-request.index') }}"
+                                <a href="{{ route(request('context') === 'amc' ? 'amcs-lists.index' : 'service-request.index') }}"
                                     class="btn btn-secondary w-sm waves ripple-light">
                                     <i class="mdi mdi-cancel"></i> Cancel
                                 </a>

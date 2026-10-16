@@ -220,6 +220,7 @@
                     <a class='tp-link' href="{{ route('amcs-lists.index') }}">
                         <i class="fas fa-clipboard-list"></i>
                         <span class="ps-1"> AMCs </span>
+                        <span data-unread-amcs class="badge bg-danger rounded-pill ms-auto {{ $unreadAmcCount ? '' : 'd-none' }}" aria-label="Unread AMCs">{{ $unreadAmcCount }}</span>
                     </a>
                 </li>
                 

@@ -1046,8 +1046,10 @@ class ServiceRequestController extends Controller
     public function storeAmcServiceRequest(Request $request)
     {
         $request->validate([
+            'context' => 'nullable|in:amc,service_request',
             'email' => 'required|email',
-            'amc_plan_id' => 'required',
+            'amc_plan_id' => 'required|exists:amc_plans,id',
+            'amc_type' => 'nullable|in:remote,onsite',
             'products' => 'required|array',
             'products.*.product_name' => 'required|string',
         ]);
@@ -1100,10 +1102,14 @@ class ServiceRequestController extends Controller
             // 2. Store service request
             $uniqRequestId = uniqid('SR-'); // Generate unique request ID with prefix
 
-            if ($request->service_type == 'amc') {
+            $amcPlan = AmcPlan::findOrFail($request->amc_plan_id);
+
+            $createAmc = $request->service_type == 'amc' && $request->input('context') === 'amc';
+            if ($createAmc) {
                 $amc = Amc::create([
                     'request_id' => $uniqRequestId,
                     'service_type' => $request->service_type,
+                    'amc_type' => $request->amc_type ?? ($amcPlan->support_type === 'remote' ? 'remote' : 'onsite'),
                     'customer_id' => $customer->id,
                     'customer_address_id' => $customerAddress->id ?? null,
                     'amc_plan_id' => $request->amc_plan_id,
@@ -1130,8 +1136,6 @@ class ServiceRequestController extends Controller
                 ]);
             }
 
-            $amcPlan = AmcPlan::where('id', $request->amc_plan_id)->first();
-
             // Calculate the month gap between visits as an integer (avoid fractional months)
             $monthGapFloat = intval($amcPlan->duration) / max(1, intval($amcPlan->total_visits));
             $monthGap = (int) round($monthGapFloat);
@@ -1142,11 +1146,10 @@ class ServiceRequestController extends Controller
             // Start from the next visit after the initial visit date
             $nextVisitDate = $startVisitDate->copy()->addMonths($monthGap);
 
-            foreach (range(1, $amcPlan->total_visits) as $visitNumber) {
+            $scheduleOwner = $createAmc ? $amc : $serviceRequest;
+            for ($visitNumber = 1; $visitNumber <= (int) $amcPlan->total_visits; $visitNumber++) {
                 // Create a service request visit for each visit
-                $serviceRequest->amcScheduleMeetings()->create([
-                    'service_request_id' => $serviceRequest->id,
-                    'amc_id' => $amc->id,
+                $scheduleOwner->amcScheduleMeetings()->create([
                     'scheduled_at' => $nextVisitDate,
                     'completed_at' => null,
                     'remarks' => null,
@@ -1161,7 +1164,7 @@ class ServiceRequestController extends Controller
 
             // 3. Store products
             foreach ($request->products as $product) {
-                if ($request->service_type == 'amc') {
+                if ($createAmc) {
                     AmcProduct::create([
                         'amc_id' => $amc->id,
                         'name' => $product['product_name'] ?? 'N/A',
@@ -1176,7 +1179,8 @@ class ServiceRequestController extends Controller
                 } else {
                     $serviceRequest->products()->create([
                         'service_requests_id' => $serviceRequest->id,
-                        'item_code_id' => $request->amc_plan_id ?? null,
+                        // AMC plans belong to the parent request, not covered_items.
+                        'item_code_id' => null,
 
                         'name' => $product['product_name'] ?? 'N/A',
                         'type' => $product['product_type'] ?? 'N/A',
@@ -1194,7 +1198,8 @@ class ServiceRequestController extends Controller
 
             DB::commit();
 
-            return redirect()->route('service-request.index')->with('success', 'Service request created successfully!');
+            return redirect()->route($createAmc ? 'amcs-lists.index' : 'service-request.index')
+                ->with('success', 'Service request created successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
 

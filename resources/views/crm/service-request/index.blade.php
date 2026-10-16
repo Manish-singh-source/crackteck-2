@@ -94,7 +94,7 @@
                                                                 <option value="completed">Completed</option>
                                                             </select>
                                                         </div>
-                                                        <a href="{{ route('amc-service-requests.create') }}" class="btn btn-primary">Create AMC</a>
+                                                        <a href="{{ route('amc-service-requests.create', ['context' => 'service_request']) }}" class="btn btn-primary">Create AMC</a>
                                                     </div>
                                                     <table
                                                         class="table table-striped table-borderless dt-responsive nowrap service-datatable">

@@ -580,6 +580,42 @@ class AmcController extends Controller
     }
 
     // 2. Delete AMC request (if needed)
+    public function editAmcsRequest($id)
+    {
+        $amc = Amc::with(['customer', 'amcProducts'])->findOrFail($id);
+
+        return view('crm.active-amcs.edit', compact('amc'));
+    }
+
+    public function updateAmcsRequest(Request $request, $id)
+    {
+        $amc = Amc::findOrFail($id);
+        $data = $request->validate([
+            'amc_type' => 'required|in:remote,onsite',
+            'request_date' => 'required|date',
+            'status' => 'required|in:pending,active,completed,expired,cancelled',
+            'products' => 'required|array|min:1',
+            'products.*.id' => 'required|integer|distinct',
+            'products.*.name' => 'required|string|max:255',
+            'products.*.model_no' => 'nullable|string|max:255',
+            'products.*.brand' => 'nullable|string|max:255',
+            'products.*.sku' => 'nullable|string|max:255',
+            'products.*.hsn' => 'nullable|string|max:255',
+            'products.*.purchase_date' => 'nullable|date',
+            'products.*.description' => 'nullable|string',
+        ]);
+
+        DB::transaction(function () use ($amc, $data) {
+            $amc->update(collect($data)->only(['amc_type', 'request_date', 'status'])->all());
+            foreach ($data['products'] as $product) {
+                $record = $amc->amcProducts()->whereKey($product['id'])->firstOrFail();
+                $record->update(collect($product)->except('id')->all());
+            }
+        });
+
+        return redirect()->route('amcs-lists.index')->with('success', 'AMC updated successfully.');
+    }
+
     public function deleteAmcsRequest($id)
     {
         $amcRequest = Amc::findOrFail($id);
@@ -605,6 +641,8 @@ class AmcController extends Controller
 
         // Get tickets for this AMC service
         $amcTickets = AmcTicket::where('amc_id', $id)->orderBy('created_at', 'desc')->get();
+
+        app(\App\Services\AmcUnreadService::class)->markViewed($amcRequest->id);
 
         return view('/crm/active-amcs/view', compact('amcRequest', 'engineers','remoteEngineers', 'amcTickets'));
     }

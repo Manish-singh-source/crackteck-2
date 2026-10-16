@@ -179,6 +179,35 @@
 </script>
 
 @yield('scripts')
+<script>
+    (() => {
+        let pending = false;
+        async function refreshAmcCount() {
+            if (document.hidden || pending) return;
+            pending = true;
+            try {
+                const response = await fetch(@json(route('amcs-lists.unread-count')), {
+                    headers: { 'Accept': 'application/json' },
+                    cache: 'no-store'
+                });
+                if (!response.ok) return;
+                const counts = await response.json();
+                if (!Number.isInteger(counts.amcs) || counts.amcs < 0) return;
+                document.querySelectorAll('[data-unread-amcs]').forEach(badge => {
+                    badge.textContent = counts.amcs;
+                    badge.classList.toggle('d-none', counts.amcs === 0);
+                });
+            } catch (error) {
+                // Keep the last count while the network is unavailable.
+            } finally {
+                pending = false;
+            }
+        }
+        setInterval(refreshAmcCount, 15000);
+        document.addEventListener('visibilitychange', refreshAmcCount);
+        window.addEventListener('pageshow', refreshAmcCount);
+    })();
+</script>
 </body>
 
 

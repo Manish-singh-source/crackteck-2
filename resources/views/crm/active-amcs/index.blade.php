@@ -39,7 +39,7 @@
                                                         <div id="amc_filters"
                                                             class="d-flex justify-content-between align-items-center mb-3"
                                                             style="display: none;">
-                                                            <a href="{{ route('amc-service-requests.create') }}"
+                                                            <a href="{{ route('amc-service-requests.create', ['context' => 'amc']) }}"
                                                                 class="btn btn-primary">Create AMC</a>
                                                         </div>
                                                         <table
@@ -153,7 +153,7 @@
                                                                             </a>
                                                                             
                                                                             <a aria-label="anchor"
-                                                                                href="{{ route('service-request.edit-amc-service-request', [$request->id, 'amc']) }}"
+                                                                                href="{{ route('amcs-request.edit', $request->id) }}"
                                                                                 class="btn btn-icon btn-sm bg-warning-subtle me-1"
                                                                                 data-bs-toggle="tooltip"
                                                                                 data-bs-original-title="Edit">

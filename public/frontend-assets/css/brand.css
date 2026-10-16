@@ -1,0 +1,84 @@
+/* SRB colors sampled from header-logo.png. */
+:root {
+    --srb-red: #ee2d2a;
+    --srb-navy: #020f37;
+    --primary: var(--srb-red);
+    --secondary: var(--srb-navy);
+    --bs-primary: var(--srb-red);
+    --bs-primary-rgb: 238, 45, 42;
+}
+
+body .tf-btn:not(.btn-line):not(.btn-line-white):not(.btn-outline):not(.btn-gray):not(.btn-gray-2),
+body .form-search-product .btn-submit-form,
+body .contact-form button,
+body .toggle-buttons .active {
+    background: var(--srb-red) !important;
+    color: #fff !important;
+}
+
+body .tf-btn:not(.btn-line):not(.btn-line-white):not(.btn-outline):not(.btn-gray):not(.btn-gray-2):hover,
+body .tf-btn:not(.btn-line):not(.btn-line-white):not(.btn-outline):not(.btn-gray):not(.btn-gray-2):focus-visible,
+body .form-search-product .btn-submit-form:hover,
+body .contact-form button:hover {
+    background: var(--srb-navy) !important;
+    color: #fff !important;
+}
+
+body .btn-primary,
+body .btn-outline-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--srb-red);
+    --bs-btn-border-color: var(--srb-red);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--srb-navy);
+    --bs-btn-hover-border-color: var(--srb-navy);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--srb-navy);
+    --bs-btn-active-border-color: var(--srb-navy);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: var(--srb-red);
+    --bs-btn-disabled-border-color: var(--srb-red);
+    --bs-btn-focus-shadow-rgb: 238, 45, 42;
+}
+
+body .btn-outline-primary {
+    --bs-btn-color: var(--srb-red);
+    --bs-btn-bg: transparent;
+    color: var(--srb-red);
+    background: transparent;
+    border: 1px solid var(--srb-red);
+}
+
+body .btn-primary,
+body .plan-action .btn-primary {
+    color: #fff;
+    background: var(--srb-red);
+    border-color: var(--srb-red);
+}
+
+body .btn-primary:hover,
+body .btn-primary:focus-visible,
+body .btn-primary:active,
+body .btn-outline-primary:hover,
+body .btn-outline-primary:focus-visible,
+body .btn-outline-primary:active {
+    color: #fff;
+    background: var(--srb-navy);
+    border-color: var(--srb-navy);
+}
+
+body .plan-action .btn-primary {
+    box-shadow: 0 4px 15px rgba(238, 45, 42, 0.3);
+}
+
+body .plan-action .btn-primary:hover {
+    background: var(--srb-navy);
+    box-shadow: 0 8px 25px rgba(2, 15, 55, 0.3);
+}
+
+body .tf-btn:focus-visible,
+body .btn:focus-visible,
+body .btn-submit-form:focus-visible {
+    outline: 3px solid var(--srb-navy);
+    outline-offset: 3px;
+}

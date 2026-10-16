@@ -18,7 +18,7 @@
 
 <div class="{{ $colClass ?? '' }}">
     {{-- Label for the input --}}
-    <label for="{{ $name }}" class="form-label">{{ $label ?? ucfirst($name) }}</label>
+    <label for="{{ $name }}" class="form-label">{{ $label ?? ucfirst($name) }}@if (!empty($required) || !empty($requiredLabel)) <span class="text-danger">*</span>@endif</label>
 
     {{-- Input Field --}}
     <input type="{{ $type ?? 'text' }}" class="form-control @error($name) is-invalid @enderror {{ $class ?? '' }}"

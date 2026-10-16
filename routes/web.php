@@ -599,6 +599,11 @@ Route::prefix('/demo')->group(function () {
 
             // Active AMC Page
             Route::get('/amcs-list', 'listAmcRequests')->name('amcs-lists.index');
+            Route::get('/amcs-request/{id}/edit', 'editAmcsRequest')->name('amcs-request.edit');
+            Route::put('/amcs-request/{id}', 'updateAmcsRequest')->name('amcs-request.update');
+            Route::get('/amcs-unread-count', function (\App\Services\AmcUnreadService $unread) {
+                return response()->json(['amcs' => $unread->count()])->header('Cache-Control', 'no-store');
+            })->middleware('auth:staff_web')->name('amcs-lists.unread-count');
             Route::delete('/amcs-request/{id}', 'deleteAmcsRequest')->name('amcs-request.delete');
             Route::get('/amcs-request/{id}', 'viewAmcsRequest')->name('amcs-request.view');
             Route::post('/amcs-request/ticket-status/{id}', 'updateTicketStatus')->name('amcs-request.ticket-status');

@@ -38,6 +38,7 @@
                     <a class='tp-link' href="{{ route('order.index') }}">
                         <i class="fas fa-receipt"></i>
                         <span class="ps-1"> Orders </span>
+                        <span data-unread-count="orders" class="badge bg-danger rounded-pill ms-auto {{ $unreadCounts['orders'] ? '' : 'd-none' }}" aria-label="Unread orders">{{ $unreadCounts['orders'] }}</span>
                     </a>
                 </li>
 
@@ -46,6 +47,7 @@
                     <a class='tp-link' href="{{ route('order-feedback.index') }}">
                         <i class="fas fa-star"></i>
                         <span class="ps-1"> Reviews </span>
+                        <span data-unread-count="reviews" class="badge bg-danger rounded-pill ms-auto {{ $unreadCounts['reviews'] ? '' : 'd-none' }}" aria-label="Unread reviews">{{ $unreadCounts['reviews'] }}</span>
                     </a>
                 </li>
 

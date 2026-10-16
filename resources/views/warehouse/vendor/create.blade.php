@@ -17,6 +17,7 @@
                     <form action="{{ route('vendor_list.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('POST')
+                        <p class="text-muted"><span class="text-danger">*</span> Required fields</p>
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="card">
@@ -36,6 +37,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'First Name',
                                                     'name' => 'first_name',
+                                                    'required' => true,
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter First Name',
                                                 ])
@@ -44,7 +46,8 @@
                                             <div class="col-4">
                                                 @include('components.form.input', [ 
                                                     'label' => 'Last Name', 
-                                                    'name' => 'last_name',  
+                                                    'name' => 'last_name',
+                                                    'required' => true,
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Last Name',
                                                 ])
@@ -54,6 +57,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Phone number',
                                                     'name' => 'phone',
+                                                    'required' => true,
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Phone number',
                                                 ])
@@ -63,6 +67,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Email',
                                                     'name' => 'email',
+                                                    'required' => true,
                                                     'type' => 'email',
                                                     'placeholder' => 'Enter Email',
                                                 ])
@@ -72,6 +77,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Address 1',
                                                     'name' => 'address1',
+                                                    'required' => true,
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Address 1',
                                                 ])
@@ -90,6 +96,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'City',
                                                     'name' => 'city',
+                                                    'required' => true,
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter City',
                                                 ])
@@ -99,6 +106,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'State',
                                                     'name' => 'state',
+                                                    'required' => true,
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter State',
                                                 ])
@@ -108,6 +116,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Country',
                                                     'name' => 'country',
+                                                    'required' => true,
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Country',
                                                 ])
@@ -117,6 +126,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Pincode',
                                                     'name' => 'pincode',
+                                                    'required' => true,
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Pincode',
                                                 ])
@@ -144,6 +154,7 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Status',
                                                     'name' => 'status',
+                                                    'required' => true,
                                                     'value' => 'active',
                                                     'options' => [
                                                         'inactive' => 'Inactive',

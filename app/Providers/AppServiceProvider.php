@@ -75,7 +75,15 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapFive();
         Paginator::useBootstrapFour();
 
+        View::composer('crm.layouts.sidebar', function ($view) {
+            $view->with('unreadAmcCount', app(\App\Services\AmcUnreadService::class)->count());
+        });
+
         // Share parent categories with the master layout
+        View::composer('e-commerce.layouts.sidebar', function ($view) {
+            $view->with('unreadCounts', app(\App\Services\EcommerceUnreadService::class)->counts());
+        });
+
         View::composer('frontend.layout.master', function ($view) {
             $categories = ParentCategory::where('status', 'active')
                 ->orderBy('sort_order', 'asc')

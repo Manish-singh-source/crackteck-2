@@ -38,6 +38,7 @@
                 <div class="col-12">
                     <form action="{{ route('customer.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
+                        <p class="text-muted"><span class="text-danger">*</span> Required fields</p>
                         @method('POST')
                         <div class="row">
                             <div class="col-lg-8">
@@ -58,6 +59,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'First Name',
                                                     'name' => 'first_name',
+                                                    'required' => true,
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter First Name',
                                                 ])
@@ -67,6 +69,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Last Name',
                                                     'name' => 'last_name',
+                                                    'required' => true,
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Last Name',
                                                 ])
@@ -76,6 +79,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'Phone number',
                                                     'name' => 'phone',
+                                                    'required' => true,
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Phone number',
                                                 ])
@@ -85,6 +89,7 @@
                                                 @include('components.form.input', [
                                                     'label' => 'E-mail address',
                                                     'name' => 'email',
+                                                    'required' => true,
                                                     'type' => 'email',
                                                     'placeholder' => 'Enter Email id',
                                                 ])
@@ -130,6 +135,7 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Source Type',
                                                     'name' => 'source_type',
+                                                    'required' => true,
                                                     'options' => [
                                                         '' => '--Select--',
                                                         'ecommerce' => 'E-commerce',
@@ -246,10 +252,10 @@
                                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                                     <h6 class="mb-0 text-primary">Branch #1</h6>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="radio" name="is_primary"
+                                                        <input class="form-check-input" type="radio" name="is_primary" required
                                                             value="0" id="primary_0" checked>
                                                         <label class="form-check-label" for="primary_0">
-                                                            Primary Branch
+                                                            Primary Branch <span class="text-danger">*</span>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -259,6 +265,7 @@
                                                         @include('components.form.input', [
                                                             'label' => 'Branch Name',
                                                             'name' => 'branches[0][branch_name]',
+                                                            'required' => true,
                                                             'type' => 'text',
                                                             'placeholder' => 'Enter Name of Branch',
                                                         ])
@@ -267,6 +274,7 @@
                                                         @include('components.form.input', [
                                                             'label' => 'Address Line 1',
                                                             'name' => 'branches[0][address1]',
+                                                            'required' => true,
                                                             'type' => 'text',
                                                             'placeholder' => 'Enter Address Line 1',
                                                         ])
@@ -283,6 +291,7 @@
                                                         @include('components.form.input', [
                                                             'label' => 'City',
                                                             'name' => 'branches[0][city]',
+                                                            'required' => true,
                                                             'type' => 'text',
                                                             'placeholder' => 'Enter City',
                                                         ])
@@ -291,6 +300,7 @@
                                                         @include('components.form.input', [
                                                             'label' => 'State',
                                                             'name' => 'branches[0][state]',
+                                                            'required' => true,
                                                             'type' => 'text',
                                                             'placeholder' => 'Enter State',
                                                         ])
@@ -299,6 +309,7 @@
                                                         @include('components.form.input', [
                                                             'label' => 'Country',
                                                             'name' => 'branches[0][country]',
+                                                            'required' => true,
                                                             'type' => 'text',
                                                             'placeholder' => 'Enter Country',
                                                         ])
@@ -307,6 +318,7 @@
                                                         @include('components.form.input', [
                                                             'label' => 'Pincode',
                                                             'name' => 'branches[0][pincode]',
+                                                            'required' => true,
                                                             'type' => 'text',
                                                             'placeholder' => 'Enter Pincode',
                                                         ])
@@ -485,9 +497,9 @@
                             <h6 class="mb-0 text-primary">Branch #${branchIndex + 1}</h6>
                             <div class="d-flex align-items-center gap-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="is_primary" value="${branchIndex}" id="primary_${branchIndex}">
+                                    <input class="form-check-input" type="radio" name="is_primary" required value="${branchIndex}" id="primary_${branchIndex}">
                                     <label class="form-check-label" for="primary_${branchIndex}">
-                                        Primary Branch
+                                        Primary Branch <span class="text-danger">*</span>
                                     </label>
                                 </div>
                                 <button type="button" class="btn btn-danger btn-sm remove-branch-btn">
@@ -498,11 +510,11 @@
                         <div class="row g-3">
                             <div class="col-6">
                                 <label for="branches_${branchIndex}_branch_name" class="form-label">Branch Name <span class="text-danger">*</span></label>
-                                <input type="text" name="branches[${branchIndex}][branch_name]" id="branches_${branchIndex}_branch_name" class="form-control" placeholder="Enter Name of Branch">
+                                <input type="text" name="branches[${branchIndex}][branch_name]" required id="branches_${branchIndex}_branch_name" class="form-control" placeholder="Enter Name of Branch">
                             </div>
                             <div class="col-6">
                                 <label for="branches_${branchIndex}_address1" class="form-label">Address Line 1 <span class="text-danger">*</span></label>
-                                <input type="text" name="branches[${branchIndex}][address1]" id="branches_${branchIndex}_address1" class="form-control" placeholder="Enter Address Line 1">
+                                <input type="text" name="branches[${branchIndex}][address1]" required id="branches_${branchIndex}_address1" class="form-control" placeholder="Enter Address Line 1">
                             </div>
                             <div class="col-6">
                                 <label for="branches_${branchIndex}_address2" class="form-label">Address Line 2</label>
@@ -510,19 +522,19 @@
                             </div>
                             <div class="col-6">
                                 <label for="branches_${branchIndex}_city" class="form-label">City <span class="text-danger">*</span></label>
-                                <input type="text" name="branches[${branchIndex}][city]" id="branches_${branchIndex}_city" class="form-control" placeholder="Enter City">
+                                <input type="text" name="branches[${branchIndex}][city]" required id="branches_${branchIndex}_city" class="form-control" placeholder="Enter City">
                             </div>
                             <div class="col-6">
                                 <label for="branches_${branchIndex}_state" class="form-label">State <span class="text-danger">*</span></label>
-                                <input type="text" name="branches[${branchIndex}][state]" id="branches_${branchIndex}_state" class="form-control" placeholder="Enter State">
+                                <input type="text" name="branches[${branchIndex}][state]" required id="branches_${branchIndex}_state" class="form-control" placeholder="Enter State">
                             </div>
                             <div class="col-6">
                                 <label for="branches_${branchIndex}_country" class="form-label">Country <span class="text-danger">*</span></label>
-                                <input type="text" name="branches[${branchIndex}][country]" id="branches_${branchIndex}_country" class="form-control" placeholder="Enter Country">
+                                <input type="text" name="branches[${branchIndex}][country]" required id="branches_${branchIndex}_country" class="form-control" placeholder="Enter Country">
                             </div>
                             <div class="col-6">
                                 <label for="branches_${branchIndex}_pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
-                                <input type="text" name="branches[${branchIndex}][pincode]" id="branches_${branchIndex}_pincode" class="form-control" placeholder="Enter Pincode">
+                                <input type="text" name="branches[${branchIndex}][pincode]" required id="branches_${branchIndex}_pincode" class="form-control" placeholder="Enter Pincode">
                             </div>
                         </div>
                     </div>

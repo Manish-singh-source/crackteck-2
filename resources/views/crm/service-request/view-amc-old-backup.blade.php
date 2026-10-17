@@ -555,7 +555,7 @@
                                     <th>Type</th>
                                     <th>Modal Number</th>
                                     <th>Product Serial Number</th>
-                                    <th>Crackteck Serial Number</th>
+                                    <th>SRB Computers Serial Number</th>
                                 </tr>
                             </thead>
                             <tbody>

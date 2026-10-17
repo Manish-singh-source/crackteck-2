@@ -1951,7 +1951,7 @@
                 key: razorpayData.key_id,
                 amount: razorpayData.amount,
                 currency: razorpayData.currency,
-                name: 'Crackteck',
+                name: 'SRB Computers',
                 description: 'Remote AMC Payment',
                 order_id: razorpayData.order_id,
                 handler: async function(response) {

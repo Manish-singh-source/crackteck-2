@@ -18,7 +18,7 @@
             </p>
         @endif
 
-        <p style="margin-bottom:0;line-height:1.6;">Crackteck Team</p>
+        <p style="margin-bottom:0;line-height:1.6;">SRB Computers Team</p>
     </div>
 </body>
 </html>

@@ -874,7 +874,7 @@ class CheckoutController extends Controller
                 'invoice_date' => $order->created_at->format('d/m/Y'),
                 'amount_in_words' => $this->convertNumberToWords($totals['grand_total']),
                 'company' => [
-                    'name' => 'CrackTeck Solutions Pvt. Ltd.',
+                    'name' => 'SRB Computers',
                     'address' => 'Tech Park, Mumbai - 400001',
                     'gstin' => '27AABCC1234M1Z2',
                     'phone' => '+91 98765 43210',

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Forgot Password | Crackteck</title>
+    <title>Forgot Password | SRB Computers</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Technofra" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -110,7 +110,7 @@
                     <div class="auth-page-sidebar">
                         <div class="overlay"></div>
                         <div class="auth-user-testimonial">
-                            <p class="fs-18 fw-semibold mb-1">Crackteck</p>
+                            <p class="fs-18 fw-semibold mb-1">SRB Computers</p>
                             <p class="fs-14">Your trusted service partner</p>
                         </div>
                     </div>

@@ -68,7 +68,7 @@
                     style="background-image: url('{{ asset('frontend-assets/images/banner/main-banner-1.jpg') }}');">
                     <div class="container">
                         <div class="carousel-caption">
-                            <h5>Welcome to CrackTeck</h5>
+                            <h5>Welcome to SRB Computers</h5>
                             <h1>Your Technology Partner</h1>
                             <p>Discover our latest products and services</p>
                             <a href="{{ route('shop') }}" class="btn btn-outline-light">EXPLORE NOW</a>

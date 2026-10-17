@@ -32,7 +32,7 @@ class PasswordResetMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Password Reset Request - Crackteck',
+            subject: 'Password Reset Request - SRB Computers',
         );
     }
 

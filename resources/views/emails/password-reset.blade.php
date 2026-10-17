@@ -83,7 +83,7 @@
             <div class="email-body">
                 <p>Hello {{ $user->first_name ?? 'User' }},</p>
                 
-                <p>We received a request to reset your password for your Crackteck account. Click the button below to reset your password:</p>
+                <p>We received a request to reset your password for your SRB Computers account. Click the button below to reset your password:</p>
                 
                 <div style="text-align: center;">
                     <a href="{{ $resetUrl }}" class="btn">Reset Password</a>
@@ -102,7 +102,7 @@
                 </p>
             </div>
             <div class="email-footer">
-                <p>&copy; {{ date('Y') }} Crackteck. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} SRB Computers. All rights reserved.</p>
                 <p>This is an automated message, please do not reply to this email.</p>
             </div>
         </div>

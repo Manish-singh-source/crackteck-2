@@ -108,12 +108,12 @@ Todays Tasks:
 #Roshan 
 
 1. SK International changes 
-2. Home Page categories filter feature in crackteck
+2. Home Page categories filter feature in SRB Computers
 
 
 #Saurabh 
 
-Crackteck: 
+SRB Computers:
 
 1. Razorpay payment APIs setup and integration for e-commerce order 
 2. App Testing and solving if any error occurred
@@ -136,14 +136,14 @@ Todays Tasks:
 
 # Saurabh 
 
-Crackteck: 
+SRB Computers:
 1. Remove the following fields from forms like remote amc and onsite amc Preferred Start Date, SKU, HSN
 2. The “Visits (AMC Scheduled Meeting)” feature will be removed from Remote AMC.
 
 # Roshan
 
 1. Oceanic: responsiveness for all devices
-2. Crackteck: Forgot password feature adding
+2. SRB Computers: Forgot password feature adding
 
 #Shubham 
 
@@ -162,14 +162,14 @@ Todays Completed Tasks:
 
 # Saurabh 
 
-Crackteck: 
+SRB Computers:
 1. Remove the following fields from forms like remote amc and onsite amc Preferred Start Date, SKU, HSN     - done
 2. The “Visits (AMC Scheduled Meeting)” feature will be removed from Remote AMC                             - done
 
 # Roshan
 
 1. Oceanic: responsiveness for all devices                      - done
-2. Crackteck: Forgot password feature adding                    - done
+2. SRB Computers: Forgot password feature adding                    - done
 
 #Shubham 
 
@@ -191,7 +191,7 @@ MyCRM:
 
 Pending All Over Tasks: 
 
-Crackteck App: 
+SRB Computers App:
 
 1. Payment integration                                               - done 
 2. Client changes as defined in MoM                                               - done 
@@ -200,7 +200,7 @@ Crackteck App:
 5. Adding Invoices
 6. Chats Module
 
-Crackteck CRM and Website: 
+SRB Computers CRM and Website:
 
 1. Dashboard Pages: 
     - E-commerce                                                - done 
@@ -359,17 +359,17 @@ Todays Tasks:
 
 
 #Saurabh 
-1. Crackteck: App Testing Customer
+1. SRB Computers: App Testing Customer
 2. Facebook Login 
 
 
 #Roshan 
-1. Crackteck: Customer Reviews
+1. SRB Computers: Customer Reviews
 2. Dashboard Page: E-commerce  
 
 #Shubham 
 1. CRM: Staff Module 
-2. Crackteck: App Testing Customer
+2. SRB Computers: App Testing Customer
 
 
 
@@ -379,11 +379,11 @@ Todays Tasks:
 
 
 #Saurabh 
-1. Crackteck: App Testing Customer
+1. SRB Computers: App Testing Customer
 2. Headquaters: Documentation creation 
 
 #Shubham 
-1. Crackteck: App Testing Customer
+1. SRB Computers: App Testing Customer
 
 #Roshan
 
@@ -394,7 +394,7 @@ Date: 30 March 2026
 Todays Tasks:
 
 #Saurabh & #Shubham
-1. Crackteck: App Testing Customer
+1. SRB Computers: App Testing Customer
 
 
 
@@ -403,7 +403,7 @@ Date: 31 March 2026
 Todays Tasks:
 
 #Saurabh & #Shubham
-1. Crackteck: App Testing Customer
+1. SRB Computers: App Testing Customer
 
 
 
@@ -414,7 +414,7 @@ Todays Tasks:
 
 #Saurabh 
 
-1. Crackteck: Dashboard Pages: 
+1. SRB Computers: Dashboard Pages:
     - E-commerce - Checking and correcting data
     - Warehouse  - implementing 
 2. Headquaters: Implement the ‘Shipped’ button and the ‘Vendor PI Update’ button
@@ -426,7 +426,7 @@ Todays Tasks:
 
 #Saurabh 
 
-Crackteck E-commerce: 
+SRB Computers E-commerce:
 
 1. Adding Meta tags in website for seo 
 3. Improve performance of website 

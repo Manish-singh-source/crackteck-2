@@ -6,7 +6,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="author" content="Crackteck">
+    <meta name="author" content="SRB Computers">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {!! seo()->generate() !!}
@@ -566,7 +566,7 @@
                                 <li><a href="https://web.whatsapp.com/"><i class="icon-whatapp"></i></a></li>
                             </ul>
                             <p class="nocopy caption text-center">
-                                <span class="fw-medium">Crackteck </span>© <script>document.write(new Date().getFullYear());</script>. All right reserved - Designed by
+                                <span class="fw-medium">SRB Computers </span>© <script>document.write(new Date().getFullYear());</script>. All right reserved - Designed by
                                 <a href="https://technofra.com/" style="color: #fff" target="_blank">Technofra</a>
                             </p>
                         </div>

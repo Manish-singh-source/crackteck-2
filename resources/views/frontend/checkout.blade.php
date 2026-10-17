@@ -585,7 +585,7 @@
                     key: razorpayData.key_id,
                     amount: razorpayData.amount,
                     currency: razorpayData.currency,
-                    name: 'Crackteck',
+                    name: 'SRB Computers',
                     description: 'Order #' + checkoutResponse.order_number,
                     order_id: razorpayData.order_id,
                     handler: function(response) {

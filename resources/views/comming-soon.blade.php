@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Coming Soon — CrackTeck</title>
+    <title>Coming Soon — SRB Computers</title>
 
     <!-- Fonts & Styles from frontend-assets -->
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/bootstrap.min.css') }}">
@@ -113,7 +113,7 @@
         <div class="coming-card">
             <div class="coming-logo mb-3">
                 <a href="{{ url('/') }}"><img src="{{ asset('frontend-assets/images/logo/header-logo-2.png') }}"
-                        alt="CrackTeck"></a>
+                        alt="SRB Computers"></a>
             </div>
 
             <h1 class="coming-title">Coming Soon</h1>

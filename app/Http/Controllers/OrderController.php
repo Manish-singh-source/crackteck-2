@@ -770,7 +770,7 @@ class OrderController extends Controller
                 'invoice_date' => $order->created_at->format('d/m/Y'),
                 'amount_in_words' => $this->convertNumberToWords($totals['grand_total']),
                 'company' => [
-                    'name' => 'CrackTeck Solutions Pvt. Ltd.',
+                    'name' => 'SRB Computers',
                     'address' => 'Tech Park, Mumbai - 400001',
                     'gstin' => '27AABCC1234M1Z2',
                     'phone' => '+91 98765 43210',
@@ -810,7 +810,7 @@ class OrderController extends Controller
                 'invoice_date' => $order->created_at->format('d/m/Y'),
                 'amount_in_words' => $this->convertNumberToWords($totals['grand_total']),
                 'company' => [
-                    'name' => 'CrackTeck Solutions Pvt. Ltd.',
+                    'name' => 'SRB Computers',
                     'address' => 'Tech Park, Mumbai - 400001',
                     'gstin' => '27AABCC1234M1Z2',
                     'phone' => '+91 98765 43210',
@@ -825,8 +825,8 @@ class OrderController extends Controller
             $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
             // Set document information
-            $pdf->SetCreator('CrackTeck');
-            $pdf->SetAuthor('CrackTeck Solutions');
+            $pdf->SetCreator('SRB Computers');
+            $pdf->SetAuthor('SRB Computers');
             $pdf->SetTitle('Invoice '.$order->order_number);
             $pdf->SetSubject('Invoice');
 

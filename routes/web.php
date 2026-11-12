@@ -52,9 +52,9 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\WithdrawController;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/', function () {
-//     return view('comming-soon');
-// })->name('comming-soon');
+Route::get('/', function () {
+    return view('comming-soon');
+})->name('comming-soon');
 
 Route::get('/auth/{provider}/redirect', [SocialController::class, 'redirectToProvider'])
     ->whereIn('provider', ['google', 'facebook', 'github'])
@@ -91,28 +91,20 @@ Route::prefix('password')->name('password.')->group(function () {
         ->name('api.reset');
 });
 
-Route::prefix('/demo')->group(function () {
+Route::controller(AuthController::class)->group(function () {
+    Route::get('/admin/login', 'login')->name('login');
+    Route::post('/admin/login', 'loginStore')->name('loginStore');
+    Route::post('/admin/send-otp', 'sendOtp')->name('send-otp');
+    Route::get('/admin/signup', 'signup')->name('signup');
+    Route::post('/admin/signup', 'register')->name('register');
+    Route::get('/admin/recover-password', 'recover_password')->name('recover-password');
+    Route::get('/crm/profile', 'profile')->name('profile');
+    Route::post('/crm/profile/update', 'updateProfile')->name('staff.profile.update');
+    Route::post('/crm/profile/password-update', 'updatePassword')->name('staff.password.update');
+    Route::post('/admin/logout', 'logout')->name('logout');
+});
 
-    Route::controller(AuthController::class)->group(function () {
-        // Login Page
-        Route::get('/admin/login', 'login')->name('login');
-        Route::post('/admin/login', 'loginStore')->name('loginStore');
-        // Send OTP for Phone Login
-        Route::post('/admin/send-otp', 'sendOtp')->name('send-otp');
-        // Sign Up Page
-        Route::get('/admin/signup', 'signup')->name('signup');
-        Route::post('/admin/signup', 'register')->name('register');
-        // Forgot Password
-        Route::get('/admin/recover-password', 'recover_password')->name('recover-password');
-        // Profile Page
-        Route::get('/crm/profile', 'profile')->name('profile');
-        // Update Profile
-        Route::post('/crm/profile/update', 'updateProfile')->name('staff.profile.update');
-        // Update Password
-        Route::post('/crm/profile/password-update', 'updatePassword')->name('staff.password.update');
-        // Logout Page
-        Route::post('/admin/logout', 'logout')->name('logout');
-    });
+Route::prefix('/demo')->group(function () {
 
     // Route::get('/', function () {
     //     return view('login');

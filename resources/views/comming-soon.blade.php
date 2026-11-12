@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title>Coming Soon | CrackTeck</title>
+    <title>Coming Soon | SRB Computers</title>
     <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon.png') }}?v=1">
     <link rel="apple-touch-icon" href="{{ asset('assets/images/favicon.png') }}?v=1">
     <style>

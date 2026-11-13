@@ -43,6 +43,31 @@ class ApiAuthController extends Controller
         ][$roleId] ?? null;
     }
 
+    /**
+     * Support older staff_role values already stored in production while the
+     * mobile app continues to send the canonical role ID.
+     */
+    protected function staffRoleAliases(string $role): array
+    {
+        return match ($role) {
+            'sales_person' => ['sales_person', 'Salesperson', 'salesperson', 'Sales Person'],
+            'delivery_man' => ['delivery_man', 'Delivery Man', 'deliveryman'],
+            default => [$role],
+        };
+    }
+
+    protected function findStaffForLogin(string $phone, string $role, bool $withVehicle = false): ?Staff
+    {
+        $query = Staff::where('phone', trim($phone))
+            ->whereIn('staff_role', $this->staffRoleAliases($role));
+
+        if ($withVehicle) {
+            $query->with('vehicleDetails');
+        }
+
+        return $query->first();
+    }
+
     public function sendDltSms($phoneNumbers, $templateId, $variablesValues)
     {
         $apiKey = env('FAST2SMS_API_KEY');
@@ -815,9 +840,7 @@ class ApiAuthController extends Controller
                     // ->where('status', 'active')
                     ->first();
             } else {
-                $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)
-                    // ->where('status', 'active')
-                    ->first();
+                $user = $this->findStaffForLogin($request->phone_number, $staffRole);
             }
             if (! $user) {
                 return response()->json(['success' => false, 'message' => 'User not found with the provided phone number.'], 404);
@@ -898,13 +921,13 @@ class ApiAuthController extends Controller
 
             if ($staffRole == 'delivery_man') {
 
-                $user = Staff::with('vehicleDetails')->where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
+                $user = $this->findStaffForLogin($request->phone_number, $staffRole, true);
 
-                if (! $user->vehicleDetails) {
+                if ($user && ! $user->vehicleDetails) {
                     return response()->json(['success' => false, 'message' => 'Vehical Details Not Found'], 401);
                 }
             } else {
-                $user = Staff::where('phone', $request->phone_number)->where('staff_role', $staffRole)->first();
+                $user = $this->findStaffForLogin($request->phone_number, $staffRole);
             }
         }
 

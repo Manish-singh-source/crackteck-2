@@ -131,27 +131,26 @@ class UpdateEcommerceProductRequest extends FormRequest
         }
 
         if (! $this->has('shipping_class')) {
-            // default DB enum code
-            $this->merge(['shipping_class' => '0']);
+            $this->merge(['shipping_class' => 'light']);
         }
 
-        // 3) Normalize shipping_class to DB enum codes (0..3)
+        // 3) Normalize legacy numeric form values to the database enum labels.
         if ($this->has('shipping_class')) {
             $val = $this->input('shipping_class');
 
             $map = [
-                '0' => '0',
-                '1' => '1',
-                '2' => '2',
-                '3' => '3',
-                0 => '0',
-                1 => '1',
-                2 => '2',
-                3 => '3',
-                'light' => '0',
-                'medium' => '1',
-                'heavy' => '2',
-                'fragile' => '3',
+                '0' => 'light',
+                '1' => 'medium',
+                '2' => 'heavy',
+                '3' => 'fragile',
+                0 => 'light',
+                1 => 'medium',
+                2 => 'heavy',
+                3 => 'fragile',
+                'light' => 'light',
+                'medium' => 'medium',
+                'heavy' => 'heavy',
+                'fragile' => 'fragile',
             ];
 
             $key = is_string($val) ? strtolower($val) : $val;

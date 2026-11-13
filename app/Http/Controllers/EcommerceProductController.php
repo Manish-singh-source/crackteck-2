@@ -280,31 +280,31 @@ class EcommerceProductController extends Controller
                 $data['with_installation'] = in_array($data['with_installation'], ['1', 'yes', true], true);
             }
 
-            // 3) Normalize shipping_class to 0..3
+            // 3) Normalize legacy numeric form values to the database enum labels.
             if ($request->filled('shipping_class')) {
                 $val = $request->input('shipping_class');
                 $map = [
-                    '0' => '0',
-                    '1' => '1',
-                    '2' => '2',
-                    '3' => '3',
-                    0 => '0',
-                    1 => '1',
-                    2 => '2',
-                    3 => '3',
-                    'light' => '0',
-                    'Light' => '0',
-                    'medium' => '1',
-                    'Medium' => '1',
-                    'heavy' => '2',
-                    'Heavy' => '2',
-                    'fragile' => '3',
-                    'Fragile' => '3',
+                    '0' => 'light',
+                    '1' => 'medium',
+                    '2' => 'heavy',
+                    '3' => 'fragile',
+                    0 => 'light',
+                    1 => 'medium',
+                    2 => 'heavy',
+                    3 => 'fragile',
+                    'light' => 'light',
+                    'Light' => 'light',
+                    'medium' => 'medium',
+                    'Medium' => 'medium',
+                    'heavy' => 'heavy',
+                    'Heavy' => 'heavy',
+                    'fragile' => 'fragile',
+                    'Fragile' => 'fragile',
                 ];
                 $key = is_string($val) ? $val : $val;
-                $data['shipping_class'] = $map[$key] ?? '0';
+                $data['shipping_class'] = $map[$key] ?? 'light';
             } else {
-                $data['shipping_class'] = $product->shipping_class ?? '0';
+                $data['shipping_class'] = $product->shipping_class ?? 'light';
             }
 
             // 4) With installation - store as 0 or 1 (not as array)

@@ -101,33 +101,34 @@ class StoreEcommerceProductRequest extends FormRequest
             $this->merge(['min_order_qty' => 1]);
         }
 
-        // Default shipping_class
+        // Keep this value aligned with the database enum
         if (! $this->has('shipping_class')) {
-            $this->merge(['shipping_class' => 'Light']);
+            $this->merge(['shipping_class' => 'light']);
         }
 
-        // Normalize shipping_class to DB enum codes (0..3)
+        // The form historically submitted numeric codes, while the database
+        // stores the enum labels. Normalize every accepted input to the label.
         if ($this->has('shipping_class')) {
             $val = $this->input('shipping_class');
 
             $map = [
                 // numeric codes as strings
-                '0' => '0',
-                '1' => '1',
-                '2' => '2',
-                '3' => '3',
+                '0' => 'light',
+                '1' => 'medium',
+                '2' => 'heavy',
+                '3' => 'fragile',
 
                 // numeric as ints
-                0 => '0',
-                1 => '1',
-                2 => '2',
-                3 => '3',
+                0 => 'light',
+                1 => 'medium',
+                2 => 'heavy',
+                3 => 'fragile',
 
                 // labels (case-insensitive)
-                'light' => '0',
-                'medium' => '1',
-                'heavy' => '2',
-                'fragile' => '3',
+                'light' => 'light',
+                'medium' => 'medium',
+                'heavy' => 'heavy',
+                'fragile' => 'fragile',
             ];
 
             $key = is_string($val) ? strtolower($val) : $val;

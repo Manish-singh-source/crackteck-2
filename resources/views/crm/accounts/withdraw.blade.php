@@ -1,262 +1,34 @@
-@extends('crm/layouts/master')
+@extends('crm.layouts.master')
 
 @section('content')
+<div class="content"><div class="container-fluid">
+    <div class="py-3"><h4 class="fs-18 fw-semibold m-0">Staff Payout Requests</h4></div>
+    @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+    @if($errors->any())<div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 
-<div class="content">
+    <div class="card mb-3"><div class="card-body"><h5 class="card-title">Create Payout Request</h5>
+        <form method="POST" action="{{ route('withdraw.store') }}" class="row g-3">@csrf
+            <div class="col-md-4"><label class="form-label">Staff</label><select name="staff_id" class="form-select" required><option value="">Select staff</option>@foreach($staff as $member)<option value="{{ $member->id }}" @selected(old('staff_id') == $member->id)>{{ $member->first_name }} {{ $member->last_name }} — {{ $member->staff_role }}</option>@endforeach</select></div>
+            <div class="col-md-2"><label class="form-label">Amount</label><input name="amount" type="number" min="1" step="0.01" value="{{ old('amount') }}" class="form-control" required></div>
+            <div class="col-md-3"><label class="form-label">Payout method</label><select name="payout_method" class="form-select" required><option value="cash">Cash</option><option value="upi" @selected(old('payout_method') === 'upi')>UPI</option><option value="bank_transfer" @selected(old('payout_method') === 'bank_transfer')>Bank transfer</option></select></div>
+            <div class="col-md-3"><label class="form-label">UPI / bank details</label><input name="payout_details" value="{{ old('payout_details') }}" class="form-control" placeholder="Required except cash"></div>
+            <div class="col-md-9"><label class="form-label">Reason</label><input name="reason" value="{{ old('reason') }}" maxlength="500" class="form-control" required></div>
+            <div class="col-md-3 d-flex align-items-end"><button class="btn btn-primary w-100">Submit request</button></div>
+        </form>
+    </div></div>
 
-    <!-- Start Content-->
-    <div class="container-fluid">
-        <div class="pb-3 d-flex align-items-sm-center flex-sm-row flex-column">
-            <div class="flex-grow-1">
-                <h4 class="fs-18 fw-semibold m-0">Withdraw Log List</h4>
-            </div>
-        </div>
-
-
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body pt-0">
-
-                        <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link active p-2" id="all_logs_tab" data-bs-toggle="tab"
-                                    href="#all_logs" role="tab">
-                                    <span class="d-block d-sm-none"><i
-                                            class="mdi mdi-information"></i></span>
-                                    <span class="d-none d-sm-block">All Logs</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link p-2" id="pending_logs_tab" data-bs-toggle="tab" href="#pending_logs"
-                                    role="tab">
-                                    <span class="d-block d-sm-none"><i
-                                            class="mdi mdi-sitemap-outline"></i></span>
-                                    <span class="d-none d-sm-block">Pending Logs</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link p-2" id="approved_logs_tab" data-bs-toggle="tab" href="#approved_logs"
-                                    role="tab">
-                                    <span class="d-block d-sm-none"><i
-                                            class="mdi mdi-sitemap-outline"></i></span>
-                                    <span class="d-none d-sm-block">Approved Logs</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link p-2" id="rejected_logs_tab" data-bs-toggle="tab" href="#rejected_logs"
-                                    role="tab">
-                                    <span class="d-block d-sm-none"><i
-                                            class="mdi mdi-sitemap-outline"></i></span>
-                                    <span class="d-none d-sm-block">Rejected Logs</span>
-                                </a>
-                            </li>
-                        </ul>
-
-                        <div class="tab-content text-muted">
-                            <div class="tab-pane active show pt-4" id="all_logs" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="card shadow-none">
-                                            <div class="card-body">
-                                                <table id="responsive-datatable"
-                                                    class="table table-striped table-borderless dt-responsive nowrap">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Withdrawal ID
-                                                            </th>
-                                                            <th>Date
-                                                            </th>
-                                                            <th>Requester Name
-                                                            </th>
-                                                            <th>User Type
-                                                            </th>
-                                                            <th>Amount
-                                                            </th>
-                                                            <th>Method
-                                                            </th>
-                                                            <th>Status
-                                                            </th>
-                                                            <th>Approved By
-                                                            </th>
-                                                            <th>Notes
-                                                            </th>
-                                                        </tr>
-
-                                                    </thead>
-                                                    <tbody>
-
-                                                        <tr>
-
-                                                            <td>WDR001</td>
-                                                            <td>2025-05-27</td>
-                                                            <td>Engineer Arun</td>
-                                                            <td>Staff</td>
-                                                            <td>200 INR</td>
-                                                            <td>Bank Transfer</td>
-                                                            <td>Approved</td>
-                                                            <td>Admin A1</td>
-                                                            <td>Tool expense refund</td>
-                                                        </tr>
-
-                                                        <tr>
-
-                                                            <td>WDR002</td>
-                                                            <td>2025-05-26</td>
-                                                            <td>John ABC</td>
-                                                            <td>Staff</td>
-                                                            <td>150 INR</td>
-                                                            <td>Wallet Refund</td>
-                                                            <td>Rejected</td>
-                                                            <td>Admin A2</td>
-                                                            <td>Invalid claim</td>
-                                                        </tr>
-
-                                                        <tr>
-
-                                                            <td>WDR003</td>
-                                                            <td>2025-05-25</td>
-                                                            <td>Vendor XYZ</td>
-                                                            <td>Vendor</td>
-                                                            <td>700 INR</td>
-                                                            <td>Cheque</td>
-                                                            <td>Pending</td>
-                                                            <td>-</td>
-                                                            <td>Monthly payout</td>
-                                                        </tr>
-
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane show pt-4" id="pending_logs" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="card shadow-none">
-                                            <div class="card-body">
-                                                <table id="responsive-datatable"
-                                                    class="table table-striped table-borderless dt-responsive nowrap">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Time</th>
-                                                            <th>Seller/Deliveryman/User</th>
-                                                            <th>Method</th>
-                                                            <th>Amount</th>
-                                                            <th>Charge</th>
-                                                            <th>Receivable</th>
-                                                            <th>Status</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody class="list form-check-all">
-                                                        <tr>
-                                                            <td class="border-bottom-0" colspan="100">
-                                                                <div class="tab-pane" id="productnav-draft" role="tabpanel">
-                                                                    <div class="py-4 text-center">
-                                                                        <lord-icon src="" trigger="loop" colors="primary:#405189,secondary:#0ab39c" class="loader-icon">
-                                                                        </lord-icon>
-                                                                        <h5 class="mt-4">
-                                                                            Sorry! No Result Found
-                                                                        </h5>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane show pt-4" id="approved_logs" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="card shadow-none">
-                                            <div class="card-body">
-                                                <table id="responsive-datatable"
-                                                    class="table table-striped table-borderless dt-responsive nowrap">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Time</th>
-                                                            <th>Seller/Deliveryman/User</th>
-                                                            <th>Method</th>
-                                                            <th>Amount</th>
-                                                            <th>Charge</th>
-                                                            <th>Receivable</th>
-                                                            <th>Status</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody class="list form-check-all">
-                                                        <tr>
-                                                            <td class="border-bottom-0" colspan="100">
-                                                                <div class="tab-pane" id="productnav-draft" role="tabpanel">
-                                                                    <div class="py-4 text-center">
-                                                                        <lord-icon src="" trigger="loop" colors="primary:#405189,secondary:#0ab39c" class="loader-icon">
-                                                                        </lord-icon>
-                                                                        <h5 class="mt-4">
-                                                                            Sorry! No Result Found
-                                                                        </h5>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane show pt-4" id="rejected_logs" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="card shadow-none">
-                                            <div class="card-body">
-                                                <table id="responsive-datatable"
-                                                    class="table table-striped table-borderless dt-responsive nowrap">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Time</th>
-                                                            <th>Seller/Deliveryman/User</th>
-                                                            <th>Method</th>
-                                                            <th>Amount</th>
-                                                            <th>Charge</th>
-                                                            <th>Receivable</th>
-                                                            <th>Status</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody class="list form-check-all">
-                                                        <tr>
-                                                            <td class="border-bottom-0" colspan="100">
-                                                                <div class="tab-pane" id="productnav-draft" role="tabpanel">
-                                                                    <div class="py-4 text-center">
-                                                                        <lord-icon src="" trigger="loop" colors="primary:#405189,secondary:#0ab39c" class="loader-icon">
-                                                                        </lord-icon>
-                                                                        <h5 class="mt-4">
-                                                                            Sorry! No Result Found
-                                                                        </h5>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> <!-- container-fluid -->
-    </div> <!-- content -->
-
+    <div class="card"><div class="card-body">
+        <form method="GET" class="row g-2 mb-3">
+            <div class="col-md-3"><select name="staff_id" class="form-select"><option value="">All staff</option>@foreach($staff as $member)<option value="{{ $member->id }}" @selected(request('staff_id') == $member->id)>{{ $member->first_name }} {{ $member->last_name }}</option>@endforeach</select></div>
+            <div class="col-md-2"><select name="status" class="form-select"><option value="">All statuses</option>@foreach(['pending','approved','rejected','paid'] as $status)<option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>@endforeach</select></div>
+            <div class="col-md-2"><input type="date" name="from" value="{{ request('from') }}" class="form-control"></div><div class="col-md-2"><input type="date" name="to" value="{{ request('to') }}" class="form-control"></div><div class="col-md-3"><button class="btn btn-outline-primary">Filter</button> <a href="{{ route('withdraw') }}" class="btn btn-light">Reset</a></div>
+        </form>
+        <div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th>Request</th><th>Staff</th><th>Amount</th><th>Method</th><th>Reason</th><th>Status</th><th>Requested</th><th>Action</th></tr></thead><tbody>
+        @forelse($withdrawals as $withdrawal)
+            <tr><td>{{ $withdrawal->withdrawal_no }}</td><td>{{ $withdrawal->staff?->first_name }} {{ $withdrawal->staff?->last_name }}<small class="d-block text-muted">{{ $withdrawal->requester_role }}</small></td><td>₹{{ number_format($withdrawal->amount, 2) }}</td><td>{{ strtoupper(str_replace('_', ' ', $withdrawal->payout_method)) }}<small class="d-block text-muted">{{ $withdrawal->payout_details }}</small></td><td>{{ $withdrawal->reason }}</td><td><span class="badge bg-{{ $withdrawal->status === 'paid' ? 'success' : ($withdrawal->status === 'rejected' ? 'danger' : ($withdrawal->status === 'approved' ? 'info' : 'warning')) }}">{{ ucfirst($withdrawal->status) }}</span>@if($withdrawal->rejection_reason)<small class="d-block text-danger">{{ $withdrawal->rejection_reason }}</small>@endif</td><td>{{ $withdrawal->requested_at?->format('d M Y, h:i A') }}</td><td>@if($withdrawal->status === 'pending')<form method="POST" action="{{ route('withdraw.status', $withdrawal) }}" class="d-inline">@csrf @method('PATCH')<input type="hidden" name="status" value="approved"><button class="btn btn-sm btn-success">Approve</button></form><button class="btn btn-sm btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#reject-{{ $withdrawal->id }}">Reject</button><form id="reject-{{ $withdrawal->id }}" class="collapse mt-1" method="POST" action="{{ route('withdraw.status', $withdrawal) }}">@csrf @method('PATCH')<input type="hidden" name="status" value="rejected"><input required name="rejection_reason" class="form-control form-control-sm mb-1" placeholder="Rejection reason"><button class="btn btn-sm btn-danger">Confirm</button></form>@elseif($withdrawal->status === 'approved')<form method="POST" action="{{ route('withdraw.status', $withdrawal) }}">@csrf @method('PATCH')<input type="hidden" name="status" value="paid"><input required name="payment_reference" class="form-control form-control-sm mb-1" placeholder="UTR / payment reference"><button class="btn btn-sm btn-primary">Mark paid</button></form>@else<span class="text-muted">{{ $withdrawal->payment_reference ?: 'Finalized' }}</span>@endif</td></tr>
+        @empty<tr><td colspan="8" class="text-center py-4">No payout requests found.</td></tr>@endforelse
+        </tbody></table></div>
+        {{ $withdrawals->links() }}
+    </div></div>
+</div></div>
 @endsection

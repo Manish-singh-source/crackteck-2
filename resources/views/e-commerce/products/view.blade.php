@@ -541,6 +541,10 @@
                                             1 => 'Medium',
                                             2 => 'Heavy',
                                             3 => 'Fragile',
+                                            'light' => 'Light',
+                                            'medium' => 'Medium',
+                                            'heavy' => 'Heavy',
+                                            'fragile' => 'Fragile',
                                         ];
                                     @endphp
                                     <span
@@ -596,21 +600,23 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                {{-- @php $variations = json_decode($product->warehouseProduct->variation_options, true); 
-                                    // print_r($variations);
-                                @endphp --}}
-                                @foreach ($product->warehouseProduct->variation_options as $key => $attribute)
+                                @php $variations = $product->warehouseProduct?->variation_options; @endphp
+                                @if (is_array($variations) && !empty($variations))
+                                @foreach ($variations as $key => $attribute)
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label class="fw-semibold">{{ $key }}:</label>
                                             <p class="text-muted">
-                                                @foreach ($attribute as $value)
+                                                @foreach ((array) $attribute as $value)
                                                     {{ $value }},
                                                 @endforeach
                                             </p>
                                         </div>
                                     </div>
                                 @endforeach
+                                @else
+                                    <p class="text-muted mb-0">No product variations configured.</p>
+                                @endif
                             </div>
                         </div>
 

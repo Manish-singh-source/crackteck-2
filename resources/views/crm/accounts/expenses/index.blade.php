@@ -1,151 +1,22 @@
-@extends('crm/layouts/master')
+@extends('crm.layouts.master')
 
 @section('content')
-    <style>
-        .table-top-head {
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            align-items: center;
-            -webkit-box-align: center;
-            -ms-flex-align: center;
-            justify-content: center;
-            -webkit-justify-content: center;
-            -ms-flex-pack: center;
-        }
-
-        .table-top-head span {
-            list-style: none;
-            margin-right: 8px;
-            flex-shrink: 0;
-        }
-
-        .table-top-head span a {
-            height: 35px;
-            width: 35px;
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            align-items: center;
-            -webkit-box-align: center;
-            -ms-flex-align: center;
-            justify-content: center;
-            -webkit-justify-content: center;
-            -ms-flex-pack: center;
-            border: 1px solid #E6EAED;
-            background: #ffffff;
-            border-radius: 5px;
-            padding: 4px;
-            cursor: pointer;
-        }
-
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-pending {
-            background-color: #FFF3CD;
-            color: #856404;
-        }
-
-        .status-admin_approved {
-            background-color: #D4EDDA;
-            color: #155724;
-        }
-
-        .status-admin_rejected {
-            background-color: #F8D7DA;
-            color: #721C24;
-        }
-
-        .status-paid {
-            background-color: #CCE5FF;
-            color: #004085;
-        }
-    </style>
-    <div class="content">
-
-        <!-- Start Content-->
-        <div class="container-fluid">
-            <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
-                <div class="flex-grow-1">
-                    <h4 class="fs-18 fw-semibold m-0">Staff Wallet Expenses</h4>
-                </div>
-                <div>
-                    <a href="{{ route('expenses.create') }}" class="btn btn-primary">Add Expense</a>
-                </div>
-            </div>
-
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body pt-0">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <ul class="nav nav-underline border-bottom pt-2" id="pills-tab" role="tablist">
-                                    <li class="nav-item" role="presentation">
-                                        <a class="nav-link active p-2" id="all_expenses_tab" data-bs-toggle="tab"
-                                            href="#all_expenses" role="tab">
-                                            <span class="d-block d-sm-none"><i class="mdi mdi-information"></i></span>
-                                            <span class="d-none d-sm-block">All Expenses</span>
-                                        </a>
-                                    </li>
-                                </ul>
-
-                            </div>
-
-                            <div class="tab-content text-muted">
-
-                                <div class="tab-pane active show" id="all_expenses" role="tabpanel">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="card shadow-none">
-                                                <div class="card-body">
-                                                    <table id="responsive-datatable"
-                                                        class="table table-striped table-borderless dt-responsive nowrap">
-
-                                                        <thead>
-                                                            <tr>
-                                                                <td>ID</td>
-                                                                <td>Staff Type</td>
-                                                                <td>Staff Name</td>
-                                                                <td>Staff Code</td>
-                                                                <td>Amount</td>
-                                                                <td>Reason</td>
-                                                                <td>Receipt</td>
-                                                                <td>Status</td>
-                                                                <td>Date</td>
-                                                                <td>Actions</td>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-
-                                                            <tr>
-                                                                <td colspan="10" class="text-center">No expenses found
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div><!-- end tab-pane -->
-
-                            </div> <!-- Tab panes -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> <!-- container-fluid -->
-    </div> <!-- content -->
+<div class="content"><div class="container-fluid">
+    <div class="py-3 d-flex justify-content-between align-items-center"><h4 class="fs-18 fw-semibold m-0">Staff Wallet Expenses</h4><a href="{{ route('expenses.create') }}" class="btn btn-primary">Add Expense</a></div>
+    @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+    @if($errors->any())<div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+    <div class="card"><div class="card-body">
+        <form method="GET" class="row g-2 mb-3">
+            <div class="col-md-3"><select name="staff_id" class="form-select"><option value="">All staff</option>@foreach($staff as $member)<option value="{{ $member->id }}" @selected(request('staff_id') == $member->id)>{{ $member->first_name }} {{ $member->last_name }}</option>@endforeach</select></div>
+            <div class="col-md-2"><select name="status" class="form-select"><option value="">All statuses</option>@foreach(['pending'=>'Pending','admin_approved'=>'Approved','admin_rejected'=>'Rejected','paid'=>'Paid'] as $value => $label)<option value="{{ $value }}" @selected(request('status') === $value)>{{ $label }}</option>@endforeach</select></div>
+            <div class="col-md-2"><input type="date" name="from" value="{{ request('from') }}" class="form-control"></div><div class="col-md-2"><input type="date" name="to" value="{{ request('to') }}" class="form-control"></div><div class="col-md-3"><button class="btn btn-outline-primary">Filter</button> <a href="{{ route('expenses.index') }}" class="btn btn-light">Reset</a></div>
+        </form>
+        <div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th>ID</th><th>Staff</th><th>Role</th><th>Amount</th><th>Reason</th><th>Receipt</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>
+        @forelse($expenses as $expense)
+            <tr><td>#{{ $expense->id }}</td><td>{{ $expense->staff?->first_name }} {{ $expense->staff?->last_name }}<small class="d-block text-muted">{{ $expense->staff?->staff_code }}</small></td><td>{{ ucfirst(str_replace('_', ' ', $expense->staff_type)) }}</td><td>₹{{ number_format($expense->amount, 2) }}</td><td>{{ $expense->reason }}</td><td>@if($expense->receipt)<a href="{{ asset('storage/'.$expense->receipt) }}" target="_blank">View</a>@else — @endif</td><td><span class="badge bg-{{ $expense->status === 'paid' ? 'success' : ($expense->status === 'admin_rejected' ? 'danger' : ($expense->status === 'admin_approved' ? 'info' : 'warning')) }}">{{ str_replace('_', ' ', ucfirst($expense->status)) }}</span></td><td>{{ $expense->created_at?->format('d M Y') }}</td><td class="text-nowrap"><a href="{{ route('expenses.view', $expense->id) }}" class="btn btn-sm btn-outline-primary">View</a><a href="{{ route('expenses.edit', $expense->id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>@if(in_array($expense->status, ['pending','admin_approved']))<form method="POST" action="{{ route('expenses.status', $expense->id) }}" class="d-inline">@csrf @method('PATCH')<input type="hidden" name="status" value="{{ $expense->status === 'pending' ? 'admin_approved' : 'paid' }}"><button class="btn btn-sm btn-success">{{ $expense->status === 'pending' ? 'Approve' : 'Mark paid' }}</button></form>@endif<form method="POST" action="{{ route('expenses.delete', $expense->id) }}" class="d-inline" onsubmit="return confirm('Delete this expense?')">@csrf @method('DELETE')<button class="btn btn-sm btn-outline-danger">Delete</button></form></td></tr>
+        @empty<tr><td colspan="9" class="text-center py-4">No expenses found.</td></tr>@endforelse
+        </tbody></table></div>
+        {{ $expenses->links() }}
+    </div></div>
+</div></div>
 @endsection

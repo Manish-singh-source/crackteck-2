@@ -13,7 +13,25 @@ class ExpensesController extends Controller
      */
     public function index(Request $request)
     {
-        return view('/crm/accounts/expenses/index');
+        $query = StaffWallet::with('staff')->latest();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+        if ($request->filled('staff_id')) {
+            $query->where('staff_id', $request->input('staff_id'));
+        }
+        if ($request->filled('from')) {
+            $query->whereDate('created_at', '>=', $request->input('from'));
+        }
+        if ($request->filled('to')) {
+            $query->whereDate('created_at', '<=', $request->input('to'));
+        }
+
+        $expenses = $query->paginate(20)->withQueryString();
+        $staff = Staff::whereIn('staff_role', ['engineer', 'delivery_man'])->where('status', 'active')->orderBy('first_name')->get();
+
+        return view('crm.accounts.expenses.index', compact('expenses', 'staff'));
     }
 
     /**

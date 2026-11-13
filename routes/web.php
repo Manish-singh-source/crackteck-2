@@ -243,6 +243,8 @@ Route::prefix('/demo')->group(function () {
 
     // Withdraw Page
     Route::get('/crm/withdraw', [WithdrawController::class, 'index'])->name('withdraw');
+    Route::post('/crm/withdraw', [WithdrawController::class, 'store'])->name('withdraw.store');
+    Route::patch('/crm/withdraw/{withdrawal}/status', [WithdrawController::class, 'updateStatus'])->name('withdraw.status');
 
     // KYC Log Page
     Route::get('/crm/kyc-log', [KycLogController::class, 'index'])->name('kyc-log');
@@ -312,13 +314,14 @@ Route::prefix('/demo')->group(function () {
         // Store Expenses List Page
         Route::post('/crm/store-expenses', 'store')->name('expenses.store');
         // View Expenses List Page
-        Route::get('/crm/view-expenses', 'view')->name('expenses.view');
+        Route::get('/crm/view-expenses/{id}', 'view')->name('expenses.view');
         // Edit Expenses List Page
-        Route::get('/crm/edit-expenses', 'edit')->name('expenses.edit');
+        Route::get('/crm/edit-expenses/{id}', 'edit')->name('expenses.edit');
         // Update Expenses List Page
-        Route::put('/crm/update-expenses', 'update')->name('expenses.update');
+        Route::put('/crm/update-expenses/{id}', 'update')->name('expenses.update');
         // Delete Expenses List Page
-        Route::delete('/crm/delete-expenses', 'delete')->name('expenses.delete');
+        Route::delete('/crm/delete-expenses/{id}', 'delete')->name('expenses.delete');
+        Route::patch('/crm/expenses/{id}/status', 'updateStatus')->name('expenses.status');
     });
 
     // ######################## Stock Request  ########################

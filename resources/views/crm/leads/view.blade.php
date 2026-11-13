@@ -296,10 +296,12 @@
 
                     </div>
 
-                    {{-- Product Details Card --}}
+                    {{-- Products belong to an AMC, not to a newly-created lead. --}}
+                    @php $amcProducts = optional($lead->amcs)->amcProducts ?? collect(); @endphp
+                    @if($amcProducts->isNotEmpty())
                     <div class="card mt-3">
                         <div class="card-header border-bottom-dashed">
-                            <h5 class="card-title mb-0">Product Information</h5>
+                            <h5 class="card-title mb-0">AMC Covered Products</h5>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -318,9 +320,7 @@
                                     </thead>
                                     <tbody>
                                         @php $srNo = 1; @endphp
-                                        @php $amcProducts = optional($lead->amcs)->amcProducts ?? collect(); @endphp
-                                        @if($amcProducts->count() > 0)
-                                            @foreach($amcProducts as $product)
+                                        @foreach($amcProducts as $product)
                                                 <tr>
                                                     <td>{{ $srNo++ }}</td>
                                                     <td>
@@ -338,17 +338,13 @@
                                                     <td>{{ $product->purchase_date ?? 'N/A' }}</td>
                                                     <td>{{ $product->brand ?? 'N/A' }}</td>
                                                 </tr>
-                                            @endforeach
-                                        @else
-                                            <tr>
-                                                <td colspan="8" class="text-center text-muted">No products found</td>
-                                            </tr>
-                                        @endif
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
+                    @endif
 
                 </div>
             </div>

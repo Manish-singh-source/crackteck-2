@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\RazorpayWebhookController;
 use App\Http\Controllers\Api\ReplacementRequestController;
 use App\Http\Controllers\Api\RewardClaimController;
 use App\Http\Controllers\Api\StaffWalletController;
+use App\Http\Controllers\Api\WithdrawalRequestController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\FcmTestFinalController;
 use App\Http\Controllers\FieldEngineerController;
@@ -97,6 +98,10 @@ Route::prefix('v1')->group(function () {
     Route::post('/test-fcm-final', [FcmTestFinalController::class, 'sendFinal'])->middleware('throttle:60,1');
 
     Route::middleware(['throttle:60,1', 'jwt.verify'])->group(function () {
+        // Staff payout requests: the authenticated staff member can submit and view only their own requests.
+        Route::get('/withdrawals', [WithdrawalRequestController::class, 'index']);
+        Route::post('/withdrawals', [WithdrawalRequestController::class, 'store']);
+
         // E-commerce payment APIs: create Razorpay order, verify checkout payment, and request order refund
         Route::post('/checkout/orders/{order}/razorpay', [ApiCheckoutController::class, 'createRazorpayOrder']); // Create a Razorpay order for an e-commerce order checkout
         Route::post('/checkout/razorpay/verify', [ApiCheckoutController::class, 'verifyRazorpayPayment']); // Verify Razorpay payment signature after successful checkout

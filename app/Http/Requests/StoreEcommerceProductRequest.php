@@ -49,7 +49,7 @@ class StoreEcommerceProductRequest extends FormRequest
             'cod' => 'nullable|in:0,1,yes,no',
             'installation' => 'nullable|in:0,1,yes,no',
             'shipping_charges' => 'nullable|numeric|min:0',
-            'shipping_class' => 'nullable|in:0,1,2,3,Light,Medium,Heavy,Fragile',
+            'shipping_class' => 'nullable|in:light,medium,heavy,fragile',
 
             // E-commerce flags
             'is_featured' => 'nullable|boolean',

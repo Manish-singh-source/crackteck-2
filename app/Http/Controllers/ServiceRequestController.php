@@ -74,7 +74,9 @@ class ServiceRequestController extends Controller
 
         // Repairing
         $repairingServices = (clone $baseQuery)
-            ->where('service_type', 'repair')
+            // `repairing` was used by older form submissions. Keep those visible
+            // while all new requests use the canonical `repair` value.
+            ->whereIn('service_type', ['repair', 'repairing'])
             ->get();
 
         // Quick
@@ -1405,7 +1407,7 @@ class ServiceRequestController extends Controller
             // 2. Store service request
             $serviceRequest = ServiceRequest::create([
                 'request_id' => $this->generateServiceId(),
-                'service_type' => $request->service_type,
+                'service_type' => 'installation',
                 'customer_id' => $customer->id,
                 'request_date' => now(),
                 'request_source' => 'system',
@@ -1758,7 +1760,7 @@ class ServiceRequestController extends Controller
             // 2. Store service request
             $serviceRequest = ServiceRequest::create([
                 'request_id' => $this->generateServiceId(),
-                'service_type' => $request->service_type,
+                'service_type' => 'repair',
                 'customer_id' => $customer->id,
                 'request_date' => now(),
                 'request_source' => 'system',
@@ -1934,7 +1936,7 @@ class ServiceRequestController extends Controller
             */
             $serviceRequest->update([
                 'customer_id' => $customer->id,
-                'service_type' => 'repairing', // Quick Service
+                'service_type' => 'repair',
                 'request_source' => 'system',
                 'request_date' => $serviceRequest->request_date ?? now(),
                 'created_by' => $serviceRequest->created_by ?? Auth::id(),

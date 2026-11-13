@@ -46,7 +46,7 @@
 
                                     <div class="col-xl-4 col-lg-6">
                                         <div>
-                                            <input type="hidden" name="service_type" value="repairing">
+                                            <input type="hidden" name="service_type" value="repair">
                                         </div>
                                         <div>
                                             @include('components.form.input', [

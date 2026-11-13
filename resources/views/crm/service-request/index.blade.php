@@ -263,10 +263,8 @@
                                                                             <i
                                                                                 class="mdi mdi-information-outline fs-1"></i>
                                                                             <p class="mt-2">
-                                                                                No Quick Service requests found.
-                                                                                <a
-                                                                                    href="{{ route('quick-service-requests.create') }}">Create
-                                                                                    one now</a>
+                                                                                No AMC Service requests found.
+                                                                                <a href="{{ route('amc-service-requests.create', ['context' => 'service_request']) }}">Create one now</a>
                                                                             </p>
                                                                         </div>
                                                                     </td>
@@ -314,7 +312,7 @@
                                                                 <option value="completed">Completed</option>
                                                             </select>
                                                         </div>
-                                                        <a href="{{ route('quick-service-requests.create') }}" class="btn btn-primary">Create Installation</a>
+                                                        <a href="{{ route('installation-service-requests.create') }}" class="btn btn-primary">Create Installation</a>
                                                     </div>
                                                     <table
                                                         class="table table-striped table-borderless nowrap service-datatable">
@@ -483,10 +481,8 @@
                                                                             <i
                                                                                 class="mdi mdi-information-outline fs-1"></i>
                                                                             <p class="mt-2">
-                                                                                No Quick Service requests found.
-                                                                                <a
-                                                                                    href="{{ route('quick-service-requests.create') }}">Create
-                                                                                    one now</a>
+                                                                                No Installation Service requests found.
+                                                                                <a href="{{ route('installation-service-requests.create') }}">Create one now</a>
                                                                             </p>
                                                                         </div>
                                                                     </td>
@@ -534,7 +530,7 @@
                                                                 <option value="completed">Completed</option>
                                                             </select>
                                                         </div>
-                                                        <a href="{{ route('quick-service-requests.create') }}" class="btn btn-primary">Create Repairing</a>
+                                                        <a href="{{ route('repairing-service-requests.create') }}" class="btn btn-primary">Create Repairing</a>
                                                     </div>
                                                     <table
                                                         class="table table-striped table-borderless nowrap service-datatable">
@@ -703,10 +699,8 @@
                                                                             <i
                                                                                 class="mdi mdi-information-outline fs-1"></i>
                                                                             <p class="mt-2">
-                                                                                No Quick Service requests found.
-                                                                                <a
-                                                                                    href="{{ route('quick-service-requests.create') }}">Create
-                                                                                    one now</a>
+                                                                                No Repairing Service requests found.
+                                                                                <a href="{{ route('repairing-service-requests.create') }}">Create one now</a>
                                                                             </p>
                                                                         </div>
                                                                     </td>

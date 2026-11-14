@@ -25,6 +25,31 @@ class Fast2smsService
 
     public function sendOtp(string $mobile, string $otp): array
     {
+        $mobile = preg_replace('/\D+/', '', $mobile);
+        if (str_starts_with($mobile, '91') && strlen($mobile) === 12) {
+            $mobile = substr($mobile, 2);
+        }
+
+        if (! preg_match('/^[6-9]\d{9}$/', $mobile)) {
+            return [
+                'success' => false,
+                'status' => 422,
+                'message' => 'A valid 10-digit Indian mobile number is required.',
+                'data' => [],
+            ];
+        }
+
+        if (empty($this->apiKey) || empty($this->senderId) || empty($this->templateId)) {
+            Log::error('Fast2SMS is not configured.');
+
+            return [
+                'success' => false,
+                'status' => 500,
+                'message' => 'SMS service is not configured.',
+                'data' => [],
+            ];
+        }
+
         $url = 'https://www.fast2sms.com/dev/bulkV2';
 
         $payload = [
@@ -44,14 +69,14 @@ class Fast2smsService
         $response = Http::withHeaders([
             'authorization' => $this->apiKey,
             'accept' => 'application/json',
-        ])->asForm()->post($url, $payload);
+        ])->timeout(15)->asForm()->post($url, $payload);
 
         $responseData = $response->json() ?? [];
 
         Log::info('Fast2SMS Response', [
             'status' => $response->status(),
             'body' => $response->body(),
-            'payload' => $payload,
+            'mobile_last_four' => substr($mobile, -4),
         ]);
 
         return [

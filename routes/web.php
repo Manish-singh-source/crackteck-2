@@ -746,6 +746,8 @@ Route::prefix('/demo')->group(function () {
         Route::get('/crm/case-transfer', 'index')->name('case-transfer.index');
         // Create Case Transfer Page
         Route::get('/crm/create-case-transfer', 'create')->name('case-transfer.create');
+        // Store Case Transfer Request
+        Route::post('/crm/create-case-transfer', 'store')->name('case-transfer.store');
         // View Case Transfer Page
         Route::get('/crm/view-case-transfer/{id}', 'view')->name('case-transfer.view');
         // Approve Case Transfer

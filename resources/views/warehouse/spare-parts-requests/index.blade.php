@@ -98,6 +98,9 @@
                                                                         'bg-danger-subtle text-danger',
                                                                     'admin_approved' => 'bg-success-subtle text-success',
                                                                     'admin_rejected' => 'bg-danger-subtle text-danger',
+                                                                    'warehouse_approved' => 'bg-success-subtle text-success',
+                                                                    'warehouse_rejected' => 'bg-danger-subtle text-danger',
+                                                                    'assigned' => 'bg-info-subtle text-info',
                                                                     'picked' => 'bg-success-subtle text-success',
                                                                     'in_transit' => 'bg-warning-subtle text-warning',
                                                                     'delivered' => 'bg-success-subtle text-success',
@@ -119,6 +122,9 @@
                                                                     'customer_rejected' => 'Customer Rejected',
                                                                     'admin_approved' => 'Admin Approved',
                                                                     'admin_rejected' => 'Admin Rejected',
+                                                                    'warehouse_approved' => 'Warehouse Approved',
+                                                                    'warehouse_rejected' => 'Warehouse Rejected',
+                                                                    'assigned' => 'Assigned',
                                                                     'picked' => 'Picked',
                                                                     'in_transit' => 'In Transit',
                                                                     'delivered' => 'Delivered',
@@ -144,9 +150,9 @@
                                                                         {{ ucwords(str_replace('_', ' ', $request->request_type)) }}
                                                                     </td>
                                                                     <td>
-                                                                        <span
-                                                                            class="badge {{ $badgeClasses[strtolower($request->status)] }}">
-                                                                            {{ $status[strtolower($request->status)] }}
+                                                                        @php($currentStatus = strtolower((string) ($request->status ?? 'pending')))
+                                                                        <span class="badge {{ $badgeClasses[$currentStatus] ?? 'bg-secondary-subtle text-secondary' }}">
+                                                                            {{ $status[$currentStatus] ?? ucwords(str_replace('_', ' ', $currentStatus)) }}
                                                                         </span>
                                                                     </td>
                                                                     <td>

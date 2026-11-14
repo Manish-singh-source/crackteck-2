@@ -274,28 +274,38 @@ class FieldEngineerController extends Controller
             $otp = rand(1000, 9999);
 
             $customerPhone = $serviceRequest->customer->phone ?? null;
-            $smsSent = false;
-            $smsError = null;
+            if (! $customerPhone) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Customer phone number is not available.',
+                ], 422);
+            }
 
-            if ($customerPhone) {
-                try {
-                    $smsService = new Fast2smsService();
-                    $smsResponse = $smsService->sendOtp($customerPhone, $otp);
-                    $smsSent = $smsResponse['success'] ?? false;
-                    $smsError = $smsResponse['message'] ?? null;
+            try {
+                $smsResponse = (new Fast2smsService())->sendOtp($customerPhone, (string) $otp);
+            } catch (\Exception $smsException) {
+                Log::error('OTP SMS provider request failed', [
+                    'service_request_id' => $id,
+                    'error' => $smsException->getMessage(),
+                ]);
 
-                    Log::info('OTP SMS sent to customer', [
-                        'service_request_id' => $id,
-                        'customer_phone' => $customerPhone,
-                        'sms_success' => $smsSent,
-                    ]);
-                } catch (\Exception $smsException) {
-                    Log::error('Failed to send OTP SMS', [
-                        'service_request_id' => $id,
-                        'error' => $smsException->getMessage(),
-                    ]);
-                    $smsError = $smsException->getMessage();
-                }
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unable to send OTP SMS. Please try again.',
+                ], 502);
+            }
+
+            if (! ($smsResponse['success'] ?? false)) {
+                Log::warning('OTP SMS was rejected by the provider', [
+                    'service_request_id' => $id,
+                    'provider_status' => $smsResponse['status'] ?? null,
+                    'provider_message' => $smsResponse['message'] ?? null,
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP SMS could not be sent. Please try again.',
+                ], 502);
             }
 
             DB::beginTransaction();
@@ -306,13 +316,11 @@ class FieldEngineerController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'OTP sent successfully.',
+                'message' => 'OTP sent successfully by SMS.',
                 'data' => [
                     'service_request_id' => $serviceRequest->id,
-                    'otp' => $otp,
                     'otp_expiry' => $serviceRequest->otp_expiry,
-                    'sms_sent' => $smsSent,
-                    'customer_phone' => $customerPhone,
+                    'sms_sent' => true,
                 ],
             ], 200);
         } catch (\Exception $e) {

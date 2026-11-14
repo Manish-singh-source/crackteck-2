@@ -1230,8 +1230,9 @@ class ServiceRequestController extends Controller
         ])->findOrFail($id);
 
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
+        $deliveryMen = Staff::where('staff_role', 'delivery_man')->where('status', 'active')->get();
 
-        return view('crm/service-request/view-amc-service-request', compact('request', 'engineers'));
+        return view('crm/service-request/view-amc-service-request', compact('request', 'engineers', 'deliveryMen'));
     }
 
     public function editAmcServiceRequest($id, $service_type)

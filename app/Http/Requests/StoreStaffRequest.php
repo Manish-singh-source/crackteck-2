@@ -28,7 +28,7 @@ class StoreStaffRequest extends FormRequest
             // Role / staff table
             'role' => 'required',
             'first_name' => 'required|string|max:255',
-            'last_name' => 'nullable|string|max:255',
+            'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|unique:staff,email',
             'dob' => 'nullable|date',

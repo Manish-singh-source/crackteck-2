@@ -101,6 +101,7 @@
                                                     'name' => 'last_name',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Last Name',
+                                                    'required' => true,
                                                 ])
                                             </div>
 

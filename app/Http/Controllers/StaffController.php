@@ -81,7 +81,7 @@ class StaffController extends Controller
                 // End
 
                 // 3. Bank
-                if ($validated['bank_acc_holder_name'] || $validated['bank_acc_number'] || $validated['bank_name'] || $validated['ifsc_code']) {
+                if (($validated['bank_acc_holder_name'] ?? null) || ($validated['bank_acc_number'] ?? null) || ($validated['bank_name'] ?? null) || ($validated['ifsc_code'] ?? null)) {
                     $passbookPath = null;
                     if ($request->hasFile('passbook_pic')) {
                         $passbookPath = FileUpload::fileUpload($request->file('passbook_pic'), 'staff/passbook/');
@@ -98,7 +98,7 @@ class StaffController extends Controller
                 // End
 
                 // 4. Work skills
-                if ($validated['primary_skills'] || $validated['languages_known'] || $validated['certifications'] || $validated['experience'] || $validated['qualification'] || $request->hasFile('qualification_certifications') || $request->hasFile('address_proof')) {
+                if (($validated['primary_skills'] ?? null) || ($validated['languages_known'] ?? null) || ($validated['certifications'] ?? null) || ($validated['experience'] ?? null) || ($validated['qualification'] ?? null) || $request->hasFile('qualification_certifications') || $request->hasFile('address_proof')) {
                     $certPath = null;
                     if ($request->hasFile('certifications')) {
                         $certPath = FileUpload::fileUpload($request->file('certifications'), 'staff/certifications/');
@@ -132,7 +132,7 @@ class StaffController extends Controller
                 // End
 
                 // 5. Aadhar
-                if ($validated['aadhar_number'] || $request->hasFile('aadhar_front_path') || $request->hasFile('aadhar_back_path')) {
+                if (($validated['aadhar_number'] ?? null) || $request->hasFile('aadhar_front_path') || $request->hasFile('aadhar_back_path')) {
                     $aadharFront = null;
                     if ($request->hasFile('aadhar_front_path')) {
                         $aadharFront = FileUpload::fileUpload($request->file('aadhar_front_path'), 'staff/aadhar/');
@@ -151,7 +151,7 @@ class StaffController extends Controller
                 }
 
                 // 6. PAN
-                if ($validated['pan_number'] || $request->hasFile('pan_card_front_path') || $request->hasFile('pan_card_back_path')) {
+                if (($validated['pan_number'] ?? null) || $request->hasFile('pan_card_front_path') || $request->hasFile('pan_card_back_path')) {
                     $panFront = null;
                     if ($request->hasFile('pan_card_front_path')) {
                         $panFront = FileUpload::fileUpload($request->file('pan_card_front_path'), 'staff/pan/');
@@ -170,7 +170,7 @@ class StaffController extends Controller
                 }
 
                 // 7. Vehicle
-                if ($validated['vehicle_type'] || $validated['vehicle_number'] || $validated['driving_license_no']) {
+                if (($validated['vehicle_type'] ?? null) || ($validated['vehicle_number'] ?? null) || ($validated['driving_license_no'] ?? null)) {
                     $dlFront = null;
                     if ($request->hasFile('driving_license_front_path')) {
                         $dlFront = FileUpload::fileUpload($request->file('driving_license_front_path'), 'staff/license/');
@@ -191,7 +191,7 @@ class StaffController extends Controller
                 }
 
                 // 8. Police verification
-                if ($validated['police_verification'] || $validated['police_verification_status'] || $request->hasFile('police_certificate')) {
+                if (($validated['police_verification'] ?? null) || ($validated['police_verification_status'] ?? null) || $request->hasFile('police_certificate')) {
                     $policeCert = null;
                     if ($request->hasFile('police_certificate')) {
                         $policeCert = FileUpload::fileUpload($request->file('police_certificate'), 'staff/police/');

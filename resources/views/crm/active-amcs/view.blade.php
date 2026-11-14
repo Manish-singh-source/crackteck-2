@@ -321,6 +321,7 @@
                                                                                 <option value="{{ $engineer->id }}">
                                                                                     {{ $engineer->first_name }}
                                                                                     {{ $engineer->last_name }}
+                                                                                    — {{ ucwords(str_replace('_', ' ', $engineer->staff_role)) }}
                                                                                 </option>
                                                                             @endforeach
                                                                         </select>

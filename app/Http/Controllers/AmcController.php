@@ -637,7 +637,14 @@ class AmcController extends Controller
         ])->findOrFail($id);
 
         $engineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
-        $remoteEngineers = Staff::where('staff_role', 'engineer')->where('status', 'active')->get();
+        $remoteEngineers = Staff::whereIn('staff_role', [
+            'engineer',
+            'Engineer',
+            'remote engineer',
+            'Remote engineer',
+            'remote_engineer',
+            'Remote Engineer',
+        ])->where('status', 'active')->orderBy('first_name')->get();
 
         // Get tickets for this AMC service
         $amcTickets = AmcTicket::where('amc_id', $id)->orderBy('created_at', 'desc')->get();

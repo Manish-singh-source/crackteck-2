@@ -1608,14 +1608,14 @@
 
         $(document).ready(function() {
             // Toggle between Individual and Group sections
-            $('input[name="assignment_type"]').change(function() {
+            $('#assignEngineerForm input[name="assignment_type"]').change(function() {
                 if ($(this).val() === 'individual') {
                     $('#individualSection').show();
                     $('#groupSection').hide();
                     // Clear group fields
                     $('#group_name').val('');
-                    $('.engineer-checkbox').prop('checked', false);
-                    $('input[name="supervisor_id"]').prop('checked', false);
+                    $('#assignEngineerForm .engineer-checkbox').prop('checked', false);
+                    $('#assignEngineerForm input[name="supervisor_id"]').prop('checked', false);
                 } else {
                     $('#individualSection').hide();
                     $('#groupSection').show();
@@ -1625,9 +1625,9 @@
             });
 
             // Sync checkbox with supervisor radio
-            $('.engineer-checkbox').change(function() {
+            $('#assignEngineerForm .engineer-checkbox').change(function() {
                 const engineerId = $(this).val();
-                const supervisorRadio = $('input[name="supervisor_id"][value="' + engineerId + '"]');
+                const supervisorRadio = $('#assignEngineerForm input[name="supervisor_id"][value="' + engineerId + '"]');
 
                 if (!$(this).is(':checked')) {
                     // If unchecked, also uncheck supervisor radio
@@ -1636,9 +1636,9 @@
             });
 
             // Ensure supervisor is also checked as engineer
-            $('input[name="supervisor_id"]').change(function() {
+            $('#assignEngineerForm input[name="supervisor_id"]').change(function() {
                 const engineerId = $(this).val();
-                const engineerCheckbox = $('.engineer-checkbox[value="' + engineerId + '"]');
+                const engineerCheckbox = $('#assignEngineerForm .engineer-checkbox[value="' + engineerId + '"]');
 
                 if (!engineerCheckbox.is(':checked')) {
                     engineerCheckbox.prop('checked', true);
@@ -1648,28 +1648,29 @@
             // Form submission
             $('#assignEngineerForm').submit(function(e) {
                 e.preventDefault();
+                const $form = $(this);
 
-                const assignmentType = $('input[name="assignment_type"]:checked').val();
+                const assignmentType = $form.find('input[name="assignment_type"]:checked').val();
 
                 // Validation
                 if (assignmentType === 'individual') {
-                    if (!$('#engineer_id').val()) {
+                    if (!$form.find('#engineer_id').val()) {
                         alert('Please select an engineer');
                         return;
                     }
                 } else if (assignmentType === 'group') {
-                    if (!$('#group_name').val()) {
+                    if (!$form.find('#group_name').val().trim()) {
                         alert('Please enter group name');
                         return;
                     }
 
-                    const checkedEngineers = $('.engineer-checkbox:checked').length;
+                    const checkedEngineers = $form.find('.engineer-checkbox:checked').length;
                     if (checkedEngineers === 0) {
                         alert('Please select at least one engineer');
                         return;
                     }
 
-                    if (!$('input[name="supervisor_id"]:checked').val()) {
+                    if (!$form.find('input[name="supervisor_id"]:checked').val()) {
                         alert('Please select a supervisor');
                         return;
                     }
@@ -1710,14 +1711,14 @@
 
             // Modal Assign Engineer Form Handling (AMC modal)
             // Toggle between Individual and Group sections inside modal
-            $('input[name="assignment_type_modal"]').change(function() {
+            $('#assignEngineerModalForm input[name="assignment_type"]').change(function() {
                 if ($(this).val() === 'individual') {
                     $('#individualSectionModal').show();
                     $('#groupSectionModal').hide();
                     // Clear group fields
                     $('#group_name_modal').val('');
-                    $('.engineer-checkbox-modal').prop('checked', false);
-                    $('input[name="supervisor_id"]').prop('checked', false);
+                    $('#assignEngineerModalForm .engineer-checkbox-modal').prop('checked', false);
+                    $('#assignEngineerModalForm input[name="supervisor_id"]').prop('checked', false);
                 } else {
                     $('#individualSectionModal').hide();
                     $('#groupSectionModal').show();
@@ -1729,7 +1730,7 @@
             // Sync checkbox with supervisor radio (modal)
             $(document).on('change', '.engineer-checkbox-modal', function() {
                 const engineerId = $(this).val();
-                const supervisorRadio = $('input[name="supervisor_id"][value="' + engineerId + '"]');
+                const supervisorRadio = $('#assignEngineerModalForm input[name="supervisor_id"][value="' + engineerId + '"]');
 
                 if (!$(this).is(':checked')) {
                     supervisorRadio.prop('checked', false);
@@ -1737,9 +1738,9 @@
             });
 
             // Ensure supervisor is also checked as engineer (modal)
-            $(document).on('change', 'input[name="supervisor_id"]', function() {
+            $('#assignEngineerModalForm input[name="supervisor_id"]').change(function() {
                 const engineerId = $(this).val();
-                const engineerCheckbox = $('.engineer-checkbox-modal[value="' + engineerId + '"]');
+                const engineerCheckbox = $('#assignEngineerModalForm .engineer-checkbox-modal[value="' + engineerId + '"]');
 
                 if (!engineerCheckbox.is(':checked')) {
                     engineerCheckbox.prop('checked', true);
@@ -1749,28 +1750,29 @@
             // Modal form submission
             $('#assignEngineerModalForm').submit(function(e) {
                 e.preventDefault();
+                const $form = $(this);
 
-                const assignmentType = $('input[name="assignment_type_modal"]:checked').val();
+                const assignmentType = $form.find('input[name="assignment_type"]:checked').val();
 
                 // Validation
                 if (assignmentType === 'individual') {
-                    if (!$('#engineer_id_modal').val()) {
+                    if (!$form.find('#engineer_id_modal').val()) {
                         alert('Please select an engineer');
                         return;
                     }
                 } else if (assignmentType === 'group') {
-                    if (!$('#group_name_modal').val()) {
+                    if (!$form.find('#group_name_modal').val().trim()) {
                         alert('Please enter group name');
                         return;
                     }
 
-                    const checkedEngineers = $('.engineer-checkbox-modal:checked').length;
+                    const checkedEngineers = $form.find('.engineer-checkbox-modal:checked').length;
                     if (checkedEngineers === 0) {
                         alert('Please select at least one engineer');
                         return;
                     }
 
-                    if (!$('input[name="supervisor_id"]:checked').val()) {
+                    if (!$form.find('input[name="supervisor_id"]:checked').val()) {
                         alert('Please select a supervisor');
                         return;
                     }

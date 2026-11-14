@@ -9,12 +9,39 @@ use App\Models\CustomerAddressDetail;
 use App\Models\Lead;
 use App\Models\Staff;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class LeadController extends Controller
 {
-    //
+    /**
+     * Production contains both the legacy `Salesperson` value and the newer
+     * canonical `sales_person` value.  Treat them as the same role so a valid
+     * sales staff JWT is not rejected just because of a saved label.
+     */
+    private function isSalesPerson(Staff $staff): bool
+    {
+        $role = strtolower(trim((string) $staff->staff_role));
+        $role = str_replace([' ', '-'], '_', $role);
+
+        return in_array($role, ['sales_person', 'salesperson'], true);
+    }
+
+    private function salesPersonForbiddenResponse(Request $request): ?JsonResponse
+    {
+        $staff = Staff::find($request->integer('user_id'));
+
+        if ($staff && $this->isSalesPerson($staff)) {
+            return null;
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'User is not a sales person.',
+        ], 403);
+    }
+
     /**
      * Get all leads for a user
      * description: Get all leads for a user
@@ -25,7 +52,7 @@ class LeadController extends Controller
     {
         // Create validator
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required',
+            'user_id' => 'required|integer|exists:staff,id',
         ]);
 
         // Check for validation errors
@@ -37,13 +64,8 @@ class LeadController extends Controller
             ], 422);
         }
 
-        $roleCheck = Staff::where('id', $request->user_id)->first();
-
-        if ($roleCheck->staff_role != 'sales_person') {
-            return response()->json([
-                'success' => false,
-                'message' => 'User is not a sales person.',
-            ], 403);
+        if ($forbidden = $this->salesPersonForbiddenResponse($request)) {
+            return $forbidden;
         }
 
         // Get validated data as array
@@ -60,7 +82,7 @@ class LeadController extends Controller
     {
         $validator = Validator::make($request->all(), [
             // Customer fields
-            'user_id' => 'required',
+            'user_id' => 'required|integer|exists:staff,id',
             'first_name' => 'required|string|max:50',
             'last_name' => 'required|string|max:50',
             'phone' => 'required|string|max:10',
@@ -84,6 +106,10 @@ class LeadController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validator->errors()], 422);
+        }
+
+        if ($forbidden = $this->salesPersonForbiddenResponse($request)) {
+            return $forbidden;
         }
 
         try {
@@ -168,11 +194,15 @@ class LeadController extends Controller
     public function show(Request $request, $lead_id)
     {
         $validated = Validator::make($request->all(), ([
-            'user_id' => 'required',
+            'user_id' => 'required|integer|exists:staff,id',
         ]));
 
         if ($validated->fails()) {
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        if ($forbidden = $this->salesPersonForbiddenResponse($request)) {
+            return $forbidden;
         }
 
         $validated = $validated->validated();
@@ -189,11 +219,15 @@ class LeadController extends Controller
     {
         $validated = Validator::make($request->all(), ([
             // validation rules if any
-            'user_id' => 'required',
+            'user_id' => 'required|integer|exists:staff,id',
         ]));
 
         if ($validated->fails()) {
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        if ($forbidden = $this->salesPersonForbiddenResponse($request)) {
+            return $forbidden;
         }
 
         $validated = $validated->validated();
@@ -215,11 +249,15 @@ class LeadController extends Controller
     {
         $validated = Validator::make($request->all(), ([
             // validation rules if any
-            'user_id' => 'required',
+            'user_id' => 'required|integer|exists:staff,id',
         ]));
 
         if ($validated->fails()) {
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        if ($forbidden = $this->salesPersonForbiddenResponse($request)) {
+            return $forbidden;
         }
 
         $lead = Lead::where('staff_id', $request->user_id)->where('id', $lead_id)->delete();

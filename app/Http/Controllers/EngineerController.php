@@ -10,6 +10,7 @@ use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Role;
 
 class EngineerController extends Controller
 {
@@ -24,7 +25,9 @@ class EngineerController extends Controller
 
     public function create()
     {
-        return view('/crm/access-control/staff/create');
+        $roles = Role::where('name', '!=', 'Customer')->get();
+
+        return view('/crm/access-control/staff/create', compact('roles'));
     }
 
     public function store(Request $request)

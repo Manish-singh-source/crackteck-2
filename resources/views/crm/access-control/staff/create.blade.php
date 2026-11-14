@@ -66,6 +66,7 @@
                                                     'label' => 'Role',
                                                     'name' => 'role',
                                                     'options' => $roleOptions,
+                                                    'required' => true,
                                                 ])
                                             </div>
                                         </div>
@@ -90,6 +91,7 @@
                                                     'name' => 'first_name',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter First Name',
+                                                    'required' => true,
                                                 ])
                                             </div>
 
@@ -108,6 +110,7 @@
                                                     'name' => 'phone',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Phone number',
+                                                    'required' => true,
                                                 ])
                                             </div>
 
@@ -118,6 +121,7 @@
                                                     'name' => 'email',
                                                     'type' => 'email',
                                                     'placeholder' => 'Enter Email id',
+                                                    'required' => true,
                                                 ])
                                             </div>
 
@@ -206,6 +210,7 @@
                                                     'name' => 'address1',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Address Line 1',
+                                                    'required' => true,
                                                 ])
                                             </div>
 
@@ -224,6 +229,7 @@
                                                     'name' => 'city',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter City',
+                                                    'required' => true,
                                                 ])
                                             </div>
 
@@ -233,6 +239,7 @@
                                                     'name' => 'state',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter State',
+                                                    'required' => true,
                                                 ])
                                             </div>
 
@@ -242,6 +249,7 @@
                                                     'name' => 'country',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Country',
+                                                    'required' => true,
                                                 ])
                                             </div>
 
@@ -251,6 +259,7 @@
                                                     'name' => 'pincode',
                                                     'type' => 'text',
                                                     'placeholder' => 'Enter Pincode',
+                                                    'required' => true,
                                                 ])
                                             </div>
                                         </div>

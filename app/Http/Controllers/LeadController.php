@@ -12,7 +12,20 @@ use Illuminate\Support\Facades\Validator;
 
 class LeadController extends Controller
 {
-    //
+    /**
+     * Support both legacy and canonical staff role values. Existing staff
+     * records were saved as `Salesperson`, while newer flows use
+     * `sales_person`.
+     */
+    private function salesPersons()
+    {
+        return Staff::whereIn('staff_role', [
+            'sales_person',
+            'Salesperson',
+            'Sales Person',
+        ])->orderBy('first_name')->orderBy('last_name')->get();
+    }
+
     public function index()
     {
         $status = request()->get('status') ?? 'all';
@@ -27,9 +40,8 @@ class LeadController extends Controller
 
     public function create()
     {
-        $salesPersons = Staff::where('staff_role', 'sales_person')->get();
+        $salesPersons = $this->salesPersons();
 
-        // dd($salesPersons);
         return view('/crm/leads/create', compact('salesPersons'));
     }
 
@@ -78,7 +90,7 @@ class LeadController extends Controller
     public function view($id)
     {
         $lead = Lead::with('customerAddress', 'companyDetails', 'amcs.amcProducts')->findOrFail($id);
-        $salesPersons = Staff::where('staff_role', 'sales_person')->get();
+        $salesPersons = $this->salesPersons();
 
         return view('/crm/leads/view', compact('lead', 'salesPersons'));
     }
@@ -86,8 +98,7 @@ class LeadController extends Controller
     public function edit($id)
     {
         $lead = Lead::with('customer', 'staff', 'customerAddress', 'companyDetails')->find($id);
-        $salesPersons = Staff::where('staff_role', 'sales_person')->get();
-        // dd($lead);
+        $salesPersons = $this->salesPersons();
 
         return view('/crm/leads/edit', compact('lead', 'salesPersons'));
     }

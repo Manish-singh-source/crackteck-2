@@ -151,6 +151,7 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Marital Status',
                                                     'name' => 'marital_status',
+                                                    'value' => 'unmarried',
                                                     'options' => [
                                                         '' => '--Select--',
                                                         'married' => 'Married',
@@ -164,6 +165,7 @@
                                                 @include('components.form.select', [
                                                     'label' => 'Employment Type',
                                                     'name' => 'employment_type',
+                                                    'value' => 'full_time',
                                                     'options' => [
                                                         '' => '--Select--',
                                                         'full_time' => 'Full-time',

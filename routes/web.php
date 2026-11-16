@@ -98,42 +98,28 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('/admin/signup', 'signup')->name('signup');
     Route::post('/admin/signup', 'register')->name('register');
     Route::get('/admin/recover-password', 'recover_password')->name('recover-password');
-    Route::get('/crm/profile', 'profile')->name('profile');
-    Route::post('/crm/profile/update', 'updateProfile')->name('staff.profile.update');
-    Route::post('/crm/profile/password-update', 'updatePassword')->name('staff.password.update');
-    Route::post('/admin/logout', 'logout')->name('logout');
+    Route::middleware('auth:staff_web')->group(function () {
+        Route::get('/crm/profile', 'profile')->name('profile');
+        Route::post('/crm/profile/update', 'updateProfile')->name('staff.profile.update');
+        Route::post('/crm/profile/password-update', 'updatePassword')->name('staff.password.update');
+        Route::post('/admin/logout', 'logout')->name('logout');
+    });
 });
 
-Route::prefix('/demo')->group(function () {
+// Public Demo Error Pages
+Route::get('/demo/404', function () {
+    return view('404');
+})->name('404');
 
-    // Route::get('/', function () {
-    //     return view('login');
-    // })->name('login');
+Route::get('/demo/500', function () {
+    return view('500');
+})->name('500');
 
-    // Sign Up
-    // Route::get('/signup', function () {
-    //     return view('signup');
-    // })->name('signup');
+Route::get('/demo/503', function () {
+    return view('503');
+})->name('503');
 
-    // Recover Password
-    // Route::get('/recover-password', function () {
-    //     return view('recover-password');
-    // })->name('recover-password');
-
-    // 404
-    Route::get('/404', function () {
-        return view('404');
-    })->name('404');
-
-    // 500
-    Route::get('/500', function () {
-        return view('500');
-    })->name('500');
-
-    // 503
-    Route::get('/503', function () {
-        return view('503');
-    })->name('503');
+Route::prefix('/demo')->middleware('auth:staff_web')->group(function () {
 
     // 503
     // Route::get('/crm/profile', function () {

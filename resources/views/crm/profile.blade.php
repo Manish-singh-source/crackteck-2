@@ -93,8 +93,7 @@
                                                             <div class="col-lg-12 col-xl-12">
                                                                 <input class="form-control" type="text" 
                                                                     name="first_name"
-                                                                    value="{{ Auth::guard('staff_web')->user()->first_name }}"
-                                                                    {{ Auth::guard('staff_web')->user()->first_name ? 'readonly' : '' }}>
+                                                                    value="{{ old('first_name', Auth::guard('staff_web')->user()->first_name) }}">
                                                             </div>
                                                         </div>
 
@@ -103,8 +102,7 @@
                                                             <div class="col-lg-12 col-xl-12">
                                                                 <input class="form-control" type="text" 
                                                                     name="last_name"
-                                                                    value="{{ Auth::guard('staff_web')->user()->last_name }}"
-                                                                    {{ Auth::guard('staff_web')->user()->last_name ? 'readonly' : '' }}>
+                                                                    value="{{ old('last_name', Auth::guard('staff_web')->user()->last_name) }}">
                                                             </div>
                                                         </div>
 
@@ -116,8 +114,7 @@
                                                                     <input class="form-control" type="text" 
                                                                         name="phone"
                                                                         placeholder="Phone" 
-                                                                        value="{{ Auth::guard('staff_web')->user()->phone }}"
-                                                                        {{ Auth::guard('staff_web')->user()->phone ? 'readonly' : '' }}>
+                                                                        value="{{ old('phone', Auth::guard('staff_web')->user()->phone) }}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -129,9 +126,8 @@
                                                                     <span class="input-group-text"><i class="mdi mdi-email"></i></span>
                                                                     <input type="text" class="form-control" 
                                                                         name="email"
-                                                                        value="{{ Auth::guard('staff_web')->user()->email }}"
-                                                                        placeholder="Email" 
-                                                                        {{ Auth::guard('staff_web')->user()->email ? 'readonly' : '' }}>
+                                                                        value="{{ old('email', Auth::guard('staff_web')->user()->email) }}"
+                                                                        placeholder="Email">
                                                                 </div>
                                                             </div>
                                                         </div>

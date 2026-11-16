@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'jwt.verify' => \App\Http\Middleware\JWTMiddleware::class,
             'customer.auth' => \App\Http\Middleware\AuthenticateCustomer::class,
             'customer.guest' => \App\Http\Middleware\RedirectIfCustomer::class,
+            'crm.notifications' => \App\Http\Middleware\RecordCrmNotification::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

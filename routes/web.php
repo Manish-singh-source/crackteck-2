@@ -119,7 +119,31 @@ Route::get('/demo/503', function () {
     return view('503');
 })->name('503');
 
-Route::prefix('/demo')->middleware('auth:staff_web')->group(function () {
+// Firebase Messaging Service Worker
+Route::get('/demo/firebase-messaging-sw.js', function () {
+    $config = config('services.firebase_web');
+    abort_unless(collect($config)->only(['api_key', 'auth_domain', 'project_id', 'messaging_sender_id', 'app_id'])->every(fn ($value) => filled($value)), 404);
+
+    return response()
+        ->view('crm.firebase-messaging-sw', ['firebaseConfig' => [
+            'apiKey' => $config['api_key'],
+            'authDomain' => $config['auth_domain'],
+            'projectId' => $config['project_id'],
+            'messagingSenderId' => $config['messaging_sender_id'],
+            'appId' => $config['app_id'],
+        ]])
+        ->header('Content-Type', 'application/javascript')
+        ->header('Service-Worker-Allowed', '/demo/');
+});
+
+Route::prefix('/demo')->middleware(['auth:staff_web', 'crm.notifications'])->group(function () {
+
+    Route::prefix('/crm/notifications')->controller(\App\Http\Controllers\CrmNotificationController::class)->group(function () {
+        Route::get('/', 'index')->name('crm.notifications.index');
+        Route::post('/device-token', 'storeDeviceToken')->name('crm.notifications.device-token');
+        Route::post('/read-all', 'readAll')->name('crm.notifications.read-all');
+        Route::post('/{notification}/read', 'read')->name('crm.notifications.read');
+    });
 
     // 503
     // Route::get('/crm/profile', function () {

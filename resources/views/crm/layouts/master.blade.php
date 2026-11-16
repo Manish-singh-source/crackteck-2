@@ -170,6 +170,29 @@
 <script src="{{ asset('assets/js/pages/apexcharts-line.init.js') }}"></script>
 <!-- App js-->
 <script src="{{ asset('assets/js/app.js') }}"></script>
+@php
+    $firebaseWebConfig = [
+        'apiKey' => config('services.firebase_web.api_key'),
+        'authDomain' => config('services.firebase_web.auth_domain'),
+        'projectId' => config('services.firebase_web.project_id'),
+        'messagingSenderId' => config('services.firebase_web.messaging_sender_id'),
+        'appId' => config('services.firebase_web.app_id'),
+        'vapidKey' => config('services.firebase_web.vapid_key'),
+    ];
+@endphp
+<script>
+    window.crmNotificationConfig = {
+        endpoints: {
+            list: @json(route('crm.notifications.index')),
+            readAll: @json(route('crm.notifications.read-all')),
+            deviceToken: @json(route('crm.notifications.device-token')),
+        },
+        csrfToken: document.querySelector('meta[name="csrf-token"]')?.content,
+        firebase: @json($firebaseWebConfig),
+        serviceWorker: @json(url('/demo/firebase-messaging-sw.js')),
+    };
+</script>
+<script src="{{ asset('assets/js/crm-notifications.js') }}"></script>
 <script>
     $(document).ready(function() {
         // $(".delete-row").on("click", function() {

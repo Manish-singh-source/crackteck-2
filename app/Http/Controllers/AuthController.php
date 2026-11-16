@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileUpload;
 use App\Models\User;
 use App\Models\Staff;
 use App\Services\Fast2smsService;
@@ -177,15 +178,25 @@ class AuthController extends Controller
             'last_name' => 'required|string|max:255',
             'phone' => 'required|digits:10|unique:staff,phone,' . $staff->id,
             'email' => 'required|email|unique:staff,email,' . $staff->id,
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        // Update the staff profile
-        $staff->update([
+        $profileData = [
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'phone' => $request->phone,
             'email' => $request->email,
-        ]);
+        ];
+
+        if ($request->hasFile('avatar')) {
+            $profileData['avatar'] = FileUpload::updateFileUpload(
+                $request->file('avatar'),
+                (string) $staff->avatar,
+                'uploads/crm/staff/avatars/'
+            );
+        }
+
+        $staff->update($profileData);
 
         return redirect()->route('profile')->with('success', 'Profile updated successfully!');
     }

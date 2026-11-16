@@ -39,6 +39,7 @@ class DeviceTokenController extends Controller
                 'role_id' => $request->role_id,
                 'device_type' => $request->device_type ?? null,
                 'device_id' => $request->device_id ?? null,
+                'firebase_project_id' => config('services.firebase.project_id'),
                 'last_used_at' => now(),
             ]
         );

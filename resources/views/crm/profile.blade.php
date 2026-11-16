@@ -1,6 +1,13 @@
 @extends('crm/layouts.master')
 
 @section('content')
+@php
+    $profileStaff = Auth::guard('staff_web')->user();
+    $profileAvatar = $profileStaff?->avatar;
+    $profileAvatarUrl = $profileAvatar
+        ? (\Illuminate\Support\Str::startsWith($profileAvatar, ['http://', 'https://']) ? $profileAvatar : asset($profileAvatar))
+        : asset('assets/images/users/user-13.jpg');
+@endphp
 <div class="content">
 
     <!-- Start Content-->
@@ -26,7 +33,7 @@
 
                             <div class="hando-main-sections">
                                 <div class="hando-profile-main">
-                                    <img src="{{ Auth::guard('staff_web')->user()->avatar ?? asset('assets/images/users/user-13.jpg') }}" class="rounded-circle img-fluid avatar-xxl img-thumbnail float-start" alt="image profile">
+                                    <img src="{{ $profileAvatarUrl }}" class="rounded-circle img-fluid avatar-xxl img-thumbnail float-start" alt="Profile image">
 
                                     <span class="sil-profile_main-pic-change img-thumbnail">
                                         <i class="mdi mdi-camera text-white"></i>
@@ -86,8 +93,15 @@
                                                 </div>
 
                                                 <div class="card-body">
-                                                    <form action="{{ route('staff.profile.update') }}" method="POST">
+                                                    <form action="{{ route('staff.profile.update') }}" method="POST" enctype="multipart/form-data">
                                                         @csrf
+                                                        <div class="form-group mb-3 row">
+                                                            <label class="form-label" for="avatar">Profile Image</label>
+                                                            <div class="col-lg-12 col-xl-12">
+                                                                <input class="form-control" type="file" id="avatar" name="avatar" accept="image/jpeg,image/png,image/webp">
+                                                                <small class="text-muted">JPG, PNG or WEBP. Maximum 2 MB.</small>
+                                                            </div>
+                                                        </div>
                                                         <div class="form-group mb-3 row">
                                                             <label class="form-label">First Name</label>
                                                             <div class="col-lg-12 col-xl-12">

@@ -63,6 +63,7 @@ class CrmNotificationController extends Controller
                 'role_id' => (int) ($staff->staff_role ?? 1),
                 'device_type' => 'web',
                 'device_id' => $data['device_id'] ?? null,
+                'firebase_project_id' => config('services.firebase.project_id'),
                 'last_used_at' => now(),
             ]
         );

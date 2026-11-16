@@ -23,6 +23,7 @@ Homestead.yaml
 Thumbs.db
 /public/uploads
 /storage/app
+/storage/app/firebase/*.json
 /public/uploads
 /public/staff
 /public/storage

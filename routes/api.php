@@ -97,7 +97,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/test-fcm', [FcmTestController::class, 'send'])->middleware('throttle:60,1');
     Route::post('/test-fcm-final', [FcmTestFinalController::class, 'sendFinal'])->middleware('throttle:60,1');
 
-    Route::middleware(['throttle:60,1', 'jwt.verify'])->group(function () {
+    Route::middleware(['throttle:60,1', 'jwt.verify', 'crm.notifications'])->group(function () {
         // Staff payout requests: the authenticated staff member can submit and view only their own requests.
         Route::get('/withdrawals', [WithdrawalRequestController::class, 'index']);
         Route::post('/withdrawals', [WithdrawalRequestController::class, 'store']);

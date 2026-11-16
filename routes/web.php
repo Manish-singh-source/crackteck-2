@@ -142,6 +142,7 @@ Route::prefix('/demo')->middleware(['auth:staff_web', 'crm.notifications'])->gro
         Route::get('/', 'index')->name('crm.notifications.index');
         Route::post('/device-token', 'storeDeviceToken')->name('crm.notifications.device-token');
         Route::post('/read-all', 'readAll')->name('crm.notifications.read-all');
+        Route::delete('/', 'destroyAll')->name('crm.notifications.destroy-all');
         Route::post('/{notification}/read', 'read')->name('crm.notifications.read');
     });
 

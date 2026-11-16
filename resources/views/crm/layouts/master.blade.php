@@ -185,6 +185,7 @@
         endpoints: {
             list: @json(route('crm.notifications.index')),
             readAll: @json(route('crm.notifications.read-all')),
+            clearAll: @json(route('crm.notifications.destroy-all')),
             deviceToken: @json(route('crm.notifications.device-token')),
         },
         csrfToken: document.querySelector('meta[name="csrf-token"]')?.content,

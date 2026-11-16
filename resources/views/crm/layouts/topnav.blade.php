@@ -173,6 +173,7 @@
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-sm btn-link p-0" id="crm-enable-push">Enable alerts</button>
                                 <button type="button" class="btn btn-sm btn-link p-0" id="crm-read-all">Mark all read</button>
+                                <button type="button" class="btn btn-sm btn-link text-danger p-0" id="crm-clear-all">Clear all</button>
                             </div>
                         </div>
                         <div id="crm-notification-list" style="max-height: 360px; overflow-y: auto;">

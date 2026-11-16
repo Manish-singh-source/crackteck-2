@@ -40,6 +40,13 @@ class CrmNotificationController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function destroyAll(): JsonResponse
+    {
+        $this->staff()->notifications()->delete();
+
+        return response()->json(['success' => true]);
+    }
+
     public function storeDeviceToken(Request $request): JsonResponse
     {
         $data = $request->validate([

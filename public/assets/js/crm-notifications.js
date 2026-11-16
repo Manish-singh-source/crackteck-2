@@ -7,11 +7,12 @@
     const headers = { Accept: 'application/json', 'X-CSRF-TOKEN': config.csrfToken };
 
     const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
-    const post = (url, body = null) => fetch(url, {
-        method: 'POST',
+    const request = (url, method = 'POST', body = null) => fetch(url, {
+        method,
         headers: body ? { ...headers, 'Content-Type': 'application/json' } : headers,
         body: body ? JSON.stringify(body) : null,
     });
+    const post = (url, body = null) => request(url, 'POST', body);
 
     async function loadNotifications() {
         if (document.hidden) return;
@@ -35,6 +36,11 @@
     }
 
     document.getElementById('crm-read-all')?.addEventListener('click', async () => { await post(config.endpoints.readAll); loadNotifications(); });
+    document.getElementById('crm-clear-all')?.addEventListener('click', async () => {
+        if (!window.confirm('Remove all of your notifications?')) return;
+        await request(config.endpoints.clearAll, 'DELETE');
+        loadNotifications();
+    });
     loadNotifications();
     setInterval(loadNotifications, 30000);
     document.addEventListener('visibilitychange', loadNotifications);

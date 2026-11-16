@@ -469,7 +469,12 @@ class AllServicesController extends Controller
         }
 
         if ($staffRole == 'customers') {
-            $serviceRequests = ServiceRequest::where('customer_id', $validated['user_id'])->orderBy('created_at', 'desc')->get();
+            // Products are included so their submitted equipment images are
+            // available in the request-list response as well as the detail API.
+            $serviceRequests = ServiceRequest::with('products')
+                ->where('customer_id', $validated['user_id'])
+                ->orderBy('created_at', 'desc')
+                ->get();
 
             return response()->json(['service_requests' => $serviceRequests], 200);
         }
@@ -1351,7 +1356,10 @@ class AllServicesController extends Controller
                 return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
             }
     
-            $amcs = Amc::with('amcPlan')->withCount('amcScheduleMeetings')->where('customer_id', $validated['user_id'])->get();
+            $amcs = Amc::with(['amcPlan', 'amcProducts'])
+                ->withCount('amcScheduleMeetings')
+                ->where('customer_id', $validated['user_id'])
+                ->get();
     
             return ApiResponse::success($amcs, 'AMCs retrieved successfully.');
     }
@@ -1373,7 +1381,10 @@ class AllServicesController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid role_id provided.'], 400);
         }
 
-        $amc = Amc::with(['amcPlan', 'amcScheduleMeetings'])->where('id', $amc_id)->where('customer_id', $validated['user_id'])->first();
+        $amc = Amc::with(['amcPlan', 'amcScheduleMeetings', 'amcProducts'])
+            ->where('id', $amc_id)
+            ->where('customer_id', $validated['user_id'])
+            ->first();
 
         if (! $amc) {
             return ApiResponse::error('AMC not found or does not belong to this customer.', 404);

@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // All API JSON media values receive a companion *_url field. This is
+        // intentionally applied to every API response, including nested models.
+        $middleware->appendToGroup('api', \App\Http\Middleware\ExposeApiMediaUrls::class);
+
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,

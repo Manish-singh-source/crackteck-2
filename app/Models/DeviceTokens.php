@@ -9,6 +9,7 @@ class DeviceTokens extends Model
     //
     protected $fillable = [
         'user_id',
+        'owner_type',
         'role_id',
         'device_type',
         'fcm_token',

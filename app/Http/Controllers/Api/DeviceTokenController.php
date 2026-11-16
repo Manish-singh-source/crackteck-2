@@ -35,6 +35,7 @@ class DeviceTokenController extends Controller
             ['fcm_token' => $request->fcm_token],
             [
                 'user_id' => $user->id,
+                'owner_type' => get_class($user),
                 'role_id' => $request->role_id,
                 'device_type' => $request->device_type ?? null,
                 'device_id' => $request->device_id ?? null,

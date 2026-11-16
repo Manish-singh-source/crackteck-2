@@ -131,4 +131,9 @@ class Staff extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(StaffPoliceVerification::class);
     }
+
+    public function devices()
+    {
+        return $this->hasMany(DeviceTokens::class, 'user_id')->whereIn('role_id', [1, 2, 3]);
+    }
 }

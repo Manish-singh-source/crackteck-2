@@ -162,6 +162,25 @@
                     </div>
                 </li> --}}
 
+                <li class="dropdown notification-list topbar-dropdown">
+                    <a class="nav-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false" aria-label="Notifications">
+                        <i data-feather="bell" class="noti-icon"></i>
+                        <span id="crm-notification-badge" class="noti-icon-badge d-none"></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end dropdown-lg p-0" id="crm-notification-menu">
+                        <div class="p-2 border-bottom d-flex justify-content-between align-items-center">
+                            <h6 class="m-0">Notifications</h6>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-link p-0" id="crm-enable-push">Enable alerts</button>
+                                <button type="button" class="btn btn-sm btn-link p-0" id="crm-read-all">Mark all read</button>
+                            </div>
+                        </div>
+                        <div id="crm-notification-list" style="max-height: 360px; overflow-y: auto;">
+                            <div class="p-3 text-muted small">Loading notifications…</div>
+                        </div>
+                    </div>
+                </li>
+
                 <!-- User Dropdown -->
                 <li class="dropdown notification-list topbar-dropdown">
                     <a class="nav-link dropdown-toggle nav-user me-0" data-bs-toggle="dropdown" href="#"

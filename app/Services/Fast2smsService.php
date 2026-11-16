@@ -79,10 +79,13 @@ class Fast2smsService
             'mobile_last_four' => substr($mobile, -4),
         ]);
 
+        $rawMessage = $responseData['message'] ?? 'SMS request failed.';
+        $messageString = is_array($rawMessage) ? implode(', ', $rawMessage) : (string) $rawMessage;
+
         return [
             'success' => $response->successful() && (($responseData['return'] ?? false) === true),
             'status' => $response->status(),
-            'message' => $responseData['message'] ?? 'SMS request failed.',
+            'message' => $messageString,
             'data' => $responseData,
         ];
     }

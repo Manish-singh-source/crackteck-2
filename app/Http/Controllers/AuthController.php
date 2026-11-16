@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Staff;
+use App\Services\Fast2smsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -129,12 +131,27 @@ class AuthController extends Controller
             'otp_expiry' => $otpExpiry,
         ]);
 
-        // In production, you would send SMS here
-        // For demo, return the OTP in response
+        // Send real SMS via Fast2SMS
+        $smsService = new Fast2smsService();
+        $smsResponse = $smsService->sendOtp($staff->phone, (string) $otp);
+
+        Log::info("Staff Login OTP for {$staff->phone}: {$otp}", [
+            'sms_success' => $smsResponse['success'] ?? false,
+            'sms_message' => $smsResponse['message'] ?? '',
+        ]);
+
+        if (!($smsResponse['success'] ?? false)) {
+            Log::error("Fast2SMS OTP delivery failed for {$staff->phone}: " . ($smsResponse['message'] ?? 'Unknown error'));
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send SMS: ' . ($smsResponse['message'] ?? 'SMS gateway error. Please try again.'),
+            ], 500);
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'OTP sent successfully!',
-            'otp' => $otp, // Remove this in production
+            'message' => 'OTP sent successfully to your mobile number via SMS.',
         ]);
     }
 

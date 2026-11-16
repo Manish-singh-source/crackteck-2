@@ -153,13 +153,13 @@
                                                             <label for="otp" class="form-label">OTP (4 digit)</label>
                                                             <div class="otp-input-wrapper d-flex gap-2">
                                                                 <input type="text" class="form-control text-center otp-digit @error('otp') is-invalid @enderror"
-                                                                 id="otp1" name="otp[]" maxlength="1" pattern="[0-9]" required>
+                                                                 id="otp1" maxlength="1" pattern="[0-9]" inputmode="numeric">
                                                                 <input type="text" class="form-control text-center otp-digit @error('otp') is-invalid @enderror"
-                                                                 id="otp2" name="otp[]" maxlength="1" pattern="[0-9]" required>
+                                                                 id="otp2" maxlength="1" pattern="[0-9]" inputmode="numeric">
                                                                 <input type="text" class="form-control text-center otp-digit @error('otp') is-invalid @enderror"
-                                                                 id="otp3" name="otp[]" maxlength="1" pattern="[0-9]" required>
+                                                                 id="otp3" maxlength="1" pattern="[0-9]" inputmode="numeric">
                                                                 <input type="text" class="form-control text-center otp-digit @error('otp') is-invalid @enderror"
-                                                                 id="otp4" name="otp[]" maxlength="1" pattern="[0-9]" required>
+                                                                 id="otp4" maxlength="1" pattern="[0-9]" inputmode="numeric">
                                                             </div>
                                                             <input type="hidden" id="otp" name="otp">
                                                             @error('otp')
@@ -350,12 +350,28 @@
         });
         
         function combineOTP() {
-            const otp1 = document.getElementById('otp1').value;
-            const otp2 = document.getElementById('otp2').value;
-            const otp3 = document.getElementById('otp3').value;
-            const otp4 = document.getElementById('otp4').value;
+            const otp1 = document.getElementById('otp1')?.value || '';
+            const otp2 = document.getElementById('otp2')?.value || '';
+            const otp3 = document.getElementById('otp3')?.value || '';
+            const otp4 = document.getElementById('otp4')?.value || '';
             const combinedOTP = otp1 + otp2 + otp3 + otp4;
-            document.getElementById('otp').value = combinedOTP;
+            const otpHidden = document.getElementById('otp');
+            if (otpHidden) {
+                otpHidden.value = combinedOTP;
+            }
+            return combinedOTP;
+        }
+
+        const phoneLoginForm = document.getElementById('phoneLoginForm');
+        if (phoneLoginForm) {
+            phoneLoginForm.addEventListener('submit', function(e) {
+                const combined = combineOTP();
+                if (combined.length !== 4) {
+                    e.preventDefault();
+                    alert('Please enter a complete 4-digit OTP');
+                    return false;
+                }
+            });
         }
         
         function sendOTP() {
@@ -371,15 +387,22 @@
             sendOtpBtn.innerHTML = '<button type="button" class="btn btn-info w-100" disabled><span class="spinner-border spinner-border-sm me-1"></span> Sending...</button>';
             
             // Make AJAX request to send OTP
-            fetch('/demo/admin/send-otp', {
+            fetch("{{ route('send-otp') }}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify({ phone: phone })
             })
-            .then(response => response.json())
+            .then(async response => {
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to send OTP');
+                }
+                return data;
+            })
             .then(data => {
                 if (data.success) {
                     // Show OTP section and login button
@@ -387,8 +410,7 @@
                     document.getElementById('phoneLoginBtn').style.display = 'block';
                     document.getElementById('sendOtpBtn').style.display = 'none';
                     
-                    // Show the OTP for demo purposes
-                    alert('OTP sent! Demo OTP: ' + data.otp);
+                    alert(data.message || 'OTP sent successfully to your mobile number via SMS.');
                     
                     // Focus on first OTP input
                     setTimeout(() => {
@@ -401,7 +423,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred: ' + error.message + '. Please check console for details.');
+                alert(error.message || 'An error occurred. Please check console for details.');
                 sendOtpBtn.innerHTML = '<button type="button" class="btn btn-info w-100" onclick="sendOTP()"><i class="mdi mdi-send me-1"></i> Send OTP</button>';
             });
         }

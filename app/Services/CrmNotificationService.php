@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Jobs\SendFcmNotification;
 use App\Models\Staff;
 use App\Notifications\CrmActivityNotification;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class CrmNotificationService
@@ -20,15 +19,10 @@ class CrmNotificationService
         $label = $this->labelFor($routeName);
         $actorName = trim(($actor?->first_name ?? '').' '.($actor?->last_name ?? '')) ?: 'A CRM user';
         $recipients = Staff::query()
-            ->when($actor, fn ($query) => $query->whereKeyNot($actor->getKey()))
             ->where(function ($query) {
                 $query->whereNull('status')->orWhereNotIn('status', ['inactive', 'Inactive', 'deleted']);
             })
             ->get();
-
-        if ($recipients->isEmpty() && $actor) {
-            $recipients = collect([$actor]);
-        }
 
         if ($recipients->isEmpty()) {
             return;

@@ -18,7 +18,19 @@ class FirebaseFcmService
     public function __construct()
     {
         $this->projectId = (string) config('services.firebase.project_id');
-        $this->credentialsPath = (string) config('services.firebase.credentials');
+        $credentials = (string) config('services.firebase.credentials');
+
+        if ($credentials !== '' && ! file_exists($credentials)) {
+            if (file_exists(base_path($credentials))) {
+                $credentials = base_path($credentials);
+            } elseif (file_exists(storage_path('app/firebase/service-account.json'))) {
+                $credentials = storage_path('app/firebase/service-account.json');
+            }
+        } elseif ($credentials === '' && file_exists(storage_path('app/firebase/service-account.json'))) {
+            $credentials = storage_path('app/firebase/service-account.json');
+        }
+
+        $this->credentialsPath = $credentials;
 
         if ($this->projectId === '') {
             throw new RuntimeException('FIREBASE_PROJECT_ID is not configured.');
@@ -69,6 +81,24 @@ class FirebaseFcmService
                 'notification' => [
                     'title' => $title,
                     'body' => $body,
+                ],
+                'android' => [
+                    'priority' => 'high',
+                    'notification' => [
+                        'sound' => 'default',
+                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                    ],
+                ],
+                'apns' => [
+                    'headers' => [
+                        'apns-priority' => '10',
+                    ],
+                    'payload' => [
+                        'aps' => [
+                            'sound' => 'default',
+                            'badge' => 1,
+                        ],
+                    ],
                 ],
                 'data' => collect($data)
                     ->map(fn ($value) => is_scalar($value) || $value === null ? (string) $value : json_encode($value))

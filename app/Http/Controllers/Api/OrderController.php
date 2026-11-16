@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendFcmNotification;
 use App\Models\Brand;
 use App\Models\Coupon;
 use App\Models\Customer;
@@ -222,14 +223,14 @@ class OrderController extends Controller
                 'processed_at' => now(),
             ]);
 
-            // if ($customer->devices()->first()?->fcm_token) {
-            //     // send push notification 
-            //     $fcm->sendToToken(
-            //         $customer->devices()->first()->fcm_token,
-            //         'Order Placed',
-            //         'Hi, Your order has been placed successfully.'
-            //     );
-            // }
+            // Send push notification to customer's devices
+            SendFcmNotification::dispatch(
+                [$customer->id],
+                'Order Placed',
+                'Hi, Your order #' . $order->order_number . ' has been placed successfully.',
+                ['order_id' => (string) $order->id, 'type' => 'order_placed'],
+                Customer::class
+            );
 
             $customer->notify(new NewOrderNotification([
                 'id' => $order->id,

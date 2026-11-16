@@ -96,6 +96,12 @@ class Customer extends Authenticatable implements JWTSubject
 
     public function devices()
     {
-        return $this->hasMany(DeviceTokens::class, 'user_id');
+        return $this->hasMany(DeviceTokens::class, 'user_id')
+            ->where(function ($query) {
+                $query->where('owner_type', self::class)
+                    ->orWhere(function ($legacy) {
+                        $legacy->whereNull('owner_type')->where('role_id', 4);
+                    });
+            });
     }
 }

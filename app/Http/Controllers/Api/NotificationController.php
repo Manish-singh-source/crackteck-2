@@ -31,7 +31,65 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'notifications' => $user->notifications,
+            'notifications' => $user ? $user->notifications : [],
+        ]);
+    }
+
+    public function markAsRead(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'user_id' => ['required', 'integer'],
+            'role_id' => ['required', 'in:1,2,3,4'],
+            'notification_id' => ['required', 'string'],
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $user = $request->role_id == '4'
+            ? Customer::find($request->user_id)
+            : Staff::find($request->user_id);
+
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+        }
+
+        $notification = $user->notifications()->where('id', $request->notification_id)->first();
+        if ($notification) {
+            $notification->markAsRead();
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notification marked as read.',
+        ]);
+    }
+
+    public function markAllAsRead(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'user_id' => ['required', 'integer'],
+            'role_id' => ['required', 'in:1,2,3,4'],
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
+        }
+
+        $user = $request->role_id == '4'
+            ? Customer::find($request->user_id)
+            : Staff::find($request->user_id);
+
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+        }
+
+        $user->unreadNotifications->markAsRead();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'All notifications marked as read.',
         ]);
     }
 }

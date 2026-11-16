@@ -175,6 +175,8 @@ Route::prefix('v1')->group(function () {
 
         // Notifications
         Route::get('/notifications', [NotificationController::class, 'getNotifications']);
+        Route::post('/notifications/mark-read', [NotificationController::class, 'markAsRead']);
+        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
 
         Route::post('/device-token', [DeviceTokenController::class, 'store']);
         Route::delete('/device-token', [DeviceTokenController::class, 'destroy']);

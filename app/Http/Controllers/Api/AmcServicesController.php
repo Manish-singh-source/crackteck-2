@@ -29,6 +29,9 @@ class AmcServicesController extends Controller
             ->get()
             ->map(function (CoveredItem $item) {
                 $item->image_url = ApiMediaUrl::make($item->image);
+                // Explicit name for mobile clients: this image belongs to
+                // this particular covered service.
+                $item->service_image_url = $item->image_url;
 
                 return $item;
             })

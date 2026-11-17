@@ -174,6 +174,7 @@ class FieldEngineerController extends Controller
                 ->get()
                 ->map(function (CoveredItem $item) {
                     $item->image_url = ApiMediaUrl::make($item->image);
+                    $item->service_image_url = $item->image_url;
 
                     return $item;
                 })
@@ -209,6 +210,7 @@ class FieldEngineerController extends Controller
                 ->get()
                 ->map(function (CoveredItem $item) {
                     $item->image_url = ApiMediaUrl::make($item->image);
+                    $item->service_image_url = $item->image_url;
 
                     return $item;
                 })

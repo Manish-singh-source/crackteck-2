@@ -2102,7 +2102,8 @@ class ServiceRequestController extends Controller
             'email' => 'required|email',
             'products' => 'required|array',
             'products.*.product_name' => 'required|string',
-            // Add other validations as needed
+            'products.*.product_type' => 'required|string',
+            'products.*.product_brand' => 'required|string',
         ]);
 
         // 1. Check if customer exists
@@ -2177,8 +2178,8 @@ class ServiceRequestController extends Controller
                 ServiceRequestProduct::create([
                     'service_requests_id' => $serviceRequest->id,
                     'name' => $product['product_name'],
-                    'type' => $product['product_type'],
-                    'brand' => $product['product_brand'],
+                    'type' => $product['product_type'] ?? null,
+                    'brand' => $product['product_brand'] ?? null,
                     'model_no' => $product['model_no'] ?? null,
                     'hsn' => $product['hsn'] ?? null,
                     'purchase_date' => $product['purchase_date'] ?? null,

@@ -31,6 +31,7 @@ class StoreStaffRequest extends FormRequest
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|unique:staff,email',
+            'password' => 'required|string|min:8|confirmed',
             'dob' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',
             'marital_status' => 'nullable|in:married,unmarried,divorced',

@@ -1157,7 +1157,9 @@ class ApiAuthController extends Controller
         if ($staffRole == 'customers') {
             $user = Customer::where('email', $request->email)->first();
         } else {
-            $user = Staff::where('email', $request->email)->where('staff_role', $staffRole)->first();
+            $user = Staff::where('email', $request->email)
+                ->whereIn('staff_role', $this->staffRoleAliases($staffRole))
+                ->first();
         }
 
         if (!$user) {

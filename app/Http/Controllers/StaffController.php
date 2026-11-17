@@ -14,6 +14,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Rappasoft\LaravelAuthenticationLog\Models\AuthenticationLog;
@@ -60,6 +61,7 @@ class StaffController extends Controller
                     'last_name' => $validated['last_name'] ?? null,
                     'phone' => $validated['phone'],
                     'email' => $validated['email'],
+                    'password' => Hash::make($validated['password']),
                     'dob' => $validated['dob'] ?? null,
                     'gender' => $validated['gender'] ?? null,
                     'marital_status' => $validated['marital_status'] ?? 'unmarried',

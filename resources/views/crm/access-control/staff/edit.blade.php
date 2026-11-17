@@ -136,6 +136,27 @@
                                                 ])
                                             </div>
 
+                                             <div class="col-6">
+                                                 @include('components.form.input', [
+                                                     'label' => 'New Password',
+                                                     'name' => 'password',
+                                                     'type' => 'password',
+                                                     'placeholder' => 'Leave blank to keep current password',
+                                                     'attributes' => 'autocomplete="new-password"',
+                                                 ])
+                                                 <small class="text-muted">Enter a new password only when it needs to be changed.</small>
+                                             </div>
+
+                                             <div class="col-6">
+                                                 @include('components.form.input', [
+                                                     'label' => 'Confirm New Password',
+                                                     'name' => 'password_confirmation',
+                                                     'type' => 'password',
+                                                     'placeholder' => 'Re-enter new password',
+                                                     'attributes' => 'autocomplete="new-password"',
+                                                 ])
+                                             </div>
+
                                             <div class="col-6">
                                                 @include('components.form.input', [
                                                     'label' => 'Date of Birth',

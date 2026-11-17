@@ -315,6 +315,7 @@ class StaffController extends Controller
             'last_name' => 'nullable|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|unique:staff,email,' . $id . ',id',
+            'password' => 'nullable|string|min:8|confirmed',
             'dob' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',
             'marital_status' => 'nullable|in:unmarried,married,divorced',
@@ -395,6 +396,13 @@ class StaffController extends Controller
                     'assigned_area' => $request->assigned_area ?? null,
                     'status' => $request->status ?? 'pending',
                 ]);
+
+                // Leave password unchanged unless an administrator enters a new one.
+                if ($request->filled('password')) {
+                    $staff->update([
+                        'password' => Hash::make($request->password),
+                    ]);
+                }
 
                 // 2. Address
                 $staff->address()->updateOrCreate([], [

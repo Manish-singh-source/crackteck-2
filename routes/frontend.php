@@ -29,10 +29,10 @@ Route::prefix('/website')->group(function () {
     // Social Login Routes (using Auth\SocialController for customer login)
     Route::get('/auth/redirect/{provider}', [SocialController::class, 'redirectToProvider'])
         ->where('provider', 'google|facebook|github')
-        ->name('auth.redirect');
+        ->name('frontend.auth.redirect');
     Route::get('/auth/callback/{provider}', [SocialController::class, 'handleProviderCallback'])
         ->where('provider', 'google|facebook|github')
-        ->name('auth.callback');
+        ->name('frontend.auth.callback');
 
     // Phone OTP Login Route
     Route::post('/login/phone', [FrontendAuthController::class, 'loginWithPhone'])->name('frontend.login.phone');

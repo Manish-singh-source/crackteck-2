@@ -382,7 +382,12 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div>
-                                                <img src="{{ $product->images ? (is_array($product->images) ? ($product->images[0] ?? 'https://placehold.co/100x100') : (json_decode($product->images, true)[0] ?? 'https://placehold.co/100x100')) : 'https://placehold.co/100x100' }}" alt="{{ $product->name }}" width="100px" class="img-fluid d-block">
+                                                @php
+                                                    $productImage = is_array($product->images)
+                                                        ? ($product->images[0] ?? null)
+                                                        : $product->images;
+                                                @endphp
+                                                <img src="{{ $productImage ? \App\Support\ApiMediaUrl::make($productImage) : 'https://placehold.co/100x100' }}" alt="{{ $product->name }}" width="100px" class="img-fluid d-block">
                                             </div>
                                         </div>
                                     </td>

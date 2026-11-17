@@ -37,7 +37,15 @@ class ApiMediaUrl
             'service-request-images/',
             'ecommerce/',
         ])) {
-            return url(Storage::disk('public')->url($path));
+            $storageUrl = Storage::disk('public')->url($path);
+
+            // APP_URL is sometimes configured with a trailing slash. Avoid
+            // returning https://example.com//storage/file.jpg.
+            $storageUrl = preg_replace('#(?<!:)/{2,}#', '/', $storageUrl);
+
+            return Str::startsWith($storageUrl, ['http://', 'https://'])
+                ? $storageUrl
+                : url($storageUrl);
         }
 
         if (Str::startsWith($path, 'storage/')) {

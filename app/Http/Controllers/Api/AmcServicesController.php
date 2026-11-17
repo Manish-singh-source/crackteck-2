@@ -5,11 +5,36 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AmcPlan;
 use App\Models\CoveredItem;
+use App\Support\ApiMediaUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class AmcServicesController extends Controller
 {
+    protected function addPlanMediaUrls(AmcPlan $plan): AmcPlan
+    {
+        // AMC plans currently store a brochure, not a separate image column.
+        $plan->brochure_url = ApiMediaUrl::make($plan->brochure);
+
+        return $plan;
+    }
+
+    /**
+     * Return covered items with a client-ready absolute image URL.
+     * The database keeps the relative public path in `image`.
+     */
+    protected function coveredItemsForPlan(AmcPlan $plan)
+    {
+        return CoveredItem::whereIn('id', $plan->covered_items ?? [])
+            ->get()
+            ->map(function (CoveredItem $item) {
+                $item->image_url = ApiMediaUrl::make($item->image);
+
+                return $item;
+            })
+            ->values();
+    }
+
     //
     protected function getRoleId($roleId)
     {
@@ -44,10 +69,9 @@ class AmcServicesController extends Controller
             $amcPlans = AmcPlan::where('status', 'active')->get();
             $amcPlansCoveredItems = [];
             foreach ($amcPlans as $plan) {
-                $detail = CoveredItem::whereIn('id', $plan->covered_items)->get();
                 $amcPlansCoveredItems[] = [
-                    'plan' => $plan,
-                    'covered_items' => $detail ?? [],
+                    'plan' => $this->addPlanMediaUrls($plan),
+                    'covered_items' => $this->coveredItemsForPlan($plan),
                 ];
             }
 
@@ -80,8 +104,8 @@ class AmcServicesController extends Controller
         }
 
         $data = [
-            'amc_plan' => $amcPlan,
-            'covered_items' => CoveredItem::whereIn('id', $amcPlan->covered_items)->get(),
+            'amc_plan' => $this->addPlanMediaUrls($amcPlan),
+            'covered_items' => $this->coveredItemsForPlan($amcPlan),
         ];
 
         return response()->json(['data' => $data], 200);

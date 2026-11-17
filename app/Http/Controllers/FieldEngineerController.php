@@ -17,6 +17,7 @@ use App\Models\ServiceRequestQuotation;
 use App\Models\Staff;
 use App\Models\StockInHandProduct;
 use App\Services\Fast2smsService;
+use App\Support\ApiMediaUrl;
 use Barryvdh\DomPDF\Facade\PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -153,7 +154,7 @@ class FieldEngineerController extends Controller
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
-        $serviceRequests = ServiceRequest::with(['customer', 'products'])
+        $serviceRequests = ServiceRequest::with(['customer', 'products', 'amcPlan'])
             ->whereHas('activeAssignment', function ($query) use ($request) {
                 $query->where('engineer_id', $request->user_id);
             })
@@ -161,6 +162,23 @@ class FieldEngineerController extends Controller
             ->where('is_engineer_assigned', 'assigned')
             ->orderBy('created_at', 'desc')
             ->get();
+
+        $serviceRequests->each(function (ServiceRequest $serviceRequest) {
+            if (! $serviceRequest->amcPlan) {
+                return;
+            }
+
+            $plan = $serviceRequest->amcPlan;
+            $plan->brochure_url = ApiMediaUrl::make($plan->brochure);
+            $plan->covered_items_details = CoveredItem::whereIn('id', $plan->covered_items ?? [])
+                ->get()
+                ->map(function (CoveredItem $item) {
+                    $item->image_url = ApiMediaUrl::make($item->image);
+
+                    return $item;
+                })
+                ->values();
+        });
 
         return response()->json(['serviceRequests' => $serviceRequests], 200);
     }
@@ -181,7 +199,21 @@ class FieldEngineerController extends Controller
             'customerAddress',
             'customerCompany',
             'products',
+            'amcPlan',
         ])->findOrFail($id);
+
+        if ($serviceRequest->amcPlan) {
+            $plan = $serviceRequest->amcPlan;
+            $plan->brochure_url = ApiMediaUrl::make($plan->brochure);
+            $plan->covered_items_details = CoveredItem::whereIn('id', $plan->covered_items ?? [])
+                ->get()
+                ->map(function (CoveredItem $item) {
+                    $item->image_url = ApiMediaUrl::make($item->image);
+
+                    return $item;
+                })
+                ->values();
+        }
 
         // Get active assignment
         $activeAssignment = AssignedEngineer::with(['engineer'])

@@ -28,6 +28,25 @@ use Rappasoft\LaravelAuthenticationLog\Models\AuthenticationLog;
 
 class FieldEngineerController extends Controller
 {
+    protected function attachCoveredItemMedia(ServiceRequest $serviceRequest): void
+    {
+        $serviceRequest->products?->each(function (ServiceRequestProduct $product) {
+            $coveredItem = $product->itemCode;
+
+            if (! $coveredItem) {
+                return;
+            }
+
+            $coveredItem->image_url = ApiMediaUrl::make($coveredItem->image);
+            $coveredItem->service_image_url = $coveredItem->image_url;
+
+            // Keep the image directly on the product for easy Flutter access,
+            // while also exposing the complete covered item.
+            $product->service_image_url = $coveredItem->image_url;
+            $product->covered_item = $coveredItem;
+        });
+    }
+
     protected function getRoleId($roleId)
     {
         return [
@@ -154,7 +173,7 @@ class FieldEngineerController extends Controller
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $validated->errors()], 422);
         }
 
-        $serviceRequests = ServiceRequest::with(['customer', 'products', 'amcPlan'])
+        $serviceRequests = ServiceRequest::with(['customer', 'products.itemCode', 'amcPlan'])
             ->whereHas('activeAssignment', function ($query) use ($request) {
                 $query->where('engineer_id', $request->user_id);
             })
@@ -164,6 +183,8 @@ class FieldEngineerController extends Controller
             ->get();
 
         $serviceRequests->each(function (ServiceRequest $serviceRequest) {
+            $this->attachCoveredItemMedia($serviceRequest);
+
             if (! $serviceRequest->amcPlan) {
                 return;
             }
@@ -199,9 +220,11 @@ class FieldEngineerController extends Controller
             'customer',
             'customerAddress',
             'customerCompany',
-            'products',
+            'products.itemCode',
             'amcPlan',
         ])->findOrFail($id);
+
+        $this->attachCoveredItemMedia($serviceRequest);
 
         if ($serviceRequest->amcPlan) {
             $plan = $serviceRequest->amcPlan;

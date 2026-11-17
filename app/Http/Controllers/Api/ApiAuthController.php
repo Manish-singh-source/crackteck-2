@@ -70,8 +70,10 @@ class ApiAuthController extends Controller
 
     public function sendDltSms($phoneNumbers, $templateId, $variablesValues)
     {
-        $apiKey = env('FAST2SMS_API_KEY');
-        $senderId = env('FAST2SMS_SENDER_ID');
+        // Read production values through config so they remain available after
+        // `php artisan config:cache`.
+        $apiKey = config('services.fast2sms.api_key');
+        $senderId = config('services.fast2sms.sender_id');
 
         $payload = [
             'route' => 'dlt',
@@ -874,7 +876,7 @@ class ApiAuthController extends Controller
             // Send OTP via Fast2SMS DLT
             // Template ID from .env (191040) - DLT approved template
             // Template message: "Your OTP is {#var#}. Valid for 5 minutes. - CRCTK"
-            $templateId = env('FAST2SMS_TEMPLATE_ID'); // 191040
+            $templateId = config('services.fast2sms.template_id');
 
             $success = $this->sendDltSms(
                 $user->phone,           // Phone number

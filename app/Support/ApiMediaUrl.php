@@ -28,8 +28,15 @@ class ApiMediaUrl
         $path = ltrim($path, '/');
 
         // Files written with $file->store(..., 'public') are exposed through
-        // the public storage symlink, not directly from public/.
-        if (Str::startsWith($path, ['diagnosis_photos/', 'kyc_documents/'])) {
+        // the public storage symlink, not directly from public/. This includes
+        // service-request product photos. Returning the raw path here creates
+        // URLs such as /service-request-images/foo.jpg, which do not exist.
+        if (Str::startsWith($path, [
+            'diagnosis_photos/',
+            'kyc_documents/',
+            'service-request-images/',
+            'ecommerce/',
+        ])) {
             return url(Storage::disk('public')->url($path));
         }
 

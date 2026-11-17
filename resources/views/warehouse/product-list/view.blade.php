@@ -220,10 +220,27 @@
                                                 <td>{{ $serial->auto_generated_serial ?? 'N/A'}}</td>
                                                 <td>{{ $serial->manual_serial ?? 'N/A' }}</td>
                                                 <td>
-                                                    <img src="{{ asset($serial->barcode_url) }}"
-                                                        alt="Barcode" width="200">
+                                                    @if ($serial->barcode_url)
+                                                        <img src="{{ asset($serial->barcode_url) }}"
+                                                            alt="Barcode for {{ $serial->final_serial }}" width="200">
+                                                        <div class="d-flex flex-wrap gap-1 mt-2">
+                                                            <button type="button" class="btn btn-sm btn-outline-primary print-barcode-btn"
+                                                                data-barcode-url="{{ asset($serial->barcode_url) }}"
+                                                                data-serial-number="{{ $serial->final_serial }}"
+                                                                data-product-name="{{ $product->product_name }}">
+                                                                <i class="mdi mdi-printer me-1"></i>Print
+                                                            </button>
+                                                            <a href="{{ asset($serial->barcode_url) }}" class="btn btn-sm btn-outline-secondary"
+                                                                download="barcode-{{ $serial->final_serial }}.png">
+                                                                <i class="mdi mdi-download me-1"></i>Download
+                                                            </a>
+                                                        </div>
+                                                    @else
+                                                        <span class="text-muted">Barcode unavailable</span>
+                                                    @endif
                                                 </td>
                                                 <td>
+                                                    <div class="d-flex flex-wrap gap-2">
                                                     {{-- Edit button --}}
                                                     <button type="button" class="btn btn-sm btn-warning edit-serial-btn"
                                                         data-serial-id="{{ $serial->id }}">
@@ -235,6 +252,7 @@
                                                         data-serial-number="{{ $serial->auto_generated_serial }}">
                                                         <i class="mdi mdi-recycle"></i>
                                                     </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @empty
@@ -893,6 +911,39 @@
                     const serialId = this.getAttribute('data-serial-id');
                     const serialNumber = this.getAttribute('data-serial-number');
                     scrapSerial(serialNumber, serialId);
+                });
+            });
+
+            // Print one barcode label at a time, without the rest of the page.
+            document.querySelectorAll('.print-barcode-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const printWindow = window.open('', '_blank', 'width=500,height=400');
+
+                    if (!printWindow) {
+                        showAlert('error', 'Please allow pop-ups to print the barcode.');
+                        return;
+                    }
+
+                    const documentToPrint = printWindow.document;
+                    documentToPrint.title = `Barcode - ${this.dataset.serialNumber}`;
+                    documentToPrint.head.innerHTML = '<style>body{font-family:Arial,sans-serif;text-align:center;margin:30px}.barcode{max-width:100%;height:auto}.serial{font-size:16px;font-weight:700;margin:12px 0 0}.product{font-size:14px;margin:0 0 12px;color:#555}@media print{body{margin:0}}</style>';
+
+                    const productName = documentToPrint.createElement('p');
+                    productName.className = 'product';
+                    productName.textContent = this.dataset.productName;
+                    const barcode = documentToPrint.createElement('img');
+                    barcode.className = 'barcode';
+                    barcode.src = this.dataset.barcodeUrl;
+                    barcode.alt = `Barcode for ${this.dataset.serialNumber}`;
+                    const serialNumber = documentToPrint.createElement('p');
+                    serialNumber.className = 'serial';
+                    serialNumber.textContent = this.dataset.serialNumber;
+
+                    documentToPrint.body.append(productName, barcode, serialNumber);
+                    barcode.addEventListener('load', () => {
+                        printWindow.focus();
+                        printWindow.print();
+                    });
                 });
             });
 

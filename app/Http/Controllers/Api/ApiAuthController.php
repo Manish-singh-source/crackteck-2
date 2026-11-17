@@ -85,7 +85,14 @@ class ApiAuthController extends Controller
         try {
             $response = Http::withHeaders([
                 'authorization' => $apiKey,
-            ])->asForm()->post('https://www.fast2sms.com/dev/bulkV2', $payload);
+                'accept' => 'application/json',
+            ])
+                // Never let an unavailable SMS provider hold the API request
+                // open until the mobile client times out.
+                ->connectTimeout(5)
+                ->timeout(15)
+                ->asForm()
+                ->post('https://www.fast2sms.com/dev/bulkV2', $payload);
 
             // Log the response for debugging
             Log::info('Fast2SMS Response', [
@@ -107,7 +114,10 @@ class ApiAuthController extends Controller
 
             return false;
         } catch (\Exception $e) {
-            Log::error('Fast2SMS Exception: ' . $e->getMessage());
+            Log::error('Fast2SMS Exception while sending login OTP', [
+                'message' => $e->getMessage(),
+                'phone_last_four' => substr((string) $phoneNumbers, -4),
+            ]);
 
             return false;
         }

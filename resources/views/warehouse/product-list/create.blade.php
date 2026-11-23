@@ -59,10 +59,10 @@
 
                                             <div class="col-xl-6 col-lg-6">
                                                 <div>
-                                                    <label for="vendor_purchase_order_id" class="form-label">Vendor PO Number <span class="text-danger">*</span></label>
-                                                    <select name="vendor_purchase_order_id" id="vendor_purchase_order_id" required
+                                                    <label for="vendor_purchase_order_id" class="form-label">Vendor Invoice Number <span class="text-danger">*</span></label>
+                                                    <select name="vendor_purchase_order_id" id="vendor_purchase_order_id"
                                                         class="form-select @error('vendor_purchase_order_id') is-invalid @enderror"
-                                                        data-old-value="{{ old('vendor_purchase_order_id') }}">
+                                                        data-old-value="{{ old('vendor_purchase_order_id') }}" required>
                                                         <option value="">--Select--</option>
                                                     </select>
                                                     @error('vendor_purchase_order_id')
@@ -199,7 +199,7 @@
                                             <div class="col-12 mb-3">
                                                 <div>
                                                     <label for="short_description" class="form-label">Short
-                                                        Description <span class="text-danger">*</span></label>
+                                                        Description</label>
                                                     <div id="short-description-editor" style="height: 200px;"></div>
                                                     <input type="hidden" name="short_description" id="short_description"
                                                         value="{{ old('short_description') }}">
@@ -366,7 +366,6 @@
                                             @include('components.form.input', [
                                                 'label' => 'Main Product Image',
                                                 'name' => 'main_product_image',
-                                                'required' => true,
                                                 'type' => 'file',
                                                 'placeholder' => 'Upload Main Product Image',
                                                 'accept' => 'image/*',

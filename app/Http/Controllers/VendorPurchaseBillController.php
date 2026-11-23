@@ -18,7 +18,7 @@ class VendorPurchaseBillController extends Controller
      */
     public function index(Request $request)
     {
-        $vendorPurchaseBills = VendorPurchaseOrder::query();
+        $vendorPurchaseBills = VendorPurchaseOrder::with('vendor');
 
         if (request()->has('po_status') && request('po_status') !== 'all') {
             $vendorPurchaseBills->where('po_status', request('po_status'));
@@ -60,12 +60,12 @@ class VendorPurchaseBillController extends Controller
 
             return redirect()
                 ->route('vendor.index')
-                ->with('success', 'Vendor Purchase Bill created successfully.');
+                ->with('success', 'Vendor Invoice created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
 
             return back()
-                ->with('error', 'Failed to create vendor purchase bill.')
+                ->with('error', 'Failed to create vendor invoice.')
                 ->withInput();
         }
     }
@@ -128,12 +128,12 @@ class VendorPurchaseBillController extends Controller
 
             return redirect()
                 ->route('vendor.index')
-                ->with('success', 'Vendor Purchase Bill updated successfully.');
+                ->with('success', 'Vendor Invoice updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
 
             return back()
-                ->with('error', 'Failed to update vendor purchase bill.')
+                ->with('error', 'Failed to update vendor invoice.')
                 ->withInput();
         }
     }
@@ -162,6 +162,6 @@ class VendorPurchaseBillController extends Controller
             return redirect()->route('vendor.index')->with('error', 'Failed to delete vendor purchase bill. Please try again.');
         }
 
-        return redirect()->route('vendor.index')->with('success', 'Vendor Purchase Bill deleted successfully.');
+        return redirect()->route('vendor.index')->with('success', 'Vendor Invoice deleted successfully.');
     }
 }

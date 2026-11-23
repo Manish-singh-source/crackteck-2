@@ -177,14 +177,27 @@
                     <!-- Product Serial Numbers -->
                     <div class="card">
                         <div class="card-header border-bottom-dashed">
-                            <h5 class="card-title mb-0">Product Serial Numbers</h5>
-                            <p class="text-muted mb-0">Each product item with unique serial number</p>
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div>
+                                    <h5 class="card-title mb-0">Product Serial Numbers</h5>
+                                    <p class="text-muted mb-0">Each product item with unique serial number</p>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" id="print-selected-barcodes">
+                                        <i class="mdi mdi-printer me-1"></i>Print Selected
+                                    </button>
+                                    <a href="{{ route('product-list.print-barcodes', $product->id) }}" target="_blank" class="btn btn-primary btn-sm">
+                                        <i class="mdi mdi-printer me-1"></i>Print All
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-striped table-hover">
                                     <thead class="table-light">
                                         <tr>
+                                            <th><input type="checkbox" id="select-all-barcodes" aria-label="Select all barcodes"></th>
                                             <th>SR No</th>
                                             <th>Product Name</th>
                                             <th>Auto Generated Serial</th>
@@ -196,6 +209,7 @@
                                     <tbody>
                                         @forelse($product->productSerials as $index => $serial)
                                             <tr id="serial-row-{{ $serial->id }}">
+                                                <td><input type="checkbox" class="barcode-selection" value="{{ $serial->id }}" aria-label="Select {{ $serial->final_serial }}"></td>
                                                 <td>
                                                     <span>{{ $index + 1 }}</span>
                                                 </td>
@@ -1190,6 +1204,27 @@
                     }
                 }
             });
+        });
+
+        const selectAllBarcodes = document.getElementById('select-all-barcodes');
+        const barcodeSelections = document.querySelectorAll('.barcode-selection');
+        const printSelectedBarcodes = document.getElementById('print-selected-barcodes');
+
+        selectAllBarcodes?.addEventListener('change', function() {
+            barcodeSelections.forEach((checkbox) => checkbox.checked = this.checked);
+        });
+
+        printSelectedBarcodes?.addEventListener('click', function() {
+            const selectedIds = Array.from(barcodeSelections)
+                .filter((checkbox) => checkbox.checked)
+                .map((checkbox) => `serial_ids[]=${encodeURIComponent(checkbox.value)}`);
+
+            if (!selectedIds.length) {
+                alert('Select at least one barcode to print.');
+                return;
+            }
+
+            window.open('{{ route('product-list.print-barcodes', $product->id) }}?' + selectedIds.join('&'), '_blank');
         });
     </script>
 @endsection

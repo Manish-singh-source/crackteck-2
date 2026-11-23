@@ -7,7 +7,7 @@
         <div class="container-fluid">
             <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
                 <div class="flex-grow-1">
-                    <h4 class="fs-18 fw-semibold m-0">Vendor Purchase Bills</h4>
+                    <h4 class="fs-18 fw-semibold m-0">Vendor Invoices</h4>
                 </div>
                 <div>
                     <a href="{{ route('vendor.create') }}" class="btn btn-primary">Add Vendor Bill</a>
@@ -116,13 +116,13 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>Vendor Name</th>
-                                                                <th>PO Number</th>
+                                                                <th>PO Number (Optional)</th>
                                                                 <th>Invoice Number</th>
                                                                 <th>Purchase Date</th>
-                                                                <th>Po Amount</th>
-                                                                <th>PO Amount Paid</th>
-                                                                <th>PO Amount Pending</th>
-                                                                <th>Payment Status</th>
+                                                                <th>Invoice Amount</th>
+                                                                <th>Invoice Amount Paid</th>
+                                                                <th>Invoice Amount Pending</th>
+                                                                <th>Invoice Status</th>
                                                                 <th>Action</th>
 
                                                             </tr>
@@ -178,7 +178,7 @@
                                                                         <form
                                                                             action="{{ route('vendor.destroy', $bill->id) }}"
                                                                             method="POST" style="display: inline;"
-                                                                            onsubmit="return confirm('Are you sure you want to delete this vendor purchase bill?')">
+                                                                            onsubmit="return confirm('Are you sure you want to delete this vendor invoice?')">
                                                                             @csrf
                                                                             @method('DELETE')
                                                                             <button type="submit" aria-label="anchor"
@@ -194,7 +194,7 @@
                                                             @empty
                                                                 <tr>
                                                                     <td colspan="9" class="text-center">No vendor
-                                                                        purchase bills found.</td>
+                                                                        invoices found.</td>
                                                                 </tr>
                                                             @endforelse
                                                         </tbody>

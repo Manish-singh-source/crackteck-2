@@ -7,7 +7,7 @@
         <div class="container-fluid">
             <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
                 <div class="flex-grow-1">
-                    <h4 class="fs-18 fw-semibold m-0">Create Vendor Purchase Bills</h4>
+                    <h4 class="fs-18 fw-semibold m-0">Create Vendor Invoice</h4>
                 </div>
             </div>
 
@@ -15,7 +15,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">Vendor Purchase Details</h5>
+                            <h5 class="card-title mb-0">Vendor Invoice Details</h5>
                         </div>
                         <div class="card-body">
                             @if ($errors->any())
@@ -37,13 +37,14 @@
                                         @include('components.form.select', [
                                             'label' => 'Vendor Name',
                                             'name' => 'vendor_id',
+                                            'required' => true,
                                             'options' => $vendors->pluck('first_name', 'id')->prepend('--Select Vendor--', 0),
                                         ])
                                     </div>
 
                                     <div class="col-4">
                                         @include('components.form.input', [
-                                            'label' => 'PO Number',
+                                            'label' => 'PO Number (Optional)',
                                             'name' => 'po_number',
                                             'type' => 'text',
                                             'placeholder' => 'Enter PO Number',
@@ -54,6 +55,7 @@
                                         @include('components.form.input', [
                                             'label' => 'Invoice Number',
                                             'name' => 'invoice_number',
+                                            'required' => true,
                                             'type' => 'text',   
                                             'placeholder' => 'Enter Invoice Number',
                                         ])
@@ -79,28 +81,28 @@
 
                                     <div class="col-4">     
                                         @include('components.form.input', [
-                                            'label' => 'PO Amount Due Date',
+                                            'label' => 'Invoice Due Date',
                                             'name' => 'po_amount_due_date',
                                             'type' => 'date',
-                                            'placeholder' => 'Enter PO Amount Due Date',
+                                            'placeholder' => 'Enter Invoice Due Date',
                                         ])
                                     </div>  
 
                                     <div class="col-4">     
                                         @include('components.form.input', [
-                                            'label' => 'PO Amount',
+                                            'label' => 'Invoice Amount',
                                             'name' => 'po_amount',
                                             'type' => 'number',
-                                            'placeholder' => 'Enter PO Amount',
+                                            'placeholder' => 'Enter Invoice Amount',
                                         ])
                                     </div>  
 
                                     <div class="col-4">     
                                         @include('components.form.input', [
-                                            'label' => 'PO Amount Paid',    
+                                            'label' => 'Invoice Amount Paid',
                                             'name' => 'po_amount_paid',
                                             'type' => 'number',
-                                            'placeholder' => 'Enter PO Amount Paid',
+                                            'placeholder' => 'Enter Invoice Amount Paid',
                                         ])
                                     </div>  
 
@@ -117,7 +119,7 @@
 
                                     <div class="col-4">     
                                         @include('components.form.select', [
-                                            'label' => 'PO Status',
+                                            'label' => 'Invoice Status',
                                             'name' => 'po_status',          
                                             'options' => [
                                                 'pending' => 'Pending',

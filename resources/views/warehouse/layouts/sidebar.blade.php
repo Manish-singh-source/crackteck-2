@@ -48,7 +48,7 @@
                 <li>
                     <a class='tp-link' href="{{ route('vendor.index') }}">
                         <i class="fas fa-file-invoice-dollar"></i>
-                        <span class="ps-1"> Vendor Purchase Bills </span>
+                        <span class="ps-1"> Vendor Invoices </span>
                     </a>
                 </li>
 
@@ -58,6 +58,12 @@
                     <a class='tp-link' href="{{ route('products.index') }}">
                         <i class="fas fa-list"></i>
                         <span class="ps-1">Product List</span>
+                    </a>
+                </li>
+                <li>
+                    <a class='tp-link' href="{{ route('opening-stock.create') }}">
+                        <i class="fas fa-file-import"></i>
+                        <span class="ps-1"> Opening Stock Import </span>
                     </a>
                 </li>
                 <li>

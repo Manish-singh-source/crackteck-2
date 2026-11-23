@@ -34,6 +34,16 @@
                                         <div class="row g-3">
                                             <div class="col-4">
                                                 @include('components.form.input', [
+                                                    'label' => 'Company Name',
+                                                    'name' => 'company_name',
+                                                    'type' => 'text',
+                                                    'placeholder' => 'Enter Company Name',
+                                                    'model' => $vendor,
+                                                ])
+                                            </div>
+
+                                            <div class="col-4">
+                                                @include('components.form.input', [
                                                     'label' => 'First Name',
                                                     'name' => 'first_name',
                                                     'type' => 'text',

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateVendorPurchaseOrderRequest extends FormRequest
 {
@@ -21,10 +22,17 @@ class UpdateVendorPurchaseOrderRequest extends FormRequest
      */
     public function rules(): array
     {
+        $invoiceId = $this->route('id');
+
         return [
             'vendor_id' => 'required|exists:vendors,id',
-            'po_number' => 'required|string|max:100',
-            'invoice_number' => 'required|string|max:100',
+            'po_number' => 'nullable|string|max:100',
+            'invoice_number' => [
+                'required', 'string', 'max:100',
+                Rule::unique('vendor_purchase_orders', 'invoice_number')
+                    ->where(fn ($query) => $query->where('vendor_id', $this->input('vendor_id')))
+                    ->ignore($invoiceId),
+            ],
             'invoice_pdf' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
             'purchase_date' => 'required|date',
             'po_amount_due_date' => 'required|date',

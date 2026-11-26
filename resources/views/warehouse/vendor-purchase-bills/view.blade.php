@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <div class="py-3 d-flex align-items-sm-center flex-sm-row flex-column">
             <div class="flex-grow-1">
-                <h4 class="fs-18 fw-semibold m-0">Vendor Purchase Bill Details</h4>
+                <h4 class="fs-18 fw-semibold m-0">Vendor Invoice Details</h4>
             </div>
             <div>
                 <a href="{{ route('vendor.index') }}" class="btn btn-secondary">Back to List</a>
@@ -20,8 +20,8 @@
                 <div class="card">
                     <div class="card-header border-bottom-dashed">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">Purchase Bill Details</h5>
-                            <div class="fw-bold text-dark">Bill No: {{ $vendorPurchaseBill->po_number ?? 'N/A' }}</div>
+                            <h5 class="card-title mb-0">Vendor Invoice Details</h5>
+                            <div class="fw-bold text-dark">Invoice No: {{ $vendorPurchaseBill->invoice_number }}</div>
                         </div>
                     </div>
 
@@ -38,7 +38,7 @@
                                     </li>   
 
                                     <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                        <span class="fw-semibold">Purchase Bill No:</span>
+                                        <span class="fw-semibold">PO Number:</span>
                                         <span>{{ $vendorPurchaseBill->po_number ?? 'N/A' }}</span>
                                     </li>
 
@@ -72,12 +72,12 @@
 
 
                                     <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                        <span class="fw-semibold">PO Amount Paid:</span>
+                                        <span class="fw-semibold">Invoice Amount Paid:</span>
                                         <span>{{ $vendorPurchaseBill->po_amount_paid ?? 'N/A' }}</span>
                                     </li>
 
                                     <li class="list-group-item border-0 d-flex align-items-center gap-2 flex-wrap">
-                                        <span class="fw-semibold">PO Amount Pending:</span> 
+                                        <span class="fw-semibold">Invoice Amount Pending:</span>
                                         <span>{{ $vendorPurchaseBill->po_amount_pending ?? 'N/A' }}</span>
                                     </li>
 

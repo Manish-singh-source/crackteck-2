@@ -51,7 +51,8 @@ class ProductListController extends Controller
         $vendors = Vendor::selectRaw(
             "id, CONCAT(vendor_code, ' - ', first_name, ' ', last_name) AS name"
         )->where('status', 'active')->pluck('name', 'id');
-        $vendorPurchaseOrders = VendorPurchaseOrder::where('po_status', 'approved')->pluck('po_number', 'id');
+        $vendorPurchaseOrders = VendorPurchaseOrder::orderBy('invoice_number')
+            ->pluck('invoice_number', 'id');
         $brands = Brand::where('status', 'active')->pluck('name', 'id');
         $parentCategories = ParentCategory::where('status', 'active')->pluck('name', 'id');
         // $subCategories = SubCategory::pluck('name', 'id');
@@ -164,6 +165,24 @@ class ProductListController extends Controller
     }
 
     /**
+     * Render one printable barcode label per selected serial.
+     */
+    public function printBarcodes(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+        $serialIds = array_filter((array) $request->input('serial_ids', []));
+
+        $serials = $product->productSerials()
+            ->whereNotNull('barcode_url')
+            ->when($serialIds, fn ($query) => $query->whereIn('id', $serialIds))
+            ->get();
+
+        abort_if($serials->isEmpty(), 404, 'No printable barcodes were found for this product.');
+
+        return view('warehouse.product-list.barcode-print', compact('product', 'serials'));
+    }
+
+    /**
      * Edit product
      *
      * @param  int  $id
@@ -177,8 +196,8 @@ class ProductListController extends Controller
             "id, CONCAT(vendor_code, ' - ', first_name, ' ', last_name) AS name"
         )->where('status', 'active')->pluck('name', 'id');
         $vendorPurchaseOrders = VendorPurchaseOrder::where('vendor_id', $product->vendor_id)
-            ->where('po_status', 'approved')
-            ->pluck('po_number', 'id');
+            ->orderBy('invoice_number')
+            ->pluck('invoice_number', 'id');
         $brands = Brand::where('status', 'active')->pluck('name', 'id');
         $parentCategories = ParentCategory::where('status', 'active')->pluck('name', 'id');
         $subCategories = SubCategory::where('status', 'active')->where('parent_category_id', $product->parent_category_id)->pluck('name', 'id');
@@ -238,6 +257,7 @@ class ProductListController extends Controller
             }
 
             $product->update($data);
+            $this->ensureProductSerials($product->fresh());
 
             DB::commit();
 
@@ -560,7 +580,9 @@ class ProductListController extends Controller
             return response()->json([]);
         }
 
-        $vendorPurchaseOrders = VendorPurchaseOrder::where('po_status', 'approved')->where('vendor_id', $vendorId)->pluck('po_number', 'id');
+        $vendorPurchaseOrders = VendorPurchaseOrder::where('vendor_id', $vendorId)
+            ->orderBy('invoice_number')
+            ->pluck('invoice_number', 'id');
 
         return response()->json($vendorPurchaseOrders);
     }

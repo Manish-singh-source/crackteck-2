@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LowStockController;
+use App\Http\Controllers\OpeningStockImportController;
 use App\Http\Controllers\ProductListController;
 use App\Http\Controllers\SparePartController;
 use App\Http\Controllers\StockReportController;
@@ -114,6 +115,14 @@ Route::prefix('demo/warehouse')->group(function () {
 
         Route::get('/get-vendor-purchase-orders-by-vendor', 'getVendorPurchaseOrdersByVendor')->name('product-list.get-vendor-purchase-orders-by-vendor');
         Route::get('/get-sub-categories', 'getSubCategories')->name('product-list.get-sub-categories');
+        // Print selected/all generated barcode labels for a product.
+        Route::get('/product-list/{id}/print-barcodes', 'printBarcodes')->name('product-list.print-barcodes');
+    });
+
+    Route::controller(OpeningStockImportController::class)->group(function () {
+        Route::get('/opening-stock/import', 'create')->name('opening-stock.create');
+        Route::get('/opening-stock/template', 'downloadTemplate')->name('opening-stock.template');
+        Route::post('/opening-stock/import', 'store')->name('opening-stock.store');
     });
 
     Route::get('/warehouse-dependent', [WarehouseRackController::class, 'getDependentData']);

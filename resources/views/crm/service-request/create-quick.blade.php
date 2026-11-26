@@ -527,7 +527,7 @@
                     <div class="col-xl-4 col-lg-6">
                         <div>
                             <label class="form-label">Product Brand</label>
-                            <input type="text" name="products[0][product_brand]" class="form-control"
+                            <input type="text" name="products[${productIndex}][product_brand]" class="form-control"
                                                     placeholder="Dell" required>
                         </div>
                     </div>

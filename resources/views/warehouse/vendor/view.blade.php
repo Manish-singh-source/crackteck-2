@@ -26,6 +26,11 @@
                             <ul class="list-group list-group-flush">
                                 <li
                                     class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                    <span class="fw-semibold text-break">Company Name :</span>
+                                    <span>{{ $vendor->company_name ?? 'N/A' }}</span>
+                                </li>
+                                <li
+                                    class="list-group-item d-flex align-items-center justify-content-between gap-3 flex-wrap">
                                     <span class="fw-semibold text-break">First Name :</span>
                                     <span>{{ $vendor->first_name ?? 'N/A' }}</span>
                                 </li>

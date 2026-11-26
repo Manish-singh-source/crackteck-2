@@ -60,6 +60,7 @@
                                                             <tr>
                                                                 <th>Sr. No.</th>
                                                                 <th>Vendor Code</th>
+                                                                 <th>Company Name</th>
                                                                 <th>First Name</th>
                                                                 <th>Last Name</th>
                                                                 <th>Phone</th>
@@ -75,6 +76,7 @@
                                                                 <tr>
                                                                     <td>{{ $loop->iteration }}</td>
                                                                     <td>{{ $vendor->vendor_code ?? 'N/A' }}</td>
+                                                                     <td>{{ $vendor->company_name ?? 'N/A' }}</td>
                                                                     <td>{{ $vendor->first_name ?? 'N/A' }}</td>
                                                                     <td>{{ $vendor->last_name ?? 'N/A' }}</td>
                                                                     <td>{{ $vendor->phone ?? 'N/A' }}</td>

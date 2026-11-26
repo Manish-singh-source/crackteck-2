@@ -62,11 +62,12 @@
                                             <div class="col-xl-6 col-lg-6">
                                                 <div>
                                                     @include('components.form.select', [
-                                                        'label' => 'Vendor PO Number',
+                                                        'label' => 'Vendor Invoice Number',
                                                         'name' => 'vendor_purchase_order_id',
                                                         'id' => 'vendor_purchase_order_id',
+                                                        'required' => true,
                                                         'options' =>
-                                                            ['' => '--Select Vendor PO Number--'] +
+                                                            ['' => '--Select Vendor Invoice Number--'] +
                                                             $vendorPurchaseOrders->toArray(),
                                                         'model' => $product,
                                                     ])

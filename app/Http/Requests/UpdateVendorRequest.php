@@ -25,6 +25,7 @@ class UpdateVendorRequest extends FormRequest
         $vendorId = $this->route('id'); // assuming your route has {id}
 
         return [
+            'company_name' => 'nullable|string|max:255',
             'first_name' => 'required|min:3',
             'last_name' => 'required|min:3',
             'phone' => 'required|digits:10',

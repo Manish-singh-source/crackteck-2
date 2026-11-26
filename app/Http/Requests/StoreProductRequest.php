@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\VendorPurchaseOrder;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProductRequest extends FormRequest
@@ -34,7 +35,7 @@ class StoreProductRequest extends FormRequest
             'sku' => 'required|string|max:100|unique:products,sku',
             'model_no' => 'required|string|max:100',
 
-            'short_description' => 'required|string',
+            'short_description' => 'nullable|string',
             'full_description' => 'nullable|string',
             'technical_specification' => 'nullable|string',
             'brand_warranty' => 'nullable|string|max:255',
@@ -55,7 +56,7 @@ class StoreProductRequest extends FormRequest
             'stock_quantity' => 'required|integer|min:0',
             'stock_status' => 'required|in:in_stock,out_of_stock,low_stock,scrap',
 
-            'main_product_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'main_product_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'additional_product_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'datasheet_manual' => 'nullable|mimes:pdf|max:10240',
 
@@ -73,8 +74,8 @@ class StoreProductRequest extends FormRequest
         return [
             'vendor_id.required' => 'Vendor is required.',
             'vendor_id.exists' => 'Selected vendor is invalid.',
-            'vendor_purchase_order_id.required' => 'Vendor PO Number is required.',
-            'vendor_purchase_order_id.exists' => 'Selected Vendor PO Number is invalid.',
+            'vendor_purchase_order_id.required' => 'Vendor Invoice Number is required.',
+            'vendor_purchase_order_id.exists' => 'Selected Vendor Invoice Number is invalid.',
             'brand_id.required' => 'Brand is required.',
             'brand_id.exists' => 'Selected brand is invalid.',
             'parent_category_id.required' => 'Parent category is required.',
@@ -91,7 +92,6 @@ class StoreProductRequest extends FormRequest
             'sku.max' => 'SKU may not be greater than 100 characters.',
             'model_no.required' => 'Model number is required.',
             'model_no.max' => 'Model number may not be greater than 100 characters.',
-            'short_description.required' => 'Short description is required.',
             'full_description.string' => 'Full description must be valid text.',
             'technical_specification.string' => 'Technical specification must be valid text.',
             'brand_warranty.max' => 'Brand warranty may not be greater than 255 characters.',
@@ -122,7 +122,6 @@ class StoreProductRequest extends FormRequest
             'stock_quantity.min' => 'Stock quantity must be at least 0.',
             'stock_status.required' => 'Stock status is required.',
             'stock_status.in' => 'Stock status must be a valid option.',
-            'main_product_image.required' => 'Main product image is required.',
             'main_product_image.image' => 'Main product image must be an image file.',
             'main_product_image.mimes' => 'Main product image must be a JPEG, PNG, JPG, or GIF file.',
             'main_product_image.max' => 'Main product image must not be larger than 2MB.',
@@ -134,5 +133,15 @@ class StoreProductRequest extends FormRequest
             'status.required' => 'Product status is required.',
             'status.in' => 'Product status must be active or inactive.',
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            if ($this->filled('vendor_purchase_order_id') && ! VendorPurchaseOrder::whereKey($this->vendor_purchase_order_id)
+                ->where('vendor_id', $this->vendor_id)->exists()) {
+                $validator->errors()->add('vendor_purchase_order_id', 'Selected Vendor Invoice does not belong to the selected vendor.');
+            }
+        });
     }
 }

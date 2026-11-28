@@ -46,14 +46,27 @@ class ServiceRequestController extends Controller
 {
     public function generateServiceId()
     {
-        $year = date('Y');
-        $lastService = ServiceRequest::whereYear('created_at', $year)
-            ->orderBy('id', 'desc')
+        $year = now()->year;
+        $prefix = 'SRV-' . $year . '-';
+
+        /*
+         * Do not use the most recently inserted row here. Imports or manual
+         * inserts can leave the latest row with a lower sequence number while
+         * a higher request ID already exists. Locking the matching ID range is
+         * safe because all service-request stores call this inside a database
+         * transaction, preventing two submissions from receiving one ID.
+         */
+        $lastService = ServiceRequest::where('request_id', 'like', $prefix . '%')
+            ->lockForUpdate()
+            ->get()
+            ->sortByDesc(fn (ServiceRequest $serviceRequest) => intval(substr($serviceRequest->request_id, strlen($prefix))))
             ->first();
 
-        $nextNumber = $lastService ? (intval(substr($lastService->request_id, -4)) + 1) : 1;
+        $nextNumber = $lastService
+            ? intval(substr($lastService->request_id, strlen($prefix))) + 1
+            : 1;
 
-        return 'SRV-' . $year . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     //

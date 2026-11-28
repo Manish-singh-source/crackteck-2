@@ -69,7 +69,7 @@ class CustomerController extends Controller
                 'profile' => $profile ?? null,
                 'status' => $validated['status'] ?? 'active',
                 'is_lead' => $validated['is_lead'] ?? 0,
-                'password' => '123456789'
+                'password' => $validated['password'] ?? '123456789'
             ]);
 
             // Handle files

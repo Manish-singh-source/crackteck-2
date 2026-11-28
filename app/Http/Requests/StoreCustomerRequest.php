@@ -27,6 +27,12 @@ class StoreCustomerRequest extends FormRequest
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|unique:customers,email',
+            // CRM-created customers must receive credentials for email/password login.
+            // Keep this optional for the separate e-commerce customer form, which does
+            // not currently collect a password.
+            'password' => $this->routeIs('customer.store')
+                ? 'required|string|min:8|confirmed'
+                : 'nullable|string|min:8|confirmed',
             'dob' => 'nullable|date|before:' . now()->subYears(18)->format('Y-m-d'),
             'gender' => 'nullable|in:male,female,other',
             'customer_type' => 'nullable|in:ecommerce,amc,both,offline',
@@ -82,6 +88,9 @@ class StoreCustomerRequest extends FormRequest
             'email.required' => 'Email is required.',
             'email.email' => 'Email must be a valid email address.',
             'email.unique' => 'Email has already been taken.',
+            'password.required' => 'A password is required for customer login.',
+            'password.min' => 'Password must be at least 8 characters long.',
+            'password.confirmed' => 'Password confirmation does not match.',
             'dob.before' => 'The user must be at least 18 years old.',
             'source_type.required' => 'Source type is required.',
 

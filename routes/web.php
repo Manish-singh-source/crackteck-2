@@ -94,6 +94,7 @@ Route::prefix('password')->name('password.')->group(function () {
 // Public admin-panel legal pages
 Route::view('/admin/privacy-policy', 'admin.privacy-policy')->name('admin.privacy-policy');
 Route::view('/admin/terms-and-conditions', 'admin.terms-and-conditions')->name('admin.terms-and-conditions');
+Route::view('/admin/delete-account', 'admin.delete-account')->name('admin.delete-account');
 Route::controller(AuthController::class)->group(function () {
     Route::get('/admin/login', 'login')->name('login');
     Route::post('/admin/login', 'loginStore')->name('loginStore');

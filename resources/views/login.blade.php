@@ -189,6 +189,7 @@
                                                 <p class="mt-3 mb-0 fs-13">
                                                     <a class="text-muted me-3" href="{{ route('admin.privacy-policy') }}">Privacy Policy</a>
                                                     <a class="text-muted" href="{{ route('admin.terms-and-conditions') }}">Terms &amp; Conditions</a>
+                                                    <a class="text-muted ms-3" href="{{ route('admin.delete-account') }}">Delete Account</a>
                                                 </p>
                                             </div>
 

@@ -96,6 +96,42 @@
                                             </div>
 
                                             <div class="col-6">
+                                                <label for="password" class="form-label">Login Password <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                                        name="password" id="password" required
+                                                        placeholder="Set customer login password"
+                                                        value="{{ old('password', '123456789') }}"
+                                                        autocomplete="new-password">
+                                                    <button class="btn btn-light border toggle-customer-password" type="button"
+                                                        data-target="password" aria-label="Show password">
+                                                        <i class="mdi mdi-eye-outline"></i>
+                                                    </button>
+                                                </div>
+                                                @error('password')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <div class="col-6">
+                                                <label for="password_confirmation" class="form-label">Confirm Login Password <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror"
+                                                        name="password_confirmation" id="password_confirmation" required
+                                                        placeholder="Confirm customer login password"
+                                                        value="{{ old('password_confirmation', '123456789') }}"
+                                                        autocomplete="new-password">
+                                                    <button class="btn btn-light border toggle-customer-password" type="button"
+                                                        data-target="password_confirmation" aria-label="Show password">
+                                                        <i class="mdi mdi-eye-outline"></i>
+                                                    </button>
+                                                </div>
+                                                @error('password_confirmation')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <div class="col-6">
                                                 @include('components.form.input', [
                                                     'label' => 'Date of Birth',
                                                     'name' => 'dob',
@@ -487,6 +523,18 @@
 
     <script>
         $(document).ready(function() {
+            $(document).on('click', '.toggle-customer-password', function() {
+                const button = $(this);
+                const input = $('#' + button.data('target'));
+                const icon = button.find('i');
+                const isHidden = input.attr('type') === 'password';
+
+                input.attr('type', isHidden ? 'text' : 'password');
+                icon.toggleClass('mdi-eye-outline', !isHidden);
+                icon.toggleClass('mdi-eye-off-outline', isHidden);
+                button.attr('aria-label', isHidden ? 'Hide password' : 'Show password');
+            });
+
             let branchIndex = 1; // Start from 1 since we already have branch 0
 
             // Add new branch
